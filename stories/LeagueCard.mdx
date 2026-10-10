@@ -64,8 +64,8 @@ Die Karte zeigt nie die ganze Tabelle. Die Regel steht in der reinen Funktion `l
     ['Eigene Mannschaft auf Platz 1, 2 oder 3', 'Plätze 1 bis 4'],
     ['Eigene Mannschaft auf Platz 7', 'Plätze 5 bis 8'],
     ['Eigene Mannschaft auf Platz 12', 'Plätze 9 bis 12'],
-    ['Keine eigene Mannschaft', 'Plätze 1 bis 3 (`limit` ändert die Zahl)'],
-    ['Nicht mehr Teams als Zeilen (vier mit eigener Mannschaft, `limit` ohne)', 'alle'],
+    ['Keine eigene Mannschaft', 'Plätze 1 bis 3 (limit ändert die Zahl)'],
+    ['Nicht mehr Teams als Zeilen (vier mit eigener Mannschaft, limit ohne)', 'alle'],
   ]}
 />
 
@@ -99,16 +99,36 @@ Jedes Team kann eine `zone` tragen: `up` (Aufstieg), `playoff` (Relegation) oder
 
 ### Messwerte
 
+Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel; die Zeilen enthalten die 1 px Trennlinie).
+
 <DocTable
   label="Maße der Ligencard (gemessen im Browser)"
   head={['Maß', 'standard', 'compact']}
   rows={[
-    ['Zeilenhöhe', '60 px', '40 px'],
-    ['Höhe der Kopfzeile der Tabelle', '38 px', '38 px'],
+    ['Zeilenhöhe', '60 px (gemessen 60,5 bis 61)', '40 px (gemessen 40,5 bis 41)'],
+    ['Höhe der Kopfzeile der Tabelle', '38 px (gemessen 38,5)', '38 px'],
     ['Logo / Initialen', '28 px', '20 px'],
+    ['Titel', '20 px, Gewicht 700 (Token --dss-card-title-size, Rückfall fs-h3)', '18 px (Rückfall fs-body-lg)'],
     ['Radius der Karte', '16 px', '12 px'],
     ['Abstand des Kopfs', '20 px 24 px 16 px (Handy 16 px)', '14 px 16 px 10 px'],
     ['Höhe des Fuß-Links', '48 px', '44 px'],
+    ['Höhe des Live-Tags', '26 px', '26 px'],
+    ['Spaltenbreiten bei 615 px Kartenbreite, alle Spalten', '# 41, Mannschaft 236, SP 46, S 37, N 37, Diff 58, PKT 50, Form 108 px', ''],
+  ]}
+/>
+
+<DocTable
+  label="Kontraste der Ligencard (gemessen)"
+  head={['Text oder Fläche', 'Verhältnis', 'Anforderung']}
+  rows={[
+    ['Titel, Name, Rang, PKT auf der Karte', '19,9 bis 21,0:1', 'mindestens 7:1'],
+    ['Untertitel (--dss-mute)', '7,7 bis 8,5:1', 'mindestens 7:1'],
+    ['Kopfzeile der Tabelle (Mono, Großbuchstaben)', '7,4 bis 7,7:1', 'mindestens 7:1'],
+    ['Diff plus und minus, auch auf der eigenen Zeile', '8,4 bis 13,7:1', 'mindestens 7:1'],
+    ['Live-Tag (Wort, Zahl und Punkt auf der Chip-Fläche)', '7,6 bis 8,8:1', 'Text mindestens 7:1, Punkt 3:1'],
+    ['Fuß-Link', '11,6 bis 15,9:1', 'mindestens 7:1'],
+    ['Zonenstreifen, Legende und Form-Punkte', '8,5 bis 14,5:1', 'mindestens 3:1'],
+    ['Fokus-Ring (gestrichelt, 3 px)', '3,6 bis 4,1:1', 'mindestens 3:1'],
   ]}
 />
 
@@ -169,12 +189,12 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Oberliga Nordhain M
   rows={[
     ['rank', 'number', 'Platz (ganze Zahl ab 1); die Karte sortiert danach. Pflicht.'],
     ['name', 'string', 'Name der Mannschaft. Pflicht.'],
-    ['short, logo, href', 'string', 'Kurzname, Logo-URL und Link des Teams, wie bei `ScheduleTeam`. Mit `href` ist der Name ein Link.'],
+    ['short, logo, href', 'string', 'Kurzname, Logo-URL und Link des Teams, wie bei ScheduleTeam. Mit href ist der Name ein Link.'],
     ['played', 'number', 'Spiele gespielt (SP). Pflicht; ist der Wert keine Zahl, bleibt die Zelle leer.'],
     ['points', 'number', 'Punkte (PKT). Pflicht.'],
-    ['won, lost', 'number', 'Siege und Niederlagen, nur mit den Spalten `won` bzw. `lost`.'],
-    ['diff', 'number', 'Korbdifferenz, positiv oder negativ; nur mit der Spalte `diff`.'],
-    ['form', "('S' | 'N' | 'U')[]", 'Letzte Spiele, neueste zuletzt; angezeigt werden höchstens fünf. Nur mit der Spalte `form`.'],
+    ['won, lost', 'number', 'Siege und Niederlagen, nur mit den Spalten won bzw. lost.'],
+    ['diff', 'number', 'Korbdifferenz, positiv oder negativ; nur mit der Spalte diff.'],
+    ['form', "('S' | 'N' | 'U')[]", 'Letzte Spiele, neueste zuletzt; angezeigt werden höchstens fünf. Nur mit der Spalte form.'],
     ['own', 'boolean', 'Eigene Mannschaft: hervorgehoben (Balken links, Hintergrund, versteckter Text „eigene Mannschaft“) und Mitte des Ausschnitts.'],
     ['zone', "'up' | 'playoff' | 'down'", 'Aufstieg, Relegation, Abstieg: Streifen, versteckter Text und Legende.'],
   ]}
