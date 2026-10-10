@@ -33,13 +33,15 @@ svelte/
   MatchCard.svelte      ← v0.9 · Spielkarte (CSS in css/components.css)
   PlayerCard.svelte     ← v0.9 · Spielerkarte, optional mit Foto (CSS in css/components.css)
   TeamCard.svelte       ← Mannschaftskarte (CSS in css/components.css)
+  LeagueCard.svelte     ← Ligencard: Mini-Tabelle mit Ausschnitt (CSS in css/components.css)
   PlayByPlay.svelte     ← v0.9 · Spielverlauf-Feed (CSS in css/components.css)
   CourtLines.svelte     ← v0.9 · Spielfeldlinien-Seitenhintergrund
-react/                  ← v0.9 · React-Fassung aller Svelte-Komponenten (Button, TextInput, Select, Modal, Banner, Card, Tabs, Icon, Checkbox, Table, TopBar, EmptyState, Stepper, AppNav, BottomNav, Breadcrumbs, Skeleton, MatchCard, PlayerCard, TeamCard, PlayByPlay, CourtLines)
+react/                  ← v0.9 · React-Fassung aller Svelte-Komponenten (Button, TextInput, Select, Modal, Banner, Card, Tabs, Icon, Checkbox, Table, TopBar, EmptyState, Stepper, AppNav, BottomNav, Breadcrumbs, Skeleton, MatchCard, PlayerCard, TeamCard, LeagueCard, PlayByPlay, CourtLines)
 js/
   appnav.js             ← v0.8 · Vanilla-Verhalten der AppNav
   periods.js            ← Spielabschnitte: „3. Viertel“, „5. Achtel“, „Verlängerung“ (`./periods.js`)
   team.js               ← Hilfsfunktionen der TeamCard (`./team.js`)
+  league.js             ← Ausschnitt, Untertitel, Form und Zonen der LeagueCard (`./league.js`)
   heading.js            ← Überschriftenebenen: `headingTag`, `nextLevel` (`./heading.js`)
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
@@ -133,7 +135,7 @@ npm install github:OliEder/dss-design-system#v0.9.0 react react-dom @radix-ui/re
 ```tsx
 import '@bbv/dss-design-system/tokens.css';
 import '@bbv/dss-design-system/components.css';
-import { Button, TextInput, Select, Modal, Banner, AppNav, Checkbox, Table, BottomNav, Breadcrumbs, MatchCard, PlayerCard, TeamCard, CourtLines } from '@bbv/dss-design-system/react';
+import { Button, TextInput, Select, Modal, Banner, AppNav, Checkbox, Table, BottomNav, Breadcrumbs, MatchCard, PlayerCard, TeamCard, LeagueCard, CourtLines } from '@bbv/dss-design-system/react';
 
 <Button variant="amber">Speichern</Button>
 <TextInput label="Name" required />
@@ -353,15 +355,17 @@ Zuordnung Turnier-Manager: `Game` wird zu `ScheduleGame` mit `nr: '#' + gameNumb
 - **`PlayerCard`** in drei Größen (`compact`, `standard`, `hero`); mit `photo` (URL) zeigt sie ein Foto statt der Trikotmarke (die Trikotnummer bleibt als Badge). `photoAlt` ist standardmäßig leer: das Foto ist dekorativ, weil der Name danebensteht. Ohne `photo`, mit leerem `photo` oder bei Ladefehler erscheint die Trikotmarke. **Datenschutz:** Fotos von Minderjährigen nur mit Einwilligung der Erziehungsberechtigten verwenden. Die Demo-Fotos in Storybook stammen von Unsplash (`stories/assets/players/CREDITS.md`), zeigen reale Personen und gehören nicht zum npm-Paket. Die Unsplash-Lizenz enthält kein Model Release (keine Einwilligung der abgebildeten Personen); die Demo-Fotos sind nur für Demonstrationen im Storybook gedacht und nicht für eigene Produkte oder mit Bezug zu echten Personen zu übernehmen.
 - **`MatchCard`** zeigt den Spielabschnitt mit `period` (ab 1) und `periods` (`4` Viertel, Standard, oder `8` Achtel): „3. Viertel“, „5. Achtel“, darüber „Verlängerung“, „2. Verlängerung“. `PlayByPlay` nimmt `period` je Ereignis und `periods` an der Komponente (Chip „V3“, „A5“, „VL“; Screenreader lesen den vollen Text). `quarter` ist veraltet und wird ohne `period` unverändert angezeigt.
 - **`TeamCard`**: Mannschaft mit Logo, Liga, Bilanz, Tabellenplatz, nächstem und letztem Spiel, Kader und optionaler Saison-Statistik (`stats`: nur übergebene Felder). Alles außer `name` ist optional; `size="compact"` ist die Listenzeile; mit `href` oder `onclick` ist die Karte klickbar.
+- **`LeagueCard`** (Ligencard): Mini-Tabelle einer Liga in einer Karte mit Titel, Untertitel („12 Teams · 66 von 132 Spielen gespielt“), `#`, `Mannschaft`, `SP`, `PKT` und einem Link zur kompletten Tabelle. Sie zeigt nur einen **Ausschnitt**: mit einer eigenen Mannschaft (`own: true`) zwei Teams davor, die eigene und eins dahinter, sonst die ersten `limit` (Standard 3). `columns` schaltet `won`, `lost`, `diff` (Korbdifferenz) und `form` zu (bis 640 px aus); `zone` (`up`, `playoff`, `down`) markiert Auf- und Abstieg mit Streifen, Text und Legende; `live` zeigt „Live“ (mit Zahl „2 Spiele laufen“); `logos` und `names="short"` wie im Spielplan; `size="compact"` für Seitenleisten; `titleAs` wählt die Überschriftenebene. Die Regeln liegen als reine Funktionen in `league.js`.
 
 ```tsx
 <TeamCard name="TSV Nordhain 1920" short="Nordhain" league="Bayernliga Süd" record={{ w: 12, l: 3 }} rank={3} rankOf={12} href="/teams/nordhain" />
+<LeagueCard title="Oberliga Nordhain Männer" teams={teams} teamCount={12} played={66} total={132} columns={['diff', 'form']} href="/liga/tabelle" />
 <MatchCard state="live" period={5} periods={8} clock="03:10" heim={{ name: 'TSV Nordhain', score: 24 }} gast={{ name: 'Lindenberg Hawks', score: 22 }} />
 ```
 
 ## Überschriften
 
-Komponenten mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamCard, EmptyState, PlayByPlay, Modal) geben nie eine `h1` aus; die gehört der App. Die **Ebene** (`h2` bis `h6`) wählst du mit `titleAs` an der Komponente oder für einen ganzen Abschnitt mit `HeadingLevel` (React: `@bbv/dss-design-system/react`, Svelte: `@bbv/dss-design-system/svelte/HeadingLevel`). Rangfolge: `titleAs` vor `HeadingLevel` vor dem Standard `h3`. Das Modal hat `titleAs` (Standard `h2`) und gibt seinem Inhalt die nächste Ebene weiter. In Vanilla-HTML schreibst du das Element selbst. Die **Größe** hängt nie an der Ebene, sondern an Tokens: `--dss-title-size`, `--dss-title-weight`, `--dss-title-leading`, `--dss-frame-title-size` (Tabellen, Spielplan, PlayByPlay) und `--dss-card-title-size` (Karten, EmptyState); ohne Wert gelten die bisherigen Größen.
+Komponenten mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamCard, LeagueCard, EmptyState, PlayByPlay, Modal) geben nie eine `h1` aus; die gehört der App. Die **Ebene** (`h2` bis `h6`) wählst du mit `titleAs` an der Komponente oder für einen ganzen Abschnitt mit `HeadingLevel` (React: `@bbv/dss-design-system/react`, Svelte: `@bbv/dss-design-system/svelte/HeadingLevel`). Rangfolge: `titleAs` vor `HeadingLevel` vor dem Standard `h3`. Das Modal hat `titleAs` (Standard `h2`) und gibt seinem Inhalt die nächste Ebene weiter. In Vanilla-HTML schreibst du das Element selbst. Die **Größe** hängt nie an der Ebene, sondern an Tokens: `--dss-title-size`, `--dss-title-weight`, `--dss-title-leading`, `--dss-frame-title-size` (Tabellen, Spielplan, PlayByPlay) und `--dss-card-title-size` (Karten, EmptyState); ohne Wert gelten die bisherigen Größen.
 
 ```tsx
 <h1>Mannschaft</h1>
@@ -431,7 +435,7 @@ Was drin ist:
 
 - **Introduction** (Startseite): Überblick, Werkzeugleiste, Inhaltsverzeichnis aller Seiten
 - **Foundation:** Colors, Typography, Focus & Hover
-- **Components:** je eine MDX-Seite pro Komponente oder Komponentengruppe (Button, TextInput, Select, Checkbox, Modal, Banner, Card, Card Library, TeamCard, Tabs, Navigation, AppNav, Table, Spielplan, EmptyState, PlayByPlay, Icon, CourtLines) und die Spielwiese zum Spielplan
+- **Components:** je eine MDX-Seite pro Komponente oder Komponentengruppe (Button, TextInput, Select, Checkbox, Modal, Banner, Card, Card Library, TeamCard, LeagueCard, Tabs, Navigation, AppNav, Table, Spielplan, EmptyState, PlayByPlay, Icon, CourtLines) und die Spielwiese zum Spielplan
 
 Die Werkzeugleiste schaltet **Marke** (BBV/DBB), **Schrift**, Hell/Dunkel, **Fassung** (Vanilla, Svelte oder React für alle
 Code-Beispiele) und **Zustand** (erzwingt Hover, Fokus oder Aktiv auf den Vorschauen der Seite) um.
