@@ -39,6 +39,9 @@ const normalize = (html: string) =>
     .replace(/<(img|br)([^>]*?)\/?>/g, '<$1$2>')
     .trim();
 
+const titles = (html: string) => [...html.matchAll(/<h[2-6] class="dss-league-title">([^<]*)</g)].map((m) => m[1]);
+/** Zeilen im tbody je Karte */
+const rowCounts = (html: string) => html.split('<table').slice(1).map((part) => ((part.split('<tbody')[1] ?? '').split('</tbody>')[0].match(/<tr/g) ?? []).length);
 const SVELTE = { svelte: league.svelte, ebeneSvelte: league.ebeneSvelte };
 const REACT = { react: league.react, ebeneReact: league.ebeneReact };
 
@@ -51,6 +54,20 @@ describe('Svelte-Code-Beispiele rendern (SSR)', () => {
     expect(html.length).toBeGreaterThan(100);
     expect(html).not.toContain('undefined');
     expect(html).toContain('dss-league');
+    if (name === 'svelte') {
+      // drei Karten: eigene Mannschaft auf Platz 3 (vier Zeilen), compact (ebenfalls vier), ohne eigene Mannschaft mit limit 5
+      expect(titles(html)).toEqual(['Oberliga Nordhain Männer', 'Oberliga Nordhain Männer', 'Oberliga Nordhain Männer']);
+      expect(rowCounts(html)).toEqual([4, 4, 5]);
+      expect(html).toContain('Korbdifferenz');
+      expect(html).toContain('12 Teams · 66 von 132 Spielen gespielt');
+      expect(html).toContain('2 Spiele laufen');
+    } else {
+      expect(titles(html)).toEqual(['Oberliga Nordhain Männer', 'Kreisliga Süd']);
+      expect(html).toMatch(/<h2[^>]*>Tabellen<\/h2>/);
+      // HeadingLevel level=4 gilt für die erste Karte, titleAs h5 gewinnt für die zweite
+      expect(html).toMatch(/<h4 class="dss-league-title">Oberliga Nordhain Männer/);
+      expect(html).toMatch(/<h5 class="dss-league-title">Kreisliga Süd/);
+    }
   });
 });
 
@@ -115,31 +132,89 @@ describe('Vanilla-Beispiel der Ligencard entspricht der Komponente', () => {
   });
 });
 
-describe('Funktionen aus league.js: das Beispiel läuft und liefert die kommentierten Werte', () => {
-  it('Importzeile ersetzt, Ausführung ohne Fehler', async () => {
+describe('Funktionen aus league.js: die Aufrufe im Beispiel werden ausgewertet und liefern die kommentierten Werte', () => {
+  // [Aufruf wie im Beispiel, erwartetes Ergebnis, Kommentartext hinter dem Aufruf]
+  const CALLS: [string, unknown, string][] = [
+    ['leagueWindow(teams).map((t) => t.rank)', [1, 2, 3, 4], 'Plätze 1 bis 4'],
+    ['leagueWindow(teams, { limit: 2 }).map((t) => t.rank)', [1, 2, 3, 4], 'wegen der eigenen Mannschaft trotzdem vier Zeilen'],
+    ["leagueWindow(teams.map(({ own, ...team }) => team), { limit: 2 }).map((t) => t.rank)", [1, 2], 'Plätze 1 und 2'],
+    ["leagueSummary({ teamCount: 12, played: 66, total: 132 })", '12 Teams · 66 von 132 Spielen gespielt', "'12 Teams · 66 von 132 Spielen gespielt'"],
+    ['leagueSummary({ teamCount: 1 })', '1 Team', "'1 Team'"],
+    ['windowLabel(rows, 12)', 'Plätze 1 bis 4 von 12', "'Plätze 1 bis 4 von 12'"],
+    ["formLabel(['S', 'S', 'N'])", 'Form: Sieg, Sieg, Niederlage', "'Form: Sieg, Sieg, Niederlage'"],
+  ];
+  it('jeder Aufruf steht im Beispiel mit seinem Kommentar, und das Ergebnis stimmt', async () => {
+    const callable = (expr: string) => expr.replace(/\)\.map\(\(t\) => t\.rank\)$/, ')');
+    for (const [expr, , comment] of CALLS) {
+      const line = league.funktionenJs.split('\n').find((l) => l.includes(callable(expr)) && l.includes('//'));
+      expect(line, expr).toBeDefined();
+      expect(line, expr).toContain(comment);
+    }
     const file = `${tmpDir}funktionen.mjs`;
-    writeFileSync(file, league.funktionenJs.replace("'@bbv/dss-design-system/league.js'", `'${rootDir}js/league.js'`) + '\nexport { rows };\n');
-    const mod = (await vite.ssrLoadModule(file)) as { rows: { rank: number }[] };
-    expect(mod.rows.map((r) => r.rank)).toEqual([1, 2, 3, 4]);
-    const js = await import(`${rootDir}js/league.js`);
-    expect(js.leagueSummary({ teamCount: 12, played: 66, total: 132 })).toBe('12 Teams · 66 von 132 Spielen gespielt');
-    expect(js.leagueSummary({ teamCount: 1 })).toBe('1 Team');
-    expect(js.windowLabel(mod.rows, 12)).toBe('Plätze 1 bis 4 von 12');
-    expect(js.formLabel(['S', 'S', 'N'])).toBe('Form: Sieg, Sieg, Niederlage');
-    expect(league.funktionenJs).toContain("// Plätze 1 und 2");
+    const body = league.funktionenJs.replace("'@bbv/dss-design-system/league.js'", `'${rootDir}js/league.js'`);
+    writeFileSync(file, `${body}\nexport const results = [${CALLS.map(([expr]) => expr).join(',\n')}];\n`);
+    const mod = (await vite.ssrLoadModule(file)) as { results: unknown[] };
+    expect(mod.results).toEqual(CALLS.map(([, expected]) => expected));
   });
 });
 
 describe('Beispiele der Doku-Seite', () => {
   const stories = readFileSync(`${rootDir}stories/LeagueCard.stories.ts`, 'utf8');
   const names = [...stories.matchAll(/example\('([\w-]+)'\)/g)].map((m) => m[1]);
+  const renderExample = async (example: string) => {
+    const Examples = ((await vite.ssrLoadModule(`${rootDir}stories/components/LeagueCardExamples.svelte`)) as { default: unknown }).default;
+    return render(Examples, { props: { example } }).body;
+  };
   it('jede Beispiel-Story hat ein Beispiel und rendert eine Ligencard', async () => {
     expect(names.length).toBeGreaterThanOrEqual(18);
-    const Examples = ((await vite.ssrLoadModule(`${rootDir}stories/components/LeagueCardExamples.svelte`)) as { default: unknown }).default;
     for (const example of names) {
-      const html = render(Examples, { props: { example } }).body;
+      const html = await renderExample(example);
       expect(html, example).toContain('dss-league');
       expect(html, example).not.toContain('undefined');
+    }
+  });
+  it('Beispiele rendern erwartete Titel, Zeilenzahl und Spaltenköpfe', async () => {
+    const heads = (html: string) => (html.split('<table')[1]?.split('</thead>')[0].match(/<th /g) ?? []).length;
+    const std = await renderExample('standard');
+    expect(rowCounts(std)).toEqual([4, 3]);
+    expect(std).toContain('12 Teams · 66 von 132 Spielen gespielt');
+    const spalten = await renderExample('spalten');
+    expect(rowCounts(spalten)).toEqual([4, 4]);
+    const tables = spalten.split('<table').slice(1);
+    expect(tables.map((t) => (t.split('</thead>')[0].match(/<th /g) ?? []).length)).toEqual([4, 8]);
+    expect(heads(await renderExample('minimal'))).toBe(4);
+    expect(rowCounts(await renderExample('minimal'))).toEqual([3, 1]);
+    expect(rowCounts(await renderExample('ausschnitt'))).toEqual([4, 4, 4, 3, 3]);
+    expect(rowCounts(await renderExample('zonen'))).toEqual([4, 12]);
+    expect(await renderExample('live')).toContain('2 Spiele laufen');
+    expect(rowCounts(await renderExample('do-zeilen'))).toEqual([4]);
+    expect(rowCounts(await renderExample('dont-zeilen'))).toEqual([12]);
+  });
+  it('Titel sind eindeutig: je Beispiel und über alle Beispiele einer Docs-Seite (axe landmark-unique)', async () => {
+    const all: string[] = [];
+    for (const example of names) {
+      const found = titles(await renderExample(example));
+      expect(new Set(found).size, `${example}: ${found.join(' | ')}`).toBe(found.length);
+      // Die Handy-Vorschau lebt allein in ihrem iframe und kommt auf der Docs-Seite nicht inline vor
+      if (example !== 'handy') all.push(...found);
+    }
+    expect(new Set(all).size, `doppelt: ${all.filter((t, i) => all.indexOf(t) !== i).join(', ')}`).toBe(all.length);
+  });
+  it('Quelltext: kein fester Titel an einer Karte, alle Titel stammen aus LIGEN (mit Index)', () => {
+    const source = readFileSync(`${rootDir}stories/components/LeagueCardExamples.svelte`, 'utf8');
+    const cards = source.match(/<LeagueCard [^>]*>/g) ?? [];
+    expect(cards.length).toBeGreaterThanOrEqual(28);
+    for (const card of cards) expect(card).toMatch(/title=\{LIGEN\[\d+( \+ i)?\]\}/);
+    const indexes = cards.map((c) => c.match(/LIGEN\[(\d+)( \+ i)?\]/)!).flatMap((m) => (m[2] ? [Number(m[1]), Number(m[1]) + 1, Number(m[1]) + 2] : [Number(m[1])]));
+    expect(new Set(indexes).size).toBe(indexes.length);
+    const data = readFileSync(`${rootDir}stories/components/leagueData.ts`, 'utf8');
+    const ligen = [...data.slice(data.indexOf('export const LIGEN'), data.indexOf('];', data.indexOf('export const LIGEN'))).matchAll(/'([^']+)'/g)].map((m) => m[1]);
+    expect(new Set(ligen).size).toBe(ligen.length);
+    expect(Math.max(...indexes)).toBeLessThan(ligen.length);
+  });
+  it('Dos und Don\'ts: Kartentitel als h4 unter den h3-Paartiteln', async () => {
+    for (const example of names.filter((n) => /^(do|dont)-/.test(n))) {
+      expect(await renderExample(example), example).toMatch(/<h4 class="dss-league-title">/);
     }
   });
   it('alle Beispiel-Stories sind versteckt (tags !dev), nur Spielwiese sichtbar; kein autodocs', () => {
