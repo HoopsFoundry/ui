@@ -283,7 +283,7 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
   const inert = open ? {} : ({ inert: '' } as Record<string, string>);
 
   return (
-    <div ref={el} id={id} className={cn('dss-acc-item', open && 'is-open', disabled && 'is-disabled')}>
+    <div ref={el} className={cn('dss-acc-item', open && 'is-open', disabled && 'is-disabled')} id={id}>
       <TitleTag className="dss-acc-title">
         <button
           ref={trigger}
