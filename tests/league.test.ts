@@ -1,7 +1,7 @@
 // @vitest-environment node
 // Ligencard: reine Hilfsfunktionen in js/league.js, Tabellentests.
 import { describe, it, expect } from 'vitest';
-import { cellNumber, diffSign, diffText, formEntries, formLabel, leagueSummary, leagueWindow, liveInfo, rankText, windowLabel, zoneInfo, zoneLegend } from '../js/league.js';
+import { cellNumber, diffSign, diffText, formEntries, formLabel, leagueSummary, leagueWindow, liveInfo, rankText, teamTotal, windowLabel, zoneInfo, zoneLegend } from '../js/league.js';
 
 const table = (count: number, ownRank?: number) =>
   Array.from({ length: count }, (_, i) => ({ rank: i + 1, name: `Team ${i + 1}`, played: 10, points: 30 - i, ...(ownRank === i + 1 ? { own: true } : {}) }));
@@ -234,5 +234,17 @@ describe('liveInfo', () => {
   });
   it.each([false, 0, -1, 1.5, Number.NaN, undefined, null, '2'])('%s ergibt undefined', (value) => {
     expect(liveInfo(value)).toBeUndefined();
+  });
+});
+
+describe('teamTotal', () => {
+  it('gültiges teamCount gewinnt, sonst die Länge der Liste', () => {
+    expect(teamTotal(12, table(3))).toBe(12);
+    expect(teamTotal(undefined, table(3))).toBe(3);
+    expect(teamTotal(-1, table(3))).toBe(3);
+    expect(teamTotal(1.5, table(2))).toBe(2);
+    expect(teamTotal(undefined, [])).toBeUndefined();
+    expect(teamTotal(undefined, undefined)).toBeUndefined();
+    expect(teamTotal(0, [])).toBe(0);
   });
 });

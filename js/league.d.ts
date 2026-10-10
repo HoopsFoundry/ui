@@ -67,3 +67,4 @@ export function rankText(rank: unknown): string;
 export function zoneInfo(zone: unknown): LeagueZoneInfo | undefined;
 export function zoneLegend(rows: readonly { zone?: unknown }[]): LeagueZoneInfo[];
 export function liveInfo(live: unknown): LeagueLiveInfo | undefined;
+export function teamTotal(teamCount: unknown, teams: readonly unknown[] | undefined): number | undefined;

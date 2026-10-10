@@ -132,3 +132,9 @@ export function liveInfo(live) {
   if (Number.isInteger(live) && live >= 1) return { count: live, text: live === 1 ? '1 Spiel läuft' : `${live} Spiele laufen` };
   return undefined;
 }
+
+/** Zahl der Teams für den Untertitel: `teamCount`, wenn gültig (ganze Zahl ab 0), sonst die Länge der Liste; `undefined` bei leerer Liste ohne gültiges `teamCount`. */
+export function teamTotal(teamCount, teams) {
+  if (isCount(teamCount)) return teamCount;
+  return Array.isArray(teams) && teams.length > 0 ? teams.length : undefined;
+}
