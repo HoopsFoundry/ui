@@ -1418,7 +1418,6 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 .dss-league-zone--down { --league-zone: var(--dss-chip-err-fg); }
 .dss-league-tbl tr.dss-league-zone td:first-child { box-shadow: inset 4px 0 0 var(--league-zone); }
 .dss-league-tbl tr.is-own.dss-league-zone td:first-child { box-shadow: inset 4px 0 0 var(--league-zone), inset 8px 0 0 var(--dss-accent-text); }
-.dss-league-tbl tr.dss-league-zone.is-own td:first-child { padding-left: 28px; }
 
 /* Form: Punkte, S gefüllt und grün, N rotes Quadrat, U Ring; der Text steht versteckt in der Zelle (formLabel) */
 .dss-league-dots { display: inline-flex; align-items: center; gap: 5px; vertical-align: middle; }
@@ -1444,7 +1443,6 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 .dss-league--compact .dss-league-title { font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-body-lg))); line-height: var(--dss-title-leading, 1.2); }
 .dss-league--compact .dss-league-tbl th:first-child, .dss-league--compact .dss-league-tbl td:first-child { padding-left: 16px; }
 .dss-league--compact .dss-league-tbl th:last-child, .dss-league--compact .dss-league-tbl td:last-child { padding-right: 16px; }
-.dss-league--compact .dss-league-tbl tr.dss-league-zone.is-own td:first-child { padding-left: 20px; }
 .dss-league--compact .dss-league-legend { padding: 10px 16px; }
 .dss-league--compact .dss-league-foot { padding: 0 16px; }
 .dss-league--compact .dss-league-more { min-height: 44px; }
@@ -1455,7 +1453,6 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
   .dss-league-head { padding: 16px 16px 12px; }
   .dss-league-tbl th:first-child, .dss-league-tbl td:first-child { padding-left: 16px; }
   .dss-league-tbl th.dss-league-pts, .dss-league-tbl td.dss-league-pts { padding-right: 16px; }
-  .dss-league-tbl tr.dss-league-zone.is-own td:first-child { padding-left: 20px; }
   .dss-league-legend { padding: 10px 16px; }
   .dss-league-foot { padding: 0 16px; }
 }
