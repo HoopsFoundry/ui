@@ -194,6 +194,7 @@ export function initAccordion(root, options = {}) {
   const cleanups = [];
   const created = [];
   const expected = new Set(); // Bereiche, die das Skript selbst umgeschaltet hat (kein Anker-Schreiben beim späteren toggle-Ereignis)
+  const known = new WeakMap(); // zuletzt bekannter Zustand je details: toggle-Ereignisse ohne Änderung (z. B. beim Parsen) zählen nicht
   let current = null;
   let announce = null;
   let navLinks = new Map();
@@ -205,6 +206,7 @@ export function initAccordion(root, options = {}) {
         expected.add(item);
         item.open = open;
       }
+      known.set(item, open);
     } else {
       const trigger = triggerOf(item);
       const panel = panelOf(item);
@@ -254,6 +256,8 @@ export function initAccordion(root, options = {}) {
   const onToggle = (event) => {
     const item = event.target;
     if (!(item instanceof Element) || !item.matches('details' + ITEM) || item.parentElement?.closest('.dss-acc') !== root) return;
+    if (known.get(item) === item.open) return;
+    known.set(item, item.open);
     const programmatic = expected.delete(item);
     item.classList.toggle('is-open', item.open);
     if (item.open) {
