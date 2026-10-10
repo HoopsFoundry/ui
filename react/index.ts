@@ -1,4 +1,6 @@
 export { HeadingLevel, useHeadingLevel, type HeadingLevelProps, type HeadingLevelInput, type HeadingLevelValue, type HeadingTag } from './HeadingLevel';
+export { Accordion, type AccordionProps, type AccordionVariant } from './Accordion';
+export { AccordionItem, type AccordionItemProps } from './AccordionItem';
 export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from './Button';
 export { TextInput, type TextInputProps, type TextInputDensity, type FieldState } from './TextInput';
 export { Select, type SelectProps, type SelectOption } from './Select';

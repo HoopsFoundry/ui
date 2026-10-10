@@ -1379,3 +1379,138 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 .dss-frame--dark :focus-visible, .dss-pbp-frame--dark :focus-visible, .dss-topbar--dark :focus-visible {
   outline-color: var(--ring-color-on-dark);
 }
+
+/* ── Accordion · Bereiche auf und zu klappen ───────────────────
+   Zwei Markup-Wege mit gleichem Aussehen:
+   (1) Überschrift + Button:  div.dss-acc-item > h3.dss-acc-title > button.dss-acc-trigger[aria-expanded][aria-controls]
+       und div.dss-acc-panel[hidden] > div.dss-acc-panel-inner > div.dss-acc-body   (Komponenten und js/accordion.js)
+   (2) natives details:  details.dss-acc-item > summary.dss-acc-trigger + div.dss-acc-panel (ohne Skript bedienbar)
+   Tokens (nicht vorbelegt, nur mit Rückfall gelesen): --dss-acc-gap, --dss-acc-pad, --dss-acc-radius, --dss-acc-title-size
+   (Rückfall --dss-card-title-size → --dss-title-size → heutiger Wert), --dss-acc-sticky-top (Abstand zu einer festen Kopfzeile). */
+.dss-acc {
+  --_dss-acc-chev: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 7.5l5 5 5-5'/%3E%3C/svg%3E");
+  display: flex; flex-direction: column; gap: var(--dss-acc-gap, 12px); min-width: 0;
+  font-family: var(--font-body); color: var(--dss-fg);
+}
+.dss-acc-item {
+  min-width: 0; background: var(--dss-surface); border: 1px solid var(--dss-line);
+  border-radius: var(--dss-acc-radius, var(--radius-lg)); box-shadow: var(--shadow-sm);
+  scroll-margin-top: calc(var(--dss-acc-sticky-top, 0px) + 8px);
+}
+.dss-acc-title { margin: 0; font: inherit; border-radius: inherit; }
+.dss-acc-trigger {
+  appearance: none; border: 0; background: transparent; margin: 0; width: 100%; text-align: left; cursor: pointer;
+  display: flex; align-items: center; gap: 12px; min-height: 44px; padding: var(--dss-acc-pad, 12px 18px);
+  font-family: var(--font-display); font-weight: var(--dss-title-weight, 600);
+  font-size: var(--dss-acc-title-size, var(--dss-card-title-size, var(--dss-title-size, var(--fs-body-lg))));
+  line-height: var(--dss-title-leading, 1.3); letter-spacing: -0.005em; color: var(--dss-fg);
+  border-radius: inherit; transition: background 0.12s;
+}
+summary.dss-acc-trigger { list-style: none; }
+summary.dss-acc-trigger::-webkit-details-marker { display: none; }
+.dss-acc-label { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.dss-acc-meta {
+  flex: none; display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 8px; max-width: 60%;
+  font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--dss-mute);
+}
+.dss-acc-chevron, summary.dss-acc-trigger::after, .dss-acc-nav-toggle::after {
+  flex: none; width: 20px; height: 20px; color: var(--dss-mute); transition: transform 0.2s ease;
+}
+summary.dss-acc-trigger::after, .dss-acc-nav-toggle::after {
+  content: ""; background: currentColor;
+  -webkit-mask: var(--_dss-acc-chev) center / contain no-repeat; mask: var(--_dss-acc-chev) center / contain no-repeat;
+}
+.dss-acc-trigger[aria-expanded="true"] .dss-acc-chevron, details[open] > summary.dss-acc-trigger::after, .dss-acc-nav-toggle[aria-expanded="true"]::after { transform: rotate(180deg); }
+
+/* Zustände: Hover, Aktiv, Fokus (gestrichelt, innen), Offen (Kopf abgesetzt), Gesperrt */
+.dss-acc-trigger:hover:not([aria-disabled="true"]) { background: var(--dss-hover-bg); }
+.dss-acc-trigger:active:not([aria-disabled="true"]) { background: var(--dss-surface-2); }
+.dss-acc-trigger:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: -3px; }
+.dss-acc-trigger[aria-expanded="true"], details[open] > summary.dss-acc-trigger { background: var(--dss-hover-bg); }
+.dss-acc-trigger[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+.dss-acc-item.is-open > .dss-acc-title > .dss-acc-trigger,
+details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius: 0; border-bottom-right-radius: 0; box-shadow: inset 0 -1px 0 var(--dss-line); }
+
+/* Bereich: Höhen-Animation 0fr → 1fr (200 ms); geschlossen bleibt hidden gesetzt, sichtbar steuert visibility (nach dem Zuklappen) */
+.dss-acc-panel { display: grid; grid-template-rows: 1fr; transition: grid-template-rows 0.2s ease, visibility 0s linear 0s; }
+.dss-acc-panel[hidden] { display: grid; grid-template-rows: 0fr; visibility: hidden; transition: grid-template-rows 0.2s ease, visibility 0s linear 0.2s; }
+.dss-acc-panel-inner { min-height: 0; overflow: hidden; }
+.dss-acc-body { padding: var(--dss-acc-pad, 12px 18px); padding-block-start: 14px; color: var(--dss-fg-soft); font-size: var(--fs-body); line-height: var(--lh-body); }
+@supports (transition-behavior: allow-discrete) {
+  /* Nach dem Aufklappen nicht mehr abschneiden (Fokus-Ringe, Popups); beim Zuklappen sofort wieder */
+  .dss-acc-panel:not([hidden]) > .dss-acc-panel-inner { overflow: visible; transition: overflow 0s linear 0.2s allow-discrete; }
+}
+
+/* Flach: nur Trennlinien */
+.dss-acc--flat { gap: 0; border-top: 1px solid var(--dss-line); }
+.dss-acc--flat > .dss-acc-item { background: transparent; border: 0; border-bottom: 1px solid var(--dss-line); border-radius: 0; box-shadow: none; }
+.dss-acc--flat > .dss-acc-item > .dss-acc-title > .dss-acc-trigger,
+.dss-acc--flat > details.dss-acc-item > summary.dss-acc-trigger { border-radius: 0; }
+
+/* Verschachtelt: kleiner, eingerückt, Linien statt Karte, kein Schatten */
+.dss-acc--nested { gap: 0; margin-top: 4px; padding-left: 12px; border-left: 2px solid var(--dss-line); }
+.dss-acc--nested > .dss-acc-item { background: transparent; border: 0; border-bottom: 1px solid var(--dss-line); border-radius: 0; box-shadow: none; }
+.dss-acc--nested > .dss-acc-item > .dss-acc-title > .dss-acc-trigger,
+.dss-acc--nested > details.dss-acc-item > summary.dss-acc-trigger { min-height: 44px; border-radius: 0; font-size: var(--dss-acc-nested-title-size, var(--fs-body)); font-weight: 600; }
+.dss-acc--nested > .dss-acc-item:last-child { border-bottom: 0; }
+
+/* Zusatzinfo im Kopf: Live-Tag und Chip bringen ihre eigene Farbe mit; der Rest ist Text in --dss-mute */
+.dss-acc-meta .dss-chip, .dss-acc-meta .dss-live { text-transform: uppercase; }
+
+/* Kopf des offenen Bereichs klebt oben, solange sein Bereich im Bild ist (nur die oberste Gruppe; keine abgeschnittenen Vorfahren dazwischen) */
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-acc-item.is-open > .dss-acc-title,
+.dss-acc--sticky:not(.dss-acc--nested) > details[open].dss-acc-item > summary.dss-acc-trigger {
+  position: sticky; top: var(--dss-acc-sticky-top, 0px); z-index: 2; background: var(--dss-surface);
+}
+
+/* Werkzeugleiste: Alle öffnen/schließen und Sprungleiste */
+.dss-acc-tools { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; }
+.dss-acc-bar { display: flex; flex-wrap: wrap; gap: 8px; }
+.dss-acc-nav { flex: 1 1 320px; min-width: 0; }
+.dss-acc-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.dss-acc-nav-link {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--radius-full);
+  border: 1px solid var(--dss-line); background: var(--dss-surface); color: var(--dss-fg-soft);
+  font-size: var(--fs-body-sm); font-weight: 600; text-decoration: none;
+}
+.dss-acc-nav-link:hover { border-color: var(--dss-line-strong); color: var(--dss-fg); }
+.dss-acc-nav-link:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }
+.dss-acc-nav-link[aria-current="true"] { background: var(--dss-btn-bg); border-color: var(--dss-btn-bg); color: var(--dss-btn-fg); }
+.dss-acc-nav-toggle {
+  appearance: none; display: none; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 0 14px;
+  border: 1px solid var(--dss-line); border-radius: var(--radius-md); background: var(--dss-surface-2); color: var(--dss-fg);
+  font-family: inherit; font-size: var(--fs-body-sm); font-weight: 600; cursor: pointer;
+}
+.dss-acc-nav-toggle:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }
+@media (max-width: 639.98px) {
+  .dss-acc-nav-toggle { display: flex; }
+  .dss-acc-nav:not(.is-open) .dss-acc-nav-list { display: none; }
+  .dss-acc-nav-list { flex-direction: column; margin-top: 8px; gap: 4px; }
+  .dss-acc-nav-link { width: 100%; border-radius: var(--radius-md); }
+}
+
+/* Aus bei „Bewegung reduzieren“ und data-motion="reduce" auf <html>: keine Höhen- und Drehanimation (zuklappen ist sofort) */
+@media (prefers-reduced-motion: reduce) {
+  .dss-acc-panel, .dss-acc-panel[hidden] { transition: none; }
+  .dss-acc-panel[hidden] { display: none; }
+  .dss-acc-panel:not([hidden]) > .dss-acc-panel-inner { transition: none; }
+  .dss-acc-chevron, summary.dss-acc-trigger::after, .dss-acc-nav-toggle::after, .dss-acc-trigger { transition: none; }
+}
+:root[data-motion="reduce"] .dss-acc-panel, :root[data-motion="reduce"] .dss-acc-panel[hidden] { transition: none; }
+:root[data-motion="reduce"] .dss-acc-panel[hidden] { display: none; }
+:root[data-motion="reduce"] .dss-acc-panel:not([hidden]) > .dss-acc-panel-inner { transition: none; }
+:root[data-motion="reduce"] .dss-acc-chevron, :root[data-motion="reduce"] summary.dss-acc-trigger::after,
+:root[data-motion="reduce"] .dss-acc-nav-toggle::after, :root[data-motion="reduce"] .dss-acc-trigger { transition: none; }
+
+/* Druck: alle Bereiche offen (Skript-Zustand egal), keine Bedienelemente; natives details je nach Browser (::details-content) */
+@media print {
+  .dss-acc-panel, .dss-acc-panel[hidden], :root[data-motion="reduce"] .dss-acc-panel[hidden] { display: grid; grid-template-rows: 1fr; visibility: visible; transition: none; }
+  .dss-acc-panel-inner, .dss-acc-panel:not([hidden]) > .dss-acc-panel-inner { overflow: visible; }
+  .dss-acc-tools, .dss-acc-chevron, summary.dss-acc-trigger::after { display: none; }
+  .dss-acc-item { box-shadow: none; break-inside: auto; }
+  .dss-acc-title { break-after: avoid; }
+  .dss-acc--sticky .dss-acc-title, .dss-acc--sticky summary.dss-acc-trigger { position: static; }
+  .dss-acc-trigger[aria-expanded="true"], .dss-acc-trigger:hover { background: transparent; }
+  details.dss-acc-item::details-content { content-visibility: visible; display: block; }
+}

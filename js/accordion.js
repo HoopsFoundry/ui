@@ -135,6 +135,22 @@ export function scrollToElement(el) {
   else run();
 }
 
+/**
+ * Tastatur in einer Gruppe: Pfeil ab/auf, Home, End bewegen den Fokus zwischen den Köpfen (`.dss-acc-trigger`), die direkt zu
+ * `root` (`.dss-acc`) gehören; deaktivierte (`aria-disabled`) werden übersprungen. Gibt `true` zurück, wenn die Taste behandelt wurde
+ * (der Aufrufer ruft dann `preventDefault` auf). Mit Strg, Alt, Meta oder Umschalt passiert nichts.
+ */
+export function moveFocus(root, trigger, key, modifiers = {}) {
+  if (!root || !trigger || modifiers.altKey || modifiers.ctrlKey || modifiers.metaKey || modifiers.shiftKey) return false;
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return false;
+  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter((el) => el.closest('.dss-acc') === root);
+  const index = triggers.indexOf(trigger);
+  if (index < 0) return false;
+  const target = nextHeader(index, key, triggers.map((el) => ({ disabled: el.getAttribute('aria-disabled') === 'true' })));
+  if (target !== index) triggers[target]?.focus();
+  return true;
+}
+
 // ── Vanilla-Skript ───────────────────────────────────────────
 
 const ITEM = '.dss-acc-item';
@@ -269,14 +285,8 @@ export function initAccordion(root, options = {}) {
   };
   const onKeyDown = (event) => {
     const trigger = event.target instanceof Element ? event.target.closest('.dss-acc-trigger') : null;
-    if (!trigger || trigger.closest('.dss-acc') !== root) return;
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-    if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
-    const triggers = items().map(triggerOf).filter(Boolean);
-    const index = triggers.indexOf(trigger);
-    const target = nextHeader(index, event.key, triggers.map((t) => ({ disabled: t.getAttribute('aria-disabled') === 'true' })));
-    event.preventDefault();
-    if (target !== index) triggers[target]?.focus();
+    if (!trigger) return;
+    if (moveFocus(root, trigger, event.key, event)) event.preventDefault();
   };
   root.addEventListener('click', onClick);
   root.addEventListener('keydown', onKeyDown);

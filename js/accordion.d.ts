@@ -37,6 +37,8 @@ export function currentHash(): string;
 export function writeHash(id: string, open: boolean): void;
 /** Scrollt das Element nach dem nächsten Frame in Sicht (ohne Browser ohne Wirkung). */
 export function scrollToElement(el: Element | null | undefined): void;
+/** Tastatur einer Gruppe (Pfeil ab/auf, Home, End zwischen den Köpfen; deaktivierte übersprungen). `true`, wenn die Taste behandelt wurde (dann `preventDefault`). */
+export function moveFocus(root: Element, trigger: Element, key: string, modifiers?: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean }): boolean;
 /** Macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und natives `details`); gibt `destroy()` zurück. */
 export function initAccordion(root: Element, options?: AccordionOptions): () => void;
 /** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument). */
