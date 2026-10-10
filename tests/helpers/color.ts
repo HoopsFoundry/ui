@@ -18,6 +18,8 @@ const num = (expr: string, scope: string): number => {
   const e = expr.trim();
   const v = e.match(/^var\((--[\w-]+)\)$/);
   if (v) return num(defOf(scope, v[1]), scope);
+  const c = e.match(/^calc\(\s*(.+?)\s*([+-])\s*([\d.]+)\s*\)$/);
+  if (c) return num(c[1], scope) + (c[2] === '+' ? 1 : -1) * Number(c[3]);
   return Number(e);
 };
 
