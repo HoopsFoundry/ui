@@ -161,6 +161,10 @@ Die Karte selbst ist nicht klickbar, die Links in ihr sind es: die Namen der Tea
 
 Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeugleiste **Zustand** umschalten.
 
+## Barrierefreiheit
+
+Die Tabelle ist eine echte `table` mit `caption` („Titel, Plätze 5 bis 8 von 12“) und `th scope="col"`. Ihr Scrollbereich ist eine benannte, per Tastatur erreichbare Region („Tabelle: Titel“). Eigene Zeile, Zonen, Form und Korbdifferenz haben immer Text, nie nur Farbe. Der Name des Fuß-Links enthält den Titel der Liga. Mehrere Karten auf einer Seite brauchen unterschiedliche Titel, weil die Tabelle als benannte Region erscheint (axe: landmark-unique). Alle Beispiele dieser Seite haben deshalb eigene, erfundene Ligen-Titel.
+
 ## Dunkelmodus
 
 Alle Flächen und Texte laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Text hat mindestens 7:1, Zonenstreifen, Form-Punkte und der Balken der eigenen Zeile mindestens 3:1, in beiden Marken (BBV, DBB) und in beiden Modi. Die Dunkelansicht steht in der Handy-Vorschau oben; mit der Werkzeugleiste **Theme** wird jede Story dunkel.

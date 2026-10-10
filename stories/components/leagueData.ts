@@ -6,6 +6,16 @@ import seebergLogo from '../assets/logos/seeberg.svg';
 import elbachLogo from '../assets/logos/elbach.svg';
 
 export const LIGA = 'Oberliga Nordhain Männer';
+/**
+ * Erfundene Ligen für die Beispielkarten. Jede Karte auf einer Doku-Seite bekommt einen eigenen Titel, weil die Tabelle als benannte
+ * Region erscheint („Tabelle: <Titel>“); gleiche Titel verletzen axe `landmark-unique`. Tests: tests/league-code.test.ts.
+ */
+export const LIGEN = [
+  'Oberliga Nordhain Männer', 'Oberliga Nordhain Frauen', 'Landesliga Ost', 'Landesliga West', 'Landesliga Nord', 'Landesliga Süd', 'Bezirksliga Ost', 'Bezirksliga West',
+  'Bezirksliga Nord', 'Bezirksliga Süd', 'Kreisliga Süd', 'Kreisliga Nord', 'Kreisliga Ost', 'Kreisliga West', 'Kreisliga A', 'Kreisliga B', 'Kreisliga C', 'Kreisliga D',
+  'Verbandsliga Ost', 'Verbandsliga West', 'Verbandsliga Nord', 'Verbandsliga Süd', 'Regionalliga Mitte', 'Regionalliga Küste', 'Oberliga Nordhain U18', 'Oberliga Nordhain U16',
+  'Landesliga Mitte', 'Bezirksliga Mitte', 'Kreisliga Mitte', 'Verbandsliga Mitte', 'Oberliga Hafen', 'Oberliga Seeland',
+];
 export const LOGO: Record<string, string> = {
   'TSV Nordhain 1920': nordhainLogo,
   'Lindenberg Hawks': hawksLogo,
