@@ -21,6 +21,8 @@ export interface TitleCase {
 const GAME = { id: '1', state: 'scheduled', date: 'Sa 12.10.', time: '10:00', column: 'h1', heim: { name: 'TSV Nordhain' }, gast: { name: 'Hawks' } };
 const EVENTS = [{ id: 1, time: '9:12', period: 1, team: 'heim', kind: 'score-2p', title: 'Korbleger' }];
 
+const LEAGUE_TEAM = { rank: 1, name: 'TSV Nordhain 1920', played: 10, points: 20 };
+
 export const TITLE_CASES: TitleCase[] = [
   {
     name: 'ScheduleTable', titleClass: 'dss-frame-title', svelte: 'svelte/ScheduleTable.svelte', react: 'react/ScheduleTable.tsx', reactName: 'ScheduleTable',
@@ -59,6 +61,10 @@ export const TITLE_CASES: TitleCase[] = [
   {
     name: 'TeamCard (compact)', titleClass: 'dss-team-nm', svelte: 'svelte/TeamCard.svelte', react: 'react/TeamCard.tsx', reactName: 'TeamCard',
     svelteProps: () => ({ name: 'TSV Nordhain 1920', size: 'compact' }), reactProps: () => ({ name: 'TSV Nordhain 1920', size: 'compact' }),
+  },
+  {
+    name: 'LeagueCard', titleClass: 'dss-league-title', svelte: 'svelte/LeagueCard.svelte', react: 'react/LeagueCard.tsx', reactName: 'LeagueCard',
+    svelteProps: () => ({ title: 'Oberliga', teams: [LEAGUE_TEAM] }), reactProps: () => ({ title: 'Oberliga', teams: [LEAGUE_TEAM] }),
   },
 ];
 

@@ -36,6 +36,8 @@ const TITLES: Record<string, [string, string, string]> = {
   '.dss-empty-title': [CARD('var(--fs-body-lg)'), WEIGHT('700'), LEADING('inherit')],
   '.dss-team-nm': [CARD('var(--fs-body-lg)'), WEIGHT('600'), LEADING('1.2')],
   '.dss-team--compact .dss-team-nm': [CARD('var(--fs-body)'), WEIGHT('600'), LEADING('1.2')],
+  '.dss-league-title': [CARD('var(--fs-h3)'), WEIGHT('700'), LEADING('1.2')],
+  '.dss-league--compact .dss-league-title': [CARD('var(--fs-body-lg)'), WEIGHT('700'), LEADING('1.2')],
   '.dss-m-title': ['var(--dss-title-size, var(--fs-h3))', WEIGHT('700'), LEADING('inherit')],
 };
 

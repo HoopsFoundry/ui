@@ -1441,7 +1441,7 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 /* compact: Seitenleisten. Zeilen 40 px (dss-tbl--compact), kleinerer Titel, engere Ränder */
 .dss-league--compact { border-radius: 12px; }
 .dss-league--compact .dss-league-head { padding: 14px 16px 10px; }
-.dss-league--compact .dss-league-title { font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-body-lg))); }
+.dss-league--compact .dss-league-title { font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-body-lg))); line-height: var(--dss-title-leading, 1.2); }
 .dss-league--compact .dss-league-tbl th:first-child, .dss-league--compact .dss-league-tbl td:first-child { padding-left: 16px; }
 .dss-league--compact .dss-league-tbl th:last-child, .dss-league--compact .dss-league-tbl td:last-child { padding-right: 16px; }
 .dss-league--compact .dss-league-tbl tr.dss-league-zone.is-own td:first-child { padding-left: 20px; }
