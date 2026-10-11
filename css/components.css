@@ -1634,6 +1634,12 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   font-family: var(--font-mono); font-size: var(--fs-body-sm); font-weight: 700; line-height: 1;
 }
 .dss-map-ph-pin.is-own { background: var(--dss-cta-bg); color: var(--dss-cta-fg); }
+/* Haus-Symbol (Sitzmarker) im Platzhalter und in der Liste: Maske in currentColor, nicht Teil des Textes */
+.dss-map-ph-pin.is-seat::before, .dss-map-num.is-seat::before {
+  content: ''; display: block; width: 16px; height: 16px; background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 3 21 10.6V21h-6.2v-6.4H9.2V21H3V10.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 3 21 10.6V21h-6.2v-6.4H9.2V21H3V10.6z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
 .dss-map-ph-card {
   position: relative; display: grid; justify-items: center; gap: 10px; max-width: min(100%, 420px); padding: 14px 16px; text-align: center;
   background: var(--dss-surface); border: 1px solid var(--dss-line-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
@@ -1664,6 +1670,12 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--dss-map-dim, 0.8)); }
 }
+/* darkTiles="invert": Kacheln invertieren und umfärben statt nur abzudunkeln (Wasser und Straßen wirken fremd, dafür wird die Karte wirklich dunkel).
+   Gilt nur mit dimInDark; nur die Kachelebene, Marker, Steuerung und Quellenangabe bleiben unberührt. Token: --dss-map-invert-filter. */
+:root[data-theme="dark"] .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles { filter: var(--dss-map-invert-filter, invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles { filter: var(--dss-map-invert-filter, invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)); }
+}
 
 /* Marker (Inline-SVG): dunkle Füllung mit weißem Ring und dunkler Kontur, sichtbar auf hellen wie dunklen Kacheln; Nummer weiß auf dunkel */
 .dss-map-marker { display: flex; justify-content: center; align-items: flex-start; background: transparent; border: 0; border-radius: 8px; cursor: pointer; }
@@ -1674,7 +1686,10 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-map-pin-num { fill: var(--dss-map-pin-fg, var(--n-0)); font-family: var(--font-mono); font-size: 15px; font-weight: 700; }
 .dss-map-pin-num.is-small { font-size: 11px; }
 .dss-map-marker.is-own .dss-map-pin-body { fill: var(--dss-cta-bg); }
+/* Sitzmarker (kind="seat"): dasselbe Pin wie die anderen (44 px breit, gleiche Kontur und Ring), im Pin ein weißes Haus statt Nummer oder Punkt */
+.dss-map-pin-house { fill: var(--dss-map-pin-fg, var(--n-0)); stroke: var(--dss-map-pin-fg, var(--n-0)); stroke-width: 1; stroke-linejoin: round; }
 .dss-map-marker.is-own .dss-map-pin-dot, .dss-map-marker.is-own .dss-map-pin-num { fill: var(--dss-cta-fg); }
+.dss-map-marker.is-own .dss-map-pin-house { fill: var(--dss-cta-fg); stroke: var(--dss-cta-fg); }
 /* Fokus: Fläche und 8 px Hof in --dss-surface unter dem gestrichelten Ring, damit er auf jeder Kachel (hell, dunkel, abgedunkelt) mindestens 3:1 hat */
 .dss-map-marker:focus-visible {
   outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; background: var(--dss-surface); box-shadow: 0 0 0 8px var(--dss-surface);

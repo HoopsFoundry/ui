@@ -6,7 +6,7 @@
  * gehören der Komponente (Markup), Leaflet liefert nur Kacheln, Marker und Gesten. Marker sind Inline-SVG (`L.divIcon`), erzeugt mit
  * DOM-Aufrufen, ohne Leaflets Standardbilder.
  */
-import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, validTileUrl } from './map.js';
+import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, markerName, validTileUrl } from './map.js';
 import { safeHref } from './url.js';
 import { reducedMotion } from './motion.js';
 
@@ -14,6 +14,8 @@ import { reducedMotion } from './motion.js';
 export { reducedMotion };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
+// Haus für den Sitzmarker (Mitte bei 18/16,5 wie Punkt und Nummer): Dach, Wände und Tür als eine Fläche
+const HOUSE_PATH = 'M18 9.5 25.5 15.8V23h-5.1v-4.6h-4.8V23h-5.1v-7.2z';
 const PIN_PATH = 'M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z';
 // Rand beim Einpassen: oben Platz für die Pin-Spitze samt Pin (46 px), rechts für die Zoom-Schaltflächen, unten für die Quellenangabe
 const FIT_OPTIONS = { paddingTopLeft: [56, 64], paddingBottomRight: [84, 52], maxZoom: 17 };
@@ -40,12 +42,14 @@ const svgEl = (name, attrs) => {
   return node;
 };
 
-/** Marker als SVG: Kontur und weißer Ring (sichtbar auf hellen und dunklen Kacheln), Füllung, Nummer oder Punkt. */
+/** Marker als SVG: Kontur und weißer Ring (sichtbar auf hellen und dunklen Kacheln), Füllung, Nummer, Punkt oder (Sitzmarker) Haus. */
 export function pinElement(item) {
   const svg = svgEl('svg', { viewBox: '0 0 36 46', width: '36', height: '46', class: 'dss-map-pin', 'aria-hidden': 'true', focusable: 'false' });
   svg.appendChild(svgEl('path', { d: PIN_PATH, class: 'dss-map-pin-edge' }));
   svg.appendChild(svgEl('path', { d: PIN_PATH, class: 'dss-map-pin-body' }));
-  if (item.number === null || item.number === undefined) {
+  if (item.kind === 'seat') {
+    svg.appendChild(svgEl('path', { d: HOUSE_PATH, class: 'dss-map-pin-house' }));
+  } else if (item.number === null || item.number === undefined) {
     svg.appendChild(svgEl('circle', { cx: '18', cy: '16.5', r: '5.5', class: 'dss-map-pin-dot' }));
   } else {
     const text = svgEl('text', { x: '18', y: '16.5', class: `dss-map-pin-num${String(item.number).length > 2 ? ' is-small' : ''}`, 'text-anchor': 'middle', 'dominant-baseline': 'central' });
@@ -87,7 +91,7 @@ export function createMapController(el, opts, hooks = {}) {
     if (map) hooks.onZoom?.({ zoom: map.getZoom(), min: map.getMinZoom(), max: map.getMaxZoom() });
   };
 
-  const markerIcon = (item) => L.divIcon({ html: pinElement(item), className: `dss-map-marker${item.own ? ' is-own' : ''}`, iconSize: [44, 46], iconAnchor: [22, 45] });
+  const markerIcon = (item) => L.divIcon({ html: pinElement(item), className: `dss-map-marker${item.own ? ' is-own' : ''}${item.kind === 'seat' ? ' is-seat' : ''}`, iconSize: [44, 46], iconAnchor: [22, 45] });
 
   const syncMarkers = (items) => {
     const keep = new Set(items.map((i) => i.id));
@@ -95,7 +99,7 @@ export function createMapController(el, opts, hooks = {}) {
       if (!keep.has(id)) { entry.marker.remove(); entries.delete(id); }
     }
     for (const item of items) {
-      const sig = JSON.stringify([item.label, item.number, item.own, item.href ?? '']);
+      const sig = JSON.stringify([item.label, item.number, item.own, item.kind, item.href ?? '']);
       const entry = entries.get(item.id);
       if (entry && entry.sig === sig) {
         entry.item = item;
@@ -103,7 +107,7 @@ export function createMapController(el, opts, hooks = {}) {
         continue;
       }
       if (entry) entry.marker.remove();
-      const marker = L.marker([item.lat, item.lng], { icon: markerIcon(item), title: item.label, alt: item.label, keyboard: true, riseOnHover: true });
+      const marker = L.marker([item.lat, item.lng], { icon: markerIcon(item), title: markerName(item), alt: markerName(item), keyboard: true, riseOnHover: true });
       const next = { marker, sig, item, lat: item.lat, lng: item.lng };
       const activate = () => {
         hooks.onMarkerClick?.(next.item);
@@ -120,7 +124,7 @@ export function createMapController(el, opts, hooks = {}) {
         activate();
       });
       // Das Icon entsteht erst, wenn die Karte einen Ausschnitt hat: Name für Hilfstechnik beim Hinzufügen setzen
-      const name = () => marker.getElement?.()?.setAttribute('aria-label', next.item.label);
+      const name = () => marker.getElement?.()?.setAttribute('aria-label', markerName(next.item));
       marker.on('add', name);
       marker.addTo(map);
       name();

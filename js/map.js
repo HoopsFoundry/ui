@@ -23,6 +23,7 @@ export const mapText = {
   linkRoute: 'Route planen',
   listLabel: 'Orte auf der Karte',
   own: 'Eigener Ort',
+  seat: 'Vereinssitz',
   zoomGroup: 'Maßstab',
   canvasHint: 'Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab.',
 };
@@ -134,6 +135,17 @@ export function boundsOf(markers) {
   return { sw: [Math.min(...lats), west], ne: [Math.max(...lats), east] };
 }
 
+/** Name eines Markers für Hilfstechnik: der Name des Orts, bei einem Sitzmarker mit dem Zusatz „Vereinssitz“ („Sporthalle Nordhain, Vereinssitz“). */
+export function markerName(item) {
+  const label = item && typeof item.label === 'string' ? item.label : '';
+  return item?.kind === 'seat' ? (label ? `${label}, ${mapText.seat}` : mapText.seat) : label;
+}
+
+/** Kachelverfahren im Dunkelmodus: `invert` (invertieren und umfärben) oder `dim` (abdunkeln, Standard); alles andere ergibt `dim`. */
+export function tilesMode(value) {
+  return value === 'invert' ? 'invert' : 'dim';
+}
+
 /**
  * Marker für Liste, Platzhalter und Karte aufbereiten: ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
  * Markern die laufende Nummer (ein Marker bekommt keine), dazu Koordinatentext und Links (nur die in `appLinks` gewünschten).
@@ -150,7 +162,12 @@ export function mapItems(markers, appLinks = ['osm', 'route']) {
     used.add(id);
     return id;
   };
+  // Sitzmarker (kind: 'seat') tragen keine Nummer und zählen nicht mit; die Orte werden unter sich von 1 an gezählt
+  const places = valid.filter((m) => m.kind !== 'seat').length;
+  let running = 0;
   return valid.map((m, index) => {
+    const seat = m.kind === 'seat';
+    if (!seat) running += 1;
     const label = typeof m.label === 'string' ? m.label : '';
     const all = mapLinks({ lat: m.lat, lng: m.lng, label });
     const links = [];
@@ -166,7 +183,8 @@ export function mapItems(markers, appLinks = ['osm', 'route']) {
       label,
       href: safeHref(m.href),
       own: m.own === true,
-      number: given ?? (valid.length > 1 ? index + 1 : null),
+      kind: seat ? 'seat' : 'place',
+      number: seat ? null : given ?? (places > 1 ? running : null),
       coords: formatCoords(m.lat, m.lng),
       links,
     };
@@ -214,6 +232,7 @@ export function placeholderPins(items) {
         id: String(m.id),
         number: m.number ?? null,
         own: m.own === true,
+        kind: m.kind === 'seat' ? 'seat' : 'place',
         x: Math.round(pos(lng, bounds.sw[1], spanLng, 12, 88) * 10) / 10,
         // Norden oben: größere Breite liegt weiter oben
         y: Math.round(pos(bounds.ne[0] - m.lat, 0, spanLat, 14, 44) * 10) / 10,

@@ -10,8 +10,8 @@
    * Der Dateiname ist `Map.svelte`; beim Import `MapView` nennen, damit das JS-Global `Map` nicht überdeckt wird.
    */
   import { tick, untrack } from 'svelte';
-  import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, validTileUrl } from '../js/map.js';
-  import type { MapAppLink, MapMarker } from '../js/map.js';
+  import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, tilesMode, validTileUrl } from '../js/map.js';
+  import type { MapAppLink, MapDarkTiles, MapMarker } from '../js/map.js';
   import { createMapController, devWarn } from '../js/map-leaflet.js';
 
   type Phase = 'idle' | 'loading' | 'ready';
@@ -30,12 +30,13 @@
     appLinks = ['osm', 'route'],
     showList = true,
     dimInDark = true,
+    darkTiles = 'dim',
     onload = undefined,
     onerror = undefined,
     onmarkerclick = undefined,
     class: klass = '',
   }: {
-    /** Orte auf der Karte: `{ id, lat, lng, label, href?, number?, own? }`. Ungültige Koordinaten werden ignoriert. */
+    /** Orte auf der Karte: `{ id, lat, lng, label, href?, number?, own?, kind? }` (`kind: 'seat'`: Vereinssitz mit Haus-Symbol). Ungültige Koordinaten werden ignoriert. */
     markers: MapMarker[];
     /** Name der Karte für Hilfstechnik (Region). Mehrere Karten auf einer Seite brauchen verschiedene Namen. */
     label: string;
@@ -59,8 +60,10 @@
     appLinks?: MapAppLink[];
     /** Liste der Orte sichtbar (Standard); `false`: nur für Hilfstechnik. */
     showList?: boolean;
-    /** Kacheln im Dunkelmodus abdunkeln. */
+    /** Kacheln im Dunkelmodus abdunkeln (Standard). `false` lässt sie unverändert. */
     dimInDark?: boolean;
+    /** Verfahren im Dunkelmodus: `dim` dunkelt ab (Standard), `invert` invertiert und färbt um (Wasser und Straßen wirken fremd, die Karte wird wirklich dunkel). Wirkt nur mit `dimInDark`. */
+    darkTiles?: MapDarkTiles;
     /** Die Karte ist bereit; Argument ist die Leaflet-Karte. */
     onload?: (map: unknown) => void;
     /** Laden fehlgeschlagen: `tile-url`, `import`, `init`, `update` oder `tiles`. */
@@ -146,6 +149,7 @@
   class={`dss-map${klass ? ` ${klass}` : ''}`}
   data-state={state}
   data-dim={dimInDark ? 'true' : 'false'}
+  data-tiles={tilesMode(darkTiles)}
   style={`--dss-map-h:${Number.isFinite(height) ? Math.max(200, height) : 320}px`}
 >
   <a class="dss-map-skip" href={`#${textId}`}>{mapText.skip}</a>
@@ -157,7 +161,7 @@
       {#if state !== 'ready'}
         <div class="dss-map-ph">
           {#each state === 'error' ? [] : pins as pin (pin.id)}
-            <span class={`dss-map-ph-pin${pin.own ? ' is-own' : ''}`} style={`left:${pin.x}%;top:${pin.y}%`} aria-hidden="true">{pin.number ?? ''}</span>
+            <span class={`dss-map-ph-pin${pin.own ? ' is-own' : ''}${pin.kind === 'seat' ? ' is-seat' : ''}`} style={`left:${pin.x}%;top:${pin.y}%`} aria-hidden="true">{pin.number ?? ''}</span>
           {/each}
           {#if state === 'idle'}
             <div class="dss-map-ph-card">
@@ -185,10 +189,11 @@
     <ol class="dss-map-list" aria-label={mapText.listLabel}>
       {#each items as item (item.id)}
         <li class="dss-map-item" value={item.number ?? undefined}>
-          {#if item.number !== null}<span class={`dss-map-num${item.own ? ' is-own' : ''}`} aria-hidden="true">{item.number}</span>{/if}
+          {#if item.kind === 'seat'}<span class={`dss-map-num is-seat${item.own ? ' is-own' : ''}`} aria-hidden="true"></span>{:else if item.number !== null}<span class={`dss-map-num${item.own ? ' is-own' : ''}`} aria-hidden="true">{item.number}</span>{/if}
           <div class="dss-map-item-body">
             <p class="dss-map-name">
               {#if item.href}<a class="dss-link" href={item.href}>{item.label}</a>{:else}<span>{item.label}</span>{/if}
+              {#if item.kind === 'seat'}<span class="dss-chip">{mapText.seat}</span>{/if}
               {#if item.own}<span class="dss-chip dss-chip--amber">{mapText.own}</span>{/if}
             </p>
             <p class="dss-map-coords">{item.coords}</p>

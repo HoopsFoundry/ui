@@ -10,7 +10,7 @@ export const vanilla = `<!-- Vanilla: es gibt keine Karten-Komponente ohne Frame
      Quellenangabe, Liste) und die reinen Funktionen aus map.js. Leaflet und leaflet.css lädt die Seite selbst (npm install leaflet). -->
 <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
 
-<div class="dss-map" data-state="ready" data-dim="true" style="--dss-map-h:320px">
+<div class="dss-map" data-state="ready" data-dim="true" data-tiles="dim" style="--dss-map-h:320px">
   <div class="dss-map-frame" role="region" aria-label="Karte der Sporthalle Nordhain">
     <div class="dss-map-stage">
       <div class="dss-map-canvas" id="karte" role="group" aria-label="Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab."></div>

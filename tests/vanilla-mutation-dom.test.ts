@@ -4,12 +4,19 @@ import { describe, expect, it } from 'vitest';
 import { loadModule, mutate, read, type Rules } from './helpers/mutation';
 import { backtopLogicRules, pagenavCssRules, pagenavLogicRules, pagenavSourceRules } from './helpers/pagenav-rules';
 import { themeCssRules, themeLogicRules, themeSourceRules } from './helpers/theme-rules';
+import { mapSeatCssRules, mapSeatLogicRules, mapSeatSourceRules } from './helpers/map-seat-rules';
+import * as realMap from '../js/map.js';
+import * as realLeaflet from '../js/map-leaflet.js';
 
 type Mutation = { name: string; rule: string; from: string; to: string };
 
 const pagenavJs = read('js/pagenav.js');
 const backtopJs = read('js/backtop.js');
 const themeJs = read('js/theme.js');
+const mapJs = read('js/map.js');
+const leafletJs = read('js/map-leaflet.js');
+const svelteMap = read('svelte/Map.svelte');
+const reactMap = read('react/Map.tsx');
 const css = read('css/components.css');
 const cssStart = css.indexOf('/* ── Seitennavigation und Nach-oben-Knopf');
 const themeCssStart = css.indexOf('/* ── Dunkelmodus-Umschalter');
@@ -187,5 +194,74 @@ describe('Mutationstests: Quelltext der DOM-Bausteine', () => {
     const files = { pagenav: pagenavJs, backtop: backtopJs };
     expect(pagenavSourceRules(files)[rule], `Regel fehlt: ${rule}`).toBe(true);
     expect(pagenavSourceRules({ ...files, [file]: mutate(files[file], from, to) })[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+});
+
+const MAP_LOGIC: Mutation[] = [
+  { name: 'Art wird nicht übernommen', rule: 'Sitz: kind seat bleibt, alles andere ist place', from: "kind: seat ? 'seat' : 'place',", to: "kind: 'place'," },
+  { name: 'jede Art ist ein Sitz', rule: 'Sitz: kind seat bleibt, alles andere ist place', from: "const seat = m.kind === 'seat';", to: "const seat = Boolean(m.kind);" },
+  { name: 'Sitz mit Nummer', rule: 'Sitz: nie eine Nummer, auch nicht mit number', from: 'number: seat ? null : given ??', to: 'number: given ??' },
+  { name: 'Sitz verbraucht eine Nummer', rule: 'Sitz: zählt in der Nummerierung der Orte nicht mit', from: 'if (!seat) running += 1;', to: 'running += 1;' },
+  { name: 'Nummerierung zählt den Index', rule: 'Sitz: zählt in der Nummerierung der Orte nicht mit', from: 'places > 1 ? running : null', to: 'places > 1 ? index + 1 : null' },
+  { name: 'Einzelner Ort bekommt neben dem Sitz eine Nummer', rule: 'Sitz: ein einzelner Ort neben dem Sitz bleibt ohne Nummer', from: 'const places = valid.filter((m) => m.kind !== \'seat\').length;', to: 'const places = valid.length;' },
+  { name: 'Platzhalter ohne Art', rule: 'Sitz: der Platzhalter kennt die Art', from: "kind: m.kind === 'seat' ? 'seat' : 'place',\n        x: Math.round", to: "kind: 'place',\n        x: Math.round" },
+  { name: 'Name ohne Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "return item?.kind === 'seat' ?", to: 'return false ?' },
+  { name: 'anderer Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "seat: 'Vereinssitz',", to: "seat: 'Sitz',", },
+  { name: 'jeder Wert ist ein Verfahren', rule: 'darkTiles: nur invert ändert den Standard dim', from: "return value === 'invert' ? 'invert' : 'dim';", to: "return value ? value : 'dim';" },
+];
+const LEAFLET_LOGIC: Mutation[] = [
+  { name: 'Sitz ohne Haus', rule: 'Sitz: Pin zeigt ein Haus statt Nummer und Punkt', from: "if (item.kind === 'seat') {", to: 'if (false) {' },
+  { name: 'Haus auch bei Orten', rule: 'Orte: Pin zeigt Nummer oder Punkt, kein Haus', from: "if (item.kind === 'seat') {", to: 'if (true) {' },
+];
+const MAP_CSS: Mutation[] = [
+  { name: 'invert ohne Umfärben', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: 'filter: var(--dss-map-invert-filter, invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)); }\n@media', to: 'filter: var(--dss-map-invert-filter, invert(1) brightness(0.85) contrast(0.9)); }\n@media' },
+  { name: 'invert auch ohne dimInDark', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: ':root[data-theme="dark"] .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles', to: ':root[data-theme="dark"] .dss-map[data-tiles="invert"] .dss-map-tiles' },
+  { name: 'invert nicht bei System-Dunkel', rule: 'CSS: invert auch bei System-Dunkel ohne data-theme', from: ':root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles', to: ':root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invertx"] .dss-map-tiles' },
+  { name: 'dim abgeschafft', rule: 'CSS: dim bleibt der Standard', from: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--dss-map-dim, 0.8)); }', to: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: none; }' },
+  { name: 'Haus in fester Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-pin-house { fill: var(--dss-map-pin-fg, var(--n-0));', to: '.dss-map-pin-house { fill: var(--n-0);' },
+  { name: 'eigener Sitz ohne cta-Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-marker.is-own .dss-map-pin-house { fill: var(--dss-cta-fg); stroke: var(--dss-cta-fg); }', to: '' },
+  { name: 'Haus-Maske entfällt', rule: 'CSS: Haus im Platzhalter und in der Liste als Maske in currentColor', from: 'content: \'\'; display: block; width: 16px; height: 16px; background: currentColor;', to: 'content: \'\'; display: block; width: 16px; height: 16px; background: red;' },
+  { name: 'Haus 12 px', rule: 'CSS: Haus-Symbol im Platzhalter 16 px', from: 'content: \'\'; display: block; width: 16px; height: 16px;', to: 'content: \'\'; display: block; width: 12px; height: 12px;' },
+  { name: 'festes Hex beim Haus', rule: 'CSS: kein festes Hex im Abschnitt des Sitzes', from: '.dss-map-pin-house { fill: var(--dss-map-pin-fg, var(--n-0)); stroke: var(--dss-map-pin-fg, var(--n-0));', to: '.dss-map-pin-house { fill: #ffffff; stroke: var(--dss-map-pin-fg, var(--n-0));' },
+];
+const MAP_SRC: { name: string; rule: string; file: 'svelte' | 'react' | 'leaflet'; from: string; to: string }[] = [
+  { name: 'data-tiles fehlt (Svelte)', rule: 'Quelle: data-tiles aus tilesMode', file: 'svelte', from: 'data-tiles={tilesMode(darkTiles)}', to: '' },
+  { name: 'data-tiles fehlt (React)', rule: 'Quelle: data-tiles aus tilesMode', file: 'react', from: 'data-tiles={tilesMode(darkTiles)}', to: '' },
+  { name: 'darkTiles Standard invert (React)', rule: 'Quelle: darkTiles hat den Standard dim', file: 'react', from: "darkTiles = 'dim'", to: "darkTiles = 'invert'" },
+  { name: 'Haus-Badge fehlt (Svelte)', rule: 'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl', file: 'svelte', from: 'dss-map-num is-seat', to: 'dss-map-num' },
+  { name: 'Chip fehlt (React)', rule: 'Quelle: Chip Vereinssitz in der Liste', file: 'react', from: '{mapText.seat}', to: '' },
+  { name: 'Platzhalter-Pin ohne is-seat (Svelte)', rule: 'Quelle: Platzhalter-Pin trägt is-seat', file: 'svelte', from: "pin.kind === 'seat' ? ' is-seat'", to: "false ? ' is-seat'" },
+  { name: 'Marker ohne markerName', rule: 'Quelle: Marker nutzt markerName für Titel, Alt und aria-label', file: 'leaflet', from: "title: markerName(item), alt: markerName(item)", to: 'title: item.label, alt: item.label' },
+  { name: 'Art nicht in der Signatur', rule: 'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)', file: 'leaflet', from: 'item.own, item.kind, item.href', to: 'item.own, item.href' },
+  { name: 'style in der Svelte-Datei', rule: 'Quelle: kein style in der Svelte-Datei', file: 'svelte', from: '<script lang="ts">', to: '<style>.x{}</style>\n<script lang="ts">' },
+];
+const mapCssStart = css.indexOf('/* ── Map (Karte');
+
+describe('Mutationstests: Sitzmarker und darkTiles der Karte', () => {
+  it('Ausgangslage', () => {
+    expect(Object.entries(mapSeatLogicRules(realMap as never, realLeaflet as never)).filter(([, ok]) => !ok)).toEqual([]);
+    expect(Object.entries(mapSeatCssRules(css)).filter(([, ok]) => !ok)).toEqual([]);
+    expect(Object.entries(mapSeatSourceRules({ svelte: svelteMap, react: reactMap, leaflet: leafletJs })).filter(([, ok]) => !ok)).toEqual([]);
+  });
+  it.each(MAP_LOGIC)('Logik (map.js): $name', async ({ rule, from, to }) => {
+    const mod = await loadModule(mutate(mapJs, from, to));
+    const rules = mapSeatLogicRules(mod as never, realLeaflet as never);
+    expect(rule in rules, `Regel fehlt: ${rule}`).toBe(true);
+    expect(rules[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+  it.each(LEAFLET_LOGIC)('Logik (map-leaflet.js): $name', async ({ rule, from, to }) => {
+    const mod = await loadModule(mutate(leafletJs, from, to));
+    const rules = mapSeatLogicRules(realMap as never, mod as never);
+    expect(rule in rules, `Regel fehlt: ${rule}`).toBe(true);
+    expect(rules[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+  it.each(MAP_CSS)('CSS: $name', ({ rule, from, to }) => {
+    expect(mapSeatCssRules(css)[rule], `Regel fehlt: ${rule}`).toBe(true);
+    expect(mapSeatCssRules(mutate(css, from, to, mapCssStart))[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+  it.each(MAP_SRC)('Quelltext: $name', ({ rule, file, from, to }) => {
+    const files = { svelte: svelteMap, react: reactMap, leaflet: leafletJs };
+    expect(mapSeatSourceRules(files)[rule], `Regel fehlt: ${rule}`).toBe(true);
+    expect(mapSeatSourceRules({ ...files, [file]: mutate(files[file], from, to) })[rule], `Regel kippt nicht: ${rule}`).toBe(false);
   });
 });

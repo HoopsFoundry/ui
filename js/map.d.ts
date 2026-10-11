@@ -12,7 +12,16 @@ export interface MapMarker {
   number?: number;
   /** Eigener Ort (zum Beispiel die eigene Halle): Marker in Akzentfarbe. */
   own?: boolean;
+  /**
+   * Art des Markers: `place` (Standard, Nummer oder Punkt) oder `seat` (Vereinssitz: Haus-Symbol statt Nummer; ohne Nummer, zählt in der
+   * Nummerierung der übrigen Orte nicht mit, Name für Hilfstechnik mit Zusatz „Vereinssitz“).
+   */
+  kind?: MapMarkerKind;
 }
+
+export type MapMarkerKind = 'place' | 'seat';
+/** Kachelverfahren im Dunkelmodus: abdunkeln (Standard) oder invertieren und umfärben. */
+export type MapDarkTiles = 'dim' | 'invert';
 
 export type MapAppLink = 'osm' | 'geo' | 'route';
 
@@ -45,6 +54,7 @@ export interface MapItem {
   label: string;
   href: string | undefined;
   own: boolean;
+  kind: MapMarkerKind;
   /** Nummer am Marker und in der Liste; `null` bei einem einzelnen Marker ohne eigene Nummer. */
   number: number | null;
   /** Koordinaten im deutschen Format („49,4875° N, 8,4660° O“). */
@@ -60,6 +70,7 @@ export interface MapPin {
   id: string;
   number: number | null;
   own: boolean;
+  kind: MapMarkerKind;
   /** Prozent von links. */
   x: number;
   /** Prozent von oben. */
@@ -68,9 +79,13 @@ export interface MapPin {
 
 export const mapText: {
   load: string; loading: string; error: string; privacy: string; skip: string; zoomIn: string; zoomOut: string;
-  attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; zoomGroup: string; canvasHint: string;
+  attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; seat: string; zoomGroup: string; canvasHint: string;
 };
 export const DEFAULT_TILE_URL: string;
+/** Name eines Markers für Hilfstechnik; ein Sitzmarker bekommt den Zusatz „Vereinssitz“. */
+export function markerName(item: { label?: string; kind?: MapMarkerKind }): string;
+/** `invert` bleibt `invert`, alles andere ergibt `dim`. */
+export function tilesMode(value: unknown): MapDarkTiles;
 export const MIN_ZOOM: number;
 export const MAX_ZOOM: number;
 export const DEFAULT_ZOOM: number;
