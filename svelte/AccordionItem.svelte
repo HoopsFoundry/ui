@@ -44,6 +44,7 @@
 
   let el = $state<HTMLElement>();
   let trigger = $state<HTMLButtonElement>();
+  let panel = $state<HTMLElement>();
 
   const triggerId = $derived(`${id}-trigger`);
   const panelId = $derived(`${id}-panel`);
@@ -51,9 +52,12 @@
   const region = $derived(group ? group.count > 0 && group.count <= 6 : true);
 
   function setOpen(next: boolean, user = false) {
-    if (next === open) return;
-    if (disabled) return;
+    if (disabled && next !== open) return;
+    // Auch ein schon offener Bereich schließt bei exclusive die anderen (Anker auf einen beim Start offenen Bereich)
     if (next && group?.exclusive) group.closeOthers(id);
+    if (next === open) return;
+    // Der Fokus liegt im Bereich, der gleich inert wird: er geht auf den Kopf (sonst fiele er auf <body>)
+    if (!next && panel && trigger && panel.contains(document.activeElement)) trigger.focus();
     open = next;
     if (user && (group?.syncHash ?? true)) writeHash(id, next);
   }
@@ -122,7 +126,7 @@
       <svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5" /></svg>
     </button>
   </svelte:element>
-  <div class="dss-acc-panel" id={panelId} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} inert={!open}>
+  <div class="dss-acc-panel" id={panelId} bind:this={panel} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} inert={!open}>
     <div class="dss-acc-panel-inner">
       <div class="dss-acc-body">{@render children?.()}</div>
     </div>

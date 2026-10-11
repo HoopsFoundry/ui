@@ -59,6 +59,19 @@ describe('Accordion-CSS: Klassen und Tokens', () => {
   it('Elementselektoren h1 bis h6 setzen keine Größen (die Klasse trägt die Größe)', () => {
     expect(acc).not.toMatch(/(^|[\s,}])h[1-6]\s*[,{]/);
   });
+  it('Kopf als button und als summary sehen gleich aus: box-sizing, font, margin, appearance, Breite, Ausrichtung', () => {
+    const r = rule('.dss-acc-trigger');
+    expect(r).toMatch(/box-sizing:\s*border-box/);
+    expect(r).toMatch(/font:\s*inherit/);
+    expect(r).toMatch(/margin:\s*0/);
+    expect(r).toMatch(/appearance:\s*none/);
+    expect(r).toMatch(/width:\s*100%/);
+    expect(r).toMatch(/text-align:\s*left/);
+    expect(rule('summary.dss-acc-trigger')).toMatch(/list-style:\s*none/);
+    // font: inherit steht vor den einzelnen font-Angaben (die Kurzform würde sie sonst zurücksetzen)
+    expect(r.indexOf('font: inherit')).toBeLessThan(r.indexOf('font-family'));
+    expect(r.indexOf('font: inherit')).toBeLessThan(r.indexOf('line-height'));
+  });
   it('der Kopf ist mindestens 44 px hoch; Nav-Link und Nav-Schalter ebenso', () => {
     expect(rule('.dss-acc-trigger')).toMatch(/min-height:\s*44px/);
     expect(rule('.dss-acc-nav-link')).toMatch(/min-height:\s*44px/);

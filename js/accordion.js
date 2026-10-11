@@ -125,30 +125,36 @@ export function writeHash(id, open) {
   }
 }
 
-/** Scrollt das Element in Sicht (nach dem nächsten Frame, damit ein gerade geöffneter Bereich schon im Layout steht). */
-export function scrollToElement(el) {
-  if (typeof window === 'undefined' || !el) return;
-  const run = () => {
-    if (typeof el.scrollIntoView === 'function') el.scrollIntoView({ block: 'start', behavior: 'auto' });
-  };
-  if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(run);
-  else run();
+/**
+ * Höhe des klebenden Kopfes, der ein verschachteltes Ziel verdecken würde: Steht `el` in einem Bereich einer klebenden Gruppe
+ * (`dss-acc--sticky`), bleibt dessen Kopf oben stehen und liegt über dem Ziel. Ist `el` selbst der Bereich der obersten Ebene, ist es 0.
+ */
+export function stickyOffset(el) {
+  if (!el || typeof el.closest !== 'function') return 0;
+  let top = null;
+  for (let item = el.parentElement?.closest('.dss-acc-item'); item; item = item.parentElement?.closest('.dss-acc-item')) top = item;
+  if (!top || !top.parentElement?.closest('.dss-acc')?.classList.contains('dss-acc--sticky')) return 0;
+  const head = top.querySelector(':scope > .dss-acc-title, :scope > summary');
+  return head ? Math.ceil(head.getBoundingClientRect().height) : 0;
 }
 
 /**
- * Tastatur in einer Gruppe: Pfeil ab/auf, Home, End bewegen den Fokus zwischen den Köpfen (`.dss-acc-trigger`), die direkt zu
- * `root` (`.dss-acc`) gehören; deaktivierte (`aria-disabled`) werden übersprungen. Gibt `true` zurück, wenn die Taste behandelt wurde
- * (der Aufrufer ruft dann `preventDefault` auf). Mit Strg, Alt, Meta oder Umschalt passiert nichts.
+ * Scrollt das Element in Sicht (nach dem nächsten Frame, damit ein gerade geöffneter Bereich schon im Layout steht). Der Abstand nach
+ * oben (`scroll-margin-top`) enthält `--dss-acc-sticky-top`, 8 px und die Höhe des klebenden Kopfes eines umgebenden Bereichs
+ * (`stickyOffset`), damit ein verschachteltes Ziel nicht unter dem Kopf der Eltern verschwindet.
  */
-export function moveFocus(root, trigger, key, modifiers = {}) {
-  if (!root || !trigger || modifiers.altKey || modifiers.ctrlKey || modifiers.metaKey || modifiers.shiftKey) return false;
-  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return false;
-  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter((el) => el.closest('.dss-acc') === root);
-  const index = triggers.indexOf(trigger);
-  if (index < 0) return false;
-  const target = nextHeader(index, key, triggers.map((el) => ({ disabled: el.getAttribute('aria-disabled') === 'true' })));
-  if (target !== index) triggers[target]?.focus();
-  return true;
+export function scrollToElement(el) {
+  if (typeof window === 'undefined' || !el) return;
+  const run = () => {
+    if (typeof el.scrollIntoView !== 'function') return;
+    const extra = stickyOffset(el);
+    const before = el.style.scrollMarginTop;
+    if (extra) el.style.scrollMarginTop = `calc(var(--dss-acc-sticky-top, 0px) + 8px + ${extra}px)`;
+    el.scrollIntoView({ block: 'start', behavior: 'auto' });
+    if (extra) el.style.scrollMarginTop = before;
+  };
+  if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(run);
+  else run();
 }
 
 // ── Vanilla-Skript ───────────────────────────────────────────
@@ -169,10 +175,21 @@ const isDetails = (item) => item.tagName === 'DETAILS';
 const isOpen = (item) => (isDetails(item) ? item.open : triggerOf(item)?.getAttribute('aria-expanded') === 'true');
 const isLocked = (item) => triggerOf(item)?.getAttribute('aria-disabled') === 'true';
 
+/** Liegt der Fokus im Bereich, der sich schließt (und damit nicht mehr erreichbar ist), geht er auf den Kopf dieses Bereichs. */
+function keepFocus(item) {
+  const active = item.ownerDocument.activeElement;
+  const trigger = triggerOf(item);
+  if (trigger && active && active !== trigger && item.contains(active) && !trigger.contains(active)) trigger.focus();
+}
+
 function labelOf(item) {
   const trigger = triggerOf(item);
-  const label = trigger?.querySelector('.dss-acc-label');
-  return clean((label ?? trigger)?.textContent);
+  const source = trigger?.querySelector('.dss-acc-label') ?? trigger;
+  if (!source) return '';
+  // Das unsichtbare Komma (.dss-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
+  const copy = source.cloneNode(true);
+  for (const hidden of copy.querySelectorAll('.dss-sr-only')) hidden.remove();
+  return clean(copy.textContent);
 }
 
 /** Alle Bereiche, die direkt zu `root` gehören (verschachtelte Gruppen zählen nicht mit). */
@@ -218,6 +235,7 @@ export function initAccordion(root, options = {}) {
   const items = () => itemsOf(root);
   const apply = (item, open) => {
     if (isDetails(item)) {
+      if (!open && item.open) keepFocus(item);
       if (item.open !== open) {
         expected.add(item);
         item.open = open;
@@ -226,6 +244,7 @@ export function initAccordion(root, options = {}) {
     } else {
       const trigger = triggerOf(item);
       const panel = panelOf(item);
+      if (!open) keepFocus(item);
       trigger?.setAttribute('aria-expanded', String(open));
       if (panel) {
         panel.hidden = !open;

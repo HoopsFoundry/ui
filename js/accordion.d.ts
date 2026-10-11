@@ -37,7 +37,9 @@ export function summaryText(open: number, total: number): string;
 export function currentHash(): string;
 /** Setzt beim Öffnen `#id` per `history.replaceState`; beim Schließen wird der Anker nur entfernt, wenn er zu `id` gehört. */
 export function writeHash(id: string, open: boolean): void;
-/** Scrollt das Element nach dem nächsten Frame in Sicht (ohne Browser ohne Wirkung). */
+/** Höhe des klebenden Kopfes eines umgebenden Bereichs, der ein verschachteltes Ziel verdecken würde (sonst 0). */
+export function stickyOffset(el: Element | null | undefined): number;
+/** Scrollt das Element nach dem nächsten Frame in Sicht; der Abstand nach oben enthält `--dss-acc-sticky-top` und den klebenden Kopf der Eltern (ohne Browser ohne Wirkung). */
 export function scrollToElement(el: Element | null | undefined): void;
 /** Tastatur einer Gruppe (Pfeil ab/auf, Home, End zwischen den Köpfen; deaktivierte übersprungen). `true`, wenn die Taste behandelt wurde (dann `preventDefault`). */
 export function moveFocus(root: Element, trigger: Element, key: string, modifiers?: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean }): boolean;

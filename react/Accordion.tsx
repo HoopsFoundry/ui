@@ -96,16 +96,18 @@ export function Accordion({
   const [current, setCurrent] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const [navOpen, setNavOpen] = useState(false);
-  const entriesRef = useRef(entries);
-  entriesRef.current = entries;
+  // Sofort aktuell (anders als der State): beim Start melden sich die Bereiche nacheinander an, und der Hash-Check des einen muss die schon angemeldeten anderen sehen
+  const entriesRef = useRef<Entry[]>([]);
 
   const register = useCallback((entry: Entry) => {
+    entriesRef.current = [...entriesRef.current, entry];
     setEntries((list) =>
       [...list, entry].sort((a, b) =>
         a.el && b.el ? (a.el.compareDocumentPosition(b.el) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1) : 0,
       ),
     );
     return () => {
+      entriesRef.current = entriesRef.current.filter((e) => e !== entry);
       setEntries((list) => list.filter((e) => e !== entry));
       setCurrent((now) => (now === entry.id ? null : now));
     };
@@ -231,6 +233,7 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
   const open = controlled ? openProp : inner;
   const el = useRef<HTMLDivElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
 
   // Neuester Stand für Funktionen, die später (Ereignis, hashchange, Gruppe) laufen
   const latest = useRef({ id, title, open, disabled, controlled, onOpenChange, group, parent });
@@ -238,8 +241,12 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
 
   const setOpen = useCallback((next: boolean, user = false) => {
     const now = latest.current;
-    if (next === now.open || now.disabled) return;
+    if (now.disabled && next !== now.open) return;
+    // Auch ein schon offener Bereich schließt bei exclusive die anderen (Anker auf einen beim Start offenen Bereich)
     if (next && now.group?.exclusive) now.group.closeOthers(now.id);
+    if (next === now.open) return;
+    // Der Fokus liegt im Bereich, der gleich inert wird: er geht auf den Kopf (sonst fiele er auf <body>)
+    if (!next && panel.current && trigger.current && panel.current.contains(document.activeElement)) trigger.current.focus();
     if (!now.controlled) setInner(next);
     now.onOpenChange?.(next);
     if (user && (now.group?.syncHash ?? true)) writeHash(now.id, next);
@@ -315,7 +322,7 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
           </svg>
         </button>
       </TitleTag>
-      <div className="dss-acc-panel" id={panelId} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} {...inert}>
+      <div ref={panel} className="dss-acc-panel" id={panelId} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} {...inert}>
         <div className="dss-acc-panel-inner">
           <div className="dss-acc-body">
             <ItemContext.Provider value={itemApi}>
