@@ -19,8 +19,8 @@ export const buttonMarkup = `<div class="dss-acc dss-acc--card" data-dss-acc>
   <div class="dss-acc-item" id="spielplan">
     <h3 class="dss-acc-title">
       <button type="button" class="dss-acc-trigger" id="spielplan-trigger" aria-expanded="false" aria-controls="spielplan-panel">
-        <span class="dss-acc-label">Spielplan</span>
-        <span class="dss-acc-meta"><span class="dss-sr-only">, </span>12 Spiele</span>
+        <span class="dss-acc-label">Spielplan<span class="dss-sr-only">,</span></span>
+        <span class="dss-acc-meta">12 Spiele</span>
         ${CHEVRON}
       </button>
     </h3>

@@ -30,7 +30,7 @@ Der Pfeil im Kopf ist ein SVG (`aria-hidden`) und dreht sich beim Öffnen um 180
 
 ## Kopf mit Zusatzinfo
 
-Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht in der Zusatzinfo ein unsichtbares Komma (`dss-sr-only`), das Name und Zusatz trennt; die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
+Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht hinter dem Titel ein unsichtbares Komma (`dss-sr-only`), das Name und Zusatz trennt; die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
 
 <Canvas of={AccordionStories.Zusatzinfo} />
 
@@ -119,7 +119,7 @@ Importiere `Accordion` und `AccordionItem` über die Path-Exporte (Svelte) bzw. 
 
 <FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
 
-<FrameworkCode label="Natives details (Vanilla)" vanilla={detailsVanilla} />
+<FrameworkCode label="Natives details (HTML, für alle Fassungen)" vanilla={detailsVanilla} svelte={detailsVanilla} react={detailsVanilla} />
 
 Die Tabelle zeigt die Steuerelemente der Gruppe; die Spielwiese rechts zeigt sie mit echten Komponenten. `count`, `firstOpen`, `lockSecond` und `meta` gehören nur zur Demo.
 
@@ -147,15 +147,15 @@ Die Gruppe hat in React zusätzlich `className`, in Svelte `class`. Die Namen ge
 
 ### Vanilla-Skript
 
-`initAccordion(root, { exclusive, syncHash, expandAll, nav, sticky })` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-dss-acc]`. Dieselben Hilfsfunktionen nutzen die Komponenten:
+`initAccordion(root, options)` mit den Optionen `exclusive`, `syncHash`, `expandAll`, `nav` und `sticky` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-dss-acc]`. Dieselben Hilfsfunktionen nutzen die Komponenten:
 
-<FrameworkCode label="Hilfsfunktionen" vanilla={funktionenJs} />
+<FrameworkCode label="Hilfsfunktionen (JavaScript, für alle Fassungen)" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
 
 <Canvas of={AccordionStories.VanillaButton} />
 
 ### Tokens
 
-<FrameworkCode label="Tokens" vanilla={tokensCss} />
+<FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
 
 ## Handy · 390 px Breite
 
@@ -163,7 +163,7 @@ Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px: Die Sprun
 
 <div className="dss-phones">
   <div className="dss-phone">
-    <h4 className="dss-doc-cap">Accordion · Sprungleiste und Zusatzinfo</h4>
+    <h3 className="dss-doc-cap">Accordion · Sprungleiste und Zusatzinfo</h3>
     <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Accordion auf dem Handy">
       <iframe title="Handy-Vorschau: Accordion mit Sprungleiste in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-accordion--handy" loading="lazy" />
     </div>

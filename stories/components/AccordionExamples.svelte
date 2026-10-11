@@ -73,7 +73,7 @@
     <div>
       <div class="cap">variant="flat"</div>
       <Accordion syncHash={false} variant="flat">
-        <AccordionItem id="va-f1" title="Tabelle" open>{TABELLE}</AccordionItem>
+        <AccordionItem id="va-f1" title="Saison" open>{TABELLE}</AccordionItem>
         <AccordionItem id="va-f2" title="Spielplan">{SPIELPLAN}</AccordionItem>
         <AccordionItem id="va-f3" title="Kader">{KADER}</AccordionItem>
       </Accordion>
@@ -187,19 +187,19 @@
       <div class="cap">In HeadingLevel level=2: Bereiche h2, Inhalt h3 · Ebenen: <code>{outline.level}</code></div>
       <HeadingLevel level={2}>
         <Accordion syncHash={false}>
-          <AccordionItem id="eb-2" title="Kader" open>
+          <AccordionItem id="eb-2" title="Mannschaft" open>
             <Accordion syncHash={false}>
-              <AccordionItem id="eb-2a" title="Heim" open>Nordhain-Halle</AccordionItem>
+              <AccordionItem id="eb-2a" title="Auswärts" open>Nordhain-Halle</AccordionItem>
             </Accordion>
           </AccordionItem>
         </Accordion>
       </HeadingLevel>
     </div>
     <div use:read={'titleas'}>
-      <div class="cap">titleAs: Gruppe h4, ein Bereich h6 · Ebenen: <code>{outline.titleas}</code></div>
+      <div class="cap">titleAs: Gruppe h4, ein Bereich h5 · Ebenen: <code>{outline.titleas}</code></div>
       <Accordion syncHash={false} titleAs="h4">
-        <AccordionItem id="eb-3" title="Kader" open>Zehn Spieler.</AccordionItem>
-        <AccordionItem id="eb-3b" title="Trainerstab" titleAs="h6" open>Vier Trainer und Betreuer.</AccordionItem>
+        <AccordionItem id="eb-3" title="Spieler" open>Zehn Spieler.</AccordionItem>
+        <AccordionItem id="eb-3b" title="Trainerstab" titleAs="h5" open>Vier Trainer und Betreuer.</AccordionItem>
       </Accordion>
     </div>
   </div>
@@ -215,7 +215,7 @@
           {#each cols as c}
             <div class="cell" use:mark={stateClass[c]}>
               <Accordion syncHash={false} variant={v.id}>
-                <AccordionItem id={`zu-${v.id}-${c}`} title="Spielplan" open={c === 'Offen'} disabled={c === 'Gesperrt'}>Bericht</AccordionItem>
+                <AccordionItem id={`zu-${v.id}-${c}`} title={c === 'Offen' ? `Spielplan ${v.name}` : 'Spielplan'} open={c === 'Offen'} disabled={c === 'Gesperrt'}>Bericht</AccordionItem>
               </Accordion>
             </div>
           {/each}

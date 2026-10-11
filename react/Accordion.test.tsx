@@ -359,7 +359,7 @@ describe('Accordion: Zusatzinfo und Name', () => {
     const button = screen.getByRole('button', { name: /Kader/ });
     expect(button).toHaveAccessibleName(/^Kader,\s?14 Spieler$/); // Leerraum zwischen Spans: je nach Layout
     expect(button.textContent?.match(/14 Spieler/g)).toHaveLength(1);
-    expect(button.querySelector('.dss-acc-meta')).toHaveTextContent(', 14 Spieler');
+    expect(button.querySelector('.dss-acc-meta')).toHaveTextContent('14 Spieler');
   });
   it('Chip und Live-Tag als Zusatzinfo', () => {
     render(

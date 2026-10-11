@@ -80,7 +80,7 @@ describe('Svelte Accordion: Öffnen und bind:open', () => {
     expect(isOpen('b')).toBe(true);
   });
   it('Zusatzinfo steht im Kopf, einmal; ohne meta entfällt sie', () => {
-    expect(trigger('a').querySelector('.dss-acc-meta')!.textContent).toBe(', 14 Spieler');
+    expect(trigger('a').querySelector('.dss-acc-meta')!.textContent).toBe('14 Spieler');
     set({ metaOn: false });
     expect(trigger('a').querySelector('.dss-acc-meta')).toBeNull();
   });
