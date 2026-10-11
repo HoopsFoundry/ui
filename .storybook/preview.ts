@@ -6,6 +6,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import '../fonts/fonts.css';
 import '../tokens/tokens.css';
 import '../css/components.css';
+import 'leaflet/dist/leaflet.css';
 import './storybook.css';
 import { installPseudoStates } from './pseudo-states';
 import { setForcedState, type ForcedState } from './state-switch';

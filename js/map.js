@@ -20,6 +20,8 @@ export const mapText = {
   linkOsm: 'In OpenStreetMap öffnen',
   linkRoute: 'Route planen',
   listLabel: 'Orte auf der Karte',
+  own: 'Eigener Ort',
+  zoomGroup: 'Maßstab',
   canvasHint: 'Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab.',
 };
 

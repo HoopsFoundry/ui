@@ -68,7 +68,7 @@ export interface MapPin {
 
 export const mapText: {
   load: string; loading: string; error: string; privacy: string; skip: string; zoomIn: string; zoomOut: string;
-  attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; canvasHint: string;
+  attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; zoomGroup: string; canvasHint: string;
 };
 export const DEFAULT_TILE_URL: string;
 export const MIN_ZOOM: number;
