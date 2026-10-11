@@ -1,0 +1,146 @@
+import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as StatsStories from './Stats.stories';
+import { DosDonts } from './docs/blocks/DosDonts';
+import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { DocTable } from './docs/blocks/DocTable';
+import './docs/blocks/blocks.css';
+import { vanilla, svelte, react, tokensCss } from './Stats.code';
+
+<Meta of={StatsStories} />
+
+# Kennzahlen und Form
+
+Zwei kleine Bausteine für Zahlen rund um eine Mannschaft: das **Kennzahlen-Gitter** (`dss-stats`) zeigt Werte wie Siege oder Punkte pro Spiel als Kacheln oder, kompakt, in einer Zeile. Die **Form** (`dss-form`) zeigt die letzten Spiele als Reihe kleiner Zeichen. Beide gibt es als Komponente für Svelte (`StatGrid`, `FormChips`) und React und als Vanilla-Markup mit denselben Klassen. Die Form in der Spalte „Form“ der [LeagueCard](?path=/docs/components-leaguecard--docs) ist derselbe Baustein, es gibt keine zweite Darstellung.
+
+## Kennzahlen: Aufbau
+
+Eine Kennzahl hat eine Beschriftung und einen Wert. Das Markup ist eine Beschreibungsliste (`dl`): Im Lesefluss steht die Beschriftung zuerst („Siege, 12“), optisch steht der Wert darüber (der Wert ist groß, in `--fs-h2`; die Beschriftung klein, Mono, in `--fs-caption`). Zahlen bekommen das Dezimalkomma (`82.4` wird `82,4`); Texte wie „71 %“ bleiben, wie sie sind. Das Gitter füllt die Breite und bricht um: jede Kachel ist mindestens `8rem` breit, auf schmalem Bildschirm reicht eine Spalte, ohne dass die Seite seitlich scrollt.
+
+<Canvas of={StatsStories.Aufbau} />
+
+**Fehlende Werte:** Gibt es keinen Wert (`null`, leer oder keine endliche Zahl), steht ein Gedankenstrich in der Kachel. Er ist für Screenreader verborgen; stattdessen liest die Hilfstechnik „keine Angabe“. Ein Eintrag ohne Beschriftung entfällt ganz.
+
+## Kompakt
+
+`compact` nimmt die Kacheln weg (kein Rand, keine Fläche, keine Innenabstände) und stellt die Kennzahlen in eine Zeile, die umbricht. Die Werte sind dann kleiner (`--fs-h3`). Das passt in den Kopf einer Karte oder in eine Seitenleiste.
+
+<Canvas of={StatsStories.Kompakt} />
+
+## Form: die letzten Spiele
+
+`FormChips` zeigt höchstens die **letzten fünf** Ergebnisse, das neueste zuletzt. Eingaben sind `S` (Sieg), `N` (Niederlage) und `U` (Unentschieden); alles andere wird ignoriert, ohne gültigen Eintrag erscheint nichts. Die Zeichen unterscheiden sich in der **Form**, nicht nur in der Farbe: Sieg ein gefüllter Punkt, Niederlage ein Quadrat, Unentschieden ein Ring. Mit `variant="letters"` stehen die Buchstaben S, N, U in farbigen Marken (die Buchstaben kommen aus dem CSS und sind nicht Teil des Textes).
+
+<Canvas of={StatsStories.Form} />
+
+Die Zeichen sind `aria-hidden`. Für Screenreader steht daneben ein versteckter Text aus `formLabel` (`js/league.js`): „Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden“. Dieselbe Funktion nutzt die LeagueCard; ändert sich der Text dort, ändert er sich hier.
+
+### Form in der Tabelle
+
+Die LeagueCard setzt in der Spalte „Form“ genau diesen Baustein ein. Auf dem Handy entfällt die Spalte (bis 640 px), die anderen optionalen Spalten ebenso.
+
+<Canvas of={StatsStories.Tabelle} />
+
+## Vanilla: dasselbe Markup
+
+Ohne Framework schreibst du das Markup selbst. Die Klassen und der versteckte Text sind dieselben; den Text erzeugt `formLabel` aus `league.js`, die Kennzahlen bereitet `statItems` aus `stats.js` auf. Das Beispiel rendert das Markup aus dem Code unten.
+
+<Canvas of={StatsStories.VanillaMarkup} />
+
+## Barrierefreiheit
+
+- **Nie nur Farbe:** Die Form unterscheidet Ergebnisse durch Form (Punkt, Quadrat, Ring) oder Buchstaben und hat den Text „Form: …“. Ohne diesen Text ist die Form für Screenreader leer.
+- **Zielgröße:** Die Zeichen sind nicht bedienbar und deshalb von der Zielgröße (WCAG 2.5.5 und 2.5.8) ausgenommen. Die Punkte sind 10 px groß, die Marken mit Buchstaben mindestens 24 × 24 px. **Wer sie anklickbar macht, braucht ein Ziel von 44 × 44 px** (zum Beispiel einen Link um die ganze Form).
+- **Kontrast:** Textfarben liegen über 7:1 (Buchstaben in den Chip-Tönen), Punkte und Quadrate haben mindestens 3:1 zur Fläche; in beiden Marken (BBV, DBB) und beiden Modi geprüft.
+- **Windows-Kontrastmodus:** Die Punkte behalten ihre Form (Punkt, Quadrat, Ring) in der Systemfarbe.
+- **Kennzahlen:** Die Beschreibungsliste ist eine echte Liste von Begriffen; Hilfstechnik liest „Siege, 12“. Kennzahlen haben keinen Zustand und sind nicht bedienbar.
+
+## Dunkelmodus und Marken
+
+Alle Flächen und Texte laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-chip-*`). Die Bausteine brauchen keinen eigenen Dunkelmodus und folgen der Marke (BBV, DBB).
+
+## Handy · 390 px Breite
+
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Inhalte, damit die Beispiele auf der Seite unterscheidbar bleiben). Das Gitter wird zweispaltig, die Form bleibt in einer Zeile, und die Tabelle der Karte blendet die Form aus.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Kennzahlen und Form · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen hell">
+      <iframe title="Handy-Vorschau: Kennzahlen und Form hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-kennzahlen--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Kennzahlen und Form · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen dunkel">
+      <iframe title="Handy-Vorschau: Kennzahlen und Form dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-kennzahlen--handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Verwendung: Import und Props
+
+Importiere `StatGrid` und `FormChips` über die Path-Exporte (Svelte) bzw. aus dem React-Paket. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel zeigt das Markup und die reinen Funktionen.
+
+<FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
+
+Die Spielwiese zeigt die echten Komponenten mit erfundenen Zahlen; `count`, `missing` und `formLength` gehören nur zur Demo.
+
+<Controls of={StatsStories.Spielwiese} />
+
+Props von `StatGrid`:
+
+<DocTable
+  label="Props von StatGrid"
+  head={['Prop', 'Typ', 'Beschreibung']}
+  rows={[
+    ['items', '{ label: string; value?: number | string | null }[] (Pflicht)', 'Kennzahlen. Zahlen bekommen das Dezimalkomma, Texte werden getrimmt. Ohne Beschriftung entfällt der Eintrag, ein fehlender Wert zeigt einen Gedankenstrich mit dem versteckten Text „keine Angabe“.'],
+    ['compact', 'boolean', 'Ohne Kacheln, in einer Zeile (Standard false).'],
+    ['class (Svelte) / className (React)', 'string', 'Zusätzliche Klassen am `dl`.'],
+  ]}
+/>
+
+Props von `FormChips`:
+
+<DocTable
+  label="Props von FormChips"
+  head={['Prop', 'Typ', 'Beschreibung']}
+  rows={[
+    ['form', "('S' | 'N' | 'U')[] (Pflicht)", 'Ergebnisse, neueste zuletzt. Angezeigt werden höchstens die letzten fünf; ungültige Einträge entfallen. Ohne gültigen Eintrag erscheint nichts.'],
+    ['variant', "'dots' | 'letters'", 'Punkte, Quadrat und Ring (Standard) oder Marken mit S, N, U.'],
+    ['class (Svelte) / className (React)', 'string', 'Zusätzliche Klassen an der Hülle `dss-form`.'],
+  ]}
+/>
+
+Die reinen Funktionen sind `statItems(items)` (`@bbv/dss-design-system/stats.js`) sowie `formEntries(form)` und `formLabel(form)` (`@bbv/dss-design-system/league.js`).
+
+### Tokens
+
+<FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Die Form nie nur in Farbe',
+      doText: 'Punkt, Quadrat und Ring unterscheiden die Ergebnisse auch ohne Farbe, und der versteckte Text „Form: …“ sagt sie an.',
+      dontText: 'Gleiche Punkte in Grün, Rot und Gelb: wer Farben nicht unterscheidet, sieht dreimal dasselbe, und der Screenreader liest nichts.',
+      good: <Story of={StatsStories.DoFarbe} inline />,
+      bad: <Story of={StatsStories.DontFarbe} inline />,
+    },
+    {
+      title: 'Wenige Kennzahlen',
+      doText: 'Vier bis sechs Kennzahlen, die eine Mannschaft beschreiben. Für mehr gibt es Tabellen.',
+      dontText: 'Ein Dutzend Kacheln schieben den Inhalt weg und lassen sich nicht mehr überblicken. Viele Werte gehören in eine Tabelle.',
+      good: <Story of={StatsStories.DoWenige} inline />,
+      bad: <Story of={StatsStories.DontWenige} inline />,
+    },
+    {
+      title: 'Kurze Werte, sprechende Beschriftung',
+      doText: 'Der Wert ist eine Zahl oder ein Kurzwert, die Einheit steht in der Beschriftung („Punkte pro Spiel“).',
+      dontText: 'Ein Satz im Wert bricht um, macht die Kacheln ungleich hoch und wiederholt, was die Beschriftung sagen soll.',
+      good: <Story of={StatsStories.DoKurz} inline />,
+      bad: <Story of={StatsStories.DontKurz} inline />,
+    },
+  ]}
+/>

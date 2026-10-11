@@ -104,8 +104,8 @@ const preview: Preview = {
       storySort: {
         order: [
           'Introduction',
-          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live'],
-          'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Map', 'VenueCard', 'Tabs', 'Accordion', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
+          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode'],
+          'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Kennzahlen', 'Map', 'VenueCard', 'Tabs', 'Accordion', 'PageNav', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
         ],
       },
     },
