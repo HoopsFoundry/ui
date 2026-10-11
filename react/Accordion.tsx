@@ -184,7 +184,7 @@ export function Accordion({
                   {navLabel}
                 </button>
                 <ul className="dss-acc-nav-list" id={listId}>
-                  {entries.filter((e) => e.anchor !== false).map((entry) => (
+                  {entries.filter((e) => e.anchor !== false && e.title).map((entry) => (
                     <li key={entry.id} className="dss-acc-nav-item">
                       <a
                         className="dss-acc-nav-link"

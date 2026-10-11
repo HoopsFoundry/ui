@@ -86,3 +86,12 @@ describe('CSS einklappbarer Rahmen', () => {
     }
   });
 });
+
+describe('Zielgröße der Links im Spielplan (WCAG 2.5.8)', () => {
+  const sub = css.match(/\.dss-sch-sub \.dss-link, \.dss-sch-team \.dss-link \{([^}]*)\}/);
+  it('Links in Unterzeile und am Teamnamen: 3 px Fläche oben und unten, negativer Rand hält die Zeilenhöhe', () => {
+    expect(sub).not.toBeNull();
+    expect(sub![1]).toMatch(/padding-block:\s*3px/);
+    expect(sub![1]).toMatch(/margin-block:\s*-3px/);
+  });
+});

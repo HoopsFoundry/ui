@@ -1118,6 +1118,8 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 .dss-tbl--schedule td.dss-sch-ha { width: 64px; padding-right: 0; }
 .dss-tbl--schedule td.dss-sch-match { color: var(--dss-fg); }
 .dss-sch-sub { display: block; margin-top: 2px; font-size: var(--fs-body-sm); }
+/* Zielgröße: Links in der Unterzeile und am Teamnamen bekommen 3 px Fläche oben und unten (WCAG 2.5.8), der negative Rand hält die Zeilenhöhe */
+.dss-sch-sub .dss-link, .dss-sch-team .dss-link { padding-block: 3px; margin-block: -3px; }
 .dss-sch-sep { color: var(--dss-mute); }
 .dss-sch-team.is-loser, .dss-sch-team.is-loser .dss-link { color: var(--dss-mute); }
 .dss-sch-ph { color: var(--dss-mute); font-style: italic; }

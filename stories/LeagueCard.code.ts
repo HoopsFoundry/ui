@@ -271,7 +271,9 @@ export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
 
 export const collapsibleVanilla = `<!-- Wie die normale Ligencard (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Untertitel steht im Button
      (dss-acc-sub), ein Live-Tag käme als dss-league-live dahinter. Die Karte trägt is-collapsible (und is-open, wenn sie offen ist);
-     Tabelle, Legende und Link stehen im Bereich (dss-acc-panel). Geschlossen: aria-expanded="false", Bereich mit hidden und inert. -->
+     Tabelle, Legende und Link stehen im Bereich (dss-acc-panel). Geschlossen: aria-expanded="false", Bereich mit hidden und inert.
+     Steht der Rahmen im Panel eines Bereichs (dss-acc-item), braucht er einen eigenen Container (div.dss-acc mit data-dss-acc) und einen eigenen
+     initAccordion-Aufruf; initAccordions startet jeden data-dss-acc-Container einzeln. -->
 ${collapsibleMarkup}
 
 <script type="module">

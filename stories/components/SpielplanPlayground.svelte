@@ -36,6 +36,8 @@
     showBye = true,
     showEmptyCell = true,
     collapsible = false,
+    open = true,
+    id = '',
   }: {
     kind?: 'table' | 'grid';
     layout?: ScheduleLayout;
@@ -60,6 +62,8 @@
     showBye?: boolean;
     showEmptyCell?: boolean;
     collapsible?: boolean;
+    open?: boolean;
+    id?: string;
   } = $props();
 
   const dens = $derived(density === 'auto' ? undefined : density);
@@ -221,7 +225,8 @@
       meta="4 Spiele"
       caption="Spielplan Spielwiese"
       {collapsible}
-      open
+      {open}
+      id={id || undefined}
       time={editableTime ? editTime : undefined}
       notice={showNotice ? sperrzeit : undefined}
     />
@@ -238,7 +243,8 @@
       meta="Samstag, 10.10.2026"
       caption="Zeitraster Spielwiese"
       {collapsible}
-      open
+      {open}
+      id={id || undefined}
     />
   {/if}
 </div>

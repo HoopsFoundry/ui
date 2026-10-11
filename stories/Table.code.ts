@@ -150,7 +150,9 @@ export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
 
 export const collapsibleVanilla = `<!-- Wie die normale Tabelle (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Rahmen trägt
      is-collapsible (und is-open, wenn er offen ist), die Tabelle steht in einem Bereich (dss-acc-panel). Geschlossen: aria-expanded="false",
-     Bereich mit hidden und inert. Der Container mit data-dss-acc macht ihn bedienbar; mehrere Rahmen in einem Container bilden eine Gruppe. -->
+     Bereich mit hidden und inert. Der Container mit data-dss-acc macht ihn bedienbar; mehrere Rahmen in einem Container bilden eine Gruppe.
+     Steht der Rahmen im Panel eines Bereichs (dss-acc-item), braucht er einen eigenen Container (div.dss-acc mit data-dss-acc) und einen eigenen
+     initAccordion-Aufruf; initAccordions startet jeden data-dss-acc-Container einzeln. -->
 ${collapsibleMarkup}
 
 <script type="module">

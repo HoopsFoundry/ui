@@ -163,6 +163,16 @@ describe('Rahmen in einer Accordion-Gruppe', () => {
     expect(document.activeElement).toBe(trig(container, 't2'));
     expect(container.querySelector('a[href="#t2"]')!.getAttribute('aria-current')).toBe('true');
   });
+  it('Rahmen mit Knoten-Titel und id erzeugt keinen leeren Sprunglink', async () => {
+    const { container } = render(
+      <Accordion syncHash={false} nav>
+        <Table collapsible id="k1" title={<em>Knoten</em>} columns={[{ key: 'a', label: 'A' }]}><tr><td>x</td></tr></Table>
+        <Table collapsible id="k2" title="Text" columns={[{ key: 'a', label: 'A' }]}><tr><td>x</td></tr></Table>
+      </Accordion>,
+    );
+    await wait(10);
+    expect([...container.querySelectorAll('.dss-acc-nav-link')].map((a) => a.textContent)).toEqual(['Text']);
+  });
   it('Alle öffnen und Alle schließen betreffen Rahmen und Bereiche (auch ohne id)', async () => {
     const { container, getByText } = render(<Group expandAll />);
     await wait(10);

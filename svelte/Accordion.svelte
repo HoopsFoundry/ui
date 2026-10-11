@@ -128,7 +128,7 @@
         <nav class="dss-acc-nav{navOpen ? ' is-open' : ''}" aria-label={navLabel}>
           <button type="button" class="dss-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>{navLabel}</button>
           <ul class="dss-acc-nav-list" id={listId}>
-            {#each entries.filter((e) => e.anchor !== false) as entry (entry.id)}
+            {#each entries.filter((e) => e.anchor !== false && e.title) as entry (entry.id)}
               <li class="dss-acc-nav-item">
                 <a class="dss-acc-nav-link" href={`#${encodeURIComponent(entry.id)}`} aria-current={current === entry.id ? 'true' : undefined} onclick={(event) => jump(event, entry)}>{entry.title}</a>
               </li>

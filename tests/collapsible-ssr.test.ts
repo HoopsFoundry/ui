@@ -146,3 +146,16 @@ describe('Server-Markup einklappbarer Rahmen', () => {
     expect(out).not.toContain('dss-acc-');
   });
 });
+
+describe('ohne collapsible: kein Accordion-Markup, Svelte gleich React', () => {
+  it.each(COMPS)('%s', (comp) => {
+    for (const props of [{ title: 'Titel A', collapsible: false }, { title: 'Titel A', collapsible: false, id: 'x', meta: 'Info' }, { id: 'x', collapsible: false }]) {
+      const cfg = one(comp, props, true);
+      const s = render(Host, { props: { cfg } }).body;
+      const r = renderToStaticMarkup(reactTree(cfg));
+      expect(s).not.toMatch(/--acc|is-collapsible|dss-acc/);
+      expect(r).not.toMatch(/--acc|is-collapsible|dss-acc/);
+      expect(normalize(s)).toBe(normalize(r));
+    }
+  });
+});

@@ -32,6 +32,7 @@
     size={rest.size}
     titleAs={rest.titleAs}
     collapsible={rest.collapsible}
-    open
+    open={rest.open}
+    id={rest.id || undefined}
   />
 </div>

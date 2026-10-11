@@ -3,6 +3,7 @@
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import Host from './helpers/FramesHost.svelte';
+import ItemHost from './helpers/FramesInItem.svelte';
 
 let target: HTMLElement;
 let instance: Record<string, unknown>;
@@ -138,5 +139,24 @@ describe('in einer Accordion-Gruppe', () => {
     start({ syncHash: true }, '#t2');
     await wait();
     expect(isOpen('t2')).toBe(true);
+  });
+});
+
+describe('einzelner Rahmen im Bereich eines AccordionItem', () => {
+  it('schließt bei exclusive den Elternbereich nicht und gehört nicht zur Pfeiltasten-Reihe der Gruppe', async () => {
+    window.history.replaceState(null, '', '/');
+    target = document.createElement('div');
+    document.body.replaceChildren(target);
+    instance = mount(ItemHost, { target });
+    flushSync();
+    await wait();
+    click(trig('k'));
+    expect(isOpen('k')).toBe(true);
+    expect(isOpen('p')).toBe(true);
+    trig('k').focus();
+    key(trig('k'), 'ArrowDown');
+    expect(document.activeElement).toBe(trig('k'));
+    key(trig('p'), 'ArrowDown');
+    expect(document.activeElement).toBe(trig('q'));
   });
 });

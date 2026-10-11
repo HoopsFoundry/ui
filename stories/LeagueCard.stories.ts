@@ -16,7 +16,7 @@ export const Spielwiese = {
   args: {
     title: 'Oberliga Nordhain Männer', teams: demoTable(0, { links: true }), ownRank: 0, zones: false,
     teamCount: 12, played: 66, total: 132, columns: [], limit: 3, href: '#tabelle', linkLabel: 'Komplette Tabelle und Spielplan', live: 0,
-    names: 'full', logos: false, size: 'standard', collapsible: false,
+    names: 'full', logos: false, size: 'standard', collapsible: false, open: true, id: '',
   },
   argTypes: {
     title: { control: 'text', description: 'Name der Liga; die Überschrift der Karte', table: t('string') },
@@ -35,6 +35,8 @@ export const Spielwiese = {
     logos: { control: 'boolean', description: 'Logo bzw. Initialen vor dem Namen (die Spielwiese ergänzt Demo-Logos für vier Vereine)', table: t('boolean', 'false') },
     size: { control: 'inline-radio', options: ['standard', 'compact'], description: 'Zeilen 60 px mit Untertitel oder Zeilen 40 px ohne Untertitel (Seitenleiste)', table: t("'standard' | 'compact'", "'standard'") },
     collapsible: { control: 'boolean', description: 'Einklappbar: der Kopf (Titel, Untertitel, Live) wird zum Accordion-Kopf, Tabelle, Legende und Link sind der Bereich. Die Spielwiese zeigt sie geöffnet (`open`)', table: t('boolean', 'false') },
+    open: { control: 'boolean', description: 'Geöffnet (nur mit `collapsible`; Svelte `bind:open`, React `open` mit `onOpenChange`). Die Spielwiese startet geöffnet', table: t('boolean', 'false') },
+    id: { control: 'text', description: 'Anker für Deep-Link und Sprungleiste (nur mit `collapsible`); leer: kein Anker', table: t('string') },
     titleAs: { control: 'inline-radio', options: [undefined, 'h2', 'h3', 'h4', 'h5', 'h6'], description: 'Überschriftenebene des Titels. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor `h3`. Die Größe hängt am Token `--dss-card-title-size`, nicht an der Ebene. Leer lassen, damit die Ebene gilt, die sich aus der Gliederung ergibt', table: t("'h2' | 'h3' | 'h4' | 'h5' | 'h6'", "'h3'") },
   },
 };

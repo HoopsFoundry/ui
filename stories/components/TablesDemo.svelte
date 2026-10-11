@@ -2,7 +2,7 @@
   import Table from '../../svelte/Table.svelte';
   import { roster, boxscore, crew, signClass } from './tableData';
 
-  let { preset = 'boxscore', density = 'compact', dark = false, collapsible = false } = $props();
+  let { preset = 'boxscore', density = 'compact', dark = false, collapsible = false, open = true, id = '' } = $props();
 </script>
 
 <div style="padding: 24px;">
@@ -14,7 +14,8 @@
     density="touch"
     {dark}
     {collapsible}
-    open
+    {open}
+    id={id || undefined}
     columns={[
       { key: 'check', label: '✓', width: '52px', align: 'center' },
       { key: 'num', label: '#', width: '64px', align: 'center' },
@@ -55,7 +56,8 @@
     {density}
     {dark}
     {collapsible}
-    open
+    {open}
+    id={id || undefined}
     columns={[
       { key: 'num',  label: '#',   width: '52px' },
       { key: 'name', label: 'Spieler' },
@@ -112,7 +114,8 @@
     density="default"
     {dark}
     {collapsible}
-    open
+    {open}
+    id={id || undefined}
     columns={[
       { key: 'role', label: 'Rolle' },
       { key: 'name', label: 'Person' },
@@ -139,7 +142,7 @@
         <div style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--page-mute); margin-bottom: 8px;">
           Dichte · {d} · {d === 'touch' ? '60' : d === 'default' ? '48' : d === 'compact' ? '40' : '32'} px
         </div>
-        <Table density={d} {dark} {collapsible} open title={collapsible ? `Dichte ${d}` : undefined} caption={`Dichte ${d}`} columns={[
+        <Table density={d} {dark} {collapsible} {open} title={collapsible ? `Dichte ${d}` : undefined} caption={`Dichte ${d}`} columns={[
           { key: 'num', label: '#', width: '52px' },
           { key: 'name', label: 'Spieler' },
           { key: 'pts', label: 'PTS', width: '70px', align: 'right' },
