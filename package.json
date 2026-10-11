@@ -88,6 +88,14 @@
       "types": "./js/backtop.d.ts",
       "import": "./js/backtop.js"
     },
+    "./theme.js": {
+      "types": "./js/theme.d.ts",
+      "import": "./js/theme.js"
+    },
+    "./vanilla-core.js": {
+      "types": "./js/vanilla-core.d.ts",
+      "import": "./js/vanilla-core.js"
+    },
     "./stats.js": {
       "types": "./js/stats.d.ts",
       "import": "./js/stats.js"

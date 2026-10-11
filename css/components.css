@@ -1593,6 +1593,15 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-backtop[hidden] { display: none; }
 @media print { .dss-pagenav, .dss-backtop { display: none; } }
 
+/* ── Dunkelmodus-Umschalter (initTheme) ──────────────────────────
+   Markup: button.dss-btn.dss-btn--secondary.dss-btn--icon[data-dss="theme"] (mit hidden bis das Skript läuft); initTheme ergänzt die Klasse
+   .dss-theme-toggle, aria-pressed (gedrückt = Dunkelmodus), data-theme-state="light|dark" (tatsächlicher Zustand) und data-theme-mode="light|dark|system"
+   und legt, falls der Button leer ist, zwei Symbole an. Die Beschriftung bleibt fest; der Zustand steht im Symbol (Mond im Dunkelmodus, Sonne sonst). */
+.dss-theme-toggle .dss-theme-icon { display: block; flex: none; width: 20px; height: 20px; }
+.dss-theme-toggle[data-theme-state="dark"] .dss-theme-icon--sun,
+.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: none; }
+.dss-theme-toggle[aria-pressed="true"] { background: var(--dss-selected-bg); }
+
 /* ── Map (Karte mit Leaflet und OpenStreetMap) ───────────────────
    Markup: div.dss-map > a.dss-map-skip + div.dss-map-frame[role=region] > div.dss-map-stage (Platzhalter | Leaflet-Fläche .dss-map-canvas,
    Zoom-Schaltflächen, Quellenangabe .dss-map-attr, Status) + div.dss-map-text (Liste der Orte mit Koordinaten und Links).

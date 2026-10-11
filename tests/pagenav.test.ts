@@ -41,7 +41,7 @@ describe('reine Funktionen', () => {
   });
   it('labelOf: data-pagenav gewinnt, Leerraum zusammengefasst', () => {
     const el = document.createElement('div');
-    el.innerHTML = '  Mannschaft \n  Kader ';
+    el.textContent = '  Mannschaft \n  Kader ';
     expect(labelOf(el)).toBe('Mannschaft Kader');
     el.setAttribute('data-pagenav', ' Termine ');
     expect(labelOf(el)).toBe('Termine');

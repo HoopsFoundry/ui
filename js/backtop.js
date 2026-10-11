@@ -53,6 +53,7 @@ export function initBackToTop(options = {}) {
   const avoid = opts.avoid === null ? null : typeof opts.avoid === 'string' ? opts.avoid : DEFAULTS.avoid;
 
   const adopted = Boolean(opts.button);
+  let icon = null; // das Symbol, das wir einem übernommenen Knopf angefügt haben
   const button = adopted ? opts.button : doc.createElement('button');
   const before = { hidden: button.hidden, type: button.getAttribute('type'), label: button.getAttribute('aria-label'), cls: button.className, offset: button.style.getPropertyValue('--dss-backtop-offset') };
   if (!adopted) {
@@ -61,7 +62,10 @@ export function initBackToTop(options = {}) {
     button.append(arrow(doc));
   } else {
     button.classList.add('dss-backtop');
-    if (!button.querySelector('svg')) button.append(arrow(doc));
+    if (!button.querySelector('svg')) {
+      icon = arrow(doc);
+      button.append(icon);
+    }
   }
   button.setAttribute('aria-label', label);
   button.hidden = true;
@@ -111,8 +115,10 @@ export function initBackToTop(options = {}) {
     for (const el of added) el.removeAttribute('tabindex');
     added.clear();
     if (adopted) {
+      icon?.remove();
       button.hidden = before.hidden;
-      button.className = before.cls;
+      if (before.cls) button.className = before.cls;
+      else button.removeAttribute('class');
       if (before.label === null) button.removeAttribute('aria-label');
       else button.setAttribute('aria-label', before.label);
       if (before.offset) button.style.setProperty('--dss-backtop-offset', before.offset);

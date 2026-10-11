@@ -3,13 +3,16 @@
 import { describe, expect, it } from 'vitest';
 import { loadModule, mutate, read, type Rules } from './helpers/mutation';
 import { backtopLogicRules, pagenavCssRules, pagenavLogicRules, pagenavSourceRules } from './helpers/pagenav-rules';
+import { themeCssRules, themeLogicRules, themeSourceRules } from './helpers/theme-rules';
 
 type Mutation = { name: string; rule: string; from: string; to: string };
 
 const pagenavJs = read('js/pagenav.js');
 const backtopJs = read('js/backtop.js');
+const themeJs = read('js/theme.js');
 const css = read('css/components.css');
 const cssStart = css.indexOf('/* ── Seitennavigation und Nach-oben-Knopf');
+const themeCssStart = css.indexOf('/* ── Dunkelmodus-Umschalter');
 
 const PAGENAV: Mutation[] = [
   { name: 'ä wird nicht aufgelöst', rule: 'PageNav: ids lösen Umlaute auf', from: ".replace(/ä/g, 'ae')", to: ".replace(/ä/g, 'a')" },
@@ -69,6 +72,77 @@ const SOURCE: { name: string; rule: string; file: 'pagenav' | 'backtop'; from: s
   { name: 'SVG per innerHTML-freier Alternative entfällt', rule: 'Quelltext: SVG per createElementNS', file: 'backtop', from: 'doc.createElementNS(SVG_NS, \'svg\')', to: 'doc.createElement(\'svg\')' },
   { name: 'globale Zuweisung', rule: 'Quelltext: kein eigener globaler Zustand außer dem Register', file: 'pagenav', from: 'const registry = createRegistry();', to: 'const registry = createRegistry();\nwindow.__pagenav = 1;' },
 ];
+
+type ThemeMutation = Mutation & { after?: string };
+const THEME: ThemeMutation[] = [
+  { name: 'jede Zeichenkette ist ein Modus', rule: 'Theme: nur light, dark und system sind Modi', from: "typeof value === 'string' && MODES.includes(value) ? value : null", to: "typeof value === 'string' ? value : null" },
+  { name: 'system bleibt immer hell', rule: 'Theme: system folgt der Systemeinstellung', from: "if (m === 'system') return prefersDark ? 'dark' : 'light';", to: "if (m === 'system') return 'light';" },
+  { name: 'Klick ohne Blick auf das System', rule: 'Theme: der Klick wechselt den tatsächlichen Zustand', from: "return resolveTheme(mode, prefersDark) === 'dark' ? 'light' : 'dark';", to: "return mode === 'dark' ? 'light' : 'dark';" },
+  { name: 'Speicherfehler beim Lesen werden geworfen', rule: 'Theme: blockierter Speicher bleibt ohne Fehler', from: '} catch {\n    return null;\n  }', to: '} catch (e) {\n    throw e;\n  }' },
+  { name: 'system schreibt statt zu löschen', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "if (mode === 'system') storage?.removeItem(key);", to: "if (mode === 'system') storage?.setItem(key, mode);" },
+  { name: 'anderer Standardschlüssel', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "export const THEME_KEY = 'dss-theme';", to: "export const THEME_KEY = 'theme';" },
+  { name: 'Rückfall hell statt system', rule: 'Theme: ein ungültiger gemerkter Wert gilt als system', from: "readTheme(storage, key) ?? 'system';", to: "readTheme(storage, key) ?? 'light';" },
+  { name: 'aria-pressed bleibt falsch', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('aria-pressed', String(theme === 'dark'));", to: "button.setAttribute('aria-pressed', 'false');" },
+  { name: 'kein Zustand am Button', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('data-theme-state', theme);", to: '' },
+  { name: 'Beschriftung folgt dem Modus', rule: 'Theme: feste Beschriftung „Dunkelmodus“, auch nach dem Umschalten', from: "button.setAttribute('aria-label', label);\n  button.hidden", to: "button.setAttribute('aria-label', mode);\n  button.hidden" },
+  { name: 'Button mit Text bekommt aria-label', rule: 'Theme: ein Button mit eigenem Text behält seinen Namen', from: '!button.textContent.trim() && ', to: '' },
+  { name: 'system setzt ein Attribut', rule: 'Theme: system setzt kein Attribut, auch bei dunklem System', from: "if (mode === 'system') target.removeAttribute(attribute);", to: "if (mode === 'system') target.setAttribute(attribute, resolveTheme(mode, prefersDark()));" },
+  { name: 'Systemeinstellung wird nicht gehört', rule: 'Theme: Änderungen der Systemeinstellung werden gehört (nur im Modus system)', from: "cleanups.add(listen(query, 'change', onScheme))", to: "cleanups.add(listen(query, 'changex', onScheme))" },
+  { name: 'Systemänderung auch bei gewählter Wahl', rule: 'Theme: Änderungen der Systemeinstellung werden gehört (nur im Modus system)', from: "const onScheme = () => { if (mode === 'system') {", to: 'const onScheme = () => { if (true) {' },
+  { name: 'Symbole nicht verborgen', rule: 'Theme: Symbole sind aria-hidden-SVG, eigene Symbole bleiben', from: "'aria-hidden': 'true', focusable: 'false' }", to: "focusable: 'false' }" },
+  { name: 'eigene Symbole werden ergänzt', rule: 'Theme: Symbole sind aria-hidden-SVG, eigene Symbole bleiben', from: "if (!button.querySelector('.dss-theme-icon')) {", to: 'if (true) {' },
+  { name: 'andere Tabs werden nicht gehört', rule: 'Theme: ein anderer Tab ändert die Wahl', from: "listen(win, 'storage',", to: "listen(win, 'storagex'," },
+  { name: 'Symbole bleiben nach destroy', rule: 'Theme: destroy entfernt Listener und Ergänzungen', from: 'for (const icon of created) icon.remove();', to: '' },
+  { name: 'Klick-Listener bleibt nach destroy', rule: 'Theme: destroy entfernt Listener und Ergänzungen', from: 'cleanups.run();\n    for (const icon', to: 'for (const icon' },
+  { name: 'zweiter Aufruf ersetzt nicht', rule: 'Theme: ein zweiter Aufruf ersetzt den ersten', from: 'registry.release(button);', to: '' },
+  { name: 'ungültiger Attributname wird übernommen', rule: 'Theme: ein ungültiger Attributname fällt auf data-theme zurück', from: "typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;\n  const target", to: "typeof opts.attribute === 'string' ? opts.attribute : THEME_ATTRIBUTE;\n  const target" },
+  { name: 'Boot setzt system als Attribut', rule: 'Boot: system, ungültig und leer setzen nichts', from: 'if(m==="light"||m==="dark")document', to: 'if(m)document' },
+  { name: 'Boot ohne try', rule: 'Boot: blockierter Speicher wirft nicht und defaultMode gilt', from: 'try{m=localStorage.getItem(${lit(key)})}catch(e){}', to: 'm=localStorage.getItem(${lit(key)});' },
+  { name: 'Boot: defaultMode gewinnt immer', rule: 'Boot: die gemerkte Wahl gewinnt gegen defaultMode', from: 'if(m!=="light"&&m!=="dark")m=${lit(fallback)};', to: 'm=${lit(fallback)};' },
+  { name: 'Boot: Schlüssel nicht maskiert', rule: 'Boot: Schlüssel und Attribut sind konfigurierbar und maskiert', from: ".replace(/</g, '\\\\u003c')", to: '' },
+  { name: 'Boot: Attribut nicht geprüft', rule: 'Boot: Schlüssel und Attribut sind konfigurierbar und maskiert', after: 'export function themeBootScript', from: "typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;", to: "typeof opts.attribute === 'string' ? opts.attribute : THEME_ATTRIBUTE;" },
+  { name: 'Boot wird lang', rule: 'Boot: kurz und ohne let, const, Pfeilfunktion', from: '(function(){var m;', to: `(function(){/* ${'x'.repeat(300)} */var m;` },
+];
+const THEME_CSS: Mutation[] = [
+  { name: 'beide Symbole sichtbar', rule: 'CSS: Symbole wechseln über den Zustand (Mond im Dunkelmodus, Sonne sonst)', from: '.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: none; }', to: '.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: block; }' },
+  { name: 'Symbol 24 px', rule: 'CSS: Symbolgröße 20 px', from: 'width: 20px; height: 20px; }\n.dss-theme-toggle[data-theme-state', to: 'width: 24px; height: 24px; }\n.dss-theme-toggle[data-theme-state' },
+  { name: 'gedrückt ohne Fläche', rule: 'CSS: gedrückt zeigt die Auswahlfläche', from: 'background: var(--dss-selected-bg); }', to: 'background: transparent; }' },
+  { name: 'festes Hex', rule: 'CSS: kein festes Hex', from: 'background: var(--dss-selected-bg); }', to: 'background: #eeeeee; }' },
+];
+const THEME_SRC: Mutation[] = [
+  { name: 'Inline-onclick', rule: 'Quelltext: kein innerHTML, kein Inline-onclick, kein eval', from: 'button.hidden = false;', to: "button.setAttribute('onclick', 'x'); button.hidden = false;" },
+  { name: 'globaler Zustand', rule: 'Quelltext: kein globaler Zustand', from: 'const registry = createRegistry();', to: 'const registry = createRegistry();\nwindow.__theme = 1;' },
+  { name: 'Speicherzugriff ohne try', rule: 'Quelltext: Speicherzugriff nur in try', from: 'try {\n      storage = opts.storage ?? win.localStorage;', to: 'if (true) {\n      storage = opts.storage ?? win.localStorage;' },
+  { name: 'Lebenszyklus selbst gebaut', rule: 'Quelltext: Lebenszyklus über js/lifecycle.js', from: "from './lifecycle.js'", to: "from './own.js'" },
+  { name: 'anderer Schlüssel im Quelltext', rule: 'Quelltext: Standardschlüssel dss-theme', from: "'dss-theme'", to: "'theme'" },
+];
+
+describe('Mutationstests: Dunkelmodus-Umschalter', () => {
+  it('Ausgangslage', async () => {
+    const mod = await loadModule(themeJs);
+    expect(Object.entries(await themeLogicRules(mod as never)).filter(([, ok]) => !ok)).toEqual([]);
+  });
+  it.each(THEME)('$name', async ({ rule, from, to, after }) => {
+    const start = after ? themeJs.indexOf(after) : 0;
+    const mutated = await themeLogicRules((await loadModule(mutate(themeJs, from, to, start))) as never);
+    expect(rule in mutated, `Regel fehlt: ${rule}`).toBe(true);
+    expect(mutated[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+  it('CSS: Ausgangslage', () => {
+    expect(Object.entries(themeCssRules(css)).filter(([, ok]) => !ok)).toEqual([]);
+  });
+  it.each(THEME_CSS)('CSS: $name', ({ rule, from, to }) => {
+    expect(themeCssRules(css)[rule], `Regel fehlt: ${rule}`).toBe(true);
+    expect(themeCssRules(mutate(css, from, to, themeCssStart))[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+  it('Quelltext: Ausgangslage', () => {
+    expect(Object.entries(themeSourceRules(themeJs)).filter(([, ok]) => !ok)).toEqual([]);
+  });
+  it.each(THEME_SRC)('Quelltext: $name', ({ rule, from, to }) => {
+    expect(themeSourceRules(themeJs)[rule], `Regel fehlt: ${rule}`).toBe(true);
+    expect(themeSourceRules(mutate(themeJs, from, to))[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+});
 
 describe('Mutationstests: Seitennavigation', () => {
   it('Ausgangslage', async () => {
