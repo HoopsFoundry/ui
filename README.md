@@ -18,6 +18,7 @@ svelte/
   Modal.svelte          ← Reference component
   Card.svelte           ← v0.6
   Tabs.svelte           ← v0.6
+  Accordion.svelte      ← Bereiche auf und zu klappen (mit AccordionItem.svelte, CSS in css/components.css)
   Icon.svelte           ← v0.6 (67 Glyphen)
   Select.svelte         ← v0.7 · natives <select> im DSS-Look
   Banner.svelte         ← v0.7 · Inline-Hinweis
@@ -39,6 +40,7 @@ svelte/
 react/                  ← v0.9 · React-Fassung aller Svelte-Komponenten (Button, TextInput, Select, Modal, Banner, Card, Tabs, Icon, Checkbox, Table, TopBar, EmptyState, Stepper, AppNav, BottomNav, Breadcrumbs, Skeleton, MatchCard, PlayerCard, TeamCard, LeagueCard, PlayByPlay, CourtLines)
 js/
   appnav.js             ← v0.8 · Vanilla-Verhalten der AppNav
+  accordion.js          ← Accordion: reine Funktionen und `initAccordion` für Vanilla (Button-Weg und natives details)
   periods.js            ← Spielabschnitte: „3. Viertel“, „5. Achtel“, „Verlängerung“ (`./periods.js`)
   team.js               ← Hilfsfunktionen der TeamCard (`./team.js`)
   league.js             ← Ausschnitt, Untertitel, Form und Zonen der LeagueCard (`./league.js`)
@@ -435,7 +437,7 @@ Was drin ist:
 
 - **Introduction** (Startseite): Überblick, Werkzeugleiste, Inhaltsverzeichnis aller Seiten
 - **Foundation:** Colors, Typography, Focus & Hover
-- **Components:** je eine MDX-Seite pro Komponente oder Komponentengruppe (Button, TextInput, Select, Checkbox, Modal, Banner, Card, Card Library, TeamCard, LeagueCard, Tabs, Navigation, AppNav, Table, Spielplan, EmptyState, PlayByPlay, Icon, CourtLines) und die Spielwiese zum Spielplan
+- **Components:** je eine MDX-Seite pro Komponente oder Komponentengruppe (Button, TextInput, Select, Checkbox, Modal, Banner, Card, Card Library, TeamCard, LeagueCard, Tabs, Accordion, Navigation, AppNav, Table, Spielplan, EmptyState, PlayByPlay, Icon, CourtLines) und die Spielwiese zum Spielplan
 
 Die Werkzeugleiste schaltet **Marke** (BBV/DBB), **Schrift**, Hell/Dunkel, **Fassung** (Vanilla, Svelte oder React für alle
 Code-Beispiele) und **Zustand** (erzwingt Hover, Fokus oder Aktiv auf den Vorschauen der Seite) um.

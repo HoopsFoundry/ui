@@ -41,6 +41,8 @@
     "./svelte/AppNav": "./svelte/AppNav.svelte",
     "./svelte/Checkbox": "./svelte/Checkbox.svelte",
     "./svelte/CourtLines": "./svelte/CourtLines.svelte",
+    "./svelte/Accordion": "./svelte/Accordion.svelte",
+    "./svelte/AccordionItem": "./svelte/AccordionItem.svelte",
     "./appnav.js": "./js/appnav.js",
     "./schedule.js": {
       "types": "./js/schedule.d.ts",
@@ -61,6 +63,10 @@
     "./heading.js": {
       "types": "./js/heading.d.ts",
       "import": "./js/heading.js"
+    },
+    "./accordion.js": {
+      "types": "./js/accordion.d.ts",
+      "import": "./js/accordion.js"
     }
   },
   "files": [

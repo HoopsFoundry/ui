@@ -1,0 +1,218 @@
+import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as AccordionStories from './Accordion.stories';
+import { DosDonts } from './docs/blocks/DosDonts';
+import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { DocTable } from './docs/blocks/DocTable';
+import './docs/blocks/blocks.css';
+import { vanilla, detailsVanilla, svelte, react, ebenenSvelte, ebenenReact, tokensCss, funktionenJs } from './Accordion.code';
+
+<Meta of={AccordionStories} />
+
+# Accordion
+
+Ein Accordion klappt Bereiche auf und zu: lange Seiten werden übersichtlich, ohne dass etwas verloren geht. Jeder Bereich hat einen Kopf (Titel, optional eine Zusatzinfo) und einen Inhalt, der beliebig sein darf: Text, Tabellen, Karten oder eine weitere Gruppe. Das Accordion gibt es als Komponente für Svelte und React und als Vanilla-CSS, dort wahlweise mit Skript oder mit dem nativen `<details>`. Einklappbare Tabellenrahmen (`Table`, Spielplan, `LeagueCard`) folgen in einem eigenen Paket und nutzen dieselben Bausteine.
+
+## Aufbau
+
+Der Kopf ist eine Überschrift, die einen Button enthält (`<h3><button aria-expanded aria-controls>`). So finden Screenreader die Bereiche über die Überschriftennavigation, und der Button ist per Tastatur und Sprachsteuerung bedienbar. Der Inhalt steht in einem Bereich, der geschlossen verborgen ist (`hidden` und `inert`): Sein Inhalt ist nicht sichtbar, nicht lesbar und nicht per **Tab** erreichbar. Das Aufklappen ist eine kurze Höhenanimation (200 ms); bei „Bewegung reduzieren“ und mit `data-motion="reduce"` entfällt sie.
+
+<Canvas of={AccordionStories.Aufbau} />
+
+Jeder Bereich braucht eine `id`: sie ist der Anker für den Deep-Link und die Sprungleiste und die Grundlage der ids von Kopf (`<id>-trigger`) und Bereich (`<id>-panel`). Der Bereich trägt `role="region"` mit `aria-labelledby` auf den Kopf, aber nur bis zu sechs Bereichen je Gruppe; bei mehr würden die Regionen die Landmarken-Liste des Screenreaders füllen, dann entfällt die Rolle. Die Anzahl steht erst im Browser fest, im Server-Markup einer Gruppe fehlt die Rolle deshalb noch (ein einzelner `AccordionItem` ist immer eine Region).
+
+Der Pfeil im Kopf ist ein SVG (`aria-hidden`) und dreht sich beim Öffnen um 180°.
+
+## Varianten: Karte und flach
+
+**Karte** (Standard): jeder Bereich eine Karte mit Rand, Radius und leichtem Schatten, mit Abstand dazwischen. **Flach**: nur Trennlinien, ohne Rand, Radius und Schatten, für Fragen und Antworten oder Seiten, die schon aus Karten bestehen.
+
+<Canvas of={AccordionStories.Varianten} />
+
+## Kopf mit Zusatzinfo
+
+Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht hinter dem Titel ein unsichtbares Komma (`dss-acc-sep`, Schriftgröße 0), das Name und Zusatz trennt (Chromium und WebKit lesen „Kader, 14 Spieler“; auch Leerraum im Markup zwischen Titel und Zusatz stört nicht); die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
+
+<Canvas of={AccordionStories.Zusatzinfo} />
+
+## Verschachtelt
+
+Eine Gruppe im Inhalt eines Bereichs ist automatisch verschachtelt: kleinere Titel, eingerückt, mit Linien statt Karten und ohne Schatten (`dss-acc--nested`). Technisch sind beliebig viele Ebenen möglich; mehr als zwei sind schwer zu überblicken (siehe Dos und Don'ts).
+
+<Canvas of={AccordionStories.Verschachtelt} />
+
+## Alle öffnen und nur einer offen
+
+Mit `expandAll` stehen über der Gruppe zwei Buttons „Alle öffnen“ und „Alle schließen“. Sie verweisen mit `aria-controls` auf die Bereiche und sagen das Ergebnis höflich an (`aria-live="polite"`): „Alle Bereiche geöffnet“, „Alle Bereiche geschlossen“ oder „3 von 5 Bereichen geöffnet“, wenn gesperrte Bereiche ihren Zustand behalten. Die Leiste entsteht im Browser, weil sie ohne Skript nichts tun könnte.
+
+<Canvas of={AccordionStories.AlleOeffnen} />
+
+Mit `exclusive` ist immer höchstens ein Bereich offen, ein Öffnen schließt die anderen (der offene lässt sich schließen). „Alle öffnen/schließen“ wird dann nicht angeboten. Stehen beim Start mehrere Bereiche offen, bleibt nur der erste (in Dokumentreihenfolge) offen, in Svelte, React und im Vanilla-Skript gleich; bei einem kontrollierten Bereich (React `open`) bekommen die übrigen `onOpenChange(false)`.
+
+<Canvas of={AccordionStories.Exklusiv} />
+
+## Deep-Link per Anker
+
+Mit `syncHash` (Standard `true`) öffnet ein passender Anker in der Adresse den Bereich samt aller Eltern-Bereiche und scrollt ihn in Sicht, beim Laden der Seite und bei jedem `hashchange`. Beim Öffnen per Klick setzt die Gruppe `#id` in die Adresse (`history.replaceState`, kein neuer Verlaufseintrag); beim Schließen verschwindet der Anker, wenn er der des geschlossenen Bereichs ist. Der Abstand beim Scrollen (`scroll-margin-top`) berücksichtigt den klebenden Kopf und `--dss-acc-sticky-top`. Auf dem Server passiert nichts (kein `window`-Zugriff).
+
+Im Beispiel öffnet ein Klick auf einen Link den Bereich ohne Seitenwechsel. Das Torhüter-Beispiel öffnet außerdem den Bereich „Kader“, in dem es steht. Diese Doku ist eine eingebettete Seite; der Anker ändert hier nur die Adresse des eingebetteten Fensters. In deiner Seite gilt: `…/liga#kader` öffnet den Kader. Wo mehrere Gruppen auf einer Seite stehen, hält `syncHash={false}` die Adresse unberührt.
+
+<Canvas of={AccordionStories.DeepLink} />
+
+## Sprungleiste
+
+Mit `nav` steht über der Gruppe eine Navigation „Bereiche“ mit einem Link je Bereich (`href="#id"`). Ein Klick öffnet den Bereich, scrollt dorthin und setzt den Fokus auf den Kopf; der Link des zuletzt geöffneten Bereichs trägt `aria-current="true"`. Der Name der Leiste ist „Bereiche“ und mit `navLabel` änderbar (nötig, wenn mehrere Sprungleisten auf einer Seite stehen). Ab 640 px Fensterbreite stehen die Links nebeneinander und brechen um; darunter ist die Liste selbst einklappbar (Button „Bereiche“ mit `aria-expanded`). Auch die Sprungleiste entsteht im Browser.
+
+<Canvas of={AccordionStories.Sprungleiste} />
+
+## Tastatur
+
+<DocTable
+  label="Tastaturbedienung"
+  head={['Taste', 'Wirkung']}
+  rows={[
+    ['Tab', 'Folgt der Dokumentreihenfolge: Kopf, Inhalt des geöffneten Bereichs, nächster Kopf, dessen Inhalt … Ein geschlossener Bereich wird übersprungen (sein Inhalt ist inert).'],
+    ['Enter / Leertaste', 'Öffnet oder schließt den Bereich des fokussierten Kopfes (Button).'],
+    ['Pfeil unten / oben', 'Springt zum nächsten bzw. vorherigen Kopf der Gruppe. Gesperrte Köpfe werden übersprungen, an den Enden geht es nicht von vorn weiter.'],
+    ['Pos1 / Ende', 'Springt zum ersten bzw. letzten Kopf der Gruppe (gesperrte übersprungen).'],
+  ]}
+/>
+
+Es gibt keinen Fokusfang: **Tab** verlässt die Gruppe wie jedes andere Element. Gesperrte Köpfe (`disabled`) tragen `aria-disabled="true"` statt des Attributs `disabled`, damit sie mit **Tab** erreichbar bleiben und der Screenreader sie vorliest. Köpfe verschachtelter Gruppen gehören zur inneren Gruppe.
+
+## Barrierefreiheit: Namen
+
+Mehrere Accordions/Bereiche mit gleichem Titel oder mehrere Sprungleisten auf einer Seite brauchen unterschiedliche Namen (axe: `landmark-unique`): Ein geöffneter Bereich ist (bis sechs Bereiche) eine Region mit dem Titel als Namen, die Sprungleiste eine Navigation. `navLabel` setzt den Namen der Sprungleiste (Standard „Bereiche“, auch der Text des Handy-Schalters), etwa „Bereiche der Liga-Seite“. Die Beispiele dieser Seite haben darum je Seite eindeutige Titel und Namen.
+
+## Kopf klebt oben
+
+Mit `sticky` bleibt der Kopf des geöffneten Bereichs oben stehen, solange sein Bereich im Bild ist, und endet mit dem Bereich. Der Abstand nach oben ist `--dss-acc-sticky-top` (Standard 0), etwa die Höhe einer festen Top-Bar. Der Kopf liegt auf `z-index: 2`, unter Overlays wie dem Modal. Damit es wirkt, darf zwischen Gruppe und Scrollbereich kein Vorfahr `overflow: hidden` setzen. Nur die oberste Gruppe klebt; verschachtelte Gruppen kleben nicht. Im Beispiel scrollt der Rahmen (340 px hoch):
+
+<Canvas of={AccordionStories.KopfKlebt} />
+
+## Natives `<details>` (Vanilla)
+
+Im Vanilla-CSS gibt es zusätzlich einen Weg ohne Skript: `<details class="dss-acc-item">` mit `<summary class="dss-acc-trigger">`. Aussehen und Zustände sind dieselben; der Pfeil kommt per CSS. Mit demselben `name` an allen `details` einer Gruppe ist immer nur einer offen (nativ, in allen aktuellen Browsern). Das Skript ist optional und ergänzt Deep-Link, Sprungleiste, „Alle öffnen/schließen“ und die Pfeiltasten.
+
+**Hinweis zur Auffindbarkeit:** `<summary>` ist selbst keine Überschrift. HTML erlaubt aber Überschriften im `summary`; das Beispiel hier nutzt sie nicht und bleibt bei der einfachsten Form. Ohne Überschrift im Kopf führen die Überschriften-Navigation und die Überschriftenliste der Screenreader nicht zu den Bereichen, und bei älterer Hilfstechnik wird der Zustand (auf/zu) nicht überall angesagt. Für Inhaltsseiten, auf denen die Bereiche auffindbar sein sollen, nimm den Button-Weg (Überschrift mit Button). Die Höhenanimation gibt es beim `details`-Weg nicht.
+
+**Zusatzinfo im `summary`:** Das Komma zwischen Titel und Zusatzinfo steht nicht von selbst da. Setze es wie im Beispiel als `<span class="dss-acc-sep">,</span>` ans Ende des Titels (Schriftgröße 0, unsichtbar, im Namen); ohne dieses Komma liest Chromium „Spielplan 12 Spiele“, andere Browser unter Umständen „Spielplan12 Spiele“.
+
+<Canvas of={AccordionStories.VanillaDetails} />
+
+## Druck
+
+Beim Drucken sind alle Bereiche geöffnet, auch geschlossene (`@media print`); Bedienelemente (Pfeile, „Alle öffnen/schließen“, Sprungleiste) entfallen, der Kopf klebt nicht. Das gilt für den Button-Weg in jedem Browser. Beim nativen `<details>` hängt es vom Browser ab: Wo `::details-content` bekannt ist, werden auch geschlossene Bereiche gedruckt, sonst nur die offenen.
+
+## Überschriftenebene
+
+Die Ebene der Köpfe folgt der gemeinsamen Regel (siehe [Überschriften](?path=/docs/foundation-headings--docs)): `titleAs` am Bereich, sonst `titleAs` an der Gruppe, sonst die Ebene eines umgebenden `HeadingLevel`, sonst `h3`. Der Inhalt eines Bereichs bekommt die Ebene darunter: Titelkomponenten (Table, EmptyState …) und verschachtelte Gruppen zählen dadurch automatisch hoch. Die Größe der Titel ändert die Ebene nie; sie hängt an `--dss-acc-title-size`.
+
+<Canvas of={AccordionStories.Ebenen} />
+
+<FrameworkCode label="Überschriftenebene" svelte={ebenenSvelte} react={ebenenReact} />
+
+## Zustände
+
+Hover hinterlegt den Kopf, der Fokus-Ring ist gestrichelt in Gold/Amber und liegt innen (`-3px`), damit er nicht abgeschnitten wird. Offen zeigt den gedrehten Pfeil und einen abgesetzten Kopf, Gesperrt ist abgeblendet. Aktiv (gehaltene Maustaste) legt die flache Fläche (`--dss-surface-2`) unter den Kopf.
+
+<Canvas of={AccordionStories.Zustaende} />
+
+Die Matrix ist fest gesetzt. Marke und Hell/Dunkel in der Werkzeugleiste umschalten.
+
+## Verwendung: Import und Props
+
+Importiere `Accordion` und `AccordionItem` über die Path-Exporte (Svelte) bzw. aus dem React-Paket. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel zeigt den Button-Weg mit `initAccordions`.
+
+<FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
+
+<FrameworkCode label="Natives details (HTML, für alle Fassungen)" vanilla={detailsVanilla} svelte={detailsVanilla} react={detailsVanilla} />
+
+Die Tabelle zeigt die Steuerelemente der Gruppe; die Spielwiese rechts zeigt sie mit echten Komponenten. `count`, `firstOpen`, `lockSecond` und `meta` gehören nur zur Demo.
+
+<Controls of={AccordionStories.Spielwiese} />
+
+Props von `AccordionItem`:
+
+<DocTable
+  label="Props von AccordionItem"
+  head={['Prop', 'Typ', 'Beschreibung']}
+  rows={[
+    ['id', 'string (Pflicht)', 'Anker für Deep-Link und Sprungleiste; die ids von Kopf (id-trigger) und Bereich (id-panel) leiten sich daraus ab. Stabil wählen und nicht ändern.'],
+    ['title', 'string (Pflicht)', 'Titel im Kopf; kurz halten.'],
+    ['open', 'boolean', 'Geöffnet. Svelte: bind:open. React: open (kontrolliert) zusammen mit onOpenChange.'],
+    ['defaultOpen', 'boolean', 'React: Anfangszustand, wenn unkontrolliert (Standard false).'],
+    ['onOpenChange', '(open: boolean) => void', 'React: wird bei jeder Änderung aufgerufen, auch wenn „Alle öffnen“, die Sprungleiste oder ein Anker öffnet.'],
+    ['disabled', 'boolean', 'Gesperrt: aria-disabled, abgeblendet, kein Klick; die Pfeiltasten überspringen ihn.'],
+    ['meta', 'Snippet (Svelte) / ReactNode', 'Zusatzinfo rechts im Kopf: Zähler, Chip oder Live-Tag. Teil des zugänglichen Namens.'],
+    ['titleAs', "'h2' … 'h6'", 'Ebene der Überschrift. Gewinnt gegen titleAs der Gruppe und HeadingLevel.'],
+    ['children', 'Snippet / ReactNode', 'Inhalt des Bereichs.'],
+  ]}
+/>
+
+Die Gruppe hat in React zusätzlich `className`, in Svelte `class`; `navLabel` (Standard „Bereiche“) benennt die Sprungleiste. Die Namen gelten für beide Fassungen, bis auf `bind:open` (Svelte) gegen `open` und `onOpenChange` (React).
+
+### Vanilla-Skript
+
+`initAccordion(root, options)` mit den Optionen `exclusive`, `syncHash`, `expandAll`, `nav` und `sticky` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-dss-acc]`. **Bereiche nachträglich hinzufügen oder entfernen:** Rufe `initAccordion` erneut auf (die frühere Fassung wird ersetzt); Sprungleiste und `aria-controls` von „Alle öffnen“ aktualisieren sich nicht von selbst. **Verschachtelte Gruppen** brauchen `data-dss-acc` am inneren Wurzelelement (`initAccordions` startet jede `[data-dss-acc]`-Gruppe einzeln). Dieselben Hilfsfunktionen nutzen die Komponenten:
+
+<FrameworkCode label="Hilfsfunktionen (JavaScript, für alle Fassungen)" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
+
+<Canvas of={AccordionStories.VanillaButton} />
+
+### Tokens
+
+<FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
+
+## Handy · 390 px Breite
+
+Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px: Die Sprungleiste ist selbst einklappbar, die Köpfe sind mindestens 44 px hoch und die Zusatzinfo bleibt neben dem Titel.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Accordion · Sprungleiste und Zusatzinfo</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Accordion auf dem Handy">
+      <iframe title="Handy-Vorschau: Accordion mit Sprungleiste in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-accordion--handy" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Beispiel: Liga-Seite mit vier Bereichen
+
+Eine Vereinsseite mit Tabelle, Spielplan, Kader und Statistik als vier Bereiche, mit Sprungleiste und „Alle öffnen/schließen“. Die Tabellen haben hier noch ihren eigenen Rahmen im Bereich; einklappbare Tabellenrahmen kommen in einem eigenen Paket. Die Daten sind erfunden.
+
+<Canvas of={AccordionStories.LigaSeite} />
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Kurze Titel',
+      doText: 'Ein oder zwei Wörter benennen den Bereich. Der Kopf bleibt einzeilig, die Sprungleiste lesbar.',
+      dontText: 'Ein ganzer Satz als Titel bricht um, macht den Kopf hoch und füllt die Sprungleiste. Der Satz gehört in den Inhalt.',
+      good: <Story of={AccordionStories.DoKurz} inline />,
+      bad: <Story of={AccordionStories.DontKurz} inline />,
+    },
+    {
+      title: 'Höchstens zwei Ebenen',
+      doText: 'Eine Gruppe in einer Gruppe reicht für Liga und Altersklasse.',
+      dontText: 'Vier Ebenen schieben den Inhalt nach rechts, die Überschriften rutschen auf h6, und niemand weiß mehr, wo er ist.',
+      good: <Story of={AccordionStories.DoTiefe} inline />,
+      bad: <Story of={AccordionStories.DontTiefe} inline />,
+    },
+    {
+      title: 'Wichtiges nicht verstecken',
+      doText: 'Fehler und Live-Stand stehen sichtbar: als Hinweis über der Gruppe oder als Chip im Kopf.',
+      dontText: 'Ein Fehler im geschlossenen Bereich wird überlesen. Bis jemand öffnet, ist der Bericht nicht freigegeben.',
+      good: <Story of={AccordionStories.DoWichtig} inline />,
+      bad: <Story of={AccordionStories.DontWichtig} inline />,
+    },
+    {
+      title: 'Stabile ids für Deep-Links',
+      doText: 'Die id benennt den Inhalt (kader). Ein Link aus einer E-Mail trifft auch nach dem Umsortieren noch den Kader.',
+      dontText: 'Laufende Nummern (bereich-2) zeigen nach dem Umsortieren auf einen anderen Bereich; der gespeicherte Link öffnet das Falsche.',
+      good: <Story of={AccordionStories.DoId} inline />,
+      bad: <Story of={AccordionStories.DontId} inline />,
+    },
+  ]}
+/>
