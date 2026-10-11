@@ -17,6 +17,8 @@ import {
 } from '../js/league.js';
 import type { LeagueColumn, LeagueFormEntry, LeagueTeam, LeagueZone } from '../js/league.js';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
+import { CollapsibleFrame } from './internal/CollapsibleFrame';
+import { devWarn } from './internal/devWarn';
 
 export type { LeagueColumn, LeagueFormEntry, LeagueTeam, LeagueZone };
 export type LeagueCardSize = 'standard' | 'compact';
@@ -50,6 +52,15 @@ export interface LeagueCardProps {
   size?: LeagueCardSize;
   /** Überschriftenebene des Titels, h2 bis h6. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor h3. */
   titleAs?: HeadingTag;
+  /** Einklappbar: Kopf (Titel, Untertitel, Live) wird zum Bereichskopf (Button in der Überschrift), die Tabelle zum Bereich. */
+  collapsible?: boolean;
+  /** Geöffnet, kontrolliert (zusammen mit `onOpenChange`); nur mit `collapsible`. */
+  open?: boolean;
+  /** Anfangszustand, wenn unkontrolliert (Standard geschlossen). */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
+  id?: string;
   className?: string;
 }
 
@@ -83,6 +94,11 @@ export function LeagueCard({
   logos = false,
   size = 'standard',
   titleAs,
+  collapsible = false,
+  open,
+  defaultOpen,
+  onOpenChange,
+  id,
   className,
 }: LeagueCardProps) {
   const Heading = useHeadingTag(titleAs);
@@ -97,24 +113,9 @@ export function LeagueCard({
   const wantsDiff = columns.includes('diff');
   const wantsForm = columns.includes('form');
 
-  return (
-    <div className={cn('dss-league', size === 'compact' && 'dss-league--compact', className)}>
-      <div className="dss-league-head">
-        <div className="dss-league-heading">
-          <Heading className="dss-league-title">{title}</Heading>
-          {summary ? <p className="dss-league-sub">{summary}</p> : null}
-        </div>
-        {liveTag ? (
-          <span className="dss-league-live">
-            <span className="dss-live">
-              <span className="dss-live-dot" aria-hidden="true" />
-              Live
-            </span>
-            {liveTag.text ? <span className="dss-league-live-n">{liveTag.text}</span> : null}
-          </span>
-        ) : null}
-      </div>
-
+  const rootClass = cn('dss-league', size === 'compact' && 'dss-league--compact', className);
+  const panel = (
+    <>
       <div className="dss-table-scroll dss-league-scroll" role="region" tabIndex={0} aria-label={title ? `Tabelle: ${title}` : 'Tabelle'}>
         <table className={cn('dss-tbl', `dss-tbl--${size === 'compact' ? 'compact' : 'touch'}`, 'dss-league-tbl')}>
           {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
@@ -229,6 +230,57 @@ export function LeagueCard({
           </a>
         </div>
       ) : null}
+    </>
+  );
+
+  if (collapsible && title) {
+    return (
+      <CollapsibleFrame
+        kind="league"
+        rootClass={rootClass}
+        id={id}
+        title={title}
+        sub={summary}
+        titleAs={titleAs}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        meta={
+          liveTag ? (
+            <span className="dss-league-live">
+              <span className="dss-live">
+                <span className="dss-live-dot" aria-hidden="true" />
+                Live
+              </span>
+              {liveTag.text ? <span className="dss-league-live-n">{liveTag.text}</span> : null}
+            </span>
+          ) : undefined
+        }
+      >
+        {panel}
+      </CollapsibleFrame>
+    );
+  }
+  if (collapsible) devWarn('[DSS] LeagueCard: `collapsible` braucht einen `title`, sonst bleibt die Karte unverändert.');
+  return (
+    <div className={rootClass}>
+      <div className="dss-league-head">
+        <div className="dss-league-heading">
+          <Heading className="dss-league-title">{title}</Heading>
+          {summary ? <p className="dss-league-sub">{summary}</p> : null}
+        </div>
+        {liveTag ? (
+          <span className="dss-league-live">
+            <span className="dss-live">
+              <span className="dss-live-dot" aria-hidden="true" />
+              Live
+            </span>
+            {liveTag.text ? <span className="dss-league-live-n">{liveTag.text}</span> : null}
+          </span>
+        ) : null}
+      </div>
+
+      {panel}
     </div>
   );
 }

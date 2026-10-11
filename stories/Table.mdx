@@ -4,7 +4,7 @@ import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
-import { vanilla, svelte, react } from './Table.code';
+import { vanilla, svelte, react, collapsibleVanilla, collapsibleSvelte, collapsibleReact } from './Table.code';
 
 <Meta of={TableStories} />
 
@@ -108,6 +108,28 @@ Der Kopf (`th`) ist `position: sticky; top: 0`. Er bleibt stehen, sobald der Scr
 
 Zellen brechen nicht um (`white-space: nowrap`). Wenn die Tabelle breiter ist als der Platz, scrollt sie im Rahmen seitlich (`.dss-table-scroll`, `overflow-x: auto`). Der Scrollbereich ist eine Region mit Namen (`caption`, sonst `title`, sonst „Tabelle“) und per Tab erreichbar, damit Tastaturnutzer ihn mit den Pfeiltasten bewegen können. Ordne die wichtigsten Spalten nach vorn (siehe Dos und Don'ts).
 
+## Tabellen einklappen
+
+Mit `collapsible` wird der Rahmenkopf zum Kopf eines Accordions: Der Titel steht als Überschrift mit Button (`<h3><button aria-expanded aria-controls>`), `meta` und die Live-Marke bleiben rechts, dahinter steht der Pfeil. Die Tabelle ist der Bereich. Geschlossen zeigt der Rahmen nur den Kopf, ohne doppelten Strich. Die Größe des Titels bleibt an `--dss-frame-title-size` (die Accordion-Tokens gelten hier nicht), die Ebene folgt `titleAs` und `HeadingLevel`; der Inhalt bekommt die Ebene darunter. Ohne `title` wirkt `collapsible` nicht (in der Entwicklung erscheint eine Warnung in der Konsole). Standard ist geschlossen; `open` (Svelte `bind:open`, React `open` mit `onOpenChange` oder `defaultOpen`) öffnet.
+
+<Canvas of={TableStories.Einklappbar} />
+
+Zusatzinfo und Live-Marke gehören zum Namen des Buttons („Heimteam im 4. Viertel, Stand · 4. Viertel Live“). Der Scrollbereich der Tabelle bleibt die benannte Region (`caption`, sonst `title`); der Bereich selbst trägt keine zweite Region, damit der Inhalt nicht doppelt benannt ist.
+
+### Deep-Link mit `id`
+
+Mit `id` öffnet ein passender Anker in der Adresse (`…#tab-gast`) den Rahmen beim Laden und bei `hashchange`; ein Klick setzt den Anker, beim Schließen verschwindet er. Ohne `id` gibt es keinen Anker.
+
+<Canvas of={TableStories.EinklappbarId} />
+
+### In einer Accordion-Gruppe
+
+Innerhalb von `Accordion` melden sich einklappbare Rahmen selbst an: Sprungleiste (`nav`), „Alle öffnen/schließen“ (`expandAll`), `exclusive`, Deep-Link und die Pfeiltasten zwischen den Köpfen gelten auch für sie, gemischt mit `AccordionItem`. Ein Rahmen ohne `id` steht nicht in der Sprungleiste. Steht ein einklappbarer Rahmen direkt im Inhalt eines `AccordionItem`, bleibt er einzeln (sonst würde `exclusive` seinen Elternbereich schließen); eine eigene verschachtelte Gruppe nimmt ihn wieder auf. Jeder Rahmen einer Seite braucht einen eigenen Titel oder eine eigene `caption`.
+
+<Canvas of={TableStories.EinklappbarGruppe} />
+
+<FrameworkCode label="Tabellen einklappen" vanilla={collapsibleVanilla} svelte={collapsibleSvelte} react={collapsibleReact} />
+
 ## Zustände: Zeile, Link, Schalter, Kontrollkästchen
 
 Die Tabelle selbst hat nur einen Zustand, den Hover der Zeile (`--dss-hover-bg`). Alles Bedienbare in den Zellen kommt aus den eigenen Bausteinen: Link (`.dss-link`), Schalter (`.dss-btn`), Kontrollkästchen (`.dss-check-input`). Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand; auf dunklen Flächen dezenter). Der Scrollbereich hat den Ring innen, weil der Rahmen außen abschneidet. Ein Gedrückt (Aktiv) gibt es für die Zeile nicht; die Spalte zeigt Hover der Zeile plus Aktiv des Elements. Gesperrt gibt es bei Schalter und Kontrollkästchen.
@@ -141,6 +163,11 @@ Dazu kommen Props, die sich nicht als Steuerelement zeigen lassen:
     ['rows / body (React: children)', 'Svelte: Snippet, React: ReactNode', 'Die Zeilen des tbody als tr-Elemente.'],
     ['foot', 'Svelte: Snippet, React: ReactNode', 'Zeilen des tfoot, z. B. Team-Totals.'],
     ['caption', 'string', 'Unsichtbare Tabellenbeschriftung für Screenreader; benennt auch den Scrollbereich.'],
+    ['collapsible', 'boolean', 'Der Rahmenkopf wird zum Accordion-Kopf, die Tabelle zum Bereich (Standard false). Braucht einen title.'],
+    ['open', 'boolean', 'Geöffnet (nur mit collapsible, Standard geschlossen). Svelte: bind:open. React: open zusammen mit onOpenChange.'],
+    ['defaultOpen', 'boolean', 'React: Anfangszustand, wenn unkontrolliert (Standard false).'],
+    ['onOpenChange', '(open: boolean) => void', 'React: wird bei jeder Änderung aufgerufen, auch durch Sprungleiste, „Alle öffnen“ oder einen Anker.'],
+    ['id', 'string', 'Anker für Deep-Link und Sprungleiste einer Accordion-Gruppe (nur mit collapsible); ohne id kein Anker. Die ids von Kopf (id-trigger) und Bereich (id-panel) leiten sich daraus ab.'],
     ['class (React: className)', 'string', 'Zusätzliche Klasse am Rahmen.'],
   ]}
 />
@@ -196,6 +223,13 @@ Dazu kommen Props, die sich nicht als Steuerelement zeigen lassen:
       dontText: 'Ein reiner Farbpunkt (hier mit lokalem CSS ohne Text nachgestellt) ist für Menschen mit Farbsehschwäche nicht lesbar.',
       good: <Story of={TableStories.DoFarbe} inline />,
       bad: <Story of={TableStories.DontFarbe} inline />,
+    },
+    {
+      title: 'Wichtiges offen lassen',
+      doText: 'Bei mehreren einklappbaren Tabellen steht das Wichtige (hier der laufende Spielstand) offen, der Rest ist zu. Der Titel bleibt sichtbar und nennt den Inhalt.',
+      dontText: 'Alles zugeklappt: Wer die Seite öffnet, sieht nur Titel und muss den laufenden Spielstand erst suchen und öffnen.',
+      good: <Story of={TableStories.DoOffen} inline />,
+      bad: <Story of={TableStories.DontZu} inline />,
     },
   ]}
 />

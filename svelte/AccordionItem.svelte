@@ -10,7 +10,7 @@
   import type { Snippet } from 'svelte';
   import { untrack } from 'svelte';
   import { levelOfTag, nextLevel, type HeadingTag } from '../js/heading.js';
-  import { hashTarget, scrollToElement, writeHash } from '../js/accordion.js';
+  import { createCollapsible } from '../js/accordion.js';
   import { provideHeadingLevel, useHeadingTag } from './heading-context.js';
   import { provideItem, useGroup, useParentItem } from './accordion-context.js';
 
@@ -51,38 +51,29 @@
   // Allein: immer eine Region; in einer Gruppe nur bis 6 Bereiche (die Anzahl ist erst im Browser bekannt)
   const region = $derived(group ? group.count > 0 && group.count <= 6 : true);
 
-  function setOpen(next: boolean, user = false) {
-    if (disabled && next !== open) return;
-    // Auch ein schon offener Bereich schließt bei exclusive die anderen (Anker auf einen beim Start offenen Bereich)
-    if (next && group?.exclusive) group.closeOthers(id);
-    if (next === open) return;
-    // Der Fokus liegt im Bereich, der gleich inert wird: er geht auf den Kopf (sonst fiele er auf <body>)
-    if (!next && panel && trigger && panel.contains(document.activeElement)) trigger.focus();
-    open = next;
-    if (user && (group?.syncHash ?? true)) writeHash(id, next);
-  }
-  /** Öffnet diesen Bereich und alle Eltern-Bereiche (Deep-Link, Sprungleiste). */
-  function reveal() {
-    setOpen(true);
-    parent?.reveal();
-  }
+  // Verhalten (Öffnen, exclusive, Anker, Eltern, Eintrag für die Gruppe): gemeinsamer Baustein in js/accordion.js
+  const collapsible = createCollapsible({
+    id: () => id,
+    title: () => title,
+    open: () => open,
+    disabled: () => disabled,
+    anchor: () => true,
+    group: () => group,
+    parent: () => parent,
+    el: () => el,
+    trigger: () => trigger,
+    panel: () => panel,
+    commit: (next) => { open = next; },
+  });
+  const { setOpen, reveal, entry } = collapsible;
 
   provideItem({
     get id() { return id; },
     reveal,
+    group,
   });
 
-  // Anmelden bei der Gruppe (Sprungleiste, Alle öffnen, Tastatur); Werte als Getter, damit sie aktuell bleiben
-  const entry = {
-    get id() { return id; },
-    get title() { return title; },
-    get open() { return open; },
-    get disabled() { return disabled; },
-    get el() { return el; },
-    get trigger() { return trigger; },
-    reveal,
-    setOpen: (next: boolean) => setOpen(next),
-  };
+  // Anmelden bei der Gruppe (Sprungleiste, Alle öffnen, Tastatur); der Eintrag liest die Werte erst beim Zugriff
   $effect(() => {
     if (group) return untrack(() => group.register(entry));
   });
@@ -95,14 +86,9 @@
   // Deep-Link: passender Anker beim Laden und bei hashchange
   $effect(() => {
     if (!(group?.syncHash ?? true) || typeof window === 'undefined') return;
-    const check = () => {
-      if (hashTarget(window.location.hash, [id]) !== id) return;
-      reveal();
-      scrollToElement(el);
-    };
-    untrack(check);
-    window.addEventListener('hashchange', check);
-    return () => window.removeEventListener('hashchange', check);
+    untrack(collapsible.checkHash);
+    window.addEventListener('hashchange', collapsible.checkHash);
+    return () => window.removeEventListener('hashchange', collapsible.checkHash);
   });
 
   const itemClass = $derived(['dss-acc-item', open && 'is-open', disabled && 'is-disabled'].filter(Boolean).join(' '));

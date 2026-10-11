@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import { cn } from './cn';
+import { CollapsibleFrame } from './internal/CollapsibleFrame';
+import { devWarn } from './internal/devWarn';
 import { ariaForResult, buildGrid, hasScore, stateLabel, winnerSide } from '../js/schedule.js';
 import { LiveTag, ResultText, TeamName, type ScheduleRenderLink } from './ScheduleParts';
 import type { ScheduleBreak, ScheduleDensity, ScheduleGame, ScheduleGridColumn, ScheduleNames } from './schedule-types';
@@ -26,6 +28,15 @@ export interface ScheduleGridProps {
   titleAs?: HeadingTag;
   meta?: ReactNode;
   caption?: string;
+  /** Einklappbar: der Rahmenkopf wird zum Bereichskopf (Button in der Überschrift), die Tabelle zum Bereich. Braucht einen `title`. */
+  collapsible?: boolean;
+  /** Geöffnet, kontrolliert (zusammen mit `onOpenChange`); nur mit `collapsible`. */
+  open?: boolean;
+  /** Anfangszustand, wenn unkontrolliert (Standard geschlossen). */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
+  id?: string;
   className?: string;
   renderLink?: ScheduleRenderLink;
   /** Zusätzlicher Inhalt in der Spielzelle, z. B. Konflikt-Badge. */
@@ -46,6 +57,11 @@ export function ScheduleGrid({
   titleAs,
   meta,
   caption,
+  collapsible = false,
+  open,
+  defaultOpen,
+  onOpenChange,
+  id,
   className,
   renderLink,
   renderNotice,
@@ -96,84 +112,106 @@ export function ScheduleGrid({
     );
   };
 
+  const rootClass = cn('dss-frame', className);
+  // Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1)
+  const region = (
+    <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Zeitraster'}>
+      <table role="table" className={cn('dss-tbl dss-sgrid', `dss-tbl--${density}`)}>
+        {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
+        <thead role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader" className="dss-sg-time">
+              Zeit
+            </th>
+            {columns.map((column) => (
+              <th key={column.id} scope="col" role="columnheader">
+                {column.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          {/* Schlüssel mit Index ist Absicht: Zeitzeile, Pause und Freilos können dieselbe Startzeit haben. */}
+          {rows.map((row, index) => {
+            if (row.kind === 'break') {
+              return (
+                <tr key={`b-${index}`} role="row" className="dss-sg-break">
+                  <th scope="row" role="rowheader" className="dss-sg-time">
+                    {row.time}
+                  </th>
+                  <td role="cell" colSpan={columns.length}>
+                    {row.label}
+                  </td>
+                </tr>
+              );
+            }
+            if (row.kind === 'bye') {
+              return (
+                <tr key={`y-${index}`} role="row" className="dss-sg-bye">
+                  <th scope="row" role="rowheader" className="dss-sg-time">
+                    {row.time ? row.time : <span className="dss-sr-only">Zeit offen</span>}
+                  </th>
+                  <td role="cell" colSpan={columns.length}>
+                    {row.game.heim ? (
+                      <>
+                        <TeamName team={row.game.heim} renderLink={renderLink} names={names} logo={logos} /> hat Freilos
+                      </>
+                    ) : (
+                      (row.game.note ?? 'Spielfrei')
+                    )}
+                  </td>
+                </tr>
+              );
+            }
+            return (
+              <tr key={`s-${row.time}-${index}`} role="row">
+                <th scope="row" role="rowheader" className="dss-sg-time">
+                  {row.time}
+                </th>
+                {row.cells.map((cell, columnIndex) => (
+                  <td
+                    key={columns[columnIndex].id}
+                    role="cell"
+                    className={cn('dss-sg-cell', cell.length === 0 && 'is-empty')}
+                    data-label={columns[columnIndex].label}
+                  >
+                    {cell.length === 0 ? <span className="dss-sg-empty">{emptyLabel}</span> : cell.map(gameBlock)}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  if (collapsible && title) {
+    return (
+      <CollapsibleFrame
+        rootClass={rootClass}
+        id={id}
+        title={title}
+        titleAs={titleAs}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        meta={meta ? <span className="dss-frame-meta"><span>{meta}</span></span> : undefined}
+      >
+        {region}
+      </CollapsibleFrame>
+    );
+  }
+  if (collapsible) devWarn('[DSS] ScheduleGrid: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
-    <div className={cn('dss-frame', className)}>
+    <div className={rootClass}>
       {hasHead ? (
         <div className="dss-frame-head">
           {title ? <Heading className="dss-frame-title">{title}</Heading> : <span />}
           <div className="dss-frame-meta">{meta ? <span>{meta}</span> : null}</div>
         </div>
       ) : null}
-      {/* Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1) */}
-      <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Zeitraster'}>
-        <table role="table" className={cn('dss-tbl dss-sgrid', `dss-tbl--${density}`)}>
-          {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
-          <thead role="rowgroup">
-            <tr role="row">
-              <th scope="col" role="columnheader" className="dss-sg-time">
-                Zeit
-              </th>
-              {columns.map((column) => (
-                <th key={column.id} scope="col" role="columnheader">
-                  {column.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody role="rowgroup">
-            {/* Schlüssel mit Index ist Absicht: Zeitzeile, Pause und Freilos können dieselbe Startzeit haben. */}
-            {rows.map((row, index) => {
-              if (row.kind === 'break') {
-                return (
-                  <tr key={`b-${index}`} role="row" className="dss-sg-break">
-                    <th scope="row" role="rowheader" className="dss-sg-time">
-                      {row.time}
-                    </th>
-                    <td role="cell" colSpan={columns.length}>
-                      {row.label}
-                    </td>
-                  </tr>
-                );
-              }
-              if (row.kind === 'bye') {
-                return (
-                  <tr key={`y-${index}`} role="row" className="dss-sg-bye">
-                    <th scope="row" role="rowheader" className="dss-sg-time">
-                      {row.time ? row.time : <span className="dss-sr-only">Zeit offen</span>}
-                    </th>
-                    <td role="cell" colSpan={columns.length}>
-                      {row.game.heim ? (
-                        <>
-                          <TeamName team={row.game.heim} renderLink={renderLink} names={names} logo={logos} /> hat Freilos
-                        </>
-                      ) : (
-                        (row.game.note ?? 'Spielfrei')
-                      )}
-                    </td>
-                  </tr>
-                );
-              }
-              return (
-                <tr key={`s-${row.time}-${index}`} role="row">
-                  <th scope="row" role="rowheader" className="dss-sg-time">
-                    {row.time}
-                  </th>
-                  {row.cells.map((cell, columnIndex) => (
-                    <td
-                      key={columns[columnIndex].id}
-                      role="cell"
-                      className={cn('dss-sg-cell', cell.length === 0 && 'is-empty')}
-                      data-label={columns[columnIndex].label}
-                    >
-                      {cell.length === 0 ? <span className="dss-sg-empty">{emptyLabel}</span> : cell.map(gameBlock)}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+      {region}
     </div>
   );
 }

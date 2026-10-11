@@ -132,9 +132,9 @@ export function writeHash(id, open) {
 export function stickyOffset(el) {
   if (!el || typeof el.closest !== 'function') return 0;
   let top = null;
-  for (let item = el.parentElement?.closest('.dss-acc-item'); item; item = item.parentElement?.closest('.dss-acc-item')) top = item;
+  for (let item = el.parentElement?.closest(ITEM); item; item = item.parentElement?.closest(ITEM)) top = item;
   if (!top || !top.parentElement?.closest('.dss-acc')?.classList.contains('dss-acc--sticky')) return 0;
-  const head = top.querySelector(':scope > .dss-acc-title, :scope > summary');
+  const head = top.querySelector(':scope > .dss-acc-title, :scope > summary, :scope > .dss-frame-head, :scope > .dss-league-head');
   return head ? Math.ceil(head.getBoundingClientRect().height) : 0;
 }
 
@@ -165,7 +165,10 @@ export function scrollToElement(el) {
 export function moveFocus(root, trigger, key, modifiers = {}) {
   if (!root || !trigger || modifiers.altKey || modifiers.ctrlKey || modifiers.metaKey || modifiers.shiftKey) return false;
   if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return false;
-  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter((el) => el.closest('.dss-acc') === root);
+  // Köpfe in einem Panel (ein einzelner einklappbarer Rahmen im Inhalt eines Bereichs) gehören nicht zur Gruppe
+  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter(
+    (el) => el.closest('.dss-acc') === root && el.closest('.dss-acc-panel')?.closest('.dss-acc') !== root,
+  );
   const index = triggers.indexOf(trigger);
   if (index < 0) return false;
   const target = nextHeader(index, key, triggers.map((el) => ({ disabled: el.getAttribute('aria-disabled') === 'true' })));
@@ -173,16 +176,70 @@ export function moveFocus(root, trigger, key, modifiers = {}) {
   return true;
 }
 
+// ── Gemeinsamer Baustein für Bereiche und einklappbare Rahmen (Svelte und React) ──
+
+/**
+ * Das Verhalten eines einklappbaren Bereichs, ohne Oberfläche: Öffnen und Schließen (mit `exclusive` der Gruppe, Fokus-Rettung,
+ * Anker), Öffnen samt Eltern (`reveal`), Eintrag für die Gruppe (Sprungleiste, „Alle öffnen“) und die Prüfung des URL-Ankers.
+ * `host` liefert den aktuellen Stand über Funktionen (kein Schnappschuss): `id`, `title`, `open`, `disabled`, `anchor` (hat der
+ * Bereich einen öffentlichen Anker?), `group` (Gruppe, bei der er angemeldet ist, sonst `undefined`), `parent` (`{ reveal }` des
+ * Eltern-Bereichs), `el`, `trigger`, `panel` und `commit(next)` (setzt den Zustand, in der Oberfläche).
+ */
+export function createCollapsible(host) {
+  function setOpen(next, user = false) {
+    const group = host.group();
+    const open = host.open();
+    if (host.disabled() && next !== open) return;
+    // Auch ein schon offener Bereich schließt bei exclusive die anderen (Anker auf einen beim Start offenen Bereich)
+    if (next && group?.exclusive) group.closeOthers(host.id());
+    if (next === open) return;
+    // Der Fokus liegt im Bereich, der gleich inert wird: er geht auf den Kopf (sonst fiele er auf <body>)
+    const panel = host.panel();
+    const trigger = host.trigger();
+    if (!next && panel && trigger && panel.contains(document.activeElement)) trigger.focus();
+    host.commit(next);
+    if (user && host.anchor() && (group?.syncHash ?? true)) writeHash(host.id(), next);
+  }
+  /** Öffnet diesen Bereich und alle Eltern-Bereiche (Deep-Link, Sprungleiste). */
+  function reveal() {
+    setOpen(true);
+    host.parent()?.reveal();
+  }
+  /** Passt der URL-Anker zu diesem Bereich, wird er samt Eltern geöffnet und in Sicht gescrollt. */
+  function checkHash() {
+    if (typeof window === 'undefined' || !host.anchor()) return;
+    if (hashTarget(window.location.hash, [host.id()]) !== host.id()) return;
+    reveal();
+    scrollToElement(host.el());
+  }
+  const entry = {
+    get id() { return host.id(); },
+    get title() { return host.title(); },
+    get open() { return host.open(); },
+    get disabled() { return host.disabled(); },
+    get anchor() { return host.anchor(); },
+    get el() { return host.el(); },
+    get trigger() { return host.trigger(); },
+    reveal,
+    setOpen: (next) => setOpen(next),
+  };
+  return { setOpen, reveal, checkHash, entry };
+}
+
 // ── Vanilla-Skript ───────────────────────────────────────────
 
-const ITEM = '.dss-acc-item';
+// Bereiche: Karten (`.dss-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
+const ITEM = '.dss-acc-item, .dss-frame.is-collapsible, .dss-league.is-collapsible';
+const DETAILS = 'details.dss-acc-item';
 const instances = new WeakMap();
 let uid = 0;
 
 const TEXT = { all: 'Alle öffnen', none: 'Alle schließen', nav: 'Bereiche' };
 
 function triggerOf(item) {
-  return item.querySelector(':scope > summary, :scope > .dss-acc-title > .dss-acc-trigger');
+  return item.querySelector(
+    ':scope > summary, :scope > .dss-acc-title > .dss-acc-trigger, :scope > .dss-frame-head > .dss-frame-title > .dss-acc-trigger, :scope > .dss-league-head > .dss-league-title > .dss-acc-trigger',
+  );
 }
 function panelOf(item) {
   return item.querySelector(':scope > .dss-acc-panel');
@@ -204,13 +261,19 @@ function labelOf(item) {
   if (!source) return '';
   // Das unsichtbare Komma (.dss-acc-sep, früher .dss-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
   const copy = source.cloneNode(true);
-  for (const hidden of copy.querySelectorAll('.dss-sr-only, .dss-acc-sep')) hidden.remove();
+  for (const hidden of copy.querySelectorAll('.dss-sr-only, .dss-acc-sep, .dss-acc-sub')) hidden.remove();
   return clean(copy.textContent);
 }
 
 /** Alle Bereiche, die direkt zu `root` gehören (verschachtelte Gruppen zählen nicht mit). */
 function itemsOf(root) {
-  return [...root.querySelectorAll(ITEM)].filter((el) => el.parentElement?.closest('.dss-acc') === root);
+  return [...root.querySelectorAll(ITEM)].filter((el) => inGroup(el, root));
+}
+
+/** Gehört der Bereich direkt zu `root`? Nicht, wenn er in einer verschachtelten Gruppe oder (als einzelner Rahmen) im Panel eines Bereichs steht. */
+function inGroup(item, root) {
+  const parent = item.parentElement;
+  return parent?.closest('.dss-acc') === root && parent.closest('.dss-acc-panel')?.closest('.dss-acc') !== root;
 }
 
 /** Baum aller Bereiche mit id unterhalb von `scope` (über alle Gruppen): jeder Bereich kennt den Bereich, in dem er liegt. */
@@ -297,7 +360,7 @@ export function initAccordion(root, options = {}) {
     const trigger = event.target instanceof Element ? event.target.closest('.dss-acc-trigger') : null;
     if (!trigger || trigger.closest('.dss-acc') !== root) return;
     const item = trigger.closest(ITEM);
-    if (!item || item.parentElement?.closest('.dss-acc') !== root) return;
+    if (!item || !inGroup(item, root)) return;
     if (isDetails(item)) {
       if (isLocked(item)) event.preventDefault();
       return; // das native Umschalten übernimmt der Browser; toggle-Ereignis siehe unten
@@ -306,7 +369,7 @@ export function initAccordion(root, options = {}) {
   };
   const onToggle = (event) => {
     const item = event.target;
-    if (!(item instanceof Element) || !item.matches('details' + ITEM) || item.parentElement?.closest('.dss-acc') !== root) return;
+    if (!(item instanceof Element) || !item.matches(DETAILS) || !inGroup(item, root)) return;
     if (known.get(item) === item.open) return;
     known.set(item, item.open);
     const programmatic = expected.delete(item);

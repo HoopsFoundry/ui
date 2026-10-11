@@ -13,6 +13,7 @@ type Venue = {
   contactInfo: (c: unknown) => unknown;
   gameState: (g: unknown) => { text: string; tone: string } | undefined;
   gamesLimit: (n: unknown) => number;
+  gameKeys: (games: unknown) => string[];
 };
 
 const game = (id: string, state = 'scheduled', extra: Record<string, unknown> = {}) => ({ id, state, heim: { name: `H${id}` }, gast: { name: `G${id}` }, ...extra });
@@ -53,6 +54,10 @@ export function logicRules(mod: Venue): Rules {
     'Karten-Links nur mit gültigen Koordinaten': m.venueMapLinks({ lat: Number.NaN, lng: 1 }).length === 0 && m.venueMapLinks({ lat: 91, lng: 1 }).length === 0 && m.venueMapLinks({ lat: 49.3, lng: 7.9, name: 'A' }).length === 2,
     'Kartenname unterscheidet die Hallen': m.venueMapLabel('A') !== m.venueMapLabel('B') && m.venueMapLabel('Sporthalle Nordhain') === 'Karte: Sporthalle Nordhain',
     'Kontakt: ohne Angaben keiner': m.contactInfo({ name: ' ' }) === null && m.contactInfo(undefined) === null && m.contactInfo({ name: 'A' }) !== null,
+    'Schlüssel: eindeutig, fehlende und doppelte id bekommen Ersatz': (() => {
+      const k = m.gameKeys([{ id: 'a' }, { id: 'a' }, {}, { id: '' }, { id: 'a-2' }, { id: 5 }]);
+      return Array.isArray(k) && new Set(k).size === 6 && k[0] === 'a' && k[4] === 'a-2' && k[5] === '5' && k[2] === 'spiel-2' && k[3] === 'spiel-3' && m.gameKeys(undefined).length === 0;
+    })(),
     'Zustand: Live ok, Abgesagt err, Verschoben warn': m.gameState({ state: 'live' })?.tone === 'ok' && m.gameState({ state: 'cancelled' })?.tone === 'err' && m.gameState({ state: 'postponed' })?.tone === 'warn' && m.gameState({ state: 'scheduled' }) === undefined,
   };
 }
@@ -87,6 +92,8 @@ export function cssRules(css: string): Rules {
     'Zielgröße: Kontaktlinks mindestens 32 px, schmal 44 px': minHeight('.dss-venue-contact .dss-link') >= 32 && /\.dss-venue-contact \.dss-link \{[^}]*min-height:\s*44px/.test(container),
     'Karte wie die anderen Karten: Rand, Radius 16 px, Fläche': /border:\s*1px solid var\(--dss-line\)/.test(body('.dss-venue')) && /border-radius:\s*16px/.test(body('.dss-venue')) && /background:\s*var\(--dss-surface\)/.test(body('.dss-venue')),
     'Trikotpunkt mit Rand in --dss-mute': /border:\s*1px solid var\(--dss-mute\)/.test(body('.dss-venue-dot')),
+    'lange Wörter ohne Leerstelle brechen um (Straße, Info, Liga und Feld, Datum, Link, Beschriftung)': ['.dss-venue-line', '.dss-venue-info', '.dss-venue-game-meta', '.dss-venue-when', '.dss-venue-more', '.dss-venue-sec', '.dss-venue-contact dd', '.dss-venue-team-name'].every((s) => /overflow-wrap:\s*anywhere/.test(body(s))),
+    'Gitterspalten dürfen schrumpfen (minmax(0, 1fr))': ['.dss-venue-address', '.dss-venue-game-list', '.dss-venue-teams'].every((s) => /grid-template-columns:\s*minmax\(0, 1fr\)/.test(body(s))),
     'Adresse ohne Kursivschrift': /font-style:\s*normal/.test(body('.dss-venue-address')),
     'Druck: eine Spalte ohne Links unter der Karte': /@media print \{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*\.dss-venue-maplinks \{ display: none; \}/.test(text),
   };
@@ -99,13 +106,15 @@ export function sourceRules(svelte: string, react: string): Rules {
     'Karte ist nicht interaktiv': both((s) => /interactive=\{false\}/.test(s)),
     'Karte ohne eigene Liste (Adresse steht im Text)': both((s) => /showList=\{false\}/.test(s)),
     'Karte ohne App-Links (die Karte hat eigene darunter)': both((s) => /appLinks=\{\[\]\}/.test(s)),
-    'Kartenname je Halle': both((s) => s.includes('venueMapLabel(name)')),
+    'Kartenname je Halle': both((s) => s.includes('venueMapLabel(title)')),
     'Titelebene über useHeadingTag': both((s) => /useHeadingTag\(/.test(s)),
     'kein fester Überschriftenname': both((s) => !/<h[1-6][\s>]|<\/h[1-6]>/.test(s)),
     'Adresse als address-Element': both((s) => s.includes('<address')),
     'Kontakt als Definitionsliste': both((s) => s.includes('<dl') && s.includes('<dt>') && s.includes('<dd>')),
     'Spieleliste mit Namen': both((s) => s.includes('aria-label={gamesLabel}')),
-    'Link zur Hallenseite nennt die Halle': both((s) => /dss-link dss-venue-more[^>]*>\s*\{linkLabel\}\s*<span[^>]*dss-sr-only[^>]*>, \{name\}<\/span>/.test(s)),
+    'Link zur Hallenseite nennt die Halle': both((s) => /dss-link dss-venue-more[^>]*>\s*\{linkLabel\}\s*(\{#if title\}|\{title \?)\s*<span[^>]*dss-sr-only[^>]*>, \{title\}<\/span>/.test(s)),
+    'ohne Namen keine Überschrift': both((s) => /title \? <Heading|\{#if title\}<svelte:element/.test(s)),
+    'Listenschlüssel aus gameKeys': both((s) => s.includes('gameKeys(rows)') && /keys\[(i|index)\]/.test(s)),
     'Standardwerte': both((s) => /size = 'standard'/.test(s) && /load = 'click'/.test(s) && /mapHeight = 250/.test(s) && /logos = false/.test(s) && /names = 'full'/.test(s)),
     'Spiele nur in standard': both((s) => /size === 'compact' \? \[\]/.test(s)),
     'ohne Koordinaten keine Karte': both((s) => /isCoord\(lat, lng\)/.test(s)),

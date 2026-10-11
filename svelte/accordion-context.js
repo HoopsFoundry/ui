@@ -12,6 +12,7 @@ const ITEM = Symbol.for('dss.accordionItem');
  * @property {string} title
  * @property {boolean} open
  * @property {boolean} disabled
+ * @property {boolean} [anchor] Hat der Bereich einen öffentlichen Anker (id)? `false`: keine Sprungleiste, kein Hash.
  * @property {HTMLElement | undefined} el
  * @property {HTMLElement | undefined} trigger
  * @property {() => void} reveal Öffnet den Bereich samt allen Eltern-Bereichen.
@@ -42,13 +43,14 @@ export function useGroup() {
 
 /**
  * Der Bereich, in dessen Inhalt wir stehen (für verschachtelte Gruppen und das Öffnen der Eltern).
- * @param {{ readonly id: string, reveal: () => void }} api
+ * `group` ist die Gruppe, die der Bereich im Kontext fand (auch wenn er sich nicht anmeldet): so erkennt ein einklappbarer Rahmen im Inhalt, ob er direkt im Bereich steht.
+ * @param {{ readonly id: string, reveal: () => void, group?: AccordionGroupApi }} api
  */
 export function provideItem(api) {
   setContext(ITEM, api);
 }
 
-/** @returns {{ readonly id: string, reveal: () => void } | undefined} */
+/** @returns {{ readonly id: string, reveal: () => void, group?: AccordionGroupApi } | undefined} */
 export function useParentItem() {
-  return /** @type {{ id: string, reveal: () => void } | undefined} */ (getContext(ITEM));
+  return /** @type {{ id: string, reveal: () => void, group?: AccordionGroupApi } | undefined} */ (getContext(ITEM));
 }

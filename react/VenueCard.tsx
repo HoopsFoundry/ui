@@ -4,6 +4,7 @@ import type { ScheduleGame, ScheduleTeam } from '../js/schedule.js';
 import {
   addressLines,
   contactInfo,
+  gameKeys,
   gameMeta,
   gameState,
   gameWhen,
@@ -23,7 +24,7 @@ export type VenueCardSize = 'standard' | 'compact';
 export type VenueCardNames = 'full' | 'short';
 
 export interface VenueCardProps {
-  /** Name der Halle, z. B. „Sporthalle Nordhain“. Pflicht. */
+  /** Name der Halle, z. B. „Sporthalle Nordhain“. Pflicht; leer oder nur Leerraum ergibt keine Überschrift. */
   name: string;
   /** Adresse: Straße, Postleitzahl, Ort. Leere Teile entfallen. */
   address?: VenueAddress;
@@ -115,12 +116,15 @@ export function VenueCard({
   className,
 }: VenueCardProps) {
   const Heading = useHeadingTag(titleAs);
+  // Ohne Namen (leer oder nur Leerraum) entfällt die Überschrift, statt leer zu bleiben
+  const title = typeof name === 'string' ? name.trim() : '';
   const hasMap = isCoord(lat, lng);
   const lines = addressLines(address);
   const person = contactInfo(contact);
   const rows: ScheduleGame[] = size === 'compact' ? [] : venueGames(games, limit);
-  const mapLinks = venueMapLinks({ lat, lng, name });
+  const mapLinks = venueMapLinks({ lat, lng, name: title });
   const target = venueHref(href);
+  const keys = gameKeys(rows);
 
   return (
     <div className={cn('dss-venue', `dss-venue--${size}`, hasMap && 'dss-venue--map', className)}>
@@ -128,8 +132,8 @@ export function VenueCard({
       {hasMap ? (
         <div className="dss-venue-map">
           <MapView
-            label={venueMapLabel(name)}
-            markers={[{ id: 'halle', lat: lat as number, lng: lng as number, label: name }]}
+            label={venueMapLabel(title)}
+            markers={[{ id: 'halle', lat: lat as number, lng: lng as number, label: title }]}
             interactive={false}
             showList={false}
             height={mapHeight}
@@ -142,7 +146,7 @@ export function VenueCard({
             {mapLinks.map((link) => (
               <a key={link.kind} className="dss-link" href={link.href}>
                 {link.text}
-                <span className="dss-sr-only">, {name}</span>
+                {title ? <span className="dss-sr-only">, {title}</span> : null}
               </a>
             ))}
           </div>
@@ -150,7 +154,7 @@ export function VenueCard({
       ) : null}
 
       <div className="dss-venue-body">
-        <Heading className="dss-venue-title">{name}</Heading>
+        {title ? <Heading className="dss-venue-title">{title}</Heading> : null}
 
         {lines.length > 0 ? (
           <address className="dss-venue-address">
@@ -209,12 +213,12 @@ export function VenueCard({
               {gamesLabel}
             </div>
             <ul className="dss-venue-game-list" aria-label={gamesLabel}>
-              {rows.map((game) => {
+              {rows.map((game, index) => {
                 const when = gameWhen(game);
                 const meta = gameMeta(game);
                 const state = gameState(game);
                 return (
-                  <li key={game.id} className="dss-venue-game">
+                  <li key={keys[index]} className="dss-venue-game">
                     {when || state ? (
                       <div className="dss-venue-game-head">
                         {when ? <span className="dss-venue-when">{when}</span> : null}
@@ -237,7 +241,7 @@ export function VenueCard({
           <div className="dss-venue-foot">
             <a className="dss-link dss-venue-more" href={target}>
               {linkLabel}
-              <span className="dss-sr-only">, {name}</span>
+              {title ? <span className="dss-sr-only">, {title}</span> : null}
             </a>
           </div>
         ) : null}

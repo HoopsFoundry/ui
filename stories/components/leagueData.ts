@@ -15,6 +15,8 @@ export const LIGEN = [
   'Bezirksliga Nord', 'Bezirksliga Süd', 'Kreisliga Süd', 'Kreisliga Nord', 'Kreisliga Ost', 'Kreisliga West', 'Kreisliga A', 'Kreisliga B', 'Kreisliga C', 'Kreisliga D',
   'Verbandsliga Ost', 'Verbandsliga West', 'Verbandsliga Nord', 'Verbandsliga Süd', 'Regionalliga Mitte', 'Regionalliga Küste', 'Oberliga Nordhain U18', 'Oberliga Nordhain U16',
   'Landesliga Mitte', 'Bezirksliga Mitte', 'Kreisliga Mitte', 'Verbandsliga Mitte', 'Oberliga Hafen', 'Oberliga Seeland',
+  'Landesliga Hafen', 'Bezirksliga Hafen', 'Kreisliga Hafen', 'Verbandsliga Hafen', 'Landesliga Seeland', 'Bezirksliga Seeland', 'Kreisliga Seeland', 'Verbandsliga Seeland',
+  'Oberliga Auenland', 'Landesliga Auenland', 'Bezirksliga Auenland', 'Kreisliga Auenland',
 ];
 export const LOGO: Record<string, string> = {
   'TSV Nordhain 1920': nordhainLogo,

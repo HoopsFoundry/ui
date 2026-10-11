@@ -7,7 +7,7 @@ export interface VenueAddress {
 }
 
 export interface VenueContact {
-  name: string;
+  name?: string;
   phone?: string;
   email?: string;
 }
@@ -52,6 +52,8 @@ export function contactInfo(contact: VenueContact | undefined): ContactInfo | nu
 export function gamesLimit(limit: unknown): number;
 /** Nächste Spiele der Halle: ohne beendete und Spielfrei, höchstens `limit` (Standard 2). */
 export function venueGames(games: ScheduleGame[] | undefined, limit?: number): ScheduleGame[];
+/** Eindeutige Listenschlüssel der Spiele (fehlende oder doppelte `id` bekommen Ersatz). */
+export function gameKeys(games: ScheduleGame[] | undefined): string[];
 export function gameWhen(game: ScheduleGame): string;
 export function gameMeta(game: ScheduleGame): string;
 /** Hinweis zum Zustand eines Spiels (Live, Abgesagt, Verschoben) mit Ton für den Chip. */

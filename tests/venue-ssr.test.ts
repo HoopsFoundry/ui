@@ -89,6 +89,9 @@ describe('VenueCard: Svelte und React erzeugen dasselbe Markup', () => {
     'titleAs h6': { ...BASE, titleAs: 'h6' },
     'titleAs ungültig': { ...BASE, titleAs: 'h1' },
     class: { ...BASE, className: 'meine-klasse' },
+    'Spiele mit doppelter und fehlender id': { ...BASE, limit: 5, games: [GAMES[0], { ...GAMES[1], id: 'g0' }, { ...GAMES[2], id: undefined }, { ...GAMES[3], id: '' }] },
+    'Name leer': { name: '  ', lat: 49.3, lng: 7.9, href: '/h' },
+    'Kontakt ohne name': { ...BASE, contact: { phone: '112' } },
     'alles zusammen': { ...FULL, logos: true, names: 'short', limit: 4, titleAs: 'h4', load: 'auto', gamesLabel: 'Belegung', linkLabel: 'Hallenplan', mapHeight: 280 },
   };
   it.each(Object.entries(cases))('%s', async (_name, props) => {

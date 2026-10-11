@@ -233,3 +233,111 @@ export const namesSvelte = `<script>
 <!-- Kurznamen und Logos; bis 640 px Breite erscheinen die Kurznamen auch bei names="full" -->
 <ScheduleTable {games} layout="versus" names="short" logos caption="Spieltag" />
 <ScheduleGrid games={gridGames} {columns} names="short" logos caption="Hallenbelegung" />`;
+
+// ── Tabellen einklappen (Spielplan.mdx, Abschnitt „Tabellen einklappen“). Die Tests (tests/collapsible-code.test.ts) übersetzen die
+// React-Beispiele mit dem TypeScript-Compiler, rendern die Svelte-Beispiele und vergleichen das Vanilla-Markup mit der Ausgabe der Komponenten.
+
+const CHEVRON = `<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
+
+/** Markup eines einklappbaren Spielplans (ScheduleTable, geöffnet, mit Zusatzinfo); die Doku zeigt es und prüft es gegen die Komponente. */
+export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
+  <div class="dss-frame is-collapsible is-open" id="spielplan">
+    <div class="dss-frame-head dss-frame-head--acc">
+      <h3 class="dss-frame-title">
+        <button type="button" class="dss-acc-trigger" id="spielplan-trigger" aria-expanded="true" aria-controls="spielplan-panel">
+          <span class="dss-acc-label">Spielplan<span class="dss-acc-sep">,</span></span>
+          <span class="dss-frame-meta"><span>Saison 2026/27</span></span>
+          ${CHEVRON}
+        </button>
+      </h3>
+    </div>
+    <div class="dss-acc-panel" id="spielplan-panel">
+      <div class="dss-acc-panel-inner">
+        <div class="dss-table-scroll" role="region" tabindex="0" aria-label="Heimspiele">
+          <table role="table" class="dss-tbl dss-tbl--schedule dss-tbl--touch dss-sch--versus">
+            <caption class="dss-sr-only">Heimspiele</caption>
+            <thead role="rowgroup" class="dss-sr-only">
+              <tr role="row">
+                <th scope="col" role="columnheader">Zeit</th>
+                <th scope="col" role="columnheader">Spiel</th>
+                <th scope="col" role="columnheader">Ergebnis</th>
+              </tr>
+            </thead>
+            <tbody role="rowgroup">
+              <tr role="row" class="dss-sch-row">
+                <td role="cell" class="dss-sch-when"><span class="dss-sch-time">19:00</span></td>
+                <td role="cell" class="dss-sch-match">
+                  <span class="dss-sch-team">Team A</span><span class="dss-sch-sep" aria-hidden="true"> – </span><span class="dss-sr-only"> gegen </span><span class="dss-sch-team is-loser">Team B</span>
+                </td>
+                <td role="cell" class="dss-sch-res">
+                  <span class="dss-sch-resbox"><span class="dss-sch-score" aria-hidden="true">72 : 65</span><span class="dss-sr-only">Heim 72, Gast 65</span></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+export const collapsibleVanilla = `<!-- Wie der normale Spielplan (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Rahmen trägt
+     is-collapsible (und is-open, wenn er offen ist), die Tabelle steht in einem Bereich (dss-acc-panel). Das Zeitraster (dss-sgrid)
+     wird genauso eingeklappt. Geschlossen: aria-expanded="false", Bereich mit hidden und inert.
+     Steht der Rahmen im Panel eines Bereichs (dss-acc-item), braucht er einen eigenen Container (div.dss-acc mit data-dss-acc) und einen eigenen
+     initAccordion-Aufruf; initAccordions startet jeden data-dss-acc-Container einzeln. -->
+${collapsibleMarkup}
+
+<script type="module">
+  import { initAccordions } from '@bbv/dss-design-system/accordion.js';
+
+  initAccordions(document, { nav: true });
+</script>`;
+
+const collapsibleGames = `const games = [
+  { id: 'v1', state: 'finished', time: '19:00', heim: { name: 'Team A', score: 72 }, gast: { name: 'Team B', score: 65 } },
+];
+const columns = [{ id: 'h1', label: 'Halle 1' }, { id: 'h2', label: 'Halle 2' }];
+const rasterGames = [
+  { id: 'g1', state: 'scheduled', time: '09:00', column: 'h1', heim: { name: 'Team A' }, gast: { name: 'Team B' } },
+];`;
+
+export const collapsibleSvelte = `<script>
+  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
+  import ScheduleGrid from '@bbv/dss-design-system/svelte/ScheduleGrid';
+  import ScheduleTable from '@bbv/dss-design-system/svelte/ScheduleTable';
+
+  ${collapsibleGames.replaceAll('\n', '\n  ')}
+  let open = $state(true);
+</script>
+
+<!-- Einzeln: bind:open, id für den Deep-Link (…#spielplan) -->
+<ScheduleTable collapsible id="spielplan" bind:open title="Spielplan" meta="Saison 2026/27" {games} caption="Heimspiele" />
+
+<!-- In einer Gruppe: Sprungleiste und „Alle öffnen/schließen“; auch das Zeitraster lässt sich einklappen -->
+<Accordion nav navLabel="Bereiche des Spieltags" expandAll>
+  <ScheduleTable collapsible id="heimspiele" title="Heimspiele" {games} caption="Heimspiele des Spieltags" />
+  <ScheduleGrid collapsible id="hallen" title="Hallenbelegung" games={rasterGames} {columns} caption="Hallenbelegung am Samstag" />
+</Accordion>`;
+
+export const collapsibleReact = `import { useState } from 'react';
+import { Accordion, ScheduleGrid, ScheduleTable } from '@bbv/dss-design-system/react';
+import type { ScheduleGame } from '@bbv/dss-design-system/react';
+
+${collapsibleGames.replace('const games = [', 'const games: ScheduleGame[] = [').replace('const rasterGames = [', 'const rasterGames: ScheduleGame[] = [')}
+
+export function Spieltag() {
+  const [open, setOpen] = useState(true);
+  return (
+    <>
+      {/* Einzeln: open + onOpenChange (oder defaultOpen), id für den Deep-Link (…#spielplan) */}
+      <ScheduleTable collapsible id="spielplan" open={open} onOpenChange={setOpen} title="Spielplan" meta="Saison 2026/27" games={games} caption="Heimspiele" />
+
+      {/* In einer Gruppe: Sprungleiste und „Alle öffnen/schließen“; auch das Zeitraster lässt sich einklappen */}
+      <Accordion nav navLabel="Bereiche des Spieltags" expandAll>
+        <ScheduleTable collapsible id="heimspiele" title="Heimspiele" games={games} caption="Heimspiele des Spieltags" />
+        <ScheduleGrid collapsible id="hallen" title="Hallenbelegung" games={rasterGames} columns={columns} caption="Hallenbelegung am Samstag" />
+      </Accordion>
+    </>
+  );
+}`;

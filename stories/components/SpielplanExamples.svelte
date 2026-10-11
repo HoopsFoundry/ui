@@ -1,6 +1,7 @@
 <script lang="ts">
   import ScheduleTable from '../../svelte/ScheduleTable.svelte';
   import ScheduleGrid from '../../svelte/ScheduleGrid.svelte';
+  import Accordion from '../../svelte/Accordion.svelte';
   import type { ScheduleGame } from '../../js/schedule.js';
   // Erfundene Vereinslogos (nur Storybook, nicht im Paket)
   import nordhainLogo from '../assets/logos/nordhain.svg';
@@ -46,6 +47,9 @@
     { id: 't3', state: 'scheduled', nr: '#3', section: 'Runde 2 · Gruppe A', time: '09:30–09:50', field: 'F1', venue: 'Halle 2', heim: { name: 'TSV Nordhain', own: true }, gast: { name: 'TV Elbach' } },
     { id: 't9', state: 'scheduled', nr: '#9', section: 'Halbfinale', time: '11:00–11:20', field: 'F1', venue: 'Halle 1', heim: { name: 'Erster Gruppe A', placeholder: true }, gast: { name: 'Zweiter Gruppe B', placeholder: true } },
   ];
+
+  // Do und Don't stehen in schmalen Spalten (Handy-Karten): dort ohne Links, damit Namen und Unterzeile die Zielfläche nicht verdecken
+  const ligaOhneLinks: ScheduleGame[] = liga.map((g) => ({ ...g, league: g.league && { name: g.league.name }, heim: g.heim && { ...g.heim, href: undefined }, gast: g.gast && { ...g.gast, href: undefined } }));
 
   // 03 · Raster
   const raster: ScheduleGame[] = [
@@ -262,6 +266,33 @@
   <div class="shout">
     <ScheduleTable games={eigene} layout="versus" caption="Eigene Mannschaft laut" />
   </div>
+{:else if example === 'einklappbar'}
+  <div class="stack">
+    <ScheduleTable collapsible open games={liga} layout="versus" title="Spieltage der Herren" meta="3 Spiele" caption="Einklappbar: Spielplan offen" />
+    <ScheduleGrid collapsible games={raster} columns={hallen} title="Zeitraster am Samstag" meta="3 Hallen" caption="Einklappbar: Zeitraster zu" />
+  </div>
+{:else if example === 'einklappbar-id'}
+  <div class="stack">
+    <p class="links">Direkt springen: <a class="dss-link" href="#sp-turnier">Turnierplan (Deep-Link)</a></p>
+    <ScheduleTable collapsible id="sp-mannschaft" games={mannschaft} layout="opponent" title="Spielplan der Mannschaft" meta="4 Spiele" caption="Deep-Link: Mannschaftsplan" />
+    <ScheduleTable collapsible id="sp-turnier" games={turnier} layout="columns" title="Turnierplan" meta="4 Spiele" caption="Deep-Link: Turnierplan" />
+  </div>
+{:else if example === 'einklappbar-gruppe'}
+  <Accordion syncHash={false} nav navLabel="Bereiche des Spieltags" expandAll>
+    <ScheduleTable collapsible id="gr-liga" games={liga} layout="versus" title="Liga-Spieltag" meta="3 Spiele" caption="Gruppe: Liga-Spieltag" />
+    <ScheduleTable collapsible id="gr-turnier" games={turnier} layout="columns" title="Turnier-Spielplan" meta="4 Spiele" caption="Gruppe: Turnier-Spielplan" />
+    <ScheduleGrid collapsible id="gr-raster" games={raster} columns={hallen} title="Hallenbelegung" meta="3 Hallen" caption="Gruppe: Hallenbelegung" />
+  </Accordion>
+{:else if example === 'do-offen'}
+  <div class="stack">
+    <ScheduleTable collapsible open games={ligaOhneLinks} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Do: heutiger Spieltag" />
+    <ScheduleTable collapsible games={mannschaft} layout="opponent" title="Restliche Saison" meta="4 Spiele" caption="Do: restliche Saison" />
+  </div>
+{:else if example === 'dont-zu'}
+  <div class="stack">
+    <ScheduleTable collapsible games={ligaOhneLinks} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Don't: heutiger Spieltag" />
+    <ScheduleTable collapsible games={mannschaft} layout="opponent" title="Restliche Saison" meta="4 Spiele" caption="Don't: restliche Saison" />
+  </div>
 {/if}
 
 {#each states as s (s.key)}
@@ -281,6 +312,8 @@
 {/each}
 
 <style>
+  .stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .links { margin: 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
   .readout { margin: 8px 0 0; font-size: var(--fs-body-sm); color: var(--dss-fg-soft); }
   .shout :global(.dss-tbl tbody tr:not(.dss-sch-group)) { background: var(--signal-400); }
 </style>

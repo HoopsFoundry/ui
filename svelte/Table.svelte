@@ -19,6 +19,7 @@
   import type { Snippet } from 'svelte';
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
+  import CollapsibleFrame from './internal/CollapsibleFrame.svelte';
 
   type Density = 'touch' | 'default' | 'compact' | 'dense';
 
@@ -36,6 +37,9 @@
     body,
     foot = undefined,
     caption = '',
+    collapsible = false,
+    open = $bindable(false),
+    id = undefined,
     class: klass = '',
   }: {
     title?: string;
@@ -53,23 +57,30 @@
     foot?: Snippet;
     /** Unsichtbare Tabellenbeschriftung für Screenreader; benennt auch den Scrollbereich. */
     caption?: string;
+    /** Einklappbar: der Rahmenkopf wird zum Bereichskopf (Button in der Überschrift), die Tabelle zum Bereich. Braucht einen `title`. */
+    collapsible?: boolean;
+    /** Geöffnet, mit `bind:open` gebunden (nur mit `collapsible`; Standard geschlossen). */
+    open?: boolean;
+    /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
+    id?: string;
     class?: string;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
+  $inspect(collapsible && !title).with((_type, missing) => {
+    if (missing) console.warn('[DSS] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
+  });
 </script>
 
-<div class={`dss-frame ${dark ? 'dss-frame--dark' : ''} ${klass}`}>
-  {#if title || meta || live}
-    <div class="dss-frame-head">
-      {#if title}<svelte:element this={heading.tag} class="dss-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
-      <div class="dss-frame-meta">
-        {#if meta}<span>{meta}</span>{/if}
-        {#if live}<span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
-      </div>
-    </div>
-  {/if}
+{#snippet frameMeta()}
+  <span class="dss-frame-meta">
+    {#if meta}<span>{meta}</span>{/if}
+    {#if live}<span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
+  </span>
+{/snippet}
 
+{#snippet tableRegion()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
   <div class="dss-table-scroll" role="region" tabindex="0" aria-label={caption || title || 'Tabelle'}>
     <table class={`dss-tbl dss-tbl--${density} ${striped ? 'dss-tbl--striped' : ''}`}>
@@ -93,4 +104,24 @@
       {#if foot}<tfoot>{@render foot()}</tfoot>{/if}
     </table>
   </div>
+{/snippet}
+
+{#if collapsible && title}
+  <CollapsibleFrame rootClass={`dss-frame ${dark ? 'dss-frame--dark' : ''} ${klass}`} {id} {title} {titleAs} bind:open meta={meta || live ? frameMeta : undefined}>
+    {@render tableRegion()}
+  </CollapsibleFrame>
+{:else}
+<div class={`dss-frame ${dark ? 'dss-frame--dark' : ''} ${klass}`}>
+  {#if title || meta || live}
+    <div class="dss-frame-head">
+      {#if title}<svelte:element this={heading.tag} class="dss-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
+      <div class="dss-frame-meta">
+        {#if meta}<span>{meta}</span>{/if}
+        {#if live}<span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
+      </div>
+    </div>
+  {/if}
+
+  {@render tableRegion()}
 </div>
+{/if}

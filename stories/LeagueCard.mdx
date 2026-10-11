@@ -4,7 +4,7 @@ import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
-import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs } from './LeagueCard.code';
+import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs, collapsibleVanilla, collapsibleSvelte, collapsibleReact } from './LeagueCard.code';
 
 <Meta of={LeagueCardStories} />
 
@@ -153,6 +153,20 @@ Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell
   </div>
 </div>
 
+## Tabellen einklappen
+
+Mit `collapsible` wird der Kopf der Karte (Titel, Untertitel und Live-Tag) zum Kopf eines Accordions: Der Titel steht als Überschrift mit Button, Untertitel und Live-Tag sind Teil des Buttons und seines Namens („Oberliga …, 12 Teams · 66 von 132 Spielen gespielt, Live 2 Spiele laufen“), dahinter steht der Pfeil. Tabelle, Legende und Link zur kompletten Tabelle sind der Bereich. Geschlossen zeigt die Karte nur den Kopf; der Rand schließt unten ab, der Trennstrich gehört zur Tabelle. Die Titelgröße bleibt an `--dss-card-title-size` (die Accordion-Tokens gelten hier nicht), die Ebene folgt `titleAs` und `HeadingLevel`. Standard ist geschlossen; `open` (Svelte `bind:open`, React `open` mit `onOpenChange` oder `defaultOpen`) öffnet. Die Tabelle bleibt die benannte Region „Tabelle: Titel“, der Bereich trägt keine zweite.
+
+<Canvas of={LeagueCardStories.Einklappbar} />
+
+Mit `id` öffnet ein Anker in der Adresse (`…#lc-west`) die Karte beim Laden und bei `hashchange`; ohne `id` gibt es keinen Anker. In einer `Accordion`-Gruppe nehmen die Karten an Sprungleiste, „Alle öffnen/schließen“, `exclusive`, Deep-Link und Pfeiltasten teil (auch gemischt mit `AccordionItem`).
+
+<Canvas of={LeagueCardStories.EinklappbarId} />
+
+<Canvas of={LeagueCardStories.EinklappbarGruppe} />
+
+<FrameworkCode label="Ligencard einklappen" vanilla={collapsibleVanilla} svelte={collapsibleSvelte} react={collapsibleReact} />
+
 ## Zustände: Link-Hover und Fokus
 
 Die Karte selbst ist nicht klickbar, die Links in ihr sind es: die Namen der Teams (wenn `href` am Team steht) und der Fuß-Link. Hover verdickt die Unterstreichung auf 2 px; bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring (3 px, 2 px Abstand, auf der eigenen Zeile im Dunkelmodus in der helleren Chip-Textfarbe) um den Link. Der Scrollbereich der Tabelle ist per Tastatur erreichbar und hat einen eigenen Ring. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Bei „Bewegung reduzieren“ gibt es keine Übergänge.
@@ -235,6 +249,13 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Oberliga Nordhain M
       dontText: 'Mit `limit={12}` wird aus der Karte eine ganze Tabelle, die in der Seitenleiste den Platz sprengt. Die komplette Tabelle gehört in `Table` auf eine eigene Seite.',
       good: <Story of={LeagueCardStories.DoZeilen} inline />,
       bad: <Story of={LeagueCardStories.DontZeilen} inline />,
+    },
+    {
+      title: 'Wichtiges offen lassen',
+      doText: 'Bei mehreren einklappbaren Karten steht die eigene Liga offen, die anderen sind zu. Der Titel bleibt sichtbar und nennt die Liga.',
+      dontText: 'Alles zugeklappt: Auch die Tabelle der eigenen Liga steckt hinter einem Klick, und die Seite zeigt nur Titel.',
+      good: <Story of={LeagueCardStories.DoOffen} inline />,
+      bad: <Story of={LeagueCardStories.DontZu} inline />,
     },
   ]}
 />

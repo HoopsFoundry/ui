@@ -15,6 +15,12 @@ export const MiniMannschaft = example('mini-mannschaft');
 export const MiniTurnier = example('mini-turnier');
 export const MiniRaster = example('mini-raster');
 
+export const Einklappbar = example('einklappbar');
+export const EinklappbarId = example('einklappbar-id');
+export const EinklappbarGruppe = example('einklappbar-gruppe');
+export const DoOffen = example('do-offen');
+export const DontZu = example('dont-zu');
+
 export const LayoutOpponent = example('layout-opponent');
 export const LayoutVersus = example('layout-versus');
 export const LayoutColumns = example('layout-columns');

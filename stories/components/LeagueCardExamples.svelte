@@ -1,5 +1,6 @@
 <script lang="ts">
   import LeagueCard from '../../svelte/LeagueCard.svelte';
+  import Accordion from '../../svelte/Accordion.svelte';
   import { LIGEN, demoTable } from './leagueData';
 
   let { example }: { example: string } = $props();
@@ -159,6 +160,41 @@
   <div class="narrow">
     <LeagueCard {...COMMON} title={LIGEN[27]} titleAs="h4" teams={demoTable()} size="compact" limit={12} />
   </div>
+{:else if example === 'einklappbar'}
+  <div class="grid2">
+    <div>
+      <div class="cap">Offen · collapsible open</div>
+      <LeagueCard {...COMMON} collapsible open title={LIGEN[32]} teams={mid} live={2} />
+    </div>
+    <div>
+      <div class="cap">Geschlossen · collapsible</div>
+      <LeagueCard {...COMMON} collapsible title={LIGEN[33]} teams={mid} />
+    </div>
+  </div>
+{:else if example === 'einklappbar-id'}
+  <div class="grid1">
+    <p class="links">Direkt springen: <a class="dss-link" href="#lc-west">Liga West (Deep-Link)</a></p>
+    <div class="grid2">
+      <LeagueCard {...COMMON} collapsible id="lc-ost" title={LIGEN[34]} teams={mid} />
+      <LeagueCard {...COMMON} collapsible id="lc-west" title={LIGEN[35]} teams={mid} />
+    </div>
+  </div>
+{:else if example === 'einklappbar-gruppe'}
+  <Accordion syncHash={false} nav navLabel="Ligen der Vereinsseite" expandAll>
+    <LeagueCard {...COMMON} collapsible id="lg-herren" title={LIGEN[36]} teams={mid} />
+    <LeagueCard {...COMMON} collapsible id="lg-damen" title={LIGEN[37]} teams={demoTable()} live={1} />
+    <LeagueCard {...COMMON} collapsible id="lg-jugend" title={LIGEN[38]} teams={mid} size="compact" />
+  </Accordion>
+{:else if example === 'do-offen'}
+  <div class="grid1">
+    <LeagueCard {...COMMON} collapsible open title={LIGEN[39]} titleAs="h4" teams={mid} />
+    <LeagueCard {...COMMON} collapsible title={LIGEN[40]} titleAs="h4" teams={demoTable()} />
+  </div>
+{:else if example === 'dont-zu'}
+  <div class="grid1">
+    <LeagueCard {...COMMON} collapsible title={LIGEN[41]} titleAs="h4" teams={mid} />
+    <LeagueCard {...COMMON} collapsible title={LIGEN[42]} titleAs="h4" teams={demoTable()} />
+  </div>
 {:else if example === 'zustaende'}
   <!-- data-fixed-states: die Werkzeugleiste "Zustand" lässt diese Matrix in Ruhe -->
   <div class="matrix" data-fixed-states>
@@ -177,6 +213,8 @@
 
 <style>
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; align-items: start; }
+  .grid1 { display: flex; flex-direction: column; gap: 18px; min-width: 0; max-width: 640px; }
+  .links { margin: 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
   .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 18px; align-items: start; }
   .narrow { width: 100%; max-width: 380px; }
   .gap { height: 12px; }

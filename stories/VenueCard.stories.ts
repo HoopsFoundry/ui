@@ -57,6 +57,7 @@ export const Kontakt    = { ...example('kontakt'), tags: ['!dev'] };
 export const Spiele     = { ...example('spiele'), tags: ['!dev'] };
 export const Compact    = { ...example('compact'), tags: ['!dev'] };
 export const Handy      = { ...example('handy'), tags: ['!dev'] };
+export const HandyDunkel = { ...example('handy-dunkel'), tags: ['!dev'] };
 export const Zustaende  = { ...example('zustaende'), tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).

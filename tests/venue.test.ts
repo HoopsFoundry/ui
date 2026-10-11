@@ -82,6 +82,25 @@ describe('venueGames und gamesLimit', () => {
   });
 });
 
+describe('gameKeys', () => {
+  it.each<[unknown[], string[]]>([
+    [[{ id: 'a' }, { id: 'b' }], ['a', 'b']],
+    [[{ id: 'a' }, { id: 'a' }, { id: 'a' }], ['a', 'a-2', 'a-3']],
+    [[{ id: 'a' }, { id: 'a' }, { id: 'a-2' }], ['a', 'a-3', 'a-2']],
+    [[{}, { id: '' }, { id: null }], ['spiel-0', 'spiel-1', 'spiel-2']],
+    [[{ id: 3 }, { id: '3' }], ['3', '3-2']],
+    [[{ id: 'spiel-1' }, {}], ['spiel-1', 'spiel-1-2']],
+    [[null, 'x'], ['spiel-0', 'spiel-1']],
+  ])('gameKeys(%j) = %j', (input, expected) => {
+    expect(venue.gameKeys(input as never)).toEqual(expected);
+    expect(new Set(venue.gameKeys(input as never)).size).toBe(input.length);
+  });
+  it('keine Liste ergibt []', () => {
+    expect(venue.gameKeys(undefined)).toEqual([]);
+    expect(venue.gameKeys('x' as never)).toEqual([]);
+  });
+});
+
 describe('Zeilen eines Spiels', () => {
   it('gameWhen: Datum und Uhrzeit, soweit vorhanden', () => {
     expect(gameWhen(game('1', 'scheduled', { date: 'Sa, 17.10.2026', time: '17:30' }))).toBe('Sa, 17.10.2026 · 17:30');

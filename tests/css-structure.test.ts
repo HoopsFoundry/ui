@@ -6,7 +6,8 @@ import { describe, expect, it } from 'vitest';
 
 const css = readFileSync(new URL('../css/components.css', import.meta.url), 'utf8');
 // Kommentare weg (enthalten Klammern), Zeichenketten weg (data:-URLs)
-const bare = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/"[^"]*"/g, '""').replace(/'[^']*'/g, "''");
+const strip = (src: string) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/"[^"]*"/g, '""').replace(/'[^']*'/g, "''");
+const bare = strip(css);
 
 type Block = { prelude: string; body: string };
 function topLevel(src: string): Block[] {
@@ -45,8 +46,10 @@ describe('components.css: Klammern', () => {
 });
 
 describe('components.css: Blöcke der Komponenten bleiben getrennt', () => {
-  const blocks = topLevel(bare);
-  const at = blocks.filter((b) => b.prelude.startsWith('@'));
+  // Der Abschnitt „Einklappbare Rahmen“ (Paket B) verbindet beide Welten bewusst und steht am Ende; er wird getrennt geprüft
+  const marker = '/* ── Einklappbare Rahmen';
+  const frames = css.indexOf(marker);
+  const at = topLevel(strip(frames > 0 ? css.slice(0, frames) : css)).filter((b) => b.prelude.startsWith('@'));
   it('kein @media/@supports mit Accordion-Selektoren enthält Ligencard-, Tabellen- oder Rahmen-Selektoren', () => {
     for (const b of at.filter((x) => x.body.includes('.dss-acc'))) {
       expect(b.body, b.prelude).not.toMatch(/\.dss-(league|tbl|frame|sch|sgrid)/);
@@ -64,5 +67,9 @@ describe('components.css: Blöcke der Komponenten bleiben getrennt', () => {
     const print = at.find((b) => b.prelude === '@media print' && b.body.includes('.dss-acc'));
     expect(print).toBeDefined();
     expect(print!.body).toContain('::details-content');
+  });
+  it('der Abschnitt „Einklappbare Rahmen“ steht nach Accordion und Ligencard und ist in sich ausgeglichen', () => {
+    expect(frames).toBeGreaterThan(css.indexOf('/* ── LeagueCard'));
+    expect(() => topLevel(strip(css.slice(frames)))).not.toThrow();
   });
 });

@@ -74,6 +74,13 @@
     <div class="gap"></div>
     <VenueCard {...venueProps(11)} size="compact" tileUrl={tile} />
   </div>
+{:else if example === 'handy-dunkel'}
+  <!-- andere Hallen als bei 'handy': beide Vorschauen stehen auf einer Seite -->
+  <div class="narrow">
+    <VenueCard {...venueProps(0)} games={games} logos names="short" tileUrl={tile} />
+    <div class="gap"></div>
+    <VenueCard {...venueProps(1)} size="compact" tileUrl={tile} />
+  </div>
 {:else if example === 'zustaende'}
   <!-- data-fixed-states: die Werkzeugleiste "Zustand" lässt diese Matrix in Ruhe -->
   <div class="matrix" data-fixed-states>

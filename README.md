@@ -18,7 +18,7 @@ svelte/
   Modal.svelte          ← Reference component
   Card.svelte           ← v0.6
   Tabs.svelte           ← v0.6
-  Accordion.svelte      ← Bereiche auf und zu klappen (mit AccordionItem.svelte, CSS in css/components.css)
+  Accordion.svelte      ← Bereiche auf und zu klappen (mit AccordionItem.svelte, CSS in css/components.css); Table, ScheduleTable, ScheduleGrid und LeagueCard klappen mit `collapsible` ein (interner Baustein internal/CollapsibleFrame.svelte)
   Icon.svelte           ← v0.6 (67 Glyphen)
   Select.svelte         ← v0.7 · natives <select> im DSS-Look
   Banner.svelte         ← v0.7 · Inline-Hinweis

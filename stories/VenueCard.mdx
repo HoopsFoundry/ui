@@ -61,19 +61,20 @@ Telefon und E-Mail werden nur zu Links, wenn sie sicher sind. Die Rufnummer darf
 
 ## Größen
 
-`size="compact"` macht die Karte kleiner (Spalte etwa 30 % statt 40 %, kleinerer Titel, engere Ränder) und lässt die Spiele weg. Die Karte ist mindestens 224 px breit (der Kartenrahmen mindestens 206 px, damit die Quellenangabe in einer Zeile bleibt), wächst mit der Höhe der Daten und ist mindestens `mapHeight` hoch (Standard 250 px).
+`size="compact"` macht die Karte kleiner (Spalte etwa 30 % statt 40 %, kleinerer Titel, engere Ränder) und lässt die Spiele weg. Die Kartenspalte ist mindestens 224 px breit (der Kartenrahmen mindestens 206 px, damit die Quellenangabe in einer Zeile bleibt); die 30 % der compact-Karte gelten erst ab etwa 750 px Kartenbreite, darunter bestimmt die Mindestbreite, wächst mit der Höhe der Daten und ist mindestens `mapHeight` hoch (Standard 250 px).
 
 <Canvas of={VenueCardStories.Compact} />
 
 ### Messwerte
 
-Gemessen im Browser (Chromium, BBV).
+Gemessen im Browser (Chromium, BBV); die Kartenbreite steht in der jeweiligen Zeile.
 
 <DocTable
   label="Maße der Hallenkarte (gemessen im Browser)"
   head={['Maß', 'standard', 'compact']}
   rows={[
-    ['Kartenspalte bei 860 px Kartenbreite', '343 px (40 %), Rahmen 327 px', '224 px (Mindestbreite; 30 % wären 210 px), Rahmen 212 px'],
+    ['Kartenspalte bei 860 px Kartenbreite', '343 px (40 %), Rahmen 327 px', '258 px (30 %), Rahmen 246 px (bei 862 px Kartenbreite gemessen)'],
+    ['Kartenspalte bei 700 px Kartenbreite', '280 px (40 %)', '224 px (Mindestbreite; 30 % wären 210 px), Rahmen 212 px'],
     ['Karte schmal (Karte bis 640 px breit)', 'Rahmen 354 × 226 px bei 380 px Kartenbreite (16:9, mindestens 224 px hoch)', 'wie standard'],
     ['Titel', '20 px, Gewicht 700 (Token --dss-card-title-size, Rückfall fs-h3)', '18 px (Rückfall fs-body-lg)'],
     ['Radius der Karte', '16 px', '12 px'],
@@ -86,7 +87,7 @@ Gemessen im Browser (Chromium, BBV).
 
 ## Handy · 390 px Breite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel. Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben.
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (zwei verschiedene Hallen, damit die Karten auf der Seite unterscheidbar bleiben). Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben. Genau gilt: ist die Containerbreite ohne den 1 px breiten Rand der Karte höchstens 640 px (die Karte also höchstens 642 px breit), steht die Karte oben; ab 643 px steht sie links. Die Kurznamen der Mannschaften (`names`) folgen dagegen der **Fensterbreite** (bis 640 px), nicht der Karte: in einer schmalen Spalte am großen Bildschirm bleibt es bei `names="full"`, wenn du `short` nicht selbst setzt.
 
 <div className="dss-phones">
   <div className="dss-phone">
@@ -98,18 +99,18 @@ Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell
   <div className="dss-phone">
     <h3 className="dss-doc-cap">VenueCard · dunkel</h3>
     <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard dunkel">
-      <iframe title="Handy-Vorschau: Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--handy" loading="lazy" />
+      <iframe title="Handy-Vorschau: Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--handy-dunkel" loading="lazy" />
     </div>
   </div>
 </div>
 
 ## Dunkelmodus
 
-Alle Flächen und Texte laufen über die semantischen Tokens; die Karte braucht keinen eigenen Dunkelmodus. Text hat mindestens 7:1, Trikotpunkt-Rand und Rahmen mindestens 3:1, in beiden Marken (BBV, DBB) und in beiden Modi (Tests). Die Kacheln der Karte werden im Dunkelmodus abgedunkelt (siehe Map).
+Alle Flächen und Texte laufen über die semantischen Tokens; die Karte braucht keinen eigenen Dunkelmodus. Text hat mindestens 7:1, der Rand der Trikotpunkte mindestens 3:1, in beiden Marken (BBV, DBB) und in beiden Modi (Tests). Die Kacheln der Karte werden im Dunkelmodus abgedunkelt (siehe Map).
 
 ## Zustände: Link-Hover und Fokus
 
-Die Karte selbst ist nicht klickbar, die Links in ihr sind es: Größere Karte, Route planen, Telefon, E-Mail und der Link zur Hallenseite. Bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring um den Link. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Die Schaltflächen der Karte (Karte laden, Zoom) stehen auf der Seite Map.
+Die Karte selbst ist nicht klickbar, die Links in ihr sind es: Größere Karte, Route planen, Telefon, E-Mail und der Link zur Hallenseite. Bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring um den Link. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Die Schaltflächen der Karte (Karte laden, Zoom) stehen auf der Seite Map. Hinweis: Auch mit `interactive={false}` zeigt die geladene Karte die Zoom-Schaltflächen und reagiert auf die Tasten; nur Ziehen, Scrollzoom und Doppelklick sind aus.
 
 <Canvas of={VenueCardStories.Zustaende} />
 
@@ -130,6 +131,8 @@ Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; di
 <FrameworkCode label="VenueCard" vanilla={vanilla} svelte={svelte} react={react} />
 
 <CodeBlock label="Funktionen aus venue.js" language="JavaScript" code={funktionenJs} />
+
+Lange Wörter ohne Leerstelle (Straße, Info, Liga, Link) brechen um, statt die Karte zu weiten. Ein leerer oder nur aus Leerraum bestehender `name` ergibt keine Überschrift; Karte, Links und die übrigen Blöcke bleiben.
 
 Die Spielwiese zeigt die echte Komponente mit der erfundenen Sporthalle Nordhain; `gameCount` ist nur eine Hilfe der Spielwiese, `tileUrl` `demo` lädt das lokale Bild.
 

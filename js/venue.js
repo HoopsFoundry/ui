@@ -95,6 +95,24 @@ export function venueGames(games, limit) {
     .slice(0, gamesLimit(limit));
 }
 
+/**
+ * Eindeutige Schlüssel für die Spielzeilen (Listenschlüssel in Svelte und React): `id` als Text, fehlende oder leere `id` ergeben `spiel-<Index>`,
+ * doppelte bekommen ein Suffix (`-2`, `-3` …), das nie mit einer anderen `id` zusammenfällt.
+ */
+export function gameKeys(games) {
+  const list = Array.isArray(games) ? games : [];
+  const given = new Set(list.map((g) => g?.id).filter((id) => (typeof id === 'string' && id !== '') || typeof id === 'number').map(String));
+  const used = new Set();
+  return list.map((g, index) => {
+    const hasId = (typeof g?.id === 'string' && g.id !== '') || typeof g?.id === 'number';
+    const base = hasId ? String(g.id) : `spiel-${index}`;
+    let key = base;
+    for (let n = 2; used.has(key) || (given.has(key) && !(hasId && key === base)); n++) key = `${base}-${n}`;
+    used.add(key);
+    return key;
+  });
+}
+
 /** Zeitangabe eines Spiels: „Sa, 17.10.2026 · 17:30“ (Datum und Uhrzeit, soweit vorhanden). */
 export function gameWhen(game) {
   return [text(game?.date), text(game?.time)].filter(Boolean).join(' · ');

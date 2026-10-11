@@ -1,5 +1,6 @@
 <script lang="ts">
   import Table from '../../svelte/Table.svelte';
+  import Accordion from '../../svelte/Accordion.svelte';
   import { boxscore, roster, signClass } from './tableData';
 
   let { example }: { example: string } = $props();
@@ -13,6 +14,14 @@
     { name: 'M. Okafor', pts: 81, reb: 108 },
     { name: 'L. Brandt', pts: 8, reb: 1 },
     { name: 'K. Vogler', pts: 100, reb: 111 },
+  ];
+
+  // Einklappbare Tabellen: gemeinsame Spalten; jede Tabelle hat einen eigenen Titel (die Tabelle ist eine benannte Region, axe landmark-unique)
+  const statCols = [
+    { key: 'num', label: '#', width: '52px' },
+    { key: 'name', label: 'Spieler' },
+    { key: 'pts', label: 'PTS', align: 'right' as const },
+    { key: 'reb', label: 'REB', align: 'right' as const },
   ];
 
   const stati = ['Aktiv', 'Bank', 'Aktiv', 'DNP'] as const;
@@ -35,6 +44,12 @@
 
 {#snippet spieler(name: string)}
   <div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">{name}</span></div></div>
+{/snippet}
+
+{#snippet statRows(list: typeof boxscore)}
+  {#each list as p}
+    <tr><td><span class="dss-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.reb}</td></tr>
+  {/each}
 {/snippet}
 
 {#if example === 'zellen'}
@@ -291,9 +306,62 @@
       {/snippet}
     </Table>
   </div>
+{:else if example === 'einklappbar'}
+  <div class="stack">
+    <Table collapsible open title="Heimteam im 4. Viertel" meta="Stand · 4. Viertel" live density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+    <Table collapsible title="Gastteam im 4. Viertel" meta="4. Viertel" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+  </div>
+{:else if example === 'einklappbar-id'}
+  <div class="stack">
+    <p class="links">
+      Direkt springen: <a class="dss-link" href="#tab-gast">Statistik Lindenberg Hawks</a>
+    </p>
+    <Table collapsible id="tab-heim" title="Statistik TSV Nordhain" meta="Stand · 4. Viertel" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+    <Table collapsible id="tab-gast" title="Statistik Lindenberg Hawks" meta="4. Viertel" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+  </div>
+{:else if example === 'einklappbar-gruppe'}
+  <Accordion syncHash={false} nav navLabel="Tabellen der Spielseite" expandAll>
+    <Table collapsible id="gr-heim" title="Boxscore Nordhain" meta="4. Viertel" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+    <Table collapsible id="gr-gast" title="Boxscore Hawks" meta="4. Viertel" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+    <Table collapsible id="gr-kader" title="Kader Nordhain" meta="10 Spieler" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+  </Accordion>
+{:else if example === 'do-offen'}
+  <div class="stack">
+    <Table collapsible open title="Live: Nordhain gegen Seeberg" meta="4. Viertel" live density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+    <Table collapsible title="Kader Seeberg" meta="10 Spieler" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+  </div>
+{:else if example === 'dont-zu'}
+  <div class="stack">
+    <Table collapsible title="Live: Elbach gegen Kiefernau" meta="4. Viertel" live density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+    <Table collapsible title="Kader Kiefernau" meta="10 Spieler" density="compact" columns={statCols}>
+      {#snippet rows()}{@render statRows(kurz)}{/snippet}
+    </Table>
+  </div>
 {/if}
 
 <style>
+  .stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .links { margin: 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
   .wide { width: 100%; }
   .narrow { width: 100%; max-width: 360px; }
   .phone { width: 100%; max-width: 340px; }

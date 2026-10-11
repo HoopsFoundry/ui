@@ -47,3 +47,43 @@ export function moveFocus(root: Element, trigger: Element, key: string, modifier
 export function initAccordion(root: Element, options?: AccordionOptions): () => void;
 /** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument). */
 export function initAccordions(scope?: ParentNode, options?: AccordionOptions): () => void;
+
+/** Ein angemeldeter Bereich (Werte als Getter, damit sie aktuell bleiben). `anchor: false`: kein öffentlicher Anker (keine Sprungleiste, kein Hash). */
+export interface CollapsibleEntry {
+  readonly id: string;
+  readonly title: string;
+  readonly open: boolean;
+  readonly disabled: boolean;
+  readonly anchor: boolean;
+  readonly el: HTMLElement | null | undefined;
+  readonly trigger: HTMLElement | null | undefined;
+  reveal(): void;
+  setOpen(open: boolean): void;
+}
+/** Was `createCollapsible` von der Gruppe braucht. */
+export interface CollapsibleGroup {
+  exclusive: boolean;
+  syncHash: boolean;
+  closeOthers(id: string): void;
+}
+/** Die Oberfläche (Svelte oder React) liefert den Stand über Funktionen. */
+export interface CollapsibleHost {
+  id(): string;
+  title(): string;
+  open(): boolean;
+  disabled(): boolean;
+  anchor(): boolean;
+  group(): CollapsibleGroup | undefined;
+  parent(): { reveal(): void } | undefined;
+  el(): HTMLElement | null | undefined;
+  trigger(): HTMLElement | null | undefined;
+  panel(): HTMLElement | null | undefined;
+  commit(next: boolean): void;
+}
+/** Verhalten eines einklappbaren Bereichs ohne Oberfläche (gemeinsam für `AccordionItem` und die einklappbaren Tabellenrahmen). */
+export function createCollapsible(host: CollapsibleHost): {
+  setOpen(next: boolean, user?: boolean): void;
+  reveal(): void;
+  checkHash(): void;
+  entry: CollapsibleEntry;
+};

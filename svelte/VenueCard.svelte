@@ -20,6 +20,7 @@
   import {
     addressLines,
     contactInfo,
+    gameKeys,
     gameMeta,
     gameState,
     gameWhen,
@@ -55,7 +56,7 @@
     mapHeight = 250,
     class: klass = '',
   }: {
-    /** Name der Halle, z. B. „Sporthalle Nordhain“. Pflicht. */
+    /** Name der Halle, z. B. „Sporthalle Nordhain“. Pflicht; leer oder nur Leerraum ergibt keine Überschrift. */
     name: string;
     /** Adresse: Straße, Postleitzahl, Ort. Leere Teile entfallen. */
     address?: VenueAddress;
@@ -90,12 +91,15 @@
 
   const heading = useHeadingTag(() => titleAs);
 
+  /** Ohne Namen (leer oder nur Leerraum) entfällt die Überschrift, statt leer zu bleiben. */
+  const title = $derived(typeof name === 'string' ? name.trim() : '');
   const hasMap = $derived(isCoord(lat, lng));
   const lines = $derived(addressLines(address));
   const person = $derived(contactInfo(contact));
   const rows = $derived(size === 'compact' ? [] : venueGames(games, limit));
-  const mapLinks = $derived(venueMapLinks({ lat, lng, name }));
-  const marker = $derived([{ id: 'halle', lat: lat as number, lng: lng as number, label: name }]);
+  const mapLinks = $derived(venueMapLinks({ lat, lng, name: title }));
+  const marker = $derived([{ id: 'halle', lat: lat as number, lng: lng as number, label: title }]);
+  const keys = $derived(gameKeys(rows));
   const target = $derived(venueHref(href));
 </script>
 
@@ -116,7 +120,7 @@
   {#if hasMap}
     <div class="dss-venue-map">
       <MapView
-        label={venueMapLabel(name)}
+        label={venueMapLabel(title)}
         markers={marker}
         interactive={false}
         showList={false}
@@ -128,14 +132,14 @@
       />
       <div class="dss-venue-maplinks">
         {#each mapLinks as link (link.kind)}
-          <a class="dss-link" href={link.href}>{link.text}<span class="dss-sr-only">, {name}</span></a>
+          <a class="dss-link" href={link.href}>{link.text}{#if title}<span class="dss-sr-only">, {title}</span>{/if}</a>
         {/each}
       </div>
     </div>
   {/if}
 
   <div class="dss-venue-body">
-    <svelte:element this={heading.tag} class="dss-venue-title">{name}</svelte:element>
+    {#if title}<svelte:element this={heading.tag} class="dss-venue-title">{title}</svelte:element>{/if}
 
     {#if lines.length}
       <address class="dss-venue-address">{#each lines as line, i (i)}<span class="dss-venue-line">{line}</span>{/each}</address>
@@ -155,7 +159,7 @@
       <div class="dss-venue-games">
         <div class="dss-venue-sec" aria-hidden="true">{gamesLabel}</div>
         <ul class="dss-venue-game-list" aria-label={gamesLabel}>
-          {#each rows as game (game.id)}
+          {#each rows as game, i (keys[i])}
             {@const when = gameWhen(game)}
             {@const meta = gameMeta(game)}
             {@const state = gameState(game)}
@@ -179,7 +183,7 @@
 
     {#if target}
       <div class="dss-venue-foot">
-        <a class="dss-link dss-venue-more" href={target}>{linkLabel}<span class="dss-sr-only">, {name}</span></a>
+        <a class="dss-link dss-venue-more" href={target}>{linkLabel}{#if title}<span class="dss-sr-only">, {title}</span>{/if}</a>
       </div>
     {/if}
   </div>

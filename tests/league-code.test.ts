@@ -39,7 +39,8 @@ const normalize = (html: string) =>
     .replace(/<(img|br)([^>]*?)\/?>/g, '<$1$2>')
     .trim();
 
-const titles = (html: string) => [...html.matchAll(/<h[2-6] class="dss-league-title">([^<]*)</g)].map((m) => m[1]);
+// Titel der Karten; bei einklappbaren Karten steht er im Button (`.dss-acc-label`)
+const titles = (html: string) => [...html.matchAll(/<h[2-6] class="dss-league-title">(?:<button[^>]*><span class="dss-acc-label">)?([^<]*)</g)].map((m) => m[1]);
 /** Zeilen im tbody je Karte */
 const rowCounts = (html: string) => html.split('<table').slice(1).map((part) => ((part.split('<tbody')[1] ?? '').split('</tbody>')[0].match(/<tr/g) ?? []).length);
 const SVELTE = { svelte: league.svelte, ebeneSvelte: league.ebeneSvelte };

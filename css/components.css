@@ -1118,6 +1118,8 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 .dss-tbl--schedule td.dss-sch-ha { width: 64px; padding-right: 0; }
 .dss-tbl--schedule td.dss-sch-match { color: var(--dss-fg); }
 .dss-sch-sub { display: block; margin-top: 2px; font-size: var(--fs-body-sm); }
+/* Zielgröße: Links in der Unterzeile und am Teamnamen bekommen 3 px Fläche oben und unten (WCAG 2.5.8), der negative Rand hält die Zeilenhöhe */
+.dss-sch-sub .dss-link, .dss-sch-team .dss-link { padding-block: 3px; margin-block: -3px; }
 .dss-sch-sep { color: var(--dss-mute); }
 .dss-sch-team.is-loser, .dss-sch-team.is-loser .dss-link { color: var(--dss-mute); }
 .dss-sch-ph { color: var(--dss-mute); font-style: italic; }
@@ -1759,9 +1761,9 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 /* Datenspalte */
 .dss-venue-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 18px 20px; }
 .dss-venue-title { margin: 0; font-family: var(--font-display); font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-h3))); letter-spacing: -0.01em; line-height: var(--dss-title-leading, 1.2); color: var(--dss-fg); overflow-wrap: break-word; }
-.dss-venue-address { display: grid; font-style: normal; font-size: var(--fs-body-md); line-height: 1.4; color: var(--dss-fg-soft); }
-.dss-venue-line { display: block; }
-.dss-venue-info { margin: 0; font-size: var(--fs-body-md); line-height: 1.5; color: var(--dss-fg-soft); }
+.dss-venue-address { display: grid; grid-template-columns: minmax(0, 1fr); font-style: normal; font-size: var(--fs-body-md); line-height: 1.4; color: var(--dss-fg-soft); }
+.dss-venue-line { display: block; overflow-wrap: anywhere; }
+.dss-venue-info { margin: 0; font-size: var(--fs-body-md); line-height: 1.5; color: var(--dss-fg-soft); overflow-wrap: anywhere; }
 .dss-venue-contact { display: grid; gap: 0; margin: 0; }
 .dss-venue-contact > div { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 8px; align-items: center; }
 .dss-venue-contact dt { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-mute); }
@@ -1771,13 +1773,13 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 
 /* Nächste Spiele: Karten im Stil der Spielkarte (Kopfzeile in Mono, Trikotpunkte, Namen) */
 .dss-venue-games { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--dss-line); }
-.dss-venue-sec { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-mute); }
-.dss-venue-game-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.dss-venue-sec { overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-mute); }
+.dss-venue-game-list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; margin: 0; padding: 0; list-style: none; }
 .dss-venue-game { padding: 10px 14px 12px; background: var(--dss-surface-2); border: 1px solid var(--dss-line); border-radius: 12px; }
 .dss-venue-game-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-fg-soft); }
-.dss-venue-when { color: var(--dss-fg); }
-.dss-venue-game-meta { margin-top: 2px; font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.04em; color: var(--dss-mute); }
-.dss-venue-teams { display: grid; gap: 6px; margin-top: 8px; }
+.dss-venue-when { color: var(--dss-fg); overflow-wrap: anywhere; min-width: 0; }
+.dss-venue-game-meta { margin-top: 2px; font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.04em; color: var(--dss-mute); overflow-wrap: anywhere; }
+.dss-venue-teams { display: grid; grid-template-columns: minmax(0, 1fr); gap: 6px; margin-top: 8px; }
 .dss-venue-team { display: flex; align-items: center; gap: 10px; min-width: 0; }
 /* Trikotpunkt mit Rand in --dss-mute (≥ 3:1 auf der Fläche), damit er auch im Dunkelmodus sichtbar bleibt; die Seite steht zusätzlich als versteckter Text im Markup */
 .dss-venue-dot { box-sizing: border-box; flex: none; width: 12px; height: 12px; border: 1px solid var(--dss-mute); border-radius: 50%; background: var(--team-heim, oklch(0.55 0.20 27)); }
@@ -1785,7 +1787,7 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-venue-team-name { min-width: 0; font-family: var(--font-display); font-weight: 600; font-size: var(--fs-body); letter-spacing: -0.005em; color: var(--dss-fg); overflow-wrap: anywhere; }
 
 .dss-venue-foot { margin: auto 0 -10px; } /* der Link ist 48 px hoch, sein Text hat darüber und darunter Luft: der Überstand gleicht den Innenabstand aus */
-.dss-venue-more { display: inline-flex; align-items: center; min-height: 48px; font-size: var(--fs-body-md); font-weight: 500; }
+.dss-venue-more { display: inline-flex; align-items: center; max-width: 100%; min-height: 48px; overflow-wrap: anywhere; font-size: var(--fs-body-md); font-weight: 500; }
 
 /* compact: kleinere Karte, kleinerer Titel, engere Ränder; die Spiele entfallen (im Markup) */
 .dss-venue--compact { border-radius: 12px; }
@@ -1812,4 +1814,70 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   .dss-venue--map .dss-venue-in, .dss-venue--map.dss-venue--compact .dss-venue-in { grid-template-columns: minmax(0, 1fr); }
   .dss-venue-maplinks { display: none; }
   .dss-venue-game { break-inside: avoid; }
+}
+
+/* ── Einklappbare Rahmen (Table, ScheduleTable, ScheduleGrid, LeagueCard mit collapsible) ──
+   Der Kopf des Rahmens wird zum Accordion-Kopf, der Inhalt zum Panel (dieselben Klassen .dss-acc-trigger, .dss-acc-panel, .dss-acc-chevron):
+     div.dss-frame.is-collapsible[.is-open] > div.dss-frame-head.dss-frame-head--acc > h3.dss-frame-title > button.dss-acc-trigger
+     div.dss-league.is-collapsible[.is-open] > div.dss-league-head.dss-league-head--acc > h3.dss-league-title > button.dss-acc-trigger
+     darunter div.dss-acc-panel[hidden] > div.dss-acc-panel-inner > Tabelle (mit eigenem Scrollbereich als benannter Region).
+   Die Titelgröße bleibt an den Rahmen-Tokens (--dss-frame-title-size bzw. --dss-card-title-size): der Button erbt die Schrift vom Titel,
+   die Accordion-Tokens (--dss-acc-title-size, --dss-acc-pad) gelten hier nicht. Geschlossen zeigt der Rahmen nur den Kopf ohne unteren Strich. */
+.dss-frame.is-collapsible, .dss-league.is-collapsible { scroll-margin-top: calc(var(--dss-acc-sticky-top, 0px) + 8px); }
+.dss-frame-head--acc, .dss-league-head--acc { display: block; padding: 0; }
+.dss-frame-head--acc > .dss-frame-title, .dss-league-head--acc > .dss-league-title { border-radius: inherit; }
+.dss-frame-title > .dss-acc-trigger, .dss-league-title > .dss-acc-trigger { font: inherit; letter-spacing: inherit; color: inherit; border-radius: inherit; }
+.dss-frame-title > .dss-acc-trigger { padding: 16px 22px; }
+.dss-frame-title > .dss-acc-trigger[aria-expanded="true"], .dss-league-title > .dss-acc-trigger[aria-expanded="true"] { background: transparent; }
+
+/* Rahmen: Kopfzeile bleibt im Rand eingebettet (Radius = Rahmenradius minus Rand); geschlossen ohne unteren Strich (der Rahmenrand schließt ab) */
+.dss-frame-head--acc { border-radius: 13px 13px 0 0; }
+.dss-frame.is-collapsible:not(.is-open) > .dss-frame-head--acc { border-bottom-color: transparent; border-radius: 13px; }
+.dss-frame-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: color-mix(in oklab, var(--dss-hover-bg), var(--dss-fg) 6%); }
+.dss-frame-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: color-mix(in oklab, var(--dss-hover-bg), var(--dss-fg) 12%); }
+.dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: var(--n-900); }
+.dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: var(--n-800); }
+/* Die Zusatzinfo (gedämpft) wird auf der getönten Hover-/Aktiv-Fläche dunkler, damit der Kontrast ≥ 7:1 bleibt */
+.dss-frame-head--acc .dss-acc-trigger:is(:hover, :active) .dss-frame-meta { color: var(--dss-fg-soft); }
+.dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:is(:hover, :active) .dss-frame-meta { color: var(--n-200); }
+.dss-frame--dark .dss-acc-trigger:focus-visible { outline-color: var(--ring-color-on-dark); }
+.dss-frame--dark .dss-acc-chevron { color: var(--n-400); }
+.dss-frame-head--acc .dss-frame-meta { flex: none; }
+/* Der Pfeil (20 px) soll die Kopfhöhe nicht bestimmen: sie bleibt wie beim Rahmen ohne collapsible (Titelzeile + 2 × 16 px) */
+.dss-frame-title > .dss-acc-trigger .dss-acc-chevron { margin-block: -2px; }
+
+/* Karte: Kopf mit Titel, Untertitel (Teil des Namens) und Live-Tag; die Tabelle darunter trägt ihren Trennstrich selbst (.dss-league-scroll) */
+.dss-league-head--acc, .dss-league--compact .dss-league-head--acc { padding: 0; }
+.dss-league-head--acc { border-radius: 15px 15px 0 0; }
+.dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc { border-radius: 15px; }
+.dss-league-title > .dss-acc-trigger { align-items: flex-start; padding: 20px 24px 16px; }
+.dss-league--compact .dss-league-title > .dss-acc-trigger { padding: 14px 16px 10px; }
+@media (max-width: 640px) { .dss-league-title > .dss-acc-trigger { padding: 16px 16px 12px; } }
+.dss-league-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: var(--dss-hover-bg); }
+.dss-league-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: var(--dss-surface-2); }
+.dss-league-head--acc .dss-league-live, .dss-league-head--acc .dss-acc-chevron { align-self: flex-start; }
+.dss-league-head--acc .dss-acc-chevron { margin-top: max(0px, calc((var(--dss-title-leading, 1.2) * 1em - 20px) / 2)); }
+
+/* Untertitel im Kopf (Karte): wie .dss-league-sub, aber als Teil des Buttons */
+.dss-acc-label > .dss-acc-sub {
+  display: block; margin-top: 4px; font-family: var(--font-body); font-weight: 400; font-size: var(--fs-body-md);
+  line-height: 1.4; letter-spacing: 0; color: var(--dss-mute);
+}
+
+/* Kopf des offenen Rahmens klebt oben (Gruppe mit sticky); `overflow: clip` statt `hidden`, damit der Rahmen kein Scrollcontainer wird */
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame.is-collapsible, .dss-acc--sticky:not(.dss-acc--nested) > .dss-league.is-collapsible { overflow: clip; }
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame.is-open > .dss-frame-head--acc,
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-league.is-open > .dss-league-head--acc {
+  position: sticky; top: var(--dss-acc-sticky-top, 0px); z-index: 2; background: var(--dss-surface);
+}
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame.is-open > .dss-frame-head--acc { background: var(--dss-hover-bg); }
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame--dark.is-open > .dss-frame-head--acc { background: var(--n-950); }
+
+/* Druck: Rahmen offen mit Strich unter dem Kopf, Kopf nicht klebend */
+@media print {
+  .dss-frame.is-collapsible:not(.is-open) > .dss-frame-head--acc { border-bottom-color: var(--dss-line); border-radius: 13px 13px 0 0; }
+  .dss-frame--dark.is-collapsible:not(.is-open) > .dss-frame-head--acc { border-bottom-color: var(--n-800); }
+  .dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc { border-radius: 15px 15px 0 0; }
+  .dss-acc--sticky > .dss-frame.is-collapsible > .dss-frame-head--acc, .dss-acc--sticky > .dss-league.is-collapsible > .dss-league-head--acc { position: static; }
+  .dss-frame-head--acc .dss-acc-trigger:hover, .dss-league-head--acc .dss-acc-trigger:hover { background: transparent; }
 }

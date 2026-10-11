@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import { VenueCard } from './VenueCard';
 import { HeadingLevel } from './HeadingLevel';
@@ -111,6 +111,15 @@ describe('VenueCard', () => {
       expect(screen.getByText('Abgesagt')).toBeInTheDocument();
       expect(screen.getByText('Verschoben')).toBeInTheDocument();
     });
+    it('doppelte und fehlende id: alle Zeilen bleiben, keine React-Warnung über Schlüssel', () => {
+      const errors: unknown[] = [];
+      const spy = vi.spyOn(console, 'error').mockImplementation((...args) => { errors.push(args); });
+      const bad = [game('x'), game('x'), { ...game('y'), id: '' }, { ...game('z'), id: undefined as unknown as string }];
+      render(<VenueCard name="H" games={bad} limit={5} />);
+      spy.mockRestore();
+      expect(screen.getAllByRole('listitem')).toHaveLength(4);
+      expect(errors).toEqual([]);
+    });
     it('gamesLabel: Überschrift des Blocks und Name der Liste', () => {
       render(<VenueCard name="H" games={GAMES} gamesLabel="Belegung" />);
       expect(screen.getByRole('list', { name: 'Belegung' })).toBeInTheDocument();
@@ -217,6 +226,23 @@ describe('VenueCard', () => {
     it('ungültiges titleAs fällt zurück (nie h1)', () => {
       const { container } = render(<VenueCard name="H" titleAs={'h1' as never} />);
       expect(container.querySelector('.dss-venue-title')!.tagName).toBe('H3');
+    });
+  });
+
+  describe('Name', () => {
+    it('leer oder nur Leerraum: keine leere Überschrift, Karte und Links bleiben', () => {
+      const { container } = render(<VenueCard name="   " lat={49.3} lng={7.9} href="/h" />);
+      expect(container.querySelector('h1,h2,h3,h4,h5,h6')).toBeNull();
+      expect(screen.getByRole('region', { name: 'Karte' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Zur Hallenseite' })).toBeInTheDocument();
+    });
+    it('Leerraum am Rand fällt weg', () => {
+      render(<VenueCard name="  Halle A " />);
+      expect(screen.getByRole('heading', { name: 'Halle A' })).toBeInTheDocument();
+    });
+    it('Kontakt ohne name ist erlaubt (Typ und Laufzeit)', () => {
+      render(<VenueCard name="H" contact={{ phone: '112' }} />);
+      expect(screen.getAllByRole('term').map((t) => t.textContent)).toEqual(['Telefon']);
     });
   });
 
