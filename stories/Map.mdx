@@ -195,7 +195,7 @@ Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen übe
 OpenStreetMap kennt keinen Dunkelmodus. Zwei Verfahren stehen zur Wahl, beide wirken nur auf die Kachelebene und nur, solange `dimInDark` an ist (Marker, Zoom-Schaltflächen und Quellenangabe bleiben unberührt):
 
 - **`dim`** (Standard): abdunkeln mit `brightness(0.8)` (Token `--dss-map-dim`). Die Straßenfarben bleiben vertraut, die Karte bleibt aber hell.
-- **`invert`**: invertieren und umfärben, `invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)` (Token `--dss-map-invert-filter`). Die Karte wird wirklich dunkel, Wasser, Wald und Straßen wirken dafür fremd (Wasser wird dunkelbraun-orange statt blau).
+- **`invert`**: invertieren und umfärben mit `invert(1)`, `hue-rotate(180deg)`, `brightness(0.85)` und `contrast(0.9)` (Token `--dss-map-invert-filter`). Die Karte wird wirklich dunkel, Wasser, Wald und Straßen wirken dafür fremd (Wasser wird dunkelbraun-orange statt blau).
 
 Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau rechts zeigt beide im Dunkelmodus (der Rahmen ist dunkel geschaltet):
 
