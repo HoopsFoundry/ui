@@ -49,6 +49,11 @@ js/
   league.js             ← Ausschnitt, Untertitel, Form und Zonen der LeagueCard (`./league.js`)
   heading.js            ← Überschriftenebenen: `headingTag`, `nextLevel` (`./heading.js`)
   stats.js              ← Kennzahlen: `statItems` für `StatGrid` (`./stats.js`)
+  pagenav.js            ← Seitennavigation „Auf dieser Seite“: `initPageNav` (`./pagenav.js`)
+  backtop.js            ← Nach-oben-Knopf: `initBackToTop` (`./backtop.js`)
+  theme.js              ← Dunkelmodus: `initTheme`, `themeBootScript` (`./theme.js`)
+  vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme"` (`./vanilla-core.js`)
+  motion.js, url.js, lifecycle.js ← gemeinsame Grundlagen: `reducedMotion`, `safeHref`, das Muster `initX(root, options) → { destroy() }`
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
 css/
@@ -177,6 +182,30 @@ Tailwind-Nutzer: `components.css` **nach** `@tailwind base` laden (Preflight set
 ```
 
 Gesperrte Einträge: `<span role="link" aria-disabled="true" class="dss-appnav-link is-disabled" title="Hinweis">Label</span>`.
+
+## Bausteine ohne Framework (Vanilla)
+
+Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein folgt demselben Muster: `initX(root, options) → { destroy() }`, idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten), nur `root` und seine Nachfahren, beim Import wird nichts ausgeführt. `initAll(scope)` aus `vanilla-core.js` findet alle Elemente mit `data-dss="accordion|pagenav|backtop|theme"`; Optionen stehen in `initAll(document, { pagenav: { … } })` oder am Element als JSON in `data-dss-options`.
+
+```html
+<body data-dss="backtop">
+  <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" aria-label="Dunkelmodus" hidden></button>
+  <main data-dss="pagenav" data-dss-options='{"label":"Auf dieser Seite"}'>
+    <h1>Verein Nordhain</h1>
+    <h2>Tabelle</h2> … <h2>Spielplan</h2> … <h2>Kader</h2> …
+  </main>
+  <script type="module">
+    import { initAll } from '…/js/vanilla-core.js';
+    initAll(document);
+  </script>
+</body>
+```
+
+- **`initPageNav`** (`pagenav.js`): Seitennavigation „Auf dieser Seite“ aus den Überschriften; ein Sprung öffnet Accordion-Bereiche und `details`, setzt den Fokus auf das Ziel, beobachtet nachgeladene Überschriften. Optionen `selector`, `container`, `label`, `minHeadings`, `skipAttribute`, `observe`, `syncHash`.
+- **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `dss-bnav`, mit `--dss-backtop-offset`, Sicherheitsabständen und Druckregel.
+- **`initTheme`** und **`themeBootScript`** (`theme.js`): Umschalter hell/dunkel/System mit `aria-pressed`, Speicherschlüssel `dss-theme`; das Boot-Skript gehört in den `<head>` und verhindert das Flackern.
+
+Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav` und `Foundation/Dark Mode`.
 
 ## Leisten mit begrenzter Inhaltsbreite
 
@@ -411,6 +440,14 @@ Tokens unterstützen Light und Dark out-of-the-box:
 
 <!-- Force dark (Kampfgericht-Tablet, TV-Scoreboard) -->
 <html data-theme="dark">
+```
+
+Einen Umschalter (hell, dunkel, System) liefert `initTheme` aus `theme.js`; `themeBootScript()` setzt die gemerkte Wahl im `<head>` vor dem ersten Zeichnen:
+
+```html
+<script>/* Ergebnis von themeBootScript(), mit CSP als nonce oder Hash */</script>
+<button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" hidden></button>
+<script type="module">import { initAll } from '…/js/vanilla-core.js'; initAll(document);</script>
 ```
 
 ---
