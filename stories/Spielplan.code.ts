@@ -259,7 +259,7 @@ export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
             <thead role="rowgroup" class="dss-sr-only">
               <tr role="row">
                 <th scope="col" role="columnheader">Zeit</th>
-                <th scope="col" role="columnheader">Begegnung</th>
+                <th scope="col" role="columnheader">Spiel</th>
                 <th scope="col" role="columnheader">Ergebnis</th>
               </tr>
             </thead>
@@ -267,10 +267,10 @@ export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
               <tr role="row" class="dss-sch-row">
                 <td role="cell" class="dss-sch-when"><span class="dss-sch-time">19:00</span></td>
                 <td role="cell" class="dss-sch-match">
-                  <span class="dss-sch-team">Team A</span><span class="dss-sch-sep" aria-hidden="true"> – </span><span class="dss-sr-only"> gegen </span><span class="dss-sch-team">Team B</span>
+                  <span class="dss-sch-team">Team A</span><span class="dss-sch-sep" aria-hidden="true"> – </span><span class="dss-sr-only"> gegen </span><span class="dss-sch-team is-loser">Team B</span>
                 </td>
                 <td role="cell" class="dss-sch-res">
-                  <span class="dss-sch-resbox"><span class="dss-sch-score" aria-hidden="true">72 : 65</span><span class="dss-sr-only">Team A gegen Team B, Endstand 72 zu 65</span></span>
+                  <span class="dss-sch-resbox"><span class="dss-sch-score" aria-hidden="true">72 : 65</span><span class="dss-sr-only">Heim 72, Gast 65</span></span>
                 </td>
               </tr>
             </tbody>

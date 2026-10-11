@@ -1622,8 +1622,11 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-frame--dark .dss-acc-trigger:focus-visible { outline-color: var(--ring-color-on-dark); }
 .dss-frame--dark .dss-acc-chevron { color: var(--n-400); }
 .dss-frame-head--acc .dss-frame-meta { flex: none; }
+/* Der Pfeil (20 px) soll die Kopfhöhe nicht bestimmen: sie bleibt wie beim Rahmen ohne collapsible (Titelzeile + 2 × 16 px) */
+.dss-frame-title > .dss-acc-trigger .dss-acc-chevron { margin-block: -2px; }
 
 /* Karte: Kopf mit Titel, Untertitel (Teil des Namens) und Live-Tag; die Tabelle darunter trägt ihren Trennstrich selbst (.dss-league-scroll) */
+.dss-league-head--acc, .dss-league--compact .dss-league-head--acc { padding: 0; }
 .dss-league-head--acc { border-radius: 15px 15px 0 0; }
 .dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc { border-radius: 15px; }
 .dss-league-title > .dss-acc-trigger { align-items: flex-start; padding: 20px 24px 16px; }
