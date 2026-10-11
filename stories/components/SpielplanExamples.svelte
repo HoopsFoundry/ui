@@ -48,6 +48,9 @@
     { id: 't9', state: 'scheduled', nr: '#9', section: 'Halbfinale', time: '11:00–11:20', field: 'F1', venue: 'Halle 1', heim: { name: 'Erster Gruppe A', placeholder: true }, gast: { name: 'Zweiter Gruppe B', placeholder: true } },
   ];
 
+  // Do und Don't stehen in schmalen Spalten (Handy-Karten): dort ohne Links, damit Namen und Unterzeile die Zielfläche nicht verdecken
+  const ligaOhneLinks: ScheduleGame[] = liga.map((g) => ({ ...g, league: g.league && { name: g.league.name }, heim: g.heim && { ...g.heim, href: undefined }, gast: g.gast && { ...g.gast, href: undefined } }));
+
   // 03 · Raster
   const raster: ScheduleGame[] = [
     { id: 'r1', state: 'finished', nr: '#1', section: 'Gruppe A', time: '09:00', column: 'h1', heim: { name: 'TSV Nordhain', score: 42, own: true }, gast: { name: 'Lindenberg Hawks', score: 31 } },
@@ -282,12 +285,12 @@
   </Accordion>
 {:else if example === 'do-offen'}
   <div class="stack">
-    <ScheduleTable collapsible open games={liga} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Do: heutiger Spieltag" />
+    <ScheduleTable collapsible open games={ligaOhneLinks} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Do: heutiger Spieltag" />
     <ScheduleTable collapsible games={mannschaft} layout="opponent" title="Restliche Saison" meta="4 Spiele" caption="Do: restliche Saison" />
   </div>
 {:else if example === 'dont-zu'}
   <div class="stack">
-    <ScheduleTable collapsible games={liga} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Don't: heutiger Spieltag" />
+    <ScheduleTable collapsible games={ligaOhneLinks} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Don't: heutiger Spieltag" />
     <ScheduleTable collapsible games={mannschaft} layout="opponent" title="Restliche Saison" meta="4 Spiele" caption="Don't: restliche Saison" />
   </div>
 {/if}
