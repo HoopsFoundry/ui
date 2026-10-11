@@ -3,7 +3,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
 
-type Entry = { svelte: string; react: string; css: string[] };
+type Entry = { svelte: string; react: string; css: string[]; export?: string };
 
 const root = new URL('../', import.meta.url);
 const manifest = JSON.parse(readFileSync(new URL('parity.manifest.json', root), 'utf8')) as Record<string, Entry>;
@@ -18,7 +18,8 @@ describe.each(Object.entries(manifest))('Parität: %s', (name, entry) => {
 
   it('hat eine React-Version, die aus react/index.ts exportiert wird', () => {
     expect(existsSync(new URL(entry.react, root))).toBe(true);
-    expect(indexTs).toMatch(new RegExp(`\\b${name}\\b[^;]*from '\\./${name}'`));
+    // `export`: Name des React-Exports, wenn er vom Dateinamen abweicht (Map heißt in React MapView, um das JS-Global Map nicht zu überdecken)
+    expect(indexTs).toMatch(new RegExp(`\\b${entry.export ?? name}\\b[^;]*from '\\./${name}'`));
   });
 
   it.each(entry.css)('definiert die CSS-Klasse .%s', (cls) => {

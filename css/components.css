@@ -1521,6 +1521,140 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   details.dss-acc-item::details-content { content-visibility: visible; display: block; }
 }
 
+/* ── Map (Karte mit Leaflet und OpenStreetMap) ───────────────────
+   Markup: div.dss-map > a.dss-map-skip + div.dss-map-frame[role=region] > div.dss-map-stage (Platzhalter | Leaflet-Fläche .dss-map-canvas,
+   Zoom-Schaltflächen, Quellenangabe .dss-map-attr, Status) + div.dss-map-text (Liste der Orte mit Koordinaten und Links).
+   Leaflet selbst liefert nur Kacheln, Marker und Gesten; leaflet/dist/leaflet.css muss die App laden. Zoom, Quelle, Platzhalter und
+   Fehlerhinweis sind Markup der Komponente. Tokens (nicht vorbelegt): --dss-map-dim (Kachelhelligkeit im Dunkelmodus, Rückfall 0.8). */
+.dss-map { --_dss-map-h: var(--dss-map-h, 320px); display: grid; gap: 12px; min-width: 0; color: var(--dss-fg); font-family: var(--font-body); }
+.dss-map-skip {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.dss-map-skip:focus-visible {
+  position: static; width: auto; height: auto; margin: 0; padding: 10px 14px; clip: auto; white-space: normal;
+  display: inline-flex; align-items: center; min-height: 44px; justify-self: start;
+  background: var(--dss-surface); color: var(--dss-link); border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--dss-line-strong);
+  outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px;
+}
+.dss-map-frame { position: relative; min-width: 240px; border: 1px solid var(--dss-line-strong); border-radius: var(--radius-lg); background: var(--dss-surface-2); overflow: hidden; box-shadow: var(--shadow-sm); }
+.dss-map-stage { position: relative; isolation: isolate; height: var(--_dss-map-h); min-height: 200px; overflow: hidden; }
+
+/* Platzhalter (Zwei-Klick): ruhiges Gitter, Marker als Hinweis auf die Lage, Karte mit Hinweis und Schaltfläche */
+.dss-map-ph {
+  position: absolute; inset: 0; z-index: 900; display: grid; place-items: end center; padding: 16px 16px 44px; /* unten Platz für die Quellenangabe (28 px) */
+  background-color: var(--dss-surface-2);
+  background-image: linear-gradient(var(--dss-line) 1px, transparent 1px), linear-gradient(90deg, var(--dss-line) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+.dss-map-ph-pin {
+  position: absolute; width: 28px; height: 28px; margin: -14px 0 0 -14px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--dss-map-pin-bg, var(--base-1000)); color: var(--dss-map-pin-fg, var(--n-0));
+  box-shadow: 0 0 0 2px var(--dss-map-pin-ring, var(--n-0)), 0 0 0 3px var(--dss-map-pin-edge, var(--base-1000));
+  font-family: var(--font-mono); font-size: var(--fs-body-sm); font-weight: 700; line-height: 1;
+}
+.dss-map-ph-pin.is-own { background: var(--dss-cta-bg); color: var(--dss-cta-fg); }
+.dss-map-ph-card {
+  position: relative; display: grid; justify-items: center; gap: 10px; max-width: min(100%, 420px); padding: 14px 16px; text-align: center;
+  background: var(--dss-surface); border: 1px solid var(--dss-line-strong); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+}
+.dss-map-note { margin: 0; font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--dss-fg-soft); }
+.dss-map-load { min-width: 44px; }
+
+/* Status: leer unsichtbar (aber vorhanden, damit Änderungen angesagt werden); Ladehinweis oben, Fehler in der Mitte */
+.dss-map-status:empty {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.dss-map-status:not(:empty) {
+  position: absolute; z-index: 1002; top: 12px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 24px);
+  padding: 8px 14px; text-align: center; font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--dss-fg);
+  background: var(--dss-surface); border: 1px solid var(--dss-line-strong); border-radius: var(--radius-md);
+}
+.dss-map[data-state="error"] .dss-map-status:not(:empty) {
+  top: 50%; transform: translate(-50%, -50%); width: max-content; max-width: min(calc(100% - 32px), 420px);
+  padding: 14px 18px; font-size: var(--fs-body); line-height: var(--lh-body); box-shadow: var(--shadow-sm);
+}
+
+/* Leaflet-Fläche */
+.dss-map-canvas.leaflet-container { position: absolute; inset: 0; height: 100%; background: var(--dss-surface-2); font: inherit; outline-offset: -3px; }
+.dss-map-canvas.leaflet-container:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: -3px; }
+
+/* Kacheln: im Dunkelmodus abgedunkelt (nur die Kachelebene, nie Marker oder Steuerung) */
+:root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--dss-map-dim, 0.8)); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--dss-map-dim, 0.8)); }
+}
+
+/* Marker (Inline-SVG): dunkle Füllung mit weißem Ring und dunkler Kontur, sichtbar auf hellen wie dunklen Kacheln; Nummer weiß auf dunkel */
+.dss-map-marker { display: flex; justify-content: center; align-items: flex-start; background: transparent; border: 0; border-radius: 8px; cursor: pointer; }
+.dss-map-pin { display: block; overflow: visible; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35)); }
+.dss-map-pin-edge { fill: none; stroke: var(--dss-map-pin-edge, var(--base-1000)); stroke-width: 6; stroke-linejoin: round; }
+.dss-map-pin-body { fill: var(--dss-map-pin-bg, var(--base-1000)); stroke: var(--dss-map-pin-ring, var(--n-0)); stroke-width: 3; stroke-linejoin: round; }
+.dss-map-pin-dot { fill: var(--dss-map-pin-fg, var(--n-0)); }
+.dss-map-pin-num { fill: var(--dss-map-pin-fg, var(--n-0)); font-family: var(--font-mono); font-size: 15px; font-weight: 700; }
+.dss-map-pin-num.is-small { font-size: 11px; }
+.dss-map-marker.is-own .dss-map-pin-body { fill: var(--dss-cta-bg); }
+.dss-map-marker.is-own .dss-map-pin-dot, .dss-map-marker.is-own .dss-map-pin-num { fill: var(--dss-cta-fg); }
+/* Fokus: Fläche und 8 px Hof in --dss-surface unter dem gestrichelten Ring, damit er auf jeder Kachel (hell, dunkel, abgedunkelt) mindestens 3:1 hat */
+.dss-map-marker:focus-visible {
+  outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; background: var(--dss-surface); box-shadow: 0 0 0 8px var(--dss-surface);
+}
+
+/* Zoom-Schaltflächen: eigene Steuerung (Leaflets Standard ist aus), 44 px Ziel, gestrichelter Ring innen */
+.dss-map-zoom { position: absolute; z-index: 1001; top: 12px; right: 12px; display: grid; gap: 8px; }
+.dss-map-zoom-btn {
+  appearance: none; display: inline-flex; align-items: center; justify-content: center; width: var(--touch-sm); height: var(--touch-sm); padding: 0;
+  background: var(--dss-surface); color: var(--dss-fg); border: 1px solid var(--dss-line-strong); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+  cursor: pointer; transition: background 0.12s;
+}
+.dss-map-zoom-btn svg { width: 20px; height: 20px; display: block; }
+.dss-map-zoom-btn:hover:not([aria-disabled="true"]) { background: var(--dss-hover-bg); }
+.dss-map-zoom-btn:active:not([aria-disabled="true"]) { background: var(--dss-surface-2); }
+.dss-map-zoom-btn:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: -5px; }
+.dss-map-zoom-btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; }
+
+/* Quellenangabe: immer sichtbar, lesbar (Text auf Fläche über 7:1) und verlinkt */
+.dss-map-attr {
+  position: absolute; z-index: 1001; right: 0; bottom: 0; margin: 0; padding: 0 4px;
+  background: var(--dss-surface); border-top-left-radius: var(--radius-md); font-size: var(--fs-body-sm); line-height: var(--lh-body-sm); color: var(--dss-fg);
+}
+.dss-map-attr a { display: inline-flex; align-items: center; min-height: 28px; padding: 0 6px; color: var(--dss-link); text-decoration: underline; text-underline-offset: 3px; }
+.dss-map-attr a:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: -3px; }
+
+/* Textalternative: nummerierte Liste mit Koordinaten und Links */
+.dss-map-text { min-width: 0; outline: none; }
+.dss-map-text.is-quiet {
+  position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+.dss-map-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.dss-map-item { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.dss-map-num {
+  flex: none; display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 6px; border-radius: 14px;
+  background: var(--dss-map-pin-bg, var(--base-1000)); color: var(--dss-map-pin-fg, var(--n-0)); font-family: var(--font-mono); font-size: var(--fs-body-sm); font-weight: 700;
+  box-shadow: inset 0 0 0 2px var(--dss-map-pin-ring, var(--n-0)), 0 0 0 1px var(--dss-map-pin-edge, var(--base-1000));
+}
+.dss-map-num.is-own { background: var(--dss-cta-bg); color: var(--dss-cta-fg); }
+.dss-map-item-body { display: grid; gap: 2px; min-width: 0; }
+.dss-map-name { margin: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: var(--fs-body); font-weight: 600; line-height: var(--lh-body); color: var(--dss-fg); overflow-wrap: anywhere; }
+.dss-map-coords { margin: 0; font-family: var(--font-mono); font-size: var(--fs-body-sm); color: var(--dss-mute); }
+.dss-map-links { display: flex; flex-wrap: wrap; gap: 0 16px; }
+.dss-map-links .dss-link { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--fs-body-md); }
+
+/* Aus bei „Bewegung reduzieren“ und data-motion="reduce" auf <html>: keine Animationen der Karte (Leaflets Optionen sind im Skript ebenfalls aus) */
+@media (prefers-reduced-motion: reduce) {
+  .dss-map .leaflet-zoom-anim .leaflet-zoom-animated, .dss-map .leaflet-fade-anim .leaflet-tile, .dss-map .leaflet-fade-anim .leaflet-popup,
+  .dss-map .leaflet-pan-anim .leaflet-proxy, .dss-map-zoom-btn { transition: none !important; animation: none !important; }
+}
+:root[data-motion="reduce"] .dss-map .leaflet-zoom-anim .leaflet-zoom-animated, :root[data-motion="reduce"] .dss-map .leaflet-fade-anim .leaflet-tile,
+:root[data-motion="reduce"] .dss-map .leaflet-fade-anim .leaflet-popup, :root[data-motion="reduce"] .dss-map .leaflet-pan-anim .leaflet-proxy,
+:root[data-motion="reduce"] .dss-map-zoom-btn { transition: none !important; animation: none !important; }
+
+/* Druck: statt der Karte nur die Liste mit Adresse und Koordinaten */
+@media print {
+  .dss-map-frame, .dss-map-skip { display: none; }
+  .dss-map-text.is-quiet { position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; }
+  .dss-map-item { break-inside: avoid; }
+}
+
 /* ── LeagueCard (Ligencard) ─────────────────────────────────
    Mini-Tabelle einer Liga in einer Karte: Kopf (Titel, Untertitel, Live-Tag), Tabelle (.dss-tbl, Dichte touch 60 px bzw. compact 40 px),
    Legende der Zonen, Link zur kompletten Tabelle. Logos und Kurznamen teilen die Bausteine der Namen-und-Logos-Regeln

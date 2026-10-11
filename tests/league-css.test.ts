@@ -8,7 +8,9 @@ const read = (path: string) => readFileSync(new URL(`../${path}`, import.meta.ur
 const css = read('css/components.css');
 const tokens = read('tokens/tokens.css');
 const start = css.indexOf('/* ── LeagueCard');
-const league = css.slice(start);
+// nur bis zum nächsten Abschnittskopf (`/* ── `), nicht bis Dateiende
+const nextSection = css.indexOf('\n/* ── ', start + 10);
+const league = css.slice(start, nextSection < 0 ? undefined : nextSection);
 
 /** Alle Regeln des LeagueCard-Abschnitts als [Selektor, Rumpf] inklusive der Regeln in @media. */
 const RULES: [string, string][] = [...league.replace(/\/\*[\s\S]*?\*\//g, '').matchAll(/([^{}]+)\{([^{}]*)\}/g)].map((m) => [m[1].trim(), m[2]]);

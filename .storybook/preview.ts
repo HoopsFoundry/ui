@@ -6,6 +6,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import '../fonts/fonts.css';
 import '../tokens/tokens.css';
 import '../css/components.css';
+import 'leaflet/dist/leaflet.css';
 import './storybook.css';
 import { installPseudoStates } from './pseudo-states';
 import { setForcedState, type ForcedState } from './state-switch';
@@ -104,7 +105,7 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live'],
-          'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Tabs', 'Accordion', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
+          'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Map', 'Tabs', 'Accordion', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
         ],
       },
     },
