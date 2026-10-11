@@ -44,6 +44,7 @@
     "./svelte/Accordion": "./svelte/Accordion.svelte",
     "./svelte/AccordionItem": "./svelte/AccordionItem.svelte",
     "./svelte/Map": "./svelte/Map.svelte",
+    "./svelte/VenueCard": "./svelte/VenueCard.svelte",
     "./appnav.js": "./js/appnav.js",
     "./schedule.js": {
       "types": "./js/schedule.d.ts",
@@ -72,6 +73,10 @@
     "./map.js": {
       "types": "./js/map.d.ts",
       "import": "./js/map.js"
+    },
+    "./venue.js": {
+      "types": "./js/venue.d.ts",
+      "import": "./js/venue.js"
     }
   },
   "files": [

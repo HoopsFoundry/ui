@@ -5,7 +5,7 @@ import { describe, it, expect } from 'vitest';
 const read = (p: string) => readFileSync(new URL(p, import.meta.url), 'utf8');
 
 // Komponenten mit Überschrift: Ebene wählbar (h2 bis h6), Rangfolge titleAs > HeadingLevel > h3 (gedacht für einen Abschnitt unter einer h2).
-const MIT_TITEL = ['ScheduleTable', 'ScheduleGrid', 'Table', 'PlayerCard', 'EmptyState', 'PlayByPlay', 'TeamCard', 'LeagueCard'];
+const MIT_TITEL = ['ScheduleTable', 'ScheduleGrid', 'Table', 'PlayerCard', 'EmptyState', 'PlayByPlay', 'TeamCard', 'LeagueCard', 'VenueCard'];
 
 describe('Überschriftenebenen der Komponenten', () => {
   it('keine Komponente gibt eine h1 aus (die gehört der App)', () => {
