@@ -199,14 +199,14 @@ function make(tag, className, attrs = {}) {
  * (1) `div.dss-acc-item` mit `h3.dss-acc-title > button.dss-acc-trigger[aria-expanded][aria-controls]` und `div.dss-acc-panel[hidden]`;
  * (2) natives `details.dss-acc-item` mit `summary.dss-acc-trigger` (zeigt auch ohne Skript; das Skript ergänzt die Funktionen).
  * Optionen: `exclusive` (nur ein Bereich offen), `syncHash` (Deep-Link, Standard `true`), `expandAll` („Alle öffnen/schließen“ mit Ansage),
- * `nav` (Sprungleiste), `sticky` (Kopf des offenen Bereichs klebt). Gibt `destroy()` zurück; mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
+ * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt `destroy()` zurück; mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
  */
 export function initAccordion(root, options = {}) {
   const noop = () => {};
   if (typeof document === 'undefined' || !root || typeof root.querySelectorAll !== 'function') return noop;
   instances.get(root)?.();
 
-  const { exclusive = false, syncHash = true, expandAll = false, nav = false, sticky = false } = options;
+  const { exclusive = false, syncHash = true, expandAll = false, nav = false, sticky = false, navLabel = TEXT.nav } = options;
   const cleanups = [];
   const created = [];
   const expected = new Set(); // Bereiche, die das Skript selbst umgeschaltet hat (kein Anker-Schreiben beim späteren toggle-Ereignis)
@@ -345,10 +345,10 @@ export function initAccordion(root, options = {}) {
   }
 
   if (nav) {
-    const navEl = make('nav', 'dss-acc-nav', { 'aria-label': TEXT.nav });
+    const navEl = make('nav', 'dss-acc-nav', { 'aria-label': navLabel });
     const listId = `dss-acc-nav-${++uid}`;
     const toggle = make('button', 'dss-acc-nav-toggle', { type: 'button', 'aria-expanded': 'false', 'aria-controls': listId });
-    toggle.textContent = TEXT.nav;
+    toggle.textContent = navLabel;
     const list = make('ul', 'dss-acc-nav-list', { id: listId });
     navLinks = new Map();
     for (const item of items()) {

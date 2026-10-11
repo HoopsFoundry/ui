@@ -3,6 +3,7 @@
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import Host from './helpers/AccordionHost.svelte';
+import SsrHost from './helpers/AccordionSsr.svelte';
 
 type Api = { set: (values: Record<string, unknown>) => void; get: () => { openA: boolean } };
 let target: HTMLElement;
@@ -281,5 +282,57 @@ describe('Svelte Accordion: scrollt zum Deep-Link', () => {
     delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
     // b ist gesperrt und öffnet nicht, scrollt aber zum Anker
     expect(spy).toHaveBeenCalled();
+  });
+});
+
+describe('Svelte Accordion: exclusive beim Start', () => {
+  const mountCfg = async (props: Record<string, unknown>) => {
+    void unmount(instance);
+    target = document.createElement('div');
+    document.body.replaceChildren(target);
+    instance = mount(SsrHost, {
+      target,
+      props: { cfg: { props: { syncHash: false, ...props }, items: [{ id: 'a', title: 'A' }, { id: 'b', title: 'B', open: true }, { id: 'c', title: 'C', open: true }] } },
+    });
+    flushSync();
+    await wait();
+  };
+  it('bleibt nur der erste offene Bereich offen', async () => {
+    await mountCfg({ exclusive: true });
+    expect([isOpen('a'), isOpen('b'), isOpen('c')]).toEqual([false, true, false]);
+  });
+  it('ohne exclusive bleiben beide offen', async () => {
+    await mountCfg({});
+    expect([isOpen('b'), isOpen('c')]).toEqual([true, true]);
+  });
+  it('wird exclusive später eingeschaltet, bleibt nur der erste offene', async () => {
+    set({ lockB: false });
+    click(trigger('a'));
+    click(trigger('b'));
+    click(trigger('c'));
+    expect([isOpen('a'), isOpen('b'), isOpen('c')]).toEqual([true, true, true]);
+    set({ exclusive: true });
+    await wait();
+    expect([isOpen('a'), isOpen('b'), isOpen('c')]).toEqual([true, false, false]);
+    expect(api().get().openA).toBe(true);
+  });
+});
+
+describe('Svelte Accordion: navLabel', () => {
+  it('Standard „Bereiche“', async () => {
+    set({ nav: true });
+    await wait();
+    expect(target.querySelector('nav')!.getAttribute('aria-label')).toBe('Bereiche');
+    expect(target.querySelector('.dss-acc-nav-toggle')!.textContent).toBe('Bereiche');
+  });
+  it('navLabel setzt Navigation und Schalter', async () => {
+    void unmount(instance);
+    target = document.createElement('div');
+    document.body.replaceChildren(target);
+    instance = mount(SsrHost, { target, props: { cfg: { props: { syncHash: false, nav: true, navLabel: 'Bereiche der Liga-Seite' }, items: [{ id: 'a', title: 'A' }] } } });
+    flushSync();
+    await wait();
+    expect(target.querySelector('nav')!.getAttribute('aria-label')).toBe('Bereiche der Liga-Seite');
+    expect(target.querySelector('.dss-acc-nav-toggle')!.textContent).toBe('Bereiche der Liga-Seite');
   });
 });

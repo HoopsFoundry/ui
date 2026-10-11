@@ -243,6 +243,11 @@ describe('Sprungleiste', () => {
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
     expect(nav.classList.contains('is-open')).toBe(true);
   });
+  it('navLabel setzt aria-label und Schaltertext', () => {
+    destroy = initAccordion(mount(group(item('a'))), { nav: true, navLabel: 'Bereiche Kader', syncHash: false });
+    expect($('nav.dss-acc-nav').getAttribute('aria-label')).toBe('Bereiche Kader');
+    expect($('.dss-acc-nav-toggle').textContent).toBe('Bereiche Kader');
+  });
   it('Klick auf einen Link öffnet den Bereich, setzt den Fokus auf den Kopf und markiert ihn aktuell', () => {
     destroy = initAccordion(mount(group(item('a') + item('b'))), { nav: true });
     const link = document.querySelector<HTMLAnchorElement>('a[href="#b"]')!;

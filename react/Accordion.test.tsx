@@ -140,6 +140,65 @@ describe('Accordion: exclusive', () => {
   });
 });
 
+describe('Accordion: exclusive beim Start', () => {
+  it('bleibt nur der erste offene Bereich (Dokumentreihenfolge) offen', async () => {
+    render(
+      <Accordion exclusive syncHash={false}>
+        <AccordionItem id="a" title="A">x</AccordionItem>
+        <AccordionItem id="b" title="B" defaultOpen>y</AccordionItem>
+        <AccordionItem id="c" title="C" defaultOpen>z</AccordionItem>
+      </Accordion>,
+    );
+    await tick();
+    expect([isOpen('a'), isOpen('b'), isOpen('c')]).toEqual([false, true, false]);
+  });
+  it('kontrolliert: die anderen bekommen onOpenChange(false)', async () => {
+    const onB = vi.fn();
+    const onC = vi.fn();
+    render(
+      <Accordion exclusive syncHash={false}>
+        <AccordionItem id="b" title="B" open onOpenChange={onB}>y</AccordionItem>
+        <AccordionItem id="c" title="C" open onOpenChange={onC}>z</AccordionItem>
+      </Accordion>,
+    );
+    await tick();
+    expect(onB).not.toHaveBeenCalled();
+    expect(onC).toHaveBeenCalledWith(false);
+  });
+  it('ohne exclusive bleiben alle offen', async () => {
+    render(
+      <Accordion syncHash={false}>
+        <AccordionItem id="b" title="B" defaultOpen>y</AccordionItem>
+        <AccordionItem id="c" title="C" defaultOpen>z</AccordionItem>
+      </Accordion>,
+    );
+    await tick();
+    expect([isOpen('b'), isOpen('c')]).toEqual([true, true]);
+  });
+});
+
+describe('Accordion: Name der Sprungleiste (navLabel)', () => {
+  it('Standard „Bereiche“; navLabel setzt aria-label der Navigation und den Text des Schalters', async () => {
+    const { rerender } = render(<Basic nav />);
+    await tick();
+    expect(screen.getByRole('navigation', { name: 'Bereiche' })).toBeInTheDocument();
+    rerender(<Basic nav navLabel="Bereiche der Liga-Seite" />);
+    await tick();
+    expect(screen.getByRole('navigation', { name: 'Bereiche der Liga-Seite' })).toBeInTheDocument();
+    expect(document.querySelector('.dss-acc-nav-toggle')).toHaveTextContent('Bereiche der Liga-Seite');
+  });
+  it('zwei Sprungleisten mit verschiedenen Namen bestehen axe (landmark-unique)', async () => {
+    render(
+      <>
+        <Accordion nav navLabel="Bereiche Liga" syncHash={false}><AccordionItem id="l1" title="Tabelle">x</AccordionItem></Accordion>
+        <Accordion nav navLabel="Bereiche Kader" syncHash={false}><AccordionItem id="k1" title="Spieler">x</AccordionItem></Accordion>
+      </>,
+    );
+    await tick();
+    await expectNoA11yViolations();
+  });
+});
+
 describe('Accordion: Alle öffnen / schließen', () => {
   it('zeigt zwei Buttons mit aria-controls und eine höfliche Ansage', async () => {
     render(<Basic expandAll />);

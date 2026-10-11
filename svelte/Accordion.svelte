@@ -8,7 +8,7 @@
    * Sprungleiste und „Alle öffnen/schließen“ entstehen im Browser (sie kennen die Bereiche erst nach dem Anmelden).
    * Nutzt ausschließlich die Klassen aus css/components.css (kein eigener Scoped-Style).
    */
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import type { HeadingTag } from '../js/heading.js';
   import { moveFocus, scrollToElement, summaryText, writeHash } from '../js/accordion.js';
   import { provideGroup, useParentItem, type AccordionEntry } from './accordion-context.js';
@@ -20,6 +20,7 @@
     nav = false,
     syncHash = true,
     sticky = false,
+    navLabel = 'Bereiche',
     titleAs = undefined,
     class: klass = '',
     children,
@@ -36,6 +37,8 @@
     syncHash?: boolean;
     /** Kopf des offenen Bereichs klebt oben (Abstand: `--dss-acc-sticky-top`). */
     sticky?: boolean;
+    /** Name der Sprungleiste (`aria-label` der Navigation und Text des Handy-Schalters), Standard „Bereiche“. Mehrere Sprungleisten auf einer Seite brauchen verschiedene Namen. */
+    navLabel?: string;
     /** Ebene der Bereichsüberschriften, h2 bis h6; ein `titleAs` am Bereich gewinnt. Ohne Angabe gilt `HeadingLevel`, sonst h3. */
     titleAs?: HeadingTag;
     class?: string;
@@ -79,6 +82,15 @@
     },
   });
 
+  // Bei `exclusive` bleibt nur der erste offene Bereich (in Dokumentreihenfolge) offen; läuft beim Start und wenn sich Bereiche oder `exclusive` ändern
+  $effect(() => {
+    if (!exclusive) return;
+    const list = entries;
+    untrack(() => {
+      for (const e of list.filter((x) => x.open).slice(1)) e.setOpen(false);
+    });
+  });
+
   const showAll = $derived(expandAll && !exclusive);
 
   function setAll(flag: boolean) {
@@ -110,8 +122,8 @@
         </div>
       {/if}
       {#if nav}
-        <nav class="dss-acc-nav{navOpen ? ' is-open' : ''}" aria-label="Bereiche">
-          <button type="button" class="dss-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>Bereiche</button>
+        <nav class="dss-acc-nav{navOpen ? ' is-open' : ''}" aria-label={navLabel}>
+          <button type="button" class="dss-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>{navLabel}</button>
           <ul class="dss-acc-nav-list" id={listId}>
             {#each entries as entry (entry.id)}
               <li class="dss-acc-nav-item">

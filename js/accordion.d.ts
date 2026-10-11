@@ -16,6 +16,8 @@ export interface AccordionOptions {
   nav?: boolean;
   /** Kopf des offenen Bereichs klebt oben (`--dss-acc-sticky-top`). */
   sticky?: boolean;
+  /** Name der Sprungleiste (`aria-label` und Text des Handy-Schalters), Standard „Bereiche“. */
+  navLabel?: string;
 }
 
 /**

@@ -61,6 +61,8 @@ export interface AccordionProps {
   syncHash?: boolean;
   /** Kopf des offenen Bereichs klebt oben (Abstand: `--dss-acc-sticky-top`). */
   sticky?: boolean;
+  /** Name der Sprungleiste (`aria-label` der Navigation und Text des Handy-Schalters), Standard „Bereiche“. Mehrere Sprungleisten auf einer Seite brauchen verschiedene Namen. */
+  navLabel?: string;
   /** Ebene der Bereichsüberschriften, h2 bis h6; ein `titleAs` am Bereich gewinnt. Ohne Angabe gilt `HeadingLevel`, sonst h3. */
   titleAs?: HeadingTag;
   className?: string;
@@ -80,6 +82,7 @@ export function Accordion({
   nav = false,
   syncHash = true,
   sticky = false,
+  navLabel = 'Bereiche',
   titleAs,
   className,
   children,
@@ -122,6 +125,12 @@ export function Accordion({
     [exclusive, syncHash, titleAs, entries.length, register, closeOthers, opened, onKey],
   );
 
+  // Bei `exclusive` bleibt nur der erste offene Bereich (in Dokumentreihenfolge) offen; läuft beim Start und wenn sich Bereiche oder `exclusive` ändern
+  useEffect(() => {
+    if (!exclusive) return;
+    for (const e of entries.filter((x) => x.open).slice(1)) e.setOpen(false);
+  }, [exclusive, entries]);
+
   const showAll = expandAll && !exclusive;
   const panelIds = entries.map((e) => `${e.id}-panel`).join(' ');
 
@@ -159,9 +168,9 @@ export function Accordion({
               </div>
             ) : null}
             {nav ? (
-              <nav className={cn('dss-acc-nav', navOpen && 'is-open')} aria-label="Bereiche">
+              <nav className={cn('dss-acc-nav', navOpen && 'is-open')} aria-label={navLabel}>
                 <button type="button" className="dss-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onClick={() => setNavOpen((v) => !v)}>
-                  Bereiche
+                  {navLabel}
                 </button>
                 <ul className="dss-acc-nav-list" id={listId}>
                   {entries.map((entry) => (
