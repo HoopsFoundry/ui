@@ -22,6 +22,7 @@
   "MatchCard": { "svelte": "svelte/MatchCard.svelte", "react": "react/MatchCard.tsx", "css": ["dss-match", "dss-match--live", "dss-match-team", "dss-match-score", "dss-match--logos"] },
   "PlayerCard": { "svelte": "svelte/PlayerCard.svelte", "react": "react/PlayerCard.tsx", "css": ["dss-pc-row", "dss-pc-card", "dss-pc-hero", "dss-pc-vitals", "dss-tn", "dss-pos"] },
   "TeamCard": { "svelte": "svelte/TeamCard.svelte", "react": "react/TeamCard.tsx", "css": ["dss-team", "dss-team--compact", "dss-team-head", "dss-team-vitals", "dss-team-games", "dss-team-game-row", "dss-team-game-opp", "dss-team-squad", "dss-team-stats", "dss-team-link"] },
+  "LeagueCard": { "svelte": "svelte/LeagueCard.svelte", "react": "react/LeagueCard.tsx", "css": ["dss-league", "dss-league--compact", "dss-league-head", "dss-league-title", "dss-league-sub", "dss-league-live", "dss-league-tbl", "dss-league-opt", "dss-league-zone", "dss-league-dots", "dss-league-dot", "dss-league-legend", "dss-league-key", "dss-league-foot", "dss-league-more"] },
   "PlayByPlay": { "svelte": "svelte/PlayByPlay.svelte", "react": "react/PlayByPlay.tsx", "css": ["dss-pbp-frame", "dss-pbp-frame--dark", "dss-pbp-event", "dss-pbp-feed", "dss-pbp-score"] },
   "CourtLines": { "svelte": "svelte/CourtLines.svelte", "react": "react/CourtLines.tsx", "css": ["dss-courtbg", "dss-courtbg--absolute", "dss-courtlines"] }
 }

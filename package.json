@@ -35,6 +35,7 @@
     "./svelte/MatchCard": "./svelte/MatchCard.svelte",
     "./svelte/PlayerCard": "./svelte/PlayerCard.svelte",
     "./svelte/TeamCard": "./svelte/TeamCard.svelte",
+    "./svelte/LeagueCard": "./svelte/LeagueCard.svelte",
     "./svelte/EmptyState": "./svelte/EmptyState.svelte",
     "./svelte/Skeleton": "./svelte/Skeleton.svelte",
     "./svelte/AppNav": "./svelte/AppNav.svelte",
@@ -52,6 +53,10 @@
     "./periods.js": {
       "types": "./js/periods.d.ts",
       "import": "./js/periods.js"
+    },
+    "./league.js": {
+      "types": "./js/league.d.ts",
+      "import": "./js/league.js"
     },
     "./heading.js": {
       "types": "./js/heading.d.ts",
