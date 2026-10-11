@@ -45,8 +45,10 @@ export class FakeMap extends Evented {
   view: { center?: unknown; zoom?: number; bounds?: unknown; options?: unknown }[] = [];
   isRemoved = false;
   dragging: Handler; touchZoom: Handler; scrollWheelZoom: Handler; doubleClickZoom: Handler; boxZoom: Handler;
-  constructor(el: HTMLElement, options: Record<string, any>) {
+  constructor(target: HTMLElement | string, options: Record<string, any>) {
     super();
+    // wie Leaflet: ein Element oder die id eines Elements
+    const el = typeof target === 'string' ? document.getElementById(target)! : target;
     if (state.throwOnMap) throw new Error('Aufbau schlägt fehl');
     this.el = el; this.options = options;
     if ((el as any)._leaflet_id) throw new Error('Map container is already initialized.');
@@ -95,7 +97,9 @@ export class FakeMarker extends Evented {
     this.map = map;
     const el = document.createElement('div');
     el.className = `leaflet-marker-icon ${this.options.icon.options.className ?? ''}`;
-    el.appendChild(this.options.icon.options.html);
+    // wie Leaflet: ein Element oder eine Zeichenkette mit Markup
+    const html = this.options.icon.options.html;
+    el.appendChild(typeof html === 'string' ? document.createRange().createContextualFragment(html) : html);
     if (this.options.title) el.title = this.options.title;
     if (this.options.keyboard) { el.tabIndex = 0; el.setAttribute('role', 'button'); }
     map.el.querySelector('.leaflet-marker-pane')!.appendChild(el);
@@ -108,7 +112,7 @@ export class FakeMarker extends Evented {
 }
 
 export const L = {
-  map: (el: HTMLElement, options: Record<string, any>) => new FakeMap(el, options),
+  map: (el: HTMLElement | string, options: Record<string, any>) => new FakeMap(el, options),
   tileLayer: (url: string, options: Record<string, any>) => new FakeTileLayer(url, options),
   marker: (latlng: [number, number], options: Record<string, any>) => new FakeMarker(latlng, options),
   divIcon: (options: Record<string, any>) => ({ options }),

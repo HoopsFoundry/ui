@@ -1,0 +1,335 @@
+import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as MapStories from './Map.stories';
+import { DosDonts } from './docs/blocks/DosDonts';
+import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { DocTable } from './docs/blocks/DocTable';
+import './docs/blocks/blocks.css';
+import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite } from './Map.code';
+
+<Meta of={MapStories} />
+
+# Map (Karte)
+
+Die **Karte** zeigt einen oder mehrere Orte auf einer interaktiven Karte mit [Leaflet](https://leafletjs.com) und Kacheln von [OpenStreetMap](https://www.openstreetmap.org). Sie gehört zu Hallen und Spielorten: Name, Adresse und Route stehen immer auch als Text daneben, die Karte ergänzt sie. Es gibt sie als Komponente für Svelte (`Map.svelte`) und React (`MapView`) und als Vanilla-CSS (`dss-map*`) für eigene Seiten mit Leaflet. Die Hallenkarte mit Belegung (`VenueCard`) baut später auf ihr auf.
+
+Alle Orte, Namen und Koordinaten auf dieser Seite sind **Demo-Daten**: erfundene Hallen, frei erfundene Koordinaten in einem Waldgebiet, keine realen Gebäude oder Adressen. Die geladenen Karten in der Doku zeigen ein lokales Gitterbild als Kachel; die Doku ruft keine Kacheln von OpenStreetMap ab.
+
+**Zwei Dinge vorab:** Die Karte lädt in der Standardeinstellung **erst nach einem Klick** („Karte laden“), weil jede Kachel die IP-Adresse der Besucher an den Kartendienst gibt. Und der Standard-Kartenserver von OpenStreetMap ist für Demo und Entwicklung gedacht; produktive Seiten brauchen einen eigenen Proxy oder Kachelserver (Abschnitt „Datenschutz und Kachelserver“).
+
+## Aufbau
+
+Die Karte hat vier Teile. `markers` und `label` sind Pflicht, alles andere ist optional.
+
+- **Sprungmarke „Karte überspringen“:** der erste Tab-Stopp, springt hinter die Karte zur Liste der Orte. Sie ist unsichtbar, bis sie den Fokus hat.
+- **Kartenbereich** (`role="region"` mit dem Namen aus `label`): zuerst der **Platzhalter** (ruhiges Gitter, die Orte als Pins, ein Hinweis zum Datenschutz und die Schaltfläche „Karte laden“), nach dem Klick die **Leaflet-Karte** mit Kacheln, Markern und den eigenen **Zoom-Schaltflächen** (Vergrößern, Verkleinern). Unten rechts steht immer die **Quellenangabe** „© OpenStreetMap-Mitwirkende“ mit Link.
+- **Statusmeldung** (`role="status"`): „Karte wird geladen …“ und im Fehlerfall „Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.“
+- **Textalternative:** die nummerierte Liste der Orte mit Name, Koordinaten und Links (siehe unten). Sie ist immer da, auch ohne Skript und beim Drucken.
+
+Die Karte ist 320 px hoch (`height`, mindestens 200 px) und so breit wie ihr Platz.
+
+<Canvas of={MapStories.Aufbau} />
+
+## Datenschutz: erst nach Klick
+
+Jede Kachel ist ein Bild, das der Browser vom Kartenserver lädt. Der Server sieht dabei die **IP-Adresse** (und den Referer) der Besucher. Deshalb gilt die **Zwei-Klick-Lösung**: Solange niemand auf „Karte laden“ klickt, gibt es **keinen Netzverkehr** zum Kartendienst, und Leaflet wird nicht einmal geladen. Der Platzhalter zeigt die Orte als Text, damit die Seite auch ohne Karte vollständig ist.
+
+- `load="click"` (Standard): Platzhalter, Laden erst nach dem Klick. Danach geht der Fokus auf die Karte, weil die Schaltfläche verschwindet.
+- `load="auto"`: sofort laden. Das ist richtig, wenn die App die Einwilligung der Besucher schon hat oder einen **eigenen Proxy** nutzt (der Besucher spricht dann nur mit dem Server der App).
+- `privacyNote` ersetzt den Hinweis im Platzhalter. Der Standard sagt: „Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.“ Bei eigenem Proxy stimmt das nicht mehr, dann schreibt die App einen anderen Text:
+
+<Canvas of={MapStories.EigenerProxy} />
+
+Die Komponente ersetzt keine Datenschutzerklärung und keine Rechtsberatung. Ob eine Einwilligung nötig ist und wie sie eingeholt wird, entscheidet die App.
+
+## Datenschutz und Kachelserver
+
+### Das Problem und die Proxy-Variante
+
+Mit dem Standard-Kartenserver `tile.openstreetmap.org` ruft der Browser jede Kachel direkt dort ab. Bei der **Proxy-Variante** stellt die App unter ihrer eigenen Adresse einen Kachel-Proxy bereit, zum Beispiel `/tiles/{z}/{x}/{y}.png`. Der Proxy ruft die Kacheln beim Kartendienst ab und speichert sie zwischen. Der Besucher spricht dann **nur mit dem Server der App**; der Kartendienst sieht nur die IP-Adresse des Proxys. Die Karte braucht dafür nur eine Zeile: `tileUrl="/tiles/{z}/{x}/{y}.png"` (in Svelte als Konstante, weil `{z}` in einem Attribut ein Ausdruck wäre). Ein eigener Proxy erlaubt `load="auto"`.
+
+Das Design System liefert **nur die Komponente und diese Doku, keinen Serverteil**. Die Rezepte unten sind Beispiele zum Kopieren, nicht Teil des Pakets.
+
+### Pflichten bei OpenStreetMap-Kacheln
+
+Die [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) der OpenStreetMap Foundation gilt für jede Nutzung von `tile.openstreetmap.org`, auch über einen Proxy:
+
+- **Quellenangabe** „© OpenStreetMap-Mitwirkende“ mit Link auf die Urheberrechtsseite, sichtbar auf der Karte. Die Komponente zeigt sie immer; es gibt kein Prop zum Ausblenden.
+- **Zwischenspeichern** und `Cache-Control` des Kartendienstes beachten. Der Proxy muss Kacheln wiederverwenden, statt sie bei jedem Besucher neu abzurufen.
+- **Eindeutiger `User-Agent`** (und gültiger Referer), der die App und einen Kontakt nennt, nicht der Browser des Besuchers.
+- **Kein Vorabladen** und keine Massenabrufe (kein Abgrasen ganzer Gebiete, keine Karten „auf Vorrat“).
+- **Nicht für hohen Verkehr:** der Server ist ein Gemeinschaftsdienst ohne Zusicherungen und sperrt bei Missbrauch. Für den **Dauerbetrieb** braucht die App einen **eigenen Kachelserver** (mit einem OSM-Auszug) oder einen **Anbieter mit Sitz und Rechenzentrum in der EU und Auftragsverarbeitungsvertrag**. Das Design System empfiehlt keinen bestimmten Anbieter.
+
+### Rezept: nginx
+
+Eine Konfiguration, die Kacheln unter `/tiles/` ausliefert und zwischenspeichert. Sie nimmt nur Pfade der Form `/tiles/z/x/y.png` an, setzt einen eigenen `User-Agent` und Referer, entfernt Cookies, beachtet das `Cache-Control` des Kartendienstes und begrenzt die Abrufe je Besucher. Die Datei steht als Beispiel im Repository (`stories/examples/nginx-tiles.conf`) und wird in den Tests auf Aufbau und Pfadmuster geprüft.
+
+<FrameworkCode label="nginx: Kachel-Proxy mit Zwischenspeicher" vanilla={nginxConf} svelte={nginxConf} react={nginxConf} />
+
+**Nicht ausgeführt: bitte vor Gebrauch testen.** Auf dem Rechner, auf dem diese Doku entstand, war kein nginx installiert; die Syntax wurde gegen die nginx-Dokumentation geprüft, aber nicht mit `nginx -t` ausgeführt. Prüfe die Datei auf dem Zielserver mit `nginx -t`, bevor du sie lädst. Wichtig dabei: `proxy_pass` hat bewusst **keinen** URI-Teil (kein Schrägstrich am Ende), weil nginx ihn in einem Regex-`location` nicht erlaubt; der Pfad wird stattdessen mit `rewrite … break` umgeschrieben. `proxy_ssl_server_name on` ist nötig, damit der Kartendienst das richtige Zertifikat ausliefert (SNI).
+
+### Rezept: Node-Endpunkt (SvelteKit)
+
+Ein kleiner Endpunkt, der Kacheln mit `fetch` abruft und mit dem `Cache-Control` des Kartendienstes weiterreicht. **Kein offener Proxy:** der Host ist fest im Code, aus der Anfrage werden nur drei Ganzzahlen übernommen (`z`, `x`, `y`), und ausgeliefert wird nur `png`. `parseTilePath` prüft: Ganzzahlen ohne führende Nullen, Zoom 0 bis 19, Bereich `0 ≤ x, y < 2^z`; alles andere ergibt 404. Eine frei wählbare URL nimmt der Endpunkt nie an. Er speichert nichts selbst: vor ihn gehört ein Zwischenspeicher (nginx, CDN), der das weitergereichte `Cache-Control` nutzt.
+
+<FrameworkCode label="Endpunkt src/routes/tiles/[...path]/+server.ts" vanilla={kachelEndpunktTs} svelte={kachelEndpunktTs} react={kachelEndpunktTs} />
+
+Die Datei wird in den Tests mit dem TypeScript-Compiler geprüft, und `parseTilePath` und `GET` werden dort ausgeführt (mit nachgestelltem `fetch`): feste Adresse, `User-Agent`, durchgereichtes `Cache-Control`, 404 bei ungültigen Pfaden, 502 bei Fehlern des Kartendienstes.
+
+## Geladene Karte
+
+Nach dem Klick lädt die Komponente Leaflet nach (`import('leaflet')`, ein eigener Chunk) und baut die Karte. Leaflets Standardsteuerung und Standardbilder werden **nicht** verwendet: die **Marker** sind Inline-SVG (ein Pin mit weißem Ring und dunkler Kontur, damit er auf hellen und dunklen Kacheln erkennbar bleibt; ein einzelner Marker zeigt einen Punkt, mehrere zeigen Nummern), die **Zoom-Schaltflächen** und die **Quellenangabe** gehören der Komponente. Das Beispiel nutzt das lokale Demo-Bild als Kachel (`load="auto"`, damit es ohne Klick steht).
+
+<Canvas of={MapStories.Geladen} />
+
+## Mehrere Marker
+
+Bei mehreren Markern nummeriert die Karte von 1 an (oder nimmt `number` am Marker) und passt den Ausschnitt allen Markern an (`fitBounds` mit 48 px Rand, höchstens Zoom 17). Die **Liste** darunter erklärt die Nummern: ohne sie wären die Nummern auf der Karte bedeutungslos. Ein Marker mit `own: true` (der eigene Ort) ist golden und bekommt in der Liste den Hinweis „Eigener Ort“, nie nur die Farbe. Ein Marker mit `href` öffnet bei Klick und **Enter** dieses Ziel; in der Liste ist sein Name ein Link.
+
+<Canvas of={MapStories.MehrereMarker} />
+
+## Zoom und Ausschnitt
+
+- **Ohne `center` und `zoom`:** ein Marker zeigt die Karte mit Zoom 15, mehrere Marker passen sich an (siehe oben), ganz ohne Marker zeigt sie Deutschland (Zoom 5).
+- `zoom` (3 bis 19) setzt die Zoomstufe, `center` (`[Breite, Länge]`) den Mittelpunkt; ohne `center` bleibt die Mitte der Marker. Beide sind **reaktiv**: eine Änderung bewegt die vorhandene Karte, es gibt keinen Neuaufbau.
+- Die Grenzen sind fest: `minZoom` 3, `maxZoom` 19.
+- **Zoom-Schaltflächen** „Vergrößern“ und „Verkleinern“ sind eigene Schaltflächen (44 × 44 px, gestrichelter Fokus-Ring innen), verweisen per `aria-controls` auf die Kartenfläche und sind an den Zoomgrenzen **ausgegraut** (`aria-disabled="true"`, sie bleiben fokussierbar).
+
+<Canvas of={MapStories.Ausschnitt} />
+
+### Ohne Gesten
+
+`interactive={false}` schaltet Ziehen, Scrollzoom, Doppelklick, Pinch und Kastenzoom ab: die Karte zeigt nur, sie hält die Seite beim Scrollen nicht fest (der Scrollzoom nimmt das Mausrad, solange `interactive` an ist). **Tasten und Zoom-Schaltflächen bleiben.** Das passt für kleine Karten in Karten und Listen, etwa die Hallenkarte.
+
+<Canvas of={MapStories.Statisch} />
+
+## Tastatur
+
+Die Leaflet-Tastatursteuerung bleibt aktiv. Die Kartenfläche ist ein einziger Tab-Stopp; es gibt **keinen Tastaturfang**: **Tab** verlässt die Karte immer.
+
+<DocTable
+  label="Tastatur an der Karte"
+  head={['Taste', 'Wirkung']}
+  rows={[
+    ['Tab', 'Reihenfolge: „Karte überspringen“, Kartenfläche, jeder Marker, Vergrößern, Verkleinern, Quellenangabe, dann weiter auf der Seite. Die Karte hält den Fokus nie fest.'],
+    ['Pfeiltasten', 'Karte verschieben (an der fokussierten Kartenfläche); mit Umschalt weiter.'],
+    ['Plus und Minus', 'Vergrößern und Verkleinern (auch auf dem Ziffernblock); mit Umschalt um mehrere Stufen.'],
+    ['Enter (am Marker)', 'Öffnet das Ziel (`href`), falls der Marker eines hat; ohne `href` löst Enter nur das Ereignis `onmarkerclick` aus.'],
+    ['Enter oder Leertaste (an einer Zoom-Schaltfläche)', 'Zoomt um eine Stufe; an der Zoomgrenze passiert nichts (die Schaltfläche ist `aria-disabled`).'],
+    ['Enter oder Leertaste (an „Karte laden“)', 'Lädt die Karte; der Fokus geht danach auf die Kartenfläche.'],
+  ]}
+/>
+
+## Textalternative und Koordinaten
+
+Die Karte allein reicht nie: Wer sie nicht sehen oder bedienen kann, braucht den Ort als Text. Die **Textalternative** ist deshalb immer da, nicht nur im Platzhalter: eine **nummerierte Liste** (`ol`, benannt „Orte auf der Karte“) mit je Ort
+
+- dem **Namen** (Link, wenn der Marker ein `href` hat), bei `own` dazu „Eigener Ort“,
+- den **Koordinaten** im deutschen Format mit Komma und Himmelsrichtung, etwa „49,3000° N, 7,9000° O“ (`formatCoords`),
+- den **Links** (siehe nächster Abschnitt).
+
+Die Nummern in der Liste sind dekorativ (`aria-hidden`); die Listennummerierung selbst trägt die Position. Mit `showList={false}` ist die Liste nur für Hilfstechnik da (visuell versteckt, ohne Links); beim **Drucken** erscheint sie immer. Die **Sprungmarke „Karte überspringen“** führt vor der Karte direkt zur Liste.
+
+## Link in Karten-App
+
+Je Ort bietet die Liste Links an, die der Besucher in einer Karten-App öffnen kann. `appLinks` wählt sie (Standard `['osm', 'route']`); die Reihenfolge ist fest (`geo`, `osm`, `route`).
+
+<DocTable
+  label="Links in Karten-Apps"
+  head={['Wert', 'Text', 'Ziel']}
+  rows={[
+    ['osm', 'In OpenStreetMap öffnen', 'openstreetmap.org mit Markierung (`?mlat=…&mlon=…#map=17/…`)'],
+    ['geo', 'In Karten-App öffnen', '`geo:`-Link (`geo:49.3,7.9?q=49.3,7.9(Name)`), öffnet die Karten-App des Geräts (vor allem Android und Desktop-Karten-Apps)'],
+    ['route', 'Route planen', 'OpenStreetMap-Routenplaner mit dem Ort als Ziel (`/directions?route=;lat,lng`), der Start bleibt offen'],
+  ]}
+/>
+
+Jeder Linkname hängt den Ort als versteckte Ergänzung an („Route planen, Sporthalle Nordhain“), damit mehrere gleiche Linktexte unterscheidbar bleiben. Der Name wird **kodiert** (Umlaute, Leerzeichen, `&`, Klammern); die Funktion `mapLinks` aus `@bbv/dss-design-system/map.js` liefert dieselben Adressen für eigene Darstellungen.
+
+<Canvas of={MapStories.KartenApp} />
+
+## Fehlerfall
+
+Schlägt das Laden fehl, bleibt die Seite benutzbar: statt der Karte steht der Hinweis „Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.“ (`role="status"`, im Gitter-Hintergrund, kein leeres Rechteck), die Textalternative bleibt, die Quellenangabe auch. Fehlerfälle:
+
+<DocTable
+  label="Fehlerfälle der Karte"
+  head={['Fall', 'Grund (`onerror`)', 'Verhalten']}
+  rows={[
+    ['`tileUrl` ungültig (kein `{z}`, `{x}`, `{y}`, `http:` außer `localhost`, `//host`, Sonderzeichen)', 'tile-url', 'Fehlerhinweis sofort, ohne Klick; Leaflet wird nie geladen; in der Entwicklung eine Warnung in der Konsole.'],
+    ['Leaflet fehlt oder lässt sich nicht laden (nicht installiert, Chunk nicht erreichbar)', 'import', 'Fehlerhinweis; Warnung in der Entwicklung.'],
+    ['Aufbau der Karte schlägt fehl', 'init', 'Fehlerhinweis.'],
+    ['Alle sichtbaren Kacheln blockiert (Proxy aus, Netz weg, Content-Security-Policy)', 'tiles', 'Fehlerhinweis, die Karte wird abgebaut. Einzelne fehlende Kacheln führen nicht dazu.'],
+  ]}
+/>
+
+Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es erneut.
+
+<Canvas of={MapStories.Fehler} />
+
+## Dunkelmodus
+
+Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-line-strong`, `--dss-link`, `--dss-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Die **Kacheln** werden mit `dimInDark` (Standard) etwas abgedunkelt: `filter: brightness(0.8)` nur auf der Kachelebene, nie auf Markern oder Steuerung; das Token `--dss-map-dim` ändert den Wert. Die **Marker** sind in beiden Modi gleich: dunkle Füllung mit weißem Ring und dunkler Kontur, die Nummer weiß auf dunkel; der eigene Ort golden mit schwarzer Nummer. So hebt sich der Pin von hellen **und** dunklen Kacheln ab (Messwerte unten). Die Handy-Vorschau weiter unten zeigt beide Modi.
+
+## Druck
+
+Beim Drucken (`@media print`) entfällt die Karte samt Sprungmarke; es bleibt die **Liste der Orte mit Namen, Koordinaten und Links** (auch wenn `showList` aus ist). Eine gedruckte Karte ohne Kacheln wäre eine leere Fläche.
+
+## Bewegung reduzieren
+
+Bei „Bewegung reduzieren“ und mit `data-motion="reduce"` auf `<html>` (Werkzeugleiste **Bewegung**) sind alle Leaflet-Animationen aus: `zoomAnimation`, `fadeAnimation`, `markerZoomAnimation` und `inertia` stehen auf `false`, Ausschnittwechsel springen, und das CSS schaltet die Übergänge ab. Die Einstellung wird beim Aufbau der Karte gelesen.
+
+## Zustände
+
+Zoom-Schaltflächen haben Standard, Hover (Fläche `--dss-hover-bg`), Fokus (gestrichelter Gold/Amber-Ring, 3 px, innen) und Gesperrt (45 % Deckkraft, `aria-disabled`). Marker haben Fokus (gestrichelter Ring mit Fläche dahinter, damit er auf jeder Kachel erkennbar ist). „Karte laden“ ist ein normaler Button ([Button](?path=/docs/components-button--docs)), die Quellenangabe ein Link mit Fokus-Ring. Der Hover der Marker ist Leaflets Verhalten (der Marker rückt nach vorn).
+
+<Canvas of={MapStories.Zustaende} />
+
+Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeugleiste **Zustand** umschalten.
+
+## Handy · 390 px Breite
+
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel: Platzhalter und geladene Karte, Pins als Pins, die Liste darunter, die Seite scrollt nicht seitlich.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Map · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte hell">
+      <iframe title="Handy-Vorschau: Karte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-map--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Map · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte dunkel">
+      <iframe title="Handy-Vorschau: Karte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--handy" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Barrierefreiheit: Namen und Landmarken
+
+Der Kartenbereich ist eine **benannte Region** (`role="region"`, `aria-label` aus `label`). `label` ist Pflicht. **Mehrere Karten auf einer Seite brauchen unterschiedliche `label`**, sonst sind die Regionen nicht unterscheidbar (axe: `landmark-unique`); alle Beispiele dieser Seite haben deshalb eigene Namen („Karte der Hallen im Kreis Nordhain“ statt „Karte“). Die Kartenfläche selbst ist eine Gruppe mit dem Hinweis auf die Tasten, ein einziger Tab-Stopp. Marker sind fokussierbar (`keyboard`, `title` und `aria-label` sind der Name des Orts). Eine Überschrift hat die Karte nicht (daher kein `titleAs`); sie steht in einem Abschnitt, dessen Überschrift die App setzt. Die Quellenangabe ist ein Link mit sichtbarem Text (≥ 7:1). Die Statusmeldung ist ein `role="status"`, das schon im Markup steht, damit Änderungen angesagt werden. Der Hinweis im Platzhalter und die Fehlermeldung sind Text, nie nur Farbe.
+
+## Einbindung: Leaflet und Stylesheet
+
+Leaflet ist eine **optionale Peer-Abhängigkeit** (`peerDependencies` mit `peerDependenciesMeta.optional`, Lizenz BSD-2-Clause). Die App installiert es, wenn sie Karten nutzt:
+
+- `npm install leaflet` (Version 1.x) und im Entwicklungsbetrieb `npm install -D @types/leaflet`, wenn eigener Code Leaflet-Typen braucht.
+- **`leaflet/dist/leaflet.css` laden** (einmal in der App, am besten im Layout). Das Stylesheet liefert Layout, Ebenen und Gesten; die Optik von Zoom, Marker, Quellenangabe und Platzhalter kommt aus `components.css`. In Storybook ist es in der Vorschau eingebunden.
+- Die Komponente lädt Leaflet **nur bei Bedarf** per dynamischem `import('leaflet')`: nie beim Import der Komponente. Bundler (Vite, Rollup, webpack, esbuild) legen daraus einen eigenen Chunk; Seiten und Apps ohne Karte laden und bezahlen nichts. Beim Server-Rendering greift die Komponente nicht auf `window` oder `document` zu.
+- Kachel-Adressen in der **Content-Security-Policy**: bei eigenem Proxy reicht `img-src 'self'`, direkt von OpenStreetMap braucht `img-src https://tile.openstreetmap.org`.
+- In Svelte stehen `{z}`, `{x}` und `{y}` einer `tileUrl` in einer Konstante, nicht im Attribut. In React reicht ein normaler String.
+
+<FrameworkCode label="Leaflet und Stylesheet einbinden" vanilla={einbindungVite} svelte={einbindungVite} react={einbindungVite} />
+
+### Warum `MapView` in React und `Map.svelte` in Svelte
+
+Das JavaScript-Global `Map` (die Datenstruktur) bliebe in jeder Datei verdeckt, die eine Komponente `Map` importiert. Deshalb heißt der React-Export **`MapView`**; die Svelte-Datei heißt `Map.svelte` (Export `@bbv/dss-design-system/svelte/Map`) und wird beim Import ebenfalls `MapView` genannt. Die Doku-Seite heißt „Map“, die CSS-Klassen `dss-map*`.
+
+## Verwendung: Import und Props
+
+Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. **Vanilla:** Eine Karten-Komponente ohne Framework gibt es nicht. Eigene Seiten nutzen Leaflet direkt mit den Klassen `dss-map*` und den reinen Funktionen aus `@bbv/dss-design-system/map.js`; das Beispiel zeigt einen Aufbau mit Rahmen, Quellenangabe, Koordinaten und Routen-Link.
+
+<FrameworkCode label="Map" vanilla={vanilla} svelte={svelte} react={react} />
+
+Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem lokalen Demo-Bild als Kachel. `count` und `ownFirst` sind nur Hilfen der Spielwiese und bauen die Marker; `tileUrl` `demo` lädt das lokale Bild, `osm` nimmt den Standard (dann geht beim Laden eine Anfrage an OpenStreetMap).
+
+<Controls of={MapStories.Spielwiese} />
+
+### Weitere Props und Datenmodell
+
+<DocTable
+  label="Weitere Props der Karte"
+  head={['Prop', 'Typ', 'Beschreibung']}
+  rows={[
+    ['markers', 'MapMarker[]', 'Orte auf der Karte. Pflicht. Ungültige Koordinaten (Zeichenkette, NaN, außerhalb von ±90 und ±180) werden ignoriert, in Liste und Karte.'],
+    ['center', '[number, number]', 'Mittelpunkt `[Breite, Länge]`. Mit `center` ist der Standardzoom 15, ohne `center` und `zoom` passt sich der Ausschnitt den Markern an.'],
+    ['onload (Svelte), onLoad (React)', '(map) => void', 'Die Karte steht. Das Argument ist die Leaflet-Karte (`L.Map`); damit lässt sich Leaflet erweitern.'],
+    ['onerror (Svelte), onError (React)', "(reason: 'tile-url' | 'import' | 'init' | 'tiles') => void", 'Laden fehlgeschlagen (siehe Fehlerfall).'],
+    ['onmarkerclick (Svelte), onMarkerClick (React)', '(marker) => void', 'Klick oder Enter an einem Marker; danach öffnet ein vorhandenes `href`.'],
+    ['class (Svelte), className (React)', 'string', 'Zusätzliche Klasse am Wurzelelement.'],
+  ]}
+/>
+
+<DocTable
+  label="Felder eines Markers der Karte"
+  head={['Feld', 'Typ', 'Beschreibung']}
+  rows={[
+    ['id', 'string', 'Eindeutige Kennung; damit erkennt die Karte beim Aktualisieren, welcher Marker neu, geändert oder weg ist (kein Neuaufbau der Karte). Pflicht.'],
+    ['lat, lng', 'number', 'Breite (−90 bis 90) und Länge (−180 bis 180) in Grad. Pflicht.'],
+    ['label', 'string', 'Name des Orts: Titel und Name des Markers, Eintrag der Liste, Bezeichnung in den Links. Pflicht.'],
+    ['href', 'string', 'Ziel bei Klick und Enter am Marker; in der Liste ist der Name ein Link.'],
+    ['number', 'number', 'Angezeigte Nummer. Ohne Angabe zählt die Karte bei mehreren Markern von 1 an; ein einzelner Marker zeigt einen Punkt.'],
+    ['own', 'boolean', 'Eigener Ort: Marker in Gold, in der Liste „Eigener Ort“.'],
+  ]}
+/>
+
+### Reine Funktionen: `map.js`
+
+Die Logik der Karte steckt in reinen Funktionen (`@bbv/dss-design-system/map.js`, mit Typen), die auch für eigene Darstellungen taugen: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord`. Die Aufrufe im Beispiel werden in den Tests ausgewertet und liefern die kommentierten Werte.
+
+<FrameworkCode label="Funktionen aus map.js" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
+
+### Maße
+
+Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
+
+<DocTable
+  label="Maße der Karte (gemessen im Browser)"
+  head={['Maß', 'Wert']}
+  rows={[
+    ['Höhe der Karte', '320 px (Standard, `height`; mindestens 200 px)'],
+    ['Zoom-Schaltflächen', '44 × 44 px, Abstand 8 px, 12 px vom Rand'],
+    ['Marker (Fläche zum Anklicken)', '44 × 46 px, der Pin 36 × 46 px'],
+    ['Quellenangabe (Link)', '28 px hoch, Schrift 13 px'],
+    ['Links in der Liste', '44 px hoch'],
+    ['„Karte laden“', '44 px hoch (Button md)'],
+    ['Rahmen', '1 px `--dss-line-strong`, Radius 12 px'],
+  ]}
+/>
+
+<DocTable
+  label="Kontraste der Karte (gemessen und berechnet)"
+  head={['Text oder Fläche', 'Verhältnis', 'Anforderung']}
+  rows={[
+    ['Quellenangabe (`--dss-link` auf `--dss-surface`)', '7,0 bis 12,6:1', 'mindestens 7:1'],
+    ['Name, Hinweis und Koordinaten in Liste und Platzhalter', '7,2 bis 21,0:1', 'mindestens 7:1'],
+    ['Nummer im Pin (Weiß auf Schwarz) und eigener Pin (Schwarz auf Gold)', '21,0:1 und 11,1 bis 12,0:1', 'mindestens 7:1'],
+    ['Pin gegen helle und dunkle Kacheln (Kontur oder Ring)', '3,1 bis 19,0:1', 'mindestens 3:1'],
+    ['Fokus-Ring (gestrichelt, 3 px)', '3,0 bis 4,1:1', 'mindestens 3:1'],
+  ]}
+/>
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Die Adresse immer auch als Text',
+      doText: 'Name, Koordinaten und Links stehen als Liste neben der Karte. Wer die Karte nicht sehen oder bedienen kann, hat alles; die Liste funktioniert auch ohne Skript und beim Drucken.',
+      dontText: 'Eine Karte ohne Text lässt Screenreader, Tastaturnutzer und alle, bei denen die Karte nicht lädt, ohne Ort. Die Komponente liefert die Liste immer; die Doku blendet sie hier aus, um den Fehler zu zeigen.',
+      good: <Story of={MapStories.DoAdresse} inline />,
+      bad: <Story of={MapStories.DontAdresse} inline />,
+    },
+    {
+      title: 'Karte erst nach Einwilligung oder über einen eigenen Proxy',
+      doText: 'Der Platzhalter lädt nichts: erst „Karte laden“ ruft Kacheln ab. Mit eigenem Proxy ist `load="auto"` in Ordnung, dann mit passendem Hinweis (`privacyNote`).',
+      dontText: 'Eine Karte, die sofort Kacheln vom Fremdserver holt, gibt die IP-Adresse der Besucher weiter, bevor jemand zugestimmt hat. Die Doku nutzt hier das lokale Demo-Bild, damit kein Netzverkehr entsteht.',
+      good: <Story of={MapStories.DoDatenschutz} inline />,
+      bad: <Story of={MapStories.DontDatenschutz} inline />,
+    },
+    {
+      title: 'Bei mehreren Markern die Liste zeigen',
+      doText: 'Die Nummern auf der Karte stehen in der Liste mit Namen und Koordinaten. So bedeutet jede Nummer etwas.',
+      dontText: 'Drei Nummern ohne Liste sagen nichts: Wer welche Halle ist, bleibt unklar, und ein Screenreader erfährt nichts über die Orte. Die Doku blendet die Liste hier aus.',
+      good: <Story of={MapStories.DoListe} inline />,
+      bad: <Story of={MapStories.DontListe} inline />,
+    },
+    {
+      title: 'Die Quellenangabe nie entfernen',
+      doText: '„© OpenStreetMap-Mitwirkende“ bleibt unten rechts sichtbar und verlinkt. Das verlangt die Lizenz der Daten (ODbL) und die Tile Usage Policy.',
+      dontText: 'Eine Karte ohne Quellenangabe verletzt die Lizenz. Die Komponente hat deshalb kein Prop zum Ausblenden; die Doku blendet sie hier mit eigenem CSS aus, um den Fehler zu zeigen.',
+      good: <Story of={MapStories.DoQuelle} inline />,
+      bad: <Story of={MapStories.DontQuelle} inline />,
+    },
+  ]}
+/>
