@@ -43,6 +43,8 @@ export { MatchCard, type MatchCardProps, type MatchNames, type MatchState, type 
 export { TeamCard, type TeamCardProps, type TeamCardSize, type TeamCardNames, type TeamLast, type TeamNext, type TeamRecord, type TeamRef, type TeamSquad, type TeamStats } from './TeamCard';
 export { MapView, type MapViewProps, type MapMarker, type MapAppLink, type MapLoad, type MapErrorReason } from './Map';
 export { VenueCard, type VenueCardProps, type VenueCardSize, type VenueCardNames, type VenueAddress, type VenueContact } from './VenueCard';
+export { FormChips, type FormChipsProps } from './FormChips';
+export { StatGrid, type StatGridProps, type StatInput } from './StatGrid';
 export { LeagueCard, type LeagueCardProps, type LeagueCardSize, type LeagueCardNames, type LeagueColumn, type LeagueFormEntry, type LeagueTeam, type LeagueZone } from './LeagueCard';
 export { PlayerCard, type PlayerCardProps, type PlayerCardSize, type PlayerTeam, type PlayerVital } from './PlayerCard';
 export { PlayByPlay, type PlayByPlayProps, type PbpEvent, type PbpTeam, type PbpKind } from './PlayByPlay';

@@ -4,8 +4,6 @@ import {
   cellNumber,
   diffSign,
   diffText,
-  formEntries,
-  formLabel,
   leagueSummary,
   leagueWindow,
   liveInfo,
@@ -18,6 +16,7 @@ import {
 import type { LeagueColumn, LeagueFormEntry, LeagueTeam, LeagueZone } from '../js/league.js';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
 import { CollapsibleFrame } from './internal/CollapsibleFrame';
+import { FormChips } from './FormChips';
 import { devWarn } from './internal/devWarn';
 
 export type { LeagueColumn, LeagueFormEntry, LeagueTeam, LeagueZone };
@@ -163,7 +162,6 @@ export function LeagueCard({
             {rows.map((t, i) => {
               const zone = zoneInfo(t.zone);
               const sign = diffSign(t.diff);
-              const dots = formEntries(t.form);
               return (
                 <tr key={i} className={cn(t.own && 'is-own', zone && 'dss-league-zone', zone && `dss-league-zone--${zone.zone}`) || undefined}>
                   <td className="dss-league-rank">{rankText(t.rank)}</td>
@@ -192,16 +190,7 @@ export function LeagueCard({
                   <td className="num lead dss-league-pts">{cellNumber(t.points)}</td>
                   {wantsForm ? (
                     <td className="dss-league-opt">
-                      {dots.length > 0 ? (
-                        <>
-                          <span className="dss-league-dots" aria-hidden="true">
-                            {dots.map((e, k) => (
-                              <span key={k} className={`dss-league-dot dss-league-dot--${e.toLowerCase()}`} />
-                            ))}
-                          </span>
-                          <span className="dss-sr-only">{formLabel(t.form)}</span>
-                        </>
-                      ) : null}
+                      <FormChips form={t.form ?? []} />
                     </td>
                   ) : null}
                 </tr>

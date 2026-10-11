@@ -277,6 +277,46 @@
 .dss-stat-value { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h2); letter-spacing: -0.02em; color: var(--dss-fg); line-height: 1.1; }
 .dss-stat-label { margin-top: 4px; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-mute); }
 
+/* ── Kennzahlen-Gitter und Form ─────────────────────────────────
+   Kennzahlen: <dl class="dss-stats"> mit <div class="dss-stat"><dt class="dss-stat-label"><dd class="dss-stat-value">; der Wert steht optisch
+   über der Beschriftung (order), im Lesefluss steht die Beschriftung zuerst („Siege, 12“). Schriftgrößen nur aus Tokens (--fs-*).
+   --compact: ohne Kachel, in einer Zeile (Seitenleiste, Kopf einer Karte).
+   Form (letzte Spiele): <span class="dss-form"><span class="dss-form-list" aria-hidden="true"><span class="dss-form-item dss-form-item--s">…</span>
+   <span class="dss-sr-only">Form: Sieg, …</span></span>. Eine Darstellung für LeagueCard und eigene Seiten: Standard Punkte (S gefüllt, N Quadrat,
+   U Ring: Form statt nur Farbe), --letters mit Buchstaben S, N, U. Die Elemente sind nicht bedienbar (kein Ziel nach WCAG 2.5.5/2.5.8). */
+.dss-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(8rem, 100%), 1fr)); gap: 0.75rem; margin: 0; padding: 0; }
+.dss-stats > .dss-stat { display: flex; flex-direction: column; min-width: 0; }
+.dss-stats .dss-stat-value { order: -1; margin: 0; overflow-wrap: anywhere; }
+.dss-stats .dss-stat-label { overflow-wrap: anywhere; }
+.dss-stats--compact { display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; }
+.dss-stat--compact, .dss-stats--compact > .dss-stat { padding: 0; border: 0; border-radius: 0; background: none; }
+.dss-stat--compact .dss-stat-value, .dss-stats--compact .dss-stat-value { font-size: var(--fs-h3); }
+
+.dss-form { position: relative; display: inline-flex; align-items: center; vertical-align: middle; }
+.dss-form-list { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.dss-form-item { box-sizing: border-box; flex: none; width: 10px; height: 10px; border-radius: 50%; }
+.dss-form-item--s { background: var(--dss-chip-ok-fg); }
+.dss-form-item--n { background: var(--dss-chip-err-fg); border-radius: 2px; }
+.dss-form-item--u { border: 2px solid var(--dss-mute); }
+.dss-tbl tr.is-own .dss-form-item--u { border-color: var(--dss-mute-on-selected); }
+/* Buchstaben: farbige Marken (Chip-Töne, Kontrast wie die Chips) mit S, N, U; der Buchstabe kommt aus dem CSS und ist nicht Teil des Textes */
+.dss-form--letters .dss-form-list { gap: 4px; }
+.dss-form--letters .dss-form-item {
+  display: inline-grid; place-items: center; width: auto; min-width: 24px; height: 24px; border: 0; border-radius: var(--radius-full);
+  font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 700; line-height: 1;
+}
+.dss-form--letters .dss-form-item--s { background: var(--dss-chip-ok-bg); color: var(--dss-chip-ok-fg); }
+.dss-form--letters .dss-form-item--n { background: var(--dss-chip-err-bg); color: var(--dss-chip-err-fg); border-radius: var(--radius-sm); }
+.dss-form--letters .dss-form-item--u { background: var(--dss-chip-neutral-bg); color: var(--dss-chip-neutral-fg); box-shadow: inset 0 0 0 1px var(--dss-line-strong); }
+.dss-form--letters .dss-form-item--s::before { content: "S"; }
+.dss-form--letters .dss-form-item--n::before { content: "N"; }
+.dss-form--letters .dss-form-item--u::before { content: "U"; }
+/* Windows-Kontrastmodus: Füllungen entfallen dort; Formen bleiben (Punkt, Quadrat, Ring) */
+@media (forced-colors: active) {
+  .dss-form-item--s, .dss-form-item--n { background: CanvasText; forced-color-adjust: none; }
+  .dss-form-item--u { border-color: CanvasText; }
+}
+
 /* ── Tabelle ────────────────────────────────────────────────── */
 .dss-frame { border: 1px solid var(--dss-line); border-radius: 14px; background: var(--dss-surface); overflow: hidden; color: var(--dss-fg); }
 .dss-table-scroll { overflow-x: auto; }
@@ -1696,13 +1736,7 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-league-tbl tr.dss-league-zone td:first-child { box-shadow: inset 4px 0 0 var(--league-zone); }
 .dss-league-tbl tr.is-own.dss-league-zone td:first-child { box-shadow: inset 4px 0 0 var(--league-zone), inset 8px 0 0 var(--dss-accent-text); }
 
-/* Form: Punkte, S gefüllt und grün, N rotes Quadrat, U Ring; der Text steht versteckt in der Zelle (formLabel) */
-.dss-league-dots { display: inline-flex; align-items: center; gap: 5px; vertical-align: middle; }
-.dss-league-dot { box-sizing: border-box; width: 10px; height: 10px; border-radius: 50%; }
-.dss-league-dot--s { background: var(--dss-chip-ok-fg); }
-.dss-league-dot--n { background: var(--dss-chip-err-fg); border-radius: 2px; }
-.dss-league-dot--u { border: 2px solid var(--dss-mute); }
-.dss-league-tbl tr.is-own .dss-league-dot--u { border-color: var(--dss-mute-on-selected); }
+/* Form: die Punkte der Spalte „Form“ sind der Baustein `dss-form` (Abschnitt Kennzahlen-Gitter und Form); der Text steht versteckt in der Zelle (formLabel) */
 
 .dss-league-legend { list-style: none; margin: 0; padding: 12px 24px; display: flex; flex-wrap: wrap; gap: 6px 18px; border-top: 1px solid var(--dss-line); font-size: var(--fs-body-sm); color: var(--dss-fg-soft); }
 .dss-league-legend li { display: inline-flex; align-items: center; gap: 8px; }

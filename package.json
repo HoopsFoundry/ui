@@ -45,6 +45,8 @@
     "./svelte/AccordionItem": "./svelte/AccordionItem.svelte",
     "./svelte/Map": "./svelte/Map.svelte",
     "./svelte/VenueCard": "./svelte/VenueCard.svelte",
+    "./svelte/FormChips": "./svelte/FormChips.svelte",
+    "./svelte/StatGrid": "./svelte/StatGrid.svelte",
     "./appnav.js": "./js/appnav.js",
     "./schedule.js": {
       "types": "./js/schedule.d.ts",
@@ -77,6 +79,10 @@
     "./venue.js": {
       "types": "./js/venue.d.ts",
       "import": "./js/venue.js"
+    },
+    "./stats.js": {
+      "types": "./js/stats.d.ts",
+      "import": "./js/stats.js"
     },
     "./motion.js": {
       "types": "./js/motion.d.ts",

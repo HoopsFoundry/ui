@@ -79,11 +79,12 @@ describe('LeagueCard', () => {
 
   it('Form ohne Spalte erscheint nicht; die Form-Punkte sind aria-hidden', () => {
     const { container, rerender } = render(<LeagueCard title="L" teams={teams()} />);
-    expect(container.querySelector('.dss-league-dots')).toBeNull();
+    expect(container.querySelector('.dss-form')).toBeNull();
     expect(screen.queryByText(/Form:/)).toBeNull();
     rerender(<LeagueCard title="L" teams={teams()} columns={['form']} />);
-    expect(container.querySelector('.dss-league-dots')).toHaveAttribute('aria-hidden', 'true');
-    expect(container.querySelectorAll('.dss-league-dot--s').length).toBeGreaterThan(0);
+    expect(container.querySelector('.dss-form-list')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelectorAll('.dss-form-item--s').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden').length).toBeGreaterThan(0);
   });
 
   it('Zonen: Streifen-Klasse, versteckter Text je Zeile und Legende nur mit Zone', () => {
