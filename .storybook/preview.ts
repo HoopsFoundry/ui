@@ -104,7 +104,7 @@ const preview: Preview = {
         order: [
           'Introduction',
           'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live'],
-          'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'Tabs', 'Accordion', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
+          'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Tabs', 'Accordion', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
         ],
       },
     },

@@ -1515,3 +1515,80 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   .dss-acc-trigger[aria-expanded="true"], .dss-acc-trigger:hover { background: transparent; }
   details.dss-acc-item::details-content { content-visibility: visible; display: block; }
 }
+
+/* ── LeagueCard (Ligencard) ─────────────────────────────────
+   Mini-Tabelle einer Liga in einer Karte: Kopf (Titel, Untertitel, Live-Tag), Tabelle (.dss-tbl, Dichte touch 60 px bzw. compact 40 px),
+   Legende der Zonen, Link zur kompletten Tabelle. Logos und Kurznamen teilen die Bausteine der Namen-und-Logos-Regeln
+   (.dss-team-logo, .dss-team-name). Der Titel hängt an den Überschriften-Tokens (--dss-card-title-size), nie am Elementnamen.
+   Optionale Spalten (.dss-league-opt: S, N, Diff, Form) entfallen bis 640 px. Nie nur Farbe: Zonen, eigene Zeile, Form und Diff
+   haben Text (versteckt bzw. Vorzeichen). */
+.dss-league {
+  box-sizing: border-box; width: 100%; overflow: hidden; font-family: var(--font-body); color: var(--dss-fg);
+  background: var(--dss-surface); border: 1px solid var(--dss-line); border-radius: 16px;
+}
+.dss-league-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 8px 12px; padding: 20px 24px 16px; }
+.dss-league-heading { min-width: 0; }
+.dss-league-title { margin: 0; font-family: var(--font-display); font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-h3))); letter-spacing: -0.01em; line-height: var(--dss-title-leading, 1.2); color: var(--dss-fg); overflow-wrap: break-word; }
+.dss-league-sub { margin: 4px 0 0; font-size: var(--fs-body-md); line-height: 1.4; color: var(--dss-mute); }
+/* Live-Tag: grüne Live-Sprache (Chip-Token für die Fläche, Text ≥ 7:1); der Puls liegt nur am Punkt (.dss-live-dot, aus bei „Bewegung reduzieren“ und data-motion="reduce") */
+.dss-league-live { flex: none; display: inline-flex; align-items: center; gap: 10px; padding: 4px 12px; border-radius: 999px; background: var(--dss-chip-ok-bg); color: var(--dss-chip-ok-fg); font-size: var(--fs-caption); }
+.dss-league-live .dss-live { color: var(--dss-chip-ok-fg); font-family: var(--font-mono); }
+.dss-league-live .dss-live-dot { background: var(--dss-chip-ok-fg); }
+.dss-league-live-n { font-weight: 600; font-size: var(--fs-body-sm); }
+
+.dss-league-scroll { border-top: 1px solid var(--dss-line); }
+.dss-league-tbl th:first-child, .dss-league-tbl td:first-child { padding-left: 24px; }
+.dss-league-tbl th:last-child, .dss-league-tbl td:last-child { padding-right: 24px; }
+.dss-league-tbl th.dss-league-rank, .dss-league-tbl td.dss-league-rank { width: 1%; padding-right: 8px; text-align: left; }
+.dss-league-tbl td.dss-league-rank { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 700; color: var(--dss-fg); }
+.dss-league-tbl td.dss-league-team { width: 100%; min-width: 0; white-space: normal; color: var(--dss-fg); font-weight: 500; }
+.dss-league-who { display: inline-flex; align-items: center; gap: 10px; min-width: 0; }
+.dss-tbl .dss-league-link { display: inline-flex; align-items: center; min-height: 24px; color: inherit; text-underline-offset: 3px; }
+.dss-league-tbl tr.is-own td { font-weight: 600; }
+.dss-league-tbl tr.is-own td.num { font-weight: 500; }
+.dss-league-tbl tr.is-own td.num.lead { font-weight: 700; }
+/* Eigene Mannschaft: Balken links in der ersten Zelle; Zone: Streifen daneben (innen der Balken, außen die Zone) */
+.dss-league-tbl tr.is-own td:first-child { box-shadow: inset 4px 0 0 var(--dss-accent-text); }
+.dss-league-zone--up { --league-zone: var(--dss-chip-ok-fg); }
+.dss-league-zone--playoff { --league-zone: var(--dss-chip-info-fg); }
+.dss-league-zone--down { --league-zone: var(--dss-chip-err-fg); }
+.dss-league-tbl tr.dss-league-zone td:first-child { box-shadow: inset 4px 0 0 var(--league-zone); }
+.dss-league-tbl tr.is-own.dss-league-zone td:first-child { box-shadow: inset 4px 0 0 var(--league-zone), inset 8px 0 0 var(--dss-accent-text); }
+
+/* Form: Punkte, S gefüllt und grün, N rotes Quadrat, U Ring; der Text steht versteckt in der Zelle (formLabel) */
+.dss-league-dots { display: inline-flex; align-items: center; gap: 5px; vertical-align: middle; }
+.dss-league-dot { box-sizing: border-box; width: 10px; height: 10px; border-radius: 50%; }
+.dss-league-dot--s { background: var(--dss-chip-ok-fg); }
+.dss-league-dot--n { background: var(--dss-chip-err-fg); border-radius: 2px; }
+.dss-league-dot--u { border: 2px solid var(--dss-mute); }
+.dss-league-tbl tr.is-own .dss-league-dot--u { border-color: var(--dss-mute-on-selected); }
+
+.dss-league-legend { list-style: none; margin: 0; padding: 12px 24px; display: flex; flex-wrap: wrap; gap: 6px 18px; border-top: 1px solid var(--dss-line); font-size: var(--fs-body-sm); color: var(--dss-fg-soft); }
+.dss-league-legend li { display: inline-flex; align-items: center; gap: 8px; }
+.dss-league-key { flex: none; width: 4px; height: 16px; border-radius: 2px; background: var(--dss-fg-soft); }
+.dss-league-key--up { background: var(--dss-chip-ok-fg); }
+.dss-league-key--playoff { background: var(--dss-chip-info-fg); }
+.dss-league-key--down { background: var(--dss-chip-err-fg); }
+
+.dss-league-foot { padding: 4px 24px; border-top: 1px solid var(--dss-line); }
+.dss-league-more { display: inline-flex; align-items: center; min-height: 48px; font-size: var(--fs-body-md); font-weight: 500; }
+
+/* compact: Seitenleisten. Zeilen 40 px (dss-tbl--compact), kleinerer Titel, engere Ränder */
+.dss-league--compact { border-radius: 12px; }
+.dss-league--compact .dss-league-head { padding: 14px 16px 10px; }
+.dss-league--compact .dss-league-title { font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-body-lg))); line-height: var(--dss-title-leading, 1.2); }
+.dss-league--compact .dss-league-tbl th:first-child, .dss-league--compact .dss-league-tbl td:first-child { padding-left: 16px; }
+.dss-league--compact .dss-league-tbl th:last-child, .dss-league--compact .dss-league-tbl td:last-child { padding-right: 16px; }
+.dss-league--compact .dss-league-legend { padding: 10px 16px; }
+.dss-league--compact .dss-league-foot { padding: 0 16px; }
+.dss-league--compact .dss-league-more { min-height: 44px; }
+
+/* Handy: S, N, Diff und Form entfallen (Kopf und Zellen); # · Mannschaft · SP · PKT bleiben */
+@media (max-width: 640px) {
+  .dss-league-opt { display: none; }
+  .dss-league-head { padding: 16px 16px 12px; }
+  .dss-league-tbl th:first-child, .dss-league-tbl td:first-child { padding-left: 16px; }
+  .dss-league-tbl th.dss-league-pts, .dss-league-tbl td.dss-league-pts { padding-right: 16px; }
+  .dss-league-legend { padding: 10px 16px; }
+  .dss-league-foot { padding: 0 16px; }
+}

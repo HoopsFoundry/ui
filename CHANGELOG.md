@@ -5,6 +5,11 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 
 ## [Unveröffentlicht] — Marken-Rollen und DBB-Marke
 
+### Neu
+- **`LeagueCard` (Ligencard)** in Svelte und React (`@bbv/dss-design-system/svelte/LeagueCard`, `LeagueCard` und die Typen `LeagueTeam`, `LeagueColumn` aus `/react`): Mini-Tabelle einer Liga in einer Karte (Titel, Untertitel „12 Teams · 66 von 132 Spielen gespielt“, Tabelle `#`, `Mannschaft`, `SP`, `PKT`, Link „Komplette Tabelle und Spielplan“). Zeigt einen **Ausschnitt**: mit eigener Mannschaft (`own: true`) zwei davor, die eigene, eine dahinter (an den Rändern verschoben, immer vier Zeilen), sonst die ersten `limit` (Standard 3). Optional `columns` (`won`, `lost`, `diff`, `form`; bis 640 px ausgeblendet), `zone` je Team (Aufstieg, Relegation, Abstieg mit Streifen, verstecktem Text und Legende), `live` (Tag „Live“ und „n Spiele laufen“), `logos` und `names="short"` wie im Spielplan, `size="compact"` (Zeilen 40 px, kein Untertitel), `titleAs` (Ebene wie die anderen Titelkomponenten, Größe über `--dss-card-title-size`). Zugänglichkeit: echte `table` mit `caption` („Plätze 5 bis 8 von 12“), Scrollbereich als benannte Region, eigene Zeile, Zonen, Form und Diff auch als Text, eindeutiger Link-Name. CSS `dss-league*`.
+- **`league.js`** (Export `@bbv/dss-design-system/league.js` mit Typen): reine Funktionen `leagueWindow`, `leagueSummary`, `formLabel`, `formEntries`, `windowLabel`, `diffText`, `zoneLegend`, `liveInfo` für eigene Darstellungen.
+- **Doku:** Seite `Components/LeagueCard` mit Ausschnitt-Regeln, Spalten, Logos, Auf-/Abstieg, Live, Zuständen, Handy, Code (Vanilla, Svelte, React) und Dos/Don'ts.
+
 ### Geändert
 - **Fix Svelte `HeadingLevel`: `by` ist reaktiv.** Ein inneres `<HeadingLevel by={…}>` folgt jetzt einem Wechsel des äußeren `level` (vorher blieb es auf dem Wert vom Start stehen). `level` darf auch eine Ziffern-Zeichenkette sein (`level="4"`, Typ `HeadingLevelInput`).
 - **`titleAs` an allen Titelkomponenten ist `'h2'` bis `'h6'`** (vorher `'h2' | 'h3' | 'h4'`; ScheduleTable, ScheduleGrid, Table, PlayerCard, EmptyState, PlayByPlay, TeamCard; Svelte und React). Ohne `titleAs` gilt die Ebene aus einem umgebenden `HeadingLevel`, sonst weiter `h3`. Ein ungültiges `titleAs` (etwa `'h1'`) fällt auf diese Ebene zurück.

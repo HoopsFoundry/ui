@@ -1,0 +1,240 @@
+import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as LeagueCardStories from './LeagueCard.stories';
+import { DosDonts } from './docs/blocks/DosDonts';
+import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { DocTable } from './docs/blocks/DocTable';
+import './docs/blocks/blocks.css';
+import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs } from './LeagueCard.code';
+
+<Meta of={LeagueCardStories} />
+
+# LeagueCard (Ligencard)
+
+**Ligencard**: eine kleine Tabelle einer Liga in einer Karte, zum Beispiel auf der Startseite eines Vereins oder in der Seitenleiste. Sie zeigt nur einen Ausschnitt der Tabelle, am liebsten um die eigene Mannschaft, und führt per Link zur kompletten Tabelle. Die Teams teilen sich das Datenmodell mit dem Spielplan ([Spielplan](?path=/docs/components-spielplan--docs)): `name`, `short`, `logo` und `href` sind dieselben Felder wie bei `ScheduleTeam`. Die Mannschaftskarte ([TeamCard](?path=/docs/components-teamcard--docs)) zeigt eine einzelne Mannschaft, die Ligencard die Liga.
+
+## Aufbau
+
+Die Karte hat vier Teile, die Daten kommen aus `teams` (Pflicht) und `title` (Pflicht); alles andere ist optional.
+
+- **Kopf:** der Titel (die Liga) als Überschrift, darunter der Untertitel „12 Teams · 66 von 132 Spielen gespielt“. Er entsteht aus `teamCount` (sonst der Länge von `teams`), `played` und `total`; fehlt eine Angabe oder ist sie ungültig, entfällt dieser Teil („1 Team“, „1 von 6 Spielen gespielt“). Rechts steht bei `live` das Live-Tag. Die Ebene der Überschrift ist `h3` und mit `titleAs` oder `HeadingLevel` wählbar.
+- **Tabelle:** eine echte `table` mit `caption`, Kopfzellen mit `scope="col"` und den Spalten `#` (Platz, fett), `Mannschaft`, `SP` und `PKT` (rechtsbündig, Mono, `PKT` fett). Die Kopfzeile ist Mono, in Großbuchstaben und hell getönt (`--dss-surface-2`). Die Zeilen sind 60 px hoch (Dichte `touch`, `size="standard"`), in `compact` 40 px (siehe Messwerte unten). Die Kürzel haben versteckte Langtexte („Spiele“, „Punkte“) für Screenreader. Der Scrollbereich ist wie bei [Table](?path=/docs/components-table--docs) eine fokussierbare Region mit Namen (`Tabelle: <Titel>`).
+- **Legende:** nur, wenn mindestens eine Zeile eine Zone trägt (siehe Auf- und Abstieg).
+- **Fuß:** der Link „Komplette Tabelle und Spielplan“ (`href`; `linkLabel` ändert den Text). Sein Name hat eine versteckte Ergänzung mit dem Titel („Komplette Tabelle und Spielplan, Oberliga Nordhain Männer“), damit mehrere Karten auf einer Seite unterscheidbar bleiben. Ohne `href` gibt es keinen Link.
+
+<Canvas of={LeagueCardStories.Standard} />
+
+Die kleinste Karte braucht nur `title` und `teams`. Ohne Untertitel-Daten entfällt die Zeile, und eine einzelne Mannschaft ergibt eine einzelne Zeile:
+
+<Canvas of={LeagueCardStories.Minimal} />
+
+## Spalten
+
+Standard sind `#`, `Mannschaft`, `SP` und `PKT`. Mit `columns` kommen Spalten dazu, in fester Reihenfolge (die Reihenfolge im Array spielt keine Rolle):
+
+<DocTable
+  label="Optionale Spalten der Ligencard"
+  head={['Wert', 'Spalte', 'Daten am Team', 'Darstellung']}
+  rows={[
+    ['won', 'S (Siege)', 'won', 'Zahl, rechtsbündig, Mono'],
+    ['lost', 'N (Niederlagen)', 'lost', 'Zahl, rechtsbündig, Mono'],
+    ['diff', 'Diff (Korbdifferenz)', 'diff', 'Mit Vorzeichen als Text: „+12“, „−5“ (echtes Minuszeichen), „0“. Dazu Farbe (grün bzw. rot, Chip-Töne mit mindestens 7:1); die Farbe ist nie der einzige Hinweis.'],
+    ['form', 'Form', 'form: (\'S\' | \'N\' | \'U\')[]', 'Höchstens die letzten fünf Spiele, neueste zuletzt, als Punktreihe: Sieg grüner Punkt, Niederlage rotes Quadrat, Unentschieden Ring. Der Text „Form: Sieg, Sieg, Niederlage …“ steht versteckt in der Zelle; ungültige Einträge werden ignoriert.'],
+  ]}
+/>
+
+Fehlt der Wert eines Teams, bleibt die Zelle leer (ein Strich als Platzhalter erscheint nie). **Auf dem Handy (bis 640 px) entfallen S, N, Diff und Form** (Kopf und Zellen); `#`, `Mannschaft`, `SP` und `PKT` bleiben, damit die Karte ohne seitliches Scrollen passt.
+
+<Canvas of={LeagueCardStories.Spalten} />
+
+## Ausschnitt: welche Zeilen erscheinen
+
+Die Karte zeigt nie die ganze Tabelle. Die Regel steht in der reinen Funktion `leagueWindow` (`@bbv/dss-design-system/league.js`), Svelte und React nutzen dieselbe:
+
+- **Mit eigener Mannschaft** (`own: true` an einem Team; bei mehreren zählt die erste in der Reihenfolge der Plätze): **zwei Teams davor, die eigene, eins dahinter**, vier Zeilen. An den Rändern verschiebt sich das Fenster, sodass immer vier Zeilen erscheinen: Platz 1 zeigt die Plätze 1 bis 4, der letzte Platz die letzten vier.
+- **Ohne eigene Mannschaft:** die ersten `limit` Plätze (Standard **3**).
+- **Weniger Teams als Zeilen:** alle. Eine leere Liste ergibt eine Karte ohne Zeilen.
+- Die Teams werden nach `rank` sortiert (gleiche Plätze bleiben in der Eingabereihenfolge). Es entsteht keine Lücke-Zeile: die Spalte `#` zeigt die Plätze, und die `caption` sagt Screenreadern „Plätze 5 bis 8 von 12“.
+
+<Canvas of={LeagueCardStories.Ausschnitt} />
+
+<DocTable
+  label="Ausschnitt-Regeln"
+  head={['Lage', 'Zeilen (Beispiel mit 12 Teams)']}
+  rows={[
+    ['Eigene Mannschaft auf Platz 1, 2 oder 3', 'Plätze 1 bis 4'],
+    ['Eigene Mannschaft auf Platz 7', 'Plätze 5 bis 8'],
+    ['Eigene Mannschaft auf Platz 12', 'Plätze 9 bis 12'],
+    ['Keine eigene Mannschaft', 'Plätze 1 bis 3 (limit ändert die Zahl)'],
+    ['Nicht mehr Teams als Zeilen (vier mit eigener Mannschaft, limit ohne)', 'alle'],
+  ]}
+/>
+
+Wer den Ausschnitt selbst braucht (zum Beispiel für eine eigene Darstellung), nutzt die Funktionen direkt:
+
+<FrameworkCode label="Funktionen aus league.js" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
+
+## Logos und Kurznamen
+
+`logos` setzt Logo bzw. Initialen (28 px, in `compact` 20 px) vor den Namen, `names="short"` zeigt den Kurznamen (`short` am Team). Bis 640 px erscheint der Kurzname automatisch. Der volle Name steht für Screenreader genau einmal im Markup; der Kurzname ist `aria-hidden` und trägt den vollen Namen als `title`. Ohne `logo` erscheinen die Initialen im Kreis. Logos sind dekorativ (`alt=""`), weil der Name daneben steht. Die Mechanik ist dieselbe wie bei Spielplan und Karten.
+
+<Canvas of={LeagueCardStories.Logos} />
+
+## Auf- und Abstieg
+
+Jedes Team kann eine `zone` tragen: `up` (Aufstieg), `playoff` (Relegation) oder `down` (Abstieg). Die Zeile bekommt einen farbigen Streifen am linken Rand (grün, blau, rot), versteckten Text in der Zeile („Aufstiegsplatz“, „Relegation“, „Abstiegsplatz“), und unter der Tabelle erklärt eine **Legende** (Text: „Aufstieg“, „Relegation“, „Abstieg“) die Streifen. Die Legende erscheint nur für Zonen, die in den **gezeigten** Zeilen vorkommen; sie nennt die Zonen in fester Reihenfolge. Die eigene Zeile hat einen Balken am linken Rand; liegt sie in einer Zone, steht der Zonenstreifen außen und der Balken daneben.
+
+<Canvas of={LeagueCardStories.Zonen} />
+
+## Live
+
+`live` zeigt im Kopf ein kleines Tag: das Wort „Live“ mit grünem Punkt und bei einer Zahl den Text „2 Spiele laufen“ („1 Spiel läuft“). `live` ohne Zahl (`true`) zeigt nur „Live“; `0` oder `false` zeigt nichts. Es sind dieselben Live-Farben und der Punkt pulsiert wie überall (Deckkraft, 1,6 s); bei „Bewegung reduzieren“ und mit `data-motion="reduce"` auf `<html>` steht der Punkt still (Werkzeugleiste **Bewegung**). Das Wort steht immer im Text, die Farbe ist nie der einzige Hinweis.
+
+<Canvas of={LeagueCardStories.Live} />
+
+## Kompakt (Seitenleiste)
+
+`size="compact"` macht die Zeilen 40 px hoch (Dichte `compact`), lässt den Untertitel weg und nimmt einen kleineren Titel (`--dss-card-title-size` mit Rückfall auf 18 px statt 20 px). Der Ausschnitt bleibt gleich.
+
+<Canvas of={LeagueCardStories.Compact} />
+
+### Messwerte
+
+Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel; die Zeilen enthalten die 1 px Trennlinie).
+
+<DocTable
+  label="Maße der Ligencard (gemessen im Browser)"
+  head={['Maß', 'standard', 'compact']}
+  rows={[
+    ['Zeilenhöhe', '60 px (gemessen 60,5 bis 61)', '40 px (gemessen 40,5 bis 41)'],
+    ['Höhe der Kopfzeile der Tabelle', '38 px (gemessen 38,5)', '38 px'],
+    ['Logo / Initialen', '28 px', '20 px'],
+    ['Titel', '20 px, Gewicht 700 (Token --dss-card-title-size, Rückfall fs-h3)', '18 px (Rückfall fs-body-lg)'],
+    ['Radius der Karte', '16 px', '12 px'],
+    ['Abstand des Kopfs', '20 px 24 px 16 px (Handy 16 px)', '14 px 16 px 10 px'],
+    ['Höhe des Fuß-Links', '48 px', '44 px'],
+    ['Höhe des Live-Tags', '26 px', '26 px'],
+    ['Spaltenbreiten bei 615 px Kartenbreite, alle Spalten', '# 41, Mannschaft 236, SP 46, S 37, N 37, Diff 58, PKT 50, Form 108 px', ''],
+  ]}
+/>
+
+<DocTable
+  label="Kontraste der Ligencard (gemessen)"
+  head={['Text oder Fläche', 'Verhältnis', 'Anforderung']}
+  rows={[
+    ['Titel, Name, Rang, PKT auf der Karte', '19,9 bis 21,0:1', 'mindestens 7:1'],
+    ['Untertitel (--dss-mute)', '7,7 bis 8,5:1', 'mindestens 7:1'],
+    ['Kopfzeile der Tabelle (Mono, Großbuchstaben)', '7,4 bis 7,7:1', 'mindestens 7:1'],
+    ['Diff plus und minus, auch auf der eigenen Zeile', '8,4 bis 13,7:1', 'mindestens 7:1'],
+    ['Live-Tag (Wort, Zahl und Punkt auf der Chip-Fläche)', '7,6 bis 8,8:1', 'Text mindestens 7:1, Punkt 3:1'],
+    ['Fuß-Link', '11,6 bis 15,9:1', 'mindestens 7:1'],
+    ['Zonenstreifen, Legende und Form-Punkte', '8,5 bis 14,5:1', 'mindestens 3:1'],
+    ['Fokus-Ring (gestrichelt, 3 px)', '3,6 bis 4,1:1', 'mindestens 3:1'],
+  ]}
+/>
+
+Die Vorlage des Vereinsregisters hat Zeilen von etwa 60 px; `standard` entspricht ihr.
+
+## Handy · 390 px Breite
+
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel: S, N, Diff und Form entfallen, die Namen erscheinen als Kurzname (wo vorhanden), die Seite scrollt nicht seitlich. Im Dunkelmodus gelten dieselben Tokens; alle Texte haben mindestens 7:1.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">LeagueCard · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: LeagueCard hell">
+      <iframe title="Handy-Vorschau: Ligencard hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-leaguecard--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">LeagueCard · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: LeagueCard dunkel">
+      <iframe title="Handy-Vorschau: Ligencard dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-leaguecard--handy" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Zustände: Link-Hover und Fokus
+
+Die Karte selbst ist nicht klickbar, die Links in ihr sind es: die Namen der Teams (wenn `href` am Team steht) und der Fuß-Link. Hover verdickt die Unterstreichung auf 2 px; bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring (3 px, 2 px Abstand, auf der eigenen Zeile im Dunkelmodus in der helleren Chip-Textfarbe) um den Link. Der Scrollbereich der Tabelle ist per Tastatur erreichbar und hat einen eigenen Ring. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Bei „Bewegung reduzieren“ gibt es keine Übergänge.
+
+<Canvas of={LeagueCardStories.Zustaende} />
+
+Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeugleiste **Zustand** umschalten.
+
+## Barrierefreiheit
+
+Die Tabelle ist eine echte `table` mit `caption` („Titel, Plätze 5 bis 8 von 12“) und `th scope="col"`. Ihr Scrollbereich ist eine benannte, per Tastatur erreichbare Region („Tabelle: Titel“). Eigene Zeile, Zonen, Form und Korbdifferenz haben immer Text, nie nur Farbe. Der Name des Fuß-Links enthält den Titel der Liga. Mehrere Karten auf einer Seite brauchen unterschiedliche Titel, weil die Tabelle als benannte Region erscheint (axe: landmark-unique). Alle Beispiele dieser Seite haben deshalb eigene, erfundene Ligen-Titel.
+
+## Dunkelmodus
+
+Alle Flächen und Texte laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Text hat mindestens 7:1, Zonenstreifen, Form-Punkte und der Balken der eigenen Zeile mindestens 3:1, in beiden Marken (BBV, DBB) und in beiden Modi. Die Dunkelansicht steht in der Handy-Vorschau oben; mit der Werkzeugleiste **Theme** wird jede Story dunkel.
+
+## Überschriftenebene
+
+Die Ligencard gibt nie eine `h1` aus. Ohne weitere Angabe ist der Titel eine `h3`. Die Ebene (`h2` bis `h6`) wählst du mit `titleAs` an der Karte oder für einen ganzen Abschnitt mit `HeadingLevel`. Rangfolge: `titleAs` vor `HeadingLevel` vor `h3`. Die Größe hängt nicht an der Ebene, sondern am Token `--dss-card-title-size` (Rückfall `--dss-title-size`, dann 20 px; in `compact` 18 px). Mehr dazu auf der Seite [Überschriften](?path=/docs/foundation-headings--docs).
+
+<FrameworkCode label="Ebene der Überschrift" svelte={ebeneSvelte} react={ebeneReact} />
+
+## Verwendung: Import und Props
+
+Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; `leagueWindow` & Co. kommen aus `@bbv/dss-design-system/league.js`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
+
+<FrameworkCode label="LeagueCard" vanilla={vanilla} svelte={svelte} react={react} />
+
+Die Spielwiese zeigt die echte Komponente mit der erfundenen Oberliga Nordhain Männer und Demo-Logos für vier Vereine. Die Tabelle (`teams`) lässt sich im Controls-Reiter als JSON bearbeiten; `ownRank` und `zones` sind nur Hilfen der Spielwiese und bauen die Tabelle um.
+
+<Controls of={LeagueCardStories.Spielwiese} />
+
+### Datenmodell eines Teams (`LeagueTeam`)
+
+<DocTable
+  label="Felder eines Teams der Ligencard"
+  head={['Feld', 'Typ', 'Beschreibung']}
+  rows={[
+    ['rank', 'number', 'Platz (ganze Zahl ab 1); die Karte sortiert danach. Pflicht.'],
+    ['name', 'string', 'Name der Mannschaft. Pflicht.'],
+    ['short, logo, href', 'string', 'Kurzname, Logo-URL und Link des Teams, wie bei ScheduleTeam. Mit href ist der Name ein Link.'],
+    ['played', 'number', 'Spiele gespielt (SP). Pflicht; ist der Wert keine Zahl, bleibt die Zelle leer.'],
+    ['points', 'number', 'Punkte (PKT). Pflicht.'],
+    ['won, lost', 'number', 'Siege und Niederlagen, nur mit den Spalten won bzw. lost.'],
+    ['diff', 'number', 'Korbdifferenz, positiv oder negativ; nur mit der Spalte diff.'],
+    ['form', "('S' | 'N' | 'U')[]", 'Letzte Spiele, neueste zuletzt; angezeigt werden höchstens fünf. Nur mit der Spalte form.'],
+    ['own', 'boolean', 'Eigene Mannschaft: hervorgehoben (Balken links, Hintergrund, versteckter Text „eigene Mannschaft“) und Mitte des Ausschnitts.'],
+    ['zone', "'up' | 'playoff' | 'down'", 'Aufstieg, Relegation, Abstieg: Streifen, versteckter Text und Legende.'],
+  ]}
+/>
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Ausschnitt um die eigene Mannschaft',
+      doText: 'Mit `own: true` zeigt die Karte zwei Teams davor, die eigene und eins dahinter. Der Verein sieht sich und seine Nachbarn.',
+      dontText: 'Ohne `own` erscheinen nur die ersten drei. Steht die eigene Mannschaft auf Platz 7, fehlt sie in der Karte, und der Link ist der einzige Weg zu ihr.',
+      good: <Story of={LeagueCardStories.DoAusschnitt} inline />,
+      bad: <Story of={LeagueCardStories.DontAusschnitt} inline />,
+    },
+    {
+      title: 'Zonen nur mit Legende',
+      doText: 'Aufstieg, Relegation und Abstieg haben Streifen, versteckten Text je Zeile und eine Legende, die die Streifen erklärt.',
+      dontText: 'Farbige Streifen ohne Legende sind nur Farbe: Wer sie nicht unterscheiden kann oder die Bedeutung nicht kennt, erfährt nichts. Die Komponente zeigt die Legende immer; die Doku blendet sie hier aus.',
+      good: <Story of={LeagueCardStories.DoZonen} inline />,
+      bad: <Story of={LeagueCardStories.DontZonen} inline />,
+    },
+    {
+      title: 'Form nie ohne Text',
+      doText: 'Die Punktreihe der Form hat einen versteckten Text („Form: Sieg, Sieg, Niederlage …“) für Screenreader; zusätzlich unterscheiden sich die Formen (Punkt, Quadrat, Ring).',
+      dontText: 'Farbpunkte ohne Text sagen Screenreadern nichts und Farbenblinden wenig. Die Komponente hängt den Text immer an; die Doku entfernt ihn hier, um den Fehler zu zeigen.',
+      good: <Story of={LeagueCardStories.DoForm} inline />,
+      bad: <Story of={LeagueCardStories.DontForm} inline />,
+    },
+    {
+      title: 'Wenige Zeilen: höchstens fünf',
+      doText: 'Die Karte bleibt kurz: vier Zeilen mit eigener Mannschaft, drei ohne, höchstens fünf (`limit`). Der Link führt zur ganzen Tabelle.',
+      dontText: 'Mit `limit={12}` wird aus der Karte eine ganze Tabelle, die in der Seitenleiste den Platz sprengt. Die komplette Tabelle gehört in `Table` auf eine eigene Seite.',
+      good: <Story of={LeagueCardStories.DoZeilen} inline />,
+      bad: <Story of={LeagueCardStories.DontZeilen} inline />,
+    },
+  ]}
+/>
