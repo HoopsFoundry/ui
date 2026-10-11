@@ -30,5 +30,6 @@ export interface MapController {
 
 export function createMapController(el: HTMLElement, options: MapControllerOptions, hooks?: MapControllerHooks): MapController;
 export function pinElement(item: Pick<MapItem, 'number'>): SVGElement;
-export function reducedMotion(): boolean;
+/** Wie `reducedMotion` aus js/motion.js (dort definiert, hier abwärtskompatibel erneut exportiert). */
+export { reducedMotion } from './motion.js';
 export function devWarn(message: string, detail?: unknown): void;

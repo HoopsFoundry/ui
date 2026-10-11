@@ -77,6 +77,18 @@
     "./venue.js": {
       "types": "./js/venue.d.ts",
       "import": "./js/venue.js"
+    },
+    "./motion.js": {
+      "types": "./js/motion.d.ts",
+      "import": "./js/motion.js"
+    },
+    "./url.js": {
+      "types": "./js/url.d.ts",
+      "import": "./js/url.js"
+    },
+    "./lifecycle.js": {
+      "types": "./js/lifecycle.d.ts",
+      "import": "./js/lifecycle.js"
     }
   },
   "files": [

@@ -83,8 +83,8 @@ export function mapLinks(input: { lat: number; lng: number; label?: string }): M
 export function formatCoords(lat: number, lng: number): string;
 /** Kachel-Adresse prüfen: `{z}`, `{x}`, `{y}` Pflicht; `https:`, Pfad ab Wurzel oder `http://localhost`. */
 export function validTileUrl(url: unknown): boolean;
-/** Prüft ein Marker-Ziel: nur http(s), mailto, tel, Pfade und #-Ziele; sonst `undefined` (zum Beispiel `javascript:`). */
-export function safeHref(href: unknown): string | undefined;
+/** Wie `safeHref` aus js/url.js (dort definiert, hier abwärtskompatibel erneut exportiert). */
+export { safeHref } from './url.js';
 /** Umschließendes Rechteck der gültigen Marker; ohne gültigen Marker `null`. */
 export function boundsOf(markers: ReadonlyArray<Pick<MapMarker, 'lat' | 'lng'>>): MapBounds | null;
 /** Marker für Liste, Platzhalter und Karte aufbereiten (ungültige entfallen). */

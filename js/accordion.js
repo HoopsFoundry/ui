@@ -228,6 +228,21 @@ export function createCollapsible(host) {
 
 // ── Vanilla-Skript ───────────────────────────────────────────
 
+/**
+ * Rückgabe von `initAccordion`: eine Funktion zum Aufräumen (wie bisher) mit der Eigenschaft `destroy`, damit der Baustein dem
+ * gemeinsamen Muster `{ destroy() }` folgt (js/lifecycle.js). Beide Formen sind gleichwertig und mehrfach aufrufbar.
+ */
+function handle(fn) {
+  let done = false;
+  const run = () => {
+    if (done) return;
+    done = true;
+    fn();
+  };
+  run.destroy = run;
+  return run;
+}
+
 // Bereiche: Karten (`.dss-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
 const ITEM = '.dss-acc-item, .dss-frame.is-collapsible, .dss-league.is-collapsible';
 const DETAILS = 'details.dss-acc-item';
@@ -295,10 +310,10 @@ function make(tag, className, attrs = {}) {
  * (1) `div.dss-acc-item` mit `h3.dss-acc-title > button.dss-acc-trigger[aria-expanded][aria-controls]` und `div.dss-acc-panel[hidden]`;
  * (2) natives `details.dss-acc-item` mit `summary.dss-acc-trigger` (zeigt auch ohne Skript; das Skript ergänzt die Funktionen).
  * Optionen: `exclusive` (nur ein Bereich offen), `syncHash` (Deep-Link, Standard `true`), `expandAll` („Alle öffnen/schließen“ mit Ansage),
- * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt `destroy()` zurück; mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
+ * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt eine Funktion zum Aufräumen zurück, die auch als `.destroy()` aufrufbar ist (Muster `{ destroy() }`); mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
  */
 export function initAccordion(root, options = {}) {
-  const noop = () => {};
+  const noop = handle(() => {});
   if (typeof document === 'undefined' || !root || typeof root.querySelectorAll !== 'function') return noop;
   instances.get(root)?.();
 
@@ -503,14 +518,14 @@ export function initAccordion(root, options = {}) {
     if (instances.get(root) === destroy) instances.delete(root);
   };
   instances.set(root, destroy);
-  return destroy;
+  return handle(destroy);
 }
 
 /** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument) mit denselben Optionen; gibt eine Funktion zum Aufräumen aller zurück. */
 export function initAccordions(scope, options = {}) {
-  if (typeof document === 'undefined') return () => {};
+  if (typeof document === 'undefined') return handle(() => {});
   const host = scope ?? document;
   const roots = [...host.querySelectorAll('[data-dss-acc]')];
   const destroys = roots.map((root) => initAccordion(root, options));
-  return () => destroys.forEach((fn) => fn());
+  return handle(() => destroys.forEach((fn) => fn()));
 }

@@ -12,10 +12,11 @@ const css = read('css/components.css');
 const svelte = read('svelte/VenueCard.svelte');
 const react = read('react/VenueCard.tsx');
 const mapUrl = new URL('../js/map.js', import.meta.url).href;
+const urlUrl = new URL('../js/url.js', import.meta.url).href;
 
-/** js/venue.js als Modul aus einem Text laden (die Import-Zeile zeigt auf js/map.js im Repository). */
+/** js/venue.js als Modul aus einem Text laden (die Import-Zeilen zeigen auf js/map.js und js/url.js im Repository). */
 const loadLogic = async (source: string) => {
-  const code = source.replace("from './map.js'", `from '${mapUrl}'`);
+  const code = source.replace("from './map.js'", `from '${mapUrl}'`).replace("from './url.js'", `from '${urlUrl}'`);
   const mod = await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
   return logicRules(mod);
 };

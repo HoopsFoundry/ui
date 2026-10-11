@@ -6,7 +6,12 @@
  * gehören der Komponente (Markup), Leaflet liefert nur Kacheln, Marker und Gesten. Marker sind Inline-SVG (`L.divIcon`), erzeugt mit
  * DOM-Aufrufen, ohne Leaflets Standardbilder.
  */
-import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, safeHref, validTileUrl } from './map.js';
+import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, validTileUrl } from './map.js';
+import { safeHref } from './url.js';
+import { reducedMotion } from './motion.js';
+
+// Abwärtskompatibel: `reducedMotion` stand früher hier; die Funktion lebt jetzt in js/motion.js
+export { reducedMotion };
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const PIN_PATH = 'M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z';
@@ -28,13 +33,6 @@ const isDev = () => {
     return false;
   }
 };
-
-/** „Bewegung reduzieren“ (Systemeinstellung) oder `data-motion="reduce"` auf <html> (Pause-Schalter der App). */
-export function reducedMotion() {
-  if (typeof window === 'undefined') return false;
-  const system = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  return system || document.documentElement.dataset.motion === 'reduce';
-}
 
 const svgEl = (name, attrs) => {
   const node = document.createElementNS(SVG_NS, name);
