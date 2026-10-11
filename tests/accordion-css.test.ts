@@ -182,7 +182,7 @@ describe('Accordion-CSS: reservierter Platz der Leiste (kein Layout-Sprung nach 
 
 describe('Accordion-CSS: Sprungleiste unter und über 640 px', () => {
   it('unter 640 px ist die Liste einklappbar, der Schalter sichtbar; darüber nebeneinander', () => {
-    const small = mediaBlock('@media (max-width: 639.98px)');
+    const small = mediaBlock('@media (max-width: 639.98px) {\n  .dss-acc-nav-toggle');
     expect(small).toMatch(/\.dss-acc-nav-toggle\s*\{\s*display:\s*flex/);
     expect(small).toMatch(/\.dss-acc-nav:not\(\.is-open\) \.dss-acc-nav-list\s*\{\s*display:\s*none/);
     expect(rule('.dss-acc-nav-toggle')).toMatch(/display:\s*none/);
