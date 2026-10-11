@@ -19,6 +19,7 @@
   import type { Snippet } from 'svelte';
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
+  import CollapsibleFrame from './internal/CollapsibleFrame.svelte';
   import {
     ariaForResult,
     columnsFor,
@@ -44,6 +45,9 @@
     titleAs = undefined,
     meta = '',
     caption = '',
+    collapsible = false,
+    open = $bindable(false),
+    id = undefined,
     class: klass = '',
     time = undefined,
     notice = undefined,
@@ -58,12 +62,22 @@
     titleAs?: HeadingTag;
     meta?: string;
     caption?: string;
+    /** Einklappbar: der Rahmenkopf wird zum Bereichskopf (Button in der Überschrift), die Tabelle zum Bereich. Braucht einen `title`. */
+    collapsible?: boolean;
+    /** Geöffnet, mit `bind:open` gebunden (nur mit `collapsible`; Standard geschlossen). */
+    open?: boolean;
+    /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
+    id?: string;
     class?: string;
     time?: Snippet<[ScheduleGame]>;
     notice?: Snippet<[ScheduleGame]>;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
+  $inspect(collapsible && !title).with((_type, missing) => {
+    if (missing) console.warn('[DSS] ScheduleTable: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
+  });
 
   const mode = $derived<ScheduleLayout>(layout ?? layoutFor(games));
   const dens = $derived<ScheduleDensity>(density ?? densityFor(games, mode));
@@ -195,13 +209,11 @@
   {/if}
 {/snippet}
 
-<div class="dss-frame {klass}">
-  {#if title || meta}
-    <div class="dss-frame-head">
-      {#if title}<svelte:element this={heading.tag} class="dss-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
-      <div class="dss-frame-meta">{#if meta}<span>{meta}</span>{/if}</div>
-    </div>
-  {/if}
+{#snippet frameMeta()}
+  <span class="dss-frame-meta"><span>{meta}</span></span>
+{/snippet}
+
+{#snippet tableRegion()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
   <div class="dss-table-scroll" role="region" tabindex="0" aria-label={caption || title || 'Spielplan'}>
     <!-- svelte-ignore a11y_no_redundant_roles -->
@@ -230,4 +242,20 @@
       </tbody>
     </table>
   </div>
-</div>
+{/snippet}
+
+{#if collapsible && title}
+  <CollapsibleFrame rootClass="dss-frame {klass}" {id} {title} {titleAs} bind:open meta={meta ? frameMeta : undefined}>
+    {@render tableRegion()}
+  </CollapsibleFrame>
+{:else}
+  <div class="dss-frame {klass}">
+    {#if title || meta}
+      <div class="dss-frame-head">
+        {#if title}<svelte:element this={heading.tag} class="dss-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
+        <div class="dss-frame-meta">{#if meta}<span>{meta}</span>{/if}</div>
+      </div>
+    {/if}
+    {@render tableRegion()}
+  </div>
+{/if}

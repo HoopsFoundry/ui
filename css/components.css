@@ -1597,3 +1597,63 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   .dss-league-legend { padding: 10px 16px; }
   .dss-league-foot { padding: 0 16px; }
 }
+
+/* ── Einklappbare Rahmen (Table, ScheduleTable, ScheduleGrid, LeagueCard mit collapsible) ──
+   Der Kopf des Rahmens wird zum Accordion-Kopf, der Inhalt zum Panel (dieselben Klassen .dss-acc-trigger, .dss-acc-panel, .dss-acc-chevron):
+     div.dss-frame.is-collapsible[.is-open] > div.dss-frame-head.dss-frame-head--acc > h3.dss-frame-title > button.dss-acc-trigger
+     div.dss-league.is-collapsible[.is-open] > div.dss-league-head.dss-league-head--acc > h3.dss-league-title > button.dss-acc-trigger
+     darunter div.dss-acc-panel[hidden] > div.dss-acc-panel-inner > Tabelle (mit eigenem Scrollbereich als benannter Region).
+   Die Titelgröße bleibt an den Rahmen-Tokens (--dss-frame-title-size bzw. --dss-card-title-size): der Button erbt die Schrift vom Titel,
+   die Accordion-Tokens (--dss-acc-title-size, --dss-acc-pad) gelten hier nicht. Geschlossen zeigt der Rahmen nur den Kopf ohne unteren Strich. */
+.dss-frame.is-collapsible, .dss-league.is-collapsible { scroll-margin-top: calc(var(--dss-acc-sticky-top, 0px) + 8px); }
+.dss-frame-head--acc, .dss-league-head--acc { display: block; padding: 0; }
+.dss-frame-head--acc > .dss-frame-title, .dss-league-head--acc > .dss-league-title { border-radius: inherit; }
+.dss-frame-title > .dss-acc-trigger, .dss-league-title > .dss-acc-trigger { font: inherit; letter-spacing: inherit; color: inherit; border-radius: inherit; }
+.dss-frame-title > .dss-acc-trigger { padding: 16px 22px; }
+.dss-frame-title > .dss-acc-trigger[aria-expanded="true"], .dss-league-title > .dss-acc-trigger[aria-expanded="true"] { background: transparent; }
+
+/* Rahmen: Kopfzeile bleibt im Rand eingebettet (Radius = Rahmenradius minus Rand); geschlossen ohne unteren Strich (der Rahmenrand schließt ab) */
+.dss-frame-head--acc { border-radius: 13px 13px 0 0; }
+.dss-frame.is-collapsible:not(.is-open) > .dss-frame-head--acc { border-bottom-color: transparent; border-radius: 13px; }
+.dss-frame-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: color-mix(in oklab, var(--dss-hover-bg), var(--dss-fg) 6%); }
+.dss-frame-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: color-mix(in oklab, var(--dss-hover-bg), var(--dss-fg) 12%); }
+.dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: var(--n-900); }
+.dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: var(--n-800); }
+.dss-frame--dark .dss-acc-trigger:focus-visible { outline-color: var(--ring-color-on-dark); }
+.dss-frame--dark .dss-acc-chevron { color: var(--n-400); }
+.dss-frame-head--acc .dss-frame-meta { flex: none; }
+
+/* Karte: Kopf mit Titel, Untertitel (Teil des Namens) und Live-Tag; die Tabelle darunter trägt ihren Trennstrich selbst (.dss-league-scroll) */
+.dss-league-head--acc { border-radius: 15px 15px 0 0; }
+.dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc { border-radius: 15px; }
+.dss-league-title > .dss-acc-trigger { align-items: flex-start; padding: 20px 24px 16px; }
+.dss-league--compact .dss-league-title > .dss-acc-trigger { padding: 14px 16px 10px; }
+@media (max-width: 640px) { .dss-league-title > .dss-acc-trigger { padding: 16px 16px 12px; } }
+.dss-league-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: var(--dss-hover-bg); }
+.dss-league-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: var(--dss-surface-2); }
+.dss-league-head--acc .dss-league-live, .dss-league-head--acc .dss-acc-chevron { align-self: flex-start; }
+.dss-league-head--acc .dss-acc-chevron { margin-top: max(0px, calc((var(--dss-title-leading, 1.2) * 1em - 20px) / 2)); }
+
+/* Untertitel im Kopf (Karte): wie .dss-league-sub, aber als Teil des Buttons */
+.dss-acc-label > .dss-acc-sub {
+  display: block; margin-top: 4px; font-family: var(--font-body); font-weight: 400; font-size: var(--fs-body-md);
+  line-height: 1.4; letter-spacing: 0; color: var(--dss-mute);
+}
+
+/* Kopf des offenen Rahmens klebt oben (Gruppe mit sticky); `overflow: clip` statt `hidden`, damit der Rahmen kein Scrollcontainer wird */
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame.is-collapsible, .dss-acc--sticky:not(.dss-acc--nested) > .dss-league.is-collapsible { overflow: clip; }
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame.is-open > .dss-frame-head--acc,
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-league.is-open > .dss-league-head--acc {
+  position: sticky; top: var(--dss-acc-sticky-top, 0px); z-index: 2; background: var(--dss-surface);
+}
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame.is-open > .dss-frame-head--acc { background: var(--dss-hover-bg); }
+.dss-acc--sticky:not(.dss-acc--nested) > .dss-frame--dark.is-open > .dss-frame-head--acc { background: var(--n-950); }
+
+/* Druck: Rahmen offen mit Strich unter dem Kopf, Kopf nicht klebend */
+@media print {
+  .dss-frame.is-collapsible > .dss-frame-head--acc { border-bottom-color: var(--dss-line); border-radius: 13px 13px 0 0; }
+  .dss-frame--dark.is-collapsible > .dss-frame-head--acc { border-bottom-color: var(--n-800); }
+  .dss-league.is-collapsible > .dss-league-head--acc { border-radius: 15px 15px 0 0; }
+  .dss-acc--sticky > .dss-frame.is-collapsible > .dss-frame-head--acc, .dss-acc--sticky > .dss-league.is-collapsible > .dss-league-head--acc { position: static; }
+  .dss-frame-head--acc .dss-acc-trigger:hover, .dss-league-head--acc .dss-acc-trigger:hover { background: transparent; }
+}
