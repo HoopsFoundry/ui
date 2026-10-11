@@ -1,5 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { cn } from './cn';
+import { CollapsibleFrame } from './internal/CollapsibleFrame';
+import { devWarn } from './internal/devWarn';
 import {
   ariaForResult,
   columnsFor,
@@ -44,6 +46,15 @@ export interface ScheduleTableProps {
   /** Unsichtbare Tabellenbeschriftung für Screenreader. */
   caption?: string;
   /** Zusätzliche Klasse am äußeren Rahmen. */
+  /** Einklappbar: der Rahmenkopf wird zum Bereichskopf (Button in der Überschrift), die Tabelle zum Bereich. Braucht einen `title`. */
+  collapsible?: boolean;
+  /** Geöffnet, kontrolliert (zusammen mit `onOpenChange`); nur mit `collapsible`. */
+  open?: boolean;
+  /** Anfangszustand, wenn unkontrolliert (Standard geschlossen). */
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
+  id?: string;
   className?: string;
   /** Router-Links für Teamnamen und Liga. */
   renderLink?: ScheduleRenderLink;
@@ -66,6 +77,11 @@ export function ScheduleTable({
   titleAs,
   meta,
   caption,
+  collapsible = false,
+  open,
+  defaultOpen,
+  onOpenChange,
+  id,
   className,
   renderLink,
   renderTime,
@@ -254,8 +270,58 @@ export function ScheduleTable({
     );
   };
 
+  const rootClass = cn('dss-frame', className);
+  // Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1)
+  const region = (
+    <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Spielplan'}>
+      <table role="table" className={cn('dss-tbl dss-tbl--schedule', `dss-tbl--${dens}`, `dss-sch--${mode}`)}>
+        {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
+        <thead role="rowgroup" className={mode === 'columns' ? undefined : 'dss-sr-only'}>
+          <tr role="row">
+            {cols.map((col) => (
+              <th key={col.key} scope="col" role="columnheader">
+                {col.label}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody role="rowgroup">
+          {groups.map((group, index) => (
+            <Fragment key={`${group.section ?? 'ohne'}-${index}`}>
+              {group.section ? (
+                <tr role="row" className="dss-sch-group">
+                  <th scope="colgroup" colSpan={cols.length}>
+                    {group.section}
+                  </th>
+                </tr>
+              ) : null}
+              {group.games.map(row)}
+            </Fragment>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  if (collapsible && title) {
+    return (
+      <CollapsibleFrame
+        rootClass={rootClass}
+        id={id}
+        title={title}
+        titleAs={titleAs}
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={onOpenChange}
+        meta={meta ? <span className="dss-frame-meta"><span>{meta}</span></span> : undefined}
+      >
+        {region}
+      </CollapsibleFrame>
+    );
+  }
+  if (collapsible) devWarn('[DSS] ScheduleTable: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
-    <div className={cn('dss-frame', className)}>
+    <div className={rootClass}>
       {hasHead ? (
         <div className="dss-frame-head">
           {/* Platzhalter, damit die Meta-Angaben rechts stehen */}
@@ -263,35 +329,7 @@ export function ScheduleTable({
           <div className="dss-frame-meta">{meta ? <span>{meta}</span> : null}</div>
         </div>
       ) : null}
-      {/* Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1) */}
-      <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Spielplan'}>
-        <table role="table" className={cn('dss-tbl dss-tbl--schedule', `dss-tbl--${dens}`, `dss-sch--${mode}`)}>
-          {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
-          <thead role="rowgroup" className={mode === 'columns' ? undefined : 'dss-sr-only'}>
-            <tr role="row">
-              {cols.map((col) => (
-                <th key={col.key} scope="col" role="columnheader">
-                  {col.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody role="rowgroup">
-            {groups.map((group, index) => (
-              <Fragment key={`${group.section ?? 'ohne'}-${index}`}>
-                {group.section ? (
-                  <tr role="row" className="dss-sch-group">
-                    <th scope="colgroup" colSpan={cols.length}>
-                      {group.section}
-                    </th>
-                  </tr>
-                ) : null}
-                {group.games.map(row)}
-              </Fragment>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {region}
     </div>
   );
 }

@@ -15,23 +15,26 @@ import {
 import { cn } from './cn';
 import { HeadingLevelContext, type HeadingTag } from './HeadingLevel';
 import { levelOfTag, nextLevel, resolveHeading } from '../js/heading.js';
-import { hashTarget, moveFocus, scrollToElement, summaryText, writeHash } from '../js/accordion.js';
+import { createCollapsible, moveFocus, scrollToElement, summaryText, writeHash } from '../js/accordion.js';
 
 export type AccordionVariant = 'card' | 'flat';
 
-/** Ein angemeldeter Bereich (Werte als Getter, damit sie aktuell bleiben). */
-interface Entry {
+/** Ein angemeldeter Bereich (Werte als Getter, damit sie aktuell bleiben). `anchor: false`: kein öffentlicher Anker (keine Sprungleiste). */
+export interface AccordionEntry {
   readonly id: string;
   readonly title: string;
   readonly open: boolean;
   readonly disabled: boolean;
-  readonly el: HTMLElement | null;
-  readonly trigger: HTMLButtonElement | null;
+  readonly anchor?: boolean;
+  readonly el: HTMLElement | null | undefined;
+  readonly trigger: HTMLElement | null | undefined;
   reveal: () => void;
   setOpen: (open: boolean) => void;
 }
+type Entry = AccordionEntry;
 
-interface GroupApi {
+/** Intern: die Gruppe, bei der sich Bereiche (und einklappbare Rahmen) anmelden. */
+export interface GroupApi {
   exclusive: boolean;
   syncHash: boolean;
   titleAs?: HeadingTag;
@@ -44,9 +47,12 @@ interface GroupApi {
   onKey: (event: KeyboardEvent<HTMLElement>) => void;
 }
 
-const GroupContext = createContext<GroupApi | undefined>(undefined);
-/** Der Bereich, in dessen Inhalt wir stehen: für verschachtelte Gruppen und das Öffnen der Eltern. */
-const ItemContext = createContext<{ reveal: () => void } | undefined>(undefined);
+export const GroupContext = createContext<GroupApi | undefined>(undefined);
+/**
+ * Der Bereich, in dessen Inhalt wir stehen: für verschachtelte Gruppen und das Öffnen der Eltern. `group` ist die Gruppe, die der Bereich
+ * im Kontext fand: so erkennt ein einklappbarer Rahmen im Inhalt, ob er direkt im Bereich steht (dann bleibt er einzeln).
+ */
+export const ItemContext = createContext<{ reveal: () => void; group?: GroupApi } | undefined>(undefined);
 
 export interface AccordionProps {
   /** Nur ein Bereich gleichzeitig offen (Standard false); „Alle öffnen/schließen“ entfällt dann. */
@@ -178,7 +184,7 @@ export function Accordion({
                   {navLabel}
                 </button>
                 <ul className="dss-acc-nav-list" id={listId}>
-                  {entries.map((entry) => (
+                  {entries.filter((e) => e.anchor !== false && e.title).map((entry) => (
                     <li key={entry.id} className="dss-acc-nav-item">
                       <a
                         className="dss-acc-nav-link"
@@ -242,38 +248,35 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
   const latest = useRef({ id, title, open, disabled, controlled, onOpenChange, group, parent });
   latest.current = { id, title, open, disabled, controlled, onOpenChange, group, parent };
 
-  const setOpen = useCallback((next: boolean, user = false) => {
-    const now = latest.current;
-    if (now.disabled && next !== now.open) return;
-    // Auch ein schon offener Bereich schließt bei exclusive die anderen (Anker auf einen beim Start offenen Bereich)
-    if (next && now.group?.exclusive) now.group.closeOthers(now.id);
-    if (next === now.open) return;
-    // Der Fokus liegt im Bereich, der gleich inert wird: er geht auf den Kopf (sonst fiele er auf <body>)
-    if (!next && panel.current && trigger.current && panel.current.contains(document.activeElement)) trigger.current.focus();
-    if (!now.controlled) setInner(next);
-    now.onOpenChange?.(next);
-    if (user && (now.group?.syncHash ?? true)) writeHash(now.id, next);
-  }, []);
-  /** Öffnet diesen Bereich und alle Eltern-Bereiche (Deep-Link, Sprungleiste). */
-  const reveal = useCallback(() => {
-    setOpen(true);
-    latest.current.parent?.reveal();
-  }, [setOpen]);
+  // Verhalten (Öffnen, exclusive, Anker, Eltern, Eintrag für die Gruppe): gemeinsamer Baustein in js/accordion.js; einmal erzeugt, liest über `latest`
+  const collapsible = useMemo(
+    () =>
+      createCollapsible({
+        id: () => latest.current.id,
+        title: () => latest.current.title,
+        open: () => latest.current.open,
+        disabled: () => latest.current.disabled,
+        anchor: () => true,
+        group: () => latest.current.group,
+        parent: () => latest.current.parent,
+        el: () => el.current,
+        trigger: () => trigger.current,
+        panel: () => panel.current,
+        commit: (next) => {
+          const now = latest.current;
+          if (!now.controlled) setInner(next);
+          now.onOpenChange?.(next);
+        },
+      }),
+    [],
+  );
+  const { setOpen, reveal, checkHash } = collapsible;
 
   const register = group?.register;
   useEffect(() => {
     if (!register) return;
-    return register({
-      get id() { return latest.current.id; },
-      get title() { return latest.current.title; },
-      get open() { return latest.current.open; },
-      get disabled() { return latest.current.disabled; },
-      get el() { return el.current; },
-      get trigger() { return trigger.current; },
-      reveal,
-      setOpen: (next: boolean) => setOpen(next),
-    });
-  }, [register, reveal, setOpen]);
+    return register(collapsible.entry);
+  }, [register, collapsible]);
   const touch = group?.touch;
   useEffect(() => touch?.(), [touch, id, title, open, disabled]);
   const opened = group?.opened;
@@ -283,17 +286,12 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
   const syncHash = group?.syncHash ?? true;
   useEffect(() => {
     if (!syncHash) return;
-    const check = () => {
-      if (hashTarget(window.location.hash, [id]) !== id) return;
-      reveal();
-      scrollToElement(el.current);
-    };
-    check();
-    window.addEventListener('hashchange', check);
-    return () => window.removeEventListener('hashchange', check);
-  }, [syncHash, id, reveal]);
+    checkHash();
+    window.addEventListener('hashchange', checkHash);
+    return () => window.removeEventListener('hashchange', checkHash);
+  }, [syncHash, id, checkHash]);
 
-  const itemApi = useMemo(() => ({ reveal }), [reveal]);
+  const itemApi = useMemo(() => ({ reveal, group }), [reveal, group]);
   const triggerId = `${id}-trigger`;
   const panelId = `${id}-panel`;
   // Allein: immer eine Region; in einer Gruppe nur bis 6 Bereiche (die Anzahl ist erst im Browser bekannt)

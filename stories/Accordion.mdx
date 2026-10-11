@@ -10,7 +10,7 @@ import { vanilla, detailsVanilla, svelte, react, ebenenSvelte, ebenenReact, toke
 
 # Accordion
 
-Ein Accordion klappt Bereiche auf und zu: lange Seiten werden übersichtlich, ohne dass etwas verloren geht. Jeder Bereich hat einen Kopf (Titel, optional eine Zusatzinfo) und einen Inhalt, der beliebig sein darf: Text, Tabellen, Karten oder eine weitere Gruppe. Das Accordion gibt es als Komponente für Svelte und React und als Vanilla-CSS, dort wahlweise mit Skript oder mit dem nativen `<details>`. Einklappbare Tabellenrahmen (`Table`, Spielplan, `LeagueCard`) folgen in einem eigenen Paket und nutzen dieselben Bausteine.
+Ein Accordion klappt Bereiche auf und zu: lange Seiten werden übersichtlich, ohne dass etwas verloren geht. Jeder Bereich hat einen Kopf (Titel, optional eine Zusatzinfo) und einen Inhalt, der beliebig sein darf: Text, Tabellen, Karten oder eine weitere Gruppe. Das Accordion gibt es als Komponente für Svelte und React und als Vanilla-CSS, dort wahlweise mit Skript oder mit dem nativen `<details>`. Auch Tabellenrahmen (`Table`, `ScheduleTable`, `ScheduleGrid`, `LeagueCard`) lassen sich mit `collapsible` einklappen; sie nutzen dieselben Bausteine und nehmen an der Gruppe teil (siehe die Beispielseite unten).
 
 ## Aufbau
 
@@ -178,7 +178,7 @@ Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px: Die Sprun
 
 ## Beispiel: Liga-Seite mit vier Bereichen
 
-Eine Vereinsseite mit Tabelle, Spielplan, Kader und Statistik als vier Bereiche, mit Sprungleiste und „Alle öffnen/schließen“. Die Tabellen haben hier noch ihren eigenen Rahmen im Bereich; einklappbare Tabellenrahmen kommen in einem eigenen Paket. Die Daten sind erfunden.
+Eine Vereinsseite mit Tabelle, Spielplan, Kader und Statistik als vier **einklappbare Tabellenrahmen** (`<Table collapsible>`), mit Sprungleiste und „Alle öffnen/schließen“. Der Rahmenkopf ist hier der Bereichskopf: Titel als Überschrift mit Button, `meta` und die Live-Marke im Namen, der Pfeil rechts. Die Tabellen melden sich selbst bei der Gruppe an; die Funktionen der Gruppe gelten für sie wie für `AccordionItem`, und beides lässt sich mischen. Einzelheiten und die Code-Beispiele stehen auf den Seiten [Table](?path=/docs/components-table--docs), [Spielplan](?path=/docs/components-spielplan--docs) und [LeagueCard](?path=/docs/components-leaguecard--docs). Die Daten sind erfunden.
 
 <Canvas of={AccordionStories.LigaSeite} />
 

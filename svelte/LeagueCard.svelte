@@ -14,6 +14,7 @@
    */
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
+  import CollapsibleFrame from './internal/CollapsibleFrame.svelte';
   import { initials, shortName } from '../js/schedule.js';
   import {
     cellNumber,
@@ -47,6 +48,9 @@
     logos = false,
     size = 'standard',
     titleAs = undefined,
+    collapsible = false,
+    open = $bindable(false),
+    id = undefined,
     class: klass = '',
   }: {
     /** Name der Liga, z. B. „Oberliga Nordhain Männer“. */
@@ -71,10 +75,20 @@
     size?: 'standard' | 'compact';
     /** Überschriftenebene, h2 bis h6. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor h3. */
     titleAs?: HeadingTag;
+    /** Einklappbar: Kopf (Titel, Untertitel, Live) wird zum Bereichskopf (Button in der Überschrift), die Tabelle zum Bereich. */
+    collapsible?: boolean;
+    /** Geöffnet, mit `bind:open` gebunden (nur mit `collapsible`; Standard geschlossen). */
+    open?: boolean;
+    /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
+    id?: string;
     class?: string;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
+  $inspect(collapsible && !title).with((_type, missing) => {
+    if (missing) console.warn('[DSS] LeagueCard: `collapsible` braucht einen `title`, sonst bleibt die Karte unverändert.');
+  });
 
   const rows = $derived(leagueWindow(teams, { limit }));
   const count = $derived(teamTotal(teamCount, teams));
@@ -93,17 +107,11 @@
   {#if kurz}<span class="dss-team-name" class:dss-team-name--short={names === 'short'}><span class="dss-name-full">{t.name}</span><span class="dss-name-short" aria-hidden="true" title={t.name}>{kurz}</span></span>{:else}{t.name}{/if}
 {/snippet}
 
-<div class={`dss-league${size === 'compact' ? ' dss-league--compact' : ''}${klass ? ` ${klass}` : ''}`}>
-  <div class="dss-league-head">
-    <div class="dss-league-heading">
-      <svelte:element this={heading.tag} class="dss-league-title">{title}</svelte:element>
-      {#if summary}<p class="dss-league-sub">{summary}</p>{/if}
-    </div>
-    {#if liveTag}
-      <span class="dss-league-live"><span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag.text}<span class="dss-league-live-n">{liveTag.text}</span>{/if}</span>
-    {/if}
-  </div>
+{#snippet liveMeta()}
+  <span class="dss-league-live"><span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag?.text}<span class="dss-league-live-n">{liveTag.text}</span>{/if}</span>
+{/snippet}
 
+{#snippet panel()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
   <div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label={title ? `Tabelle: ${title}` : 'Tabelle'}>
     <table class={`dss-tbl dss-tbl--${size === 'compact' ? 'compact' : 'touch'} dss-league-tbl`}>
@@ -163,4 +171,24 @@
   {#if href}
     <div class="dss-league-foot"><a class="dss-link dss-league-more" {href}>{linkLabel}<span class="dss-sr-only">, {title}</span></a></div>
   {/if}
+{/snippet}
+
+{#if collapsible && title}
+  <CollapsibleFrame kind="league" rootClass={`dss-league${size === 'compact' ? ' dss-league--compact' : ''}${klass ? ` ${klass}` : ''}`} {id} {title} sub={summary} {titleAs} bind:open meta={liveTag ? liveMeta : undefined}>
+    {@render panel()}
+  </CollapsibleFrame>
+{:else}
+<div class={`dss-league${size === 'compact' ? ' dss-league--compact' : ''}${klass ? ` ${klass}` : ''}`}>
+  <div class="dss-league-head">
+    <div class="dss-league-heading">
+      <svelte:element this={heading.tag} class="dss-league-title">{title}</svelte:element>
+      {#if summary}<p class="dss-league-sub">{summary}</p>{/if}
+    </div>
+    {#if liveTag}
+      <span class="dss-league-live"><span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag.text}<span class="dss-league-live-n">{liveTag.text}</span>{/if}</span>
+    {/if}
+  </div>
+
+  {@render panel()}
 </div>
+{/if}

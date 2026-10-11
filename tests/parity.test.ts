@@ -37,10 +37,12 @@ describe('Parität: Vollständigkeit', () => {
 });
 
 describe('Parität: eine CSS-Quelle', () => {
-  it('keine Svelte-Komponente hat einen eigenen <style>-Block (alles liegt in css/components.css)', () => {
-    const withStyle = readdirSync(new URL('svelte/', root))
-      .filter((file) => file.endsWith('.svelte'))
-      .filter((file) => /<style[\s>]/.test(readFileSync(new URL(`svelte/${file}`, root), 'utf8')));
+  it('keine Svelte-Komponente (auch nicht in Unterordnern wie internal/) hat einen eigenen <style>-Block', () => {
+    const walk = (dir: string): string[] =>
+      readdirSync(new URL(dir, root), { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(`${dir}${e.name}/`) : e.name.endsWith('.svelte') ? [`${dir}${e.name}`] : []));
+    const files = walk('svelte/');
+    expect(files.some((f) => f.includes('internal/'))).toBe(true);
+    const withStyle = files.filter((file) => /<style[\s>]/.test(readFileSync(new URL(file, root), 'utf8')));
     expect(withStyle).toEqual([]);
   });
 });

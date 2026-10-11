@@ -212,3 +212,116 @@ leagueSummary({ teamCount: 12, played: 66, total: 132 }); // '12 Teams · 66 von
 leagueSummary({ teamCount: 1 }); // '1 Team'
 windowLabel(rows, 12); // 'Plätze 1 bis 4 von 12'
 formLabel(['S', 'S', 'N']); // 'Form: Sieg, Sieg, Niederlage'`;
+
+// ── Tabellen einklappen (LeagueCard.mdx, Abschnitt „Ligencard einklappen“). Die Tests (tests/collapsible-code.test.ts) übersetzen das
+// React-Beispiel mit dem TypeScript-Compiler, rendern das Svelte-Beispiel und vergleichen das Vanilla-Markup mit der Ausgabe der Komponente.
+
+const CHEVRON = `<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
+
+/** Markup einer einklappbaren Ligencard (geöffnet, mit Untertitel); die Doku zeigt es und prüft es gegen die Komponente. */
+export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
+  <div class="dss-league is-collapsible is-open" id="oberliga">
+    <div class="dss-league-head dss-league-head--acc">
+      <h3 class="dss-league-title">
+        <button type="button" class="dss-acc-trigger" id="oberliga-trigger" aria-expanded="true" aria-controls="oberliga-panel">
+          <span class="dss-acc-label">Oberliga Nordhain Männer<span class="dss-acc-sep">,</span><span class="dss-acc-sub">12 Teams · 66 von 132 Spielen gespielt</span></span>
+          ${CHEVRON}
+        </button>
+      </h3>
+    </div>
+    <div class="dss-acc-panel" id="oberliga-panel">
+      <div class="dss-acc-panel-inner">
+        <div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
+          <table class="dss-tbl dss-tbl--touch dss-league-tbl">
+            <caption class="dss-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 3 von 12</caption>
+            <thead>
+              <tr>
+                <th scope="col" class="dss-league-rank"><span aria-hidden="true">#</span><span class="dss-sr-only">Platz</span></th>
+                <th scope="col">Mannschaft</th>
+                <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="dss-sr-only">Spiele</span></th>
+                <th scope="col" class="num dss-league-pts"><span aria-hidden="true">PKT</span><span class="dss-sr-only">Punkte</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="dss-league-rank">1</td>
+                <td class="dss-league-team"><span class="dss-league-who">Lindenberg Hawks</span></td>
+                <td class="num">11</td>
+                <td class="num lead dss-league-pts">20</td>
+              </tr>
+              <tr>
+                <td class="dss-league-rank">2</td>
+                <td class="dss-league-team"><span class="dss-league-who">BG Seeberg</span></td>
+                <td class="num">11</td>
+                <td class="num lead dss-league-pts">18</td>
+              </tr>
+              <tr>
+                <td class="dss-league-rank">3</td>
+                <td class="dss-league-team"><span class="dss-league-who">TSV Nordhain 1920</span></td>
+                <td class="num">11</td>
+                <td class="num lead dss-league-pts">16</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+export const collapsibleVanilla = `<!-- Wie die normale Ligencard (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Untertitel steht im Button
+     (dss-acc-sub), ein Live-Tag käme als dss-league-live dahinter. Die Karte trägt is-collapsible (und is-open, wenn sie offen ist);
+     Tabelle, Legende und Link stehen im Bereich (dss-acc-panel). Geschlossen: aria-expanded="false", Bereich mit hidden und inert.
+     Steht der Rahmen im Panel eines Bereichs (dss-acc-item), braucht er einen eigenen Container (div.dss-acc mit data-dss-acc) und einen eigenen
+     initAccordion-Aufruf; initAccordions startet jeden data-dss-acc-Container einzeln. -->
+${collapsibleMarkup}
+
+<script type="module">
+  import { initAccordions } from '@bbv/dss-design-system/accordion.js';
+
+  initAccordions(document, { nav: true });
+</script>`;
+
+const collapsibleTeams = `const teams = [
+  { rank: 1, name: 'Lindenberg Hawks', played: 11, points: 20 },
+  { rank: 2, name: 'BG Seeberg', played: 11, points: 18 },
+  { rank: 3, name: 'TSV Nordhain 1920', played: 11, points: 16 },
+];`;
+
+export const collapsibleSvelte = `<script>
+  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
+  import LeagueCard from '@bbv/dss-design-system/svelte/LeagueCard';
+
+  ${collapsibleTeams.replaceAll('\n', '\n  ')}
+  let open = $state(true);
+</script>
+
+<!-- Einzeln: bind:open, id für den Deep-Link (…#oberliga) -->
+<LeagueCard collapsible id="oberliga" bind:open title="Oberliga Nordhain Männer" {teams} teamCount={12} played={66} total={132} />
+
+<!-- In einer Gruppe: Sprungleiste und „Alle öffnen/schließen“ -->
+<Accordion nav navLabel="Ligen der Vereinsseite" expandAll>
+  <LeagueCard collapsible id="landesliga" title="Landesliga Ost" {teams} />
+  <LeagueCard collapsible id="bezirksliga" title="Bezirksliga West" {teams} live={2} />
+</Accordion>`;
+
+export const collapsibleReact = `import { useState } from 'react';
+import { Accordion, LeagueCard, type LeagueTeam } from '@bbv/dss-design-system/react';
+
+${collapsibleTeams.replace('const teams = [', 'const teams: LeagueTeam[] = [')}
+
+export function Vereinsseite() {
+  const [open, setOpen] = useState(true);
+  return (
+    <>
+      {/* Einzeln: open + onOpenChange (oder defaultOpen), id für den Deep-Link (…#oberliga) */}
+      <LeagueCard collapsible id="oberliga" open={open} onOpenChange={setOpen} title="Oberliga Nordhain Männer" teams={teams} teamCount={12} played={66} total={132} />
+
+      {/* In einer Gruppe: Sprungleiste und „Alle öffnen/schließen“ */}
+      <Accordion nav navLabel="Ligen der Vereinsseite" expandAll>
+        <LeagueCard collapsible id="landesliga" title="Landesliga Ost" teams={teams} />
+        <LeagueCard collapsible id="bezirksliga" title="Bezirksliga West" teams={teams} live={2} />
+      </Accordion>
+    </>
+  );
+}`;

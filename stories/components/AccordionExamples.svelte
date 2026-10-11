@@ -224,45 +224,43 @@
     </div>
   </div>
 {:else if example === 'liga'}
+  <!-- Paket B: einklappbare Tabellenrahmen. Der Rahmenkopf ist der Bereichskopf, die Gruppe liefert Sprungleiste und „Alle öffnen/schließen“ -->
   <Accordion syncHash={false} nav navLabel="Bereiche der Liga-Seite" expandAll>
-    <AccordionItem id="li-tabelle" title="Tabelle der Liga">
-      {#snippet meta()}12 Teams{/snippet}
-      <Table caption="Tabellenstand Bayernliga Süd" density="compact" columns={[
-        { key: 'pl', label: '#', width: '52px' }, { key: 'team', label: 'Team' }, { key: 's', label: 'S', align: 'right' }, { key: 'n', label: 'N', align: 'right' }, { key: 'p', label: 'Pkt', align: 'right' },
-      ]}>
-        {#snippet rows()}
-          <tr><td>1</td><td>BG Seeberg</td><td class="num">13</td><td class="num">2</td><td class="num lead">26</td></tr>
-          <tr><td>2</td><td>Lindenberg Hawks</td><td class="num">12</td><td class="num">3</td><td class="num lead">24</td></tr>
-          <tr class="is-own"><td>3</td><td>TSV Nordhain</td><td class="num">12</td><td class="num">3</td><td class="num lead">24</td></tr>
-        {/snippet}
-      </Table>
-    </AccordionItem>
-    <AccordionItem id="li-spielplan" title="Spielplan der Liga">
-      {#snippet meta()}{@render liveTag()}{/snippet}
-      <Table caption="Spiele des Spieltags" density="compact" columns={[
-        { key: 'wann', label: 'Wann' }, { key: 'heim', label: 'Heim' }, { key: 'gast', label: 'Gast' }, { key: 'erg', label: 'Stand', align: 'right' },
-      ]}>
-        {#snippet rows()}
-          <tr><td>Sa 19:30</td><td>TSV Nordhain</td><td>Lindenberg Hawks</td><td class="num">87 : 64</td></tr>
-          <tr><td>So 15:00</td><td>BG Seeberg</td><td>SV Kiefernau</td><td class="num">–</td></tr>
-        {/snippet}
-      </Table>
-    </AccordionItem>
-    <AccordionItem id="li-kader" title="Kader TSV Nordhain">
-      {#snippet meta()}14 Spieler{/snippet}
-      <Table caption="Kader von TSV Nordhain" density="compact" columns={[
-        { key: 'num', label: '#', width: '52px' }, { key: 'name', label: 'Spieler' }, { key: 'pos', label: 'Pos.' },
-      ]}>
-        {#snippet rows()}
-          <tr><td>4</td><td>J. Tanner</td><td>PG</td></tr>
-          <tr><td>7</td><td>M. Okafor</td><td>SG</td></tr>
-          <tr><td>11</td><td>L. Brandt</td><td>SF</td></tr>
-        {/snippet}
-      </Table>
-    </AccordionItem>
-    <AccordionItem id="li-statistik" title="Statistik der Saison">
-      {STATISTIK}
-    </AccordionItem>
+    <Table collapsible id="li-tabelle" title="Tabelle der Liga" meta="12 Teams" caption="Tabellenstand Bayernliga Süd" density="compact" columns={[
+      { key: 'pl', label: '#', width: '52px' }, { key: 'team', label: 'Team' }, { key: 's', label: 'S', align: 'right' }, { key: 'n', label: 'N', align: 'right' }, { key: 'p', label: 'Pkt', align: 'right' },
+    ]}>
+      {#snippet rows()}
+        <tr><td>1</td><td>BG Seeberg</td><td class="num">13</td><td class="num">2</td><td class="num lead">26</td></tr>
+        <tr><td>2</td><td>Lindenberg Hawks</td><td class="num">12</td><td class="num">3</td><td class="num lead">24</td></tr>
+        <tr class="is-own"><td>3</td><td>TSV Nordhain</td><td class="num">12</td><td class="num">3</td><td class="num lead">24</td></tr>
+      {/snippet}
+    </Table>
+    <Table collapsible id="li-spielplan" title="Spielplan der Liga" meta="Spieltag 6" live caption="Spiele des Spieltags" density="compact" columns={[
+      { key: 'wann', label: 'Wann' }, { key: 'heim', label: 'Heim' }, { key: 'gast', label: 'Gast' }, { key: 'erg', label: 'Stand', align: 'right' },
+    ]}>
+      {#snippet rows()}
+        <tr><td>Sa 19:30</td><td>TSV Nordhain</td><td>Lindenberg Hawks</td><td class="num">87 : 64</td></tr>
+        <tr><td>So 15:00</td><td>BG Seeberg</td><td>SV Kiefernau</td><td class="num">–</td></tr>
+      {/snippet}
+    </Table>
+    <Table collapsible id="li-kader" title="Kader TSV Nordhain" meta="14 Spieler" caption="Kader von TSV Nordhain" density="compact" columns={[
+      { key: 'num', label: '#', width: '52px' }, { key: 'name', label: 'Spieler' }, { key: 'pos', label: 'Pos.' },
+    ]}>
+      {#snippet rows()}
+        <tr><td>4</td><td>J. Tanner</td><td>PG</td></tr>
+        <tr><td>7</td><td>M. Okafor</td><td>SG</td></tr>
+        <tr><td>11</td><td>L. Brandt</td><td>SF</td></tr>
+      {/snippet}
+    </Table>
+    <Table collapsible id="li-statistik" title="Statistik der Saison" caption="Mannschaftsstatistik der Saison" density="compact" columns={[
+      { key: 'wert', label: 'Wert' }, { key: 'zahl', label: 'Schnitt', align: 'right' },
+    ]}>
+      {#snippet rows()}
+        <tr><td>Punkte pro Spiel</td><td class="num lead">82,4</td></tr>
+        <tr><td>Rebounds pro Spiel</td><td class="num">41,3</td></tr>
+        <tr><td>Assists pro Spiel</td><td class="num">18,7</td></tr>
+      {/snippet}
+    </Table>
   </Accordion>
 {:else if example === 'handy'}
   <div class="page">
