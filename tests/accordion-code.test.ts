@@ -166,14 +166,37 @@ describe('Beispiele der Seite sind stimmig', () => {
     expect(code.svelte).toContain('@bbv/dss-design-system/svelte/Accordion');
     expect(code.svelte).toContain('@bbv/dss-design-system/svelte/AccordionItem');
   });
-  it('funktionenJs: die Kommentare stimmen mit den Funktionen überein', async () => {
-    const { nextHeader, hashTarget, ancestorsOf, labelWithMeta, summaryText } = await import('../js/accordion.js');
-    const koepfe = [{ disabled: false }, { disabled: true }, { disabled: false }];
-    expect([nextHeader(0, 'ArrowDown', koepfe), nextHeader(2, 'ArrowDown', koepfe), nextHeader(2, 'Home', koepfe)]).toEqual([2, 2, 0]);
-    expect([hashTarget('#kader', ['tabelle', 'kader']), hashTarget('#unbekannt', ['tabelle', 'kader'])]).toEqual(['kader', null]);
-    expect(ancestorsOf('halle', [{ id: 'kader' }, { id: 'heim', parent: 'kader' }, { id: 'halle', parent: 'heim' }])).toEqual(['kader', 'heim']);
-    expect([labelWithMeta('Kader', '14 Spieler'), summaryText(3, 5), summaryText(5, 5)]).toEqual(['Kader, 14 Spieler', '3 von 5 Bereichen geöffnet', 'Alle Bereiche geöffnet']);
-    for (const line of code.funktionenJs.split('\n').filter((l) => l.includes('//'))) expect(line).toMatch(/\/\/ .+/);
+  it('funktionenJs: jede kommentierte Zeile wird ausgeführt und mit dem Kommentar verglichen', async () => {
+    const mod = await import('../js/accordion.js');
+    const checks: string[] = [];
+    const evaluate = (text: string): unknown => {
+      try {
+        return new Function(`return (${text})`)();
+      } catch {
+        // Zusatz in Klammern am Ende („(Wurzel zuerst)“) gehört nicht zum Wert
+        return new Function(`return (${text.replace(/\s+\([^)]*\)$/, '')})`)();
+      }
+    };
+    const body = code.funktionenJs
+      .split('\n')
+      .filter((line) => !line.startsWith('import '))
+      .map((line) => {
+        const m = line.match(/^(\w+\(.*?\));\s*\/\/\s*(.+)$/);
+        return m ? `__check(${m[1]}, ${JSON.stringify(m[2])});` : line;
+      })
+      .join('\n');
+    const __check = (actual: unknown, comment: string) => {
+      checks.push(comment);
+      expect(actual, comment).toEqual(evaluate(comment));
+    };
+    new Function('nextHeader', 'hashTarget', 'ancestorsOf', 'labelWithMeta', 'summaryText', '__check', body)(mod.nextHeader, mod.hashTarget, mod.ancestorsOf, mod.labelWithMeta, mod.summaryText, __check);
+    expect(checks.length).toBe(code.funktionenJs.split('\n').filter((l) => /^\w+\(.*\);\s*\/\//.test(l)).length);
+    expect(checks.length).toBeGreaterThanOrEqual(9);
+  });
+  it('ein falscher Kommentar im Beispiel würde auffallen', async () => {
+    const { nextHeader, summaryText } = await import('../js/accordion.js');
+    expect(nextHeader(0, 'ArrowDown', [{ disabled: false }, { disabled: true }, { disabled: false }])).not.toBe(1);
+    expect(summaryText(3, 5)).not.toBe('3 von 5 Bereichen offen');
   });
   it('tokensCss nutzt nur Tokens, die es gibt', () => {
     const css = readFileSync(`${rootDir}css/components.css`, 'utf8');
@@ -181,5 +204,22 @@ describe('Beispiele der Seite sind stimmig', () => {
     for (const name of code.tokensCss.match(/--dss-acc-[\w-]+(?=:)/g) ?? []) expect(css, name).toContain(name);
     expect([...(code.tokensCss.match(/--dss-acc-[\w-]+(?=:)/g) ?? [])]).toHaveLength(5);
     for (const m of code.tokensCss.matchAll(/var\((--[\w-]+)\)/g)) expect(tokens, m[1]).toContain(`${m[1]}:`);
+  });
+});
+
+// Gebundener Zustand in den Beispielen: `open` ohne Rückmeldung wäre ein toter Schalter
+const lintReact = (src: string) => (/\bopen=\{/.test(src) && !/onOpenChange=\{/.test(src) ? ['open ohne onOpenChange'] : []);
+const lintSvelte = (src: string) => (/(^|\s)open=\{/.test(src) && !/bind:open=\{/.test(src) ? ['open ohne bind:open'] : []);
+
+describe('Beispiele: gebundener Zustand', () => {
+  it('React: open kommt immer mit onOpenChange, Svelte: mit bind:open', () => {
+    for (const src of [code.react, code.ebenenReact]) expect(lintReact(src)).toEqual([]);
+    for (const src of [code.svelte, code.ebenenSvelte]) expect(lintSvelte(src)).toEqual([]);
+    expect(code.react).toContain('open={tabelleOffen}');
+    expect(code.svelte).toContain('bind:open={tabelleOffen}');
+  });
+  it('das Prüfen erkennt fehlende Rückmeldung', () => {
+    expect(lintReact(code.react.replace('onOpenChange={setTabelleOffen}', ''))).toEqual(['open ohne onOpenChange']);
+    expect(lintSvelte(code.svelte.replace('bind:open={tabelleOffen}', 'open={tabelleOffen}'))).toEqual(['open ohne bind:open']);
   });
 });

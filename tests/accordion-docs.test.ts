@@ -64,3 +64,24 @@ describe('Accordion-Doku: eindeutige Namen je Seite (axe landmark-unique)', () =
     expect(mdx).not.toMatch(/schließt sie nicht von selbst/);
   });
 });
+
+describe('Accordion-Doku: ids der Beispiele', () => {
+  const branches = examples.split(/\{:else if example === |\{#if example === /).slice(1);
+  const idsOf = (text: string) => [...text.matchAll(/\bid="([^"{]+)"/g)].map((m) => m[1]);
+  it('jedes Beispiel der Stories ist ein Zweig der Beispielkomponente', () => expect(branches.length).toBe([...stories.matchAll(/example\('([\w-]+)'\)/g)].length));
+  it('jede id kommt je Beispiel und in der ganzen Datei genau einmal vor (alle Beispiele stehen auf einer Seite)', () => {
+    for (const b of branches) {
+      const ids = idsOf(b);
+      expect(ids.filter((id, i) => ids.indexOf(id) !== i), b.slice(0, 30)).toEqual([]);
+    }
+    const all = idsOf(examples);
+    expect(all.filter((id, i) => all.indexOf(id) !== i)).toEqual([]);
+  });
+  it('jeder Anker-Link zeigt auf eine vorhandene id', () => {
+    const all = new Set(idsOf(examples));
+    for (const m of examples.matchAll(/href="#([^"]+)"/g)) expect(all.has(m[1]), m[1]).toBe(true);
+  });
+  it('die Zustands-Matrix vergibt je Zelle eine eigene id', () => {
+    expect(examples).toMatch(/id=\{`zu-\$\{v\.id\}-\$\{c\}`\}/);
+  });
+});
