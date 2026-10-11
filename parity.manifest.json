@@ -25,6 +25,7 @@
   "PlayerCard": { "svelte": "svelte/PlayerCard.svelte", "react": "react/PlayerCard.tsx", "css": ["dss-pc-row", "dss-pc-card", "dss-pc-hero", "dss-pc-vitals", "dss-tn", "dss-pos"] },
   "TeamCard": { "svelte": "svelte/TeamCard.svelte", "react": "react/TeamCard.tsx", "css": ["dss-team", "dss-team--compact", "dss-team-head", "dss-team-vitals", "dss-team-games", "dss-team-game-row", "dss-team-game-opp", "dss-team-squad", "dss-team-stats", "dss-team-link"] },
   "LeagueCard": { "svelte": "svelte/LeagueCard.svelte", "react": "react/LeagueCard.tsx", "css": ["dss-league", "dss-league--compact", "dss-league-head", "dss-league-title", "dss-league-sub", "dss-league-live", "dss-league-tbl", "dss-league-opt", "dss-league-zone", "dss-league-dots", "dss-league-dot", "dss-league-legend", "dss-league-key", "dss-league-foot", "dss-league-more"] },
+  "Map": { "svelte": "svelte/Map.svelte", "react": "react/Map.tsx", "export": "MapView", "css": ["dss-map", "dss-map-frame", "dss-map-stage", "dss-map-ph", "dss-map-load", "dss-map-canvas", "dss-map-marker", "dss-map-zoom", "dss-map-zoom-btn", "dss-map-attr", "dss-map-status", "dss-map-text", "dss-map-list", "dss-map-item"] },
   "PlayByPlay": { "svelte": "svelte/PlayByPlay.svelte", "react": "react/PlayByPlay.tsx", "css": ["dss-pbp-frame", "dss-pbp-frame--dark", "dss-pbp-event", "dss-pbp-feed", "dss-pbp-score"] },
   "CourtLines": { "svelte": "svelte/CourtLines.svelte", "react": "react/CourtLines.tsx", "css": ["dss-courtbg", "dss-courtbg--absolute", "dss-courtlines"] }
 }

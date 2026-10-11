@@ -35,14 +35,16 @@ svelte/
   PlayerCard.svelte     ← v0.9 · Spielerkarte, optional mit Foto (CSS in css/components.css)
   TeamCard.svelte       ← Mannschaftskarte (CSS in css/components.css)
   LeagueCard.svelte     ← Ligencard: Mini-Tabelle mit Ausschnitt (CSS in css/components.css)
+  Map.svelte            ← Karte mit Leaflet und OpenStreetMap (React: `MapView`; CSS in css/components.css; braucht optional `leaflet`)
   PlayByPlay.svelte     ← v0.9 · Spielverlauf-Feed (CSS in css/components.css)
   CourtLines.svelte     ← v0.9 · Spielfeldlinien-Seitenhintergrund
-react/                  ← v0.9 · React-Fassung aller Svelte-Komponenten (Button, TextInput, Select, Modal, Banner, Card, Tabs, Icon, Checkbox, Table, TopBar, EmptyState, Stepper, AppNav, BottomNav, Breadcrumbs, Skeleton, MatchCard, PlayerCard, TeamCard, LeagueCard, PlayByPlay, CourtLines)
+react/                  ← v0.9 · React-Fassung aller Svelte-Komponenten (Button, TextInput, Select, Modal, Banner, Card, Tabs, Icon, Checkbox, Table, TopBar, EmptyState, Stepper, AppNav, BottomNav, Breadcrumbs, Skeleton, MatchCard, PlayerCard, TeamCard, LeagueCard, MapView, PlayByPlay, CourtLines)
 js/
   appnav.js             ← v0.8 · Vanilla-Verhalten der AppNav
   accordion.js          ← Accordion: reine Funktionen und `initAccordion` für Vanilla (Button-Weg und natives details)
   periods.js            ← Spielabschnitte: „3. Viertel“, „5. Achtel“, „Verlängerung“ (`./periods.js`)
   team.js               ← Hilfsfunktionen der TeamCard (`./team.js`)
+  map.js                ← Karte: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord` (`./map.js`); `map-leaflet.js` ist intern
   league.js             ← Ausschnitt, Untertitel, Form und Zonen der LeagueCard (`./league.js`)
   heading.js            ← Überschriftenebenen: `headingTag`, `nextLevel` (`./heading.js`)
 icons/
@@ -359,6 +361,8 @@ Zuordnung Turnier-Manager: `Game` wird zu `ScheduleGame` mit `nr: '#' + gameNumb
 - **`TeamCard`**: Mannschaft mit Logo, Liga, Bilanz, Tabellenplatz, nächstem und letztem Spiel, Kader und optionaler Saison-Statistik (`stats`: nur übergebene Felder). Alles außer `name` ist optional; `size="compact"` ist die Listenzeile; mit `href` oder `onclick` ist die Karte klickbar.
 - **`LeagueCard`** (Ligencard): Mini-Tabelle einer Liga in einer Karte mit Titel, Untertitel („12 Teams · 66 von 132 Spielen gespielt“), `#`, `Mannschaft`, `SP`, `PKT` und einem Link zur kompletten Tabelle. Sie zeigt nur einen **Ausschnitt**: mit einer eigenen Mannschaft (`own: true`) zwei Teams davor, die eigene und eins dahinter, sonst die ersten `limit` (Standard 3). `columns` schaltet `won`, `lost`, `diff` (Korbdifferenz) und `form` zu (bis 640 px aus); `zone` (`up`, `playoff`, `down`) markiert Auf- und Abstieg mit Streifen, Text und Legende; `live` zeigt „Live“ (mit Zahl „2 Spiele laufen“); `logos` und `names="short"` wie im Spielplan; `size="compact"` für Seitenleisten; `titleAs` wählt die Überschriftenebene. Die Regeln liegen als reine Funktionen in `league.js`.
 
+- **`MapView`** (Svelte: `svelte/Map`): **Karte** mit [Leaflet](https://leafletjs.com) und OpenStreetMap-Kacheln für einen oder mehrere Orte (`markers`: `id`, `lat`, `lng`, `label`, `href?`, `number?`, `own?`). Standard ist die **Zwei-Klick-Lösung**: erst ein Platzhalter mit Hinweis und „Karte laden“ (kein Netzverkehr, Leaflet wird nicht geladen), `load="auto"` lädt sofort. `tileUrl` setzt einen **eigenen Kachel-Proxy** (`/tiles/{z}/{x}/{y}.png`); der Standard `tile.openstreetmap.org` ist für Demo und Entwicklung. Die **Textalternative** (nummerierte Liste mit Koordinaten, Links „In OpenStreetMap öffnen“, „In Karten-App öffnen“ (`geo:`), „Route planen“) ist immer da; die **Quellenangabe** „© OpenStreetMap-Mitwirkende“ lässt sich nicht ausblenden. Zoom-Schaltflächen, Tastatur, Fehlerfall, Dunkelmodus (Kacheln abgedunkelt), Druck (nur die Liste) und „Bewegung reduzieren“ sind eingebaut. **Leaflet ist eine optionale Peer-Abhängigkeit** (BSD-2-Clause): `npm install leaflet` und `leaflet/dist/leaflet.css` in der App laden; die Komponente lädt Leaflet erst bei Bedarf per `import('leaflet')`. Die reinen Funktionen liegen in `map.js`; die Doku enthält Rezepte für einen Kachel-Proxy (nginx, SvelteKit-Endpunkt) und die Pflichten der OSM Tile Usage Policy. Es gibt keinen Serverteil im Paket.
+
 ```tsx
 <TeamCard name="TSV Nordhain 1920" short="Nordhain" league="Bayernliga Süd" record={{ w: 12, l: 3 }} rank={3} rankOf={12} href="/teams/nordhain" />
 <LeagueCard title="Oberliga Nordhain Männer" teams={teams} teamCount={12} played={66} total={132} columns={['diff', 'form']} href="/liga/tabelle" />
@@ -437,7 +441,7 @@ Was drin ist:
 
 - **Introduction** (Startseite): Überblick, Werkzeugleiste, Inhaltsverzeichnis aller Seiten
 - **Foundation:** Colors, Typography, Focus & Hover
-- **Components:** je eine MDX-Seite pro Komponente oder Komponentengruppe (Button, TextInput, Select, Checkbox, Modal, Banner, Card, Card Library, TeamCard, LeagueCard, Tabs, Accordion, Navigation, AppNav, Table, Spielplan, EmptyState, PlayByPlay, Icon, CourtLines) und die Spielwiese zum Spielplan
+- **Components:** je eine MDX-Seite pro Komponente oder Komponentengruppe (Button, TextInput, Select, Checkbox, Modal, Banner, Card, Card Library, TeamCard, LeagueCard, Map, Tabs, Accordion, Navigation, AppNav, Table, Spielplan, EmptyState, PlayByPlay, Icon, CourtLines) und die Spielwiese zum Spielplan
 
 Die Werkzeugleiste schaltet **Marke** (BBV/DBB), **Schrift**, Hell/Dunkel, **Fassung** (Vanilla, Svelte oder React für alle
 Code-Beispiele) und **Zustand** (erzwingt Hover, Fokus oder Aktiv auf den Vorschauen der Seite) um.
