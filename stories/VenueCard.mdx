@@ -1,0 +1,184 @@
+import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as VenueCardStories from './VenueCard.stories';
+import { DosDonts } from './docs/blocks/DosDonts';
+import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { CodeBlock } from './docs/blocks/CodeBlock';
+import { DocTable } from './docs/blocks/DocTable';
+import './docs/blocks/blocks.css';
+import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs } from './VenueCard.code';
+
+<Meta of={VenueCardStories} />
+
+# VenueCard (Hallenkarte)
+
+Die **Hallenkarte** zeigt eine Halle auf einen Blick: links eine kleine Karte, rechts Name, Adresse, Kurzinfo, Kontakt, die nächsten Spiele in der Halle und den Link zur Hallenseite. Sie baut auf der [Karte (Map)](?path=/docs/components-map--docs) auf und teilt mit dem Spielplan ([Spielplan](?path=/docs/components-spielplan--docs)) das Datenmodell der Spiele (`ScheduleGame`: `heim`, `gast`, `date`, `time`, `league`, `field`).
+
+Alle Hallen, Adressen, Rufnummern, E-Mail-Adressen und Koordinaten auf dieser Seite sind **Demo-Daten**: erfundene Hallen in einem Waldgebiet, Rufnummern aus dem Bereich für Fiktion, Adressen unter `example.org`. Die geladenen Karten zeigen ein lokales Gitterbild als Kachel; die Doku ruft keine Kacheln von OpenStreetMap ab.
+
+## Aufbau
+
+Nur `name` ist Pflicht; was fehlt, erscheint nicht (kein leerer Rahmen, kein Strich als Platzhalter).
+
+- **Karte** (links, wenn `lat` und `lng` gültig sind): die Map, nicht interaktiv (`interactive={false}`), als benannte Region „Karte: Name der Halle“. Darunter die Links „Größere Karte“ und „Route planen“.
+- **Name:** Überschrift (`h3`, mit `titleAs` oder `HeadingLevel` wählbar), Größe über die Kartentitel-Tokens.
+- **Adresse:** `address` (`street`, `zip`, `city`) als `<address>` in höchstens zwei Zeilen.
+- **Kurzinfo:** `info` als Absatz.
+- **Kontakt:** `contact` (`name`, `phone?`, `email?`) als Definitionsliste; Telefon und E-Mail sind `tel:`- und `mailto:`-Links, wenn sie gültig sind.
+- **Nächste Spiele:** `games` als Liste, höchstens zwei (`limit`, bis fünf), im Stil der Spielkarte.
+- **Link zur Hallenseite:** `href` und `linkLabel`.
+
+<Canvas of={VenueCardStories.Aufbau} />
+
+Die kleinste Karte braucht nur `name`. Mit Koordinaten kommt die Karte dazu, mit Adresse der Text:
+
+<Canvas of={VenueCardStories.Minimal} />
+
+## Karte und Datenschutz
+
+Die Karte lädt in der Standardeinstellung **erst nach einem Klick** auf „Karte laden“: Bis dahin gibt es keinen Netzverkehr zum Kartendienst. Warum, was der Kartendienst sieht und wie ein eigener Kachel-Proxy aussieht, steht auf der Seite [Map](?path=/docs/components-map--docs), Abschnitt „Datenschutz und Kachelserver“. Die Hallenkarte reicht `load`, `tileUrl`, `privacyNote` und `mapHeight` an die Karte weiter. `load="auto"` ist richtig, wenn die App eine Einwilligung hat oder einen eigenen Proxy nutzt.
+
+<Canvas of={VenueCardStories.Geladen} />
+
+**Ohne Koordinaten gibt es keine Karte**: die Daten nehmen dann die ganze Breite.
+
+<Canvas of={VenueCardStories.OhneKarte} />
+
+### Adresse und Textalternative
+
+Die Adresse steht als Text rechts (`<address>`); die Karte ergänzt sie und **wiederholt sie nicht**: der Platzhalter zeigt nur Pin, Hinweis und Schaltfläche. Für Hilfstechnik hat die Karte ihre versteckte Liste mit Hallenname und Koordinaten; ihr Name „Karte: Name der Halle“ ist je Halle verschieden (axe `landmark-unique`). Die Links „Größere Karte“ und „Route planen“ tragen den Hallennamen als versteckte Ergänzung.
+
+## Kontakt
+
+Telefon und E-Mail werden nur zu Links, wenn sie sicher sind. Die Rufnummer darf Ziffern, Leerzeichen und `+ ( ) . / -` enthalten (mindestens drei Ziffern, Plus nur am Anfang); die E-Mail-Adresse muss die einfache Form `name@domain.tld` haben, ohne Parameter (`?`, `&`) und Trenner. Alles andere bleibt **Text ohne Link**, damit kein Link entsteht, der etwas anderes tut als angezeigt.
+
+<Canvas of={VenueCardStories.Kontakt} />
+
+## Nächste Spiele
+
+`games` nimmt `ScheduleGame`-Einträge mit `heim` und `gast`. Gezeigt werden die ersten **zwei** in der Reihenfolge der Eingabe (`limit` ändert die Zahl, höchstens fünf; ungültige Werte gelten als 2). **Beendete** und **spielfreie** Einträge entfallen, ebenso Einträge ohne Mannschaft; **Live**, **Abgesagt** und **Verschoben** erscheinen mit Text-Chip. Jede Zeile zeigt Datum und Uhrzeit, Liga und Feld, darunter die Mannschaften mit Trikotpunkt (der Punkt hat einen Rand, damit er auch im Dunkelmodus sichtbar bleibt; „Heim“ und „Gast“ stehen versteckt im Text). `names` und `logos` wirken wie bei Spielplan und Karten: Kurznamen bis 640 px automatisch, Logos dekorativ, Initialen ohne Logo. `gamesLabel` (Standard „Nächste Spiele in der Halle“) beschriftet Block und Liste.
+
+<Canvas of={VenueCardStories.Spiele} />
+
+## Größen
+
+`size="compact"` macht die Karte kleiner (Spalte etwa 30 % statt 40 %, kleinerer Titel, engere Ränder) und lässt die Spiele weg. Die Karte ist mindestens 224 px breit (der Kartenrahmen mindestens 206 px, damit die Quellenangabe in einer Zeile bleibt), wächst mit der Höhe der Daten und ist mindestens `mapHeight` hoch (Standard 250 px).
+
+<Canvas of={VenueCardStories.Compact} />
+
+### Messwerte
+
+Gemessen im Browser (Chromium, BBV).
+
+<DocTable
+  label="Maße der Hallenkarte (gemessen im Browser)"
+  head={['Maß', 'standard', 'compact']}
+  rows={[
+    ['Kartenspalte bei 860 px Kartenbreite', '343 px (40 %), Rahmen 327 px', '224 px (Mindestbreite; 30 % wären 210 px), Rahmen 212 px'],
+    ['Karte schmal (Karte bis 640 px breit)', 'Rahmen 354 × 226 px bei 380 px Kartenbreite (16:9, mindestens 224 px hoch)', 'wie standard'],
+    ['Titel', '20 px, Gewicht 700 (Token --dss-card-title-size, Rückfall fs-h3)', '18 px (Rückfall fs-body-lg)'],
+    ['Radius der Karte', '16 px', '12 px'],
+    ['Link zur Hallenseite', '48 px hoch', '44 px hoch'],
+    ['Links unter der Karte', '44 px hoch', '44 px hoch'],
+    ['Kontaktlinks', '32 px hoch (schmal 44 px)', '32 px hoch (schmal 44 px)'],
+    ['Spielkarte mit Logos', 'etwa 108 px hoch', 'entfällt'],
+  ]}
+/>
+
+## Handy · 390 px Breite
+
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel. Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">VenueCard · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard hell">
+      <iframe title="Handy-Vorschau: Hallenkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-venuecard--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">VenueCard · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard dunkel">
+      <iframe title="Handy-Vorschau: Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--handy" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Dunkelmodus
+
+Alle Flächen und Texte laufen über die semantischen Tokens; die Karte braucht keinen eigenen Dunkelmodus. Text hat mindestens 7:1, Trikotpunkt-Rand und Rahmen mindestens 3:1, in beiden Marken (BBV, DBB) und in beiden Modi (Tests). Die Kacheln der Karte werden im Dunkelmodus abgedunkelt (siehe Map).
+
+## Zustände: Link-Hover und Fokus
+
+Die Karte selbst ist nicht klickbar, die Links in ihr sind es: Größere Karte, Route planen, Telefon, E-Mail und der Link zur Hallenseite. Bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring um den Link. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Die Schaltflächen der Karte (Karte laden, Zoom) stehen auf der Seite Map.
+
+<Canvas of={VenueCardStories.Zustaende} />
+
+## Barrierefreiheit
+
+Der Name ist eine Überschrift, die Adresse ein `<address>`, der Kontakt eine Definitionsliste mit sprechenden Links, die Spiele eine benannte Liste. Die Karte ist eine benannte Region mit Textalternative; ihr Name enthält den Hallennamen, mehrere Karten auf einer Seite sind unterscheidbar. Zustände (Live, Abgesagt, Verschoben) und „Heim“/„Gast“ haben immer Text, nie nur Farbe. Kontraste mindestens 7:1, Fokus-Ringe gestrichelt. Die Links tragen den Hallennamen als versteckte Ergänzung. Druck: statt der Karte nur die Daten und die Liste mit Koordinaten.
+
+## Überschriftenebene
+
+Die Hallenkarte gibt nie eine `h1` aus. Ohne weitere Angabe ist der Name eine `h3`. Rangfolge: `titleAs` vor `HeadingLevel` vor `h3`. Die Größe hängt am Token `--dss-card-title-size`. Mehr dazu auf der Seite [Überschriften](?path=/docs/foundation-headings--docs).
+
+<FrameworkCode label="Ebene der Überschrift" svelte={ebeneSvelte} react={ebeneReact} />
+
+## Verwendung: Import und Props
+
+Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; die Funktionen kommen aus `@bbv/dss-design-system/venue.js`. Die App lädt zusätzlich `leaflet/dist/leaflet.css` (siehe Map). **Vanilla:** Eine Karte ohne Framework gibt es nicht; das Beispiel zeigt das Markup mit dem Platzhalter der Karte, Leaflet lädst du selbst nach.
+
+<FrameworkCode label="VenueCard" vanilla={vanilla} svelte={svelte} react={react} />
+
+<CodeBlock label="Funktionen aus venue.js" language="JavaScript" code={funktionenJs} />
+
+Die Spielwiese zeigt die echte Komponente mit der erfundenen Sporthalle Nordhain; `gameCount` ist nur eine Hilfe der Spielwiese, `tileUrl` `demo` lädt das lokale Bild.
+
+<Controls of={VenueCardStories.Spielwiese} />
+
+### Datenmodell
+
+<DocTable
+  label="Felder der Hallenkarte"
+  head={['Feld', 'Typ', 'Beschreibung']}
+  rows={[
+    ['address', '{ street?, zip?, city? }', 'Adresse; erscheint als address in höchstens zwei Zeilen („Straße“, „PLZ Ort“); leere Teile entfallen.'],
+    ['contact', '{ name, phone?, email? }', 'Ansprechperson. Telefon und E-Mail werden nur bei gültiger Form zu tel:- und mailto:-Links, sonst Text.'],
+    ['games', 'ScheduleGame[]', 'Spiele mit heim und gast; ohne beendete und spielfreie, höchstens limit.'],
+    ['lat, lng', 'number', 'Koordinaten; nur beide gültig ergeben die Karte.'],
+  ]}
+/>
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Adresse immer als Text',
+      doText: 'Die Adresse steht als Text neben der Karte; wer die Karte nicht laden mag oder nicht sehen kann, findet die Halle trotzdem.',
+      dontText: 'Nur Name und Karte: ohne Adresse im Text hilft der Platzhalter niemandem, die Halle zu finden.',
+      good: <Story of={VenueCardStories.DoAdresse} inline />,
+      bad: <Story of={VenueCardStories.DontAdresse} inline />,
+    },
+    {
+      title: 'Wenige Spiele',
+      doText: 'Die Karte zeigt die nächsten zwei Spiele; der Link führt zur Hallenseite mit der ganzen Belegung.',
+      dontText: 'Mit `limit={5}` wird aus der Hallenkarte ein Spielplan, der den Platz sprengt. Den ganzen Plan zeigen Tabelle und Spielplan.',
+      good: <Story of={VenueCardStories.DoSpiele} inline />,
+      bad: <Story of={VenueCardStories.DontSpiele} inline />,
+    },
+    {
+      title: 'Kontakt nur als gültiger Link',
+      doText: 'Rufnummer und E-Mail-Adresse in einfacher Form werden zu `tel:`- und `mailto:`-Links, die auf dem Handy direkt anrufen und schreiben.',
+      dontText: 'Zusätze („Mo bis Fr, vormittags“) und Schreibweisen wie „(at)“ ergeben keinen Link. Die Zusätze gehören in `info`, die Angabe selbst in einfacher Form in `contact`.',
+      good: <Story of={VenueCardStories.DoKontakt} inline />,
+      bad: <Story of={VenueCardStories.DontKontakt} inline />,
+    },
+    {
+      title: 'Karte erst nach Einwilligung oder über eigenen Proxy',
+      doText: 'Standard ist der Platzhalter: Kacheln erst nach „Karte laden“.',
+      dontText: '`load="auto"` ohne Einwilligung und ohne eigenen Proxy gibt die IP-Adresse der Besucher ungefragt an den Kartendienst. Die Doku nutzt hier ein lokales Bild, damit kein Netzverkehr entsteht.',
+      good: <Story of={VenueCardStories.DoDatenschutz} inline />,
+      bad: <Story of={VenueCardStories.DontDatenschutz} inline />,
+    },
+  ]}
+/>

@@ -416,7 +416,7 @@ describe('Beispiele der Doku-Seite', () => {
   });
   it('Einführung, storySort, README und CHANGELOG nennen die Karte', () => {
     expect(read('stories/Introduction.mdx')).toContain('components-map--docs');
-    expect(read('.storybook/preview.ts')).toMatch(/'LeagueCard', 'Map', 'Tabs'/);
+    expect(read('.storybook/preview.ts')).toMatch(/'LeagueCard', 'Map', 'VenueCard', 'Tabs'/);
     expect(read('README.md')).toContain('MapView');
     expect(read('README.md')).toContain('leaflet/dist/leaflet.css');
     expect(read('CHANGELOG.md')).toContain('**`Map` (Karte)**');
