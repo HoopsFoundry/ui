@@ -48,8 +48,8 @@
     { id: 't9', state: 'scheduled', nr: '#9', section: 'Halbfinale', time: '11:00–11:20', field: 'F1', venue: 'Halle 1', heim: { name: 'Erster Gruppe A', placeholder: true }, gast: { name: 'Zweiter Gruppe B', placeholder: true } },
   ];
 
-  // Einklappbare Beispiele: die Liga-Unterzeile ohne Link (ein 14-px-Link in der Unterzeile hat eine kleine Zielfläche, siehe „Layout versus“)
-  const ligaKompakt: ScheduleGame[] = liga.map((g) => ({ ...g, league: g.league ? { name: g.league.name } : undefined }));
+  // Einklappbare Beispiele: die Liga-Unterzeile ohne Link (kleine Linkflächen in der Zeile gibt es schon im Beispiel „Layout versus“)
+  const ligaKompakt: ScheduleGame[] = liga.map((g) => ({ ...g, league: g.league ? { name: g.league.name } : undefined, venue: undefined, heim: g.heim && { ...g.heim, href: undefined }, gast: g.gast && { ...g.gast, href: undefined } }));
 
   // 03 · Raster
   const raster: ScheduleGame[] = [
