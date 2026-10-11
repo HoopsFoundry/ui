@@ -66,7 +66,7 @@ Eine Konfiguration, die Kacheln unter `/tiles/` ausliefert und zwischenspeichert
 
 <CodeBlock label="nginx: Kachel-Proxy mit Zwischenspeicher" language="nginx" code={nginxConf} />
 
-**Nicht ausgeführt: bitte vor Gebrauch testen.** Auf dem Rechner, auf dem diese Doku entstand, war kein nginx installiert; die Syntax wurde gegen die nginx-Dokumentation geprüft, aber nicht mit `nginx -t` ausgeführt. Prüfe die Datei auf dem Zielserver mit `nginx -t`, bevor du sie lädst. Wichtig dabei: `proxy_pass` hat bewusst **keinen** URI-Teil (kein Schrägstrich am Ende), weil nginx ihn in einem Regex-`location` nicht erlaubt; der Pfad wird stattdessen mit `rewrite … break` umgeschrieben. `proxy_ssl_server_name on` ist nötig, damit der Kartendienst das richtige Zertifikat ausliefert (SNI).
+**Geprüft mit `nginx -t`** (Docker-Image `nginx:stable`, Konfiguration ohne Fehler geladen); ausgeliefert wurde damit nichts. Der Test im Repository prüft nur Aufbau und Pfadmuster, nicht die Syntax. Prüfe die Datei auf dem Zielserver trotzdem mit `nginx -t`, bevor du sie lädst: Pfade, Zertifikate und der Kontext (`http`, `server`) sind deine. Das Pfadmuster begrenzt Zoom auf 0 bis 19 und x, y auf höchstens sieben Ziffern; ob x und y im Bereich von `2^z` liegen, entscheidet der Kartendienst (404). Wichtig dabei: `proxy_pass` hat bewusst **keinen** URI-Teil (kein Schrägstrich am Ende), weil nginx ihn in einem Regex-`location` nicht erlaubt; der Pfad wird stattdessen mit `rewrite … break` umgeschrieben. `proxy_ssl_server_name on` ist nötig, damit der Kartendienst das richtige Zertifikat ausliefert (SNI).
 
 ### Rezept: Node-Endpunkt (SvelteKit)
 
@@ -159,11 +159,12 @@ Schlägt das Laden fehl, bleibt die Seite benutzbar: statt der Karte steht der H
     ['`tileUrl` ungültig (kein `{z}`, `{x}`, `{y}`, `http:` außer `localhost`, `//host`, Sonderzeichen)', 'tile-url', 'Fehlerhinweis sofort, ohne Klick; Leaflet wird nie geladen; in der Entwicklung eine Warnung in der Konsole.'],
     ['Leaflet fehlt oder lässt sich nicht laden (nicht installiert, Chunk nicht erreichbar)', 'import', 'Fehlerhinweis; Warnung in der Entwicklung.'],
     ['Aufbau der Karte schlägt fehl', 'init', 'Fehlerhinweis.'],
-    ['Alle sichtbaren Kacheln blockiert (Proxy aus, Netz weg, Content-Security-Policy)', 'tiles', 'Fehlerhinweis, die Karte wird abgebaut. Einzelne fehlende Kacheln führen nicht dazu.'],
+    ['Aktualisierung (Marker, Ausschnitt) wirft einen Fehler', 'update', 'Fehlerhinweis statt eines Absturzes der Seite.'],
+    ['Die ersten sichtbaren Kacheln alle blockiert (Proxy aus, Netz weg, Content-Security-Policy)', 'tiles', 'Fehlerhinweis, die Karte wird abgebaut. Einzelne fehlende Kacheln und Fehler nach der ersten geladenen Kachel führen nicht dazu.'],
   ]}
 />
 
-Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es erneut.
+Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es erneut. Es gibt **keine Schaltfläche „Erneut versuchen“**; wer eine braucht, baut sie in der App (zum Beispiel `{#key}` bzw. ein neues `key` an der Karte). Der Fehlerzustand tritt nur ein, **solange noch nie eine Kachel ankam**: eine laufende Karte bleibt auch bei späteren Kachelfehlern (404, 429) stehen und zeigt die fehlenden Kacheln als Lücken. `load` wird **nur beim Start gelesen**: ein späterer Wechsel von `click` auf `auto` löst nichts aus.
 
 <Canvas of={MapStories.Fehler} />
 
@@ -255,10 +256,10 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
   label="Felder eines Markers der Karte"
   head={['Feld', 'Typ', 'Beschreibung']}
   rows={[
-    ['id', 'string', 'Eindeutige Kennung; damit erkennt die Karte beim Aktualisieren, welcher Marker neu, geändert oder weg ist (kein Neuaufbau der Karte). Pflicht.'],
+    ['id', 'string', 'Eindeutige Kennung; damit erkennt die Karte beim Aktualisieren, welcher Marker neu, geändert oder weg ist (kein Neuaufbau der Karte). Pflicht. Doppelte oder fehlende ids macht die Karte eindeutig (`marker-<Index>`, `<id>-2`); die erste ausdrückliche id behält ihren Wert.'],
     ['lat, lng', 'number', 'Breite (−90 bis 90) und Länge (−180 bis 180) in Grad. Pflicht.'],
     ['label', 'string', 'Name des Orts: Titel und Name des Markers, Eintrag der Liste, Bezeichnung in den Links. Pflicht.'],
-    ['href', 'string', 'Ziel bei Klick und Enter am Marker; in der Liste ist der Name ein Link.'],
+    ['href', 'string', 'Ziel bei Klick und Enter am Marker; in der Liste ist der Name ein Link. Erlaubt sind `http:`, `https:`, `mailto:`, `tel:`, Pfade und `#`-Ziele; alles andere (`javascript:`, `data:`, `vbscript:`, Leerraum davor) wird verworfen (`safeHref`).'],
     ['number', 'number', 'Angezeigte Nummer. Ohne Angabe zählt die Karte bei mehreren Markern von 1 an; ein einzelner Marker zeigt einen Punkt.'],
     ['own', 'boolean', 'Eigener Ort: Marker in Gold, in der Liste „Eigener Ort“.'],
   ]}
@@ -266,7 +267,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
 
 ### Reine Funktionen: `map.js`
 
-Die Logik der Karte steckt in reinen Funktionen (`@bbv/dss-design-system/map.js`, mit Typen), die auch für eigene Darstellungen taugen: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord`. Die Aufrufe im Beispiel werden in den Tests ausgewertet und liefern die kommentierten Werte.
+Die Logik der Karte steckt in reinen Funktionen (`@bbv/dss-design-system/map.js`, mit Typen), die auch für eigene Darstellungen taugen: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord` (dazu `safeHref` für Marker-Ziele). Die Aufrufe im Beispiel werden in den Tests ausgewertet und liefern die kommentierten Werte.
 
 <CodeBlock label="Funktionen aus map.js" language="JavaScript" code={funktionenJs} />
 

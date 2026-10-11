@@ -63,7 +63,7 @@
     dimInDark?: boolean;
     /** Die Karte ist bereit; Argument ist die Leaflet-Karte. */
     onload?: (map: unknown) => void;
-    /** Laden fehlgeschlagen: `tile-url`, `import`, `init` oder `tiles`. */
+    /** Laden fehlgeschlagen: `tile-url`, `import`, `init`, `update` oder `tiles`. */
     onerror?: (reason: string) => void;
     onmarkerclick?: (marker: unknown) => void;
     class?: string;

@@ -208,6 +208,42 @@ describe.each(drivers)('Karte · $name', (driver) => {
       expect(spy).toHaveBeenCalledTimes(2);
       expect(spy.mock.calls[0][0]).toMatchObject({ id: 'b', href: '/hallen/sued' });
     });
+    it('Marker mit javascript:-Ziel: Enter und Klick melden den Marker, öffnen aber nichts; kein Link in der Liste', async () => {
+      const spy = vi.fn();
+      const evil = { ...B, href: 'javascript:window.__pwned = 1' };
+      (window as unknown as { __pwned?: number }).__pwned = 0;
+      const m = open(driver, { markers: [A, evil], load: 'auto', ...(driver.name === 'Svelte' ? { onmarkerclick: spy } : { onMarkerClick: spy }) });
+      await vi.waitFor(() => expect(state.markers).toHaveLength(2));
+      expect(qa(m, '.dss-map-name a')).toHaveLength(0);
+      expect(m.root.innerHTML).not.toMatch(/javascript:/i);
+      await m.act(() => state.markers[1].fire('keypress', { originalEvent: { keyCode: 13, preventDefault() {} } }));
+      await m.act(() => state.markers[1].fire('click'));
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy.mock.calls[0][0].href).toBeUndefined();
+      expect((window as unknown as { __pwned?: number }).__pwned).toBe(0);
+    });
+    it('Marker mit #-Ziel: Enter öffnet es', async () => {
+      window.location.hash = '';
+      const m = open(driver, { markers: [{ ...B, href: '#zielhalle' }], load: 'auto' });
+      await vi.waitFor(() => expect(state.markers).toHaveLength(1));
+      await m.act(() => state.markers[0].fire('keypress', { originalEvent: { keyCode: 13, preventDefault() {} } }));
+      expect(window.location.hash).toBe('#zielhalle');
+      expect(qa(m, '.dss-map-name a').map((a) => a.getAttribute('href'))).toEqual(['#zielhalle']);
+    });
+    it('Listenlinks: unsichere Ziele (auch mit Leerraum und Großschreibung) erscheinen nie als href', async () => {
+      const m = open(driver, { markers: [{ ...A, href: ' JavaScript:alert(1)' }, { ...B, id: 'b', href: 'data:text/html,x' }, { ...C, id: 'c', href: 'vbscript:x' }] });
+      expect(qa(m, 'a').filter((a) => /^\s*(javascript|data|vbscript):/i.test(a.getAttribute('href') ?? ''))).toHaveLength(0);
+      expect(qa(m, '.dss-map-name a')).toHaveLength(0);
+    });
+    it('doppelte und fehlende Marker-ids: kein Absturz, alle Marker erscheinen in Liste und Karte', async () => {
+      const dup = [{ ...A, id: 'x' }, { ...B, id: 'x' }, { ...C, id: undefined as never }, { ...C, id: 'marker-2', label: 'Vierte Halle' }];
+      const m = open(driver, { markers: dup, load: 'auto' });
+      await vi.waitFor(() => expect(state.markers).toHaveLength(4));
+      expect(qa(m, '.dss-map-item')).toHaveLength(4);
+      expect(qa(m, '.dss-map-name').map((n) => n.textContent?.replace('Eigener Ort', '').trim())).toEqual(['Sporthalle Nordhain', 'Halle Süd & West', 'Gymnasium Lindenberg', 'Vierte Halle']);
+      await m.set({ markers: dup.slice(0, 3) });
+      expect(state.markers.filter((x) => !x.isRemoved)).toHaveLength(3);
+    });
     it('Klick am Marker meldet ihn', async () => {
       const spy = vi.fn();
       const m = open(driver, { markers: [A], load: 'auto', ...(driver.name === 'Svelte' ? { onmarkerclick: spy } : { onMarkerClick: spy }) });
@@ -333,6 +369,27 @@ describe.each(drivers)('Karte · $name', (driver) => {
       expect(spy).toHaveBeenCalledWith('tiles');
       expect(state.removed).toBe(1);
       expect(q(m, '.dss-map-zoom')).toBeNull();
+    });
+    it('eine laufende Karte kippt bei späteren Kachelfehlern (404, 429) nicht in den Fehlerzustand', async () => {
+      const m = open(driver, { load: 'auto' });
+      await vi.waitFor(() => expect(state.layers).toHaveLength(1));
+      await m.act(() => finishTiles(lastLayer(), 'ok'));
+      await m.act(() => finishTiles(lastLayer(), 'fail'));
+      await m.act(() => finishTiles(lastLayer(), 'fail'));
+      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('ready');
+      expect(state.removed).toBe(0);
+    });
+    it('Fehler in der Aktualisierung: Fehlerhinweis mit Grund update statt Absturz', async () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const spy = vi.fn();
+      const m = open(driver, { load: 'auto', ...(driver.name === 'Svelte' ? { onerror: spy } : { onError: spy }) });
+      await vi.waitFor(() => expect(state.maps).toHaveLength(1));
+      await m.settle();
+      state.throwOnView = true;
+      await m.set({ zoom: 12 });
+      expect(spy).toHaveBeenCalledWith('update');
+      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(state.removed).toBe(1);
     });
     it('einzelne Kachelfehler führen nicht zum Fehlerzustand', async () => {
       const m = open(driver, { load: 'auto' });

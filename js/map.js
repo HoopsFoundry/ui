@@ -86,18 +86,42 @@ export function formatCoords(lat, lng) {
  * ebenso andere Platzhalter, Leerzeichen, Anführungszeichen, spitze Klammern und Zugangsdaten in der Adresse.
  */
 export function validTileUrl(url) {
-  if (typeof url !== 'string' || !url) return false;
-  if (/[\s"'<>\\`]/.test(url)) return false;
+  if (typeof url !== 'string' || !url || url.length > 2048) return false;
+  if (/[\u0000-\u001f\u007f-\u009f\s"'<>\\`]/.test(url)) return false;
   for (const key of ['{z}', '{x}', '{y}']) if (!url.includes(key)) return false;
   const rest = url.replace(/\{[zxysr]\}/g, '');
   if (/[{}]/.test(rest)) return false;
   if (url.startsWith('/')) return !url.startsWith('//');
-  const m = url.match(/^(https?):\/\/([^/?#]*)([/?#].*)?$/);
+  const m = url.match(/^(https?):\/\/([^/?#]*)([/?#].*)?$/i);
   if (!m) return false;
-  const [, scheme, authority] = m;
-  if (!authority || authority.includes('@')) return false;
+  const scheme = m[1].toLowerCase();
+  // Nur {s} darf im Host stehen ({z}, {x}, {y} nicht); Host aus Buchstaben, Ziffern, Punkt und Bindestrich, optional :Port (1 bis 65535)
+  const host = m[2].replace(/\{s\}/g, 'a');
+  const parts = host.match(/^([A-Za-z0-9.-]+)(?::(\d{1,5}))?$/);
+  if (!parts) return false;
+  if (parts[2] !== undefined && (Number(parts[2]) < 1 || Number(parts[2]) > 65535)) return false;
   if (scheme === 'https') return true;
-  return /^localhost(:\d{1,5})?$/.test(authority);
+  return parts[1].toLowerCase() === 'localhost';
+}
+
+/**
+ * Prüft ein Ziel (`href`) eines Markers: erlaubt sind `http:`, `https:`, `mailto:`, `tel:` (Schema in beliebiger Schreibweise), Pfade
+ * (`/…`, `./…`, `../…`, `ort/seite`, `?…`) und `#`-Ziele. Alles mit anderem Schema (`javascript:`, `data:`, `vbscript:` …) und alles mit
+ * Steuerzeichen oder Leerraum am Anfang ergibt `undefined`. Steuerzeichen und Leerzeichen innerhalb entfernen Browser vor der Auswertung
+ * des Schemas, deshalb zählt die Funktion sie vorher mit.
+ */
+export function safeHref(href) {
+  if (typeof href !== 'string' || !href) return undefined;
+  if (/^[\u0000-\u0020\u007f-\u00a0\u1680\u2000-\u200f\u2028\u2029\u202f\u205f\u3000\ufeff]/.test(href)) return undefined;
+  // so, wie der Browser das Schema liest: Tabulator und Zeilenumbrüche fallen weg
+  const flat = href.replace(/[\u0000-\u001f\u007f]/g, '');
+  const scheme = flat.match(/^([A-Za-z][A-Za-z0-9+.-]*):/);
+  if (scheme) return /^(https?|mailto|tel)$/i.test(scheme[1]) ? href : undefined;
+  // „ohne Schema“ heißt: der Teil vor dem ersten / ? # enthält keinen Doppelpunkt (sonst wäre es ein Schema)
+  if (/^[^/?#]*:/.test(flat)) return undefined;
+  // Zeichenverweise (&colon;, &#58;) ergäben in Markup-Kontexten ein Schema: vor dem ersten / ? # nicht zulassen
+  if (/^[^/?#]*&/.test(flat)) return undefined;
+  return href;
 }
 
 /**
@@ -126,12 +150,21 @@ export function boundsOf(markers) {
 }
 
 /**
- * Marker für Liste, Platzhalter und Karte aufbereiten: ungültige Koordinaten fallen weg, Nummer = `number` oder bei mehreren
+ * Marker für Liste, Platzhalter und Karte aufbereiten: ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
  * Markern die laufende Nummer (ein Marker bekommt keine), dazu Koordinatentext und Links (nur die in `appLinks` gewünschten).
  */
 export function mapItems(markers, appLinks = ['osm', 'route']) {
   const valid = (Array.isArray(markers) ? markers : []).filter((m) => m && isCoord(m.lat, m.lng));
   const wants = Array.isArray(appLinks) ? appLinks : [];
+  // Eindeutige ids: ausdrückliche ids behalten ihren Wert (die erste gewinnt), doppelte und fehlende bekommen einen freien Ersatz
+  const explicit = new Set(valid.filter((m) => m.id !== undefined && m.id !== null && m.id !== '').map((m) => String(m.id)));
+  const used = new Set();
+  const unique = (base, isExplicit) => {
+    let id = base;
+    for (let n = 2; used.has(id) || (explicit.has(id) && !(isExplicit && id === base)); n++) id = `${base}-${n}`;
+    used.add(id);
+    return id;
+  };
   return valid.map((m, index) => {
     const label = typeof m.label === 'string' ? m.label : '';
     const all = mapLinks({ lat: m.lat, lng: m.lng, label });
@@ -140,12 +173,13 @@ export function mapItems(markers, appLinks = ['osm', 'route']) {
     if (wants.includes('osm')) links.push({ kind: 'osm', text: mapText.linkOsm, href: all.osm });
     if (wants.includes('route')) links.push({ kind: 'route', text: mapText.linkRoute, href: all.route });
     const given = Number.isInteger(m.number) && m.number >= 0 ? m.number : null;
+    const hasId = m.id !== undefined && m.id !== null && m.id !== '';
     return {
-      id: String(m.id ?? index),
+      id: unique(hasId ? String(m.id) : `marker-${index}`, hasId),
       lat: m.lat,
       lng: m.lng,
       label,
-      href: typeof m.href === 'string' && m.href ? m.href : undefined,
+      href: safeHref(m.href),
       own: m.own === true,
       number: given ?? (valid.length > 1 ? index + 1 : null),
       coords: formatCoords(m.lat, m.lng),

@@ -26,9 +26,11 @@ export const state = {
   removed: 0,
   /** Wird gesetzt, um beim nächsten Aufbau einen Fehler zu werfen */
   throwOnMap: false,
+  /** Wird gesetzt, damit setView und fitBounds (Aktualisierung) werfen */
+  throwOnView: false,
 };
 export const reset = () => {
-  state.maps = []; state.layers = []; state.markers = []; state.removed = 0; state.throwOnMap = false;
+  state.maps = []; state.layers = []; state.markers = []; state.removed = 0; state.throwOnMap = false; state.throwOnView = false;
 };
 
 class Handler {
@@ -65,7 +67,7 @@ export class FakeMap extends Evented {
     this.boxZoom = new Handler(options.boxZoom !== false);
     state.maps.push(this);
   }
-  setView(center: unknown, zoom: number, options?: unknown) { this.zoom = zoom; this.view.push({ center, zoom, options }); this.fire('zoomend'); return this; }
+  setView(center: unknown, zoom: number, options?: unknown) { if (state.throwOnView) throw new Error('setView schlägt fehl'); this.zoom = zoom; this.view.push({ center, zoom, options }); this.fire('zoomend'); return this; }
   fitBounds(bounds: unknown, options?: any) { this.view.push({ bounds, options }); this.zoom = 14; this.fire('zoomend'); return this; }
   getZoom() { return this.zoom; }
   getMinZoom() { return this.options.minZoom; }

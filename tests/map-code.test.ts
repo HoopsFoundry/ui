@@ -258,6 +258,17 @@ describe('Rezept: Kachel-Endpunkt (stories/examples/kachel-endpunkt.ts)', () => 
       vi.unstubAllGlobals();
     }
   });
+  it('GET: bei Fehlern des Kartendienstes wird dessen Antwort verworfen (body.cancel), die Verbindung bleibt nicht hängen', async () => {
+    const endpoint = await load();
+    const cancel = vi.fn(async () => {});
+    vi.stubGlobal('fetch', vi.fn(async () => ({ ok: false, status: 429, body: { cancel }, headers: new Headers() })));
+    try {
+      expect((await endpoint.GET({ params: { path: '3/1/1.png' } })).status).toBe(502);
+      expect(cancel).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.unstubAllGlobals();
+    }
+  });
   it('der Quelltext enthält keine frei wählbare URL: der Host steht fest, fetch hat nur diese eine Aufrufstelle', () => {
     expect(source.match(/fetch\(/g)).toHaveLength(1);
     expect(source).toMatch(/const TILE_HOST = 'https:\/\/tile\.openstreetmap\.org';/);
@@ -273,7 +284,7 @@ describe('Rezept: nginx (stories/examples/nginx-tiles.conf)', () => {
     for (const needle of ['proxy_cache_path', 'proxy_cache_valid', 'proxy_set_header User-Agent', 'proxy_pass https://tile.openstreetmap.org;', 'proxy_ssl_server_name on;', 'proxy_cache osm_tiles;']) {
       expect(conf, needle).toContain(needle);
     }
-    expect(conf).toContain('location ~ ^/tiles/(\\d+)/(\\d+)/(\\d+)\\.png$ {');
+    expect(conf).toContain('location ~ ^/tiles/(\\d|1\\d)/(\\d{1,7})/(\\d{1,7})\\.png$ {');
     // keyzone passt zu proxy_cache_path
     expect(conf).toMatch(/keys_zone=osm_tiles:/);
     expect(conf).toMatch(/limit_req_zone [^;]*zone=tiles:/);
@@ -303,8 +314,8 @@ describe('Rezept: nginx (stories/examples/nginx-tiles.conf)', () => {
   it('das Pfadmuster der location lässt nur Kachelpfade durch (als JavaScript-Muster nachgestellt)', () => {
     const pattern = conf.match(/location ~ (\S+) \{/)![1];
     const re = new RegExp(pattern.replace(/\//g, '\\/').replace(/\\\\/g, '\\'));
-    for (const ok of ['/tiles/5/17/10.png', '/tiles/0/0/0.png', '/tiles/19/524287/1.png']) expect(re.test(ok), ok).toBe(true);
-    for (const bad of ['/tiles/5/17/10.jpg', '/tiles/5/17/10.png/x', '/tiles/../etc/passwd', '/tiles/5/17/10.png?x=1', '/tiles/a/b/c.png', '/tiles/5/17.png', 'https://x/tiles/5/1/1.png', '/other/5/1/1.png', '/tiles/5/1/1.png\n']) {
+    for (const ok of ['/tiles/5/17/10.png', '/tiles/0/0/0.png', '/tiles/19/524287/1.png', '/tiles/10/1/1.png', '/tiles/1/0/9999999.png']) expect(re.test(ok), ok).toBe(true);
+    for (const bad of ['/tiles/5/17/10.jpg', '/tiles/5/17/10.png/x', '/tiles/../etc/passwd', '/tiles/5/17/10.png?x=1', '/tiles/a/b/c.png', '/tiles/5/17.png', 'https://x/tiles/5/1/1.png', '/other/5/1/1.png', '/tiles/5/1/1.png\n', '/tiles/20/1/1.png', '/tiles/25/1/1.png', '/tiles/99/1/1.png', '/tiles/000/1/1.png', '/tiles/5/12345678/1.png', '/tiles/5/1/12345678.png']) {
       expect(re.test(bad), bad).toBe(false);
     }
   });
@@ -314,7 +325,7 @@ describe('Rezept: nginx (stories/examples/nginx-tiles.conf)', () => {
     expect('/tiles/5/17/10.png'.replace(new RegExp(from), to.replace('$1', '$$1'))).toBe('/5/17/10.png');
   });
   it('die Doku nennt: nicht ausgeführt, vor Gebrauch testen', () => {
-    expect(read('stories/Map.mdx')).toContain('**Nicht ausgeführt: bitte vor Gebrauch testen.**');
+    expect(read('stories/Map.mdx')).toContain('**Geprüft mit `nginx -t`**');
     expect(read('stories/Map.mdx')).toContain('`nginx -t`');
   });
 });

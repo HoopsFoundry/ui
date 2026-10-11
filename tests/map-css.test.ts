@@ -20,11 +20,19 @@ describe('Map: CSS-Abschnitt', () => {
     expect(manifest.Map.export).toBe('MapView');
   });
 
-  it('Zoom-Schaltflächen sind 44 px (--touch-sm) breit und hoch', () => {
+  it('Zoom-Schaltflächen sind mindestens 44 px breit und hoch (Zahl aus px oder aus --touch-sm gerechnet)', () => {
     const btn = body('.dss-map-zoom-btn');
-    expect(btn).toMatch(/width:\s*var\(--touch-sm\)/);
-    expect(btn).toMatch(/height:\s*var\(--touch-sm\)/);
-    expect(tokens).toMatch(/--touch-sm:\s*44px/);
+    const px = (value: string) => {
+      const token = value.match(/^var\((--[\w-]+)\)$/);
+      if (token) return px(tokens.match(new RegExp(`${token[1]}:\\s*([^;]+);`))![1].trim());
+      const n = value.match(/^(\d+(?:\.\d+)?)px$/);
+      return n ? Number(n[1]) : NaN;
+    };
+    for (const prop of ['width', 'height']) {
+      const value = btn.match(new RegExp(`(?:^|[;\\s])${prop}:\\s*([^;]+);`))![1].trim();
+      expect(px(value), `${prop}: ${value}`).toBeGreaterThanOrEqual(44);
+    }
+    expect(px('var(--touch-sm)')).toBe(44);
   });
 
   it('Marker haben eine Zielgröße von 44 px Breite (Icon 44 × 46 im Skript)', () => {

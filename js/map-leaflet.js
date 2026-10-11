@@ -6,7 +6,7 @@
  * gehören der Komponente (Markup), Leaflet liefert nur Kacheln, Marker und Gesten. Marker sind Inline-SVG (`L.divIcon`), erzeugt mit
  * DOM-Aufrufen, ohne Leaflets Standardbilder.
  */
-import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, validTileUrl } from './map.js';
+import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, safeHref, validTileUrl } from './map.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const PIN_PATH = 'M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z';
@@ -60,7 +60,7 @@ export function pinElement(item) {
 /**
  * Erzeugt die Karte in `el`. `opts`: markers, appLinks, center, zoom, interactive, tileUrl (alles wie die Props der Komponente).
  * `hooks`: onReady(map), onError(reason), onZoom({ zoom, min, max }), onMarkerClick(item).
- * Gründe für `onError`: 'tile-url' (ungültige Adresse), 'import' (Leaflet fehlt oder lässt sich nicht laden), 'init' (Aufbau der Karte schlägt fehl), 'tiles' (alle sichtbaren Kacheln fehlgeschlagen).
+ * Gründe für `onError`: 'tile-url' (ungültige Adresse), 'import' (Leaflet fehlt oder lässt sich nicht laden), 'init' (Aufbau der Karte schlägt fehl), 'update' (Aktualisierung wirft), 'tiles' (die ersten sichtbaren Kacheln alle fehlgeschlagen; eine Karte, die schon Kacheln zeigte, kippt nicht mehr).
  * Rückgabe: `update(opts)`, `zoomIn()`, `zoomOut()`, `destroy()` (ruft `map.remove()`; auch während des Ladens sicher).
  */
 export function createMapController(el, opts, hooks = {}) {
@@ -76,6 +76,8 @@ export function createMapController(el, opts, hooks = {}) {
   let lastPositions = '';
   let tileOk = 0;
   let tileBad = 0;
+  // Ob je eine Kachel ankam: erst dann ist die Karte „lebendig“, spätere Kachelfehler (404, 429) kippen sie nicht mehr in den Fehlerzustand
+  let everLoaded = false;
 
   const fail = (reason, error) => {
     if (destroyed) return;
@@ -107,7 +109,9 @@ export function createMapController(el, opts, hooks = {}) {
       const next = { marker, sig, item, lat: item.lat, lng: item.lng };
       const activate = () => {
         hooks.onMarkerClick?.(next.item);
-        if (next.item.href) window.location.assign(next.item.href);
+        // mapItems filtert schon; hier gilt dieselbe Regel noch einmal, damit nie ein javascript:-Ziel an location geht
+        const target = safeHref(next.item.href);
+        if (target) window.location.assign(target);
       };
       marker.on('click', activate);
       // Leaflet 1.9 löst bei Tasten keinen Klick aus (nur `keypress`): Enter und Leertaste öffnen wie ein Button
@@ -141,7 +145,7 @@ export function createMapController(el, opts, hooks = {}) {
     const items = mapItems(current.markers, current.appLinks);
     setGestures(current.interactive !== false);
     const url = current.tileUrl ?? DEFAULT_TILE_URL;
-    if (layer && layerUrl !== url) { tileOk = 0; tileBad = 0; layerUrl = url; layer.setUrl(url); }
+    if (layer && layerUrl !== url) { tileOk = 0; tileBad = 0; everLoaded = false; layerUrl = url; layer.setUrl(url); }
     const viewKey = JSON.stringify([current.center ?? null, current.zoom ?? null]);
     const positions = JSON.stringify(items.map((i) => [i.id, i.lat, i.lng]));
     const hasCenter = Array.isArray(current.center);
@@ -174,10 +178,10 @@ export function createMapController(el, opts, hooks = {}) {
       layerUrl = url;
       layer = L.tileLayer(url, { minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, className: 'dss-map-tiles' });
       layer.on('loading', () => { tileOk = 0; tileBad = 0; });
-      layer.on('tileload', () => { tileOk += 1; });
+      layer.on('tileload', () => { tileOk += 1; everLoaded = true; });
       layer.on('tileerror', () => { tileBad += 1; });
       // „load“ kommt, wenn alle sichtbaren Kacheln geladen oder fehlgeschlagen sind: keine einzige geladen heißt blockiert
-      layer.on('load', () => { if (tileOk === 0 && tileBad > 0) fail('tiles'); });
+      layer.on('load', () => { if (!everLoaded && tileOk === 0 && tileBad > 0) fail('tiles'); });
       layer.addTo(map);
       map.on('zoomend', emitZoom);
       apply(true);
@@ -199,7 +203,11 @@ export function createMapController(el, opts, hooks = {}) {
       current = next;
       if (!map || destroyed) return;
       if (!validTileUrl(current.tileUrl ?? DEFAULT_TILE_URL)) return fail('tile-url', current.tileUrl);
-      apply(false);
+      try {
+        apply(false);
+      } catch (error) {
+        fail('update', error);
+      }
     },
     zoomIn() { map?.zoomIn(1, { animate: !reducedMotion() }); },
     zoomOut() { map?.zoomOut(1, { animate: !reducedMotion() }); },

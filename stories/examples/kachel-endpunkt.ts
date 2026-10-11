@@ -1,6 +1,8 @@
 // Beispiel (nicht Teil des Pakets): Kachel-Proxy als SvelteKit-Endpunkt, Datei src/routes/tiles/[...path]/+server.ts.
 // Aufruf aus der Karte: tileUrl="/tiles/{z}/{x}/{y}.png". Der Besucher spricht nur mit diesem Server, OpenStreetMap sieht nur dessen IP.
 // Kein offener Proxy: der Host ist fest, aus der Anfrage werden nur drei Ganzzahlen übernommen; ausgeliefert wird ausschließlich png.
+// Rate-Limit: der Endpunkt begrenzt nichts selbst. Ein Zwischenspeicher davor und eine Begrenzung je Besucher-IP (Reverse-Proxy, CDN, Hook)
+// gehören dazu, sonst reicht der Endpunkt jeden Abruf an den Kartendienst weiter.
 
 /** Fester Kachelserver. Für den Dauerbetrieb einen eigenen Server oder einen EU-Anbieter mit Auftragsverarbeitungsvertrag eintragen. */
 const TILE_HOST = 'https://tile.openstreetmap.org';
@@ -44,7 +46,11 @@ export async function GET({ params }: { params: { path: string } }): Promise<Res
   } catch {
     return new Response('Kartendienst nicht erreichbar', { status: 502 });
   }
-  if (!upstream.ok) return new Response('Kartendienst nicht erreichbar', { status: 502 });
+  if (!upstream.ok) {
+    // Antwort verwerfen, damit die Verbindung frei wird
+    await upstream.body?.cancel();
+    return new Response('Kartendienst nicht erreichbar', { status: 502 });
+  }
 
   return new Response(upstream.body, {
     status: 200,

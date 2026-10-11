@@ -6,7 +6,7 @@ import { createMapController, devWarn } from '../js/map-leaflet.js';
 
 export type { MapAppLink, MapMarker };
 export type MapLoad = 'click' | 'auto';
-export type MapErrorReason = 'tile-url' | 'import' | 'init' | 'tiles';
+export type MapErrorReason = 'tile-url' | 'import' | 'init' | 'update' | 'tiles';
 
 export interface MapViewProps {
   /** Orte auf der Karte: `{ id, lat, lng, label, href?, number?, own? }`. Ungültige Koordinaten werden ignoriert. */

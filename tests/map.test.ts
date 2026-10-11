@@ -1,6 +1,6 @@
 // Reine Funktionen der Karte (js/map.js): Tabellentests mit Randfällen.
 import { describe, expect, it } from 'vitest';
-import { boundsOf, formatCoords, initialView, isCoord, mapItems, mapLinks, placeholderPins, validTileUrl } from '../js/map.js';
+import { boundsOf, formatCoords, initialView, isCoord, mapItems, mapLinks, placeholderPins, safeHref, validTileUrl } from '../js/map.js';
 
 describe('isCoord', () => {
   it.each<[unknown, unknown, boolean]>([
@@ -229,5 +229,72 @@ describe('placeholderPins', () => {
   it('gleiche Breite: y in der Mitte des Bereichs; leere Liste', () => {
     expect(placeholderPins([{ id: 'a', lat: 5, lng: 0, number: 1, own: false }, { id: 'b', lat: 5, lng: 1, number: 2, own: false }]).map((p) => p.y)).toEqual([29, 29]);
     expect(placeholderPins([])).toEqual([]);
+  });
+});
+
+describe('safeHref', () => {
+  it.each([
+    'https://example.org/halle', 'http://example.org', 'HTTPS://EXAMPLE.ORG', 'HtTp://example.org', 'mailto:halle@example.org', 'tel:+4912345', 'TEL:123', 'MAILTO:a@b.de',
+    '/hallen/sued', './sued', '../sued', 'hallen/sued', 'sued', '?seite=2', '#halle-seeberg', '#', '/a:b', 'a/b:c', '?x=javascript:alert(1)', '#javascript:alert(1)',
+  ])('erlaubt: %s', (href) => expect(safeHref(href)).toBe(href));
+  it.each([
+    ['javascript:alert(1)', 'javascript:'], ['JavaScript:alert(1)', 'JavaScript:'], ['JAVASCRIPT:alert(1)', 'groß'], ['jAvAsCrIpT:alert(1)', 'gemischt'],
+    [' javascript:alert(1)', 'Leerzeichen davor'], ['\tjavascript:alert(1)', 'Tabulator davor'], ['\njavascript:alert(1)', 'Zeilenumbruch davor'], ['\u0000javascript:alert(1)', 'NUL davor'],
+    ['\u0001javascript:alert(1)', 'Steuerzeichen davor'], ['\u00a0javascript:alert(1)', 'geschütztes Leerzeichen davor'], ['\u2028javascript:alert(1)', 'Zeilentrenner davor'], ['\ufeffjavascript:alert(1)', 'BOM davor'],
+    ['java\tscript:alert(1)', 'Tabulator im Schema'], ['java\nscript:alert(1)', 'Zeilenumbruch im Schema'], ['java\rscript:alert(1)', 'CR im Schema'], ['jav&#x61;script:alert(1)', 'Zeichenverweis'],
+    ['data:text/html,<script>alert(1)</script>', 'data:'], ['DATA:text/html,x', 'DATA:'], ['vbscript:msgbox(1)', 'vbscript:'], ['file:///etc/passwd', 'file:'], ['ftp://example.org', 'ftp:'], ['blob:https://example.org/x', 'blob:'],
+    ['about:blank', 'about:'], ['x:y', 'unbekanntes Schema'], ['javascript&colon;alert(1)', 'Doppelpunkt als Zeichenverweis ohne Schema-Trenner'],
+    ['', 'leer'],
+  ])('verworfen: %j (%s)', (href) => {
+    // Zeichenverweise werden in Markup-Kontexten zu Zeichen aufgelöst: sie dürfen nie als Schema durchgehen
+    expect(safeHref(href as string)).toBeUndefined();
+  });
+  it.each([[undefined], [null], [42], [{}], [['/a']], [true]])('kein String: %j', (v) => expect(safeHref(v)).toBeUndefined());
+});
+
+describe('mapItems: href und ids', () => {
+  const base = { lat: 49.4, lng: 8.4, label: 'Halle' };
+  it('unsichere hrefs werden entfernt, sichere bleiben', () => {
+    const items = mapItems([
+      { ...base, id: 'a', href: 'javascript:alert(1)' }, { ...base, id: 'b', href: ' JavaScript:alert(1)' }, { ...base, id: 'c', href: 'data:text/html,x' },
+      { ...base, id: 'd', href: '/hallen/sued' }, { ...base, id: 'e', href: 'https://example.org' },
+    ]);
+    expect(items.map((i) => i.href)).toEqual([undefined, undefined, undefined, '/hallen/sued', 'https://example.org']);
+  });
+  it('doppelte ids werden eindeutig, die erste behält ihren Wert', () => {
+    expect(mapItems([{ ...base, id: 'x' }, { ...base, id: 'x' }, { ...base, id: 'x' }]).map((i) => i.id)).toEqual(['x', 'x-2', 'x-3']);
+  });
+  it('fehlende ids bekommen marker-<Index> und kollidieren nicht mit ausdrücklichen ids', () => {
+    const ids = mapItems([{ ...base }, { ...base, id: 'marker-0' }, { ...base, id: '' }, { ...base, id: null as never }, { ...base, id: 'marker-3' }]).map((i) => i.id);
+    expect(new Set(ids).size).toBe(5);
+    expect(ids[1]).toBe('marker-0');
+    expect(ids[4]).toBe('marker-3');
+    expect(ids[0]).not.toBe('marker-0');
+  });
+  it('Zahlen als id werden zu Zeichenketten; Ersatz-ids kollidieren auch damit nicht', () => {
+    const ids = mapItems([{ ...base, id: 1 as never }, { ...base, id: '1' }, { ...base, id: '1-2' }]).map((i) => i.id);
+    expect(new Set(ids).size).toBe(3);
+    expect(ids[0]).toBe('1');
+    expect(ids[2]).toBe('1-2');
+  });
+});
+
+describe('validTileUrl: Härtung', () => {
+  it.each([
+    ['https://tile.example.org/{z}/{x}/{y}.png\u0000', 'NUL'], ['https://tile.example.org/{z}/{x}/{y}\u0007', 'Steuerzeichen'], ['https://tile.example.org/{z}/{x}/{y}\u007f', 'DEL'],
+    ['https://tile.example.org/{z}/{x}/{y}\u0085', 'NEL'], ['https://tile.example.org/{z}/{x}/{y}\u00a0', 'geschütztes Leerzeichen'],
+    ['https://{z}/{x}/{y}', 'Host ist {z}'], ['https://{x}.example.org/{z}/{y}', '{x} im Host'], ['https://tile.example.org:{y}/{z}/{x}', 'Platzhalter als Port'],
+    ['https://tile.example.org:0/{z}/{x}/{y}', 'Port 0'], ['https://tile.example.org:65536/{z}/{x}/{y}', 'Port zu groß'], ['https://tile.example.org:999999/{z}/{x}/{y}', 'Port sechsstellig'],
+    ['https://tile.example.org:abc/{z}/{x}/{y}', 'Port Text'], ['https://tile.example.org:/{z}/{x}/{y}', 'leerer Port'], ['http://localhost:0/{z}/{x}/{y}', 'localhost Port 0'], ['http://localhost:70000/{z}/{x}/{y}', 'localhost Port zu groß'],
+    ['https://exa mple.org/{z}/{x}/{y}', 'Leerzeichen im Host'], ['https://exämple.org/{z}/{x}/{y}', 'Umlaut im Host'], ['https://[::1]/{z}/{x}/{y}', 'IPv6'],
+  ])('ungültig: %j (%s)', (url) => expect(validTileUrl(url)).toBe(false));
+  it.each([
+    'HTTPS://tile.example.org/{z}/{x}/{y}.png', 'Https://tile.example.org/{z}/{x}/{y}.png', 'HTTP://LOCALHOST/{z}/{x}/{y}.png', 'http://LocalHost:8080/{z}/{x}/{y}.png',
+    'https://tile.example.org:443/{z}/{x}/{y}.png', 'https://tile.example.org:65535/{z}/{x}/{y}.png', 'https://{s}.tile.example.org:8443/{z}/{x}/{y}{r}.png',
+  ])('gültig: %s', (url) => expect(validTileUrl(url)).toBe(true));
+  it('Länge: 2048 Zeichen noch gültig, 2049 nicht', () => {
+    const head = 'https://tile.example.org/{z}/{x}/{y}.png?k=';
+    expect(validTileUrl(head + 'a'.repeat(2048 - head.length))).toBe(true);
+    expect(validTileUrl(head + 'a'.repeat(2049 - head.length))).toBe(false);
   });
 });
