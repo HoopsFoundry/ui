@@ -105,6 +105,30 @@ describe('Klick', () => {
     handle = initBackToTop();
     expect(() => btn().click()).not.toThrow();
   });
+  it('ein verstecktes h1 (display: none) zählt im Browser nicht: das nächste sichtbare bekommt den Fokus', () => {
+    page('<div id="x"><h1 id="weg">Versteckt</h1></div><main id="m"><h1 id="da">Sichtbar</h1></main>');
+    // jsdom hat kein Layout: Layout und Sichtbarkeit nachstellen
+    const shown = (el: Element, yes: boolean) => Object.defineProperty(el, 'getClientRects', { value: () => (yes ? [{}] : []), configurable: true });
+    shown(document.documentElement, true);
+    shown(document.getElementById('weg')!, false);
+    shown(document.getElementById('da')!, true);
+    shown(document.getElementById('m')!, true);
+    handle = initBackToTop();
+    btn().click();
+    expect(document.activeElement!.id).toBe('da');
+    delete (document.documentElement as unknown as { getClientRects?: unknown }).getClientRects;
+  });
+  it('mit Layout und ohne sichtbares h1 fällt der Fokus auf main', () => {
+    page('<h1 id="weg">Versteckt</h1><main id="m"><p>x</p></main>');
+    const shown = (el: Element, yes: boolean) => Object.defineProperty(el, 'getClientRects', { value: () => (yes ? [{}] : []), configurable: true });
+    shown(document.documentElement, true);
+    shown(document.getElementById('weg')!, false);
+    shown(document.getElementById('m')!, true);
+    handle = initBackToTop();
+    btn().click();
+    expect(document.activeElement!.id).toBe('m');
+    delete (document.documentElement as unknown as { getClientRects?: unknown }).getClientRects;
+  });
   it('target wählt ein anderes Fokusziel; ein vorhandenes tabindex bleibt, ein eigenes wird beim Aufräumen entfernt', () => {
     page('<main><h1 id="t" tabindex="0">T</h1><h2 id="u">U</h2></main>');
     handle = initBackToTop({ target: '#u' });

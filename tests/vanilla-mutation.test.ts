@@ -29,6 +29,8 @@ const STATS_CSS: Mutation[] = [
   { name: 'lange Werte brechen nicht', rule: 'Stats: lange Werte brechen um', from: '.dss-stats .dss-stat-value { order: -1; margin: 0; overflow-wrap: anywhere; }', to: '.dss-stats .dss-stat-value { order: -1; margin: 0; }' },
   { name: 'Niederlage als Kreis', rule: 'Form: Zeichen unterscheiden sich in der Form (N Quadrat, U Ring)', from: 'border-radius: 2px; }', to: 'border-radius: 50%; }' },
   { name: 'Unentschieden gefüllt', rule: 'Form: Zeichen unterscheiden sich in der Form (N Quadrat, U Ring)', from: '.dss-form-item--u { border: 2px solid var(--dss-mute); }', to: '.dss-form-item--u { background: var(--dss-mute); }' },
+  { name: 'Punkte brechen um', rule: 'Form: Punkte brechen nicht um (die Tabellenspalte bleibt breit), Buchstabenmarken dürfen', from: '.dss-form-list { display: inline-flex; flex-wrap: nowrap;', to: '.dss-form-list { display: inline-flex; flex-wrap: wrap;' },
+  { name: 'Marken brechen nicht um', rule: 'Form: Punkte brechen nicht um (die Tabellenspalte bleibt breit), Buchstabenmarken dürfen', from: '.dss-form--letters .dss-form-list { flex-wrap: wrap;', to: '.dss-form--letters .dss-form-list { flex-wrap: nowrap;' },
   { name: 'Punkte 12 px', rule: 'Form: Punkte 10 px mit 5 px Abstand', from: 'width: 10px; height: 10px;', to: 'width: 12px; height: 12px;' },
   { name: 'Ring in der eigenen Zeile gleich', rule: 'Form: Ring in der eigenen Zeile heller', from: 'border-color: var(--dss-mute-on-selected)', to: 'border-color: var(--dss-mute)' },
   { name: 'Buchstabe S falsch', rule: 'Form: Buchstaben S, N, U kommen aus dem CSS', from: 'content: "S"', to: 'content: "X"' },

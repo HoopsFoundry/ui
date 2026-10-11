@@ -78,7 +78,7 @@ Der Knopf hängt am Fenster. Die Vorschau ist deshalb eine eingebettete Seite (3
 
 ## Scrollabstand und Tokens
 
-Die Seitennavigation setzt **keine globalen Regeln** (kein `html { scroll-padding-bottom }`, kein `h2[id] { scroll-margin-top }`). Stattdessen hat jedes Ziel die Klasse `dss-pagenav-target` mit `scroll-margin-top: calc(var(--dss-scroll-offset, var(--dss-acc-sticky-top, 0px)) + 1rem)`: Der Abstand folgt `--dss-scroll-offset` (die Höhe einer festen oberen Leiste) und fällt auf `--dss-acc-sticky-top` des Accordions zurück, damit beide denselben Wert meinen. Wer zusätzlich Fokus und Tastatur schützen will, setzt die Opt-in-Klasse `dss-scroll-pad` auf `<html>` oder einen Scrollbereich (`scroll-padding-top` und `-bottom`).
+Die Seitennavigation setzt **keine globalen Regeln** (kein `html { scroll-padding-bottom }`, kein `h2[id] { scroll-margin-top }`). Stattdessen hat jedes Ziel die Klasse `dss-pagenav-target`, deren `scroll-margin-top` `--dss-scroll-offset` plus `1rem` ist. Das Token `--dss-scroll-offset` ist die Höhe einer festen oberen Leiste und fällt auf `--dss-acc-sticky-top` des Accordions zurück, damit beide denselben Wert meinen. Wer zusätzlich Fokus und Tastatur schützen will, setzt die Opt-in-Klasse `dss-scroll-pad` auf `<html>` oder einen Scrollbereich (`scroll-padding-top` und `-bottom`).
 
 <FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
 

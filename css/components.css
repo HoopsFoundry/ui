@@ -293,14 +293,14 @@
 .dss-stat--compact .dss-stat-value, .dss-stats--compact .dss-stat-value { font-size: var(--fs-h3); }
 
 .dss-form { position: relative; display: inline-flex; align-items: center; vertical-align: middle; }
-.dss-form-list { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.dss-form-list { display: inline-flex; flex-wrap: nowrap; align-items: center; gap: 5px; } /* Punkte brechen nie um: sonst schrumpft die Spalte „Form“ einer Tabelle */
 .dss-form-item { box-sizing: border-box; flex: none; width: 10px; height: 10px; border-radius: 50%; }
 .dss-form-item--s { background: var(--dss-chip-ok-fg); }
 .dss-form-item--n { background: var(--dss-chip-err-fg); border-radius: 2px; }
 .dss-form-item--u { border: 2px solid var(--dss-mute); }
 .dss-tbl tr.is-own .dss-form-item--u { border-color: var(--dss-mute-on-selected); }
 /* Buchstaben: farbige Marken (Chip-Töne, Kontrast wie die Chips) mit S, N, U; der Buchstabe kommt aus dem CSS und ist nicht Teil des Textes */
-.dss-form--letters .dss-form-list { gap: 4px; }
+.dss-form--letters .dss-form-list { flex-wrap: wrap; gap: 4px; }
 .dss-form--letters .dss-form-item {
   display: inline-grid; place-items: center; width: auto; min-width: 24px; height: 24px; border: 0; border-radius: var(--radius-full);
   font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 700; line-height: 1;

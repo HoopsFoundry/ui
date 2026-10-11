@@ -101,6 +101,7 @@ describe('Doku-Seite', () => {
     expect(mdx).toMatch(/--dss-scroll-offset/);
     expect(mdx).toMatch(/dss-scroll-pad/);
     expect(mdx).toMatch(/keine globalen Regeln/);
+    expect(mdx).toMatch(/`dss-pagenav-target`, deren `scroll-margin-top` `--dss-scroll-offset` plus `1rem` ist/);
   });
   it('Einführung, storySort, README und CHANGELOG nennen die Seite', () => {
     expect(read('stories/Introduction.mdx')).toContain('components-pagenav--docs');

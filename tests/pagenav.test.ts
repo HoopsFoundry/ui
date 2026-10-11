@@ -260,6 +260,26 @@ describe('Sprung', () => {
     expect(window.location.hash).toBe('#stand');
     accs.forEach((a) => a.destroy());
   });
+  it('ein Bereich, der sich erst nach dem Klick öffnet (Svelte, React): der Fokus kommt im nächsten Frame an', () => {
+    mount(`<main><h1>L</h1>
+      <div class="dss-acc-item" id="spaet"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="spaet-t" aria-expanded="false"><span class="dss-acc-label">Spät</span></button></h3>
+        <div class="dss-acc-panel" id="spaet-p" hidden inert><h2 id="drin">Drin</h2></div></div>
+      <h2>Zwei</h2><h2>Drei</h2></main>`);
+    const queue: FrameRequestCallback[] = [];
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { queue.push(cb); return 0; });
+    // Der Bereich öffnet erst in einem Mikrotask nach dem Klick; solange er inert ist, nimmt das Ziel den Fokus nicht an
+    $('#spaet-t').addEventListener('click', () => queueMicrotask(() => { $('#spaet-p').removeAttribute('hidden'); $('#spaet-p').removeAttribute('inert'); $('#spaet-t').setAttribute('aria-expanded', 'true'); }));
+    const target = $('#drin');
+    const realFocus = HTMLElement.prototype.focus;
+    target.focus = function (this: HTMLElement, o?: FocusOptions) { if (this.closest('[inert]')) return; realFocus.call(this, o); };
+    handle = initPageNav($('main'));
+    go('Drin');
+    expect(document.activeElement).not.toBe(target);
+    return Promise.resolve().then(() => {
+      queue.splice(0).forEach((cb) => cb(0));
+      expect(document.activeElement).toBe(target);
+    });
+  });
   it('verschachtelt: öffnet alle Eltern von außen nach innen', () => {
     const accs = setup();
     go('Tief drin');

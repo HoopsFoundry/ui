@@ -7,14 +7,14 @@
   let { bnav = false }: { bnav?: boolean } = $props();
 
   function setup(node: HTMLElement) {
-    const nav = initPageNav(node, { label: 'Auf dieser Seite: Nach-oben-Beispiel', syncHash: false });
+    const nav = initPageNav(node, { label: bnav ? 'Auf dieser Seite: mit BottomNav' : 'Auf dieser Seite: Nach oben', syncHash: false });
     const top = initBackToTop();
     return { destroy: () => { nav.destroy(); top.destroy(); } };
   }
   const SECTIONS = ['Tabelle', 'Spielplan', 'Kader', 'Statistik', 'Hallen', 'Berichte'];
 </script>
 
-<main use:setup class="demo">
+<main use:setup class="demo" aria-label={bnav ? 'Beispielseite mit BottomNav' : 'Beispielseite für den Nach-oben-Knopf'}>
   <h1>Verein Nordhain</h1>
   {#each SECTIONS as name (name)}
     <section>

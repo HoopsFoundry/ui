@@ -92,8 +92,20 @@ export function initBackToTop(options = {}) {
     else button.style.removeProperty('--dss-backtop-offset');
   };
 
+  /** Das erste sichtbare Element der Auswahl. Ohne Layout (Tests, Server-DOM) gilt das erste; ein verstecktes (display: none) zählt im Browser nicht. */
+  const firstShown = (selector) => {
+    let list;
+    try {
+      list = [...doc.querySelectorAll(selector)];
+    } catch {
+      return null;
+    }
+    const hasLayout = doc.documentElement.getClientRects().length > 0;
+    return hasLayout ? list.find((el) => el.getClientRects().length > 0) ?? null : list[0] ?? null;
+  };
+
   function focusTarget() {
-    const target = doc.querySelector(targetSelector) ?? doc.querySelector('main');
+    const target = firstShown(targetSelector) ?? firstShown('main');
     if (!target) return;
     if (!target.hasAttribute('tabindex')) {
       target.setAttribute('tabindex', '-1');

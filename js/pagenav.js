@@ -125,7 +125,11 @@ export function initPageNav(root, options = {}) {
       focused.add(target);
     }
     scrollToElement(target, { behavior: opened || reducedMotion() ? 'auto' : 'smooth' });
-    target.focus({ preventScroll: true });
+    const focusIt = () => target.focus({ preventScroll: true });
+    focusIt();
+    // Ein gerade geöffneter Bereich (Svelte, React) übernimmt seinen Zustand erst nach dem Klick: solange er noch inert ist, nimmt das Ziel den
+    // Fokus nicht an. Dann ein zweiter Versuch im nächsten Frame.
+    if (doc.activeElement !== target && typeof win.requestAnimationFrame === 'function') win.requestAnimationFrame(focusIt);
     try {
       win.history.replaceState(win.history.state, '', `${win.location.pathname}${win.location.search}#${encodeURIComponent(target.id)}`);
     } catch {

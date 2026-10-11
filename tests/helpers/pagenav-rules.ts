@@ -138,6 +138,27 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
       h.destroy();
       return ok;
     });
+    await rule('PageNav: der Fokus kommt auch an, wenn sich der Bereich erst nach dem Klick öffnet', async () => {
+      html('<main><h1>L</h1><div class="dss-acc-item" id="sp"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="sp-t" aria-expanded="false"><span class="dss-acc-label">Spät</span></button></h3><div class="dss-acc-panel" id="sp-p" hidden inert><h2 id="drin">Drin</h2></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
+      const queue: FrameRequestCallback[] = [];
+      const raf = window.requestAnimationFrame;
+      window.requestAnimationFrame = ((cb: FrameRequestCallback) => { queue.push(cb); return 0; }) as never;
+      try {
+        document.getElementById('sp-t')!.addEventListener('click', () => queueMicrotask(() => { document.getElementById('sp-p')!.removeAttribute('inert'); document.getElementById('sp-t')!.setAttribute('aria-expanded', 'true'); }));
+        const target = document.getElementById('drin')!;
+        const real = HTMLElement.prototype.focus;
+        target.focus = function (this: HTMLElement, o?: FocusOptions) { if (this.closest('[inert]')) return; real.call(this, o); };
+        const h = mod.initPageNav(document.querySelector('main')!);
+        links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+        await Promise.resolve();
+        queue.splice(0).forEach((cb) => cb(0));
+        const ok = document.activeElement === target;
+        h.destroy();
+        return ok;
+      } finally {
+        window.requestAnimationFrame = raf;
+      }
+    });
     await rule('PageNav: Klick mit Strg bleibt dem Browser', () => {
       html(PAGE);
       const h = mod.initPageNav(document.querySelector('main')!);
@@ -256,6 +277,19 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
       const onMain = document.activeElement === document.getElementById('m');
       h.destroy();
       return onH1 && onMain;
+    });
+    await rule('BackToTop: ein verstecktes h1 zählt im Browser nicht', () => {
+      html('<div><h1 id="weg">V</h1></div><main id="m"><h1 id="da">S</h1></main>');
+      const shown = (el: Element, yes: boolean) => Object.defineProperty(el, 'getClientRects', { value: () => (yes ? [{}] : []), configurable: true });
+      shown(document.documentElement, true);
+      shown(document.getElementById('weg')!, false);
+      shown(document.getElementById('da')!, true);
+      const h = mod.initBackToTop();
+      btn().click();
+      const ok = document.activeElement?.id === 'da';
+      h.destroy();
+      delete (document.documentElement as unknown as { getClientRects?: unknown }).getClientRects;
+      return ok;
     });
     await rule('BackToTop: über einer festen unteren Leiste', () => {
       const bar = document.createElement('nav');
