@@ -46,7 +46,7 @@ Mit `expandAll` stehen über der Gruppe zwei Buttons „Alle öffnen“ und „A
 
 <Canvas of={AccordionStories.AlleOeffnen} />
 
-Mit `exclusive` ist immer höchstens ein Bereich offen, ein Öffnen schließt die anderen (der offene lässt sich schließen). „Alle öffnen/schließen“ wird dann nicht angeboten. Stehen beim Start mehrere Bereiche offen, ist das deine Aufgabe: Die Gruppe schließt sie nicht von selbst.
+Mit `exclusive` ist immer höchstens ein Bereich offen, ein Öffnen schließt die anderen (der offene lässt sich schließen). „Alle öffnen/schließen“ wird dann nicht angeboten. Stehen beim Start mehrere Bereiche offen, bleibt nur der erste (in Dokumentreihenfolge) offen, in Svelte, React und im Vanilla-Skript gleich; bei einem kontrollierten Bereich (React `open`) bekommen die übrigen `onOpenChange(false)`.
 
 <Canvas of={AccordionStories.Exklusiv} />
 
@@ -60,7 +60,7 @@ Im Beispiel öffnet ein Klick auf einen Link den Bereich ohne Seitenwechsel. Das
 
 ## Sprungleiste
 
-Mit `nav` steht über der Gruppe eine Navigation „Bereiche“ mit einem Link je Bereich (`href="#id"`). Ein Klick öffnet den Bereich, scrollt dorthin und setzt den Fokus auf den Kopf; der Link des zuletzt geöffneten Bereichs trägt `aria-current="true"`. Ab 640 px Fensterbreite stehen die Links nebeneinander und brechen um; darunter ist die Liste selbst einklappbar (Button „Bereiche“ mit `aria-expanded`). Auch die Sprungleiste entsteht im Browser.
+Mit `nav` steht über der Gruppe eine Navigation „Bereiche“ mit einem Link je Bereich (`href="#id"`). Ein Klick öffnet den Bereich, scrollt dorthin und setzt den Fokus auf den Kopf; der Link des zuletzt geöffneten Bereichs trägt `aria-current="true"`. Der Name der Leiste ist „Bereiche“ und mit `navLabel` änderbar (nötig, wenn mehrere Sprungleisten auf einer Seite stehen). Ab 640 px Fensterbreite stehen die Links nebeneinander und brechen um; darunter ist die Liste selbst einklappbar (Button „Bereiche“ mit `aria-expanded`). Auch die Sprungleiste entsteht im Browser.
 
 <Canvas of={AccordionStories.Sprungleiste} />
 
@@ -78,6 +78,10 @@ Mit `nav` steht über der Gruppe eine Navigation „Bereiche“ mit einem Link j
 />
 
 Es gibt keinen Fokusfang: **Tab** verlässt die Gruppe wie jedes andere Element. Gesperrte Köpfe (`disabled`) tragen `aria-disabled="true"` statt des Attributs `disabled`, damit sie mit **Tab** erreichbar bleiben und der Screenreader sie vorliest. Köpfe verschachtelter Gruppen gehören zur inneren Gruppe.
+
+## Barrierefreiheit: Namen
+
+Mehrere Accordions/Bereiche mit gleichem Titel oder mehrere Sprungleisten auf einer Seite brauchen unterschiedliche Namen (axe: `landmark-unique`): Ein geöffneter Bereich ist (bis sechs Bereiche) eine Region mit dem Titel als Namen, die Sprungleiste eine Navigation. `navLabel` setzt den Namen der Sprungleiste (Standard „Bereiche“, auch der Text des Handy-Schalters), etwa „Bereiche der Liga-Seite“. Die Beispiele dieser Seite haben darum je Seite eindeutige Titel und Namen.
 
 ## Kopf klebt oben
 
@@ -143,7 +147,7 @@ Props von `AccordionItem`:
   ]}
 />
 
-Die Gruppe hat in React zusätzlich `className`, in Svelte `class`. Die Namen gelten für beide Fassungen, bis auf `bind:open` (Svelte) gegen `open` und `onOpenChange` (React).
+Die Gruppe hat in React zusätzlich `className`, in Svelte `class`; `navLabel` (Standard „Bereiche“) benennt die Sprungleiste. Die Namen gelten für beide Fassungen, bis auf `bind:open` (Svelte) gegen `open` und `onOpenChange` (React).
 
 ### Vanilla-Skript
 

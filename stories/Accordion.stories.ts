@@ -11,6 +11,7 @@ export default {
     variant: { control: 'inline-radio', options: ['card', 'flat'], description: 'Karte (Rand, Radius, Schatten) oder flach (nur Trennlinien)', table: t("'card' | 'flat'", "'card'") },
     expandAll: { control: 'boolean', description: 'Zeigt „Alle öffnen“ und „Alle schließen“ mit Ansage per `aria-live`. Entsteht im Browser; bei `exclusive` nicht angeboten.', table: t('boolean', 'false') },
     nav: { control: 'boolean', description: 'Sprungleiste (`nav` „Bereiche“) mit Links auf die Bereiche; unter 640 px selbst einklappbar. Entsteht im Browser.', table: t('boolean', 'false') },
+    navLabel: { control: 'text', description: 'Name der Sprungleiste: `aria-label` der Navigation und Text des Handy-Schalters. Mehrere Sprungleisten auf einer Seite brauchen verschiedene Namen (axe: `landmark-unique`).', table: t('string', "'Bereiche'") },
     sticky: { control: 'boolean', description: 'Kopf des offenen Bereichs klebt oben, solange sein Bereich im Bild ist. Abstand: `--dss-acc-sticky-top`.', table: t('boolean', 'false') },
     syncHash: { control: 'boolean', description: 'Deep-Link: ein passender `#id` öffnet den Bereich samt Eltern, ein Klick setzt den Anker. In der Bibliothek Standard `true`; die Spielwiese schaltet es aus, damit die Adresse der Doku unberührt bleibt.', table: t('boolean', 'true') },
     titleAs: { control: 'inline-radio', options: ['', 'h2', 'h3', 'h4', 'h5', 'h6'], description: 'Ebene der Bereichsüberschriften. Rangfolge: `titleAs` am Bereich vor `titleAs` der Gruppe vor der Ebene aus `HeadingLevel` vor `h3`. Leer: die Ebene ergibt sich aus der Gliederung.', table: t("'h2' | 'h3' | 'h4' | 'h5' | 'h6'", "'h3'") },
@@ -19,7 +20,7 @@ export default {
     lockSecond: { control: 'boolean', description: 'Nur Demo: der zweite Bereich ist gesperrt (`disabled`)', table: t('boolean', 'false') },
     meta: { control: 'inline-radio', options: ['none', 'count', 'chip', 'live'], description: 'Nur Demo: Zusatzinfo im Kopf (`meta`): ohne, Zähler, Chip oder Live-Tag', table: t("'none' | 'count' | 'chip' | 'live'", "'count'") },
   },
-  args: { exclusive: false, variant: 'card', expandAll: false, nav: false, sticky: false, syncHash: false, titleAs: '', count: 4, firstOpen: true, lockSecond: false, meta: 'count' },
+  args: { exclusive: false, variant: 'card', expandAll: false, nav: false, sticky: false, navLabel: 'Bereiche', syncHash: false, titleAs: '', count: 4, firstOpen: true, lockSecond: false, meta: 'count' },
 };
 
 export const Standard = { args: {} };

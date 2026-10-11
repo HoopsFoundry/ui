@@ -39,3 +39,28 @@ describe('Accordion-Doku', () => {
     expect(read('CHANGELOG.md')).toContain('Accordion (Paket A)');
   });
 });
+
+describe('Accordion-Doku: eindeutige Namen je Seite (axe landmark-unique)', () => {
+  const titles = [...examples.matchAll(/<AccordionItem id="[^"]+" title="([^"]+)"/g)].map((m) => m[1]);
+  const labels = [...examples.matchAll(/navLabel="([^"]+)"/g)].map((m) => m[1]);
+  it('jeder Bereichstitel kommt in den Beispielen nur einmal vor', () => {
+    expect(titles.length).toBeGreaterThan(40);
+    const dup = titles.filter((t, i) => titles.indexOf(t) !== i);
+    expect(dup).toEqual([]);
+  });
+  it('jede Sprungleiste hat einen eigenen navLabel (nicht der Standard „Bereiche“)', () => {
+    const navs = [...examples.matchAll(/<Accordion [^>]*\bnav\b[^>]*>/g)].map((m) => m[0]);
+    expect(navs.length).toBe(3);
+    for (const n of navs) expect(n).toMatch(/navLabel="[^"]+"/);
+    expect(new Set(labels).size).toBe(labels.length);
+    expect(labels).not.toContain('Bereiche');
+  });
+  it('die Barrierefreiheits-Regel steht in der Doku', () => {
+    expect(mdx).toMatch(/gleichem Titel oder mehrere Sprungleisten auf einer Seite brauchen unterschiedliche Namen \(axe: `landmark-unique`\)/);
+    expect(mdx).toMatch(/`navLabel` setzt den Namen der Sprungleiste/);
+  });
+  it('die Doku beschreibt exclusive beim Start einheitlich', () => {
+    expect(mdx).toMatch(/bleibt nur der erste \(in Dokumentreihenfolge\) offen/);
+    expect(mdx).not.toMatch(/schließt sie nicht von selbst/);
+  });
+});

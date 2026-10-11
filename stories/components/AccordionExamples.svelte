@@ -65,23 +65,23 @@
     <div>
       <div class="cap">variant="card" (Standard)</div>
       <Accordion syncHash={false} variant="card">
-        <AccordionItem id="va-c1" title="Tabelle" open>{TABELLE}</AccordionItem>
-        <AccordionItem id="va-c2" title="Spielplan">{SPIELPLAN}</AccordionItem>
-        <AccordionItem id="va-c3" title="Kader">{KADER}</AccordionItem>
+        <AccordionItem id="va-c1" title="Liga-Stand" open>{TABELLE}</AccordionItem>
+        <AccordionItem id="va-c2" title="Heimspiele">{SPIELPLAN}</AccordionItem>
+        <AccordionItem id="va-c3" title="Mannschaft">{KADER}</AccordionItem>
       </Accordion>
     </div>
     <div>
       <div class="cap">variant="flat"</div>
       <Accordion syncHash={false} variant="flat">
         <AccordionItem id="va-f1" title="Saison" open>{TABELLE}</AccordionItem>
-        <AccordionItem id="va-f2" title="Spielplan">{SPIELPLAN}</AccordionItem>
-        <AccordionItem id="va-f3" title="Kader">{KADER}</AccordionItem>
+        <AccordionItem id="va-f2" title="Auswärtsspiele">{SPIELPLAN}</AccordionItem>
+        <AccordionItem id="va-f3" title="Trainerteam">{KADER}</AccordionItem>
       </Accordion>
     </div>
   </div>
 {:else if example === 'meta'}
   <Accordion syncHash={false}>
-    <AccordionItem id="me-zaehler" title="Kader" open>
+    <AccordionItem id="me-zaehler" title="Kaderstärke" open>
       {#snippet meta()}14 Spieler{/snippet}
       {KADER}
     </AccordionItem>
@@ -115,9 +115,9 @@
   </Accordion>
 {:else if example === 'alle'}
   <Accordion syncHash={false} expandAll>
-    <AccordionItem id="al-tabelle" title="Tabelle">{TABELLE}</AccordionItem>
-    <AccordionItem id="al-spielplan" title="Spielplan">{SPIELPLAN}</AccordionItem>
-    <AccordionItem id="al-kader" title="Kader">{KADER}</AccordionItem>
+    <AccordionItem id="al-tabelle" title="Tabellenstand">{TABELLE}</AccordionItem>
+    <AccordionItem id="al-spielplan" title="Spieltage">{SPIELPLAN}</AccordionItem>
+    <AccordionItem id="al-kader" title="Spielerliste">{KADER}</AccordionItem>
     <AccordionItem id="al-gesperrt" title="Statistik (ab Spieltag 3)" disabled>{STATISTIK}</AccordionItem>
   </Accordion>
 {:else if example === 'exklusiv'}
@@ -130,14 +130,14 @@
   <div class="stack">
     <p class="links">
       Direkt springen:
-      <a class="dss-link" href="#dl-spielplan">Spielplan</a> ·
-      <a class="dss-link" href="#dl-kader">Kader</a> ·
-      <a class="dss-link" href="#dl-torhueter">Torhüter (im Kader)</a>
+      <a class="dss-link" href="#dl-spielplan">Termine</a> ·
+      <a class="dss-link" href="#dl-kader">Herrenkader</a> ·
+      <a class="dss-link" href="#dl-torhueter">Torhüter (im Herrenkader)</a>
     </p>
     <Accordion>
-      <AccordionItem id="dl-tabelle" title="Tabelle">{TABELLE}</AccordionItem>
-      <AccordionItem id="dl-spielplan" title="Spielplan">{SPIELPLAN}</AccordionItem>
-      <AccordionItem id="dl-kader" title="Kader">
+      <AccordionItem id="dl-tabelle" title="Rangliste">{TABELLE}</AccordionItem>
+      <AccordionItem id="dl-spielplan" title="Termine">{SPIELPLAN}</AccordionItem>
+      <AccordionItem id="dl-kader" title="Herrenkader">
         {KADER}
         <Accordion>
           <AccordionItem id="dl-torhueter" title="Torhüter">Zwei Torhüter im Aufgebot.</AccordionItem>
@@ -147,24 +147,24 @@
     </Accordion>
   </div>
 {:else if example === 'nav'}
-  <Accordion syncHash={false} nav expandAll>
-    <AccordionItem id="na-tabelle" title="Tabelle">{TABELLE}</AccordionItem>
-    <AccordionItem id="na-spielplan" title="Spielplan">{SPIELPLAN}</AccordionItem>
-    <AccordionItem id="na-kader" title="Kader">{KADER}</AccordionItem>
-    <AccordionItem id="na-statistik" title="Statistik">{STATISTIK}</AccordionItem>
+  <Accordion syncHash={false} nav navLabel="Bereiche der Mannschaftsseite" expandAll>
+    <AccordionItem id="na-tabelle" title="Platzierung">{TABELLE}</AccordionItem>
+    <AccordionItem id="na-spielplan" title="Ansetzungen">{SPIELPLAN}</AccordionItem>
+    <AccordionItem id="na-kader" title="Mannschaftsliste">{KADER}</AccordionItem>
+    <AccordionItem id="na-statistik" title="Wertungen">{STATISTIK}</AccordionItem>
   </Accordion>
 {:else if example === 'sticky'}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den Scrollbereich erreichen -->
   <div class="scroller" tabindex="0" role="region" aria-label="Scrollbereich: Accordion mit klebendem Kopf" style="--dss-acc-sticky-top: 0px;">
     <Accordion syncHash={false} sticky>
-      <AccordionItem id="st-tabelle" title="Tabelle" open>
+      <AccordionItem id="st-tabelle" title="Vereinsporträt" open>
         {#each LANG as p}<p>{p}</p>{/each}
         {#each LANG as p}<p>{p}</p>{/each}
       </AccordionItem>
-      <AccordionItem id="st-spielplan" title="Spielplan" open>
+      <AccordionItem id="st-spielplan" title="Abteilungen" open>
         {#each LANG as p}<p>{p}</p>{/each}
       </AccordionItem>
-      <AccordionItem id="st-kader" title="Kader">{KADER}</AccordionItem>
+      <AccordionItem id="st-kader" title="Kontakt">{KADER}</AccordionItem>
     </Accordion>
   </div>
 {:else if example === 'vanilla'}
@@ -176,9 +176,9 @@
     <div use:read={'standard'}>
       <div class="cap">Standard: Bereiche h3, Inhalt h4 · Ebenen: <code>{outline.standard}</code></div>
       <Accordion syncHash={false}>
-        <AccordionItem id="eb-1" title="Kader" open>
+        <AccordionItem id="eb-1" title="Abteilung" open>
           <Accordion syncHash={false}>
-            <AccordionItem id="eb-1a" title="Heim" open>Nordhain-Halle</AccordionItem>
+            <AccordionItem id="eb-1a" title="Heimhalle" open>Nordhain-Halle</AccordionItem>
           </Accordion>
         </AccordionItem>
       </Accordion>
@@ -187,7 +187,7 @@
       <div class="cap">In HeadingLevel level=2: Bereiche h2, Inhalt h3 · Ebenen: <code>{outline.level}</code></div>
       <HeadingLevel level={2}>
         <Accordion syncHash={false}>
-          <AccordionItem id="eb-2" title="Mannschaft" open>
+          <AccordionItem id="eb-2" title="Herrenabteilung" open>
             <Accordion syncHash={false}>
               <AccordionItem id="eb-2a" title="Auswärts" open>Nordhain-Halle</AccordionItem>
             </Accordion>
@@ -215,7 +215,7 @@
           {#each cols as c}
             <div class="cell" use:mark={stateClass[c]}>
               <Accordion syncHash={false} variant={v.id}>
-                <AccordionItem id={`zu-${v.id}-${c}`} title={c === 'Offen' ? `Spielplan ${v.name}` : 'Spielplan'} open={c === 'Offen'} disabled={c === 'Gesperrt'}>Bericht</AccordionItem>
+                <AccordionItem id={`zu-${v.id}-${c}`} title={`${c} · ${v.name}`} open={c === 'Offen'} disabled={c === 'Gesperrt'}>Bericht</AccordionItem>
               </Accordion>
             </div>
           {/each}
@@ -224,8 +224,8 @@
     </div>
   </div>
 {:else if example === 'liga'}
-  <Accordion syncHash={false} nav expandAll>
-    <AccordionItem id="li-tabelle" title="Tabelle">
+  <Accordion syncHash={false} nav navLabel="Bereiche der Liga-Seite" expandAll>
+    <AccordionItem id="li-tabelle" title="Tabelle der Liga">
       {#snippet meta()}12 Teams{/snippet}
       <Table caption="Tabellenstand Bayernliga Süd" density="compact" columns={[
         { key: 'pl', label: '#', width: '52px' }, { key: 'team', label: 'Team' }, { key: 's', label: 'S', align: 'right' }, { key: 'n', label: 'N', align: 'right' }, { key: 'p', label: 'Pkt', align: 'right' },
@@ -237,7 +237,7 @@
         {/snippet}
       </Table>
     </AccordionItem>
-    <AccordionItem id="li-spielplan" title="Spielplan">
+    <AccordionItem id="li-spielplan" title="Spielplan der Liga">
       {#snippet meta()}{@render liveTag()}{/snippet}
       <Table caption="Spiele des Spieltags" density="compact" columns={[
         { key: 'wann', label: 'Wann' }, { key: 'heim', label: 'Heim' }, { key: 'gast', label: 'Gast' }, { key: 'erg', label: 'Stand', align: 'right' },
@@ -248,7 +248,7 @@
         {/snippet}
       </Table>
     </AccordionItem>
-    <AccordionItem id="li-kader" title="Kader">
+    <AccordionItem id="li-kader" title="Kader TSV Nordhain">
       {#snippet meta()}14 Spieler{/snippet}
       <Table caption="Kader von TSV Nordhain" density="compact" columns={[
         { key: 'num', label: '#', width: '52px' }, { key: 'name', label: 'Spieler' }, { key: 'pos', label: 'Pos.' },
@@ -260,35 +260,35 @@
         {/snippet}
       </Table>
     </AccordionItem>
-    <AccordionItem id="li-statistik" title="Statistik">
+    <AccordionItem id="li-statistik" title="Statistik der Saison">
       {STATISTIK}
     </AccordionItem>
   </Accordion>
 {:else if example === 'handy'}
   <div class="page">
-    <Accordion syncHash={false} nav expandAll>
-      <AccordionItem id="ha-tabelle" title="Tabelle" open>
+    <Accordion syncHash={false} nav navLabel="Bereiche der Handy-Seite" expandAll>
+      <AccordionItem id="ha-tabelle" title="Tabelle (Handy)" open>
         {#snippet meta()}12 Teams{/snippet}
         {TABELLE}
       </AccordionItem>
-      <AccordionItem id="ha-spielplan" title="Spielplan">
+      <AccordionItem id="ha-spielplan" title="Spielplan (Handy)">
         {#snippet meta()}{@render liveTag()}{/snippet}
         {SPIELPLAN}
       </AccordionItem>
-      <AccordionItem id="ha-kader" title="Kader">
+      <AccordionItem id="ha-kader" title="Kader (Handy)">
         {#snippet meta()}14 Spieler{/snippet}
         {KADER}
       </AccordionItem>
-      <AccordionItem id="ha-statistik" title="Statistik">{STATISTIK}</AccordionItem>
+      <AccordionItem id="ha-statistik" title="Statistik (Handy)">{STATISTIK}</AccordionItem>
     </Accordion>
   </div>
 
 <!-- Dos und Don'ts -->
 {:else if example === 'do-kurz'}
   <Accordion syncHash={false} variant="flat">
-    <AccordionItem id="dk-1" title="Kader" open>{KADER}</AccordionItem>
-    <AccordionItem id="dk-2" title="Spielplan">{SPIELPLAN}</AccordionItem>
-    <AccordionItem id="dk-3" title="Statistik">{STATISTIK}</AccordionItem>
+    <AccordionItem id="dk-1" title="Mannschaftsüberblick" open>{KADER}</AccordionItem>
+    <AccordionItem id="dk-2" title="Hallen">{SPIELPLAN}</AccordionItem>
+    <AccordionItem id="dk-3" title="Wertungsübersicht">{STATISTIK}</AccordionItem>
   </Accordion>
 {:else if example === 'dont-kurz'}
   <Accordion syncHash={false} variant="flat">
@@ -297,22 +297,22 @@
   </Accordion>
 {:else if example === 'do-tiefe'}
   <Accordion syncHash={false}>
-    <AccordionItem id="dt-1" title="Jugend" open>
+    <AccordionItem id="dt-1" title="Nachwuchs" open>
       <Accordion syncHash={false}>
-        <AccordionItem id="dt-1a" title="U16" open>Dienstag und Donnerstag.</AccordionItem>
-        <AccordionItem id="dt-1b" title="U14">Montag und Mittwoch.</AccordionItem>
+        <AccordionItem id="dt-1a" title="U18" open>Dienstag und Donnerstag.</AccordionItem>
+        <AccordionItem id="dt-1b" title="U12">Montag und Mittwoch.</AccordionItem>
       </Accordion>
     </AccordionItem>
   </Accordion>
 {:else if example === 'dont-tiefe'}
   <Accordion syncHash={false}>
-    <AccordionItem id="dt-2" title="Verein" open>
+    <AccordionItem id="dt-2" title="Gesamtverein" open>
       <Accordion syncHash={false}>
-        <AccordionItem id="dt-2a" title="Abteilung" open>
+        <AccordionItem id="dt-2a" title="Sparte" open>
           <Accordion syncHash={false}>
-            <AccordionItem id="dt-2b" title="Jugend" open>
+            <AccordionItem id="dt-2b" title="Jugendsparte" open>
               <Accordion syncHash={false}>
-                <AccordionItem id="dt-2c" title="U16" open>Dienstag und Donnerstag.</AccordionItem>
+                <AccordionItem id="dt-2c" title="U15" open>Dienstag und Donnerstag.</AccordionItem>
               </Accordion>
             </AccordionItem>
           </Accordion>
@@ -324,7 +324,7 @@
   <div class="stack">
     <Banner severity="danger" title="Aufgebot unvollständig" role="status">Zwei Spielernummern fehlen im Aufgebot.</Banner>
     <Accordion syncHash={false} variant="flat">
-      <AccordionItem id="dw-1" title="Aufgebot">
+      <AccordionItem id="dw-1" title="Aufgebot (Hinweis)">
         {#snippet meta()}{@render chipFehler()}{/snippet}
         Nummern 7 und 13 fehlen.
       </AccordionItem>
@@ -332,22 +332,22 @@
   </div>
 {:else if example === 'dont-wichtig'}
   <Accordion syncHash={false} variant="flat">
-    <AccordionItem id="dw-2" title="Aufgebot">Achtung: Zwei Spielernummern fehlen, der Bericht kann nicht freigegeben werden.</AccordionItem>
+    <AccordionItem id="dw-2" title="Aufgebot (Bericht)">Achtung: Zwei Spielernummern fehlen, der Bericht kann nicht freigegeben werden.</AccordionItem>
   </Accordion>
 {:else if example === 'do-id'}
   <div class="stack">
     <p class="links">Link in der E-Mail: <code>…/liga#kader</code></p>
     <Accordion syncHash={false} variant="flat">
-      <AccordionItem id="di-spielplan" title="Spielplan">{SPIELPLAN}</AccordionItem>
-      <AccordionItem id="kader" title="Kader" open>{KADER}</AccordionItem>
+      <AccordionItem id="di-spielplan" title="Heimspieltage">{SPIELPLAN}</AccordionItem>
+      <AccordionItem id="kader" title="Herrenteam" open>{KADER}</AccordionItem>
     </Accordion>
   </div>
 {:else if example === 'dont-id'}
   <div class="stack">
     <p class="links">Link in der E-Mail: <code>…/liga#bereich-2</code> (heute der Kader, nach dem Umsortieren der Spielplan)</p>
     <Accordion syncHash={false} variant="flat">
-      <AccordionItem id="bereich-1" title="Spielplan">{SPIELPLAN}</AccordionItem>
-      <AccordionItem id="bereich-2" title="Kader" open>{KADER}</AccordionItem>
+      <AccordionItem id="bereich-1" title="Vorbereitungsspiele">{SPIELPLAN}</AccordionItem>
+      <AccordionItem id="bereich-2" title="Mannschaftskader" open>{KADER}</AccordionItem>
     </Accordion>
   </div>
 {/if}

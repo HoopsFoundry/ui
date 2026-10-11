@@ -8,6 +8,7 @@
     variant = 'card',
     expandAll = false,
     nav = false,
+    navLabel = 'Bereiche',
     sticky = false,
     syncHash = false,
     titleAs = undefined,
@@ -20,6 +21,7 @@
     variant?: 'card' | 'flat';
     expandAll?: boolean;
     nav?: boolean;
+    navLabel?: string;
     sticky?: boolean;
     syncHash?: boolean;
     titleAs?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | '';
@@ -47,7 +49,7 @@
 {#snippet chip()}<span class="dss-chip dss-chip--amber dss-chip--mono">Neu</span>{/snippet}
 {#snippet live()}<span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{/snippet}
 
-<Accordion {exclusive} {variant} {expandAll} {nav} {sticky} {syncHash} titleAs={titleAs || undefined}>
+<Accordion {exclusive} {variant} {expandAll} {nav} {navLabel} {sticky} {syncHash} titleAs={titleAs || undefined}>
   {#each Array.from({ length: n }, (_, i) => i) as i (i)}
     <AccordionItem
       id={`sw-${i}`}
