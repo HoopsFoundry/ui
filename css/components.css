@@ -1654,9 +1654,9 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 
 /* Druck: Rahmen offen mit Strich unter dem Kopf, Kopf nicht klebend */
 @media print {
-  .dss-frame.is-collapsible > .dss-frame-head--acc { border-bottom-color: var(--dss-line); border-radius: 13px 13px 0 0; }
-  .dss-frame--dark.is-collapsible > .dss-frame-head--acc { border-bottom-color: var(--n-800); }
-  .dss-league.is-collapsible > .dss-league-head--acc { border-radius: 15px 15px 0 0; }
+  .dss-frame.is-collapsible:not(.is-open) > .dss-frame-head--acc { border-bottom-color: var(--dss-line); border-radius: 13px 13px 0 0; }
+  .dss-frame--dark.is-collapsible:not(.is-open) > .dss-frame-head--acc { border-bottom-color: var(--n-800); }
+  .dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc { border-radius: 15px 15px 0 0; }
   .dss-acc--sticky > .dss-frame.is-collapsible > .dss-frame-head--acc, .dss-acc--sticky > .dss-league.is-collapsible > .dss-league-head--acc { position: static; }
   .dss-frame-head--acc .dss-acc-trigger:hover, .dss-league-head--acc .dss-acc-trigger:hover { background: transparent; }
 }

@@ -67,7 +67,8 @@ describe('CSS einklappbarer Rahmen', () => {
     const at = frames.indexOf('@media print');
     expect(at).toBeGreaterThan(0);
     const print = frames.slice(at);
-    expect(print).toMatch(/border-bottom-color:\s*var\(--dss-line\)/);
+    // so spezifisch wie die Regel für „zugeklappt“, sonst bliebe der Strich im Druck durchsichtig
+    expect(print).toMatch(/\.dss-frame\.is-collapsible:not\(\.is-open\) > \.dss-frame-head--acc\s*\{[^}]*border-bottom-color:\s*var\(--dss-line\)/);
     expect(print).toMatch(/position:\s*static/);
   });
   it('Animation und Druck der Bereiche kommen aus dem Accordion (gleiche Klassen), nicht aus einer Kopie', () => {
