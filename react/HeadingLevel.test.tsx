@@ -11,9 +11,10 @@ import { PlayerCard } from './PlayerCard';
 import { PlayByPlay } from './PlayByPlay';
 import { TeamCard } from './TeamCard';
 import { LeagueCard } from './LeagueCard';
+import { VenueCard } from './VenueCard';
 import { TITLE_CASES } from '../tests/helpers/title-cases';
 
-const COMPONENTS: Record<string, ComponentType<never>> = { ScheduleTable, ScheduleGrid, Table, PlayerCard, EmptyState, PlayByPlay, TeamCard, LeagueCard } as never;
+const COMPONENTS: Record<string, ComponentType<never>> = { ScheduleTable, ScheduleGrid, Table, PlayerCard, EmptyState, PlayByPlay, TeamCard, LeagueCard, VenueCard } as never;
 const CASES = TITLE_CASES.filter((c) => !c.name.includes('compact'));
 
 /** Elementname der Komponentenüberschrift (erste Überschrift mit der Titelklasse). */

@@ -1731,3 +1731,85 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   .dss-league-legend { padding: 10px 16px; }
   .dss-league-foot { padding: 0 16px; }
 }
+
+/* ── VenueCard (Hallenkarte) ─────────────────────────────────
+   Links eine kleine Karte (Map, nicht interaktiv; Spalte etwa 40 %, mindestens 224 px: Kartenrahmen mindestens 206 px, damit die Quellenangabe in einer Zeile bleibt), rechts die Daten der Halle: Name (Überschrift), Adresse
+   (address), Kurzinfo, Kontakt (dl mit tel:- und mailto:-Links), die nächsten Spiele in der Halle (Liste im Stil der Spielkarte) und der Link zur
+   Hallenseite. Die Karte füllt die Höhe der Daten (Mindesthöhe aus --dss-map-h der Karte). Ohne Koordinaten (.dss-venue--map fehlt) nehmen die Daten
+   die ganze Breite. Ist die Karte höchstens 640 px breit (Container-Abfrage), steht die Karte oben im Format 16:9. Der Name hängt an den Überschriften-Tokens (--dss-card-title-size), nie am
+   Elementnamen. Logos und Kurznamen teilen die Bausteine der Namen-und-Logos-Regeln (.dss-team-logo, .dss-team-name). */
+.dss-venue {
+  box-sizing: border-box; width: 100%; container: dss-venue / inline-size; font-family: var(--font-body); color: var(--dss-fg);
+  background: var(--dss-surface); border: 1px solid var(--dss-line); border-radius: 16px;
+}
+.dss-venue-in { display: grid; grid-template-columns: minmax(0, 1fr); }
+.dss-venue--map .dss-venue-in { grid-template-columns: minmax(224px, 40%) minmax(0, 1fr); }
+.dss-venue--map.dss-venue--compact .dss-venue-in { grid-template-columns: minmax(224px, 30%) minmax(0, 1fr); }
+
+/* Kartenspalte: Karte füllt die Höhe, darunter die Links (Größere Karte, Route planen) */
+.dss-venue-map { display: flex; flex-direction: column; min-width: 0; padding: 16px 0 8px 16px; }
+.dss-venue-map .dss-map { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr); gap: 0; }
+.dss-venue-map .dss-map-frame { display: flex; min-width: 0; }
+.dss-venue-map .dss-map-stage { flex: 1 1 auto; height: auto; min-height: var(--_dss-map-h); }
+.dss-venue-map .dss-map-ph { padding: 10px 10px 32px; } /* unten Platz für die Quellenangabe (28 px) */
+.dss-venue-map .dss-map-ph-card { padding: 8px 12px; gap: 6px; }
+.dss-venue-maplinks { display: flex; flex-wrap: wrap; gap: 0 16px; }
+.dss-venue-maplinks .dss-link { display: inline-flex; align-items: center; min-height: 44px; font-size: var(--fs-body-md); }
+
+/* Datenspalte */
+.dss-venue-body { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding: 18px 20px; }
+.dss-venue-title { margin: 0; font-family: var(--font-display); font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-h3))); letter-spacing: -0.01em; line-height: var(--dss-title-leading, 1.2); color: var(--dss-fg); overflow-wrap: break-word; }
+.dss-venue-address { display: grid; font-style: normal; font-size: var(--fs-body-md); line-height: 1.4; color: var(--dss-fg-soft); }
+.dss-venue-line { display: block; }
+.dss-venue-info { margin: 0; font-size: var(--fs-body-md); line-height: 1.5; color: var(--dss-fg-soft); }
+.dss-venue-contact { display: grid; gap: 0; margin: 0; }
+.dss-venue-contact > div { display: grid; grid-template-columns: 6rem minmax(0, 1fr); gap: 8px; align-items: center; }
+.dss-venue-contact dt { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-mute); }
+.dss-venue-contact dd { margin: 0; min-width: 0; font-size: var(--fs-body-md); color: var(--dss-fg); overflow-wrap: anywhere; }
+.dss-venue-contact > div { min-height: 32px; }
+.dss-venue-contact .dss-link { display: inline-flex; align-items: center; min-height: 32px; }
+
+/* Nächste Spiele: Karten im Stil der Spielkarte (Kopfzeile in Mono, Trikotpunkte, Namen) */
+.dss-venue-games { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--dss-line); }
+.dss-venue-sec { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-mute); }
+.dss-venue-game-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.dss-venue-game { padding: 10px 14px 12px; background: var(--dss-surface-2); border: 1px solid var(--dss-line); border-radius: 12px; }
+.dss-venue-game-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--dss-fg-soft); }
+.dss-venue-when { color: var(--dss-fg); }
+.dss-venue-game-meta { margin-top: 2px; font-family: var(--font-mono); font-size: var(--fs-caption); letter-spacing: 0.04em; color: var(--dss-mute); }
+.dss-venue-teams { display: grid; gap: 6px; margin-top: 8px; }
+.dss-venue-team { display: flex; align-items: center; gap: 10px; min-width: 0; }
+/* Trikotpunkt mit Rand in --dss-mute (≥ 3:1 auf der Fläche), damit er auch im Dunkelmodus sichtbar bleibt; die Seite steht zusätzlich als versteckter Text im Markup */
+.dss-venue-dot { box-sizing: border-box; flex: none; width: 12px; height: 12px; border: 1px solid var(--dss-mute); border-radius: 50%; background: var(--team-heim, oklch(0.55 0.20 27)); }
+.dss-venue-dot--gast { background: var(--team-gast, oklch(0.55 0.18 245)); }
+.dss-venue-team-name { min-width: 0; font-family: var(--font-display); font-weight: 600; font-size: var(--fs-body); letter-spacing: -0.005em; color: var(--dss-fg); overflow-wrap: anywhere; }
+
+.dss-venue-foot { margin: auto 0 -10px; } /* der Link ist 48 px hoch, sein Text hat darüber und darunter Luft: der Überstand gleicht den Innenabstand aus */
+.dss-venue-more { display: inline-flex; align-items: center; min-height: 48px; font-size: var(--fs-body-md); font-weight: 500; }
+
+/* compact: kleinere Karte, kleinerer Titel, engere Ränder; die Spiele entfallen (im Markup) */
+.dss-venue--compact { border-radius: 12px; }
+.dss-venue--compact .dss-venue-map { padding: 12px 0 4px 12px; }
+.dss-venue--compact .dss-venue-body { gap: 8px; padding: 14px 16px; }
+.dss-venue--compact .dss-venue-foot { margin-bottom: -8px; }
+.dss-venue--compact .dss-venue-title { font-weight: var(--dss-title-weight, 700); font-size: var(--dss-card-title-size, var(--dss-title-size, var(--fs-body-lg))); line-height: var(--dss-title-leading, 1.2); }
+.dss-venue--compact .dss-venue-more { min-height: 44px; }
+
+/* Schmal (Karte höchstens 640 px breit, also auch auf dem Handy und in schmalen Spalten): Karte oben (16:9, mindestens 224 px hoch), Daten darunter.
+   Maßgeblich ist die Breite der Karte, nicht die des Fensters (Container-Abfrage), damit sie auch in einer schmalen Spalte am großen Bildschirm passt. */
+@container dss-venue (max-width: 640px) {
+  .dss-venue--map .dss-venue-in, .dss-venue--map.dss-venue--compact .dss-venue-in { grid-template-columns: minmax(0, 1fr); }
+  .dss-venue-map, .dss-venue--compact .dss-venue-map { padding: 12px 12px 0; }
+  .dss-venue-map .dss-map { flex: none; }
+  .dss-venue-map .dss-map-stage { flex: none; width: 100%; height: auto; aspect-ratio: 16 / 9; min-height: 224px; } /* 224: der Pin im Platzhalter bleibt über dem Hinweis sichtbar */
+  .dss-venue-body, .dss-venue--compact .dss-venue-body { padding: 16px; }
+  .dss-venue-contact > div { grid-template-columns: 5.5rem minmax(0, 1fr); min-height: 44px; }
+  .dss-venue-contact .dss-link { min-height: 44px; }
+}
+
+/* Druck: Daten untereinander, die Karte selbst druckt die Liste mit Koordinaten */
+@media print {
+  .dss-venue--map .dss-venue-in, .dss-venue--map.dss-venue--compact .dss-venue-in { grid-template-columns: minmax(0, 1fr); }
+  .dss-venue-maplinks { display: none; }
+  .dss-venue-game { break-inside: avoid; }
+}

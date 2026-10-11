@@ -66,6 +66,10 @@ export const TITLE_CASES: TitleCase[] = [
     name: 'LeagueCard', titleClass: 'dss-league-title', svelte: 'svelte/LeagueCard.svelte', react: 'react/LeagueCard.tsx', reactName: 'LeagueCard',
     svelteProps: () => ({ title: 'Oberliga', teams: [LEAGUE_TEAM] }), reactProps: () => ({ title: 'Oberliga', teams: [LEAGUE_TEAM] }),
   },
+  {
+    name: 'VenueCard', titleClass: 'dss-venue-title', svelte: 'svelte/VenueCard.svelte', react: 'react/VenueCard.tsx', reactName: 'VenueCard',
+    svelteProps: () => ({ name: 'Sporthalle Nordhain' }), reactProps: () => ({ name: 'Sporthalle Nordhain' }),
+  },
 ];
 
 export type { ReactElement };
