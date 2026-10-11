@@ -29,7 +29,7 @@ const mediaBlock = (head: string) => {
 describe('Accordion-CSS: Klassen und Tokens', () => {
   it('der Abschnitt ist vorhanden', () => expect(START).toBeGreaterThan(0));
   it.each([
-    'dss-acc', 'dss-acc--flat', 'dss-acc--nested', 'dss-acc--sticky', 'dss-acc-item', 'dss-acc-title', 'dss-acc-trigger', 'dss-acc-label',
+    'dss-acc', 'dss-acc--card', 'dss-acc--flat', 'dss-acc--nested', 'dss-acc--sticky', 'dss-acc-item', 'dss-acc-title', 'dss-acc-trigger', 'dss-acc-label',
     'dss-acc-meta', 'dss-acc-chevron', 'dss-acc-panel', 'dss-acc-panel-inner', 'dss-acc-body', 'dss-acc-tools', 'dss-acc-bar',
     'dss-acc-nav', 'dss-acc-nav-list', 'dss-acc-nav-link', 'dss-acc-nav-toggle',
   ])('definiert .%s', (cls) => {
