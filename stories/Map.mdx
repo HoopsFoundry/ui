@@ -2,6 +2,7 @@ import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
 import * as MapStories from './Map.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite } from './Map.code';
@@ -63,7 +64,7 @@ Die [Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/) de
 
 Eine Konfiguration, die Kacheln unter `/tiles/` ausliefert und zwischenspeichert. Sie nimmt nur Pfade der Form `/tiles/z/x/y.png` an, setzt einen eigenen `User-Agent` und Referer, entfernt Cookies, beachtet das `Cache-Control` des Kartendienstes und begrenzt die Abrufe je Besucher. Die Datei steht als Beispiel im Repository (`stories/examples/nginx-tiles.conf`) und wird in den Tests auf Aufbau und Pfadmuster geprüft.
 
-<FrameworkCode label="nginx: Kachel-Proxy mit Zwischenspeicher" vanilla={nginxConf} svelte={nginxConf} react={nginxConf} />
+<CodeBlock label="nginx: Kachel-Proxy mit Zwischenspeicher" language="nginx" code={nginxConf} />
 
 **Nicht ausgeführt: bitte vor Gebrauch testen.** Auf dem Rechner, auf dem diese Doku entstand, war kein nginx installiert; die Syntax wurde gegen die nginx-Dokumentation geprüft, aber nicht mit `nginx -t` ausgeführt. Prüfe die Datei auf dem Zielserver mit `nginx -t`, bevor du sie lädst. Wichtig dabei: `proxy_pass` hat bewusst **keinen** URI-Teil (kein Schrägstrich am Ende), weil nginx ihn in einem Regex-`location` nicht erlaubt; der Pfad wird stattdessen mit `rewrite … break` umgeschrieben. `proxy_ssl_server_name on` ist nötig, damit der Kartendienst das richtige Zertifikat ausliefert (SNI).
 
@@ -71,7 +72,7 @@ Eine Konfiguration, die Kacheln unter `/tiles/` ausliefert und zwischenspeichert
 
 Ein kleiner Endpunkt, der Kacheln mit `fetch` abruft und mit dem `Cache-Control` des Kartendienstes weiterreicht. **Kein offener Proxy:** der Host ist fest im Code, aus der Anfrage werden nur drei Ganzzahlen übernommen (`z`, `x`, `y`), und ausgeliefert wird nur `png`. `parseTilePath` prüft: Ganzzahlen ohne führende Nullen, Zoom 0 bis 19, Bereich `0 ≤ x, y < 2^z`; alles andere ergibt 404. Eine frei wählbare URL nimmt der Endpunkt nie an. Er speichert nichts selbst: vor ihn gehört ein Zwischenspeicher (nginx, CDN), der das weitergereichte `Cache-Control` nutzt.
 
-<FrameworkCode label="Endpunkt src/routes/tiles/[...path]/+server.ts" vanilla={kachelEndpunktTs} svelte={kachelEndpunktTs} react={kachelEndpunktTs} />
+<CodeBlock label="Endpunkt src/routes/tiles/[...path]/+server.ts" language="TypeScript" code={kachelEndpunktTs} />
 
 Die Datei wird in den Tests mit dem TypeScript-Compiler geprüft, und `parseTilePath` und `GET` werden dort ausgeführt (mit nachgestelltem `fetch`): feste Adresse, `User-Agent`, durchgereichtes `Cache-Control`, 404 bei ungültigen Pfaden, 502 bei Fehlern des Kartendienstes.
 
@@ -219,7 +220,7 @@ Leaflet ist eine **optionale Peer-Abhängigkeit** (`peerDependencies` mit `peerD
 - Kachel-Adressen in der **Content-Security-Policy**: bei eigenem Proxy reicht `img-src 'self'`, direkt von OpenStreetMap braucht `img-src https://tile.openstreetmap.org`.
 - In Svelte stehen `{z}`, `{x}` und `{y}` einer `tileUrl` in einer Konstante, nicht im Attribut. In React reicht ein normaler String.
 
-<FrameworkCode label="Leaflet und Stylesheet einbinden" vanilla={einbindungVite} svelte={einbindungVite} react={einbindungVite} />
+<CodeBlock label="Leaflet und Stylesheet einbinden" language="JavaScript" code={einbindungVite} />
 
 ### Warum `MapView` in React und `Map.svelte` in Svelte
 
@@ -267,7 +268,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
 
 Die Logik der Karte steckt in reinen Funktionen (`@bbv/dss-design-system/map.js`, mit Typen), die auch für eigene Darstellungen taugen: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord`. Die Aufrufe im Beispiel werden in den Tests ausgewertet und liefern die kommentierten Werte.
 
-<FrameworkCode label="Funktionen aus map.js" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
+<CodeBlock label="Funktionen aus map.js" language="JavaScript" code={funktionenJs} />
 
 ### Maße
 
@@ -288,14 +289,17 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
 />
 
 <DocTable
-  label="Kontraste der Karte (gemessen und berechnet)"
+  label="Kontraste der Karte (gemessen an Pixeln des Browsers, BBV und DBB, hell und dunkel)"
   head={['Text oder Fläche', 'Verhältnis', 'Anforderung']}
   rows={[
-    ['Quellenangabe (`--dss-link` auf `--dss-surface`)', '7,0 bis 12,6:1', 'mindestens 7:1'],
-    ['Name, Hinweis und Koordinaten in Liste und Platzhalter', '7,2 bis 21,0:1', 'mindestens 7:1'],
-    ['Nummer im Pin (Weiß auf Schwarz) und eigener Pin (Schwarz auf Gold)', '21,0:1 und 11,1 bis 12,0:1', 'mindestens 7:1'],
-    ['Pin gegen helle und dunkle Kacheln (Kontur oder Ring)', '3,1 bis 19,0:1', 'mindestens 3:1'],
-    ['Fokus-Ring (gestrichelt, 3 px)', '3,0 bis 4,1:1', 'mindestens 3:1'],
+    ['Quellenangabe (Link auf `--dss-surface`)', '11,6 bis 16,1:1', 'mindestens 7:1'],
+    ['Name des Orts, Hinweis im Platzhalter, „Karte laden“', '12,6 bis 20,1:1', 'mindestens 7:1'],
+    ['Koordinaten (`--dss-mute`)', '7,8 bis 8,1:1', 'mindestens 7:1'],
+    ['Links in der Liste', '11,2 bis 15,2:1', 'mindestens 7:1'],
+    ['Zeichen der Zoom-Schaltflächen', '19,9 bis 21,0:1', 'mindestens 7:1'],
+    ['Nummer im Pin (Weiß auf Schwarz) und im eigenen Pin (Schwarz auf Gold)', '17,6 bis 21,0:1 und 8,2 bis 11,1:1 (berechnet)', 'mindestens 7:1'],
+    ['Pin gegen die Kachel (dunkle Kontur oder weißer Ring; auch auf den abgedunkelten Kacheln des Dunkelmodus)', '9,0 bis 17,5:1 (gemessen auf dem Demo-Bild); gegen die typischen OpenStreetMap-Töne (Land, Wasser, Wald, Park, Straße) immer mindestens 3:1 (getestet)', 'mindestens 3:1'],
+    ['Fokus-Ring (gestrichelt, 3 px, auf Fläche; am Marker liegt die Fläche als Hof darunter)', '3,6 bis 4,1:1', 'mindestens 3:1'],
   ]}
 />
 

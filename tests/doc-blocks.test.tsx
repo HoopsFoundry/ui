@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { DosDonts } from '../stories/docs/blocks/DosDonts';
 import { DocTable } from '../stories/docs/blocks/DocTable';
 import { FrameworkCode } from '../stories/docs/blocks/FrameworkCode';
+import { CodeBlock } from '../stories/docs/blocks/CodeBlock';
 
 afterEach(() => document.documentElement.removeAttribute('data-framework'));
 
@@ -30,6 +31,16 @@ describe('FrameworkCode', () => {
     document.documentElement.dataset.framework = 'vanilla';
     render(<FrameworkCode svelte="x" />);
     expect(screen.getByText('Für diese Fassung gibt es hier kein Beispiel.')).toBeInTheDocument();
+  });
+});
+
+describe('CodeBlock', () => {
+  it('zeigt den Code mit Sprache und unabhängig vom Umschalter Fassung, als erreichbare Region', () => {
+    document.documentElement.dataset.framework = 'react';
+    render(<CodeBlock label="nginx: Kachel-Proxy" language="nginx" code={'proxy_cache osm_tiles;'} />);
+    expect(screen.getByText('proxy_cache osm_tiles;')).toBeInTheDocument();
+    expect(screen.getByText('nginx')).toBeInTheDocument();
+    expect(screen.getByRole('region', { name: 'nginx: Kachel-Proxy, nginx' })).toHaveAttribute('tabindex', '0');
   });
 });
 

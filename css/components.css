@@ -1536,7 +1536,7 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   background: var(--dss-surface); color: var(--dss-link); border-radius: var(--radius-md); box-shadow: inset 0 0 0 1px var(--dss-line-strong);
   outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px;
 }
-.dss-map-frame { position: relative; min-width: 0; border: 1px solid var(--dss-line-strong); border-radius: var(--radius-lg); background: var(--dss-surface-2); overflow: hidden; box-shadow: var(--shadow-sm); }
+.dss-map-frame { position: relative; min-width: 240px; border: 1px solid var(--dss-line-strong); border-radius: var(--radius-lg); background: var(--dss-surface-2); overflow: hidden; box-shadow: var(--shadow-sm); }
 .dss-map-stage { position: relative; isolation: isolate; height: var(--_dss-map-h); min-height: 200px; overflow: hidden; }
 
 /* Platzhalter (Zwei-Klick): ruhiges Gitter, Marker als Hinweis auf die Lage, Karte mit Hinweis und Schaltfläche */

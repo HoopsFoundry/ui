@@ -106,21 +106,21 @@
   </div>
 {:else if example === 'do-adresse'}
   <div class="narrow">
-    <MapView label="Do: Karte mit Adresse als Text" markers={one} height={220} />
+    <MapView label="Do: Karte mit Adresse als Text" markers={one} height={280} />
   </div>
 {:else if example === 'dont-adresse'}
   <!-- Falsch: die Adresse steht nur in der Karte. Die Komponente liefert die Liste immer (auch mit showList={false} für Hilfstechnik); die Doku blendet sie hier für alle aus. -->
   <div class="narrow no-text">
-    <MapView label="Don't: Karte ohne Adresse als Text" markers={one} height={220} />
+    <MapView label="Don't: Karte ohne Adresse als Text" markers={one} height={280} />
   </div>
 {:else if example === 'do-datenschutz'}
   <div class="narrow">
-    <MapView label="Do: Karte erst nach Klick" markers={one} height={220} />
+    <MapView label="Do: Karte erst nach Klick" markers={one} height={280} />
   </div>
 {:else if example === 'dont-datenschutz'}
   <!-- Falsch: Die Karte lädt sofort und holt Kacheln vom Fremdserver, noch bevor jemand zugestimmt hat. Die Doku nutzt das lokale Demo-Bild, damit kein Netzverkehr entsteht. -->
   <div class="narrow no-text">
-    <MapView label="Don't: Karte lädt sofort" markers={one} tileUrl={tile} load="auto" height={220} />
+    <MapView label="Don't: Karte lädt sofort" markers={one} tileUrl={tile} load="auto" height={280} />
   </div>
 {:else if example === 'do-liste'}
   <div class="narrow">
