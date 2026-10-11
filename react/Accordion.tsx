@@ -154,7 +154,10 @@ export function Accordion({
   return (
     <GroupContext.Provider value={api}>
       <div ref={root} className={cn('dss-acc', `dss-acc--${variant}`, sticky && 'dss-acc--sticky', nested && 'dss-acc--nested', className)}>
-        {entries.length > 0 && (showAll || nav) ? (
+        {entries.length === 0 && (showAll || nav) ? (
+          // Platz für Leiste und Sprungleiste schon im Server-Markup: kein Sprung nach dem Hydrieren
+          <div className="dss-acc-tools dss-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true" />
+        ) : entries.length > 0 && (showAll || nav) ? (
           <div className="dss-acc-tools">
             {showAll ? (
               <div className="dss-acc-bar">

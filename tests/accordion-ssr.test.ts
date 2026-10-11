@@ -138,10 +138,15 @@ describe('Accordion SSR: Inhalt des Markups', () => {
     expect(svelteSolo).toContain('role="region" aria-labelledby="solo-trigger"');
     expect(svelteSolo).toBe(reactSolo);
   });
-  it('Sprungleiste und Alle-öffnen-Leiste fehlen im Server-Markup', () => {
+  it('Sprungleiste und Alle-öffnen-Leiste fehlen im Server-Markup, ihr Platz ist als Platzhalter reserviert (kein Sprung nach dem Hydrieren)', () => {
     const out = html({ props: { nav: true, expandAll: true }, items: three });
-    expect(out).not.toContain('dss-acc-tools');
     expect(out).not.toContain('<nav');
+    expect(out).not.toContain('<button type="button" class="dss-btn');
+    expect(out).toContain('<div class="dss-acc-tools dss-acc-tools--pending" data-parts="both" aria-hidden="true"></div>');
+    expect(html({ props: { nav: true }, items: three })).toContain('data-parts="nav"');
+    expect(html({ props: { expandAll: true }, items: three })).toContain('data-parts="bar"');
+    expect(html({ props: { expandAll: true, exclusive: true }, items: three })).not.toContain('dss-acc-tools');
+    expect(html({ items: three })).not.toContain('dss-acc-tools');
   });
   it('ein verschachteltes Accordion zählt die Ebene hoch: h3, h4, h5', () => {
     const tags = [...html(nest()).matchAll(/<(h[1-6]) class="dss-acc-title"/g)].map((m) => m[1]);

@@ -1467,11 +1467,14 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 
 /* Werkzeugleiste: Alle öffnen/schließen und Sprungleiste */
 .dss-acc-tools { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 12px 16px; }
+/* Platzhalter im Server-Markup (bis die Bereiche angemeldet sind): reserviert die Höhe der Leiste, damit nach dem Hydrieren nichts springt */
+.dss-acc-tools--pending { min-height: 44px; }
+@media (max-width: 639.98px) { .dss-acc-tools--pending[data-parts="both"] { min-height: 100px; } }
 .dss-acc-bar { display: flex; flex-wrap: wrap; gap: 8px; }
 .dss-acc-nav { flex: 1 1 320px; min-width: 0; }
 .dss-acc-nav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
 .dss-acc-nav-link {
-  display: inline-flex; align-items: center; min-height: 44px; padding: 0 14px; border-radius: var(--radius-full);
+  display: inline-flex; align-items: center; box-sizing: border-box; min-height: 44px; padding: 0 14px; border-radius: var(--radius-full);
   border: 1px solid var(--dss-line); background: var(--dss-surface); color: var(--dss-fg-soft);
   font-size: var(--fs-body-sm); font-weight: 600; text-decoration: none;
 }
@@ -1479,7 +1482,7 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-acc-nav-link:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }
 .dss-acc-nav-link[aria-current="true"] { background: var(--dss-btn-bg); border-color: var(--dss-btn-bg); color: var(--dss-btn-fg); }
 .dss-acc-nav-toggle {
-  appearance: none; display: none; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 44px; padding: 0 14px;
+  appearance: none; display: none; align-items: center; justify-content: space-between; box-sizing: border-box; gap: 12px; width: 100%; min-height: 44px; padding: 0 14px;
   border: 1px solid var(--dss-line); border-radius: var(--radius-md); background: var(--dss-surface-2); color: var(--dss-fg);
   font-family: inherit; font-size: var(--fs-body-sm); font-weight: 600; cursor: pointer;
 }

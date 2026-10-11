@@ -552,7 +552,8 @@ describe('Accordion: Server-Rendering', () => {
       </Accordion>,
     );
     expect(html).toContain('aria-expanded="true"');
-    expect(html).not.toContain('dss-acc-tools');
+    expect(html).toContain('dss-acc-tools--pending');
+    expect(html).not.toContain('<nav');
     expect(html).not.toContain('role="region"');
   });
   it('ein einzelner Bereich ist schon im Server-Markup eine Region', () => {

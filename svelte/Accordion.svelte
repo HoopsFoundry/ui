@@ -112,7 +112,10 @@
 </script>
 
 <div class={classes} bind:this={root}>
-  {#if entries.length > 0 && (showAll || nav)}
+  {#if entries.length === 0 && (showAll || nav)}
+    <!-- Platz für Leiste und Sprungleiste schon im Server-Markup: kein Sprung nach dem Hydrieren -->
+    <div class="dss-acc-tools dss-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true"></div>
+  {:else if entries.length > 0 && (showAll || nav)}
     <div class="dss-acc-tools">
       {#if showAll}
         <div class="dss-acc-bar">

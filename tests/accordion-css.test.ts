@@ -169,6 +169,17 @@ describe('Accordion-CSS: Kopf klebt (sticky)', () => {
   });
 });
 
+describe('Accordion-CSS: reservierter Platz der Leiste (kein Layout-Sprung nach dem Hydrieren)', () => {
+  it('Platzhalter ist 44 px hoch, bei Leiste plus Sprungleiste unter 640 px 100 px (44 + 12 + 44)', () => {
+    expect(rule('.dss-acc-tools--pending')).toMatch(/min-height:\s*44px/);
+    expect(mediaBlock('@media (max-width: 639.98px) { .dss-acc-tools--pending')).toMatch(/\[data-parts="both"\]\s*\{\s*min-height:\s*100px/);
+  });
+  it('Sprunglink und Schalter messen mit Rand genau 44 px (border-box)', () => {
+    expect(rule('.dss-acc-nav-link')).toMatch(/box-sizing:\s*border-box/);
+    expect(rule('.dss-acc-nav-toggle')).toMatch(/box-sizing:\s*border-box/);
+  });
+});
+
 describe('Accordion-CSS: Sprungleiste unter und über 640 px', () => {
   it('unter 640 px ist die Liste einklappbar, der Schalter sichtbar; darüber nebeneinander', () => {
     const small = mediaBlock('@media (max-width: 639.98px)');
