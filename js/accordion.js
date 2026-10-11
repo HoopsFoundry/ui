@@ -132,9 +132,9 @@ export function writeHash(id, open) {
 export function stickyOffset(el) {
   if (!el || typeof el.closest !== 'function') return 0;
   let top = null;
-  for (let item = el.parentElement?.closest('.dss-acc-item'); item; item = item.parentElement?.closest('.dss-acc-item')) top = item;
+  for (let item = el.parentElement?.closest(ITEM); item; item = item.parentElement?.closest(ITEM)) top = item;
   if (!top || !top.parentElement?.closest('.dss-acc')?.classList.contains('dss-acc--sticky')) return 0;
-  const head = top.querySelector(':scope > .dss-acc-title, :scope > summary');
+  const head = top.querySelector(':scope > .dss-acc-title, :scope > summary, :scope > .dss-frame-head, :scope > .dss-league-head');
   return head ? Math.ceil(head.getBoundingClientRect().height) : 0;
 }
 
@@ -228,14 +228,18 @@ export function createCollapsible(host) {
 
 // ── Vanilla-Skript ───────────────────────────────────────────
 
-const ITEM = '.dss-acc-item';
+// Bereiche: Karten (`.dss-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
+const ITEM = '.dss-acc-item, .dss-frame.is-collapsible, .dss-league.is-collapsible';
+const DETAILS = 'details.dss-acc-item';
 const instances = new WeakMap();
 let uid = 0;
 
 const TEXT = { all: 'Alle öffnen', none: 'Alle schließen', nav: 'Bereiche' };
 
 function triggerOf(item) {
-  return item.querySelector(':scope > summary, :scope > .dss-acc-title > .dss-acc-trigger');
+  return item.querySelector(
+    ':scope > summary, :scope > .dss-acc-title > .dss-acc-trigger, :scope > .dss-frame-head > .dss-frame-title > .dss-acc-trigger, :scope > .dss-league-head > .dss-league-title > .dss-acc-trigger',
+  );
 }
 function panelOf(item) {
   return item.querySelector(':scope > .dss-acc-panel');
@@ -257,13 +261,19 @@ function labelOf(item) {
   if (!source) return '';
   // Das unsichtbare Komma (.dss-acc-sep, früher .dss-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
   const copy = source.cloneNode(true);
-  for (const hidden of copy.querySelectorAll('.dss-sr-only, .dss-acc-sep')) hidden.remove();
+  for (const hidden of copy.querySelectorAll('.dss-sr-only, .dss-acc-sep, .dss-acc-sub')) hidden.remove();
   return clean(copy.textContent);
 }
 
 /** Alle Bereiche, die direkt zu `root` gehören (verschachtelte Gruppen zählen nicht mit). */
 function itemsOf(root) {
-  return [...root.querySelectorAll(ITEM)].filter((el) => el.parentElement?.closest('.dss-acc') === root);
+  return [...root.querySelectorAll(ITEM)].filter((el) => inGroup(el, root));
+}
+
+/** Gehört der Bereich direkt zu `root`? Nicht, wenn er in einer verschachtelten Gruppe oder (als einzelner Rahmen) im Panel eines Bereichs steht. */
+function inGroup(item, root) {
+  const parent = item.parentElement;
+  return parent?.closest('.dss-acc') === root && parent.closest('.dss-acc-panel')?.closest('.dss-acc') !== root;
 }
 
 /** Baum aller Bereiche mit id unterhalb von `scope` (über alle Gruppen): jeder Bereich kennt den Bereich, in dem er liegt. */
@@ -350,7 +360,7 @@ export function initAccordion(root, options = {}) {
     const trigger = event.target instanceof Element ? event.target.closest('.dss-acc-trigger') : null;
     if (!trigger || trigger.closest('.dss-acc') !== root) return;
     const item = trigger.closest(ITEM);
-    if (!item || item.parentElement?.closest('.dss-acc') !== root) return;
+    if (!item || !inGroup(item, root)) return;
     if (isDetails(item)) {
       if (isLocked(item)) event.preventDefault();
       return; // das native Umschalten übernimmt der Browser; toggle-Ereignis siehe unten
@@ -359,7 +369,7 @@ export function initAccordion(root, options = {}) {
   };
   const onToggle = (event) => {
     const item = event.target;
-    if (!(item instanceof Element) || !item.matches('details' + ITEM) || item.parentElement?.closest('.dss-acc') !== root) return;
+    if (!(item instanceof Element) || !item.matches(DETAILS) || !inGroup(item, root)) return;
     if (known.get(item) === item.open) return;
     known.set(item, item.open);
     const programmatic = expected.delete(item);

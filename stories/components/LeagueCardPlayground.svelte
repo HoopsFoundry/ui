@@ -31,5 +31,7 @@
     logos={rest.logos}
     size={rest.size}
     titleAs={rest.titleAs}
+    collapsible={rest.collapsible}
+    open
   />
 </div>

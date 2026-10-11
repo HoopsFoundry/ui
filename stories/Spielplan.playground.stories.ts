@@ -48,8 +48,10 @@ export const Tabelle = {
     outcome: 'auto',
     showNotice: false,
     editableTime: false,
+    collapsible: false,
   },
   argTypes: {
+    collapsible: bool('Prop collapsible: der Rahmenkopf wird zum Accordion-Kopf, die Tabelle zum Bereich (die Spielwiese zeigt sie geöffnet)', 'Optionen'),
     kind: { table: { disable: true } },
     halls: { table: { disable: true } },
     showBreak: { table: { disable: true } },
@@ -102,8 +104,10 @@ export const Zeitraster = {
     note: '',
     own: true,
     placeholder: false,
+    collapsible: false,
   },
   argTypes: {
+    collapsible: bool('Prop collapsible: der Rahmenkopf wird zum Accordion-Kopf, das Zeitraster zum Bereich (die Spielwiese zeigt sie geöffnet)', 'Optionen'),
     kind: { table: { disable: true } },
     layout: { table: { disable: true } },
     outcome: { table: { disable: true } },

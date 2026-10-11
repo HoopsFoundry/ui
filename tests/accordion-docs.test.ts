@@ -31,7 +31,12 @@ describe('Accordion-Doku', () => {
     const withHash = [...examples.matchAll(/<Accordion(?=[ >])(?![^>]*syncHash=\{false\})[^>]*>/g)].map((m) => m[0]);
     expect(withHash.length).toBe(2); // Gruppe und verschachtelte Gruppe im Deep-Link-Beispiel
   });
-  it('Beispiele nutzen keine einklappbaren Tabellenrahmen (Paket B)', () => expect(examples).not.toContain('collapsible'));
+  it('nur die Liga-Seite nutzt einklappbare Tabellenrahmen (Table mit collapsible, kein Tabellenrahmen im AccordionItem)', () => {
+    const liga = examples.slice(examples.indexOf("example === 'liga'"), examples.indexOf("example === 'handy'"));
+    expect(liga.match(/<Table collapsible/g)).toHaveLength(4);
+    expect(liga).not.toContain('<AccordionItem');
+    expect(examples.replace(liga, '')).not.toContain('collapsible');
+  });
   it('Einführung, storySort, README und CHANGELOG nennen das Accordion', () => {
     expect(read('stories/Introduction.mdx')).toContain('components-accordion--docs');
     expect(read('.storybook/preview.ts')).toMatch(/'Tabs', 'Accordion'/);

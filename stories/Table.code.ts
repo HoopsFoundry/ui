@@ -114,3 +114,126 @@ const spieler = [
     </tr>
   ))}
 </Table>`;
+
+// ── Tabellen einklappen (Table.mdx, Abschnitt „Tabellen einklappen“). Die Tests (tests/collapsible-code.test.ts) übersetzen das
+// React-Beispiel mit dem TypeScript-Compiler, rendern das Svelte-Beispiel und vergleichen das Vanilla-Markup mit der Ausgabe der Komponente.
+
+const CHEVRON = `<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
+
+/** Markup eines einklappbaren Tabellenrahmens (geöffnet, mit Zusatzinfo); die Doku zeigt es und prüft es gegen die Komponente. */
+export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
+  <div class="dss-frame is-collapsible is-open" id="boxscore">
+    <div class="dss-frame-head dss-frame-head--acc">
+      <h3 class="dss-frame-title">
+        <button type="button" class="dss-acc-trigger" id="boxscore-trigger" aria-expanded="true" aria-controls="boxscore-panel">
+          <span class="dss-acc-label">Spieler-Statistiken<span class="dss-acc-sep">,</span></span>
+          <span class="dss-frame-meta"><span>Stand · 4. Viertel</span></span>
+          ${CHEVRON}
+        </button>
+      </h3>
+    </div>
+    <div class="dss-acc-panel" id="boxscore-panel">
+      <div class="dss-acc-panel-inner">
+        <div class="dss-table-scroll" role="region" tabindex="0" aria-label="Spieler-Statistiken">
+          <table class="dss-tbl dss-tbl--compact">
+            <thead><tr><th scope="col" class="left">Spieler</th><th scope="col" class="right">PTS</th></tr></thead>
+            <tbody>
+              <tr><td>J. Tanner</td><td class="num lead">22</td></tr>
+              <tr><td>M. Okafor</td><td class="num lead">19</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`;
+
+export const collapsibleVanilla = `<!-- Wie die normale Tabelle (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Rahmen trägt
+     is-collapsible (und is-open, wenn er offen ist), die Tabelle steht in einem Bereich (dss-acc-panel). Geschlossen: aria-expanded="false",
+     Bereich mit hidden und inert. Der Container mit data-dss-acc macht ihn bedienbar; mehrere Rahmen in einem Container bilden eine Gruppe. -->
+${collapsibleMarkup}
+
+<script type="module">
+  import { initAccordions } from '@bbv/dss-design-system/accordion.js';
+
+  // Optionen wie beim Accordion: exclusive, syncHash (Standard true), expandAll, nav, sticky
+  initAccordions(document, { nav: true });
+</script>`;
+
+export const collapsibleSvelte = `<script>
+  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
+  import Table from '@bbv/dss-design-system/svelte/Table';
+
+  let open = $state(true);
+</script>
+
+<!-- Einzeln: bind:open, id für den Deep-Link (…#boxscore) -->
+<Table
+  collapsible
+  id="boxscore"
+  title="Spieler-Statistiken"
+  meta="Stand · 4. Viertel"
+  bind:open
+  density="compact"
+  columns={[
+    { key: 'name', label: 'Spieler' },
+    { key: 'pts', label: 'PTS', align: 'right' },
+  ]}
+>
+  {#snippet rows()}
+    <tr><td>J. Tanner</td><td class="num lead">22</td></tr>
+    <tr><td>M. Okafor</td><td class="num lead">19</td></tr>
+  {/snippet}
+</Table>
+
+<!-- In einer Gruppe: Sprungleiste und „Alle öffnen/schließen“ -->
+<Accordion nav navLabel="Tabellen der Spielseite" expandAll>
+  <Table collapsible id="heim" title="Boxscore Heim" density="compact" columns={[{ key: 'name', label: 'Spieler' }]}>
+    {#snippet rows()}
+      <tr><td>J. Tanner</td></tr>
+    {/snippet}
+  </Table>
+  <Table collapsible id="gast" title="Boxscore Gast" density="compact" columns={[{ key: 'name', label: 'Spieler' }]}>
+    {#snippet rows()}
+      <tr><td>P. Kessel</td></tr>
+    {/snippet}
+  </Table>
+</Accordion>`;
+
+export const collapsibleReact = `import { useState } from 'react';
+import { Accordion, Table } from '@bbv/dss-design-system/react';
+
+export function Spielseite() {
+  const [open, setOpen] = useState(true);
+  return (
+    <>
+      {/* Einzeln: open + onOpenChange (oder defaultOpen), id für den Deep-Link (…#boxscore) */}
+      <Table
+        collapsible
+        id="boxscore"
+        title="Spieler-Statistiken"
+        meta="Stand · 4. Viertel"
+        open={open}
+        onOpenChange={setOpen}
+        density="compact"
+        columns={[
+          { key: 'name', label: 'Spieler' },
+          { key: 'pts', label: 'PTS', align: 'right' },
+        ]}
+      >
+        <tr><td>J. Tanner</td><td className="num lead">22</td></tr>
+        <tr><td>M. Okafor</td><td className="num lead">19</td></tr>
+      </Table>
+
+      {/* In einer Gruppe: Sprungleiste und „Alle öffnen/schließen“ */}
+      <Accordion nav navLabel="Tabellen der Spielseite" expandAll>
+        <Table collapsible id="heim" title="Boxscore Heim" density="compact" columns={[{ key: 'name', label: 'Spieler' }]}>
+          <tr><td>J. Tanner</td></tr>
+        </Table>
+        <Table collapsible id="gast" title="Boxscore Gast" density="compact" columns={[{ key: 'name', label: 'Spieler' }]}>
+          <tr><td>P. Kessel</td></tr>
+        </Table>
+      </Accordion>
+    </>
+  );
+}`;
