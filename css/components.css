@@ -1619,6 +1619,9 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-frame-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: color-mix(in oklab, var(--dss-hover-bg), var(--dss-fg) 12%); }
 .dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:hover:not([aria-disabled="true"]) { background: var(--n-900); }
 .dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:active:not([aria-disabled="true"]) { background: var(--n-800); }
+/* Die Zusatzinfo (gedämpft) wird auf der getönten Hover-/Aktiv-Fläche dunkler, damit der Kontrast ≥ 7:1 bleibt */
+.dss-frame-head--acc .dss-acc-trigger:is(:hover, :active) .dss-frame-meta { color: var(--dss-fg-soft); }
+.dss-frame--dark .dss-frame-head--acc .dss-acc-trigger:is(:hover, :active) .dss-frame-meta { color: var(--n-200); }
 .dss-frame--dark .dss-acc-trigger:focus-visible { outline-color: var(--ring-color-on-dark); }
 .dss-frame--dark .dss-acc-chevron { color: var(--n-400); }
 .dss-frame-head--acc .dss-frame-meta { flex: none; }

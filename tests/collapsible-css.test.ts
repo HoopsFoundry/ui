@@ -80,7 +80,7 @@ describe('CSS einklappbarer Rahmen', () => {
   });
   it('ohne collapsible ändert sich nichts: alle Regeln hängen an .is-collapsible, --acc oder dem Button im Titel', () => {
     for (const m of noComments.matchAll(/(^|\})\s*([^{}@]+)\{/g)) {
-      for (const sel of m[2].split(',').map((x) => x.trim()).filter(Boolean)) {
+      for (const sel of m[2].replace(/:is\([^)]*\)/g, '').split(',').map((x) => x.trim()).filter(Boolean)) {
         expect(sel, sel).toMatch(/is-collapsible|--acc|\.dss-acc-trigger|\.dss-acc-sub|\.dss-acc-chevron|\.dss-league-live/);
       }
     }

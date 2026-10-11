@@ -48,6 +48,9 @@
     { id: 't9', state: 'scheduled', nr: '#9', section: 'Halbfinale', time: '11:00–11:20', field: 'F1', venue: 'Halle 1', heim: { name: 'Erster Gruppe A', placeholder: true }, gast: { name: 'Zweiter Gruppe B', placeholder: true } },
   ];
 
+  // Einklappbare Beispiele: die Liga-Unterzeile ohne Link (ein 14-px-Link in der Unterzeile hat eine kleine Zielfläche, siehe „Layout versus“)
+  const ligaKompakt: ScheduleGame[] = liga.map((g) => ({ ...g, league: g.league ? { name: g.league.name } : undefined }));
+
   // 03 · Raster
   const raster: ScheduleGame[] = [
     { id: 'r1', state: 'finished', nr: '#1', section: 'Gruppe A', time: '09:00', column: 'h1', heim: { name: 'TSV Nordhain', score: 42, own: true }, gast: { name: 'Lindenberg Hawks', score: 31 } },
@@ -265,7 +268,7 @@
   </div>
 {:else if example === 'einklappbar'}
   <div class="stack">
-    <ScheduleTable collapsible open games={liga} layout="versus" title="Spieltage der Herren" meta="3 Spiele" caption="Einklappbar: Spielplan offen" />
+    <ScheduleTable collapsible open games={ligaKompakt} layout="versus" title="Spieltage der Herren" meta="3 Spiele" caption="Einklappbar: Spielplan offen" />
     <ScheduleGrid collapsible games={raster} columns={hallen} title="Zeitraster am Samstag" meta="3 Hallen" caption="Einklappbar: Zeitraster zu" />
   </div>
 {:else if example === 'einklappbar-id'}
@@ -276,18 +279,18 @@
   </div>
 {:else if example === 'einklappbar-gruppe'}
   <Accordion syncHash={false} nav navLabel="Bereiche des Spieltags" expandAll>
-    <ScheduleTable collapsible id="gr-liga" games={liga} layout="versus" title="Liga-Spieltag" meta="3 Spiele" caption="Gruppe: Liga-Spieltag" />
+    <ScheduleTable collapsible id="gr-liga" games={ligaKompakt} layout="versus" title="Liga-Spieltag" meta="3 Spiele" caption="Gruppe: Liga-Spieltag" />
     <ScheduleTable collapsible id="gr-turnier" games={turnier} layout="columns" title="Turnier-Spielplan" meta="4 Spiele" caption="Gruppe: Turnier-Spielplan" />
     <ScheduleGrid collapsible id="gr-raster" games={raster} columns={hallen} title="Hallenbelegung" meta="3 Hallen" caption="Gruppe: Hallenbelegung" />
   </Accordion>
 {:else if example === 'do-offen'}
   <div class="stack">
-    <ScheduleTable collapsible open games={liga} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Do: heutiger Spieltag" />
+    <ScheduleTable collapsible open games={ligaKompakt} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Do: heutiger Spieltag" />
     <ScheduleTable collapsible games={mannschaft} layout="opponent" title="Restliche Saison" meta="4 Spiele" caption="Do: restliche Saison" />
   </div>
 {:else if example === 'dont-zu'}
   <div class="stack">
-    <ScheduleTable collapsible games={liga} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Don't: heutiger Spieltag" />
+    <ScheduleTable collapsible games={ligaKompakt} layout="versus" title="Heutiger Spieltag" meta="Live" caption="Don't: heutiger Spieltag" />
     <ScheduleTable collapsible games={mannschaft} layout="opponent" title="Restliche Saison" meta="4 Spiele" caption="Don't: restliche Saison" />
   </div>
 {/if}
