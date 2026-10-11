@@ -5,7 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
-import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite } from './Map.code';
+import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite, sitzSvelte, sitzReact, sitzVanilla } from './Map.code';
 
 <Meta of={MapStories} />
 
@@ -87,6 +87,24 @@ Nach dem Klick lädt die Komponente Leaflet nach (`import('leaflet')`, ein eigen
 Bei mehreren Markern nummeriert die Karte von 1 an (oder nimmt `number` am Marker) und passt den Ausschnitt allen Markern an (`fitBounds`, höchstens Zoom 17; der Rand lässt oben Platz für den Pin, rechts für die Zoom-Schaltflächen und unten für die Quellenangabe). Die **Liste** darunter erklärt die Nummern: ohne sie wären die Nummern auf der Karte bedeutungslos. Ein Marker mit `own: true` (der eigene Ort) ist golden und bekommt in der Liste den Hinweis „Eigener Ort“, nie nur die Farbe. Ein Marker mit `href` öffnet bei Klick und **Enter** dieses Ziel; in der Liste ist sein Name ein Link.
 
 <Canvas of={MapStories.MehrereMarker} />
+
+## Vereinssitz
+
+Die Marker-Art `kind: 'seat'` kennzeichnet den **Sitz** des Vereins (Geschäftsstelle) neben den Hallen. Der Sitzmarker ist **derselbe Pin** wie die anderen (44 px breit, dunkle Füllung, weißer Ring, dunkle Kontur, gleiche Zielgröße, derselbe Fokus-Ring), nur steht ein **Haus** statt der Nummer oder des Punkts darin. Er unterscheidet sich also in der Form, nicht nur in der Farbe. Weitere Regeln:
+
+- **Keine Nummer, keine Zählung:** Ein Sitz trägt nie eine Nummer (auch nicht mit `number`) und zählt in der Nummerierung der übrigen Orte nicht mit; die Orte zählen unter sich von 1 an. Ein einzelner Ort neben dem Sitz bleibt ohne Nummer.
+- **Name für Hilfstechnik:** „Geschäftsstelle TSV Nordhain, Vereinssitz“ (Titel, Alt-Text und `aria-label` des Markers). In der Liste steht ein Haus-Badge (`aria-hidden`) und der Chip „Vereinssitz“, sodass die Information auch als Text da ist.
+- **Platzhalter:** Auch der Platzhalter vor dem Laden zeigt das Haus.
+- **Eigener Ort:** `own` färbt den Pin golden; das Haus nimmt dann die Vordergrundfarbe der Akzentfläche.
+- **Kontrast:** Der Pin hebt sich von hellen und dunklen Kacheln mit mindestens 3:1 ab (Kontur oder Ring), das weiße Haus steht mit mindestens 7:1 auf dem dunklen Pin; geprüft für die Standardkacheln, abgedunkelt und invertiert, in BBV und DBB.
+
+<Canvas of={MapStories.Vereinssitz} />
+
+Die Pins im Detail, auf heller und dunkler Kachel (das Haus ist eine Zeichnung im Pin, kein Text):
+
+<Canvas of={MapStories.SitzMarker} />
+
+<FrameworkCode label="Vereinssitz und darkTiles" vanilla={sitzVanilla} svelte={sitzSvelte} react={sitzReact} />
 
 ## Zoom und Ausschnitt
 
@@ -171,6 +189,24 @@ Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es 
 ## Dunkelmodus
 
 Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-line-strong`, `--dss-link`, `--dss-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Die **Kacheln** werden mit `dimInDark` (Standard) etwas abgedunkelt: `filter: brightness(0.8)` nur auf der Kachelebene, nie auf Markern oder Steuerung; das Token `--dss-map-dim` ändert den Wert. Die **Marker** sind in beiden Modi gleich: dunkle Füllung mit weißem Ring und dunkler Kontur, die Nummer weiß auf dunkel; der eigene Ort golden mit schwarzer Nummer. So hebt sich der Pin von hellen **und** dunklen Kacheln ab (Messwerte unten). Die Handy-Vorschau weiter unten zeigt beide Modi.
+
+### Kacheln im Dunkelmodus: `darkTiles`
+
+OpenStreetMap kennt keinen Dunkelmodus. Zwei Verfahren stehen zur Wahl, beide wirken nur auf die Kachelebene und nur, solange `dimInDark` an ist (Marker, Zoom-Schaltflächen und Quellenangabe bleiben unberührt):
+
+- **`dim`** (Standard): abdunkeln mit `brightness(0.8)` (Token `--dss-map-dim`). Die Straßenfarben bleiben vertraut, die Karte bleibt aber hell.
+- **`invert`**: invertieren und umfärben, `invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)` (Token `--dss-map-invert-filter`). Die Karte wird wirklich dunkel, Wasser, Wald und Straßen wirken dafür fremd (Wasser wird dunkelbraun-orange statt blau).
+
+Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau rechts zeigt beide im Dunkelmodus (der Rahmen ist dunkel geschaltet):
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">darkTiles · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kacheln im Dunkelmodus">
+      <iframe style={{ height: '560px' }} title="Vorschau: Karten mit abgedunkelten und invertierten Kacheln im Dunkelmodus" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--dunkle-kacheln" loading="lazy" />
+    </div>
+  </div>
+</div>
 
 ## Druck
 
@@ -262,6 +298,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
     ['href', 'string', 'Ziel bei Klick und Enter am Marker; in der Liste ist der Name ein Link. Erlaubt sind `http:`, `https:`, `mailto:`, `tel:`, Pfade und `#`-Ziele; alles andere (`javascript:`, `data:`, `vbscript:`, Leerraum davor) wird verworfen (`safeHref`).'],
     ['number', 'number', 'Angezeigte Nummer. Ohne Angabe zählt die Karte bei mehreren Markern von 1 an; ein einzelner Marker zeigt einen Punkt.'],
     ['own', 'boolean', 'Eigener Ort: Marker in Gold, in der Liste „Eigener Ort“.'],
+    ['kind', "'place' | 'seat'", "Art des Markers: `place` (Standard) oder `seat` (Vereinssitz: Haus statt Nummer, ohne Nummer, Name mit Zusatz „Vereinssitz“). Unbekannte Werte gelten als `place`."],
   ]}
 />
 
@@ -335,6 +372,13 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
       dontText: 'Eine Karte ohne Quellenangabe verletzt die Lizenz. Die Komponente hat deshalb kein Prop zum Ausblenden; die Doku blendet sie hier mit eigenem CSS aus, um den Fehler zu zeigen.',
       good: <Story of={MapStories.DoQuelle} inline />,
       bad: <Story of={MapStories.DontQuelle} inline />,
+    },
+    {
+      title: 'Ein Sitz, die Hallen als Orte',
+      doText: 'Der Sitzmarker (Haus) steht für die Geschäftsstelle, die Hallen sind nummerierte Orte. Das Haus fällt auf und hat eine feste Bedeutung.',
+      dontText: 'Jede Halle als Sitz: drei gleiche Häuser unterscheiden nichts mehr, die Nummern fehlen, und die Liste nennt dreimal „Vereinssitz“.',
+      good: <Story of={MapStories.DoSitz} inline />,
+      bad: <Story of={MapStories.DontSitz} inline />,
     },
   ]}
 />

@@ -20,8 +20,10 @@ export default {
     appLinks: { control: 'check', options: ['osm', 'geo', 'route'], description: 'Links je Ort in der Liste: `osm` („In OpenStreetMap öffnen“), `geo` („In Karten-App öffnen“, `geo:`-Link), `route` („Route planen“).', table: t("('osm' | 'geo' | 'route')[]", "['osm', 'route']") },
     showList: { control: 'boolean', description: 'Liste der Orte mit Koordinaten und Links sichtbar. Bei `false` nur für Hilfstechnik (ohne Links); beim Drucken erscheint sie immer.', table: t('boolean', 'true') },
     dimInDark: { control: 'boolean', description: 'Kacheln im Dunkelmodus abdunkeln (Filter nur auf der Kachelebene).', table: t('boolean', 'true') },
+    darkTiles: { control: 'inline-radio', options: ['dim', 'invert'], description: 'Verfahren für die Kacheln im Dunkelmodus: `dim` dunkelt ab (Standard), `invert` invertiert und färbt um (Wasser und Straßen wirken fremd, die Karte wird wirklich dunkel). Wirkt nur mit `dimInDark`.', table: t("'dim' | 'invert'", "'dim'") },
+    seat: { control: 'boolean', description: 'Nur Demo: Ein Vereinssitz (Marker-Art `kind: \'seat\'`, Haus-Symbol, ohne Nummer) kommt als letzter Marker dazu.', table: t('boolean', 'false') },
   },
-  args: { label: 'Karte der Sporthalle Nordhain', count: 1, ownFirst: true, height: 320, interactive: true, load: 'click', tileUrl: 'demo', appLinks: ['osm', 'route'], showList: true, dimInDark: true },
+  args: { label: 'Karte der Sporthalle Nordhain', count: 1, ownFirst: true, height: 320, interactive: true, load: 'click', tileUrl: 'demo', appLinks: ['osm', 'route'], showList: true, dimInDark: true, darkTiles: 'dim', seat: false },
 };
 
 export const Standard = { args: {} };
@@ -39,6 +41,9 @@ export const Aufbau       = { ...example('aufbau'), tags: ['!dev'] };
 export const EigenerProxy = { ...example('proxy'), tags: ['!dev'] };
 export const Geladen      = { ...example('geladen'), tags: ['!dev'] };
 export const MehrereMarker = { ...example('mehrere'), tags: ['!dev'] };
+export const Vereinssitz  = { ...example('sitz'), tags: ['!dev'] };
+export const SitzMarker   = { ...example('sitz-pins'), tags: ['!dev'] };
+export const DunkleKacheln = { ...example('dunkle-kacheln'), tags: ['!dev'] };
 export const Ausschnitt   = { ...example('ausschnitt'), tags: ['!dev'] };
 export const Statisch     = { ...example('statisch'), tags: ['!dev'] };
 export const KartenApp    = { ...example('karten-app'), tags: ['!dev'] };
@@ -55,3 +60,5 @@ export const DoListe         = { ...example('do-liste'), tags: ['!dev'] };
 export const DontListe       = { ...example('dont-liste'), tags: ['!dev'] };
 export const DoQuelle        = { ...example('do-quelle'), tags: ['!dev'] };
 export const DontQuelle      = { ...example('dont-quelle'), tags: ['!dev'] };
+export const DoSitz          = { ...example('do-sitz'), tags: ['!dev'] };
+export const DontSitz        = { ...example('dont-sitz'), tags: ['!dev'] };

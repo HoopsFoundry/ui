@@ -354,7 +354,7 @@ describe('Beispiele der Doku-Seite', () => {
     for (const example of names) {
       const html = await renderExample(example);
       expect(html, example).not.toContain('undefined');
-      if (example !== 'zustaende') expect(html, example).toContain('dss-map-frame');
+      if (!['zustaende', 'sitz-pins'].includes(example)) expect(html, example).toContain('dss-map-frame');
     }
   });
   it('Namen der Karten sind eindeutig: je Beispiel und über alle Beispiele einer Docs-Seite (axe landmark-unique)', async () => {
@@ -391,13 +391,13 @@ describe('Beispiele der Doku-Seite', () => {
     expect(stories).toMatch(/export const Spielwiese = \{/);
   });
   it('die Spielwiese hat zu jeder Prop eine Beschreibung', () => {
-    for (const prop of ['label', 'count', 'ownFirst', 'zoom', 'height', 'interactive', 'load', 'tileUrl', 'attribution', 'privacyNote', 'appLinks', 'showList', 'dimInDark']) {
+    for (const prop of ['label', 'count', 'ownFirst', 'zoom', 'height', 'interactive', 'load', 'tileUrl', 'attribution', 'privacyNote', 'appLinks', 'showList', 'dimInDark', 'darkTiles', 'seat']) {
       expect(stories, prop).toMatch(new RegExp(`\\n\\s+${prop}: \\{ control: [^\\n]*description: `));
     }
   });
-  it("vier Dos und Don'ts, jedes mit zwei Geschichten", () => {
-    expect([...mdx.matchAll(/doText:/g)]).toHaveLength(4);
-    for (const n of ['Adresse', 'Datenschutz', 'Liste', 'Quelle']) {
+  it("fünf Dos und Don'ts, jedes mit zwei Geschichten", () => {
+    expect([...mdx.matchAll(/doText:/g)]).toHaveLength(5);
+    for (const n of ['Adresse', 'Datenschutz', 'Liste', 'Quelle', 'Sitz']) {
       expect(stories).toContain(`Do${n} `);
       expect(stories).toContain(`Dont${n} `);
     }
@@ -416,7 +416,7 @@ describe('Beispiele der Doku-Seite', () => {
   });
   it('Einführung, storySort, README und CHANGELOG nennen die Karte', () => {
     expect(read('stories/Introduction.mdx')).toContain('components-map--docs');
-    expect(read('.storybook/preview.ts')).toMatch(/'LeagueCard', 'Map', 'VenueCard', 'Tabs'/);
+    expect(read('.storybook/preview.ts')).toMatch(/'LeagueCard', 'Kennzahlen', 'Map', 'VenueCard', 'Tabs'/);
     expect(read('README.md')).toContain('MapView');
     expect(read('README.md')).toContain('leaflet/dist/leaflet.css');
     expect(read('CHANGELOG.md')).toContain('**`Map` (Karte)**');

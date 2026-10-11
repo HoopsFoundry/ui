@@ -118,3 +118,50 @@ export const einbindungVite = `// Vite, SvelteKit, Next.js u. a.: leaflet instal
 // als eigenen Chunk, erst beim Laden der Karte. Seiten ohne Karte laden nichts.
 //   npm install leaflet
 import 'leaflet/dist/leaflet.css'; // Layout, Gesten, Ebenen; die Optik von Zoom, Marker und Quelle liefert components.css`;
+
+export const sitzSvelte = `<script>
+  import MapView from '@bbv/dss-design-system/svelte/Map';
+
+  const orte = [
+    // kind: 'seat' – der Vereinssitz: Haus-Symbol statt Nummer, ohne Nummer, zählt in der Nummerierung nicht mit
+    { id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' },
+    { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true },
+    { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg' },
+  ];
+</script>
+
+<!-- darkTiles: im Dunkelmodus die Kacheln abdunkeln ('dim', Standard) oder invertieren und umfärben ('invert'); wirkt nur mit dimInDark -->
+<MapView label="Vereinssitz und Hallen" markers={orte} darkTiles="invert" />`;
+
+export const sitzReact = `import { MapView, type MapMarker } from '@bbv/dss-design-system/react';
+
+const orte: MapMarker[] = [
+  // kind: 'seat' – der Vereinssitz: Haus-Symbol statt Nummer, ohne Nummer, zählt in der Nummerierung nicht mit
+  { id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' },
+  { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true },
+  { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg' },
+];
+
+{/* darkTiles: im Dunkelmodus die Kacheln abdunkeln ('dim', Standard) oder invertieren und umfärben ('invert'); wirkt nur mit dimInDark */}
+<MapView label="Vereinssitz und Hallen" markers={orte} darkTiles="invert" />`;
+
+export const sitzVanilla = `<!-- Vanilla: Kacheln im Dunkelmodus invertieren statt abdunkeln – ein Attribut am Wurzelelement (und data-dim="true") -->
+<div class="dss-map" data-state="ready" data-dim="true" data-tiles="invert" style="--dss-map-h:320px">…</div>
+
+<!-- Vereinssitz in der Liste: Haus-Badge ohne Zahl (aria-hidden) und der Chip „Vereinssitz“ -->
+<li class="dss-map-item">
+  <span class="dss-map-num is-seat" aria-hidden="true"></span>
+  <div class="dss-map-item-body">
+    <p class="dss-map-name"><span>Geschäftsstelle TSV Nordhain</span><span class="dss-chip">Vereinssitz</span></p>
+    <p class="dss-map-coords">49,2982° N, 7,9021° O</p>
+  </div>
+</li>
+
+<script type="module">
+  import { markerName, tilesMode, mapItems } from '@bbv/dss-design-system/map.js';
+
+  markerName({ label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' });  // 'Geschäftsstelle TSV Nordhain, Vereinssitz'
+  tilesMode('invert');                                                  // 'invert' (alles andere ergibt 'dim')
+  mapItems([{ id: 's', lat: 49.3, lng: 7.9, label: 'Sitz', kind: 'seat' }, { id: 'a', lat: 49.31, lng: 7.91, label: 'A' }, { id: 'b', lat: 49.32, lng: 7.92, label: 'B' }])
+    .map((i) => i.number);                                              // [null, 1, 2]
+</script>`;

@@ -2,13 +2,16 @@
 // ?no-inline: sonst bettet Vite das kleine Bild als data-Adresse ein (die keine gültige Kachel-Adresse ist)
 import demoPng from '../assets/tiles/demo.png?no-inline';
 
-export type DemoMarker = { id: string; lat: number; lng: number; label: string; own?: boolean; href?: string; number?: number };
+export type DemoMarker = { id: string; lat: number; lng: number; label: string; own?: boolean; href?: string; number?: number; kind?: 'place' | 'seat' };
 
 export const HALLEN: DemoMarker[] = [
   { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true },
   { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg', href: '#halle-seeberg' },
   { id: 'kiefernau', lat: 49.2955, lng: 7.8905, label: 'Gymnasium Kiefernau' },
 ];
+
+/** Der Vereinssitz der Demo (Marker-Art `seat`): erfundene Geschäftsstelle, liegt zwischen den Hallen. */
+export const SITZ: DemoMarker = { id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' };
 
 /** Kachel-Adresse für die Doku: ein lokales Bild (kein Netzverkehr zu OpenStreetMap). Die Parameter z, x und y hängen nur an, damit die Adresse die drei Platzhalter enthält. */
 export function demoTileUrl(): string {
