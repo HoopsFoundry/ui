@@ -165,12 +165,65 @@ export function scrollToElement(el) {
 export function moveFocus(root, trigger, key, modifiers = {}) {
   if (!root || !trigger || modifiers.altKey || modifiers.ctrlKey || modifiers.metaKey || modifiers.shiftKey) return false;
   if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return false;
-  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter((el) => el.closest('.dss-acc') === root);
+  // Köpfe in einem Panel (ein einzelner einklappbarer Rahmen im Inhalt eines Bereichs) gehören nicht zur Gruppe
+  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter(
+    (el) => el.closest('.dss-acc') === root && el.closest('.dss-acc-panel')?.closest('.dss-acc') !== root,
+  );
   const index = triggers.indexOf(trigger);
   if (index < 0) return false;
   const target = nextHeader(index, key, triggers.map((el) => ({ disabled: el.getAttribute('aria-disabled') === 'true' })));
   if (target !== index) triggers[target]?.focus();
   return true;
+}
+
+// ── Gemeinsamer Baustein für Bereiche und einklappbare Rahmen (Svelte und React) ──
+
+/**
+ * Das Verhalten eines einklappbaren Bereichs, ohne Oberfläche: Öffnen und Schließen (mit `exclusive` der Gruppe, Fokus-Rettung,
+ * Anker), Öffnen samt Eltern (`reveal`), Eintrag für die Gruppe (Sprungleiste, „Alle öffnen“) und die Prüfung des URL-Ankers.
+ * `host` liefert den aktuellen Stand über Funktionen (kein Schnappschuss): `id`, `title`, `open`, `disabled`, `anchor` (hat der
+ * Bereich einen öffentlichen Anker?), `group` (Gruppe, bei der er angemeldet ist, sonst `undefined`), `parent` (`{ reveal }` des
+ * Eltern-Bereichs), `el`, `trigger`, `panel` und `commit(next)` (setzt den Zustand, in der Oberfläche).
+ */
+export function createCollapsible(host) {
+  function setOpen(next, user = false) {
+    const group = host.group();
+    const open = host.open();
+    if (host.disabled() && next !== open) return;
+    // Auch ein schon offener Bereich schließt bei exclusive die anderen (Anker auf einen beim Start offenen Bereich)
+    if (next && group?.exclusive) group.closeOthers(host.id());
+    if (next === open) return;
+    // Der Fokus liegt im Bereich, der gleich inert wird: er geht auf den Kopf (sonst fiele er auf <body>)
+    const panel = host.panel();
+    const trigger = host.trigger();
+    if (!next && panel && trigger && panel.contains(document.activeElement)) trigger.focus();
+    host.commit(next);
+    if (user && host.anchor() && (group?.syncHash ?? true)) writeHash(host.id(), next);
+  }
+  /** Öffnet diesen Bereich und alle Eltern-Bereiche (Deep-Link, Sprungleiste). */
+  function reveal() {
+    setOpen(true);
+    host.parent()?.reveal();
+  }
+  /** Passt der URL-Anker zu diesem Bereich, wird er samt Eltern geöffnet und in Sicht gescrollt. */
+  function checkHash() {
+    if (typeof window === 'undefined' || !host.anchor()) return;
+    if (hashTarget(window.location.hash, [host.id()]) !== host.id()) return;
+    reveal();
+    scrollToElement(host.el());
+  }
+  const entry = {
+    get id() { return host.id(); },
+    get title() { return host.title(); },
+    get open() { return host.open(); },
+    get disabled() { return host.disabled(); },
+    get anchor() { return host.anchor(); },
+    get el() { return host.el(); },
+    get trigger() { return host.trigger(); },
+    reveal,
+    setOpen: (next) => setOpen(next),
+  };
+  return { setOpen, reveal, checkHash, entry };
 }
 
 // ── Vanilla-Skript ───────────────────────────────────────────
