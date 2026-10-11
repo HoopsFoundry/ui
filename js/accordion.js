@@ -141,20 +141,55 @@ export function stickyOffset(el) {
 /**
  * Scrollt das Element in Sicht (nach dem nächsten Frame, damit ein gerade geöffneter Bereich schon im Layout steht). Der Abstand nach
  * oben (`scroll-margin-top`) enthält `--dss-acc-sticky-top`, 8 px und die Höhe des klebenden Kopfes eines umgebenden Bereichs
- * (`stickyOffset`), damit ein verschachteltes Ziel nicht unter dem Kopf der Eltern verschwindet.
+ * (`stickyOffset`), damit ein verschachteltes Ziel nicht unter dem Kopf der Eltern verschwindet. `options.behavior` ist `'auto'` (Standard,
+ * sofort) oder `'smooth'`.
  */
-export function scrollToElement(el) {
+export function scrollToElement(el, options = {}) {
   if (typeof window === 'undefined' || !el) return;
+  const behavior = options?.behavior === 'smooth' ? 'smooth' : 'auto';
   const run = () => {
     if (typeof el.scrollIntoView !== 'function') return;
     const extra = stickyOffset(el);
     const before = el.style.scrollMarginTop;
     if (extra) el.style.scrollMarginTop = `calc(var(--dss-acc-sticky-top, 0px) + 8px + ${extra}px)`;
-    el.scrollIntoView({ block: 'start', behavior: 'auto' });
+    el.scrollIntoView({ block: 'start', behavior });
     if (extra) el.style.scrollMarginTop = before;
   };
   if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(run);
   else run();
+}
+
+/**
+ * Öffnet alle Bereiche, die `target` umgeben, damit es sichtbar wird: Accordion-Bereiche und einklappbare Rahmen (von außen nach innen, über
+ * den Klick auf ihren Kopf: so folgen Svelte, React und das Vanilla-Skript ihrem eigenen Zustand, `exclusive` und Anker eingeschlossen)
+ * sowie jedes umgebende `<details>`. Gesperrte Bereiche bleiben zu. Gibt `true` zurück, wenn etwas geöffnet wurde. Der Bereich ist ein
+ * Vorfahr (oder `target` selbst); die Beziehung ist dieselbe wie bei `ancestorsOf`, hier aus dem DOM gelesen, auch für Bereiche ohne id.
+ */
+export function revealAround(target) {
+  if (!target || typeof target.closest !== 'function') return false;
+  const chain = [];
+  for (let el = target.closest(`${ITEM}, details`); el; el = el.parentElement?.closest(`${ITEM}, details`)) chain.unshift(el);
+  let opened = false;
+  for (const el of chain) {
+    if (isDetails(el)) {
+      if (!el.open && !isLocked(el)) {
+        el.open = true;
+        opened = true;
+      }
+    } else if (!isOpen(el) && !isLocked(el)) {
+      const trigger = triggerOf(el);
+      if (trigger) {
+        trigger.click();
+        opened = true;
+      }
+    }
+  }
+  return opened;
+}
+
+/** Ist das Element ein Bereich der Gruppe (Karte oder einklappbarer Rahmen)? */
+export function isAccordionItem(el) {
+  return Boolean(el) && typeof el.matches === 'function' && el.matches(ITEM);
 }
 
 /**

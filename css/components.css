@@ -1563,6 +1563,36 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   details.dss-acc-item::details-content { content-visibility: visible; display: block; }
 }
 
+/* ── Seitennavigation und Nach-oben-Knopf (PageNav, BackToTop) ──
+   Markup (js/pagenav.js, js/backtop.js): nav.dss-pagenav[aria-labelledby] > p.dss-eyebrow + ul.dss-pagenav-list > li > a.dss-pagenav-link;
+   button.dss-backtop (fest unten rechts). Die Seitenränder und das Scrollen werden NICHT global gesetzt, sondern über Tokens und Opt-in-Klassen:
+   --dss-scroll-offset  Höhe einer festen oberen Leiste (Rückfall --dss-acc-sticky-top des Accordions, damit beide dasselbe meinen);
+                        die Ziele der Navigation (.dss-pagenav-target, setzt initPageNav) halten diesen Abstand plus 1rem nach oben.
+   .dss-scroll-pad      Opt-in auf <html> oder einem Scrollbereich: scroll-padding oben (Token) und unten (--dss-scroll-offset-bottom, Standard 4,5rem,
+                        damit Fokus nicht unter dem Nach-oben-Knopf endet).
+   --dss-backtop-offset Abstand des Knopfes von unten (Standard 16px, plus Sicherheitsabstand); initBackToTop setzt ihn über eine feste dss-bnav.
+   --dss-backtop-gap    Abstand von rechts (Standard 16px, plus Sicherheitsabstand).
+   --dss-z-backtop      Ebene des Knopfes (Standard 20, unter Overlays wie dem Modal mit 100). */
+.dss-pagenav { margin: 1rem 0 1.5rem; }
+.dss-pagenav .dss-eyebrow { margin: 0 0 0.5rem; }
+.dss-pagenav-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.dss-pagenav-link {
+  display: inline-flex; align-items: center; box-sizing: border-box; min-height: var(--touch-sm); max-width: 100%; padding: 6px 14px;
+  border-radius: var(--radius-full); border: 1px solid var(--dss-line); background: var(--dss-surface); color: var(--dss-link);
+  font-size: var(--fs-body-sm); font-weight: 600; text-decoration: none; overflow-wrap: anywhere;
+}
+.dss-pagenav-link:hover { border-color: var(--dss-line-strong); color: var(--dss-fg); }
+.dss-pagenav-link:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }
+.dss-pagenav-target { scroll-margin-top: calc(var(--dss-scroll-offset, var(--dss-acc-sticky-top, 0px)) + 1rem); }
+.dss-scroll-pad { scroll-padding-top: var(--dss-scroll-offset, var(--dss-acc-sticky-top, 0px)); scroll-padding-bottom: var(--dss-scroll-offset-bottom, 4.5rem); }
+.dss-backtop {
+  position: fixed; z-index: var(--dss-z-backtop, 20);
+  right: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom: calc(var(--dss-backtop-offset, 16px) + env(safe-area-inset-bottom, 0px));
+  box-shadow: var(--shadow-md), inset 0 0 0 1px var(--dss-line-strong);
+}
+.dss-backtop[hidden] { display: none; }
+@media print { .dss-pagenav, .dss-backtop { display: none; } }
+
 /* ── Map (Karte mit Leaflet und OpenStreetMap) ───────────────────
    Markup: div.dss-map > a.dss-map-skip + div.dss-map-frame[role=region] > div.dss-map-stage (Platzhalter | Leaflet-Fläche .dss-map-canvas,
    Zoom-Schaltflächen, Quellenangabe .dss-map-attr, Status) + div.dss-map-text (Liste der Orte mit Koordinaten und Links).

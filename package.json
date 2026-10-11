@@ -80,6 +80,14 @@
       "types": "./js/venue.d.ts",
       "import": "./js/venue.js"
     },
+    "./pagenav.js": {
+      "types": "./js/pagenav.d.ts",
+      "import": "./js/pagenav.js"
+    },
+    "./backtop.js": {
+      "types": "./js/backtop.d.ts",
+      "import": "./js/backtop.js"
+    },
     "./stats.js": {
       "types": "./js/stats.d.ts",
       "import": "./js/stats.js"

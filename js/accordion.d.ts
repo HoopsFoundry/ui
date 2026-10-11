@@ -40,7 +40,11 @@ export function writeHash(id: string, open: boolean): void;
 /** Höhe des klebenden Kopfes eines umgebenden Bereichs, der ein verschachteltes Ziel verdecken würde (sonst 0). */
 export function stickyOffset(el: Element | null | undefined): number;
 /** Scrollt das Element nach dem nächsten Frame in Sicht; der Abstand nach oben enthält `--dss-acc-sticky-top` und den klebenden Kopf der Eltern (ohne Browser ohne Wirkung). */
-export function scrollToElement(el: Element | null | undefined): void;
+export function scrollToElement(el: Element | null | undefined, options?: { behavior?: 'auto' | 'smooth' }): void;
+/** Öffnet alle Bereiche und `<details>`, die `target` umgeben (Klick auf den Kopf, von außen nach innen); gesperrte bleiben zu. `true`, wenn etwas geöffnet wurde. */
+export function revealAround(target: Element | null | undefined): boolean;
+/** Ist das Element ein Bereich der Gruppe (Karte oder einklappbarer Rahmen)? */
+export function isAccordionItem(el: Element | null | undefined): boolean;
 /** Tastatur einer Gruppe (Pfeil ab/auf, Home, End zwischen den Köpfen; deaktivierte übersprungen). `true`, wenn die Taste behandelt wurde (dann `preventDefault`). */
 export function moveFocus(root: Element, trigger: Element, key: string, modifiers?: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean }): boolean;
 /** Rückgabe der Init-Funktionen: Funktion zum Aufräumen (wie bisher) und zugleich `.destroy()` (Muster `{ destroy() }`). */
