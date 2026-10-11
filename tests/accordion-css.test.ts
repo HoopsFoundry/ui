@@ -30,7 +30,7 @@ describe('Accordion-CSS: Klassen und Tokens', () => {
   it('der Abschnitt ist vorhanden', () => expect(START).toBeGreaterThan(0));
   it.each([
     'dss-acc', 'dss-acc--card', 'dss-acc--flat', 'dss-acc--nested', 'dss-acc--sticky', 'dss-acc-item', 'dss-acc-title', 'dss-acc-trigger', 'dss-acc-label',
-    'dss-acc-meta', 'dss-acc-chevron', 'dss-acc-panel', 'dss-acc-panel-inner', 'dss-acc-body', 'dss-acc-tools', 'dss-acc-bar',
+    'dss-acc-meta', 'dss-acc-sep', 'dss-acc-chevron', 'dss-acc-panel', 'dss-acc-panel-inner', 'dss-acc-body', 'dss-acc-tools', 'dss-acc-bar',
     'dss-acc-nav', 'dss-acc-nav-list', 'dss-acc-nav-link', 'dss-acc-nav-toggle',
   ])('definiert .%s', (cls) => {
     expect(acc).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
@@ -58,6 +58,10 @@ describe('Accordion-CSS: Klassen und Tokens', () => {
   });
   it('Elementselektoren h1 bis h6 setzen keine Größen (die Klasse trägt die Größe)', () => {
     expect(acc).not.toMatch(/(^|[\s,}])h[1-6]\s*[,{]/);
+  });
+  it('das Komma zwischen Titel und Zusatzinfo hat Schriftgröße 0 (nicht sichtbar, im Namen)', () => {
+    expect(rule('.dss-acc-sep')).toMatch(/font-size:\s*0/);
+    expect(rule('.dss-acc-sep')).not.toMatch(/display:\s*none|visibility:\s*hidden/);
   });
   it('Kopf als button und als summary sehen gleich aus: box-sizing, font, margin, appearance, Breite, Ausrichtung', () => {
     const r = rule('.dss-acc-trigger');

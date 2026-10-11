@@ -121,8 +121,8 @@ describe('Fokus geht auf den Kopf, wenn sein Bereich inert wird', () => {
 
 // ── B: Name der Sprungleiste ohne das unsichtbare Komma ───────────────
 describe('Vanilla-Sprungleiste: Linktext ist der Titel', () => {
-  it('auch bei einem Kopf mit Zusatzinfo (unsichtbares Komma im Label)', () => {
-    const item = (id: string, title: string, meta: boolean) => `<div class="dss-acc-item" id="${id}"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="${id}-t" aria-expanded="false" aria-controls="${id}-p"><span class="dss-acc-label">${title}${meta ? '<span class="dss-sr-only">,</span>' : ''}</span>${meta ? '<span class="dss-acc-meta">14 Spieler</span>' : ''}</button></h3><div class="dss-acc-panel" id="${id}-p" hidden inert><div class="dss-acc-panel-inner"><div class="dss-acc-body">x</div></div></div></div>`;
+  it('auch bei einem Kopf mit Zusatzinfo (unsichtbares Komma im Label, .dss-acc-sep)', () => {
+    const item = (id: string, title: string, meta: boolean) => `<div class="dss-acc-item" id="${id}"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="${id}-t" aria-expanded="false" aria-controls="${id}-p"><span class="dss-acc-label">${title}${meta ? '<span class="dss-acc-sep">,</span>' : ''}</span>${meta ? '<span class="dss-acc-meta">14 Spieler</span>' : ''}</button></h3><div class="dss-acc-panel" id="${id}-p" hidden inert><div class="dss-acc-panel-inner"><div class="dss-acc-body">x</div></div></div></div>`;
     document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="dss-acc dss-acc--card">${item('a', 'Bereich 0', true)}${item('b', 'Spielplan', false)}</div>`));
     const destroy = initAccordion(document.querySelector('.dss-acc')!, { nav: true, syncHash: false });
     expect([...document.querySelectorAll('.dss-acc-nav-link')].map((l) => l.textContent)).toEqual(['Bereich 0', 'Spielplan']);

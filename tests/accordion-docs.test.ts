@@ -85,3 +85,25 @@ describe('Accordion-Doku: ids der Beispiele', () => {
     expect(examples).toMatch(/id=\{`zu-\$\{v\.id\}-\$\{c\}`\}/);
   });
 });
+
+describe('Accordion-Doku: Korrekturen aus dem Review', () => {
+  it('Tab folgt der Dokumentreihenfolge', () => {
+    expect(mdx).toMatch(/Folgt der Dokumentreihenfolge: Kopf, Inhalt des geöffneten Bereichs, nächster Kopf/);
+    expect(mdx).not.toMatch(/Springt von Kopf zu Kopf, dann in den Inhalt/);
+  });
+  it('details: Hinweis zur Auffindbarkeit ist belegbar formuliert, Komma-Hinweis vorhanden', () => {
+    expect(mdx).toMatch(/HTML erlaubt aber Überschriften im `summary`/);
+    expect(mdx).toMatch(/dss-acc-sep/);
+    expect(mdx).toMatch(/Chromium „Spielplan 12 Spiele“/);
+    expect(mdx).not.toMatch(/Ehrlicher Hinweis/);
+  });
+  it('Vanilla: nachträglich ändern und verschachtelte Gruppen', () => {
+    expect(mdx).toMatch(/`initAccordion` erneut auf/);
+    expect(mdx).toMatch(/Verschachtelte Gruppen\*\* brauchen `data-dss-acc`/);
+  });
+  it('Code-Beispiele nutzen das Komma dss-acc-sep (Button- und details-Weg)', async () => {
+    const code = read('stories/Accordion.code.ts');
+    expect(code.match(/dss-acc-sep/g)!.length).toBeGreaterThanOrEqual(3);
+    expect(code).not.toMatch(/<span class="dss-sr-only">, <\/span>/);
+  });
+});

@@ -33,6 +33,7 @@ const normalize = (html: string) =>
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/ (hidden|inert)=""/g, ' $1')
     .replace(/ data-dss-acc(="")?/g, '')
+    .replace(/<div class="dss-acc-tools dss-acc-tools--pending"[^>]*><\/div>/g, '') // Platzhalter der Leiste (nur im Server-Markup der Komponenten)
     .replace(/\s+/g, ' ')
     .replace(/ ?> ?/g, '>')
     .replace(/ ?</g, '<')

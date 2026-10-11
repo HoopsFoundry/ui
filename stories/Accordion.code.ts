@@ -19,7 +19,7 @@ export const buttonMarkup = `<div class="dss-acc dss-acc--card" data-dss-acc>
   <div class="dss-acc-item" id="spielplan">
     <h3 class="dss-acc-title">
       <button type="button" class="dss-acc-trigger" id="spielplan-trigger" aria-expanded="false" aria-controls="spielplan-panel">
-        <span class="dss-acc-label">Spielplan<span class="dss-sr-only">,</span></span>
+        <span class="dss-acc-label">Spielplan<span class="dss-acc-sep">,</span></span>
         <span class="dss-acc-meta">12 Spiele</span>
         ${CHEVRON}
       </button>
@@ -52,11 +52,12 @@ export const detailsMarkup = `<div class="dss-acc dss-acc--card">
     <div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">Platz 3 von 12 in der Bayernliga Süd.</div></div></div>
   </details>
   <details class="dss-acc-item" name="liga" id="d-spielplan">
-    <summary class="dss-acc-trigger"><span class="dss-acc-label">Spielplan</span><span class="dss-acc-meta">12 Spiele</span></summary>
+    <summary class="dss-acc-trigger"><span class="dss-acc-label">Spielplan<span class="dss-acc-sep">,</span></span>
+        <span class="dss-acc-meta">12 Spiele</span></summary>
     <div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle.</div></div></div>
   </details>
   <details class="dss-acc-item" name="liga" id="d-kader">
-    <summary class="dss-acc-trigger"><span class="dss-acc-label">Kader</span><span class="dss-acc-meta">14 Spieler</span></summary>
+    <summary class="dss-acc-trigger"><span class="dss-acc-label">Kader<span class="dss-acc-sep">,</span></span><span class="dss-acc-meta">14 Spieler</span></summary>
     <div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">Zehn Spieler, vier Trainer und Betreuer.</div></div></div>
   </details>
 </div>`;

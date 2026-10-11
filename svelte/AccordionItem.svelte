@@ -121,7 +121,8 @@
       onclick={() => setOpen(!open, true)}
       onkeydown={(event) => group?.onKey(event)}
     >
-      <span class="dss-acc-label">{title}{#if meta}<span class="dss-sr-only">,</span>{/if}</span>
+      <!-- Das Komma (.dss-acc-sep, Schriftgröße 0) hängt am Titel: der Name lautet „Titel, 14 Spieler“, auch wenn zwischen den Elementen Leerraum steht -->
+      <span class="dss-acc-label">{title}{#if meta}<span class="dss-acc-sep">,</span>{/if}</span>
       {#if meta}<span class="dss-acc-meta">{@render meta()}</span>{/if}
       <svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5" /></svg>
     </button>

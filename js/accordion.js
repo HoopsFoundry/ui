@@ -202,9 +202,9 @@ function labelOf(item) {
   const trigger = triggerOf(item);
   const source = trigger?.querySelector('.dss-acc-label') ?? trigger;
   if (!source) return '';
-  // Das unsichtbare Komma (.dss-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
+  // Das unsichtbare Komma (.dss-acc-sep, früher .dss-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
   const copy = source.cloneNode(true);
-  for (const hidden of copy.querySelectorAll('.dss-sr-only')) hidden.remove();
+  for (const hidden of copy.querySelectorAll('.dss-sr-only, .dss-acc-sep')) hidden.remove();
   return clean(copy.textContent);
 }
 

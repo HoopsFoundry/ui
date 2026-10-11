@@ -1409,6 +1409,8 @@ button.dss-pc-row:focus-visible { outline: var(--ring-w) var(--ring-style) var(-
 }
 summary.dss-acc-trigger { list-style: none; }
 summary.dss-acc-trigger::-webkit-details-marker { display: none; }
+/* Komma zwischen Titel und Zusatzinfo nur für Hilfstechnik: Schriftgröße 0 (nicht sichtbar, nicht markierbar, bleibt im Namen) */
+.dss-acc-sep { font-size: 0; line-height: 0; }
 .dss-acc-label { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .dss-acc-meta {
   flex: none; display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 4px 8px; max-width: 60%;

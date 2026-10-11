@@ -317,7 +317,7 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
         >
           <span className="dss-acc-label">
             {title}
-            {meta ? <span className="dss-sr-only">,</span> : null}
+            {meta ? <span className="dss-acc-sep">,</span> : null}
           </span>
           {meta ? <span className="dss-acc-meta">{meta}</span> : null}
           <svg className="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">

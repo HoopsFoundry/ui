@@ -30,7 +30,7 @@ Der Pfeil im Kopf ist ein SVG (`aria-hidden`) und dreht sich beim Öffnen um 180
 
 ## Kopf mit Zusatzinfo
 
-Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht hinter dem Titel ein unsichtbares Komma (`dss-sr-only`), das Name und Zusatz trennt; die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
+Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht hinter dem Titel ein unsichtbares Komma (`dss-acc-sep`, Schriftgröße 0), das Name und Zusatz trennt (Chromium und WebKit lesen „Kader, 14 Spieler“; auch Leerraum im Markup zwischen Titel und Zusatz stört nicht); die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
 
 <Canvas of={AccordionStories.Zusatzinfo} />
 
@@ -70,7 +70,7 @@ Mit `nav` steht über der Gruppe eine Navigation „Bereiche“ mit einem Link j
   label="Tastaturbedienung"
   head={['Taste', 'Wirkung']}
   rows={[
-    ['Tab', 'Springt von Kopf zu Kopf, dann in den Inhalt des geöffneten Bereichs. Ein geschlossener Bereich wird übersprungen.'],
+    ['Tab', 'Folgt der Dokumentreihenfolge: Kopf, Inhalt des geöffneten Bereichs, nächster Kopf, dessen Inhalt … Ein geschlossener Bereich wird übersprungen (sein Inhalt ist inert).'],
     ['Enter / Leertaste', 'Öffnet oder schließt den Bereich des fokussierten Kopfes (Button).'],
     ['Pfeil unten / oben', 'Springt zum nächsten bzw. vorherigen Kopf der Gruppe. Gesperrte Köpfe werden übersprungen, an den Enden geht es nicht von vorn weiter.'],
     ['Pos1 / Ende', 'Springt zum ersten bzw. letzten Kopf der Gruppe (gesperrte übersprungen).'],
@@ -93,7 +93,9 @@ Mit `sticky` bleibt der Kopf des geöffneten Bereichs oben stehen, solange sein 
 
 Im Vanilla-CSS gibt es zusätzlich einen Weg ohne Skript: `<details class="dss-acc-item">` mit `<summary class="dss-acc-trigger">`. Aussehen und Zustände sind dieselben; der Pfeil kommt per CSS. Mit demselben `name` an allen `details` einer Gruppe ist immer nur einer offen (nativ, in allen aktuellen Browsern). Das Skript ist optional und ergänzt Deep-Link, Sprungleiste, „Alle öffnen/schließen“ und die Pfeiltasten.
 
-**Ehrlicher Hinweis:** Bei `<summary>` ist die Überschriften-Navigation von Screenreadern schwächer, weil der Kopf keine Überschrift ist. Für Inhaltsseiten, auf denen die Bereiche auffindbar sein sollen, nimm den Button-Weg. Die Höhenanimation gibt es beim `details`-Weg nicht.
+**Hinweis zur Auffindbarkeit:** `<summary>` ist selbst keine Überschrift. HTML erlaubt aber Überschriften im `summary`; das Beispiel hier nutzt sie nicht und bleibt bei der einfachsten Form. Ohne Überschrift im Kopf führen die Überschriften-Navigation und die Überschriftenliste der Screenreader nicht zu den Bereichen, und bei älterer Hilfstechnik wird der Zustand (auf/zu) nicht überall angesagt. Für Inhaltsseiten, auf denen die Bereiche auffindbar sein sollen, nimm den Button-Weg (Überschrift mit Button). Die Höhenanimation gibt es beim `details`-Weg nicht.
+
+**Zusatzinfo im `summary`:** Das Komma zwischen Titel und Zusatzinfo steht nicht von selbst da. Setze es wie im Beispiel als `<span class="dss-acc-sep">,</span>` ans Ende des Titels (Schriftgröße 0, unsichtbar, im Namen); ohne dieses Komma liest Chromium „Spielplan 12 Spiele“, andere Browser unter Umständen „Spielplan12 Spiele“.
 
 <Canvas of={AccordionStories.VanillaDetails} />
 
@@ -151,7 +153,7 @@ Die Gruppe hat in React zusätzlich `className`, in Svelte `class`; `navLabel` (
 
 ### Vanilla-Skript
 
-`initAccordion(root, options)` mit den Optionen `exclusive`, `syncHash`, `expandAll`, `nav` und `sticky` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-dss-acc]`. Dieselben Hilfsfunktionen nutzen die Komponenten:
+`initAccordion(root, options)` mit den Optionen `exclusive`, `syncHash`, `expandAll`, `nav` und `sticky` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-dss-acc]`. **Bereiche nachträglich hinzufügen oder entfernen:** Rufe `initAccordion` erneut auf (die frühere Fassung wird ersetzt); Sprungleiste und `aria-controls` von „Alle öffnen“ aktualisieren sich nicht von selbst. **Verschachtelte Gruppen** brauchen `data-dss-acc` am inneren Wurzelelement (`initAccordions` startet jede `[data-dss-acc]`-Gruppe einzeln). Dieselben Hilfsfunktionen nutzen die Komponenten:
 
 <FrameworkCode label="Hilfsfunktionen (JavaScript, für alle Fassungen)" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
 
