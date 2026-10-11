@@ -10,7 +10,8 @@ import { DEFAULT_TILE_URL, MAX_ZOOM, MIN_ZOOM, initialView, mapItems, validTileU
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const PIN_PATH = 'M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z';
-const FIT_PADDING = [48, 48];
+// Rand beim Einpassen: oben Platz für die Pin-Spitze samt Pin (46 px), rechts für die Zoom-Schaltflächen, unten für die Quellenangabe
+const FIT_OPTIONS = { paddingTopLeft: [56, 64], paddingBottomRight: [84, 52], maxZoom: 17 };
 
 /** Gesten, die `interactive={false}` abschaltet (die Tastatur bleibt). */
 const GESTURES = ['dragging', 'touchZoom', 'scrollWheelZoom', 'doubleClickZoom', 'boxZoom'];
@@ -104,13 +105,23 @@ export function createMapController(el, opts, hooks = {}) {
       if (entry) entry.marker.remove();
       const marker = L.marker([item.lat, item.lng], { icon: markerIcon(item), title: item.label, alt: item.label, keyboard: true, riseOnHover: true });
       const next = { marker, sig, item, lat: item.lat, lng: item.lng };
-      marker.on('click', () => {
+      const activate = () => {
         hooks.onMarkerClick?.(next.item);
         if (next.item.href) window.location.assign(next.item.href);
+      };
+      marker.on('click', activate);
+      // Leaflet 1.9 löst bei Tasten keinen Klick aus (nur `keypress`): Enter und Leertaste öffnen wie ein Button
+      marker.on('keypress', (e) => {
+        const key = e?.originalEvent?.keyCode;
+        if (key !== 13 && key !== 32) return;
+        e.originalEvent.preventDefault?.();
+        activate();
       });
+      // Das Icon entsteht erst, wenn die Karte einen Ausschnitt hat: Name für Hilfstechnik beim Hinzufügen setzen
+      const name = () => marker.getElement?.()?.setAttribute('aria-label', next.item.label);
+      marker.on('add', name);
       marker.addTo(map);
-      const icon = marker.getElement?.();
-      if (icon) icon.setAttribute('aria-label', item.label);
+      name();
       entries.set(item.id, next);
     }
   };
@@ -122,22 +133,23 @@ export function createMapController(el, opts, hooks = {}) {
   const applyView = (items, first) => {
     const view = initialView({ markers: items, center: current.center, zoom: current.zoom });
     const animate = !first && !reducedMotion();
-    if (view.bounds) map.fitBounds([view.bounds.sw, view.bounds.ne], { padding: FIT_PADDING, maxZoom: 17, animate });
+    if (view.bounds) map.fitBounds([view.bounds.sw, view.bounds.ne], { ...FIT_OPTIONS, animate });
     else map.setView(view.center, view.zoom, { animate });
   };
 
   const apply = (first) => {
     const items = mapItems(current.markers, current.appLinks);
-    syncMarkers(items);
     setGestures(current.interactive !== false);
     const url = current.tileUrl ?? DEFAULT_TILE_URL;
     if (layer && layerUrl !== url) { tileOk = 0; tileBad = 0; layerUrl = url; layer.setUrl(url); }
     const viewKey = JSON.stringify([current.center ?? null, current.zoom ?? null]);
     const positions = JSON.stringify(items.map((i) => [i.id, i.lat, i.lng]));
     const hasCenter = Array.isArray(current.center);
+    // Zuerst der Ausschnitt, dann die Marker: Leaflet legt Marker-Icons erst an, wenn die Karte eine Mitte hat
     if (first || viewKey !== lastView || (!hasCenter && positions !== lastPositions)) applyView(items, first);
     lastView = viewKey;
     lastPositions = positions;
+    syncMarkers(items);
   };
 
   const start = async () => {

@@ -9,7 +9,7 @@
    * Fehlerhinweis sind eigenes Markup; die Quellenangabe lässt sich nicht ausblenden. Nutzt nur Klassen aus css/components.css (`dss-map*`).
    * Der Dateiname ist `Map.svelte`; beim Import `MapView` nennen, damit das JS-Global `Map` nicht überdeckt wird.
    */
-  import { untrack } from 'svelte';
+  import { tick, untrack } from 'svelte';
   import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, validTileUrl } from '../js/map.js';
   import type { MapAppLink, MapMarker } from '../js/map.js';
   import { createMapController, devWarn } from '../js/map-leaflet.js';
@@ -107,7 +107,11 @@
     const ctrl = createMapController(host, untrack(options), {
       onReady: (map: unknown) => {
         phase = 'ready';
-        if (userStarted) host.focus({ preventScroll: true });
+        // Erst nach dem Rendern: bis dahin ist die Fläche inert und nimmt den Fokus nicht an
+        if (userStarted) {
+          userStarted = false;
+          void tick().then(() => host.focus({ preventScroll: true }));
+        }
         onload?.(map);
       },
       onError: (reason: string) => {

@@ -120,7 +120,6 @@ export function MapView({
     const ctrl = createMapController(host, optionsRef.current, {
       onReady: (map: unknown) => {
         setPhase('ready');
-        if (userStarted.current) host.focus({ preventScroll: true });
         handlers.current.onLoad?.(map);
       },
       onError: (reason: string) => {
@@ -136,6 +135,14 @@ export function MapView({
       controller.current = null;
     };
   }, [running]);
+
+  // Nach „Karte laden“ auf die Kartenfläche fokussieren, sobald sie nicht mehr inert ist (die Schaltfläche ist verschwunden)
+  useEffect(() => {
+    if (phase === 'ready' && userStarted.current) {
+      userStarted.current = false;
+      canvas.current?.focus({ preventScroll: true });
+    }
+  }, [phase]);
 
   // Props reaktiv: Marker, Mitte, Zoom, Gesten und Kachel-Adresse ohne Neuaufbau (der Vergleich steckt im Controller)
   useEffect(() => {

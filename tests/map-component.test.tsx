@@ -193,7 +193,22 @@ describe.each(drivers)('Karte · $name', (driver) => {
       expect(el.querySelector('text')).toBeNull();
       expect(el.querySelector('circle')).not.toBeNull();
     });
-    it('Klick am Marker meldet ihn; Enter löst in Leaflet denselben Klick aus', async () => {
+    it('Enter und Leertaste am Marker öffnen das Ziel wie ein Button (Leaflet meldet Tasten nur als keypress); andere Tasten nicht', async () => {
+      const spy = vi.fn();
+      const m = open(driver, { markers: [A, B], load: 'auto', ...(driver.name === 'Svelte' ? { onmarkerclick: spy } : { onMarkerClick: spy }) });
+      await vi.waitFor(() => expect(state.markers).toHaveLength(2));
+      const press = (keyCode: number) => {
+        const preventDefault = vi.fn();
+        state.markers[1].fire('keypress', { originalEvent: { keyCode, preventDefault } });
+        return preventDefault;
+      };
+      await m.act(() => { expect(press(13)).toHaveBeenCalled(); });
+      await m.act(() => { expect(press(32)).toHaveBeenCalled(); });
+      await m.act(() => { expect(press(65)).not.toHaveBeenCalled(); });
+      expect(spy).toHaveBeenCalledTimes(2);
+      expect(spy.mock.calls[0][0]).toMatchObject({ id: 'b', href: '/hallen/sued' });
+    });
+    it('Klick am Marker meldet ihn', async () => {
       const spy = vi.fn();
       const m = open(driver, { markers: [A], load: 'auto', ...(driver.name === 'Svelte' ? { onmarkerclick: spy } : { onMarkerClick: spy }) });
       await vi.waitFor(() => expect(state.markers).toHaveLength(1));
@@ -214,7 +229,7 @@ describe.each(drivers)('Karte · $name', (driver) => {
       await m.set({ center: undefined, zoom: undefined, markers: [A, B, C] });
       const last = lastMap().view.at(-1)!;
       expect(last.bounds).toEqual([[49.45, 8.4], [49.5, 8.5]]);
-      expect((last.options as { padding: number[] }).padding).toEqual([48, 48]);
+      expect(last.options).toMatchObject({ paddingTopLeft: [56, 64], paddingBottomRight: [84, 52], maxZoom: 17 });
     });
     it('Zoom-Schaltflächen: Namen, aria-controls auf die Fläche, aria-disabled an den Grenzen, Klick zoomt', async () => {
       const m = open(driver, { load: 'auto' });

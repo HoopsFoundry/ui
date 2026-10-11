@@ -364,6 +364,9 @@ describe('Beispiele der Doku-Seite', () => {
     const maps = examplesSrc.match(/<MapView [^>]*>/g) ?? [];
     for (const m of maps.filter((x) => x.includes('load="auto"'))) expect(m, m).toContain('tileUrl={tile}');
   });
+  it('das Demo-Bild wird mit ?no-inline importiert (sonst eine data-Adresse, die validTileUrl ablehnt)', () => {
+    expect(read('stories/components/mapData.ts')).toContain("demo.png?no-inline");
+  });
   it('Beispiele zeigen nur Demo-Hallen; keine echten Orte, Vereine oder Adressen', () => {
     const data = read('stories/components/mapData.ts') + examplesSrc + read('stories/Map.code.ts');
     expect(data).toContain('Sporthalle Nordhain');

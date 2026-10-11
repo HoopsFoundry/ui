@@ -1541,7 +1541,7 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 
 /* Platzhalter (Zwei-Klick): ruhiges Gitter, Marker als Hinweis auf die Lage, Karte mit Hinweis und Schaltfläche */
 .dss-map-ph {
-  position: absolute; inset: 0; z-index: 900; display: grid; place-items: end center; padding: 16px;
+  position: absolute; inset: 0; z-index: 900; display: grid; place-items: end center; padding: 16px 16px 44px; /* unten Platz für die Quellenangabe (28 px) */
   background-color: var(--dss-surface-2);
   background-image: linear-gradient(var(--dss-line) 1px, transparent 1px), linear-gradient(90deg, var(--dss-line) 1px, transparent 1px);
   background-size: 32px 32px;
@@ -1577,7 +1577,6 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 /* Leaflet-Fläche */
 .dss-map-canvas.leaflet-container { position: absolute; inset: 0; height: 100%; background: var(--dss-surface-2); font: inherit; outline-offset: -3px; }
 .dss-map-canvas.leaflet-container:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: -3px; }
-.dss-map-canvas.leaflet-container:focus:not(:focus-visible) { outline: none; }
 
 /* Kacheln: im Dunkelmodus abgedunkelt (nur die Kachelebene, nie Marker oder Steuerung) */
 :root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--dss-map-dim, 0.8)); }
@@ -1595,10 +1594,10 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-map-pin-num.is-small { font-size: 11px; }
 .dss-map-marker.is-own .dss-map-pin-body { fill: var(--dss-cta-bg); }
 .dss-map-marker.is-own .dss-map-pin-dot, .dss-map-marker.is-own .dss-map-pin-num { fill: var(--dss-cta-fg); }
+/* Fokus: Fläche und 8 px Hof in --dss-surface unter dem gestrichelten Ring, damit er auf jeder Kachel (hell, dunkel, abgedunkelt) mindestens 3:1 hat */
 .dss-map-marker:focus-visible {
-  outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; background: var(--dss-surface); box-shadow: 0 0 0 2px var(--dss-surface);
+  outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; background: var(--dss-surface); box-shadow: 0 0 0 8px var(--dss-surface);
 }
-.dss-map-marker:focus:not(:focus-visible) { outline: none; }
 
 /* Zoom-Schaltflächen: eigene Steuerung (Leaflets Standard ist aus), 44 px Ziel, gestrichelter Ring innen */
 .dss-map-zoom { position: absolute; z-index: 1001; top: 12px; right: 12px; display: grid; gap: 8px; }

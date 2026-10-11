@@ -175,8 +175,8 @@ export function initialView({ markers, center, zoom } = {}) {
 }
 
 /**
- * Lage der Marker im Platzhalter in Prozent (x von links, y von oben) innerhalb des umschließenden Rechtecks mit Rand.
- * Ein einzelner Marker liegt in der Mitte.
+ * Lage der Marker im Platzhalter in Prozent (x von links, y von oben) innerhalb des umschließenden Rechtecks mit Rand:
+ * x von 12 bis 88, y von 14 bis 44 (unten sitzt die Karte mit Hinweis und Schaltfläche). Ein einzelner Marker liegt in der Mitte dieses Bereichs.
  */
 export function placeholderPins(items) {
   const list = Array.isArray(items) ? items : [];
@@ -184,7 +184,8 @@ export function placeholderPins(items) {
   if (!bounds) return [];
   const spanLat = bounds.ne[0] - bounds.sw[0];
   const spanLng = bounds.ne[1] - bounds.sw[1];
-  const pos = (value, min, span) => (span > 0 ? 18 + ((value - min) / span) * 64 : 50);
+  // Anteil 0 bis 1 im Rechteck, abgebildet auf [from, to]; ohne Ausdehnung die Mitte
+  const pos = (value, min, span, from, to) => (span > 0 ? from + ((value - min) / span) * (to - from) : (from + to) / 2);
   return list
     .filter((m) => isCoord(m.lat, m.lng))
     .map((m) => {
@@ -194,8 +195,9 @@ export function placeholderPins(items) {
         id: String(m.id),
         number: m.number ?? null,
         own: m.own === true,
-        x: Math.round(pos(lng, bounds.sw[1], spanLng) * 10) / 10,
-        y: Math.round((100 - pos(m.lat, bounds.sw[0], spanLat)) * 10) / 10,
+        x: Math.round(pos(lng, bounds.sw[1], spanLng, 12, 88) * 10) / 10,
+        // Norden oben: größere Breite liegt weiter oben
+        y: Math.round(pos(bounds.ne[0] - m.lat, 0, spanLat, 14, 44) * 10) / 10,
       };
     });
 }

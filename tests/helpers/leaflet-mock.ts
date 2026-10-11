@@ -104,6 +104,8 @@ export class FakeMarker extends Evented {
     if (this.options.keyboard) { el.tabIndex = 0; el.setAttribute('role', 'button'); }
     map.el.querySelector('.leaflet-marker-pane')!.appendChild(el);
     this.el = el;
+    // Leaflet meldet „add“, sobald das Icon steht (bei Karten ohne Ausschnitt erst später)
+    this.fire('add');
     return this;
   }
   getElement() { return this.el; }

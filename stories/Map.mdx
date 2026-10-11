@@ -83,7 +83,7 @@ Nach dem Klick lädt die Komponente Leaflet nach (`import('leaflet')`, ein eigen
 
 ## Mehrere Marker
 
-Bei mehreren Markern nummeriert die Karte von 1 an (oder nimmt `number` am Marker) und passt den Ausschnitt allen Markern an (`fitBounds` mit 48 px Rand, höchstens Zoom 17). Die **Liste** darunter erklärt die Nummern: ohne sie wären die Nummern auf der Karte bedeutungslos. Ein Marker mit `own: true` (der eigene Ort) ist golden und bekommt in der Liste den Hinweis „Eigener Ort“, nie nur die Farbe. Ein Marker mit `href` öffnet bei Klick und **Enter** dieses Ziel; in der Liste ist sein Name ein Link.
+Bei mehreren Markern nummeriert die Karte von 1 an (oder nimmt `number` am Marker) und passt den Ausschnitt allen Markern an (`fitBounds`, höchstens Zoom 17; der Rand lässt oben Platz für den Pin, rechts für die Zoom-Schaltflächen und unten für die Quellenangabe). Die **Liste** darunter erklärt die Nummern: ohne sie wären die Nummern auf der Karte bedeutungslos. Ein Marker mit `own: true` (der eigene Ort) ist golden und bekommt in der Liste den Hinweis „Eigener Ort“, nie nur die Farbe. Ein Marker mit `href` öffnet bei Klick und **Enter** dieses Ziel; in der Liste ist sein Name ein Link.
 
 <Canvas of={MapStories.MehrereMarker} />
 

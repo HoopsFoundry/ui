@@ -213,21 +213,21 @@ describe('initialView', () => {
 });
 
 describe('placeholderPins', () => {
-  it('ein Marker liegt in der Mitte', () => {
-    expect(placeholderPins([{ id: 'a', lat: 1, lng: 2, number: null, own: false }])).toEqual([{ id: 'a', number: null, own: false, x: 50, y: 50 }]);
+  it('ein Marker liegt in der Mitte des freien Bereichs (oben, über der Karte mit Hinweis)', () => {
+    expect(placeholderPins([{ id: 'a', lat: 1, lng: 2, number: null, own: false }])).toEqual([{ id: 'a', number: null, own: false, x: 50, y: 29 }]);
   });
-  it('mehrere Marker: Norden oben, Osten rechts, innerhalb von 18 bis 82 Prozent', () => {
+  it('mehrere Marker: Norden oben, Osten rechts, x von 12 bis 88, y von 14 bis 44 Prozent', () => {
     const pins = placeholderPins([
       { id: 'sw', lat: 10, lng: 10, number: 1, own: false },
       { id: 'ne', lat: 11, lng: 12, number: 2, own: true },
     ]);
     expect(pins).toEqual([
-      { id: 'sw', number: 1, own: false, x: 18, y: 82 },
-      { id: 'ne', number: 2, own: true, x: 82, y: 18 },
+      { id: 'sw', number: 1, own: false, x: 12, y: 44 },
+      { id: 'ne', number: 2, own: true, x: 88, y: 14 },
     ]);
   });
-  it('gleiche Breite: y in der Mitte; leere Liste', () => {
-    expect(placeholderPins([{ id: 'a', lat: 5, lng: 0, number: 1, own: false }, { id: 'b', lat: 5, lng: 1, number: 2, own: false }]).map((p) => p.y)).toEqual([50, 50]);
+  it('gleiche Breite: y in der Mitte des Bereichs; leere Liste', () => {
+    expect(placeholderPins([{ id: 'a', lat: 5, lng: 0, number: 1, own: false }, { id: 'b', lat: 5, lng: 1, number: 2, own: false }]).map((p) => p.y)).toEqual([29, 29]);
     expect(placeholderPins([])).toEqual([]);
   });
 });
