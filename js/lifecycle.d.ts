@@ -16,3 +16,5 @@ export function createRegistry<K extends object>(): {
 };
 /** Das Handle eines Bausteins, der nichts tun konnte. */
 export function emptyHandle(): DssHandle;
+/** Merkt die Attribute `names` von `el`; die Rückgabe stellt sie wieder her (damals fehlende werden entfernt). */
+export function snapshotAttributes(el: Element, names: readonly string[]): () => void;

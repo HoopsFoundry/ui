@@ -72,3 +72,17 @@ export function createRegistry() {
 export function emptyHandle() {
   return createHandle(null);
 }
+
+/**
+ * Merkt die Attribute `names` von `el` und gibt die Funktion zurück, die sie wiederherstellt: gesetzte Werte kommen zurück,
+ * damals fehlende Attribute werden wieder entfernt. So räumt `destroy()` Markup auf, das ein Baustein verändert hat.
+ */
+export function snapshotAttributes(el, names) {
+  const before = names.map((name) => [name, el.hasAttribute(name) ? el.getAttribute(name) : null]);
+  return () => {
+    for (const [name, value] of before) {
+      if (value === null) el.removeAttribute(name);
+      else if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+    }
+  };
+}
