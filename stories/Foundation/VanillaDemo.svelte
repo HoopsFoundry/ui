@@ -43,5 +43,5 @@
   .page :global([role='tabpanel']) { margin: 12px 0; font-size: var(--fs-body-sm); }
   .page :global([role='tabpanel'] p) { margin: 0; }
   .page :global(.dss-tabs) { margin-top: 10px; }
-  .code { margin: 0; padding: 12px 14px; overflow-x: auto; font-family: var(--font-mono); font-size: var(--fs-caption); line-height: 1.5; background: var(--dss-surface-2); border: 1px solid var(--dss-line); border-radius: var(--radius-md); color: var(--dss-fg); white-space: pre; }
+  .code { margin: 0; padding: 12px 14px; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--fs-caption); line-height: 1.5; background: var(--dss-surface-2); border: 1px solid var(--dss-line); border-radius: var(--radius-md); color: var(--dss-fg); white-space: pre-wrap; }
 </style>
