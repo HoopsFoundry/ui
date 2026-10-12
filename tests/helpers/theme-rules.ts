@@ -184,6 +184,42 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
       h.destroy();
       return ok;
     });
+    rule('Theme: defaultMode gilt ohne gemerkte Wahl', () => {
+      const h = mod.initTheme(mk(), { defaultMode: 'dark' });
+      const ok = h.getMode() === 'dark' && html.getAttribute('data-theme') === 'dark';
+      h.destroy();
+      return ok;
+    });
+    rule('Theme: die gemerkte Wahl gewinnt gegen defaultMode', () => {
+      localStorage.setItem('dss-theme', 'light');
+      const h = mod.initTheme(mk(), { defaultMode: 'dark' });
+      const ok = h.getMode() === 'light';
+      h.destroy();
+      return ok;
+    });
+    rule('Theme: die Wahl „System“ wird bei defaultMode dark gemerkt', () => {
+      const h = mod.initTheme(mk(), { defaultMode: 'dark' });
+      h.setMode('system');
+      const kept = localStorage.getItem('dss-theme') === 'system';
+      h.destroy();
+      const h2 = mod.initTheme(mk(), { defaultMode: 'dark' });
+      const ok = kept && h2.getMode() === 'system' && !html.hasAttribute('data-theme');
+      h2.destroy();
+      return ok;
+    });
+    rule('Theme: mehrere Umschalter teilen den Modus', () => {
+      document.body.replaceChildren(document.createRange().createContextualFragment('<button id="b1"></button><button id="b2"></button>'));
+      const b1 = document.getElementById('b1') as HTMLButtonElement;
+      const b2 = document.getElementById('b2') as HTMLButtonElement;
+      const h1 = mod.initTheme(b1);
+      const h2 = mod.initTheme(b2);
+      b1.click();
+      const ok = b2.getAttribute('aria-pressed') === 'true' && h2.getMode() === 'dark';
+      h1.destroy();
+      h2.destroy();
+      return ok;
+    });
+    rule('Boot: eine gemerkte Wahl „system“ bleibt ohne Attribut, auch bei defaultMode dark', () => boot(mod.themeBootScript({ defaultMode: 'dark' }), 'system') === null);
     rule('Boot: setzt die gemerkte Wahl', () => boot(mod.themeBootScript(), 'dark') === 'dark' && boot(mod.themeBootScript(), 'light') === 'light');
     rule('Boot: system, ungültig und leer setzen nichts', () => ['system', 'lila', '', null].every((v) => boot(mod.themeBootScript(), v) === null));
     rule('Boot: blockierter Speicher wirft nicht und defaultMode gilt', () => boot(mod.themeBootScript({ defaultMode: 'dark' }), 'wirft') === 'dark' && boot(mod.themeBootScript(), 'wirft') === null);

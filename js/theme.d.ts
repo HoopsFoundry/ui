@@ -10,6 +10,8 @@ export interface ThemeStorage {
 }
 
 export interface ThemeOptions {
+  /** Modus ohne gemerkte Wahl (Standard `system`); derselbe Wert wie bei `themeBootScript`: gemerkte Wahl vor `defaultMode` vor `system`. */
+  defaultMode?: ThemeMode;
   /** Schlüssel im Speicher (Standard `dss-theme`). */
   storageKey?: string;
   /** Speicher (Standard `localStorage`); `null` schaltet das Merken ab. */
@@ -45,7 +47,8 @@ export function parseTheme(value: unknown): ThemeMode | null;
 export function resolveTheme(mode: unknown, prefersDark: boolean): ThemeState;
 export function nextTheme(mode: unknown, prefersDark: boolean): ThemeState;
 export function readTheme(storage: ThemeStorage | null | undefined, key?: string): ThemeMode | null;
-export function writeTheme(storage: ThemeStorage | null | undefined, mode: ThemeMode, key?: string): boolean;
+/** `keepSystem`: `system` wird gemerkt statt den Eintrag zu löschen (nötig, wenn `defaultMode` nicht `system` ist). */
+export function writeTheme(storage: ThemeStorage | null | undefined, mode: ThemeMode, key?: string, keepSystem?: boolean): boolean;
 /** Macht einen Button zum Umschalter (hell, dunkel, System); feste Beschriftung, `aria-pressed`, Symbole über `data-theme-state`. */
 export function initTheme(button: HTMLElement, options?: ThemeOptions): ThemeHandle;
 /** Inline-Code für den `<head>` gegen Flackern; mit Content-Security-Policy braucht er ein `nonce` oder einen Hash. */

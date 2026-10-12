@@ -5,6 +5,7 @@ import { loadModule, mutate, read, type Rules } from './helpers/mutation';
 import { backtopLogicRules, pagenavCssRules, pagenavLogicRules, pagenavSourceRules } from './helpers/pagenav-rules';
 import { themeCssRules, themeLogicRules, themeSourceRules } from './helpers/theme-rules';
 import { mapSeatCssRules, mapSeatLogicRules, mapSeatSourceRules } from './helpers/map-seat-rules';
+import { coreRules } from './helpers/core-rules';
 import * as realMap from '../js/map.js';
 import * as realLeaflet from '../js/map-leaflet.js';
 
@@ -94,9 +95,9 @@ const THEME: ThemeMutation[] = [
   { name: 'system bleibt immer hell', rule: 'Theme: system folgt der Systemeinstellung', from: "if (m === 'system') return prefersDark ? 'dark' : 'light';", to: "if (m === 'system') return 'light';" },
   { name: 'Klick ohne Blick auf das System', rule: 'Theme: der Klick wechselt den tatsächlichen Zustand', from: "return resolveTheme(mode, prefersDark) === 'dark' ? 'light' : 'dark';", to: "return mode === 'dark' ? 'light' : 'dark';" },
   { name: 'Speicherfehler beim Lesen werden geworfen', rule: 'Theme: blockierter Speicher bleibt ohne Fehler', from: '} catch {\n    return null;\n  }', to: '} catch (e) {\n    throw e;\n  }' },
-  { name: 'system schreibt statt zu löschen', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "if (mode === 'system') storage?.removeItem(key);", to: "if (mode === 'system') storage?.setItem(key, mode);" },
+  { name: 'system schreibt statt zu löschen', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "if (mode === 'system' && !keepSystem) storage?.removeItem(key);", to: "if (mode === 'system' && !keepSystem) storage?.setItem(key, mode);" },
   { name: 'anderer Standardschlüssel', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "export const THEME_KEY = 'dss-theme';", to: "export const THEME_KEY = 'theme';" },
-  { name: 'Rückfall hell statt system', rule: 'Theme: ein ungültiger gemerkter Wert gilt als system', from: "readTheme(storage, key) ?? 'system';", to: "readTheme(storage, key) ?? 'light';" },
+  { name: 'Rückfall hell statt system', rule: 'Theme: ein ungültiger gemerkter Wert gilt als system', from: "parseTheme(opts.defaultMode) ?? 'system';", to: "parseTheme(opts.defaultMode) ?? 'light';" },
   { name: 'aria-pressed bleibt falsch', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('aria-pressed', String(theme === 'dark'));", to: "button.setAttribute('aria-pressed', 'false');" },
   { name: 'kein Zustand am Button', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('data-theme-state', theme);", to: '' },
   { name: 'Beschriftung folgt dem Modus', rule: 'Theme: feste Beschriftung „Dunkelmodus“, auch nach dem Umschalten', from: "button.setAttribute('aria-label', label);\n  button.hidden", to: "button.setAttribute('aria-label', mode);\n  button.hidden" },
@@ -111,9 +112,14 @@ const THEME: ThemeMutation[] = [
   { name: 'Klick-Listener bleibt nach destroy', rule: 'Theme: destroy entfernt Listener und Ergänzungen', from: 'cleanups.run();\n    for (const icon', to: 'for (const icon' },
   { name: 'zweiter Aufruf ersetzt nicht', rule: 'Theme: ein zweiter Aufruf ersetzt den ersten', from: 'registry.release(button);', to: '' },
   { name: 'ungültiger Attributname wird übernommen', rule: 'Theme: ein ungültiger Attributname fällt auf data-theme zurück', from: "typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;\n  const target", to: "typeof opts.attribute === 'string' ? opts.attribute : THEME_ATTRIBUTE;\n  const target" },
+  { name: 'defaultMode wird ignoriert', rule: 'Theme: defaultMode gilt ohne gemerkte Wahl', from: "?? readTheme(storage, key) ?? defaultMode;", to: "?? readTheme(storage, key) ?? 'system';" },
+  { name: 'gemerkte Wahl wird übergangen', rule: 'Theme: die gemerkte Wahl gewinnt gegen defaultMode', from: 'parseTheme(opts.mode) ?? readTheme(storage, key) ?? defaultMode;', to: 'parseTheme(opts.mode) ?? defaultMode;' },
+  { name: 'System wird nie gemerkt', rule: 'Theme: die Wahl „System“ wird bei defaultMode dark gemerkt', from: "writeTheme(storage, mode, key, defaultMode !== 'system');", to: 'writeTheme(storage, mode, key, false);' },
+  { name: 'Umschalter hören nicht aufeinander', rule: 'Theme: mehrere Umschalter teilen den Modus', from: 'cleanups.add(listen(win, SYNC_EVENT,', to: "cleanups.add(listen(win, SYNC_EVENT + 'x'," },
+  { name: 'Boot kennt system nicht', rule: 'Boot: eine gemerkte Wahl „system“ bleibt ohne Attribut, auch bei defaultMode dark', from: 'if(m!=="light"&&m!=="dark"&&m!=="system")m=', to: 'if(m!=="light"&&m!=="dark")m=' },
   { name: 'Boot setzt system als Attribut', rule: 'Boot: system, ungültig und leer setzen nichts', from: 'if(m==="light"||m==="dark")document', to: 'if(m)document' },
   { name: 'Boot ohne try', rule: 'Boot: blockierter Speicher wirft nicht und defaultMode gilt', from: 'try{m=localStorage.getItem(${lit(key)})}catch(e){}', to: 'm=localStorage.getItem(${lit(key)});' },
-  { name: 'Boot: defaultMode gewinnt immer', rule: 'Boot: die gemerkte Wahl gewinnt gegen defaultMode', from: 'if(m!=="light"&&m!=="dark")m=${lit(fallback)};', to: 'm=${lit(fallback)};' },
+  { name: 'Boot: defaultMode gewinnt immer', rule: 'Boot: die gemerkte Wahl gewinnt gegen defaultMode', from: 'if(m!=="light"&&m!=="dark"&&m!=="system")m=${lit(fallback)};', to: 'm=${lit(fallback)};' },
   { name: 'Boot: Schlüssel nicht maskiert', rule: 'Boot: Schlüssel und Attribut sind konfigurierbar und maskiert', from: ".replace(/</g, '\\\\u003c')", to: '' },
   { name: 'Boot: Attribut nicht geprüft', rule: 'Boot: Schlüssel und Attribut sind konfigurierbar und maskiert', after: 'export function themeBootScript', from: "typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;", to: "typeof opts.attribute === 'string' ? opts.attribute : THEME_ATTRIBUTE;" },
   { name: 'Boot wird lang', rule: 'Boot: kurz und ohne let, const, Pfeilfunktion', from: '(function(){var m;', to: `(function(){/* ${'x'.repeat(300)} */var m;` },
@@ -271,5 +277,24 @@ describe('Mutationstests: Sitzmarker und darkTiles der Karte', () => {
     const files = { svelte: svelteMap, react: reactMap, leaflet: leafletJs };
     expect(mapSeatSourceRules(files)[rule], `Regel fehlt: ${rule}`).toBe(true);
     expect(mapSeatSourceRules({ ...files, [file]: mutate(files[file], from, to) })[rule], `Regel kippt nicht: ${rule}`).toBe(false);
+  });
+});
+
+describe('Mutationstests: initAll (vanilla-core.js)', () => {
+  const coreJs = read('js/vanilla-core.js');
+  const CORE: Mutation[] = [
+    { name: 'nur das erste Element je Baustein', rule: 'initAll: jedes Element eines Bausteins wird gestartet', from: 'for (const el of found) handles.push(', to: 'for (const el of [...found].slice(0, 1)) handles.push(' },
+    { name: 'Optionen nur vom ersten Element', rule: 'initAll: jedes Element bekommt seine eigenen Optionen', from: "parseOptions(el.getAttribute('data-dss-options'))", to: "parseOptions(found.values().next().value.getAttribute('data-dss-options'))" },
+    { name: 'destroy nur des ersten', rule: 'initAll: destroy baut alle Elemente ab', from: 'for (const h of handles.splice(0).reverse()) h.destroy();', to: 'handles.splice(0).slice(0, 1).forEach((h) => h.destroy());' },
+    { name: 'ohne data-dss wird etwas gestartet', rule: 'initAll: ohne data-dss nichts', from: "accordion: { selector: '[data-dss=\"accordion\"], [data-dss-acc]'", to: "accordion: { selector: 'div, [data-dss-acc]'" },
+  ];
+  it('Ausgangslage', async () => {
+    const mod = await loadModule(coreJs);
+    expect(Object.entries(coreRules(mod as never)).filter(([, ok]) => !ok)).toEqual([]);
+  });
+  it.each(CORE)('$name', async ({ rule, from, to }) => {
+    const rules = coreRules((await loadModule(mutate(coreJs, from, to))) as never);
+    expect(rule in rules, `Regel fehlt: ${rule}`).toBe(true);
+    expect(rules[rule], `Regel kippt nicht: ${rule}`).toBe(false);
   });
 });

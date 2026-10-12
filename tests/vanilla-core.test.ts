@@ -3,6 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '../js/vanilla-core.js';
 import { DSS_BLOCKS, initAll, parseOptions } from '../js/vanilla-core.js';
 import { reducedMotion } from '../js/motion.js';
+import { coreRules } from './helpers/core-rules';
 import { safeHref } from '../js/url.js';
 
 const PAGE = `
@@ -98,6 +99,10 @@ describe('initAll', () => {
     expect(h.count).toBe(1);
     expect(document.querySelector('.dss-eyebrow')!.textContent).toBe('Auf dieser Seite');
   });
+});
+
+describe('initAll: mehrere Elemente je Baustein (Aussagen aus tests/helpers/core-rules.ts)', () => {
+  it.each(Object.entries(coreRules(core as never)))('%s', (_n, ok) => expect(ok).toBe(true));
 });
 
 describe('parseOptions', () => {

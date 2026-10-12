@@ -15,6 +15,7 @@ export const THEME_ATTRIBUTE = 'data-theme';
 export const THEME_LABEL = 'Dunkelmodus';
 const MODES = ['light', 'dark', 'system'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
+const SYNC_EVENT = 'dss-theme-sync';
 const registry = createRegistry();
 
 /** Gültiger Modus (`light`, `dark`, `system`) oder `null`. */
@@ -42,9 +43,10 @@ export function readTheme(storage, key = THEME_KEY) {
     return null;
   }
 }
-export function writeTheme(storage, mode, key = THEME_KEY) {
+export function writeTheme(storage, mode, key = THEME_KEY, keepSystem = false) {
   try {
-    if (mode === 'system') storage?.removeItem(key);
+    // `system` löscht den Eintrag; gilt aber ein anderer defaultMode, muss die Wahl „System“ gemerkt werden (sonst käme beim nächsten Besuch der Standard)
+    if (mode === 'system' && !keepSystem) storage?.removeItem(key);
     else storage?.setItem(key, mode);
     return true;
   } catch {
@@ -75,7 +77,7 @@ const iconEl = (doc, kind) => {
 };
 
 /**
- * Umschalter für den Dunkelmodus. Optionen: `storageKey` (Standard `dss-theme`), `storage` (Objekt mit `getItem`, `setItem`, `removeItem`;
+ * Umschalter für den Dunkelmodus. Optionen: `defaultMode` (Modus ohne gemerkte Wahl, Standard `system`; derselbe Wert wie bei `themeBootScript`, damit Boot-Skript und Umschalter übereinstimmen: gemerkte Wahl vor `defaultMode` vor `system`), `storageKey` (Standard `dss-theme`), `storage` (Objekt mit `getItem`, `setItem`, `removeItem`;
  * Standard `localStorage`, `null` schaltet das Merken ab), `mode` (Anfangsmodus; sonst der gemerkte, sonst `system`), `target` (Element, das
  * das Attribut bekommt; Standard `<html>`: die Tokens reagieren nur dort), `attribute` (Standard `data-theme`), `label` (Standard „Dunkelmodus“,
  * nur wenn der Button keinen eigenen Text hat), `onChange(mode, theme)`.
@@ -110,7 +112,9 @@ export function initTheme(button, options = {}) {
     cls: button.className, state: button.getAttribute('data-theme-state'), mode: button.getAttribute('data-theme-mode'),
   };
 
-  let mode = parseTheme(opts.mode) ?? readTheme(storage, key) ?? 'system';
+  const defaultMode = parseTheme(opts.defaultMode) ?? 'system';
+  const id = {}; // Kennung dieser Instanz für das Fenster-Ereignis
+  let mode = parseTheme(opts.mode) ?? readTheme(storage, key) ?? defaultMode;
 
   const apply = () => {
     const theme = resolveTheme(mode, prefersDark());
@@ -121,13 +125,15 @@ export function initTheme(button, options = {}) {
     button.setAttribute('data-theme-mode', mode);
     return theme;
   };
-  const setMode = (next, { persist = true, notify = true } = {}) => {
+  const setMode = (next, { persist = true, notify = true, broadcast = true } = {}) => {
     const value = parseTheme(next);
     if (!value) return;
     mode = value;
-    if (persist) writeTheme(storage, mode, key);
+    if (persist) writeTheme(storage, mode, key, defaultMode !== 'system');
     const theme = apply();
     if (notify && typeof opts.onChange === 'function') opts.onChange(mode, theme);
+    // Mehrere Umschalter auf einer Seite (je Schlüssel) teilen sich den Modus: die anderen hören auf dieses Fenster-Ereignis
+    if (broadcast) win.dispatchEvent(new CustomEvent(SYNC_EVENT, { detail: { key, mode, source: id } }));
   };
 
   if (!button.hasAttribute('type')) button.setAttribute('type', 'button');
@@ -156,8 +162,14 @@ export function initTheme(button, options = {}) {
   // Ein anderer Tab ändert die Wahl
   cleanups.add(listen(win, 'storage', (event) => {
     if (event.key !== null && event.key !== key) return;
-    const stored = readTheme(storage, key) ?? 'system';
+    const stored = readTheme(storage, key) ?? defaultMode;
     if (stored !== mode) setMode(stored, { persist: false });
+  }));
+  // Ein anderer Umschalter im selben Fenster hat den Modus geändert
+  cleanups.add(listen(win, SYNC_EVENT, (event) => {
+    const { key: other, mode: next, source } = event.detail ?? {};
+    if (source === id || other !== key || next === mode || !parseTheme(next)) return;
+    setMode(next, { persist: false, broadcast: false });
   }));
 
   const handle = registry.claim(button, () => {
@@ -175,8 +187,9 @@ export function initTheme(button, options = {}) {
 }
 
 /**
- * Inline-Code für den `<head>`: setzt die gemerkte Wahl (`light` oder `dark`) auf `<html>`, bevor die Seite gezeichnet wird. Bei `system`, ohne
- * Eintrag oder blockiertem Speicher gilt `defaultMode` (Standard `system`: kein Attribut, das CSS folgt der Systemeinstellung). Optionen:
+ * Inline-Code für den `<head>`: setzt die gemerkte Wahl (`light` oder `dark`) auf `<html>`, bevor die Seite gezeichnet wird. Eine gemerkte Wahl
+ * `system` bleibt ohne Attribut; ohne Eintrag oder bei blockiertem Speicher gilt `defaultMode` (Standard `system`: kein Attribut, das CSS folgt der Systemeinstellung).
+ * `initTheme` bekommt dasselbe `defaultMode`. Optionen:
  * `storageKey` (Standard `dss-theme`), `attribute` (Standard `data-theme`), `defaultMode`. Die Werte werden als Zeichenketten eingebettet und so
  * maskiert, dass `</script>` und Zeilentrenner darin nichts ausrichten. Mit einer Content-Security-Policy braucht das Skript ein `nonce` oder
  * einen Hash in `script-src`.
@@ -187,5 +200,5 @@ export function themeBootScript(options = {}) {
   const attribute = typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;
   const fallback = opts.defaultMode === 'light' || opts.defaultMode === 'dark' ? opts.defaultMode : 'system';
   const lit = (value) => JSON.stringify(value).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
-  return `(function(){var m;try{m=localStorage.getItem(${lit(key)})}catch(e){}if(m!=="light"&&m!=="dark")m=${lit(fallback)};if(m==="light"||m==="dark")document.documentElement.setAttribute(${lit(attribute)},m)})();`;
+  return `(function(){var m;try{m=localStorage.getItem(${lit(key)})}catch(e){}if(m!=="light"&&m!=="dark"&&m!=="system")m=${lit(fallback)};if(m==="light"||m==="dark")document.documentElement.setAttribute(${lit(attribute)},m)})();`;
 }

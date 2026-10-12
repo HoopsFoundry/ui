@@ -316,6 +316,118 @@ describe('initTheme: Aufräumen und Idempotenz', () => {
   });
 });
 
+describe('defaultMode: Boot-Skript und Umschalter stimmen überein', () => {
+  it('ohne gemerkte Wahl gilt defaultMode: Attribut gesetzt, nichts entfernt', () => {
+    html.setAttribute('data-theme', 'dark'); // das Boot-Skript hat es gesetzt
+    const remove = vi.spyOn(html, 'removeAttribute');
+    const b = button();
+    handle = initTheme(b, { defaultMode: 'dark' });
+    expect(handle.getMode()).toBe('dark');
+    expect(html.getAttribute('data-theme')).toBe('dark');
+    expect(b.getAttribute('aria-pressed')).toBe('true');
+    expect(remove).not.toHaveBeenCalledWith('data-theme');
+    remove.mockRestore();
+  });
+  it('die gemerkte Wahl gewinnt gegen defaultMode, defaultMode gegen system', () => {
+    localStorage.setItem('dss-theme', 'light');
+    handle = initTheme(button(), { defaultMode: 'dark' });
+    expect(handle.getMode()).toBe('light');
+    handle.destroy();
+    localStorage.clear();
+    handle = initTheme(button());
+    expect(handle.getMode()).toBe('system');
+    handle.destroy();
+    handle = initTheme(button(), { defaultMode: 'bunt' as never });
+    expect(handle.getMode()).toBe('system');
+  });
+  it('die Wahl „System“ wird bei defaultMode dark gemerkt und beim nächsten Besuch behalten', () => {
+    handle = initTheme(button(), { defaultMode: 'dark' });
+    handle.setMode('system');
+    expect(localStorage.getItem('dss-theme')).toBe('system');
+    expect(html.hasAttribute('data-theme')).toBe(false);
+    handle.destroy();
+    handle = initTheme(button(), { defaultMode: 'dark' });
+    expect(handle.getMode()).toBe('system');
+    expect(html.hasAttribute('data-theme')).toBe(false);
+  });
+  it('bei defaultMode system löscht „System“ weiter den Eintrag', () => {
+    handle = initTheme(button());
+    handle.setMode('dark');
+    handle.setMode('system');
+    expect(localStorage.getItem('dss-theme')).toBeNull();
+  });
+  it('das Boot-Skript lässt eine gemerkte Wahl „system“ ohne Attribut, auch bei defaultMode dark', () => {
+    const s = themeBootScript({ defaultMode: 'dark' });
+    html.removeAttribute('data-theme');
+    vi.stubGlobal('localStorage', { getItem: () => 'system' });
+    new Function(s)();
+    expect(html.hasAttribute('data-theme')).toBe(false);
+  });
+  it('ein anderer Tab, der den Eintrag löscht, ergibt defaultMode', () => {
+    localStorage.setItem('dss-theme', 'light');
+    handle = initTheme(button(), { defaultMode: 'dark' });
+    localStorage.clear();
+    window.dispatchEvent(new StorageEvent('storage', { key: null }));
+    expect(handle.getMode()).toBe('dark');
+  });
+});
+
+describe('mehrere Umschalter teilen den Modus', () => {
+  const two = () => {
+    document.body.replaceChildren(document.createRange().createContextualFragment('<button id="b1"></button><button id="b2"></button>'));
+    return [document.getElementById('b1')!, document.getElementById('b2')!] as HTMLButtonElement[];
+  };
+  it('ein Klick auf den ersten stellt auch den zweiten um (aria-pressed, Zustand, Modus)', () => {
+    const [b1, b2] = two();
+    const h1 = initTheme(b1);
+    const h2 = initTheme(b2);
+    b1.click();
+    expect(b2.getAttribute('aria-pressed')).toBe('true');
+    expect(b2.getAttribute('data-theme-mode')).toBe('dark');
+    expect(h2.getMode()).toBe('dark');
+    b2.click();
+    expect(b1.getAttribute('aria-pressed')).toBe('false');
+    expect(h1.getMode()).toBe('light');
+    h1.destroy();
+    h2.destroy();
+  });
+  it('setMode(system) auf einem wirkt auf alle; die Wahl wird nur einmal gespeichert', () => {
+    const [b1, b2] = two();
+    const setItem = vi.spyOn(Storage.prototype, 'setItem');
+    const h1 = initTheme(b1);
+    const h2 = initTheme(b2);
+    h1.setMode('dark');
+    expect(setItem).toHaveBeenCalledTimes(1);
+    h2.setMode('system');
+    expect(h1.getMode()).toBe('system');
+    expect(b1.getAttribute('data-theme-mode')).toBe('system');
+    setItem.mockRestore();
+    h1.destroy();
+    h2.destroy();
+  });
+  it('Umschalter mit anderem Schlüssel bleiben unabhängig; nach destroy hört keiner mehr', () => {
+    const [b1, b2] = two();
+    const h1 = initTheme(b1, { storageKey: 'a' });
+    const h2 = initTheme(b2, { storageKey: 'b' });
+    b1.click();
+    expect(h2.getMode()).toBe('system');
+    h2.destroy();
+    b1.click();
+    expect(b2.hasAttribute('aria-pressed')).toBe(false);
+    h1.destroy();
+  });
+  it('onChange der anderen Instanz wird aufgerufen', () => {
+    const [b1, b2] = two();
+    const calls: string[] = [];
+    const h1 = initTheme(b1);
+    const h2 = initTheme(b2, { onChange: (m: string) => calls.push(m) });
+    b1.click();
+    expect(calls).toEqual(['dark']);
+    h1.destroy();
+    h2.destroy();
+  });
+});
+
 describe('themeBootScript', () => {
   const run = (script: string, stored?: string | (() => never)) => {
     html.removeAttribute('data-theme');
