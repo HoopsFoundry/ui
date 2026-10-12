@@ -2,7 +2,7 @@
 // `polyfillDialog()` baut beides nach (open-Attribut, close-Ereignis als eigene Aufgabe wie im Browser).
 export const dialogMarkup = (id = 'freigabe', extra = '') => `
 <button type="button" id="${id}-auf" data-dss-modal-open="${id}">Spielbericht freigeben</button>
-<dialog class="dss-modal-dialog" id="${id}" ${extra}>
+<dialog class="dss-modal-dialog" id="${id}" data-dss="modal" ${extra}>
   <div class="dss-modal dss-modal--sm">
     <div class="dss-m-head">
       <div class="dss-m-head-text"><h2 class="dss-m-title" id="${id}-titel">Spielbericht freigeben?</h2></div>
@@ -18,7 +18,7 @@ export const dialogMarkup = (id = 'freigabe', extra = '') => `
 
 export const divMarkup = (id = 'verwerfen', extra = '') => `
 <main id="${id}-seite"><button type="button" id="${id}-auf" data-dss-modal-open="${id}">Verwerfen</button><a href="/x" id="${id}-seitenlink">Seite</a></main>
-<div id="${id}" class="dss-modal-root" hidden ${extra}>
+<div id="${id}" class="dss-modal-root" data-dss="modal" hidden ${extra}>
   <div class="dss-backdrop"></div>
   <div class="dss-modal-wrap">
     <div class="dss-modal dss-modal--sm">

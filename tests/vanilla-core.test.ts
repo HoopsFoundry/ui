@@ -89,7 +89,7 @@ describe('initAll', () => {
     expect(() => h!.destroy()).not.toThrow();
   });
   it('ein unbekannter data-dss-Wert wird ignoriert', () => {
-    mount('<div data-dss="tabs"></div><div data-dss="__proto__"></div>');
+    mount('<div data-dss="karte"></div><div data-dss="__proto__"></div>');
     h = initAll();
     expect(h.count).toBe(0);
   });
@@ -124,8 +124,8 @@ describe('parseOptions', () => {
 });
 
 describe('Modul', () => {
-  it('kennt vier Bausteine und exportiert die gemeinsamen Hilfen', () => {
-    expect(DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme']);
+  it('kennt sechs Bausteine und exportiert die gemeinsamen Hilfen', () => {
+    expect(DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme', 'tabs', 'modal']);
     expect(core.reducedMotion).toBe(reducedMotion);
     expect(core.safeHref).toBe(safeHref);
     expect(typeof core.createHandle).toBe('function');

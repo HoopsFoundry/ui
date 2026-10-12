@@ -1,7 +1,7 @@
 /**
  * DSS Vanilla Core · alles auf einmal starten
  * --------------------------------------------------------------
- * `initAll(scope, options)` findet im Dokument (oder unterhalb von `scope`) alle Elemente mit `data-dss="accordion|pagenav|backtop|theme"` und
+ * `initAll(scope, options)` findet im Dokument (oder unterhalb von `scope`) alle Elemente mit `data-dss="accordion|pagenav|backtop|theme|tabs|modal"` und
  * startet den passenden Baustein darauf. Jeder Baustein folgt dem Muster `initX(root, options) → { destroy() }` (js/lifecycle.js); `initAll`
  * gibt ein Handle zurück, das alle abbaut. Ein zweiter Aufruf ersetzt die frühere Fassung je Element (idempotent). Optionen je Baustein stehen in
  * `options.<name>` oder am Element als JSON in `data-dss-options`. Beim Import passiert nichts (kein Auto-Start, kein Zugriff auf `window`/`document`).
@@ -10,7 +10,9 @@
 import { initAccordion } from './accordion.js';
 import { initBackToTop } from './backtop.js';
 import { createHandle } from './lifecycle.js';
+import { initModal } from './modal.js';
 import { initPageNav } from './pagenav.js';
+import { initTabs } from './tabs.js';
 import { initTheme } from './theme.js';
 
 export { reducedMotion } from './motion.js';
@@ -24,6 +26,8 @@ const BLOCKS = {
   // Auf einem Button wird er übernommen, auf einem anderen Element ist es der Container des Knopfes
   backtop: { selector: '[data-dss="backtop"]', start: (el, o) => initBackToTop(el.tagName === 'BUTTON' ? { ...o, button: el } : { ...o, container: el }) },
   theme: { selector: '[data-dss="theme"]', start: (el, o) => initTheme(el, o) },
+  tabs: { selector: '[data-dss="tabs"]', start: (el, o) => initTabs(el, o) },
+  modal: { selector: '[data-dss="modal"]', start: (el, o) => initModal(el, o) },
 };
 
 /** Namen der Bausteine, die `initAll` kennt. */
@@ -45,7 +49,7 @@ export function parseOptions(text) {
 
 /**
  * Startet alle Bausteine mit `data-dss` unterhalb von `scope` (Standard: das Dokument; ein passendes `scope` selbst zählt mit).
- * `options`: `{ accordion?, pagenav?, backtop?, theme?, only? }`, wobei `only` eine Liste von Namen ist (Standard alle).
+ * `options`: `{ accordion?, pagenav?, backtop?, theme?, tabs?, modal?, only? }`, wobei `only` eine Liste von Namen ist (Standard alle).
  * Gibt `{ destroy(), count }` zurück.
  */
 export function initAll(scope, options = {}) {
