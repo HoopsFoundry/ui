@@ -40,13 +40,20 @@ export function writeHash(id: string, open: boolean): void;
 /** Höhe des klebenden Kopfes eines umgebenden Bereichs, der ein verschachteltes Ziel verdecken würde (sonst 0). */
 export function stickyOffset(el: Element | null | undefined): number;
 /** Scrollt das Element nach dem nächsten Frame in Sicht; der Abstand nach oben enthält `--dss-acc-sticky-top` und den klebenden Kopf der Eltern (ohne Browser ohne Wirkung). */
-export function scrollToElement(el: Element | null | undefined): void;
+export function scrollToElement(el: Element | null | undefined, options?: { behavior?: 'auto' | 'smooth' }): void;
+/** Öffnet alle Bereiche und `<details>`, die `target` umgeben (Klick auf den Kopf, von außen nach innen); gesperrte bleiben zu. `true`, wenn etwas geöffnet wurde. */
+export function revealAround(target: Element | null | undefined): boolean;
+/** Ist das Element ein Bereich der Gruppe (Karte oder einklappbarer Rahmen)? */
+export function isAccordionItem(el: Element | null | undefined): boolean;
 /** Tastatur einer Gruppe (Pfeil ab/auf, Home, End zwischen den Köpfen; deaktivierte übersprungen). `true`, wenn die Taste behandelt wurde (dann `preventDefault`). */
 export function moveFocus(root: Element, trigger: Element, key: string, modifiers?: { altKey?: boolean; ctrlKey?: boolean; metaKey?: boolean; shiftKey?: boolean }): boolean;
-/** Macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und natives `details`); gibt `destroy()` zurück. */
-export function initAccordion(root: Element, options?: AccordionOptions): () => void;
+/** Rückgabe der Init-Funktionen: Funktion zum Aufräumen (wie bisher) und zugleich `.destroy()` (Muster `{ destroy() }`). */
+export type AccordionHandle = (() => void) & { destroy(): void };
+
+/** Macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und natives `details`); gibt eine Aufräum-Funktion mit `.destroy()` zurück. */
+export function initAccordion(root: Element, options?: AccordionOptions): AccordionHandle;
 /** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument). */
-export function initAccordions(scope?: ParentNode, options?: AccordionOptions): () => void;
+export function initAccordions(scope?: ParentNode, options?: AccordionOptions): AccordionHandle;
 
 /** Ein angemeldeter Bereich (Werte als Getter, damit sie aktuell bleiben). `anchor: false`: kein öffentlicher Anker (keine Sprungleiste, kein Hash). */
 export interface CollapsibleEntry {

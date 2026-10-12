@@ -1,6 +1,6 @@
 <script lang="ts">
   import MapView from '../../svelte/Map.svelte';
-  import { HALLEN, demoTileUrl } from './mapData';
+  import { HALLEN, SITZ, demoTileUrl } from './mapData';
 
   // Spielwiese für die Controls: alle Props der Karte. `count` und `ownFirst` bauen die Demo-Marker, `tileUrl` "demo" nutzt das lokale Demo-Bild.
   let {
@@ -17,6 +17,8 @@
     appLinks = ['osm', 'route'],
     showList = true,
     dimInDark = true,
+    darkTiles = 'dim',
+    seat = false,
   }: {
     label?: string;
     count?: number;
@@ -31,9 +33,14 @@
     appLinks?: ('osm' | 'geo' | 'route')[];
     showList?: boolean;
     dimInDark?: boolean;
+    darkTiles?: 'dim' | 'invert';
+    seat?: boolean;
   } = $props();
 
-  const markers = $derived(HALLEN.slice(0, Math.max(1, Math.min(HALLEN.length, count))).map((m, i) => ({ ...m, own: ownFirst && i === 0 })));
+  const markers = $derived([
+    ...HALLEN.slice(0, Math.max(1, Math.min(HALLEN.length, count))).map((m, i) => ({ ...m, own: ownFirst && i === 0 })),
+    ...(seat ? [SITZ] : []),
+  ]);
   // Die Doku erzeugt keinen Netzverkehr zu OpenStreetMap: "demo" lädt das lokale Bild; "osm" oder leer nimmt den Standard der Komponente
   const url = $derived(tileUrl === 'demo' ? demoTileUrl() : tileUrl && tileUrl !== 'osm' ? tileUrl : undefined);
 </script>
@@ -52,5 +59,6 @@
     {appLinks}
     {showList}
     {dimInDark}
+    {darkTiles}
   />
 </div>

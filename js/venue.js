@@ -4,7 +4,8 @@
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte und React nutzen dieselbe Logik.
  * Typen: js/venue.d.ts.
  */
-import { isCoord, mapLinks, safeHref } from './map.js';
+import { isCoord, mapLinks } from './map.js';
+import { safeHref } from './url.js';
 
 export const venueText = {
   gamesLabel: 'Nächste Spiele in der Halle',

@@ -1,7 +1,7 @@
 <script lang="ts">
   import MapView from '../../svelte/Map.svelte';
   import { pinElement } from '../../js/map-leaflet.js';
-  import { HALLEN, demoTileUrl } from './mapData';
+  import { HALLEN, SITZ, demoTileUrl } from './mapData';
 
   let { example }: { example: string } = $props();
 
@@ -11,8 +11,9 @@
   const tile = demoTileUrl();
 
   // Pin als Inline-SVG wie in der Karte (Zustandsmatrix)
-  function pin(node: HTMLElement, options: { number: number | null; own?: boolean }) {
-    node.appendChild(pinElement({ number: options.number }));
+  function pin(node: HTMLElement, options: { number: number | null; own?: boolean; kind?: 'place' | 'seat' }) {
+    node.appendChild(pinElement({ number: options.number, kind: options.kind }));
+    if (options.kind === 'seat') node.classList.add('is-seat');
     if (options.own) node.classList.add('is-own');
   }
   const stateClass = ['', 'pseudo-hover', 'pseudo-focus-visible', ''] as const;
@@ -27,6 +28,34 @@
   <MapView label="Geladene Karte der Sporthalle Nordhain" markers={one} tileUrl={tile} load="auto" height={300} />
 {:else if example === 'mehrere'}
   <MapView label="Karte der Hallen im Kreis Nordhain" markers={three} tileUrl={tile} load="auto" />
+{:else if example === 'sitz'}
+  <MapView label="Karte mit Vereinssitz und zwei Hallen" markers={[SITZ, HALLEN[0], HALLEN[1]]} tileUrl={tile} load="auto" />
+{:else if example === 'sitz-pins'}
+  <div class="surface">
+    <div class="states">
+      <div class="cell"><div class="colhead">Sitz · helle Kachel</div><div class="swatch swatch--light"><div class="dss-map-marker is-seat" use:pin={{ number: null, kind: 'seat' }}></div></div></div>
+      <div class="cell"><div class="colhead">Sitz · dunkle Kachel</div><div class="swatch swatch--dark"><div class="dss-map-marker is-seat" use:pin={{ number: null, kind: 'seat' }}></div></div></div>
+      <div class="cell"><div class="colhead">Sitz, eigener Ort · helle Kachel</div><div class="swatch swatch--light"><div class="dss-map-marker is-seat is-own" use:pin={{ number: null, kind: 'seat', own: true }}></div></div></div>
+      <div class="cell"><div class="colhead">Ort mit Nummer · dunkle Kachel</div><div class="swatch swatch--dark"><div class="dss-map-marker" use:pin={{ number: 1 }}></div></div></div>
+    </div>
+  </div>
+{:else if example === 'dunkle-kacheln'}
+  <div class="narrow">
+    <div class="cap">darkTiles="dim" (Standard)</div>
+    <MapView label="Karte mit abgedunkelten Kacheln" markers={[SITZ, HALLEN[0]]} tileUrl={tile} load="auto" height={220} showList={false} darkTiles="dim" />
+    <div class="gap"></div>
+    <div class="cap">darkTiles="invert"</div>
+    <MapView label="Karte mit invertierten Kacheln" markers={[SITZ, HALLEN[1]]} tileUrl={tile} load="auto" height={220} showList={false} darkTiles="invert" />
+  </div>
+{:else if example === 'do-sitz'}
+  <div class="narrow">
+    <MapView label="Do: ein Sitz, die Hallen als Orte" markers={[SITZ, { ...HALLEN[1], id: 'do-seeberg' }]} tileUrl={tile} load="auto" height={240} />
+  </div>
+{:else if example === 'dont-sitz'}
+  <!-- Falsch: jede Halle als Sitz; die Häuser unterscheiden sich nicht mehr, und die Nummern fehlen -->
+  <div class="narrow">
+    <MapView label="Don't: alles als Sitz" markers={[{ ...HALLEN[0], id: 'dont-nordhain', kind: 'seat' }, { ...HALLEN[1], id: 'dont-seeberg', kind: 'seat' }, { ...HALLEN[2], id: 'dont-kiefernau', kind: 'seat' }]} tileUrl={tile} load="auto" height={240} />
+  </div>
 {:else if example === 'ausschnitt'}
   <div class="grid2">
     <div>

@@ -19,8 +19,8 @@
 
   // Nachgestellte Fehler (Don'ts): entfernt den versteckten Text der Form-Zellen, so wie ein reines Punkte-Markup ihn nicht hätte
   function stripFormText(node: HTMLElement) {
-    for (const cell of node.querySelectorAll('td .dss-league-dots')) {
-      for (const hidden of cell.parentElement?.querySelectorAll('.dss-sr-only') ?? []) hidden.remove();
+    for (const cell of node.querySelectorAll('td .dss-form-list')) {
+      for (const hidden of cell.closest('td')?.querySelectorAll('.dss-sr-only') ?? []) hidden.remove();
     }
   }
 </script>

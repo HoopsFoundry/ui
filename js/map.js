@@ -5,6 +5,8 @@
  * Typen: js/map.d.ts.
  */
 
+import { safeHref } from './url.js';
+
 /** Texte der Komponente (eine Quelle für Svelte und React). */
 export const mapText = {
   load: 'Karte laden',
@@ -21,6 +23,7 @@ export const mapText = {
   linkRoute: 'Route planen',
   listLabel: 'Orte auf der Karte',
   own: 'Eigener Ort',
+  seat: 'Vereinssitz',
   zoomGroup: 'Maßstab',
   canvasHint: 'Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab.',
 };
@@ -104,25 +107,8 @@ export function validTileUrl(url) {
   return parts[1].toLowerCase() === 'localhost';
 }
 
-/**
- * Prüft ein Ziel (`href`) eines Markers: erlaubt sind `http:`, `https:`, `mailto:`, `tel:` (Schema in beliebiger Schreibweise), Pfade
- * (`/…`, `./…`, `../…`, `ort/seite`, `?…`) und `#`-Ziele. Alles mit anderem Schema (`javascript:`, `data:`, `vbscript:` …) und alles mit
- * Steuerzeichen oder Leerraum am Anfang ergibt `undefined`. Steuerzeichen und Leerzeichen innerhalb entfernen Browser vor der Auswertung
- * des Schemas, deshalb zählt die Funktion sie vorher mit.
- */
-export function safeHref(href) {
-  if (typeof href !== 'string' || !href) return undefined;
-  if (/^[\u0000-\u0020\u007f-\u00a0\u1680\u2000-\u200f\u2028\u2029\u202f\u205f\u3000\ufeff]/.test(href)) return undefined;
-  // so, wie der Browser das Schema liest: Tabulator und Zeilenumbrüche fallen weg
-  const flat = href.replace(/[\u0000-\u001f\u007f]/g, '');
-  const scheme = flat.match(/^([A-Za-z][A-Za-z0-9+.-]*):/);
-  if (scheme) return /^(https?|mailto|tel)$/i.test(scheme[1]) ? href : undefined;
-  // „ohne Schema“ heißt: der Teil vor dem ersten / ? # enthält keinen Doppelpunkt (sonst wäre es ein Schema)
-  if (/^[^/?#]*:/.test(flat)) return undefined;
-  // Zeichenverweise (&colon;, &#58;) ergäben in Markup-Kontexten ein Schema: vor dem ersten / ? # nicht zulassen
-  if (/^[^/?#]*&/.test(flat)) return undefined;
-  return href;
-}
+// `safeHref` lebt jetzt in js/url.js (gemeinsam mit den Render-Funktionen); hier abwärtskompatibel erneut exportiert
+export { safeHref };
 
 /**
  * Umschließendes Rechteck aller gültigen Marker: `{ sw: [lat, lng], ne: [lat, lng] }` (Südwest, Nordost).
@@ -149,11 +135,28 @@ export function boundsOf(markers) {
   return { sw: [Math.min(...lats), west], ne: [Math.max(...lats), east] };
 }
 
+/** Name eines Markers für Hilfstechnik: die sichtbare Nummer voran, dann der Name des Orts („1, Sporthalle Nordhain“); ein Sitzmarker hat keine Nummer und den Zusatz „Vereinssitz“ („Sporthalle Nordhain, Vereinssitz“, Text über `seatText` des Eintrags). */
+export function markerName(item) {
+  const label = item && typeof item.label === 'string' ? item.label : '';
+  if (item?.kind === 'seat') {
+    const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapText.seat;
+    return label ? `${label}, ${seat}` : seat;
+  }
+  // Die sichtbare Nummer steht voran („1, Sporthalle Nordhain“): Der Name enthält so den Text des Markers (WCAG 2.5.3, Label im Namen)
+  const number = item?.number;
+  return Number.isInteger(number) && number >= 0 ? (label ? `${number}, ${label}` : String(number)) : label;
+}
+
+/** Kachelverfahren im Dunkelmodus: `invert` (invertieren und umfärben) oder `dim` (abdunkeln, Standard); alles andere ergibt `dim`. */
+export function tilesMode(value) {
+  return value === 'invert' ? 'invert' : 'dim';
+}
+
 /**
- * Marker für Liste, Platzhalter und Karte aufbereiten: ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
+ * Marker für Liste, Platzhalter und Karte aufbereiten (`texts.seat`: Text für den Sitzmarker statt „Vereinssitz“): ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
  * Markern die laufende Nummer (ein Marker bekommt keine), dazu Koordinatentext und Links (nur die in `appLinks` gewünschten).
  */
-export function mapItems(markers, appLinks = ['osm', 'route']) {
+export function mapItems(markers, appLinks = ['osm', 'route'], texts = {}) {
   const valid = (Array.isArray(markers) ? markers : []).filter((m) => m && isCoord(m.lat, m.lng));
   const wants = Array.isArray(appLinks) ? appLinks : [];
   // Eindeutige ids: ausdrückliche ids behalten ihren Wert (die erste gewinnt), doppelte und fehlende bekommen einen freien Ersatz
@@ -165,7 +168,12 @@ export function mapItems(markers, appLinks = ['osm', 'route']) {
     used.add(id);
     return id;
   };
+  // Sitzmarker (kind: 'seat') tragen keine Nummer und zählen nicht mit; die Orte werden unter sich von 1 an gezählt
+  const places = valid.filter((m) => m.kind !== 'seat').length;
+  let running = 0;
   return valid.map((m, index) => {
+    const seat = m.kind === 'seat';
+    if (!seat) running += 1;
     const label = typeof m.label === 'string' ? m.label : '';
     const all = mapLinks({ lat: m.lat, lng: m.lng, label });
     const links = [];
@@ -181,7 +189,9 @@ export function mapItems(markers, appLinks = ['osm', 'route']) {
       label,
       href: safeHref(m.href),
       own: m.own === true,
-      number: given ?? (valid.length > 1 ? index + 1 : null),
+      kind: seat ? 'seat' : 'place',
+      seatText: typeof texts?.seat === 'string' && texts.seat.trim() ? texts.seat.trim() : mapText.seat,
+      number: seat ? null : given ?? (places > 1 ? running : null),
       coords: formatCoords(m.lat, m.lng),
       links,
     };
@@ -229,6 +239,7 @@ export function placeholderPins(items) {
         id: String(m.id),
         number: m.number ?? null,
         own: m.own === true,
+        kind: m.kind === 'seat' ? 'seat' : 'place',
         x: Math.round(pos(lng, bounds.sw[1], spanLng, 12, 88) * 10) / 10,
         // Norden oben: größere Breite liegt weiter oben
         y: Math.round(pos(bounds.ne[0] - m.lat, 0, spanLat, 14, 44) * 10) / 10,

@@ -48,6 +48,12 @@ js/
   map.js                ← Karte: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord` (`./map.js`); `map-leaflet.js` ist intern
   league.js             ← Ausschnitt, Untertitel, Form und Zonen der LeagueCard (`./league.js`)
   heading.js            ← Überschriftenebenen: `headingTag`, `nextLevel` (`./heading.js`)
+  stats.js              ← Kennzahlen: `statItems` für `StatGrid` (`./stats.js`)
+  pagenav.js            ← Seitennavigation „Auf dieser Seite“: `initPageNav` (`./pagenav.js`)
+  backtop.js            ← Nach-oben-Knopf: `initBackToTop` (`./backtop.js`)
+  theme.js              ← Dunkelmodus: `initTheme`, `themeBootScript` (`./theme.js`)
+  vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme"` (`./vanilla-core.js`)
+  motion.js, url.js, lifecycle.js ← gemeinsame Grundlagen: `reducedMotion`, `safeHref`, das Muster `initX(root, options) → { destroy() }`
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
 css/
@@ -176,6 +182,30 @@ Tailwind-Nutzer: `components.css` **nach** `@tailwind base` laden (Preflight set
 ```
 
 Gesperrte Einträge: `<span role="link" aria-disabled="true" class="dss-appnav-link is-disabled" title="Hinweis">Label</span>`.
+
+## Bausteine ohne Framework (Vanilla)
+
+Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein folgt demselben Muster: `initX(root, options) → { destroy() }`, idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten), nur `root` und seine Nachfahren, beim Import wird nichts ausgeführt. `initAll(scope)` aus `vanilla-core.js` findet alle Elemente mit `data-dss="accordion|pagenav|backtop|theme"`; Optionen stehen in `initAll(document, { pagenav: { … } })` oder am Element als JSON in `data-dss-options`.
+
+```html
+<body data-dss="backtop">
+  <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" aria-label="Dunkelmodus" hidden></button>
+  <main data-dss="pagenav" data-dss-options='{"label":"Auf dieser Seite"}'>
+    <h1>Verein Nordhain</h1>
+    <h2>Tabelle</h2> … <h2>Spielplan</h2> … <h2>Kader</h2> …
+  </main>
+  <script type="module">
+    import { initAll } from '…/js/vanilla-core.js';
+    initAll(document);
+  </script>
+</body>
+```
+
+- **`initPageNav`** (`pagenav.js`): Seitennavigation „Auf dieser Seite“ aus den Überschriften; ein Sprung öffnet Accordion-Bereiche und `details`, setzt den Fokus auf das Ziel, beobachtet nachgeladene Überschriften. Optionen `selector`, `container`, `label`, `minHeadings`, `skipAttribute`, `observe`, `syncHash`.
+- **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `dss-bnav`, mit `--dss-backtop-offset`, Sicherheitsabständen und Druckregel.
+- **`initTheme`** und **`themeBootScript`** (`theme.js`): Umschalter hell/dunkel/System mit `aria-pressed`, Speicherschlüssel `dss-theme`; das Boot-Skript gehört in den `<head>` und verhindert das Flackern.
+
+Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav` und `Foundation/Dark Mode`.
 
 ## Leisten mit begrenzter Inhaltsbreite
 
@@ -362,6 +392,7 @@ Zuordnung Turnier-Manager: `Game` wird zu `ScheduleGame` mit `nr: '#' + gameNumb
 - **`TeamCard`**: Mannschaft mit Logo, Liga, Bilanz, Tabellenplatz, nächstem und letztem Spiel, Kader und optionaler Saison-Statistik (`stats`: nur übergebene Felder). Alles außer `name` ist optional; `size="compact"` ist die Listenzeile; mit `href` oder `onclick` ist die Karte klickbar.
 - **`LeagueCard`** (Ligencard): Mini-Tabelle einer Liga in einer Karte mit Titel, Untertitel („12 Teams · 66 von 132 Spielen gespielt“), `#`, `Mannschaft`, `SP`, `PKT` und einem Link zur kompletten Tabelle. Sie zeigt nur einen **Ausschnitt**: mit einer eigenen Mannschaft (`own: true`) zwei Teams davor, die eigene und eins dahinter, sonst die ersten `limit` (Standard 3). `columns` schaltet `won`, `lost`, `diff` (Korbdifferenz) und `form` zu (bis 640 px aus); `zone` (`up`, `playoff`, `down`) markiert Auf- und Abstieg mit Streifen, Text und Legende; `live` zeigt „Live“ (mit Zahl „2 Spiele laufen“); `logos` und `names="short"` wie im Spielplan; `size="compact"` für Seitenleisten; `titleAs` wählt die Überschriftenebene. Die Regeln liegen als reine Funktionen in `league.js`.
 
+- **`StatGrid`** und **`FormChips`** (Kennzahlen und Form): Kennzahlen-Gitter (`dss-stats`, `compact` ohne Kacheln) als Beschreibungsliste und die Form der letzten Spiele (`dss-form`: Punkte oder Buchstaben, höchstens fünf, mit Screenreader-Text „Form: Sieg, …“). Dieselbe Form zeigt die Spalte „Form“ der `LeagueCard`. Import: `svelte/StatGrid`, `svelte/FormChips` bzw. aus `/react`; reine Funktion `statItems` in `@bbv/dss-design-system/stats.js`.
 - **`VenueCard`** (Hallenkarte): links eine kleine Karte (die Map, nicht interaktiv, Zwei-Klick-Platzhalter), rechts `name`, `address` (`<address>`), `info`, `contact` (`tel:`/`mailto:`-Links nur bei gültiger Form), die nächsten Spiele in der Halle (`games`, höchstens `limit`, Standard 2) und der Link zur Hallenseite (`href`, `linkLabel`). Ohne `lat`/`lng` keine Karte; `size="compact"` ohne Spiele; schmal (Karte bis 640 px breit) steht die Karte oben (16:9). Funktionen in `@bbv/dss-design-system/venue.js`. Import: `svelte/VenueCard` bzw. `VenueCard` aus `/react`.
 
 - **`MapView`** (Svelte: `svelte/Map`): **Karte** mit [Leaflet](https://leafletjs.com) und OpenStreetMap-Kacheln für einen oder mehrere Orte (`markers`: `id`, `lat`, `lng`, `label`, `href?`, `number?`, `own?`). Standard ist die **Zwei-Klick-Lösung**: erst ein Platzhalter mit Hinweis und „Karte laden“ (kein Netzverkehr, Leaflet wird nicht geladen), `load="auto"` lädt sofort. `tileUrl` setzt einen **eigenen Kachel-Proxy** (`/tiles/{z}/{x}/{y}.png`); der Standard `tile.openstreetmap.org` ist für Demo und Entwicklung. Die **Textalternative** (nummerierte Liste mit Koordinaten, Links „In OpenStreetMap öffnen“, „In Karten-App öffnen“ (`geo:`), „Route planen“) ist immer da; die **Quellenangabe** „© OpenStreetMap-Mitwirkende“ lässt sich nicht ausblenden. Zoom-Schaltflächen, Tastatur, Fehlerfall, Dunkelmodus (Kacheln abgedunkelt), Druck (nur die Liste) und „Bewegung reduzieren“ sind eingebaut. **Leaflet ist eine optionale Peer-Abhängigkeit** (BSD-2-Clause): `npm install leaflet` und `leaflet/dist/leaflet.css` in der App laden; die Komponente lädt Leaflet erst bei Bedarf per `import('leaflet')`. Die reinen Funktionen liegen in `map.js`; die Doku enthält Rezepte für einen Kachel-Proxy (nginx, SvelteKit-Endpunkt) und die Pflichten der OSM Tile Usage Policy. Es gibt keinen Serverteil im Paket.
@@ -409,6 +440,14 @@ Tokens unterstützen Light und Dark out-of-the-box:
 
 <!-- Force dark (Kampfgericht-Tablet, TV-Scoreboard) -->
 <html data-theme="dark">
+```
+
+Einen Umschalter (hell, dunkel, System) liefert `initTheme` aus `theme.js`; `themeBootScript()` setzt die gemerkte Wahl im `<head>` vor dem ersten Zeichnen. Wer einen anderen Standard als „System“ will, übergibt `defaultMode` an **beide**: `themeBootScript({ defaultMode: 'dark' })` und `initTheme(button, { defaultMode: 'dark' })` (gemerkte Wahl vor `defaultMode` vor System). Mehrere Umschalter auf einer Seite bleiben synchron:
+
+```html
+<script>/* Ergebnis von themeBootScript(), mit CSP als nonce oder Hash */</script>
+<button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" hidden></button>
+<script type="module">import { initAll } from '…/js/vanilla-core.js'; initAll(document);</script>
 ```
 
 ---

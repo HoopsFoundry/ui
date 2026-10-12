@@ -78,10 +78,12 @@ describe('LeagueCard: CSS-Abschnitt', () => {
     for (const path of ['svelte/LeagueCard.svelte', 'react/LeagueCard.tsx']) expect(read(path)).toMatch(/dss-link dss-league-more/);
   });
 
-  it('Form: Punkte unterscheiden sich auch in der Form (N Quadrat, U Ring)', () => {
-    expect(body('.dss-league-dot--n')).toMatch(/border-radius:\s*2px/);
-    expect(body('.dss-league-dot--u')).toMatch(/border:\s*2px solid/);
-    expect(body('.dss-league-dot--s')).toMatch(/background:\s*var\(--dss-chip-ok-fg\)/);
+  it('Form: die Spalte nutzt den gemeinsamen Baustein `dss-form` (FormChips), keine eigenen Punkte-Klassen mehr', () => {
+    expect(css).not.toMatch(/\.dss-league-dot/);
+    for (const path of ['svelte/LeagueCard.svelte', 'react/LeagueCard.tsx']) {
+      expect(read(path)).toMatch(/FormChips/);
+      expect(read(path)).not.toMatch(/dss-league-dot/);
+    }
   });
 });
 
@@ -93,7 +95,7 @@ describe('LeagueCard: Quelltext', () => {
   it.each(sources)('%s: gemeinsame Funktionen aus js/league.js, Standardwerte, kein fester Elementname', (path) => {
     const source = read(path);
     expect(source).toContain("from '../js/league.js'");
-    for (const fn of ['leagueWindow(', 'leagueSummary(', 'formLabel(', 'diffText(', 'windowLabel(', 'zoneLegend(', 'liveInfo(']) expect(source, fn).toContain(fn);
+    for (const fn of ['leagueWindow(', 'leagueSummary(', 'diffText(', 'windowLabel(', 'zoneLegend(', 'liveInfo(']) expect(source, fn).toContain(fn);
     expect(source).toContain("linkLabel = 'Komplette Tabelle und Spielplan'");
     expect(source).toMatch(/limit = 3/);
     expect(source).toMatch(/size = 'standard'/);
@@ -105,7 +107,9 @@ describe('LeagueCard: Quelltext', () => {
     expect(source).toMatch(/useHeadingTag\(/);
     expect(source).toContain(', eigene Mannschaft');
     expect(source).toContain('zone.row');
-    expect(source).toContain('formLabel(t.form)');
+    expect(source).toContain('<FormChips form={t.form ?? []}');
+    // der versteckte Text kommt aus formLabel (eine Quelle in FormChips)
+    expect(read(path.includes('svelte') ? 'svelte/FormChips.svelte' : 'react/FormChips.tsx')).toContain('formLabel(form)');
     expect(source).toContain('role="region"');
   });
   it('package.json exportiert ./league.js (mit Typen) und ./svelte/LeagueCard', () => {

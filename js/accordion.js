@@ -141,20 +141,55 @@ export function stickyOffset(el) {
 /**
  * Scrollt das Element in Sicht (nach dem nächsten Frame, damit ein gerade geöffneter Bereich schon im Layout steht). Der Abstand nach
  * oben (`scroll-margin-top`) enthält `--dss-acc-sticky-top`, 8 px und die Höhe des klebenden Kopfes eines umgebenden Bereichs
- * (`stickyOffset`), damit ein verschachteltes Ziel nicht unter dem Kopf der Eltern verschwindet.
+ * (`stickyOffset`), damit ein verschachteltes Ziel nicht unter dem Kopf der Eltern verschwindet. `options.behavior` ist `'auto'` (Standard,
+ * sofort) oder `'smooth'`.
  */
-export function scrollToElement(el) {
+export function scrollToElement(el, options = {}) {
   if (typeof window === 'undefined' || !el) return;
+  const behavior = options?.behavior === 'smooth' ? 'smooth' : 'auto';
   const run = () => {
     if (typeof el.scrollIntoView !== 'function') return;
     const extra = stickyOffset(el);
     const before = el.style.scrollMarginTop;
     if (extra) el.style.scrollMarginTop = `calc(var(--dss-acc-sticky-top, 0px) + 8px + ${extra}px)`;
-    el.scrollIntoView({ block: 'start', behavior: 'auto' });
+    el.scrollIntoView({ block: 'start', behavior });
     if (extra) el.style.scrollMarginTop = before;
   };
   if (typeof window.requestAnimationFrame === 'function') window.requestAnimationFrame(run);
   else run();
+}
+
+/**
+ * Öffnet alle Bereiche, die `target` umgeben, damit es sichtbar wird: Accordion-Bereiche und einklappbare Rahmen (von außen nach innen, über
+ * den Klick auf ihren Kopf: so folgen Svelte, React und das Vanilla-Skript ihrem eigenen Zustand, `exclusive` und Anker eingeschlossen)
+ * sowie jedes umgebende `<details>`. Gesperrte Bereiche bleiben zu. Gibt `true` zurück, wenn etwas geöffnet wurde. Der Bereich ist ein
+ * Vorfahr (oder `target` selbst); die Beziehung ist dieselbe wie bei `ancestorsOf`, hier aus dem DOM gelesen, auch für Bereiche ohne id.
+ */
+export function revealAround(target) {
+  if (!target || typeof target.closest !== 'function') return false;
+  const chain = [];
+  for (let el = target.closest(`${ITEM}, details`); el; el = el.parentElement?.closest(`${ITEM}, details`)) chain.unshift(el);
+  let opened = false;
+  for (const el of chain) {
+    if (isDetails(el)) {
+      if (!el.open && !isLocked(el)) {
+        el.open = true;
+        opened = true;
+      }
+    } else if (!isOpen(el) && !isLocked(el)) {
+      const trigger = triggerOf(el);
+      if (trigger) {
+        trigger.click();
+        opened = true;
+      }
+    }
+  }
+  return opened;
+}
+
+/** Ist das Element ein Bereich der Gruppe (Karte oder einklappbarer Rahmen)? */
+export function isAccordionItem(el) {
+  return Boolean(el) && typeof el.matches === 'function' && el.matches(ITEM);
 }
 
 /**
@@ -228,6 +263,21 @@ export function createCollapsible(host) {
 
 // ── Vanilla-Skript ───────────────────────────────────────────
 
+/**
+ * Rückgabe von `initAccordion`: eine Funktion zum Aufräumen (wie bisher) mit der Eigenschaft `destroy`, damit der Baustein dem
+ * gemeinsamen Muster `{ destroy() }` folgt (js/lifecycle.js). Beide Formen sind gleichwertig und mehrfach aufrufbar.
+ */
+function handle(fn) {
+  let done = false;
+  const run = () => {
+    if (done) return;
+    done = true;
+    fn();
+  };
+  run.destroy = run;
+  return run;
+}
+
 // Bereiche: Karten (`.dss-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
 const ITEM = '.dss-acc-item, .dss-frame.is-collapsible, .dss-league.is-collapsible';
 const DETAILS = 'details.dss-acc-item';
@@ -295,10 +345,10 @@ function make(tag, className, attrs = {}) {
  * (1) `div.dss-acc-item` mit `h3.dss-acc-title > button.dss-acc-trigger[aria-expanded][aria-controls]` und `div.dss-acc-panel[hidden]`;
  * (2) natives `details.dss-acc-item` mit `summary.dss-acc-trigger` (zeigt auch ohne Skript; das Skript ergänzt die Funktionen).
  * Optionen: `exclusive` (nur ein Bereich offen), `syncHash` (Deep-Link, Standard `true`), `expandAll` („Alle öffnen/schließen“ mit Ansage),
- * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt `destroy()` zurück; mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
+ * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt eine Funktion zum Aufräumen zurück, die auch als `.destroy()` aufrufbar ist (Muster `{ destroy() }`); mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
  */
 export function initAccordion(root, options = {}) {
-  const noop = () => {};
+  const noop = handle(() => {});
   if (typeof document === 'undefined' || !root || typeof root.querySelectorAll !== 'function') return noop;
   instances.get(root)?.();
 
@@ -503,14 +553,14 @@ export function initAccordion(root, options = {}) {
     if (instances.get(root) === destroy) instances.delete(root);
   };
   instances.set(root, destroy);
-  return destroy;
+  return handle(destroy);
 }
 
 /** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument) mit denselben Optionen; gibt eine Funktion zum Aufräumen aller zurück. */
 export function initAccordions(scope, options = {}) {
-  if (typeof document === 'undefined') return () => {};
+  if (typeof document === 'undefined') return handle(() => {});
   const host = scope ?? document;
   const roots = [...host.querySelectorAll('[data-dss-acc]')];
   const destroys = roots.map((root) => initAccordion(root, options));
-  return () => destroys.forEach((fn) => fn());
+  return handle(() => destroys.forEach((fn) => fn()));
 }

@@ -214,7 +214,7 @@ describe('initialView', () => {
 
 describe('placeholderPins', () => {
   it('ein Marker liegt in der Mitte des freien Bereichs (oben, über der Karte mit Hinweis)', () => {
-    expect(placeholderPins([{ id: 'a', lat: 1, lng: 2, number: null, own: false }])).toEqual([{ id: 'a', number: null, own: false, x: 50, y: 29 }]);
+    expect(placeholderPins([{ id: 'a', lat: 1, lng: 2, number: null, own: false }])).toEqual([{ id: 'a', number: null, own: false, kind: 'place', x: 50, y: 29 }]);
   });
   it('mehrere Marker: Norden oben, Osten rechts, x von 12 bis 88, y von 14 bis 44 Prozent', () => {
     const pins = placeholderPins([
@@ -222,8 +222,8 @@ describe('placeholderPins', () => {
       { id: 'ne', lat: 11, lng: 12, number: 2, own: true },
     ]);
     expect(pins).toEqual([
-      { id: 'sw', number: 1, own: false, x: 12, y: 44 },
-      { id: 'ne', number: 2, own: true, x: 88, y: 14 },
+      { id: 'sw', number: 1, own: false, kind: 'place', x: 12, y: 44 },
+      { id: 'ne', number: 2, own: true, kind: 'place', x: 88, y: 14 },
     ]);
   });
   it('gleiche Breite: y in der Mitte des Bereichs; leere Liste', () => {

@@ -143,14 +143,17 @@ describe('Map: Quelltext', () => {
     expect(js).toContain('L.divIcon(');
     expect(js).not.toMatch(/L\.icon\(|marker-icon|\.png|iconUrl/);
     expect(js).toMatch(/keyboard: true/);
-    expect(js).toMatch(/title: item\.label/);
+    expect(js).toMatch(/title: markerName\(item\)/);
     expect(js).toMatch(/map\.remove\(\)/);
   });
   it('Animationen aus bei reduzierter Bewegung (Optionen im Skript)', () => {
     const js = read('js/map-leaflet.js');
     for (const option of ['zoomAnimation', 'fadeAnimation', 'markerZoomAnimation', 'inertia']) expect(js).toMatch(new RegExp(`${option}: !calm`));
-    expect(js).toContain("dataset.motion === 'reduce'");
-    expect(js).toContain('(prefers-reduced-motion: reduce)');
+    // die Abfrage liegt gemeinsam in js/motion.js; map-leaflet nutzt sie
+    const motion = read('js/motion.js');
+    expect(js).toMatch(/import \{ reducedMotion \} from '\.\/motion\.js'/);
+    expect(motion).toContain("dataset?.motion === 'reduce'");
+    expect(motion).toContain('(prefers-reduced-motion: reduce)');
   });
   it('package.json: optionale Peer-Abhängigkeit leaflet, Dev-Abhängigkeiten, Exporte', () => {
     const pkg = JSON.parse(read('package.json')) as {

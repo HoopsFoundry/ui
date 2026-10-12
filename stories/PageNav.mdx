@@ -1,0 +1,199 @@
+import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
+import * as PageNavStories from './PageNav.stories';
+import { DosDonts } from './docs/blocks/DosDonts';
+import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { CodeBlock } from './docs/blocks/CodeBlock';
+import { DocTable } from './docs/blocks/DocTable';
+import './docs/blocks/blocks.css';
+import { vanilla, svelte, react, tokensCss, funktionenJs } from './PageNav.code';
+
+<Meta of={PageNavStories} />
+
+# PageNav (Seitennavigation und Nach-oben-Knopf)
+
+Lange Seiten brauchen einen Überblick: Die **Seitennavigation** „Auf dieser Seite“ baut aus den Überschriften der Seite eine Liste von Sprungmarken, der **Nach-oben-Knopf** bringt zurück an den Anfang. Beides sind Funktionen für vorhandenes HTML (`initPageNav`, `initBackToTop`), keine Komponenten: Sie legen ein `nav` mit Links bzw. einen Button an, beobachten die Seite und räumen mit `destroy()` alles wieder ab. Sie funktionieren ohne Framework, in Svelte und in React gleich (siehe Code unten). Ein Sprung öffnet dabei auch die Bereiche des [Accordions](?path=/docs/components-accordion--docs) und `<details>`, in denen das Ziel steckt.
+
+## Aufbau
+
+`initPageNav(root, options)` sucht in `root` alle Ziele (Standard: `h2` und Elemente mit `data-pagenav`) und setzt ab drei Einträgen eine Navigation davor: eine echte `nav` mit einer Liste von Links (`ul`, `li`, `a`), die `href`-Ziele sind `Seitenadresse#id`. Fehlende `id`s vergibt die Funktion aus dem Text (`Größe & Ärger` wird `abschnitt-groesse-aerger`, bei Kollision `-2`, `-3` …); vorhandene bleiben. Der Name der Navigation ist der sichtbare Text darüber (`aria-labelledby`), Standard „Auf dieser Seite“.
+
+In den Beispielen dieser Seite sind die Ziele `h3` (unter den `##`-Abschnitten der Doku); die Auswahl ist die Option `selector`. Auf einer echten Seite sind es meist die `h2`.
+
+<Canvas of={PageNavStories.Aufbau} />
+
+Jeder Link ist 44 px hoch (`--touch-sm`), bricht bei langen Titeln um und hat den gestrichelten Fokus-Ring. Der Link ist ein gewöhnlicher Link: Er funktioniert mit Rechtsklick, Mittelklick und Strg/Umschalt/Cmd („in neuem Tab“) wie jeder andere.
+
+## Einträge: Auswahl und Ausnahmen
+
+- **`selector`**: CSS-Auswahl der Ziele (Standard `'h2, [data-pagenav]'`). Eine ungültige Auswahl fällt auf den Standard zurück.
+- **`data-pagenav="Name"`** benennt einen Block ohne Überschrift (zum Beispiel ein Kalender-Abo); der Name ist der Text des Eintrags.
+- **`data-pagenav-skip`** nimmt ein Ziel oder alles darin aus (Name mit `skipAttribute` änderbar).
+- **`minHeadings`**: ab so vielen Einträgen erscheint die Navigation (Standard 3). Darunter bleibt die Seite unverändert und es werden keine `id`s vergeben.
+- **`container`**: Element oder Auswahl, in das die Navigation gesetzt wird (Standard `root`; sie steht dann vor dem Block mit der ersten Überschrift).
+
+<Canvas of={PageNavStories.Optionen} />
+
+## Sprung in geschlossene Bereiche
+
+Liegt das Ziel in einem eingeklappten Bereich, öffnet der Klick **alle umgebenden Bereiche**: `AccordionItem`, einklappbare Tabellenrahmen und `<details>`, von außen nach innen und über den Klick auf ihren Kopf, damit Svelte, React und das Vanilla-Skript ihrem eigenen Zustand folgen (`exclusive` und Anker eingeschlossen). Gesperrte Bereiche bleiben zu. Danach scrollt die Seite zum Ziel (unter einen klebenden Kopf nicht), setzt den Fokus auf die Überschrift (`tabindex="-1"`, ohne zu scrollen) und schreibt `#id` in die Adresse. Klappt der Bereich mit einer Höhenanimation auf (Svelte, React), wandert das Ziel noch: Nach dem `transitionend` des Bereichs, spätestens nach Dauer plus Verzögerung und einem kleinen Puffer, scrollt die Navigation noch einmal und setzt den Fokus erneut. Ohne Animation (reduzierte Bewegung, `data-motion="reduce"`, Vanilla) entfällt das zweite Scrollen. **Adresse und Routing:** Der Sprung schreibt `#id` mit `history.replaceState` (kein neuer Verlaufseintrag, nur Pfad und Suchteil bleiben) und feuert kein `hashchange`. Apps mit Hash-Routing (`#/seite`), die den Anker selbst auswerten, setzen `syncHash: false` und prüfen, ob ihr Router die Ziel-ids als Anker verträgt; die Links tragen die volle Seitenadresse und funktionieren auch mit `<base href>`. **Verschachtelte Gruppen:** Im Vanilla-Weg muss jede Accordion-Gruppe, auch eine verschachtelte, mit `initAccordion` gestartet sein (`data-dss="accordion"` oder `data-dss-acc` am inneren Wurzelelement), sonst bleibt der Klick auf ihren Kopf ohne Wirkung. Svelte und React brauchen kein Skript. Ein Anker in der Adresse beim Laden oder bei `hashchange` öffnet die Bereiche ebenfalls (`syncHash`, Standard `true`); Anker auf einen Bereich selbst bleiben dem Accordion überlassen.
+
+Im Beispiel liegen „Torhüter“, „Guards“, „Saison“ und „Anfahrt“ in geschlossenen Bereichen:
+
+<Canvas of={PageNavStories.Bereiche} />
+
+## Nachladen
+
+Seiten, die Abschnitte erst im Browser aufbauen, ändern ihren Inhalt später. `initPageNav` beobachtet `root` (`MutationObserver`) und baut die Navigation nach 150 ms Ruhe neu, nur wenn sich Einträge oder Texte geändert haben (Vergleich über eine Signatur). Beobachtet werden neue und entfernte Knoten, geänderter Text (eine umbenannte Überschrift) und die Attribute `data-pagenav` und `data-pagenav-skip`. Eine Seite, die ständig ändert, bekommt ihre Navigation trotzdem nach spätestens einer Sekunde (Höchstwartezeit des Entprellens). Die eigene Navigation löst keinen Neuaufbau aus. Mit `observe: false` entfällt das Beobachten. Im Beispiel erscheint die Navigation, sobald der dritte Abschnitt dazukommt:
+
+<Canvas of={PageNavStories.Nachladen} />
+
+## Name und Landmarken
+
+Zwei Navigationen mit demselben Namen verletzen die Regel `landmark-unique` von axe: Die Landmarken-Liste des Screenreaders zeigte zweimal „Auf dieser Seite“. **Der Name ist deshalb ein Parameter** (`label`), und auch die Sprungleiste des Accordions („Bereiche“, `navLabel`) behält ihren eigenen Namen. Alle Beispiele dieser Seite haben darum je einen eigenen Namen.
+
+## Nach-oben-Knopf
+
+`initBackToTop(options)` legt einen runden Button unten rechts an (44 × 44 px, Symbol als SVG, Name „Nach oben“). Er erscheint, sobald die Seite höher ist als zwei Fenster und mehr als 480 px gescrollt wurde. Ein Klick scrollt nach oben (sanft; bei „Bewegung reduzieren“ und mit `data-motion="reduce"` sofort) und setzt den Fokus auf die erste `h1`, sonst auf `main`. Verschwindet der Knopf, während er den Fokus hat, geht der Fokus an dasselbe Ziel.
+
+Der Knopf hängt am Fenster. Die Vorschau ist deshalb eine eingebettete Seite (350 px hoch): scrolle darin, bis er erscheint.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Nach oben</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Nach-oben-Knopf">
+      <iframe style={{ height: '350px', width: '390px' }} title="Vorschau: Nach-oben-Knopf in einer langen Seite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-pagenav--nach-oben" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Nach oben über einer festen BottomNav</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Nach-oben-Knopf mit BottomNav">
+      <iframe style={{ height: '350px', width: '390px' }} title="Vorschau: Nach-oben-Knopf über einer festen BottomNav" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-pagenav--nach-oben-bnav" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+**Feste untere Leiste:** Steht eine `dss-bnav` mit `position: fixed` (oder `sticky`) am unteren Rand, setzt `initBackToTop` den Knopf darüber (Höhe der Leiste plus 16 px) und folgt Änderungen beim Scrollen und bei `resize`. Mit der Option `offset` (CSS-Länge) legst du den Abstand selbst fest, mit `avoid: null` schaltest du die Erkennung ab. Rechts und unten gilt `env(safe-area-inset-*)`, damit der Knopf nicht unter der Home-Anzeige oder Kerbe sitzt.
+
+**Druck:** Navigation und Knopf werden nicht gedruckt.
+
+## Scrollabstand und Tokens
+
+Die Seitennavigation setzt **keine globalen Regeln** (kein `html { scroll-padding-bottom }`, kein `h2[id] { scroll-margin-top }`). Stattdessen hat jedes Ziel die Klasse `dss-pagenav-target`, deren `scroll-margin-top` `--dss-scroll-offset` plus `1rem` ist. Das Token `--dss-scroll-offset` ist die Höhe einer festen oberen Leiste und fällt auf `--dss-acc-sticky-top` des Accordions zurück, damit beide denselben Wert meinen. Wer zusätzlich Fokus und Tastatur schützen will, setzt die Opt-in-Klasse `dss-scroll-pad` auf `<html>` oder einen Scrollbereich (`scroll-padding-top` und `-bottom`).
+
+<FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
+
+## Tastatur
+
+<DocTable
+  label="Tastaturbedienung"
+  head={['Taste', 'Wirkung']}
+  rows={[
+    ['Tab', 'Läuft durch die Links der Navigation und weiter zum Inhalt; die Navigation ist eine normale Liste von Links, ohne Fokusfang.'],
+    ['Enter', 'Folgt dem Link: öffnet umgebende Bereiche, scrollt zum Ziel und setzt den Fokus auf die Überschrift.'],
+    ['Tab nach dem Sprung', 'Weiter im Inhalt hinter der Überschrift (der Fokus steht auf dem Ziel selbst).'],
+    ['Enter auf „Nach oben“', 'Scrollt zum Seitenanfang und setzt den Fokus auf die erste Überschrift (h1), sonst auf main.'],
+  ]}
+/>
+
+## Barrierefreiheit
+
+- **Navigation:** Eine `nav` mit einer Liste von Links; Name über `aria-labelledby` auf den sichtbaren Text. Die Links tragen die Namen der Überschriften.
+- **Ziel nach dem Sprung:** Die Überschrift bekommt den Fokus, damit Screenreader sie vorlesen und die Tastatur dort weitermacht (WCAG 2.4.3).
+- **Zielgröße:** Links und Knopf 44 px (WCAG 2.5.5).
+- **Bewegung:** Sanftes Scrollen entfällt bei „Bewegung reduzieren“ und `data-motion="reduce"`.
+- **Kein `innerHTML`:** Texte werden als Text gesetzt, das Symbol des Knopfes als SVG per `createElementNS`; die Links zeigen nur auf die eigene Seite.
+
+## Handy · 390 px Breite
+
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Beispiele, damit die Namen der Navigationen unterscheidbar bleiben). Die Links brechen um, jeder ist 44 px hoch; die Bereiche der rechten Seite sind geschlossen.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">PageNav · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PageNav hell">
+      <iframe title="Handy-Vorschau: Seitennavigation hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-pagenav--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">PageNav · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PageNav dunkel">
+      <iframe title="Handy-Vorschau: Seitennavigation dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-pagenav--handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Verwendung: Import und Optionen
+
+Die Funktionen kommen aus `@bbv/dss-design-system/pagenav.js` und `…/backtop.js`; `initAll` aus `…/vanilla-core.js` startet alles mit `data-dss="pagenav"` und `data-dss="backtop"`. Es gibt keine Svelte- und keine React-Komponente: die Beispiele zeigen den Aufruf in `onMount` bzw. `useEffect`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel ist ausführbar; das Beispiel hier setzt das Markup aus dem Code mit `createContextualFragment` ein (kein `innerHTML`; so tust du es auch mit Markup aus eigenen Texten) und startet es mit `initAll`:
+
+<Canvas of={PageNavStories.VanillaSeite} />
+
+<FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
+
+Die Spielwiese führt `initPageNav` auf einer Beispielseite aus; jede Änderung baut die Navigation neu. `sections`, `skipSecond` und `blockWithoutHeading` gehören nur zur Demo.
+
+<Controls of={PageNavStories.Spielwiese} />
+
+Optionen von `initPageNav(root, options)`:
+
+<DocTable
+  label="Optionen von initPageNav"
+  head={['Option', 'Typ', 'Beschreibung']}
+  rows={[
+    ['selector', 'string', "CSS-Auswahl der Ziele in root (Standard 'h2, [data-pagenav]'). Ungültig: Standard."],
+    ['container', 'Element | string', 'Wohin die Navigation kommt (Standard root, vor den Block mit der ersten Überschrift). Eine unbekannte Auswahl fällt auf root zurück.'],
+    ['label', 'string', 'Sichtbarer Text und Name der Navigation (Standard „Auf dieser Seite“). Mehrere Navigationen brauchen verschiedene Namen.'],
+    ['minHeadings', 'number', 'Mindestzahl der Einträge (Standard 3).'],
+    ['skipAttribute', 'string', "Attribut, das ein Ziel (oder dessen Inhalt) ausnimmt (Standard 'data-pagenav-skip')."],
+    ['observe', 'boolean', 'Nachgeladene Überschriften beobachten (Standard true).'],
+    ['syncHash', 'boolean', 'Anker in der Adresse öffnet Bereiche mit dem Ziel (Standard true).'],
+  ]}
+/>
+
+Optionen von `initBackToTop(options)`:
+
+<DocTable
+  label="Optionen von initBackToTop"
+  head={['Option', 'Typ', 'Beschreibung']}
+  rows={[
+    ['label (backLabel)', 'string', 'Name des Knopfes (Standard „Nach oben“).'],
+    ['container', 'Element | string', 'Wohin der Knopf kommt (Standard body).'],
+    ['button', 'HTMLButtonElement', 'Vorhandener Knopf, der übernommen wird (initAll: data-dss="backtop" auf einem Button).'],
+    ['showAfter', 'number', 'Gescrollte Pixel, ab denen er erscheint (Standard 480).'],
+    ['target', 'string', "Auswahl des Fokusziels (Standard 'h1', Rückfall main)."],
+    ['avoid', 'string | null', "Auswahl einer festen unteren Leiste (Standard '.dss-bnav'); null schaltet ab."],
+    ['offset', 'string', 'Zusätzlicher Abstand von unten als CSS-Länge (setzt --dss-backtop-offset).'],
+  ]}
+/>
+
+`initBackToTop` hat keine Wurzel, nur Optionen (der Knopf gehört zum Fenster; der Schlüssel für „zweiter Aufruf ersetzt den ersten“ ist `container` bzw. `button`). Rechts-nach-links: Der Knopf sitzt am Rand der Leserichtung (`inset-inline-end`, bei RTL links mit dem linken Sicherheitsabstand). Beide geben `{ destroy() }` zurück, sind idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten) und lesen beim Import weder `window` noch `document`. Die Hilfsfunktionen:
+
+<CodeBlock label="Hilfsfunktionen" language="JavaScript" code={funktionenJs} />
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Wenige, kurze Einträge',
+      doText: 'Drei bis acht Einträge mit ein bis zwei Wörtern: Die Navigation passt in zwei Zeilen und bleibt ein Überblick.',
+      dontText: 'Lange Titel und ein Dutzend Einträge füllen die Navigation mehrzeilig. Dann ist die Seite zu groß für eine Sprungleiste, besser teilen oder Bereiche einklappen.',
+      good: <Story of={PageNavStories.DoKurz} inline />,
+      bad: <Story of={PageNavStories.DontKurz} inline />,
+    },
+    {
+      title: 'Jede Navigation mit eigenem Namen',
+      doText: 'Zwei Navigationen heißen „Auf dieser Seite“ und „Im Bereich Mannschaft“. Der Screenreader unterscheidet sie in der Landmarken-Liste.',
+      dontText: 'Zweimal „Auf dieser Seite“: gleiche Namen verletzen axe landmark-unique, und niemand weiß, welche Navigation welche ist.',
+      good: <Story of={PageNavStories.DoNamen} inline />,
+      bad: <Story of={PageNavStories.DontNamen} inline />,
+    },
+    {
+      title: 'Echte Überschriften als Ziele',
+      doText: 'Die Ziele sind Überschriften (h2 bis h6). Sie stehen auch in der Überschriften-Navigation der Screenreader.',
+      dontText: 'Fette Absätze sehen aus wie Titel, sind aber keine Überschriften: Die Navigation findet keine Ziele, und Hilfstechnik kennt die Gliederung nicht.',
+      good: <Story of={PageNavStories.DoUeberschrift} inline />,
+      bad: <Story of={PageNavStories.DontUeberschrift} inline />,
+    },
+  ]}
+/>

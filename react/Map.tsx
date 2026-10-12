@@ -1,15 +1,15 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from './cn';
-import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, validTileUrl } from '../js/map.js';
-import type { MapAppLink, MapMarker } from '../js/map.js';
+import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, tilesMode, validTileUrl } from '../js/map.js';
+import type { MapAppLink, MapDarkTiles, MapMarker } from '../js/map.js';
 import { createMapController, devWarn } from '../js/map-leaflet.js';
 
-export type { MapAppLink, MapMarker };
+export type { MapAppLink, MapDarkTiles, MapMarker };
 export type MapLoad = 'click' | 'auto';
 export type MapErrorReason = 'tile-url' | 'import' | 'init' | 'update' | 'tiles';
 
 export interface MapViewProps {
-  /** Orte auf der Karte: `{ id, lat, lng, label, href?, number?, own? }`. Ungültige Koordinaten werden ignoriert. */
+  /** Orte auf der Karte: `{ id, lat, lng, label, href?, number?, own?, kind? }` (`kind: 'seat'`: Vereinssitz mit Haus-Symbol). Ungültige Koordinaten werden ignoriert. */
   markers: MapMarker[];
   /** Name der Karte für Hilfstechnik (Region). Mehrere Karten auf einer Seite brauchen verschiedene Namen. */
   label: string;
@@ -33,8 +33,12 @@ export interface MapViewProps {
   appLinks?: MapAppLink[];
   /** Liste der Orte sichtbar (Standard); `false`: nur für Hilfstechnik. */
   showList?: boolean;
-  /** Kacheln im Dunkelmodus abdunkeln. */
+  /** Kacheln im Dunkelmodus abdunkeln (Standard). `false` lässt sie unverändert. */
   dimInDark?: boolean;
+  /** Verfahren im Dunkelmodus: `dim` dunkelt ab (Standard), `invert` invertiert und färbt um (Wasser und Straßen wirken fremd, die Karte wird wirklich dunkel). Wirkt nur mit `dimInDark`. */
+  darkTiles?: MapDarkTiles;
+  /** Text für den Sitzmarker (`kind: 'seat'`) in Liste und Marker-Namen; Standard „Vereinssitz“. */
+  seatLabel?: string;
   /** Die Karte ist bereit; Argument ist die Leaflet-Karte. */
   onLoad?: (map: unknown) => void;
   /** Laden fehlgeschlagen. */
@@ -76,6 +80,8 @@ export function MapView({
   appLinks = ['osm', 'route'],
   showList = true,
   dimInDark = true,
+  darkTiles = 'dim',
+  seatLabel,
   onLoad,
   onError,
   onMarkerClick,
@@ -93,14 +99,14 @@ export function MapView({
   const handlers = useRef({ onLoad, onError, onMarkerClick });
   handlers.current = { onLoad, onError, onMarkerClick };
 
-  const items = mapItems(markers, appLinks);
+  const items = mapItems(markers, appLinks, { seat: seatLabel });
   const pins = placeholderPins(items);
   const urlOk = validTileUrl(tileUrl);
   const state = !urlOk || failure ? 'error' : phase;
   const running = state === 'loading' || state === 'ready';
   const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';
   const source = attribution && attribution.trim() ? attribution : mapText.attribution;
-  const options = { markers, appLinks, center, zoom, interactive, tileUrl };
+  const options = { markers, appLinks, center, zoom, interactive, tileUrl, seatLabel };
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
@@ -159,6 +165,7 @@ export function MapView({
       className={cn('dss-map', className)}
       data-state={state}
       data-dim={dimInDark ? 'true' : 'false'}
+      data-tiles={tilesMode(darkTiles)}
       style={{ '--dss-map-h': `${Number.isFinite(height) ? Math.max(200, height) : 320}px` } as React.CSSProperties}
     >
       <a className="dss-map-skip" href={`#${textId}`}>
@@ -170,7 +177,7 @@ export function MapView({
           {state !== 'ready' ? (
             <div className="dss-map-ph">
               {(state === 'error' ? [] : pins).map((pin) => (
-                <span key={pin.id} className={cn('dss-map-ph-pin', pin.own && 'is-own')} style={{ left: `${pin.x}%`, top: `${pin.y}%` }} aria-hidden="true">
+                <span key={pin.id} className={cn('dss-map-ph-pin', pin.own && 'is-own', pin.kind === 'seat' && 'is-seat')} style={{ left: `${pin.x}%`, top: `${pin.y}%` }} aria-hidden="true">
                   {pin.number ?? ''}
                 </span>
               ))}
@@ -213,7 +220,9 @@ export function MapView({
         <ol className="dss-map-list" aria-label={mapText.listLabel}>
           {items.map((item) => (
             <li key={item.id} className="dss-map-item" value={item.number ?? undefined}>
-              {item.number !== null ? (
+              {item.kind === 'seat' ? (
+                <span className={cn('dss-map-num', 'is-seat', item.own && 'is-own')} aria-hidden="true" />
+              ) : item.number !== null ? (
                 <span className={cn('dss-map-num', item.own && 'is-own')} aria-hidden="true">
                   {item.number}
                 </span>
@@ -227,6 +236,7 @@ export function MapView({
                   ) : (
                     <span>{item.label}</span>
                   )}
+                  {item.kind === 'seat' ? <span className="dss-chip">{item.seatText}</span> : null}
                   {item.own ? <span className="dss-chip dss-chip--amber">{mapText.own}</span> : null}
                 </p>
                 <p className="dss-map-coords">{item.coords}</p>

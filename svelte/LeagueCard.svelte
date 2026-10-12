@@ -15,13 +15,12 @@
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
   import CollapsibleFrame from './internal/CollapsibleFrame.svelte';
+  import FormChips from './FormChips.svelte';
   import { initials, shortName } from '../js/schedule.js';
   import {
     cellNumber,
     diffSign,
     diffText,
-    formEntries,
-    formLabel,
     leagueSummary,
     leagueWindow,
     liveInfo,
@@ -132,7 +131,6 @@
         {#each rows as t, i (i)}
           {@const zone = zoneInfo(t.zone)}
           {@const sign = diffSign(t.diff)}
-          {@const dots = formEntries(t.form)}
           <tr class={`${t.own ? 'is-own' : ''}${zone ? ` dss-league-zone dss-league-zone--${zone.zone}` : ''}`.trim() || undefined}>
             <td class="dss-league-rank">{rankText(t.rank)}</td>
             <td class="dss-league-team">
@@ -150,10 +148,7 @@
             <td class="num lead dss-league-pts">{cellNumber(t.points)}</td>
             {#if wantsForm}
               <td class="dss-league-opt">
-                {#if dots.length}
-                  <span class="dss-league-dots" aria-hidden="true">{#each dots as e, k (k)}<span class={`dss-league-dot dss-league-dot--${e.toLowerCase()}`}></span>{/each}</span>
-                  <span class="dss-sr-only">{formLabel(t.form)}</span>
-                {/if}
+                <FormChips form={t.form ?? []} />
               </td>
             {/if}
           </tr>

@@ -45,6 +45,8 @@
     "./svelte/AccordionItem": "./svelte/AccordionItem.svelte",
     "./svelte/Map": "./svelte/Map.svelte",
     "./svelte/VenueCard": "./svelte/VenueCard.svelte",
+    "./svelte/FormChips": "./svelte/FormChips.svelte",
+    "./svelte/StatGrid": "./svelte/StatGrid.svelte",
     "./appnav.js": "./js/appnav.js",
     "./schedule.js": {
       "types": "./js/schedule.d.ts",
@@ -77,6 +79,38 @@
     "./venue.js": {
       "types": "./js/venue.d.ts",
       "import": "./js/venue.js"
+    },
+    "./pagenav.js": {
+      "types": "./js/pagenav.d.ts",
+      "import": "./js/pagenav.js"
+    },
+    "./backtop.js": {
+      "types": "./js/backtop.d.ts",
+      "import": "./js/backtop.js"
+    },
+    "./theme.js": {
+      "types": "./js/theme.d.ts",
+      "import": "./js/theme.js"
+    },
+    "./vanilla-core.js": {
+      "types": "./js/vanilla-core.d.ts",
+      "import": "./js/vanilla-core.js"
+    },
+    "./stats.js": {
+      "types": "./js/stats.d.ts",
+      "import": "./js/stats.js"
+    },
+    "./motion.js": {
+      "types": "./js/motion.d.ts",
+      "import": "./js/motion.js"
+    },
+    "./url.js": {
+      "types": "./js/url.d.ts",
+      "import": "./js/url.js"
+    },
+    "./lifecycle.js": {
+      "types": "./js/lifecycle.d.ts",
+      "import": "./js/lifecycle.js"
     }
   },
   "files": [
