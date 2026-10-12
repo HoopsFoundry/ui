@@ -52,7 +52,10 @@ js/
   pagenav.js            ← Seitennavigation „Auf dieser Seite“: `initPageNav` (`./pagenav.js`)
   backtop.js            ← Nach-oben-Knopf: `initBackToTop` (`./backtop.js`)
   theme.js              ← Dunkelmodus: `initTheme`, `themeBootScript` (`./theme.js`)
-  vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme"` (`./vanilla-core.js`)
+  tabs.js               ← Tabs: `initTabs`, `nextTab` (`./tabs.js`)
+  modal.js              ← Modal: `initModal`, `openModal`, `closeModal` (`./modal.js`)
+  vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme|tabs|modal"` (`./vanilla-core.js`)
+  vanilla.js            ← Einstieg des gebündelten Pakets `dist/vanilla` (`./vanilla`)
   motion.js, url.js, lifecycle.js ← gemeinsame Grundlagen: `reducedMotion`, `safeHref`, das Muster `initX(root, options) → { destroy() }`
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
@@ -185,7 +188,7 @@ Gesperrte Einträge: `<span role="link" aria-disabled="true" class="dss-appnav-l
 
 ## Bausteine ohne Framework (Vanilla)
 
-Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein folgt demselben Muster: `initX(root, options) → { destroy() }`, idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten), nur `root` und seine Nachfahren, beim Import wird nichts ausgeführt. `initAll(scope)` aus `vanilla-core.js` findet alle Elemente mit `data-dss="accordion|pagenav|backtop|theme"`; Optionen stehen in `initAll(document, { pagenav: { … } })` oder am Element als JSON in `data-dss-options`.
+Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein folgt demselben Muster: `initX(root, options) → { destroy() }`, idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten), nur `root` und seine Nachfahren, beim Import wird nichts ausgeführt. `initAll(scope)` aus `vanilla-core.js` findet alle Elemente mit `data-dss="accordion|pagenav|backtop|theme|tabs|modal"`; Optionen stehen in `initAll(document, { pagenav: { … } })` oder am Element als JSON in `data-dss-options`.
 
 ```html
 <body data-dss="backtop">
@@ -204,8 +207,24 @@ Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein 
 - **`initPageNav`** (`pagenav.js`): Seitennavigation „Auf dieser Seite“ aus den Überschriften; ein Sprung öffnet Accordion-Bereiche und `details`, setzt den Fokus auf das Ziel, beobachtet nachgeladene Überschriften. Optionen `selector`, `container`, `label`, `minHeadings`, `skipAttribute`, `observe`, `syncHash`.
 - **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `dss-bnav`, mit `--dss-backtop-offset`, Sicherheitsabständen und Druckregel.
 - **`initTheme`** und **`themeBootScript`** (`theme.js`): Umschalter hell/dunkel/System mit `aria-pressed`, Speicherschlüssel `dss-theme`; das Boot-Skript gehört in den `<head>` und verhindert das Flackern.
+- **`initTabs`** (`tabs.js`): Tab-Leiste mit Pfeiltasten, Pos1/Ende (roving `tabindex`, `aria-selected`), Panels über `aria-controls` (`hidden` und `inert`), `role="group"` mit `aria-pressed` als Mehrfachauswahl, optionaler Deep-Link (`hash`), manuelle Aktivierung, Ereignis `dss:tabchange`. Dieselben Regeln wie die Svelte- und React-Tabs.
+- **`initModal`**, **`openModal`**, **`closeModal`** (`modal.js`): natives `<dialog class="dss-modal-dialog">` (`showModal`) oder Markup mit `hidden` (Rolle, `aria-modal`, inerte Seite); Fokus holen und an den Auslöser zurückgeben, Escape, Fokusfalle, `dismissOnBackdrop` (Standard aus), Scroll-Sperre mit Rückbau, Auslöser `data-dss-modal-open="<id>"` und `data-dss-modal-close`, Ereignisse `dss:modalopen` und `dss:modalclose`.
 
-Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav` und `Foundation/Dark Mode`.
+Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
+
+### Gebündelt, ohne Build (`dist/vanilla`)
+
+`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--dss-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 35 KB groß (gzip 12,3 KB, Budget 40 KB und 15 KB als Test). Beim Import passiert nichts, es lädt auch in Node.
+
+```html
+<link rel="stylesheet" href="/dss/dss.css" />
+<script type="module">
+  import { initAll } from '/dss/dss.min.js';
+  initAll(document);
+</script>
+```
+
+`stories/examples/portal-sync.mjs` zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet) aus `node_modules` nach `_site/dss` kopiert. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
 
 ## Leisten mit begrenzter Inhaltsbreite
 

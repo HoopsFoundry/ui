@@ -11,7 +11,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
-// Größenbudget (gemessen: 35,6 KB min, 12,6 KB gzip; Reserve für kleine Ergänzungen, V2 hebt es bewusst an)
+// Größenbudget (gemessen: 34,7 KB min, 12,3 KB gzip; Reserve für kleine Ergänzungen, V2 hebt es bewusst an)
 export const BUDGET = { minBytes: 40 * 1024, gzipBytes: 15 * 1024 };
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
