@@ -442,7 +442,7 @@ Tokens unterstützen Light und Dark out-of-the-box:
 <html data-theme="dark">
 ```
 
-Einen Umschalter (hell, dunkel, System) liefert `initTheme` aus `theme.js`; `themeBootScript()` setzt die gemerkte Wahl im `<head>` vor dem ersten Zeichnen:
+Einen Umschalter (hell, dunkel, System) liefert `initTheme` aus `theme.js`; `themeBootScript()` setzt die gemerkte Wahl im `<head>` vor dem ersten Zeichnen. Wer einen anderen Standard als „System“ will, übergibt `defaultMode` an **beide**: `themeBootScript({ defaultMode: 'dark' })` und `initTheme(button, { defaultMode: 'dark' })` (gemerkte Wahl vor `defaultMode` vor System). Mehrere Umschalter auf einer Seite bleiben synchron:
 
 ```html
 <script>/* Ergebnis von themeBootScript(), mit CSP als nonce oder Hash */</script>

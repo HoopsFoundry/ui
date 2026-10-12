@@ -11,7 +11,7 @@ export const HALLEN: DemoMarker[] = [
 ];
 
 /** Der Vereinssitz der Demo (Marker-Art `seat`): erfundene Geschäftsstelle, liegt zwischen den Hallen. */
-export const SITZ: DemoMarker = { id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' };
+export const SITZ: DemoMarker = { id: 'sitz', lat: 49.2962, lng: 7.9105, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' };
 
 /** Kachel-Adresse für die Doku: ein lokales Bild (kein Netzverkehr zu OpenStreetMap). Die Parameter z, x und y hängen nur an, damit die Adresse die drei Platzhalter enthält. */
 export function demoTileUrl(): string {

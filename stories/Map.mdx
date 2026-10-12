@@ -93,7 +93,7 @@ Bei mehreren Markern nummeriert die Karte von 1 an (oder nimmt `number` am Marke
 Die Marker-Art `kind: 'seat'` kennzeichnet den **Sitz** des Vereins (Geschäftsstelle) neben den Hallen. Der Sitzmarker ist **derselbe Pin** wie die anderen (44 px breit, dunkle Füllung, weißer Ring, dunkle Kontur, gleiche Zielgröße, derselbe Fokus-Ring), nur steht ein **Haus** statt der Nummer oder des Punkts darin. Er unterscheidet sich also in der Form, nicht nur in der Farbe. Weitere Regeln:
 
 - **Keine Nummer, keine Zählung:** Ein Sitz trägt nie eine Nummer (auch nicht mit `number`) und zählt in der Nummerierung der übrigen Orte nicht mit; die Orte zählen unter sich von 1 an. Ein einzelner Ort neben dem Sitz bleibt ohne Nummer.
-- **Name für Hilfstechnik:** „Geschäftsstelle TSV Nordhain, Vereinssitz“ (Titel, Alt-Text und `aria-label` des Markers). In der Liste steht ein Haus-Badge (`aria-hidden`) und der Chip „Vereinssitz“, sodass die Information auch als Text da ist.
+- **Name für Hilfstechnik:** „Geschäftsstelle TSV Nordhain, Vereinssitz“ (Titel, Alt-Text und `aria-label` des Markers); der Text „Vereinssitz“ lässt sich mit `seatLabel` ändern. In der Liste steht ein Haus-Badge (`aria-hidden`) und der Chip „Vereinssitz“, sodass die Information auch als Text da ist.
 - **Platzhalter:** Auch der Platzhalter vor dem Laden zeigt das Haus.
 - **Eigener Ort:** `own` färbt den Pin golden; das Haus nimmt dann die Vordergrundfarbe der Akzentfläche.
 - **Kontrast:** Der Pin hebt sich von hellen und dunklen Kacheln mit mindestens 3:1 ab (Kontur oder Ring), das weiße Haus steht mit mindestens 7:1 auf dem dunklen Pin; geprüft für die Standardkacheln, abgedunkelt und invertiert, in BBV und DBB.
@@ -195,7 +195,7 @@ Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen übe
 OpenStreetMap kennt keinen Dunkelmodus. Zwei Verfahren stehen zur Wahl, beide wirken nur auf die Kachelebene und nur, solange `dimInDark` an ist (Marker, Zoom-Schaltflächen und Quellenangabe bleiben unberührt):
 
 - **`dim`** (Standard): abdunkeln mit `brightness(0.8)` (Token `--dss-map-dim`). Die Straßenfarben bleiben vertraut, die Karte bleibt aber hell.
-- **`invert`**: invertieren und umfärben mit `invert(1)`, `hue-rotate(180deg)`, `brightness(0.85)` und `contrast(0.9)` (Token `--dss-map-invert-filter`). Die Karte wird wirklich dunkel, Wasser, Wald und Straßen wirken dafür fremd (Wasser wird dunkelbraun-orange statt blau).
+- **`invert`**: invertieren und umfärben mit `invert(1)`, `hue-rotate(180deg)`, `brightness(0.85)` und `contrast(0.9)` (Token `--dss-map-invert-filter`). Die Karte wird wirklich dunkel, die Farben wirken dafür fremd (gemessen: Wasser `#aad3df` wird zu einem dunklen Blaugrün, rgb(27, 58, 68), das Land dunkelbraun, weiße Straßen werden fast schwarz, orange Straßen braun).
 
 Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau rechts zeigt beide im Dunkelmodus (der Rahmen ist dunkel geschaltet):
 
@@ -280,6 +280,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
   head={['Prop', 'Typ', 'Beschreibung']}
   rows={[
     ['markers', 'MapMarker[]', 'Orte auf der Karte. Pflicht. Ungültige Koordinaten (Zeichenkette, NaN, außerhalb von ±90 und ±180) werden ignoriert, in Liste und Karte.'],
+    ['seatLabel', 'string', 'Text für den Sitzmarker (`kind: "seat"`) in der Liste und im Namen des Markers; Standard „Vereinssitz“.'],
     ['center', '[number, number]', 'Mittelpunkt `[Breite, Länge]`. Mit `center` ist der Standardzoom 15, ohne `center` und `zoom` passt sich der Ausschnitt den Markern an.'],
     ['onload (Svelte), onLoad (React)', '(map) => void', 'Die Karte steht. Das Argument ist die Leaflet-Karte (`L.Map`); damit lässt sich Leaflet erweitern.'],
     ['onerror (Svelte), onError (React)', "(reason: 'tile-url' | 'import' | 'init' | 'tiles') => void", 'Laden fehlgeschlagen (siehe Fehlerfall).'],
@@ -294,7 +295,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
   rows={[
     ['id', 'string', 'Eindeutige Kennung; damit erkennt die Karte beim Aktualisieren, welcher Marker neu, geändert oder weg ist (kein Neuaufbau der Karte). Pflicht. Doppelte oder fehlende ids macht die Karte eindeutig (`marker-<Index>`, `<id>-2`); die erste ausdrückliche id behält ihren Wert.'],
     ['lat, lng', 'number', 'Breite (−90 bis 90) und Länge (−180 bis 180) in Grad. Pflicht.'],
-    ['label', 'string', 'Name des Orts: Titel und Name des Markers, Eintrag der Liste, Bezeichnung in den Links. Pflicht.'],
+    ['label', 'string', 'Name des Orts: Titel und Name des Markers, Eintrag der Liste, Bezeichnung in den Links. Pflicht. Bei nummerierten Markern steht die sichtbare Nummer im Namen des Markers voran („1, Sporthalle Nordhain“), damit der Name den sichtbaren Text enthält (WCAG 2.5.3).'],
     ['href', 'string', 'Ziel bei Klick und Enter am Marker; in der Liste ist der Name ein Link. Erlaubt sind `http:`, `https:`, `mailto:`, `tel:`, Pfade und `#`-Ziele; alles andere (`javascript:`, `data:`, `vbscript:`, Leerraum davor) wird verworfen (`safeHref`).'],
     ['number', 'number', 'Angezeigte Nummer. Ohne Angabe zählt die Karte bei mehreren Markern von 1 an; ein einzelner Marker zeigt einen Punkt.'],
     ['own', 'boolean', 'Eigener Ort: Marker in Gold, in der Liste „Eigener Ort“.'],

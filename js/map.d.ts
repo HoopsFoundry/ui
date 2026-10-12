@@ -55,6 +55,8 @@ export interface MapItem {
   href: string | undefined;
   own: boolean;
   kind: MapMarkerKind;
+  /** Text für den Sitzmarker („Vereinssitz“ oder `texts.seat`). */
+  seatText: string;
   /** Nummer am Marker und in der Liste; `null` bei einem einzelnen Marker ohne eigene Nummer. */
   number: number | null;
   /** Koordinaten im deutschen Format („49,4875° N, 8,4660° O“). */
@@ -83,7 +85,7 @@ export const mapText: {
 };
 export const DEFAULT_TILE_URL: string;
 /** Name eines Markers für Hilfstechnik; ein Sitzmarker bekommt den Zusatz „Vereinssitz“. */
-export function markerName(item: { label?: string; kind?: MapMarkerKind }): string;
+export function markerName(item: { label?: string; kind?: MapMarkerKind; number?: number | null; seatText?: string }): string;
 /** `invert` bleibt `invert`, alles andere ergibt `dim`. */
 export function tilesMode(value: unknown): MapDarkTiles;
 export const MIN_ZOOM: number;

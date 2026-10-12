@@ -32,7 +32,7 @@ export function mapSeatLogicRules(m: MapMod, l: LeafletMod): Rules {
     'Sitz: ein einzelner Ort neben dem Sitz bleibt ohne Nummer': rule(() => nums([seat, a]) === '[null,null]'),
     'Orte: Nummerierung ohne Sitz unverändert': rule(() => nums([a, b]) === '[1,2]' && nums([a]) === '[null]' && nums([{ ...a, number: 4 }, b]) === '[4,2]'),
     'Sitz: der Platzhalter kennt die Art': rule(() => m.placeholderPins(m.mapItems([seat, a, b])).map((p) => p.kind).join() === 'seat,place,place'),
-    'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“': rule(() => m.markerName({ label: 'X', kind: 'seat' }) === 'X, Vereinssitz' && m.markerName({ label: 'X' }) === 'X' && m.markerName({ label: '', kind: 'seat' }) === 'Vereinssitz' && m.mapText.seat === 'Vereinssitz'),
+    'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“': rule(() => m.markerName({ label: 'X', kind: 'seat' }) === 'X, Vereinssitz' && m.markerName({ label: 'X' }) === 'X' && m.markerName({ label: 'X', number: 2 }) === '2, X' && m.markerName({ label: 'X', kind: 'seat', number: 2, seatText: 'Sitz' }) === 'X, Sitz' && m.markerName({ label: '', kind: 'seat' }) === 'Vereinssitz' && m.mapText.seat === 'Vereinssitz'),
     'darkTiles: nur invert ändert den Standard dim': rule(() => m.tilesMode('invert') === 'invert' && ['dim', undefined, null, '', 'Invert', 1].every((v) => m.tilesMode(v) === 'dim')),
     'Sitz: Pin zeigt ein Haus statt Nummer und Punkt': rule(() => {
       const svg = l.pinElement({ number: 7, kind: 'seat' });
@@ -69,10 +69,10 @@ export function mapSeatSourceRules(f: { svelte: string; react: string; leaflet: 
     'Quelle: data-tiles aus tilesMode': svelte.includes('data-tiles={tilesMode(darkTiles)}') && react.includes('data-tiles={tilesMode(darkTiles)}'),
     'Quelle: darkTiles hat den Standard dim': svelte.includes("darkTiles = 'dim'") && react.includes("darkTiles = 'dim'"),
     'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl': svelte.includes('dss-map-num is-seat') && react.includes("'is-seat'") && /kind === 'seat'/.test(svelte) && /kind === 'seat'/.test(react),
-    'Quelle: Chip Vereinssitz in der Liste': svelte.includes('{mapText.seat}') && react.includes('{mapText.seat}'),
+    'Quelle: Chip Vereinssitz in der Liste': svelte.includes('{item.seatText}') && react.includes('{item.seatText}'),
     'Quelle: Platzhalter-Pin trägt is-seat': svelte.includes("pin.kind === 'seat' ? ' is-seat'") && react.includes("pin.kind === 'seat' && 'is-seat'"),
     'Quelle: Marker nutzt markerName für Titel, Alt und aria-label': (leaflet.match(/markerName\(/g) ?? []).length === 3 && leaflet.includes("className: `dss-map-marker${item.own ? ' is-own' : ''}${item.kind === 'seat' ? ' is-seat' : ''}`"),
-    'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)': leaflet.includes('item.own, item.kind, item.href'),
+    'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)': leaflet.includes('item.own, item.kind, item.seatText, item.href'),
     'Quelle: kein style in der Svelte-Datei': !/<style[\s>]/.test(svelte),
   };
 }

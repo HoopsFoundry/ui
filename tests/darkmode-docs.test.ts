@@ -77,6 +77,12 @@ describe('Doku-Seite', () => {
   it('die Seite nennt Modi, Speicherschlüssel, aria-pressed, Boot-Skript und die CSP', () => {
     for (const part of ['hell', 'dunkel', 'System', 'dss-theme', 'aria-pressed', 'themeBootScript', 'Content-Security-Policy', '`nonce`', 'Hash', 'Dunkelmodus']) expect(mdx, part).toContain(part);
   });
+  it('die Seite nennt defaultMode an beiden Stellen und die geteilten Umschalter; die Vorschau ist hoch genug', () => {
+    expect(mdx).toContain("`defaultMode` an beiden Stellen gleich setzen");
+    expect(mdx).toContain('Mehrere Umschalter');
+    expect(mdx).toContain("height: '300px'");
+    expect(read('README.md')).toContain('`defaultMode` an **beide**');
+  });
   it('Einführung, storySort, README und CHANGELOG nennen die Seite', () => {
     expect(read('stories/Introduction.mdx')).toContain('foundation-dark-mode--docs');
     expect(read('.storybook/preview.ts')).toMatch(/'Live', 'Dark Mode'/);

@@ -7,6 +7,8 @@ export interface MapControllerOptions {
   zoom?: number;
   interactive?: boolean;
   tileUrl?: string;
+  /** Text für den Sitzmarker (Standard „Vereinssitz“). */
+  seatLabel?: string;
 }
 
 export interface MapControllerHooks {

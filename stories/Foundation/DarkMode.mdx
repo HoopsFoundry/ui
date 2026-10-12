@@ -29,6 +29,7 @@ Drei Fälle, in dieser Reihenfolge:
 
 - **Feste Beschriftung** („Dunkelmodus“) und **`aria-pressed`** (gedrückt = Dunkelmodus ist aktiv). Der Name wechselt nie; der Zustand steht im Attribut und im Symbol.
 - **Symbole über den Zustand:** Sonne im hellen, Mond im dunklen Modus. Das Skript setzt `data-theme-state="light|dark"` (der tatsächliche Zustand) und `data-theme-mode="light|dark|system"` am Button; das CSS blendet das passende Symbol ein. Ist der Button leer, legt das Skript beide Symbole an (SVG, `aria-hidden`).
+- **Mehrere Umschalter** auf einer Seite (zum Beispiel einer in der Kopfzeile und einer in den Einstellungen) teilen sich den Modus: Ein Klick auf einen stellt die anderen mit demselben `storageKey` sofort um (`aria-pressed`, Zustand, Symbole), gespeichert wird einmal.
 - **Kein Inline-`onclick`**, kein globaler Zustand, kein `innerHTML`. Ein blockierter Speicher (Privatmodus, gesperrte Website-Daten) wirft keinen Fehler; die Wahl gilt dann nur für diesen Besuch.
 - **`hidden` bis zum Start:** Ohne Skript tut der Button nichts. Setze `hidden`; `initTheme` zeigt ihn.
 
@@ -38,7 +39,7 @@ Probiere ihn in der eigenen Vorschau aus (der Modus wechselt hier nur im Rahmen)
   <div className="dss-phone">
     <h3 className="dss-doc-cap">Umschalter</h3>
     <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Umschalter ausprobieren">
-      <iframe style={{ height: '260px', width: '390px' }} title="Vorschau: Umschalter für den Dunkelmodus zum Ausprobieren" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-dark-mode--demo" loading="lazy" />
+      <iframe style={{ height: '300px', width: '390px' }} title="Vorschau: Umschalter für den Dunkelmodus zum Ausprobieren" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-dark-mode--demo" loading="lazy" />
     </div>
   </div>
 </div>
@@ -49,7 +50,7 @@ Das Skript des Umschalters läuft erst nach dem Laden der Seite. Wer die Wahl �
 
 <CodeBlock label="themeBootScript()" language="JavaScript" code={bootScript} />
 
-Optionen: `storageKey` (Standard `dss-theme`), `attribute` (Standard `data-theme`), `defaultMode` (`light`, `dark` oder `system`, Standard `system`). Die Werte werden als Zeichenketten eingebettet und so maskiert, dass `</script>` und Zeilentrenner darin nichts ausrichten; das Skript ist ES5 und unter 300 Zeichen lang. Erzeuge es zur Bauzeit (Server, Template) und füge es als Text ein, nie aus Nutzereingaben zusammen.
+Optionen: `storageKey` (Standard `dss-theme`), `attribute` (Standard `data-theme`), `defaultMode` (`light`, `dark` oder `system`, Standard `system`). **`defaultMode` an beiden Stellen gleich setzen:** `themeBootScript({ defaultMode: 'dark' })` und `initTheme(button, { defaultMode: 'dark' })`. Dann gilt immer: gemerkte Wahl vor `defaultMode` vor „System“; das Skript entfernt kein vom Boot-Skript gesetztes Attribut, und die Wahl „System“ wird bei einem anderen Standard als `system` ausdrücklich gemerkt (Eintrag `system`), damit sie den nächsten Besuch übersteht. Die Werte werden als Zeichenketten eingebettet und so maskiert, dass `</script>` und Zeilentrenner darin nichts ausrichten; das Skript ist ES5 und unter 300 Zeichen lang. Erzeuge es zur Bauzeit (Server, Template) und füge es als Text ein, nie aus Nutzereingaben zusammen.
 
 ### Content-Security-Policy
 
@@ -123,7 +124,8 @@ Optionen von `initTheme(button, options)`; es gibt `{ destroy(), getMode(), setM
   rows={[
     ['storageKey', 'string', 'Schlüssel im Speicher (Standard dss-theme).'],
     ['storage', 'ThemeStorage | null', 'Speicher mit getItem, setItem, removeItem (Standard localStorage); null schaltet das Merken ab.'],
-    ['mode', "'light' | 'dark' | 'system'", 'Anfangsmodus; sonst der gemerkte, sonst system. Wird nicht gemerkt.'],
+    ['defaultMode', "'light' | 'dark' | 'system'", 'Modus ohne gemerkte Wahl (Standard system); derselbe Wert wie bei themeBootScript.'],
+    ['mode', "'light' | 'dark' | 'system'", 'Anfangsmodus; sonst der gemerkte, sonst defaultMode. Wird nicht gemerkt.'],
     ['target', 'Element', 'Element, das das Attribut bekommt (Standard html: die Tokens reagieren nur dort).'],
     ['attribute', 'string', 'Name des Attributs (Standard data-theme); ungültige Namen fallen auf den Standard zurück.'],
     ['label', 'string', 'Beschriftung, wenn der Button keinen eigenen Text hat (Standard „Dunkelmodus“).'],

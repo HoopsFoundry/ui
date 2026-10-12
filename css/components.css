@@ -1571,7 +1571,7 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
    .dss-scroll-pad      Opt-in auf <html> oder einem Scrollbereich: scroll-padding oben (Token) und unten (--dss-scroll-offset-bottom, Standard 4,5rem,
                         damit Fokus nicht unter dem Nach-oben-Knopf endet).
    --dss-backtop-offset Abstand des Knopfes von unten (Standard 16px, plus Sicherheitsabstand); initBackToTop setzt ihn über eine feste dss-bnav.
-   --dss-backtop-gap    Abstand von rechts (Standard 16px, plus Sicherheitsabstand).
+   --dss-backtop-gap    Abstand vom Rand der Leserichtung (rechts, bei rechts-nach-links links; Standard 16px, plus Sicherheitsabstand).
    --dss-z-backtop      Ebene des Knopfes (Standard 20, unter Overlays wie dem Modal mit 100). */
 .dss-pagenav { margin: 1rem 0 1.5rem; }
 .dss-pagenav .dss-eyebrow { margin: 0 0 0.5rem; }
@@ -1587,9 +1587,10 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
 .dss-scroll-pad { scroll-padding-top: var(--dss-scroll-offset, var(--dss-acc-sticky-top, 0px)); scroll-padding-bottom: var(--dss-scroll-offset-bottom, 4.5rem); }
 .dss-backtop {
   position: fixed; z-index: var(--dss-z-backtop, 20);
-  right: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom: calc(var(--dss-backtop-offset, 16px) + env(safe-area-inset-bottom, 0px));
+  inset-inline-end: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom: calc(var(--dss-backtop-offset, 16px) + env(safe-area-inset-bottom, 0px));
   box-shadow: var(--shadow-md), inset 0 0 0 1px var(--dss-line-strong);
 }
+.dss-backtop:dir(rtl) { inset-inline-end: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-left, 0px)); } /* von rechts nach links: der Knopf sitzt links, dort gilt der linke Sicherheitsabstand */
 .dss-backtop[hidden] { display: none; }
 @media print { .dss-pagenav, .dss-backtop { display: none; } }
 

@@ -31,6 +31,7 @@
     showList = true,
     dimInDark = true,
     darkTiles = 'dim',
+    seatLabel = undefined,
     onload = undefined,
     onerror = undefined,
     onmarkerclick = undefined,
@@ -64,6 +65,8 @@
     dimInDark?: boolean;
     /** Verfahren im Dunkelmodus: `dim` dunkelt ab (Standard), `invert` invertiert und färbt um (Wasser und Straßen wirken fremd, die Karte wird wirklich dunkel). Wirkt nur mit `dimInDark`. */
     darkTiles?: MapDarkTiles;
+    /** Text für den Sitzmarker (`kind: 'seat'`) in Liste und Marker-Namen; Standard „Vereinssitz“. */
+    seatLabel?: string;
     /** Die Karte ist bereit; Argument ist die Leaflet-Karte. */
     onload?: (map: unknown) => void;
     /** Laden fehlgeschlagen: `tile-url`, `import`, `init`, `update` oder `tiles`. */
@@ -83,7 +86,7 @@
   let zoomNow = $state({ zoom: 0, min: 0, max: 99 });
   let userStarted = false;
 
-  const items = $derived(mapItems(markers, appLinks));
+  const items = $derived(mapItems(markers, appLinks, { seat: seatLabel }));
   const pins = $derived(placeholderPins(items));
   const urlOk = $derived(validTileUrl(tileUrl));
   const state = $derived(!urlOk || failure ? 'error' : phase);
@@ -101,7 +104,7 @@
     untrack(() => { failure = null; });
   });
 
-  const options = () => ({ markers, appLinks, center, zoom, interactive, tileUrl });
+  const options = () => ({ markers, appLinks, center, zoom, interactive, tileUrl, seatLabel });
 
   // Karte erzeugen und beim Entfernen abbauen (map.remove()); die Eingaben liest nur der zweite Effekt
   $effect(() => {
@@ -193,7 +196,7 @@
           <div class="dss-map-item-body">
             <p class="dss-map-name">
               {#if item.href}<a class="dss-link" href={item.href}>{item.label}</a>{:else}<span>{item.label}</span>{/if}
-              {#if item.kind === 'seat'}<span class="dss-chip">{mapText.seat}</span>{/if}
+              {#if item.kind === 'seat'}<span class="dss-chip">{item.seatText}</span>{/if}
               {#if item.own}<span class="dss-chip dss-chip--amber">{mapText.own}</span>{/if}
             </p>
             <p class="dss-map-coords">{item.coords}</p>

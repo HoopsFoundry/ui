@@ -99,7 +99,7 @@ export function createMapController(el, opts, hooks = {}) {
       if (!keep.has(id)) { entry.marker.remove(); entries.delete(id); }
     }
     for (const item of items) {
-      const sig = JSON.stringify([item.label, item.number, item.own, item.kind, item.href ?? '']);
+      const sig = JSON.stringify([item.label, item.number, item.own, item.kind, item.seatText, item.href ?? '']);
       const entry = entries.get(item.id);
       if (entry && entry.sig === sig) {
         entry.item = item;
@@ -144,7 +144,7 @@ export function createMapController(el, opts, hooks = {}) {
   };
 
   const apply = (first) => {
-    const items = mapItems(current.markers, current.appLinks);
+    const items = mapItems(current.markers, current.appLinks, { seat: current.seatLabel });
     setGestures(current.interactive !== false);
     const url = current.tileUrl ?? DEFAULT_TILE_URL;
     if (layer && layerUrl !== url) { tileOk = 0; tileBad = 0; everLoaded = false; layerUrl = url; layer.setUrl(url); }

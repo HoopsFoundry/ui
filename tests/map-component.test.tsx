@@ -176,10 +176,11 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const m = open(driver, { markers: [A, B], load: 'auto' });
       await vi.waitFor(() => expect(state.markers).toHaveLength(2));
       const [first, second] = state.markers;
-      expect(first.options).toMatchObject({ keyboard: true, title: 'Sporthalle Nordhain', alt: 'Sporthalle Nordhain' });
-      expect(second.options.title).toBe('Halle Süd & West');
+      // die sichtbare Nummer steht im Namen voran (WCAG 2.5.3)
+      expect(first.options).toMatchObject({ keyboard: true, title: '1, Sporthalle Nordhain', alt: '1, Sporthalle Nordhain' });
+      expect(second.options.title).toBe('2, Halle Süd & West');
       expect(first.el?.tabIndex).toBe(0);
-      expect(first.el?.getAttribute('aria-label')).toBe('Sporthalle Nordhain');
+      expect(first.el?.getAttribute('aria-label')).toBe('1, Sporthalle Nordhain');
       expect(first.el?.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
       expect(first.el?.querySelector('text')?.textContent).toBe('1');
       expect(first.el?.classList.contains('is-own')).toBe(true);
@@ -433,14 +434,14 @@ describe.each(drivers)('Karte · $name', (driver) => {
       await vi.waitFor(() => expect(state.markers).toHaveLength(2));
       await m.set({ markers: [A, B, C] });
       expect(state.markers).toHaveLength(3);
-      expect(state.markers[2].options.title).toBe('Gymnasium Lindenberg');
+      expect(state.markers[2].options.title).toBe('3, Gymnasium Lindenberg');
       await m.set({ markers: [A, { ...B, lat: 49.6 }, C] });
       expect(state.markers).toHaveLength(3);
       expect(state.markers[1].latlng).toEqual([49.6, 8.5]);
       await m.set({ markers: [A, { ...B, lat: 49.6, label: 'Halle Ost' }, C] });
       expect(state.markers).toHaveLength(4);
       expect(state.markers[1].isRemoved).toBe(true);
-      expect(state.markers[3].options.title).toBe('Halle Ost');
+      expect(state.markers[3].options.title).toBe('2, Halle Ost');
       await m.set({ markers: [A] });
       expect(state.markers.filter((x) => !x.isRemoved)).toHaveLength(1);
       expect(state.maps).toHaveLength(1);

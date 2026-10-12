@@ -410,7 +410,7 @@ export function pagenavCssRules(css: string): Rules {
     'Abschnitt vorhanden': text.length > 400,
     'CSS: Ebene über Token': /z-index:\s*var\(--dss-z-backtop,\s*20\)/.test(body('.dss-backtop')),
     'CSS: Abstand von unten über Token und Sicherheitsabstand': /bottom:\s*calc\(var\(--dss-backtop-offset,\s*16px\)\s*\+\s*env\(safe-area-inset-bottom,\s*0px\)\)/.test(body('.dss-backtop')),
-    'CSS: Abstand von rechts mit Sicherheitsabstand': /right:\s*calc\(var\(--dss-backtop-gap,\s*16px\)\s*\+\s*env\(safe-area-inset-right,\s*0px\)\)/.test(body('.dss-backtop')),
+    'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)': /inset-inline-end:\s*calc\(var\(--dss-backtop-gap,\s*16px\)\s*\+\s*env\(safe-area-inset-right,\s*0px\)\)/.test(body('.dss-backtop')) && !/(^|[;\s])right:/.test(body('.dss-backtop')) && /env\(safe-area-inset-left,\s*0px\)/.test(body('.dss-backtop:dir(rtl)')),
     'CSS: im Druck ausgeblendet': /\.dss-pagenav, \.dss-backtop \{ display: none; \}/.test(print),
     'CSS: Knopf fest positioniert und verborgen mit [hidden]': /position:\s*fixed/.test(body('.dss-backtop')) && /display:\s*none/.test(body('.dss-backtop[hidden]')),
     'CSS: Links mindestens 44 px': /min-height:\s*var\(--touch-sm\)/.test(body('.dss-pagenav-link')),

@@ -66,7 +66,8 @@ const BACKTOP: Mutation[] = [
 const CSS: Mutation[] = [
   { name: 'feste Ebene', rule: 'CSS: Ebene über Token', from: 'z-index: var(--dss-z-backtop, 20);', to: 'z-index: 20;' },
   { name: 'unten ohne Sicherheitsabstand', rule: 'CSS: Abstand von unten über Token und Sicherheitsabstand', from: ' + env(safe-area-inset-bottom, 0px))', to: ')' },
-  { name: 'rechts ohne Token', rule: 'CSS: Abstand von rechts mit Sicherheitsabstand', from: 'right: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-right, 0px))', to: 'right: 16px' },
+  { name: 'rechts ohne Token', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'inset-inline-end: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom:', to: 'right: 16px; bottom:' },
+  { name: 'rechts-nach-links ohne linken Sicherheitsabstand', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'env(safe-area-inset-left, 0px)); } /* von rechts', to: 'env(safe-area-inset-right, 0px)); } /* von rechts' },
   { name: 'im Druck sichtbar', rule: 'CSS: im Druck ausgeblendet', from: '@media print { .dss-pagenav, .dss-backtop { display: none; } }', to: '@media print { .dss-pagenav { display: none; } }' },
   { name: 'verborgener Knopf bleibt sichtbar', rule: 'CSS: Knopf fest positioniert und verborgen mit [hidden]', from: '.dss-backtop[hidden] { display: none; }', to: '' },
   { name: 'Links 40 px', rule: 'CSS: Links mindestens 44 px', from: 'min-height: var(--touch-sm); max-width: 100%;', to: 'min-height: 40px; max-width: 100%;' },
@@ -219,8 +220,10 @@ const MAP_LOGIC: Mutation[] = [
   { name: 'Nummerierung zählt den Index', rule: 'Sitz: zählt in der Nummerierung der Orte nicht mit', from: 'places > 1 ? running : null', to: 'places > 1 ? index + 1 : null' },
   { name: 'Einzelner Ort bekommt neben dem Sitz eine Nummer', rule: 'Sitz: ein einzelner Ort neben dem Sitz bleibt ohne Nummer', from: 'const places = valid.filter((m) => m.kind !== \'seat\').length;', to: 'const places = valid.length;' },
   { name: 'Platzhalter ohne Art', rule: 'Sitz: der Platzhalter kennt die Art', from: "kind: m.kind === 'seat' ? 'seat' : 'place',\n        x: Math.round", to: "kind: 'place',\n        x: Math.round" },
-  { name: 'Name ohne Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "return item?.kind === 'seat' ?", to: 'return false ?' },
+  { name: 'Name ohne Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "if (item?.kind === 'seat') {", to: 'if (false) {' },
   { name: 'anderer Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "seat: 'Vereinssitz',", to: "seat: 'Sitz',", },
+  { name: 'Nummer fehlt im Namen', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: 'return Number.isInteger(number) && number >= 0 ?', to: 'return false ?' },
+  { name: 'eigener Sitztext wird ignoriert', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapText.seat;", to: 'const seat = mapText.seat;' },
   { name: 'jeder Wert ist ein Verfahren', rule: 'darkTiles: nur invert ändert den Standard dim', from: "return value === 'invert' ? 'invert' : 'dim';", to: "return value ? value : 'dim';" },
 ];
 const LEAFLET_LOGIC: Mutation[] = [
@@ -243,10 +246,10 @@ const MAP_SRC: { name: string; rule: string; file: 'svelte' | 'react' | 'leaflet
   { name: 'data-tiles fehlt (React)', rule: 'Quelle: data-tiles aus tilesMode', file: 'react', from: 'data-tiles={tilesMode(darkTiles)}', to: '' },
   { name: 'darkTiles Standard invert (React)', rule: 'Quelle: darkTiles hat den Standard dim', file: 'react', from: "darkTiles = 'dim'", to: "darkTiles = 'invert'" },
   { name: 'Haus-Badge fehlt (Svelte)', rule: 'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl', file: 'svelte', from: 'dss-map-num is-seat', to: 'dss-map-num' },
-  { name: 'Chip fehlt (React)', rule: 'Quelle: Chip Vereinssitz in der Liste', file: 'react', from: '{mapText.seat}', to: '' },
+  { name: 'Chip fehlt (React)', rule: 'Quelle: Chip Vereinssitz in der Liste', file: 'react', from: '{item.seatText}', to: '' },
   { name: 'Platzhalter-Pin ohne is-seat (Svelte)', rule: 'Quelle: Platzhalter-Pin trägt is-seat', file: 'svelte', from: "pin.kind === 'seat' ? ' is-seat'", to: "false ? ' is-seat'" },
   { name: 'Marker ohne markerName', rule: 'Quelle: Marker nutzt markerName für Titel, Alt und aria-label', file: 'leaflet', from: "title: markerName(item), alt: markerName(item)", to: 'title: item.label, alt: item.label' },
-  { name: 'Art nicht in der Signatur', rule: 'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)', file: 'leaflet', from: 'item.own, item.kind, item.href', to: 'item.own, item.href' },
+  { name: 'Art nicht in der Signatur', rule: 'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)', file: 'leaflet', from: 'item.own, item.kind, item.seatText, item.href', to: 'item.own, item.href' },
   { name: 'style in der Svelte-Datei', rule: 'Quelle: kein style in der Svelte-Datei', file: 'svelte', from: '<script lang="ts">', to: '<style>.x{}</style>\n<script lang="ts">' },
 ];
 const mapCssStart = css.indexOf('/* ── Map (Karte');

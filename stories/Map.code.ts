@@ -124,7 +124,7 @@ export const sitzSvelte = `<script>
 
   const orte = [
     // kind: 'seat' – der Vereinssitz: Haus-Symbol statt Nummer, ohne Nummer, zählt in der Nummerierung nicht mit
-    { id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' },
+    { id: 'sitz', lat: 49.2962, lng: 7.9105, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' },
     { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true },
     { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg' },
   ];
@@ -137,7 +137,7 @@ export const sitzReact = `import { MapView, type MapMarker } from '@bbv/dss-desi
 
 const orte: MapMarker[] = [
   // kind: 'seat' – der Vereinssitz: Haus-Symbol statt Nummer, ohne Nummer, zählt in der Nummerierung nicht mit
-  { id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' },
+  { id: 'sitz', lat: 49.2962, lng: 7.9105, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' },
   { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true },
   { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg' },
 ];
@@ -153,7 +153,7 @@ export const sitzVanilla = `<!-- Vanilla: Kacheln im Dunkelmodus invertieren sta
   <span class="dss-map-num is-seat" aria-hidden="true"></span>
   <div class="dss-map-item-body">
     <p class="dss-map-name"><span>Geschäftsstelle TSV Nordhain</span><span class="dss-chip">Vereinssitz</span></p>
-    <p class="dss-map-coords">49,2982° N, 7,9021° O</p>
+    <p class="dss-map-coords">49,2962° N, 7,9105° O</p>
   </div>
 </li>
 

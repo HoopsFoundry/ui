@@ -37,6 +37,8 @@ export interface MapViewProps {
   dimInDark?: boolean;
   /** Verfahren im Dunkelmodus: `dim` dunkelt ab (Standard), `invert` invertiert und färbt um (Wasser und Straßen wirken fremd, die Karte wird wirklich dunkel). Wirkt nur mit `dimInDark`. */
   darkTiles?: MapDarkTiles;
+  /** Text für den Sitzmarker (`kind: 'seat'`) in Liste und Marker-Namen; Standard „Vereinssitz“. */
+  seatLabel?: string;
   /** Die Karte ist bereit; Argument ist die Leaflet-Karte. */
   onLoad?: (map: unknown) => void;
   /** Laden fehlgeschlagen. */
@@ -79,6 +81,7 @@ export function MapView({
   showList = true,
   dimInDark = true,
   darkTiles = 'dim',
+  seatLabel,
   onLoad,
   onError,
   onMarkerClick,
@@ -96,14 +99,14 @@ export function MapView({
   const handlers = useRef({ onLoad, onError, onMarkerClick });
   handlers.current = { onLoad, onError, onMarkerClick };
 
-  const items = mapItems(markers, appLinks);
+  const items = mapItems(markers, appLinks, { seat: seatLabel });
   const pins = placeholderPins(items);
   const urlOk = validTileUrl(tileUrl);
   const state = !urlOk || failure ? 'error' : phase;
   const running = state === 'loading' || state === 'ready';
   const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';
   const source = attribution && attribution.trim() ? attribution : mapText.attribution;
-  const options = { markers, appLinks, center, zoom, interactive, tileUrl };
+  const options = { markers, appLinks, center, zoom, interactive, tileUrl, seatLabel };
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
@@ -233,7 +236,7 @@ export function MapView({
                   ) : (
                     <span>{item.label}</span>
                   )}
-                  {item.kind === 'seat' ? <span className="dss-chip">{mapText.seat}</span> : null}
+                  {item.kind === 'seat' ? <span className="dss-chip">{item.seatText}</span> : null}
                   {item.own ? <span className="dss-chip dss-chip--amber">{mapText.own}</span> : null}
                 </p>
                 <p className="dss-map-coords">{item.coords}</p>

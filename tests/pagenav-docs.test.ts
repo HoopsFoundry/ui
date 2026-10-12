@@ -103,6 +103,13 @@ describe('Doku-Seite', () => {
     expect(mdx).toMatch(/keine globalen Regeln/);
     expect(mdx).toMatch(/`dss-pagenav-target`, deren `scroll-margin-top` `--dss-scroll-offset` plus `1rem` ist/);
   });
+  it('die Doku nennt Animation, Beobachtung, Routing, verschachtelte Gruppen, RTL und createContextualFragment', () => {
+    for (const part of ['`transitionend`', 'Höchstwartezeit', '`history.replaceState`', 'Hash-Routing', 'jede Accordion-Gruppe, auch eine verschachtelte', 'keine Wurzel, nur Optionen', '`inset-inline-end`', '`createContextualFragment`']) expect(mdx, part).toContain(part);
+  });
+  it('die Beispielseiten laufen nicht über ihren Rahmen (box-sizing)', () => {
+    expect(examples).toMatch(/\.page \{ box-sizing: border-box;/);
+    expect(read('stories/components/PageNavPlayground.svelte')).toMatch(/\.page \{ box-sizing: border-box;/);
+  });
   it('Einführung, storySort, README und CHANGELOG nennen die Seite', () => {
     expect(read('stories/Introduction.mdx')).toContain('components-pagenav--docs');
     expect(read('.storybook/preview.ts')).toMatch(/'Accordion', 'PageNav'/);

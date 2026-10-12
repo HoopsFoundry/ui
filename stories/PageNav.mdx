@@ -35,7 +35,7 @@ Jeder Link ist 44 px hoch (`--touch-sm`), bricht bei langen Titeln um und hat de
 
 ## Sprung in geschlossene Bereiche
 
-Liegt das Ziel in einem eingeklappten Bereich, öffnet der Klick **alle umgebenden Bereiche**: `AccordionItem`, einklappbare Tabellenrahmen und `<details>`, von außen nach innen und über den Klick auf ihren Kopf, damit Svelte, React und das Vanilla-Skript ihrem eigenen Zustand folgen (`exclusive` und Anker eingeschlossen). Gesperrte Bereiche bleiben zu. Danach scrollt die Seite zum Ziel (unter einen klebenden Kopf nicht), setzt den Fokus auf die Überschrift (`tabindex="-1"`, ohne zu scrollen) und schreibt `#id` in die Adresse. Ein Anker in der Adresse beim Laden oder bei `hashchange` öffnet die Bereiche ebenfalls (`syncHash`, Standard `true`); Anker auf einen Bereich selbst bleiben dem Accordion überlassen.
+Liegt das Ziel in einem eingeklappten Bereich, öffnet der Klick **alle umgebenden Bereiche**: `AccordionItem`, einklappbare Tabellenrahmen und `<details>`, von außen nach innen und über den Klick auf ihren Kopf, damit Svelte, React und das Vanilla-Skript ihrem eigenen Zustand folgen (`exclusive` und Anker eingeschlossen). Gesperrte Bereiche bleiben zu. Danach scrollt die Seite zum Ziel (unter einen klebenden Kopf nicht), setzt den Fokus auf die Überschrift (`tabindex="-1"`, ohne zu scrollen) und schreibt `#id` in die Adresse. Klappt der Bereich mit einer Höhenanimation auf (Svelte, React), wandert das Ziel noch: Nach dem `transitionend` des Bereichs, spätestens nach Dauer plus Verzögerung und einem kleinen Puffer, scrollt die Navigation noch einmal und setzt den Fokus erneut. Ohne Animation (reduzierte Bewegung, `data-motion="reduce"`, Vanilla) entfällt das zweite Scrollen. **Adresse und Routing:** Der Sprung schreibt `#id` mit `history.replaceState` (kein neuer Verlaufseintrag, nur Pfad und Suchteil bleiben) und feuert kein `hashchange`. Apps mit Hash-Routing (`#/seite`), die den Anker selbst auswerten, setzen `syncHash: false` und prüfen, ob ihr Router die Ziel-ids als Anker verträgt; die Links tragen die volle Seitenadresse und funktionieren auch mit `<base href>`. **Verschachtelte Gruppen:** Im Vanilla-Weg muss jede Accordion-Gruppe, auch eine verschachtelte, mit `initAccordion` gestartet sein (`data-dss="accordion"` oder `data-dss-acc` am inneren Wurzelelement), sonst bleibt der Klick auf ihren Kopf ohne Wirkung. Svelte und React brauchen kein Skript. Ein Anker in der Adresse beim Laden oder bei `hashchange` öffnet die Bereiche ebenfalls (`syncHash`, Standard `true`); Anker auf einen Bereich selbst bleiben dem Accordion überlassen.
 
 Im Beispiel liegen „Torhüter“, „Guards“, „Saison“ und „Anfahrt“ in geschlossenen Bereichen:
 
@@ -43,7 +43,7 @@ Im Beispiel liegen „Torhüter“, „Guards“, „Saison“ und „Anfahrt“
 
 ## Nachladen
 
-Seiten, die Abschnitte erst im Browser aufbauen, ändern ihren Inhalt später. `initPageNav` beobachtet `root` (`MutationObserver`) und baut die Navigation nach 150 ms Ruhe neu, nur wenn sich Einträge oder Texte geändert haben (Vergleich über eine Signatur). Die eigene Navigation löst keinen Neuaufbau aus. Mit `observe: false` entfällt das Beobachten. Im Beispiel erscheint die Navigation, sobald der dritte Abschnitt dazukommt:
+Seiten, die Abschnitte erst im Browser aufbauen, ändern ihren Inhalt später. `initPageNav` beobachtet `root` (`MutationObserver`) und baut die Navigation nach 150 ms Ruhe neu, nur wenn sich Einträge oder Texte geändert haben (Vergleich über eine Signatur). Beobachtet werden neue und entfernte Knoten, geänderter Text (eine umbenannte Überschrift) und die Attribute `data-pagenav` und `data-pagenav-skip`. Eine Seite, die ständig ändert, bekommt ihre Navigation trotzdem nach spätestens einer Sekunde (Höchstwartezeit des Entprellens). Die eigene Navigation löst keinen Neuaufbau aus. Mit `observe: false` entfällt das Beobachten. Im Beispiel erscheint die Navigation, sobald der dritte Abschnitt dazukommt:
 
 <Canvas of={PageNavStories.Nachladen} />
 
@@ -124,7 +124,7 @@ Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell
 
 ## Verwendung: Import und Optionen
 
-Die Funktionen kommen aus `@bbv/dss-design-system/pagenav.js` und `…/backtop.js`; `initAll` aus `…/vanilla-core.js` startet alles mit `data-dss="pagenav"` und `data-dss="backtop"`. Es gibt keine Svelte- und keine React-Komponente: die Beispiele zeigen den Aufruf in `onMount` bzw. `useEffect`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel ist ausführbar; das Beispiel hier rendert dasselbe Markup mit `initAll`:
+Die Funktionen kommen aus `@bbv/dss-design-system/pagenav.js` und `…/backtop.js`; `initAll` aus `…/vanilla-core.js` startet alles mit `data-dss="pagenav"` und `data-dss="backtop"`. Es gibt keine Svelte- und keine React-Komponente: die Beispiele zeigen den Aufruf in `onMount` bzw. `useEffect`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel ist ausführbar; das Beispiel hier setzt das Markup aus dem Code mit `createContextualFragment` ein (kein `innerHTML`; so tust du es auch mit Markup aus eigenen Texten) und startet es mit `initAll`:
 
 <Canvas of={PageNavStories.VanillaSeite} />
 
@@ -166,7 +166,7 @@ Optionen von `initBackToTop(options)`:
   ]}
 />
 
-Beide geben `{ destroy() }` zurück, sind idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten) und lesen beim Import weder `window` noch `document`. Die Hilfsfunktionen:
+`initBackToTop` hat keine Wurzel, nur Optionen (der Knopf gehört zum Fenster; der Schlüssel für „zweiter Aufruf ersetzt den ersten“ ist `container` bzw. `button`). Rechts-nach-links: Der Knopf sitzt am Rand der Leserichtung (`inset-inline-end`, bei RTL links mit dem linken Sicherheitsabstand). Beide geben `{ destroy() }` zurück, sind idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten) und lesen beim Import weder `window` noch `document`. Die Hilfsfunktionen:
 
 <CodeBlock label="Hilfsfunktionen" language="JavaScript" code={funktionenJs} />
 

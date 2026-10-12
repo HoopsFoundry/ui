@@ -135,10 +135,16 @@ export function boundsOf(markers) {
   return { sw: [Math.min(...lats), west], ne: [Math.max(...lats), east] };
 }
 
-/** Name eines Markers für Hilfstechnik: der Name des Orts, bei einem Sitzmarker mit dem Zusatz „Vereinssitz“ („Sporthalle Nordhain, Vereinssitz“). */
+/** Name eines Markers für Hilfstechnik: die sichtbare Nummer voran, dann der Name des Orts („1, Sporthalle Nordhain“); ein Sitzmarker hat keine Nummer und den Zusatz „Vereinssitz“ („Sporthalle Nordhain, Vereinssitz“, Text über `seatText` des Eintrags). */
 export function markerName(item) {
   const label = item && typeof item.label === 'string' ? item.label : '';
-  return item?.kind === 'seat' ? (label ? `${label}, ${mapText.seat}` : mapText.seat) : label;
+  if (item?.kind === 'seat') {
+    const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapText.seat;
+    return label ? `${label}, ${seat}` : seat;
+  }
+  // Die sichtbare Nummer steht voran („1, Sporthalle Nordhain“): Der Name enthält so den Text des Markers (WCAG 2.5.3, Label im Namen)
+  const number = item?.number;
+  return Number.isInteger(number) && number >= 0 ? (label ? `${number}, ${label}` : String(number)) : label;
 }
 
 /** Kachelverfahren im Dunkelmodus: `invert` (invertieren und umfärben) oder `dim` (abdunkeln, Standard); alles andere ergibt `dim`. */
@@ -147,10 +153,10 @@ export function tilesMode(value) {
 }
 
 /**
- * Marker für Liste, Platzhalter und Karte aufbereiten: ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
+ * Marker für Liste, Platzhalter und Karte aufbereiten (`texts.seat`: Text für den Sitzmarker statt „Vereinssitz“): ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
  * Markern die laufende Nummer (ein Marker bekommt keine), dazu Koordinatentext und Links (nur die in `appLinks` gewünschten).
  */
-export function mapItems(markers, appLinks = ['osm', 'route']) {
+export function mapItems(markers, appLinks = ['osm', 'route'], texts = {}) {
   const valid = (Array.isArray(markers) ? markers : []).filter((m) => m && isCoord(m.lat, m.lng));
   const wants = Array.isArray(appLinks) ? appLinks : [];
   // Eindeutige ids: ausdrückliche ids behalten ihren Wert (die erste gewinnt), doppelte und fehlende bekommen einen freien Ersatz
@@ -184,6 +190,7 @@ export function mapItems(markers, appLinks = ['osm', 'route']) {
       href: safeHref(m.href),
       own: m.own === true,
       kind: seat ? 'seat' : 'place',
+      seatText: typeof texts?.seat === 'string' && texts.seat.trim() ? texts.seat.trim() : mapText.seat,
       number: seat ? null : given ?? (places > 1 ? running : null),
       coords: formatCoords(m.lat, m.lng),
       links,

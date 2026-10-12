@@ -41,7 +41,7 @@ describe('Code-Beispiele: Vereinssitz und darkTiles', () => {
   it('React und Svelte liefern dasselbe Markup für den Sitz', async () => {
     const Svelte = ((await vite.ssrLoadModule(`${rootDir}svelte/Map.svelte`)) as { default: unknown }).default;
     const React = ((await vite.ssrLoadModule(`${rootDir}react/Map.tsx`)) as { MapView: unknown }).MapView;
-    const markers = [{ id: 'sitz', lat: 49.2982, lng: 7.9021, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' }, { id: 'a', lat: 49.3, lng: 7.9, label: 'Halle A', own: true }];
+    const markers = [{ id: 'sitz', lat: 49.2962, lng: 7.9105, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' }, { id: 'a', lat: 49.3, lng: 7.9, label: 'Halle A', own: true }];
     const props = { label: 'Karte', markers, darkTiles: 'invert' };
     const ids = (html: string) => normalize(html).replace(/dss-map-(canvas|text)-[^"#]+/g, 'dss-map-$1-x');
     expect(ids(renderToStaticMarkup(createElement(React as never, props as never)))).toBe(ids(render(Svelte, { props }).body));

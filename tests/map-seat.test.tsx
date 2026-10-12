@@ -52,6 +52,15 @@ describe('placeholderPins, markerName, tilesMode', () => {
   it('markerName: Sitz mit Zusatz, sonst der Name', () => {
     expect(markerName({ label: 'Halle A' })).toBe('Halle A');
     expect(markerName({ label: 'Halle A', kind: 'place' })).toBe('Halle A');
+    // sichtbare Nummer voran (WCAG 2.5.3); ein Sitz hat keine
+    expect(markerName({ label: 'Halle A', number: 2 })).toBe('2, Halle A');
+    expect(markerName({ label: 'Halle A', number: 0 })).toBe('0, Halle A');
+    expect(markerName({ label: '', number: 3 })).toBe('3');
+    expect(markerName({ label: 'Halle A', number: null })).toBe('Halle A');
+    expect(markerName({ label: 'Halle A', number: 1.5 })).toBe('Halle A');
+    expect(markerName({ label: 'Sitz', kind: 'seat', number: 4 })).toBe('Sitz, Vereinssitz');
+    expect(markerName({ label: 'Sitz', kind: 'seat', seatText: 'Geschäftsstelle' })).toBe('Sitz, Geschäftsstelle');
+    expect(markerName({ label: 'Sitz', kind: 'seat', seatText: '  ' })).toBe('Sitz, Vereinssitz');
     expect(markerName({ label: 'Geschäftsstelle', kind: 'seat' })).toBe('Geschäftsstelle, Vereinssitz');
     expect(markerName({ label: '', kind: 'seat' })).toBe('Vereinssitz');
     expect(markerName(undefined as never)).toBe('');
@@ -107,7 +116,8 @@ describe('Controller: Sitzmarker', () => {
     expect(s.el!.getAttribute('aria-label')).toBe('Geschäftsstelle, Vereinssitz');
     expect(s.el!.classList.contains('is-seat')).toBe(true);
     expect(s.el!.querySelector('.dss-map-pin-house')).not.toBeNull();
-    expect(pa.options.title).toBe('Halle A');
+    expect(pa.options.title).toBe('1, Halle A');
+    expect(pa.el!.getAttribute('aria-label')).toBe('1, Halle A');
     expect(pa.el!.querySelector('.dss-map-pin-num')!.textContent).toBe('1');
     expect(pb.el!.querySelector('.dss-map-pin-num')!.textContent).toBe('2');
     expect(el.querySelectorAll('.leaflet-marker-icon')).toHaveLength(3);
@@ -127,6 +137,31 @@ describe('Controller: Sitzmarker', () => {
     const m = mock.state.markers[0];
     m.fire('click');
     expect(window.location.href).not.toContain('javascript');
+    ctrl.destroy();
+  });
+});
+
+describe('seatLabel: eigener Text für den Sitz', () => {
+  it('mapItems: texts.seat setzt seatText, leer oder ungültig bleibt Vereinssitz', () => {
+    expect(mapItems([seat], ['osm'], { seat: 'Geschäftsstelle' })[0].seatText).toBe('Geschäftsstelle');
+    for (const v of ['', '  ', undefined, 5 as never]) expect(mapItems([seat], ['osm'], { seat: v })[0].seatText).toBe('Vereinssitz');
+    expect(mapItems([seat])[0].seatText).toBe('Vereinssitz');
+  });
+  it('React: Chip und Marker-Name nutzen seatLabel', async () => {
+    const { container } = render(<MapView label="Karte" markers={[seat, a]} seatLabel="Geschäftsstelle" load="auto" />);
+    expect(container.querySelector('.dss-map-item .dss-chip')!.textContent).toBe('Geschäftsstelle');
+    await new Promise((r) => setTimeout(r, 30));
+    const m = mock.state.markers[0];
+    expect(m.options.title).toBe('Geschäftsstelle, Geschäftsstelle');
+  });
+  it('Controller: seatLabel und Wechsel des Textes baut den Marker neu', async () => {
+    const el = document.createElement('div');
+    document.body.append(el);
+    const ctrl = createMapController(el, { markers: [seat] as never, appLinks: [], seatLabel: 'Sitz' });
+    await ctrl.started;
+    expect(mock.state.markers[0].options.title).toBe('Geschäftsstelle, Sitz');
+    ctrl.update({ markers: [seat] as never, appLinks: [], seatLabel: 'Zentrale' });
+    expect(mock.state.markers.at(-1)!.options.title).toBe('Geschäftsstelle, Zentrale');
     ctrl.destroy();
   });
 });
