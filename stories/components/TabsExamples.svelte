@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { onMount } from 'svelte';
   import Tabs from '../../svelte/Tabs.svelte';
   import { ensureSprite } from '../../svelte/Icon.svelte';
@@ -6,8 +6,7 @@
   import { initTabs } from '../../js/tabs.js';
   import { registerMarkup, filterMarkup } from '../Tabs.code';
 
-  /** @type {{ example: string }} */
-  let { example } = $props();
+  let { example }: { example: string } = $props();
 
   // Tab-Symbole kommen aus dem Sprite, das Icon.svelte einmal einhängt
   onMount(() => ensureSprite());

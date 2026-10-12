@@ -1,12 +1,11 @@
-<script>
+<script lang="ts">
   import Modal from '../../svelte/Modal.svelte';
   import Button from '../../svelte/Button.svelte';
   import ModalDemo from './ModalDemo.svelte';
   import { initAll } from '../../js/vanilla-core.js';
   import { dialogMarkup, divMarkup } from '../Modal.code';
 
-  /** @type {{ example: string }} */
-  let { example } = $props();
+  let { example }: { example: string } = $props();
 
   const severities = [
     { severity: 'default', title: 'Spielbericht freigeben', subtitle: 'Standard', body: 'Nach Freigabe ist eine Korrektur nur noch über den Verband möglich.', cancelLabel: 'Abbrechen', confirmLabel: 'Freigeben' },
