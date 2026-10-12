@@ -2,6 +2,9 @@
   import { onMount } from 'svelte';
   import Tabs from '../../svelte/Tabs.svelte';
   import { ensureSprite } from '../../svelte/Icon.svelte';
+  import { initAll } from '../../js/vanilla-core.js';
+  import { initTabs } from '../../js/tabs.js';
+  import { registerMarkup, filterMarkup } from '../Tabs.code';
 
   /** @type {{ example: string }} */
   let { example } = $props();
@@ -62,6 +65,29 @@
   ];
   const cols = ['Standard', 'Hover', 'Fokus', 'Gedrückt', 'Gewählt', 'Gesperrt'];
   const stateClass = { Standard: '', Hover: 'pseudo-hover', Fokus: 'pseudo-focus-visible', Gedrückt: 'pseudo-hover pseudo-active', Gewählt: 'is-active', Gesperrt: '' };
+
+  // Vanilla-Beispiele: das Markup aus dem Code-Beispiel (createContextualFragment statt HTML-Zuweisung), gestartet mit initAll.
+  function vanillaMarkup(node: HTMLElement, markup: string) {
+    node.replaceChildren(document.createRange().createContextualFragment(markup));
+    const handle = initAll(node, { only: ['tabs'] });
+    return { destroy: () => handle.destroy() };
+  }
+  // Filter: die Seite reagiert auf dss:tabchange
+  let filterText = $state('Bayernliga Süd, Pokal');
+  function vanillaFilter(node: HTMLElement) {
+    const handle = vanillaMarkup(node, filterMarkup);
+    const onChange = (event: Event) => {
+      const ids = (event as CustomEvent<{ ids: string[] }>).detail.ids;
+      filterText = ids.length ? ids.map((id) => node.querySelector(`[id="${id}"]`)?.textContent?.trim()).join(', ') : 'keine';
+    };
+    node.addEventListener('dss:tabchange', onChange);
+    return { destroy: () => { node.removeEventListener('dss:tabchange', onChange); handle.destroy(); } };
+  }
+  // Einzelne Leiste mit Optionen (Handy-Beispiel dunkel)
+  function bar(node: HTMLElement, options: Parameters<typeof initTabs>[1]) {
+    const handle = initTabs(node, options);
+    return { destroy: () => handle.destroy() };
+  }
 
   let single = $state('overview');
   let multi = $state(['a', 'c']);
@@ -145,7 +171,44 @@
     </div>
   </div>
 
+{:else if example === 'vanilla'}
+  <div class="vanilla" use:vanillaMarkup={registerMarkup}></div>
+{:else if example === 'vanilla-filter'}
+  <div class="vanilla" use:vanillaFilter></div>
+  <p class="panel" aria-live="polite">Gewählt: {filterText}</p>
+{:else if example === 'handy'}
+  <div class="narrow">
+    <div class="vanilla" use:vanillaMarkup={registerMarkup}></div>
+  </div>
+{:else if example === 'handy-dunkel'}
+  <div class="narrow">
+    <div class="dss-tabs dss-tabs--underline dss-tabs--md" role="tablist" aria-label="Vereinsseite" use:bar={{ activation: 'manual' }}>
+      <button type="button" class="dss-tab is-active" role="tab" id="hv-team" aria-selected="true" aria-controls="hv-team-panel" tabindex="0"><span class="dss-tab-label">Mannschaften</span><span class="dss-tab-count">7</span></button>
+      <button type="button" class="dss-tab" role="tab" id="hv-halle" aria-selected="false" aria-controls="hv-halle-panel" tabindex="-1"><span class="dss-tab-label">Halle</span></button>
+      <button type="button" class="dss-tab is-disabled" role="tab" id="hv-presse" aria-selected="false" aria-controls="hv-presse-panel" tabindex="-1" disabled><span class="dss-tab-label">Presse</span></button>
+    </div>
+    <div id="hv-team-panel" role="tabpanel" aria-labelledby="hv-team" tabindex="0"><p class="panel">Sieben Mannschaften, von U12 bis Herren. Pfeiltasten bewegen nur den Fokus, Enter wählt (activation: manual).</p></div>
+    <div id="hv-halle-panel" role="tabpanel" aria-labelledby="hv-halle" tabindex="0" hidden inert><p class="panel">Nordhain-Halle am Sportpark, 420 Plätze.</p></div>
+    <div id="hv-presse-panel" role="tabpanel" aria-labelledby="hv-presse" tabindex="0" hidden inert><p class="panel">Noch keine Berichte.</p></div>
+  </div>
+
 <!-- Dos und Don'ts -->
+{:else if example === 'do-panels'}
+  <!-- Richtig: Inaktive Panels sind im Markup hidden, vor dem Skript ist nur der erste Inhalt sichtbar -->
+  <div class="dss-tabs dss-tabs--underline dss-tabs--md" role="tablist" aria-label="Richtig: Panels verborgen" use:bar>
+    <button type="button" class="dss-tab is-active" role="tab" id="dp-a" aria-selected="true" aria-controls="dp-a-panel" tabindex="0"><span class="dss-tab-label">Übersicht</span></button>
+    <button type="button" class="dss-tab" role="tab" id="dp-b" aria-selected="false" aria-controls="dp-b-panel" tabindex="-1"><span class="dss-tab-label">Boxscore</span></button>
+  </div>
+  <div id="dp-a-panel" role="tabpanel" aria-labelledby="dp-a" tabindex="0"><p class="panel">Zusammenfassung des Spiels.</p></div>
+  <div id="dp-b-panel" role="tabpanel" aria-labelledby="dp-b" tabindex="0" hidden inert><p class="panel">Boxscore mit allen Werten.</p></div>
+{:else if example === 'dont-panels'}
+  <!-- Falsch: alle Panels sind im Markup sichtbar; ohne Skript (oder davor) stehen alle Ansichten untereinander. Die Leiste ist nicht gestartet. -->
+  <div class="dss-tabs dss-tabs--underline dss-tabs--md" role="tablist" aria-label="Falsch: Panels sichtbar">
+    <button type="button" class="dss-tab is-active" role="tab" id="dq-a" aria-selected="true" aria-controls="dq-a-panel" tabindex="0"><span class="dss-tab-label">Übersicht</span></button>
+    <button type="button" class="dss-tab" role="tab" id="dq-b" aria-selected="false" aria-controls="dq-b-panel" tabindex="-1"><span class="dss-tab-label">Boxscore</span></button>
+  </div>
+  <div id="dq-a-panel" role="tabpanel" aria-labelledby="dq-a"><p class="panel">Zusammenfassung des Spiels.</p></div>
+  <div id="dq-b-panel" role="tabpanel" aria-labelledby="dq-b"><p class="panel">Boxscore mit allen Werten.</p></div>
 {:else if example === 'do-ansichten'}
   <div class="scroll"><Tabs items={[{ id: 'overview', label: 'Übersicht' }, { id: 'box', label: 'Boxscore' }, { id: 'pbp', label: 'Play-by-Play' }]} variant="underline" value="overview" /></div>
 {:else if example === 'dont-ansichten'}
@@ -177,6 +240,10 @@
   .cap { margin-bottom: 8px; }
   .panel { margin: 14px 0 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
   .clip { width: 100%; overflow: hidden; }
+  .narrow { box-sizing: border-box; max-width: 390px; padding: 14px; }
+  .vanilla :global([role='tabpanel']) { margin: 14px 0 0; padding: 0 2px; font-size: var(--fs-body-sm); color: var(--page-fg); }
+  .vanilla :global(.dss-tabs + [role='tabpanel']), .vanilla :global([role='tabpanel'] + .dss-tabs) { margin-top: 14px; }
+  .vanilla :global([role='tabpanel'] p) { margin: 0; }
   /* Underline und Segmented brechen nicht um: in schmalen Bereichen scrollt die Leiste hier seitlich (Innenabstand für den Fokus-Ring) */
   .scroll { overflow-x: auto; max-width: 100%; padding: 6px; margin: -6px; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }

@@ -37,6 +37,12 @@ export const Bausteine = { ...example('bausteine'), tags: ['!dev'] };
 export const Bedienung = { ...example('bedienung'), tags: ['!dev'] };
 export const Zustaende = { ...example('zustaende'), tags: ['!dev'] };
 
+// Vanilla: ausführbare Beispiele (initAll auf dem Markup aus dem Code-Beispiel) und Handy-Vorschauen (zwei verschiedene Beispiele)
+export const VanillaRegister = { ...example('vanilla'), tags: ['!dev'] };
+export const VanillaFilter   = { ...example('vanilla-filter'), tags: ['!dev'] };
+export const Handy           = { ...example('handy'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
+export const HandyDunkel     = { ...example('handy-dunkel'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
+
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAnsichten   = { ...example('do-ansichten'), tags: ['!dev'] };
 export const DontAnsichten = { ...example('dont-ansichten'), tags: ['!dev'] };
@@ -46,3 +52,5 @@ export const DoZahl        = { ...example('do-zahl'), tags: ['!dev'] };
 export const DontZahl      = { ...example('dont-zahl'), tags: ['!dev'] };
 export const DoMulti       = { ...example('do-multi'), tags: ['!dev'] };
 export const DontMulti     = { ...example('dont-multi'), tags: ['!dev'] };
+export const DoPanels      = { ...example('do-panels'), tags: ['!dev'] };
+export const DontPanels    = { ...example('dont-panels'), tags: ['!dev'] };
