@@ -65,7 +65,7 @@
 
 ## V3: Auslieferung und Abschluss
 
-**Entscheidung nötig (von dir):** Wie bezieht das Portal das Paket?
+**Entschieden am 2026-10-12: A (GitHub-Release mit `dist/vanilla`). Ab Version 1.0 wechselt die Auslieferung auf npm (B);** das Release-Skript und `portal-sync` werden so gebaut, dass der Wechsel nur die Quelle ändert (Release-Anhang → npm-Paket), nicht den Aufbau von `dist/vanilla`. Ursprüngliche Optionen:
 - **A: GitHub-Release/Tag mit `dist/vanilla`** (Tarball oder Dateien), das Portal lädt eine feste Version herunter (Skript `portal-sync`). Kein npm-Konto nötig, `dist` muss nicht im Git sein. *(meine Empfehlung)*
 - **B: npm-Paket.** Sauberste Installation, braucht Veröffentlichung und Namen.
 - **C: Git-Dependency mit `prepare`.** Bauen im Portal (braucht `tsup`/`esbuild` als Abhängigkeit, schwächer).
