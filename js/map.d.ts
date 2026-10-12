@@ -105,7 +105,7 @@ export { safeHref } from './url.js';
 /** Umschließendes Rechteck der gültigen Marker; ohne gültigen Marker `null`. */
 export function boundsOf(markers: ReadonlyArray<Pick<MapMarker, 'lat' | 'lng'>>): MapBounds | null;
 /** Marker für Liste, Platzhalter und Karte aufbereiten (ungültige entfallen). */
-export function mapItems(markers: ReadonlyArray<MapMarker>, appLinks?: ReadonlyArray<MapAppLink>): MapItem[];
+export function mapItems(markers: ReadonlyArray<MapMarker>, appLinks?: ReadonlyArray<MapAppLink>, texts?: { seat?: string }): MapItem[];
 /** Ausschnitt beim Start: Mittelpunkt und Zoom oder ein Rechteck zum Einpassen. */
 export function initialView(input: { markers?: ReadonlyArray<MapMarker>; center?: [number, number]; zoom?: number }): MapView;
 /** Lage der Marker im Platzhalter in Prozent. */
