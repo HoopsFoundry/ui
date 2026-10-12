@@ -1,0 +1,28 @@
+[[building-block-view]]
+== Bausteinsicht
+
+[cols="1,2",options="header"]
+|===
+|Baustein |Verantwortung
+|`tokens/` |Token-Ausgaben und Tailwind-Preset
+|`css/` |Gemeinsame Komponentenstile
+|`fonts/`, `icons/` |Gestaltungsassets
+|`js/` |Gemeinsame Logik und Vanilla-Verhalten
+|`react/` |React-Komponenten und Typen
+|`svelte/` |Svelte-Komponenten
+|`stories/` |Stories, MDX und Framework-Codebeispiele
+|`tests/` |Automatisierte Prüfungen
+|`scripts/` |Entwicklungs- und Prüfwerkzeuge
+|`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
+|`package.json` |Öffentliche Exports, Build-Kommandos und Abhängigkeiten
+|===
+
+=== Öffentliche Schnittstellen
+
+Öffentliche Imports folgen `package.json`, nicht internen Dateinamen. Beispiel: `./svelte/Input` verweist auf `svelte/TextInput.svelte`; das Manifest nennt die Komponente `TextInput`. Die React-Kartenkomponente wird als `MapView` geführt.
+
+Das Paritätsmanifest ist derzeit kein vollständiger API-Katalog: Zweck, Dokumentationsverweise und öffentliche Imports sollen gesondert ergänzt oder generiert werden.
+
+=== Erweiterungsregel
+
+Neue gemeinsame Logik gehört nicht in mehrere Framework-Komponenten kopiert. Ob eine Abstraktion sinnvoll ist, wird anhand tatsächlicher Wiederverwendung und unterschiedlicher Framework-Lifecycles entschieden.

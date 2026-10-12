@@ -1,0 +1,22 @@
+[[introduction-and-goals]]
+== Einführung und Ziele
+
+DSS (Digital Sports System) ist ein frameworkunabhängiges Designsystem für Basketball-Anwendungen. Es stellt Design-Tokens, gemeinsames CSS, Framework-Komponenten und wiederverwendbare JavaScript-Hilfen bereit.
+
+=== Stakeholder
+
+* Anwendungsentwickler integrieren DSS in Basketball-Anwendungen und Vereinsportale.
+* Maintainer entwickeln Komponenten und erhalten Implementierungsparität.
+* Gestalter definieren konsistente Marken-, Typografie- und Interaktionsregeln.
+* Nutzer benötigen zugängliche und verständliche Oberflächen.
+* Coding-Agents benötigen eindeutige APIs und Architekturregeln; ihre Unterstützung ist ein Ausbauziel.
+
+=== Priorisierte Qualitätsziele
+
+. Zugänglichkeit: semantische Ausgabe, Tastaturbedienung, Fokus und kontrastreiche Darstellung.
+. Konsistenz: gemeinsame Gestaltungsgrundlage und überprüfbare Parität.
+. Sicherheit und Datenschutz: sichere Ausgabe und kontrollierte externe Kartenanfragen.
+. Integrierbarkeit: klare öffentliche APIs und reproduzierbare Auslieferung.
+. Wartbarkeit: gemeinsame Logik statt unnötiger Duplikation.
+
+Qualitätsziele sind Anforderungen, keine pauschalen Konformitätsnachweise. Konkrete Prüfszenarien stehen in Kapitel 10.

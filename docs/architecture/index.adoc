@@ -1,0 +1,30 @@
+= DSS – Softwarearchitektur
+include::_attributes.adoc[]
+
+Stand: 2026-10-12. Status: Architektur-Baseline zur Prüfung.
+
+Diese Dokumentation trennt geprüfte Repository-Strukturen, dokumentierte Planstände und vorgeschlagene Erweiterungen. Sie ersetzt keine Komponentenreferenz und keinen Testbericht.
+
+include::sections/01-introduction-and-goals.adoc[]
+
+include::sections/02-constraints.adoc[]
+
+include::sections/03-context-and-scope.adoc[]
+
+include::sections/04-solution-strategy.adoc[]
+
+include::sections/05-building-block-view.adoc[]
+
+include::sections/06-runtime-view.adoc[]
+
+include::sections/07-deployment-view.adoc[]
+
+include::sections/08-crosscutting-concepts.adoc[]
+
+include::sections/09-architecture-decisions.adoc[]
+
+include::sections/10-quality-requirements.adoc[]
+
+include::sections/11-risks-and-technical-debt.adoc[]
+
+include::sections/12-glossary.adoc[]

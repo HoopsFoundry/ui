@@ -1,0 +1,21 @@
+[[context-and-scope]]
+== Kontext und Abgrenzung
+
+DSS ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
+
+[cols="1,2,2",options="header"]
+|===
+|Partner |Verantwortung des Partners |DSS-Schnittstelle
+|Anwendung |Datenbeschaffung, Authentifizierung, Speicherung und Fachprozesse |Props, öffentliche Hilfsfunktionen, CSS und Lifecycle-APIs
+|Datenanbieter |Bereitstellung von Spiel-, Team- oder Vereinsdaten |Keine vorausgesetzte direkte Integration; Anwendung normalisiert Daten
+|Karteninfrastruktur |Leaflet-Auslieferung, Kachelzugriff und Betriebsregeln |Konfigurierbare Kartenoptionen und dokumentierte Integrationsrezepte
+|Storybook-Nutzer |Auswahl und Verständnis der Komponenten |Stories, MDX, Controls und Codebeispiele
+|===
+
+=== Geplante Erweiterungen
+
+WordPress-Plugin/-Theme und Drupal-Modul/-Theme wurden als mögliche Adapter diskutiert. Diese Baseline beschreibt sie nicht als implementiert. Speicherung, Synchronisation und Berechtigungen sollen außerhalb des UI-Kerns bleiben. Die verbindliche CMS-Architektur benötigt einen eigenen Entwurf.
+
+=== Live-Daten
+
+DSS darf einen gelieferten Live-Zustand darstellen. Abrufintervalle, Quellenvalidierung und Saisonumschaltung sind Anwendungsverantwortung. Verfügbarkeit echter Live-Daten ist keine Eigenschaft der UI-Bibliothek.

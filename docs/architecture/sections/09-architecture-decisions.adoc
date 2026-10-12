@@ -1,0 +1,19 @@
+[[architecture-decisions]]
+== Architekturentscheidungen
+
+Diese erste Fassung sammelt Entscheidungen und Kandidaten. Eigenständige ADRs werden nach Prüfung ihrer Quellen ergänzt. Sie dürfen bestehende Entscheidungen nicht rückwirkend mit erfundenen Begründungen versehen.
+
+[cols="1,1,2",options="header"]
+|===
+|Thema |Status dieser Baseline |Quelle beziehungsweise nächster Schritt
+|Gemeinsames Komponenten-CSS |Bestehende Strategie |README und Komponentenstruktur; Begründung als ADR prüfen
+|Explizite Vanilla-Initialisierung und Aufräumen |Dokumentierte Entwicklungsregel |Portal-Review und Vanilla-Plan
+|GitHub-Releases, später npm |Beschlossen laut Plan |Vanilla-V2-Plan, Entscheidung vom 12. Oktober 2026
+|Protokollrelative URLs |Offen laut Plan |Lückenplan; nicht eigenmächtig entscheiden
+|Favoriten als DSS-Komponente |Offen laut Plan |Portal-Review und Lückenplan
+|PageHeader/Hero |Bedarfsabhängiger Vorschlag |Lückenplan
+|CMS-Adapter |Vorgeschlagene Erweiterung |Separater Entwurf erforderlich
+|Modulare AsciiDoc-Architektur |Für diese Dokumentation vereinbart |Umsetzung mit dieser Baseline; Build folgt
+|===
+
+ADRs sollen Kontext, Entscheidung, Status, Konsequenzen und Quellen enthalten. Ablösung einer Entscheidung erfolgt durch eine neue, verlinkte Entscheidung.

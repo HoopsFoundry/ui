@@ -1,0 +1,19 @@
+[[solution-strategy]]
+== Lösungsstrategie
+
+=== Bestehende Grundlage
+
+. Gemeinsame Tokens definieren Gestaltungswerte.
+. Gemeinsames Komponenten-CSS reduziert visuelle Unterschiede.
+. Native React- und Svelte-Komponenten binden diese Grundlage ein.
+. JavaScript-Hilfen bündeln wiederverwendbare Logik.
+. Storybook vermittelt Verwendung und Referenzzustände.
+. Tests prüfen ausgewählte Aspekte von Ausgabe, Verhalten und Parität.
+
+=== Beschlossene beziehungsweise geplante Entwicklung
+
+Der Vanilla-V2-Plan ergänzt Render- und Mount-Funktionen. Das Ziel ist Nutzung ohne Framework und ohne selbst geschriebenes Komponentenmarkup. Diese Erweiterung ist laut Plan offen und muss vor einer Zusage des Funktionsumfangs gegen Code und Exports geprüft werden.
+
+=== Vorgeschlagene Agent-Unterstützung
+
+Ein zentraler Agent-Einstieg, ein generierter Komponentenkatalog und Textdokumentation sollen vorhandene Quellen erschließen. MCP ist eine Zugriffsschicht, keine neue Quelle der Wahrheit. Framework-spezifische Fähigkeiten müssen vor Integration geprüft werden.

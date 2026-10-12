@@ -1,0 +1,26 @@
+[[runtime-view]]
+== Laufzeitsicht
+
+=== Allgemeine Komponentennutzung
+
+. Die Anwendung beschafft und normalisiert Daten.
+. Eine native Komponente erhält dokumentierte Eingaben.
+. Gemeinsame Hilfen berechnen darstellungsrelevante Werte.
+. Die Komponente gibt semantisches Markup mit DSS-Klassen aus.
+. Die Anwendung aktualisiert Eingaben bei Änderungen.
+
+=== Vanilla-Lifecycle als Architekturziel
+
+. `init*` bindet Verhalten explizit an ein Element.
+. `update` aktualisiert unterstützte Optionen beziehungsweise Inhalte.
+. `destroy` entfernt eigene Listener, Observer und Ressourcen.
+
+Die tatsächlich vorhandenen Methoden unterscheiden sich je API. Der Vanilla-V2-Plan beschreibt zusätzliche `render*`- und `mount*`-APIs; sie sind nicht pauschal als verfügbar anzusehen.
+
+=== Kartenfreigabe
+
+Für den Zwei-Klick-Modus gilt als Anforderung: Vor der Freigabe werden keine externen Kartenanfragen ausgelöst. Nach Freigabe wird die Kartenintegration gestartet. Fehler sollen einen verständlichen Status und gegebenenfalls einen erneuten Versuch ermöglichen. Retry und Speicherverhalten sind im Lückenplan noch Prüf- beziehungsweise Umsetzungsaufgaben.
+
+=== Aufräumen
+
+Wiederholtes Ein-/Aushängen darf keine komponenteneigenen Ressourcen dauerhaft zurücklassen. Ein dokumentierter Verdacht auf Speicherzuwachs der Karte ist noch widersprüchlich und benötigt reproduzierbare Messungen.

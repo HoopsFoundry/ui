@@ -1,0 +1,28 @@
+[[risks-and-technical-debt]]
+== Risiken und technische Schulden
+
+=== Quellen
+
+* `docs/superpowers/plans/2026-10-12-luecken-plan.md`
+* `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`
+* `docs/superpowers/specs/2026-10-11-portal-bausteine-review.md`
+
+Der neuere Vanilla-Plan konkretisiert den älteren Review. Aufgaben aus historischen Reviews dürfen nicht ungeprüft erneut als offen behandelt werden.
+
+=== Priorisierte Risiken
+
+. Fokusmanagement und Tastaturparität: Modal und Tabs laut Lückenplan.
+. Eingabesicherheit: URL-Regeln und künftige Renderer.
+. Karten-Lifecycle: widersprüchlicher Speicherbefund und fehlender Retry laut Plan.
+. Prüflücken: Browsermatrix, CSP und vollständige Docs-Prüfungen.
+. Auslieferung: noch nicht abgeschlossener Vanilla-Releaseprozess.
+. Dokumentationsdrift: abweichende Versionen, Begriffe und Planstände.
+. Agent-Zugriff: kein zentraler Root-Einstieg in der geprüften Struktur; Katalog noch unvollständig.
+
+=== Dokumentierter Planstand
+
+V1a ist laut Vanilla-Plan fertig und gemergt. V1b ist fertig, im Review. V2a/V2b und Abschluss sind offen. Diese Zustände sind vor Umsetzung gegen aktuellen Code, Branches und Reviews zu prüfen.
+
+=== Pflege
+
+Diese Seite ist kein zweites Aufgabenboard. Detaillierte Aufgaben bleiben in den verlinkten Plänen. Statusänderungen sollen hier nur Architekturfolgen aktualisieren. Print/PDF-Baukasten und neue Portal-Komponenten sind optionale Erweiterungen, nicht Voraussetzung für diese Baseline.

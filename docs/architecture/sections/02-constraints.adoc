@@ -1,0 +1,22 @@
+[[constraints]]
+== Randbedingungen
+
+=== Beobachteter Repository-Stand
+
+* Das Paket heißt `@bbv/dss-design-system`; die gelesene Paketversion ist `0.9.0`.
+* JavaScript-Module verwenden ESM.
+* Komponentenimplementierungen liegen in `react/` und `svelte/`.
+* Storybook verwendet `@storybook/svelte-vite`.
+* React wird mit tsup gebaut; die dokumentierte Typprüfung verwendet `react/tsconfig.json`.
+* Gemeinsame Stile liegen in `css/components.css`; Tokens in `tokens/`.
+
+=== Entwicklungsregeln aus bestehenden Plänen
+
+* Gemeinsame Fach- und Hilfslogik wiederverwenden.
+* Initialisierung und Aufräumen explizit anbieten.
+* Eingaben in Renderfunktionen als unvertrauenswürdig behandeln.
+* Änderungen mit Tests und unabhängigem Review prüfen.
+
+=== Abgrenzung
+
+Konkrete Framework- und Node-Versionen werden in `package.json` gepflegt, nicht hier dupliziert. Die Kompatibilität aller angegebenen Bereiche ist gesondert zu prüfen. Diagramm- und Dokumentationswerkzeuge sind in dieser Baseline noch nicht installiert.
