@@ -1,6 +1,6 @@
 // initPageNav unter jsdom: Aufbau, ids, Auswahl, Platzierung, Namen, Nachladen, Sprung in Bereiche, Aufräumen, Sicherheit.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { entries, initPageNav, labelOf, signature, slug } from '../js/pagenav.js';
+import { cssTime, entries, initPageNav, labelOf, signature, slug } from '../js/pagenav.js';
 import { initAccordion } from '../js/accordion.js';
 
 const mount = (html: string) => {
@@ -359,6 +359,120 @@ describe('Sprung', () => {
     document.head.append(base);
     handle = initPageNav(mount(PAGE));
     for (const a of links()) expect(a.getAttribute('href')!.startsWith(window.location.origin + '/seite#')).toBe(true);
+  });
+});
+
+describe('Sprung in Bereiche mit Höhenanimation', () => {
+  const ACC = `<main><h1>L</h1><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false"><span class="dss-acc-label">A</span></button></h3>
+    <div class="dss-acc-panel" id="a-p" hidden inert style="transition-duration: 200ms"><div class="dss-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>`;
+  const open = () => $('#a-t').addEventListener('click', () => { $('#a-p').removeAttribute('hidden'); $('#a-p').removeAttribute('inert'); $('#a-t').setAttribute('aria-expanded', 'true'); });
+  const go = () => links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+
+  it('cssTime: längste Angabe in Millisekunden', () => {
+    expect([cssTime('0.2s'), cssTime('0s, 200ms'), cssTime('0.1s, 0.3s'), cssTime(''), cssTime('x'), cssTime(undefined)]).toEqual([200, 200, 300, 0, 0, 0]);
+  });
+  it('nach transitionend wird erneut gescrollt und der Fokus gesetzt', () => {
+    mount(ACC);
+    open();
+    handle = initPageNav($('main'));
+    go();
+    const before = scrolls.length;
+    $('#a-p').dispatchEvent(new Event('transitionend'));
+    expect(scrolls.length).toBe(before + 1);
+    expect(scrolls.at(-1)!.el.id).toBe('drin');
+    expect(document.activeElement).toBe($('#drin'));
+    // ein zweites transitionend (oder der Rückfall) scrollt nicht noch einmal
+    $('#a-p').dispatchEvent(new Event('transitionend'));
+    expect(scrolls.length).toBe(before + 1);
+  });
+  it('ohne transitionend greift der Zeit-Rückfall (Dauer plus Puffer)', async () => {
+    vi.useFakeTimers();
+    mount(ACC);
+    open();
+    handle = initPageNav($('main'));
+    go();
+    await vi.advanceTimersByTimeAsync(20); // der Frame mit dem ersten Scrollen
+    const before = scrolls.length;
+    await vi.advanceTimersByTimeAsync(200);
+    expect(scrolls.length).toBe(before);
+    await vi.advanceTimersByTimeAsync(100);
+    expect(scrolls.length).toBe(before + 1);
+  });
+  it('ohne Animation (Dauer 0) oder bei reduzierter Bewegung kein zweites Scrollen', async () => {
+    vi.useFakeTimers();
+    mount(ACC.replace('transition-duration: 200ms', 'transition-duration: 0s'));
+    open();
+    handle = initPageNav($('main'));
+    go();
+    await vi.advanceTimersByTimeAsync(20);
+    const before = scrolls.length;
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(scrolls.length).toBe(before);
+    handle.destroy();
+    mount(ACC);
+    open();
+    document.documentElement.dataset.motion = 'reduce';
+    handle = initPageNav($('main'));
+    go();
+    await vi.advanceTimersByTimeAsync(20);
+    const b2 = scrolls.length;
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(scrolls.length).toBe(b2);
+  });
+  it('destroy vor dem Ablauf räumt den Zeitgeber auf', async () => {
+    vi.useFakeTimers();
+    mount(ACC);
+    open();
+    handle = initPageNav($('main'));
+    go();
+    await vi.advanceTimersByTimeAsync(20);
+    const before = scrolls.length;
+    handle.destroy();
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(scrolls.length).toBe(before);
+  });
+});
+
+describe('Beobachten: umbenannte Überschriften und Höchstwartezeit', () => {
+  it('ein geänderter Text einer Überschrift (characterData) baut die Navigation neu', async () => {
+    vi.useFakeTimers();
+    const main = mount(PAGE);
+    handle = initPageNav(main);
+    (document.getElementById('abschnitt-kader')!.firstChild as Text).data = 'Mannschaft';
+    await vi.advanceTimersByTimeAsync(300);
+    expect(links().map((a) => a.textContent)).toEqual(['Tabelle', 'Spielplan', 'Mannschaft']);
+  });
+  it('ein geändertes data-pagenav und ein neues data-pagenav-skip werden übernommen', async () => {
+    vi.useFakeTimers();
+    mount(`<main><h2>A</h2><div data-pagenav="Alt">x</div><h2>B</h2><h2>C</h2></main>`);
+    handle = initPageNav($('main'));
+    $('[data-pagenav]').setAttribute('data-pagenav', 'Neu');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(links().map((a) => a.textContent)).toEqual(['A', 'Neu', 'B', 'C']);
+    document.querySelectorAll('h2')[1].setAttribute('data-pagenav-skip', '');
+    await vi.advanceTimersByTimeAsync(300);
+    expect(links().map((a) => a.textContent)).toEqual(['A', 'Neu', 'C']);
+  });
+  it('die eigene Navigation löst keinen Neuaufbau aus (auch nicht per Textänderung darin)', async () => {
+    vi.useFakeTimers();
+    handle = initPageNav(mount(PAGE));
+    const first = nav();
+    (links()[0].firstChild as Text).data = 'Fremd';
+    await vi.advanceTimersByTimeAsync(400);
+    expect(nav()).toBe(first);
+  });
+  it('Höchstwartezeit: eine Seite, die ständig ändert, bekommt ihre Navigation nach spätestens einer Sekunde', async () => {
+    vi.useFakeTimers();
+    const main = mount(`<main><h2>A</h2><h2>B</h2><h2>C</h2></main>`);
+    handle = initPageNav(main);
+    const first = nav();
+    main.append(Object.assign(document.createElement('h2'), { textContent: 'D' }));
+    for (let i = 0; i < 12; i++) {
+      await vi.advanceTimersByTimeAsync(100);
+      main.append(document.createElement('p'));
+    }
+    expect(nav()).not.toBe(first);
+    expect(links()).toHaveLength(4);
   });
 });
 

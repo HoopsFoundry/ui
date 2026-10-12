@@ -159,6 +159,68 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
         window.requestAnimationFrame = raf;
       }
     });
+    await rule('PageNav: nach der Höhenanimation wird erneut gescrollt', () => {
+      html('<main><h1>L</h1><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false"><span class="dss-acc-label">A</span></button></h3><div class="dss-acc-panel" id="a-p" hidden inert style="transition-duration: 200ms"><div class="dss-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
+      document.getElementById('a-t')!.addEventListener('click', () => { document.getElementById('a-p')!.removeAttribute('hidden'); document.getElementById('a-p')!.removeAttribute('inert'); });
+      const h = mod.initPageNav(document.querySelector('main')!);
+      links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      const before = stub.scrolls.length;
+      document.getElementById('a-p')!.dispatchEvent(new Event('transitionend'));
+      const ok = stub.scrolls.length === before + 1 && document.activeElement?.id === 'drin';
+      h.destroy();
+      return ok;
+    });
+    await rule('PageNav: ohne Animation kein zweites Scrollen', async () => {
+      html('<main><h1>L</h1><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false"><span class="dss-acc-label">A</span></button></h3><div class="dss-acc-panel" id="a-p" hidden inert style="transition-duration: 0s"><div class="dss-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
+      document.getElementById('a-t')!.addEventListener('click', () => { document.getElementById('a-p')!.removeAttribute('hidden'); });
+      const h = mod.initPageNav(document.querySelector('main')!);
+      links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
+      const before = stub.scrolls.length;
+      document.getElementById('a-p')!.dispatchEvent(new Event('transitionend'));
+      await wait(150);
+      const ok = stub.scrolls.length === before;
+      h.destroy();
+      return ok;
+    });
+    await rule('PageNav: ein umbenannter Text (characterData) wird übernommen', async () => {
+      html(PAGE);
+      const h = mod.initPageNav(document.querySelector('main')!);
+      (document.getElementById('abschnitt-kader')!.firstChild as Text).data = 'Mannschaft';
+      await wait(260);
+      const ok = links().map((a) => a.textContent).join() === 'Größe,Spielplan,Mannschaft';
+      h.destroy();
+      return ok;
+    });
+    await rule('PageNav: geändertes data-pagenav wird übernommen', async () => {
+      html('<main><h2>A</h2><div data-pagenav="Alt">x</div><h2>B</h2><h2>C</h2></main>');
+      const h = mod.initPageNav(document.querySelector('main')!);
+      document.querySelector('[data-pagenav]')!.setAttribute('data-pagenav', 'Neu');
+      await wait(260);
+      const ok = links().map((a) => a.textContent).join() === 'A,Neu,B,C';
+      h.destroy();
+      return ok;
+    });
+    await rule('PageNav: die eigene Navigation löst keinen Neuaufbau aus', async () => {
+      html(PAGE);
+      const h = mod.initPageNav(document.querySelector('main')!);
+      const first = document.querySelector('nav.dss-pagenav');
+      (links()[0].firstChild as Text).data = 'Fremd';
+      await wait(300);
+      const ok = document.querySelector('nav.dss-pagenav') === first;
+      h.destroy();
+      return ok;
+    });
+    await rule('PageNav: Höchstwartezeit des Beobachters', async () => {
+      html('<main><h2>A</h2><h2>B</h2><h2>C</h2></main>');
+      const main = document.querySelector('main')!;
+      const h = mod.initPageNav(main);
+      main.append(Object.assign(document.createElement('h2'), { textContent: 'D' }));
+      // alle 100 ms eine Änderung: ohne Höchstwartezeit käme der Neuaufbau nie
+      for (let i = 0; i < 12; i++) { await wait(100); main.append(document.createElement('p')); }
+      const ok = links().length === 4;
+      h.destroy();
+      return ok;
+    });
     await rule('PageNav: Klick mit Strg bleibt dem Browser', () => {
       html(PAGE);
       const h = mod.initPageNav(document.querySelector('main')!);

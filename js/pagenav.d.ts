@@ -24,6 +24,8 @@ export interface PageNavEntry {
 }
 
 export const MIN_HEADINGS: number;
+/** Dauer einer CSS-Zeitangabe (`0.2s, 0s`) in Millisekunden, die längste Angabe; ungültig ergibt 0. */
+export function cssTime(value: unknown): number;
 /** Id-Teil aus einem Text (Umlaute aufgelöst); nie leer. */
 export function slug(text: unknown): string;
 /** `data-pagenav` oder der Text des Ziels, Leerraum zusammengefasst. */

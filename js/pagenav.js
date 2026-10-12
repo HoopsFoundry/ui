@@ -13,7 +13,7 @@ import { reducedMotion } from './motion.js';
 
 /** Mindestzahl der Einträge, ab der die Navigation erscheint. */
 export const MIN_HEADINGS = 3;
-const DEFAULTS = { selector: 'h2, [data-pagenav]', skipAttribute: 'data-pagenav-skip', label: 'Auf dieser Seite', debounce: 150 };
+const DEFAULTS = { selector: 'h2, [data-pagenav]', skipAttribute: 'data-pagenav-skip', label: 'Auf dieser Seite', debounce: 150, maxWait: 1000 };
 const registry = createRegistry();
 let uid = 0;
 
@@ -76,6 +76,17 @@ const isSkipped = (el, root, attr) => {
   return false;
 };
 
+/** Dauer einer CSS-Zeitangabe wie `0.2s, 0s` in Millisekunden (die längste Angabe); ungültig ergibt 0. */
+export function cssTime(value) {
+  const parts = String(value ?? '').split(',').map((part) => {
+    const text = part.trim();
+    const n = parseFloat(text);
+    if (!Number.isFinite(n)) return 0;
+    return text.endsWith('ms') ? n : text.endsWith('s') ? n * 1000 : 0;
+  });
+  return Math.max(0, ...parts);
+}
+
 /**
  * Seitennavigation für `root` (Standard-Auswahl: `h2` und `[data-pagenav]` darin).
  * Optionen: `selector` (CSS-Auswahl der Ziele), `container` (Element oder Auswahl, in das die Navigation vor den ersten Block mit einem Ziel
@@ -118,6 +129,33 @@ export function initPageNav(root, options = {}) {
 
   const taken = () => new Set([...doc.querySelectorAll('[id]')].map((el) => el.id));
 
+  // Ein Bereich klappt mit einer Höhenanimation auf (Svelte, React): das Ziel wandert, während sie läuft. Nach `transitionend` des Bereichs, spätestens
+  // nach Dauer und Verzögerung plus Puffer, wird noch einmal gescrollt und der Fokus gesetzt. Ohne Animation (reduzierte Bewegung, Vanilla) entfällt das.
+  const settle = (target, focusIt) => {
+    const panels = [];
+    for (let el = target.parentElement?.closest('.dss-acc-panel'); el; el = el.parentElement?.closest('.dss-acc-panel')) panels.push(el);
+    let wait = 0;
+    for (const panel of panels) {
+      for (const el of [panel, panel.firstElementChild].filter(Boolean)) {
+        const cs = win.getComputedStyle(el);
+        wait = Math.max(wait, cssTime(cs.transitionDuration) + cssTime(cs.transitionDelay));
+      }
+    }
+    if (!wait || reducedMotion()) return;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      win.clearTimeout(fallback);
+      panels[0].removeEventListener('transitionend', finish);
+      scrollToElement(target, { behavior: 'auto' });
+      focusIt();
+    };
+    const fallback = win.setTimeout(finish, wait + 80);
+    panels[0].addEventListener('transitionend', finish);
+    cleanups.add(() => { done = true; win.clearTimeout(fallback); panels[0].removeEventListener('transitionend', finish); });
+  };
+
   const goTo = (target) => {
     const opened = revealAround(target);
     if (!target.hasAttribute('tabindex')) {
@@ -127,6 +165,7 @@ export function initPageNav(root, options = {}) {
     scrollToElement(target, { behavior: opened || reducedMotion() ? 'auto' : 'smooth' });
     const focusIt = () => target.focus({ preventScroll: true });
     focusIt();
+    if (opened) settle(target, focusIt);
     // Ein gerade geöffneter Bereich (Svelte, React) übernimmt seinen Zustand erst nach dem Klick: solange er noch inert ist, nimmt das Ziel den
     // Fokus nicht an. Dann ein zweiter Versuch im nächsten Frame.
     if (doc.activeElement !== target && typeof win.requestAnimationFrame === 'function') win.requestAnimationFrame(focusIt);
@@ -222,14 +261,25 @@ export function initPageNav(root, options = {}) {
   cleanups.add(listen(win, 'hashchange', reveal));
 
   if (observe && typeof win.MutationObserver === 'function') {
+    const own = (node) => node === nav || (nav && nav.contains(node));
+    // Änderungen an der eigenen Navigation lösen keinen Neuaufbau aus
+    const foreign = (r) => {
+      if (own(r.target)) return false;
+      if (r.type !== 'childList') return true;
+      const nodes = [...r.addedNodes, ...r.removedNodes];
+      return nodes.length === 0 || !nodes.every((n) => n.nodeType === 1 && n.classList?.contains('dss-pagenav'));
+    };
+    let pendingSince = 0;
     const observer = new win.MutationObserver((records) => {
-      // Änderungen an der eigenen Navigation lösen keinen Neuaufbau aus
-      const own = (node) => node === nav || (nav && nav.contains(node));
-      if (records.every((r) => own(r.target) || [...r.addedNodes, ...r.removedNodes].every((n) => n.nodeType === 1 && n.classList?.contains('dss-pagenav')))) return;
+      if (!records.some(foreign)) return;
+      const now = Date.now();
+      if (!pendingSince) pendingSince = now;
       win.clearTimeout(timer);
-      timer = win.setTimeout(refresh, DEFAULTS.debounce);
+      // Entprellt, aber nie länger als maxWait: eine Seite, die ständig ändert, bekommt trotzdem ihre Navigation
+      const wait = Math.max(0, Math.min(DEFAULTS.debounce, pendingSince + DEFAULTS.maxWait - now));
+      timer = win.setTimeout(() => { pendingSince = 0; refresh(); }, wait);
     });
-    observer.observe(root, { childList: true, subtree: true });
+    observer.observe(root, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ['data-pagenav', skipAttribute] });
     cleanups.add(() => {
       observer.disconnect();
       win.clearTimeout(timer);
