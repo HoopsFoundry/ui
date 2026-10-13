@@ -148,6 +148,27 @@ describe('Beispielseite ohne Build', () => {
   });
 });
 
+describe('Kopierliste gegen die statischen Importe der Bündel', () => {
+  const copied = new Set([...code.kopieren.matchAll(/^cp (?:-r )?node_modules\/\S*\/(\S+)\s/gm)].map((m) => m[1]));
+  it('jede statisch importierte Datei der kopierten Bündel steht in der Liste (kein 404 beim Laden)', () => {
+    const bundles = ['dss-map.min.js', 'dss-render.min.js'].filter((name) => copied.has(name));
+    expect(bundles).toEqual(['dss-map.min.js', 'dss-render.min.js']);
+    for (const name of ['dss-map', 'dss-render', 'dss'].flatMap((n) => [`${n}.js`, `${n}.min.js`])) {
+      const text = readFileSync(`${bundleDir}${name}`, 'utf8');
+      const imports = [...text.matchAll(/(?:^|[;}\s])(?:import|export)\s*(?:[^'";]*?\s*from\s*)?["'](\.{1,2}\/[^"']+)["']/g)].map((m) => m[1].replace(/^\.\//, ''));
+      for (const file of imports) {
+        expect(existsSync(`${bundleDir}${file}`), `${name} importiert ${file}`).toBe(true);
+        if (bundles.includes(name)) expect(copied.has(file), `${name} importiert ${file}, die Kopierliste nennt sie nicht`).toBe(true);
+      }
+    }
+    expect(copied.has('dss.min.js')).toBe(true);
+  });
+  it('die Dokumentation nennt die Abhängigkeit (Map und Foundation/Vanilla)', () => {
+    expect(read('stories/Map.mdx')).toContain('importiert statisch `./dss.min.js`');
+    expect(read('stories/Foundation/Vanilla.mdx')).toContain('importiert `dss-render.min.js` statisch `./dss.min.js`');
+  });
+});
+
 describe('Beispiel Hallenkarte vom Server', () => {
   it('renderVenueCard mit init: true trägt data-dss und Optionen; initAll mit initMapBlock macht sie lebendig', async () => {
     expect(hallenKarteServer).toContain('{ init: true }');

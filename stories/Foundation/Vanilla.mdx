@@ -182,7 +182,7 @@ Die Option `loadLeaflet` (Funktion, die ein Promise mit Leaflet liefert) ersetzt
   ]}
 />
 
-Das Bündel steht allein (es braucht weder `dss.js` noch `dss-render.js`); `mountVenueCard` aus `dss-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
+Das Bündel steht allein (es braucht weder `dss.js` noch `dss-render.js`); umgekehrt importiert `dss-render.min.js` statisch `./dss.min.js` (und `dss-render.js` das `./dss.js`), also gehören beide Dateien in denselben Ordner; `mountVenueCard` aus `dss-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
 
 ## Sicherheit
 

@@ -148,13 +148,15 @@ export const globalVariante = `<!-- Variante 3: das klassische leaflet.js (UMD, 
 </script>`;
 
 export const kopieren = `# Einmal beim Bau der Seite (oder per portal-sync.mjs, siehe Foundation/Vanilla): die Dateien liegen danach im eigenen Projekt
-cp -r node_modules/@bbv/dss-design-system/dist/vanilla/dss.css            _site/dss/
-cp    node_modules/@bbv/dss-design-system/dist/vanilla/dss-map.min.js     _site/dss/
-cp    node_modules/@bbv/dss-design-system/dist/vanilla/dss-render.min.js  _site/dss/   # nur für die Hallenkarte aus Daten
-cp    node_modules/leaflet/dist/leaflet.css                                _site/vendor/leaflet/
-cp    node_modules/leaflet/dist/leaflet-src.esm.js                         _site/vendor/leaflet/   # als ES-Modul (Variante 1 und 2)
-cp    node_modules/leaflet/dist/leaflet.js                                 _site/vendor/leaflet/   # nur für Variante 3 (window.L)
-cp -r node_modules/leaflet/dist/images                                     _site/vendor/leaflet/   # nur, wenn du Leaflets eigene Bilder brauchst (die Marker der Karte sind SVG)`;
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss.css            _site/dss/
+cp -r node_modules/@bbv/dss-design-system/dist/vanilla/courtlines      _site/dss/                # nur, wenn deine Seiten die Court-Linien nutzen
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss-map.min.js     _site/dss/
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss-render.min.js  _site/dss/                # nur für die Hallenkarte aus Daten ...
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss.min.js         _site/dss/                # ... und der Kern, den dss-render.min.js einbindet (sonst 404)
+cp node_modules/leaflet/dist/leaflet.css                                _site/vendor/leaflet/
+cp node_modules/leaflet/dist/leaflet-src.esm.js                         _site/vendor/leaflet/   # als ES-Modul (Variante 1 und 2)
+cp node_modules/leaflet/dist/leaflet.js                                 _site/vendor/leaflet/   # nur für Variante 3 (window.L)
+cp -r node_modules/leaflet/dist/images                                  _site/vendor/leaflet/   # nur, wenn du Leaflets eigene Bilder brauchst (die Marker der Karte sind SVG)`;
 
 
 export const svelte = `<script lang="ts">

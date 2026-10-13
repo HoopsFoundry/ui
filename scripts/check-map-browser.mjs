@@ -14,7 +14,7 @@
  * bei jedem Fehlschlag. Läuft nicht unter `npm test` (braucht Browser).
  */
 import { createServer } from 'node:http';
-import { readFile, mkdtemp, rm, mkdir, writeFile } from 'node:fs/promises';
+import { readFile, mkdtemp, rm, mkdir, writeFile, cp } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { extname, join, normalize } from 'node:path';
@@ -163,6 +163,27 @@ mountVenueCard(document.getElementById('v'), { name: 'Sporthalle Nordhain', lat:
 window.__ready = true;
 `;
 
+const pageTwice = () => `${head()}<main><h1>Zweimal init</h1><section aria-labelledby="a1"><h2 id="a1">Karte</h2><div id="m">${renderMap({ label: 'Karte zweimal', markers: [HALLEN[1]], tileUrl: '/tiles/{z}/{x}/{y}.png' }, { uid: 'tw1' })}</div></section>
+<section aria-labelledby="a2"><h2 id="a2">Hallenkarte</h2><div id="v">${renderVenueCard(HALLE, { init: true, uid: 'tw2' })}</div></section></main>
+<script type="module" src="/t/twice.js"></script></body></html>`;
+const twiceScript = `import { initAll } from '/dss/dss.min.js';
+import { initMap, initMapBlock } from '/dss/dss-map.min.js';
+const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
+const opts = { markers: ${JSON.stringify([HALLEN[1]])}, tileUrl: '/tiles/{z}/{x}/{y}.png', loadLeaflet };
+initMap(document.getElementById('m'), opts);
+initMap(document.getElementById('m'), opts);
+initAll(document, { map: { start: initMapBlock, loadLeaflet } });
+initAll(document, { map: { start: initMapBlock, loadLeaflet } });
+window.__ready = true;
+`;
+const pagePartial = () => `${head()}<main><h1>update mit Teilen</h1><div id="k"></div></main><script type="module" src="/t/partial.js"></script></body></html>`;
+const partialScript = `import { mountMap } from '/dss/dss-map.min.js';
+const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
+const handle = mountMap(document.getElementById('k'), { label: 'Karte', markers: ${JSON.stringify(HALLEN)}, tileUrl: '/tiles/{z}/{x}/{y}.png', load: 'auto' }, { loadLeaflet });
+window.__update = (partial) => handle.update(partial);
+window.__ready = true;
+`;
+
 /** React-Fassung derselben Karte (Vergleich der Rechtecke und Stile). */
 const pageReact = () => `${head()}<main><h1>React</h1><div id="root"></div></main><script type="module" src="/react-map.js"></script></body></html>`;
 const pageVanillaSame = (extra = '') => `${head()}<main><h1>Vanilla</h1><div id="root"></div></main><script type="module">
@@ -178,7 +199,7 @@ async function startServer({ dist, reactJs }) {
   const counts = { tiles: 0, requests: [] };
   const pages = {
     '/t/many': pageMany(), '/t/importmap': pageLoader('importmap'), '/t/global': pageLoader('global'), '/t/lader404': pageLoader('lader404'),
-    '/t/kachel404': pageLoader('kachel404'), '/t/cycle': pageCycle(), '/t/react': pageReact(), '/t/vanilla': pageVanillaSame(), '/t/initall': pageInitAll(), '/t/csp': pageCsp(),
+    '/t/kachel404': pageLoader('kachel404'), '/t/cycle': pageCycle(), '/t/react': pageReact(), '/t/vanilla': pageVanillaSame(), '/t/initall': pageInitAll(), '/t/csp': pageCsp(), '/t/twice': pageTwice(), '/t/partial': pagePartial(),
   };
   const server = createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
@@ -192,6 +213,8 @@ async function startServer({ dist, reactJs }) {
     if (path.startsWith('/tiles-fehlt/')) return send(404, 'nicht da');
     if (path === '/t/initall.js') return send(200, initAllScript, TYPES['.js']);
     if (path === '/t/csp.js') return send(200, cspScript, TYPES['.js']);
+    if (path === '/t/twice.js') return send(200, twiceScript, TYPES['.js']);
+    if (path === '/t/partial.js') return send(200, partialScript, TYPES['.js']);
     if (pages[path]) {
       // /t/initall: strenge Content-Security-Policy (kein unsafe-inline bei style-src); der Inline-Hörer im Kopf braucht script-src 'unsafe-inline'
       const csp = path === '/t/initall' || path === '/t/csp' ? { 'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:" } : {};
@@ -462,6 +485,87 @@ async function checkInitAll(ctx, origin, browserName) {
   await strict.close();
 }
 
+/**
+ * Frisches Projekt: nur die Dateien der Kopierliste aus der Doku (`kopieren` in stories/Map.code.ts) landen in einem leeren `_site`; die Beispielseite
+ * läuft daraus (kein Zugriff auf dist oder node_modules). Jeder 404 oder Konsolenfehler ist ein Befund (z. B. fehlendes dss.min.js für dss-render.min.js).
+ */
+async function checkFresh(ctx, dist, browserName) {
+  const site = await mkdtemp(join(tmpdir(), 'dss-fresh-'));
+  const source = await readFile(join(ROOT, 'stories/Map.code.ts'), 'utf8');
+  const list = source.match(/export const kopieren = `([\s\S]*?)`;/)[1];
+  const copied = [];
+  for (const line of list.split('\n')) {
+    const m = line.match(/^cp (?:-r )?(\S+)\s+(_site\/\S+)/);
+    if (!m) continue;
+    const from = m[1].replace('node_modules/@bbv/dss-design-system/dist/vanilla/', `${dist}/`).replace('node_modules/', `${ROOT}node_modules/`);
+    const to = join(site, m[2].replace(/^_site\//, ''));
+    await mkdir(to.endsWith('/') ? to : join(to, '..'), { recursive: true });
+    await cp(from, to.endsWith('/') ? join(to, from.split('/').pop()) : to, { recursive: true });
+    copied.push(from.split('/').pop());
+  }
+  await writeFile(join(site, 'index.html'), await readFile(join(ROOT, 'stories/examples/karte-ohne-build/index.html')));
+  const demo = await readFile(join(ROOT, 'stories/assets/tiles/demo.png'));
+  const misses = [];
+  const server = createServer(async (req, res) => {
+    const path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname));
+    if (path.startsWith('/tiles/')) { res.writeHead(200, { 'content-type': 'image/png' }); return res.end(demo); }
+    const file = join(site, path === '/' ? 'index.html' : path);
+    if (!file.startsWith(site) || !existsSync(file) || !extname(file)) { misses.push(path); res.writeHead(404).end(); return; }
+    res.writeHead(200, { 'content-type': TYPES[extname(file)] ?? 'application/octet-stream' });
+    res.end(await readFile(file));
+  });
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto(`http://127.0.0.1:${server.address().port}/`, { waitUntil: 'networkidle' });
+  await waitFor(() => stateOf(page, '#karte .dss-map'), 'Platzhalter');
+  await page.click('#karte .dss-map-load');
+  await page.click('#halle .dss-map-load');
+  await waitFor(async () => (await stateOf(page, '#karte .dss-map')) === 'ready' && (await stateOf(page, '#halle .dss-map')) === 'ready', 'beide Karten bereit');
+  const live = await page.evaluate(() => document.querySelectorAll('.leaflet-container').length);
+  record(`${browserName} · frisches Projekt (nur Dateien der Kopierliste): kein 404, beide Karten lebendig`, misses.length === 0 && errors.length === 0 && live === 2 && copied.includes('dss.min.js'), { misses, errors, live, copied });
+  await page.close();
+  server.close();
+  await rm(site, { recursive: true, force: true });
+}
+
+/** Zweimal init auf demselben Server-Markup (initMap und initAll): die Karte entsteht im sichtbaren DOM, der Button ist bedienbar. */
+async function checkTwice(ctx, origin, browserName) {
+  const page = await ctx.newPage();
+  await page.goto(`${origin}/t/twice`, { waitUntil: 'networkidle' });
+  await waitFor(() => page.evaluate(() => window.__ready), 'Seite');
+  const before = await page.evaluate(() => [...document.querySelectorAll('.dss-map-load')].map((b) => b.disabled));
+  for (const btn of await page.$$('.dss-map-load')) await btn.click();
+  await waitFor(async () => (await page.evaluate(() => [...document.querySelectorAll('.dss-map')].every((m) => m.getAttribute('data-state') === 'ready'))), 'beide bereit');
+  const live = await page.evaluate(() => ({
+    containers: document.querySelectorAll('.leaflet-container').length,
+    inDoc: [...document.querySelectorAll('.dss-map-canvas')].map((c) => c.classList.contains('leaflet-container') && c.isConnected && c.clientHeight > 100),
+    tiles: document.querySelectorAll('.leaflet-tile-loaded').length,
+  }));
+  record(`${browserName} · zweimal init (initMap und initAll) auf Server-Markup: Schaltflächen bedienbar, Karten lebendig im Dokument`, before.every((d) => d === false) && live.containers === 2 && live.inDoc.every(Boolean) && live.tiles > 0, { before, live });
+  await page.close();
+}
+
+/** update mit Teilen: Proxy-tileUrl bleibt, es gibt keine Anfrage an den Standardserver (eine Route fängt tile.openstreetmap.org ab und zählt). */
+async function checkPartialUpdate(ctx, origin, browserName) {
+  const page = await ctx.newPage();
+  const osm = [];
+  await page.route('**/*', (route) => {
+    const url = route.request().url();
+    if (url.includes('tile.openstreetmap.org')) { osm.push(url); return route.abort(); }
+    return route.continue();
+  });
+  await page.goto(`${origin}/t/partial`, { waitUntil: 'networkidle' });
+  await waitFor(() => page.evaluate(() => window.__ready), 'Seite');
+  await waitFor(async () => (await stateOf(page)) === 'ready', 'bereit');
+  await page.evaluate(() => window.__update({ label: 'Nur der Name ändert sich' }));
+  await sleep(600);
+  const info = await page.evaluate(() => ({ label: document.querySelector('[role=region]').getAttribute('aria-label'), markers: document.querySelectorAll('.leaflet-marker-icon').length, state: document.querySelector('.dss-map').getAttribute('data-state') }));
+  record(`${browserName} · update({ label }) mit Proxy-tileUrl: keine Anfrage an tile.openstreetmap.org, Marker und Karte bleiben`, osm.length === 0 && info.markers === 3 && info.state === 'ready' && info.label === 'Nur der Name ändert sich', { osm, info });
+  await page.close();
+}
+
 async function checkLoaders(ctx, origin, browserName) {
   for (const variant of ['importmap', 'global']) {
     const page = await ctx.newPage();
@@ -622,6 +726,9 @@ try {
       if (wants('keyboard')) await checkKeyboard(ctx, started.origin, name);
       if (wants('many')) await checkMany(ctx, started.origin, name);
       if (wants('initall')) await checkInitAll(ctx, started.origin, name);
+      if (wants('twice')) await checkTwice(ctx, started.origin, name);
+      if (wants('partial')) await checkPartialUpdate(ctx, started.origin, name);
+      if (wants('fresh')) await checkFresh(ctx, dist, name);
       if (wants('loaders')) await checkLoaders(ctx, started.origin, name);
       if (wants('cycles') && name === 'chromium') await checkCycles(ctx, started.origin, name);
       await ctx.close();

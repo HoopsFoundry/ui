@@ -271,6 +271,8 @@ Eine Seite ohne Bundler und ohne Framework kann die Karte vollständig betreiben
 
 <CodeBlock label="Dateien ins Projekt kopieren" language="Shell" code={kopieren} />
 
+**Abhängigkeiten der Bündel:** `dss-map.min.js` steht allein (Leaflet kommt zur Laufzeit über `loadLeaflet`). `dss-render.min.js` importiert statisch `./dss.min.js` aus demselben Ordner: wer die Hallenkarte aus Daten nutzt, kopiert beide, sonst meldet der Browser einen 404 und das Modul lädt nicht. Ein Test gleicht die Liste gegen die statischen Importe aller Bündel ab.
+
 Die Dateien kommen aus `@bbv/dss-design-system/vanilla-map` (`dist/vanilla/dss-map.min.js`, Quellkarte daneben) und aus dem Leaflet-Paket (BSD-2-Clause, siehe oben). `dss.css` und `leaflet.css` binden die Seiten per `<link>` ein; die Optik von Zoom, Marker, Quellenangabe und Platzhalter liefert `dss.css`, Layout und Gesten liefert `leaflet.css`.
 
 ### Drei Wege, Leaflet zu laden
