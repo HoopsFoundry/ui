@@ -47,22 +47,37 @@ export function listen(target, type, handler, options) {
 
 /**
  * Register je Baustein: `claim(key, handle)` baut eine frühere Fassung für denselben Schlüssel (Wurzel) ab und merkt sich die neue;
- * nach `destroy()` des Handles ist der Schlüssel wieder frei.
+ * nach `destroy()` des Handles ist der Schlüssel wieder frei. Mit einem `name` teilen sich alle Kopien dieses Moduls auf der Seite
+ * (zwei gebündelte `dss.js`, ein Bündel plus Einzelmodul) ein Register unter `Symbol.for('dss.registry')`; so ersetzt ein zweites `init`
+ * auch dann das erste, wenn es aus einer anderen Kopie kommt. Ohne `name` ist das Register privat.
  */
-export function createRegistry() {
-  const map = new WeakMap();
+const GLOBAL_KEY = Symbol.for('dss.registry');
+export function createRegistry(name) {
+  let map = null;
+  // lazy: beim Import wird nichts auf globalThis geschrieben (sideEffects: false)
+  const weak = () => {
+    if (map) return map;
+    if (typeof name === 'string' && name) {
+      const store = (globalThis[GLOBAL_KEY] ??= new Map());
+      map = store.get(name);
+      if (!map) store.set(name, (map = new WeakMap()));
+    } else {
+      map = new WeakMap();
+    }
+    return map;
+  };
   return {
     /** Baut eine frühere Fassung für `key` ab (vor dem Aufbau der neuen aufrufen). */
     release(key) {
-      map.get(key)?.destroy();
+      weak().get(key)?.destroy();
     },
     /** Merkt `handle` für `key` und gibt ein Handle zurück, das sich beim Abbau selbst austrägt. */
     claim(key, destroy) {
       const handle = createHandle(() => {
         destroy();
-        if (map.get(key) === handle) map.delete(key);
+        if (weak().get(key) === handle) weak().delete(key);
       });
-      map.set(key, handle);
+      weak().set(key, handle);
       return handle;
     },
   };
@@ -71,4 +86,18 @@ export function createRegistry() {
 /** Das Handle eines Bausteins, der nichts tun konnte (keine Wurzel, kein Browser). */
 export function emptyHandle() {
   return createHandle(null);
+}
+
+/**
+ * Merkt die Attribute `names` von `el` und gibt die Funktion zurück, die sie wiederherstellt: gesetzte Werte kommen zurück,
+ * damals fehlende Attribute werden wieder entfernt. So räumt `destroy()` Markup auf, das ein Baustein verändert hat.
+ */
+export function snapshotAttributes(el, names) {
+  const before = names.map((name) => [name, el.hasAttribute(name) ? el.getAttribute(name) : null]);
+  return () => {
+    for (const [name, value] of before) {
+      if (value === null) el.removeAttribute(name);
+      else if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+    }
+  };
 }

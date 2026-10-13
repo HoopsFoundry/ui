@@ -111,8 +111,24 @@
     "./lifecycle.js": {
       "types": "./js/lifecycle.d.ts",
       "import": "./js/lifecycle.js"
-    }
+    },
+    "./tabs.js": {
+      "types": "./js/tabs.d.ts",
+      "import": "./js/tabs.js"
+    },
+    "./modal.js": {
+      "types": "./js/modal.d.ts",
+      "import": "./js/modal.js"
+    },
+    "./vanilla": {
+      "types": "./dist/vanilla/dss.d.ts",
+      "import": "./dist/vanilla/dss.js"
+    },
+    "./vanilla/*": "./dist/vanilla/*"
   },
+  "sideEffects": [
+    "**/*.css"
+  ],
   "files": [
     "tokens/",
     "css/",
@@ -133,7 +149,9 @@
     "build-storybook": "storybook build",
     "build:react": "tsup",
     "typecheck": "tsc -p react/tsconfig.json --noEmit",
-    "prepare": "npm run build:react"
+    "prepare": "npm run build",
+    "build:vanilla": "node scripts/build-vanilla.mjs",
+    "build": "npm run build:react && npm run build:vanilla"
   },
   "keywords": [
     "design-system",
@@ -155,8 +173,8 @@
   "peerDependencies": {
     "@radix-ui/react-dialog": "^1.1.0",
     "leaflet": "^1.9.0",
-    "react": "^18.0.0",
-    "react-dom": "^18.0.0",
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
     "svelte": "^5.20.0",
     "tailwindcss": "^3.4.0 || ^4.0.0"
   },

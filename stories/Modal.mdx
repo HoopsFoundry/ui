@@ -61,21 +61,23 @@ Das Modal ist ein Dialog (`role="dialog"`, `aria-modal="true"`), der Titel benen
 
 <Canvas of={ModalStories.Interaktiv} />
 
-Wie viel Fokusverhalten die Komponente selbst übernimmt, hängt von der Fassung ab:
+Wie viel Fokusverhalten das Modal selbst übernimmt, hängt von der Fassung ab. Die Vanilla-Fassung (`initModal`, Abschnitt unten) macht alles, was die Tabelle aufführt:
 
 <DocTable
   label="Verhalten je Fassung"
-  head={['Verhalten', 'Svelte', 'React (Radix Dialog)']}
+  head={['Verhalten', 'Svelte', 'React (Radix Dialog)', 'Vanilla (initModal)']}
   rows={[
-    ['Escape schließt', 'Ja, nur mit closable', 'Ja, nur mit closable'],
-    ['Klick auf den Hintergrund schließt', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit closable und dismissOnBackdrop ja'],
-    ['Fokus beim Öffnen', 'Nein: der Fokus bleibt auf dem Auslöser hinter dem Modal', 'Ja, in das Modal'],
-    ['Tab bleibt im Modal', 'Nein: Tab erreicht auch die Seite dahinter', 'Ja (Fokusfalle)'],
-    ['Fokus beim Schließen', 'Nein: du setzt ihn selbst zurück', 'Nein: die Komponente hat keinen Radix-Trigger, der Fokus fällt auf body, du setzt ihn selbst zurück'],
+    ['Escape schließt', 'Ja, nur mit closable', 'Ja, nur mit closable', 'Ja, außer closable: false'],
+    ['Klick auf den Hintergrund schließt', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit dismissOnBackdrop ja, nicht bei Mausdruck im Modal und Loslassen außen'],
+    ['Fokus beim Öffnen', 'Nein: der Fokus bleibt auf dem Auslöser hinter dem Modal', 'Ja, in das Modal', 'Ja: data-dss-modal-focus, sonst die Fläche'],
+    ['Tab bleibt im Modal', 'Nein: Tab erreicht auch die Seite dahinter', 'Ja (Fokusfalle)', 'Ja (Fokusfalle, auch Umschalt+Tab; Tab läuft in jedem Browser über das Modal)'],
+    ['Fokus beim Schließen', 'Nein: du setzt ihn selbst zurück', 'Nein: die Komponente hat keinen Radix-Trigger, der Fokus fällt auf body, du setzt ihn selbst zurück', 'Ja, an den Auslöser (oder das zuvor fokussierte Element)'],
+    ['Seite dahinter', 'Bleibt bedienbar und lesbar', 'Wird abgeschaltet (Radix)', 'Abgeschaltet: natives dialog oder inert'],
+    ['Scrollen der Seite', 'Nicht gesperrt', 'Gesperrt (Radix)', 'Gesperrt, beim Schließen zurückgebaut'],
   ]}
 />
 
-Den Fokus beim Schließen gibt keine der beiden Fassungen zurück: Merke dir den Auslöser und fokussiere ihn nach dem Schließen selbst. In der Svelte-Fassung setzt du außerdem den Fokus beim Öffnen in das Modal (z. B. auf die Hauptaktion). In reinem HTML gilt alles aus der Tabelle selbst.
+Die Svelte-Fassung und die React-Fassung geben den Fokus beim Schließen nicht zurück: Merke dir den Auslöser und fokussiere ihn nach dem Schließen selbst. In der Svelte-Fassung setzt du außerdem den Fokus beim Öffnen in das Modal (z. B. auf die Hauptaktion). Das sind bekannte Lücken dieser Fassungen, kein Verhalten, das für Vanilla gilt; sie bleiben vorerst, wie sie sind (siehe CHANGELOG).
 
 ## Zustände: Schließen und Aktionen
 
@@ -85,9 +87,62 @@ Der Schließen-Button hat bei Hover einen Linienton als Hintergrund und bei Tast
 
 Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeugleiste **Zustand** auf Hover, Fokus oder Aktiv schalten. Marke und Hell/Dunkel in der Werkzeugleiste umschalten.
 
+## Ohne Framework: initModal
+
+Für statische Seiten gibt es das Modal als Funktion: `initModal(element, options)` macht ein vorhandenes `dss-modal` bedienbar, `initAll` startet jedes Element mit `data-dss="modal"`, `openModal(element)` und `closeModal(element)` öffnen und schließen es aus dem Code. Es gibt zwei Wege im Markup, beide mit denselben Klassen wie die Komponenten:
+
+- **Natives `<dialog class="dss-modal-dialog">`** (empfohlen): `showModal()` stellt es in die oberste Ebene, schaltet die Seite dahinter ab und zeichnet den Hintergrund (`::backdrop`, Abdunklung und Unschärfe wie `dss-backdrop`). Die Fläche füllt das Fenster wie `dss-modal-wrap`; ein Klick daneben trifft das Dialog selbst.
+- **Markup ohne `<dialog>`**: ein Element mit `hidden`, das `dss-backdrop` und `dss-modal-wrap` enthält. Das Skript ergänzt `role="dialog"` und `aria-modal="true"` (falls sie fehlen), macht die Geschwister des Modals `inert` und schaltet `hidden` um. Dasselbe gilt für ein `<dialog>` in einem Browser ohne `showModal`.
+
+Probiere beide aus. Das Dialog öffnet sich über die ganze Seite, das zweite innerhalb des Rahmens:
+
+<Canvas of={ModalStories.VanillaDialog} />
+
+<Canvas of={ModalStories.VanillaDiv} />
+
+<DocTable
+  label="Auslöser, Optionen und Ereignisse"
+  head={['Teil', 'Wirkung']}
+  rows={[
+    [<code>data-dss-modal-open="id"</code>, 'An jedem Element der Seite: öffnet das Modal mit dieser id; der Fokus kehrt zu diesem Element zurück. Ein Auslöser mit unbekannter id tut nichts.'],
+    [<code>data-dss-modal-close</code>, <>Im Modal: schließt es, auch bei <code>closable: false</code>. Der Knopf <code>.dss-m-close</code> tut dasselbe.</>],
+    [<code>data-dss-modal-focus</code>, 'Anfangsfokus (sonst autofocus, sonst die Fläche .dss-modal mit tabindex="-1"). Bei zerstörerischen Aktionen auf die sichere Wahl setzen.'],
+    ['dismissOnBackdrop', <>Standard <code>false</code>. Mit <code>true</code> schließt ein Klick auf den Hintergrund; gedrückt im Modal und losgelassen außen schließt nicht (Textmarkierung).</>],
+    ['closable', <>Standard <code>true</code>. <code>false</code>: Escape und Hintergrund schließen nicht, nur <code>data-dss-modal-close</code>.</>],
+    ['initialFocus, returnFocus', 'CSS-Auswahl im Modal bzw. Element (oder false) für den Fokus beim Schließen.'],
+    ['lockScroll', <>Standard <code>true</code>: <code>overflow: hidden</code> auf <code>&lt;html&gt;</code> samt Ausgleich der Bildlaufleiste; mehrere offene Modals sperren einmal, beim Schließen kommt alles zurück.</>],
+    [<><code>dss:modalopen</code>, <code>dss:modalclose</code></>, <>Blubbern bis zum Dokument; <code>detail.trigger</code> ist der Auslöser, <code>detail.reason</code> der Grund (<code>escape</code>, <code>backdrop</code>, <code>close-button</code>, <code>native</code>, <code>api</code>). <code>onOpen</code>/<code>onClose</code> sind dieselben Meldungen als Optionen.</>],
+  ]}
+/>
+
+Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das oberste auf Escape, Tab und Fokus. Das gilt auch ohne `<dialog>`: das zweite Modal bekommt den Fokus, das darunter wird inert und mit dem Schließen des obersten wieder frei; nach dem Schließen geht der Fokus an den Auslöser im darunter liegenden Modal. Ist der Auslöser entfernt oder verborgen, bekommt die Fläche des darunter offenen Modals den Fokus, sonst `main` (sonst bleibt er unberührt), nie `body`. Ein Modal ohne zugänglichen Namen (kein `aria-labelledby`, kein `aria-label`, kein `.dss-m-title`) warnt in der Konsole. Im Druck gilt die Scroll-Sperre nicht (`@media print`). Die Rückgabe `{ destroy(), open(auslöser), close(grund), isOpen() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dasselbe Element ersetzt den ersten, `destroy()` schließt ein offenes Modal still, baut Fokus, Sperre und `inert` zurück und stellt das Markup wieder her.
+
+### Überschriftenebene im Markup
+
+Es gibt in Vanilla keinen `HeadingLevel`-Kontext: Die Ebene steht im Markup. Der Titel ist das Element mit `class="dss-m-title"` (oder `data-dss-modal-title`); sein Tag wählst du, `h2` ist der Standard wie bei `titleAs` in Svelte und React, erlaubt sind `h2` bis `h6`. Überschriften im Inhalt bekommen die nächste Ebene (Titel `h2`, darin `h3`); die Größe hängt am Token `--dss-title-size`, nicht an der Ebene. Die Rangfolge: der Tag, den du schreibst, gilt; das Skript ändert ihn nie. Hat das Modal weder `aria-labelledby` noch `aria-label`, verbindet `initModal` den Titel mit dem Dialog (und vergibt dafür eine id, falls er keine hat). Titel und Inhalt sind Text: das Skript baut nichts mit `innerHTML`, setzt du Texte aus Daten ein, dann mit `textContent` oder `createContextualFragment` auf geprüftem Markup.
+
+## Handy · 390 px Breite
+
+Zwei eingebettete Seiten mit fester Breite, links hell mit einer Warnung, rechts dunkel mit einer zerstörerischen Aktion (Fokus auf der sicheren Wahl). Die Fläche schrumpft auf die Fensterbreite abzüglich 24 px Rand.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Modal · Warnung · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal hell">
+      <iframe title="Handy-Vorschau: Modal mit Warnung hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-modal--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Modal · Verwerfen · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal dunkel">
+      <iframe title="Handy-Vorschau: Modal zum Verwerfen dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-modal--handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
 ## Verwendung: Import und Props
 
-Titel und Inhalt gehören immer dazu. Die Aktionen kommen in den Fuß (Svelte: Snippet `footer`, React: Prop `footer`). Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
+Titel und Inhalt gehören immer dazu. Die Aktionen kommen in den Fuß (Svelte: Snippet `footer`, React: Prop `footer`). Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste; das Vanilla-Beispiel ist ausführbar und zeigt beide Wege, `initAll` und die einzelnen Funktionen.
 
 <FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
 
@@ -143,6 +198,13 @@ Zusätzlich gibt es je nach Fassung:
       dontText: 'danger für eine bloße Information nimmt dem roten Symbol seine Bedeutung.',
       good: <Story of={ModalStories.DoSchwere} inline />,
       bad: <Story of={ModalStories.DontSchwere} inline />,
+    },
+    {
+      title: 'Der Fokus startet auf der sicheren Wahl',
+      doText: 'Bei einer zerstörerischen Aktion startet der Fokus (data-dss-modal-focus) auf „Behalten“: Ein versehentliches Enter richtet nichts an.',
+      dontText: 'Der Fokus startet auf „Verwerfen“: Ein einziges Enter nach dem Öffnen löscht den Bericht.',
+      good: <Story of={ModalStories.DoFokus} inline />,
+      bad: <Story of={ModalStories.DontFokus} inline />,
     },
   ]}
 />

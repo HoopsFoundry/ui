@@ -1,0 +1,183 @@
+import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
+import * as VanillaStories from './Vanilla.stories';
+import { DosDonts } from '../docs/blocks/DosDonts';
+import { CodeBlock } from '../docs/blocks/CodeBlock';
+import { DocTable } from '../docs/blocks/DocTable';
+import { vanilla, options, dynamic, cspHeader, bundleSizes, budget } from './Vanilla.code';
+import syncSource from '../examples/portal-sync.mjs?raw';
+import '../docs/blocks/blocks.css';
+
+<Meta of={VanillaStories} />
+
+# Vanilla
+
+Das Design System läuft auch ohne Svelte, React und Build-Schritt: ein Stylesheet, eine JavaScript-Datei, HTML mit `dss-*`-Klassen. Das passt für statische Seiten, zum Beispiel ein Portal auf GitHub Pages. Diese Seite zeigt, wie du das Paket einbindest, was `data-dss` startet, wie die Bausteine aufgebaut sind, was sie für die Sicherheit tun und wie du die Dateien in dein Projekt bekommst.
+
+## Überblick
+
+Jeder Baustein mit Verhalten ist eine Funktion `initX(element, options)`, die vorhandenes HTML bedienbar macht und `{ destroy() }` zurückgibt. Es gibt sie in zwei Formen:
+
+- **Gebündelt:** `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` und `dss.css` (Tokens plus Komponenten) im Ordner `dist/vanilla` des Pakets (Export `@bbv/dss-design-system/vanilla`). Eine Datei, keine Abhängigkeiten.
+- **Einzelmodule:** `@bbv/dss-design-system/tabs.js`, `…/modal.js`, `…/pagenav.js`, `…/backtop.js`, `…/theme.js`, `…/accordion.js`, `…/vanilla-core.js` (`initAll`) mit Typen. Für Projekte mit eigenem Bundler.
+
+Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [PageNav und Nach oben](?path=/docs/components-pagenav--docs), [Dunkelmodus-Umschalter](?path=/docs/foundation-dark-mode--docs), [Tabs](?path=/docs/components-tabs--docs) und [Modal](?path=/docs/components-modal--docs). Die Karte ([Map](?path=/docs/components-map--docs)) lädt Leaflet erst nach Einwilligung; ein `initMap` für Vanilla ist für die nächste Stufe (V2) vorgesehen, das Bündel enthält weder Karte noch Leaflet.
+
+## Einbindung ohne Build
+
+Kopiere `dist/vanilla` (und optional `fonts/`) in dein Projekt (Abschnitt „Kopieren ins Projekt“), binde das Stylesheet ein und rufe `initAll` einmal auf. ES-Module laufen nur über `http(s)`: eine Seite, die per Doppelklick als `file://` geöffnet wird, lädt `dss.js` nicht (der Browser blockiert Modul-Skripte von `file://`); nimm einen lokalen Server (`npx serve _site`). Eine vollständige Seite:
+
+<CodeBlock label="Eine Seite ohne Build" language="HTML" code={vanilla} />
+
+Die Seite aus diesem Beispiel im Kleinen, mit Tabs, Dialog und Accordion; alles läuft über `data-dss`:
+
+<Canvas of={VanillaStories.Seite} />
+
+## data-dss: was initAll startet
+
+`initAll(scope, options)` findet unterhalb von `scope` (Standard: das Dokument; ein passendes `scope` selbst zählt mit) jedes Element mit `data-dss` und startet den Baustein darauf. Es gibt sechs:
+
+<DocTable
+  label="Bausteine von initAll"
+  head={['data-dss', 'Element', 'Funktion', 'Seite']}
+  rows={[
+    ['accordion', <>die Gruppe <code>dss-acc</code> (ältere Schreibweise <code>data-dss-acc</code> gilt weiter)</>, 'initAccordion', 'Accordion'],
+    ['pagenav', <>der Bereich, dessen Überschriften die Navigation bilden</>, 'initPageNav', 'PageNav'],
+    ['backtop', <>der Knopf selbst oder ein Container für ihn</>, 'initBackToTop', 'PageNav'],
+    ['theme', <>ein <code>&lt;button&gt;</code></>, 'initTheme', 'Dark Mode'],
+    ['tabs', <>die Leiste (<code>role="tablist"</code> oder <code>role="group"</code>)</>, 'initTabs', 'Tabs'],
+    ['modal', <>das <code>&lt;dialog&gt;</code> oder das Element mit <code>hidden</code></>, 'initModal', 'Modal'],
+  ]}
+/>
+
+Mehrere Elemente je Baustein sind der Normalfall: jede Leiste, jedes Modal und jedes Accordion der Seite wird einzeln gestartet. Optionen stehen für alle Elemente eines Bausteins in `initAll(document, { tabs: { … } })`, für ein Element als JSON in `data-dss-options` (das Element gewinnt); `only: ['tabs', 'modal']` startet nur diese. Der Rückgabewert hat `count` und `destroy()`.
+
+<CodeBlock label="Optionen und Einzelaufrufe" language="HTML und JavaScript" code={options} />
+
+## Das Muster: init, destroy, idempotent
+
+Alle Bausteine folgen derselben Regel (js/lifecycle.js):
+
+- **Nur `element` und seine Nachfahren:** kein globaler Zustand. Ausnahmen sind benannt: Das Modal sperrt das Scrollen von `<html>` und macht die Seite dahinter inert, solange es offen ist; der Dunkelmodus setzt ein Attribut auf `<html>`.
+- **Idempotent:** ein zweiter Aufruf für dasselbe Element baut die erste Fassung ab und ersetzt sie. Es gibt nie doppelte Listener oder doppelte Ereignisse, auch wenn zwei Kopien des Bündels (oder Bündel und Einzelmodul) auf der Seite laufen: die Kopien teilen sich ein Register unter `Symbol.for('dss.registry')`. Zwei Kopien bleiben trotzdem unnötig; lade eine.
+- **`destroy()`** entfernt Listener, Beobachter, Zeitgeber und alles, was der Baustein erzeugt hat, und stellt Attribute wieder her, die er geändert hat (ein Test vergleicht das Markup vor `initAll` und nach `destroy()`). Er ist mehrfach aufrufbar.
+- **Beim Import passiert nichts:** kein Auto-Start, kein Zugriff auf `window` oder `document`. Das Bündel lässt sich in Node laden (für Tests und Server), die Init-Funktionen tun dort nichts.
+- **Bewegung:** sanftes Scrollen und Höhenanimationen entfallen bei „Bewegung reduzieren“ und `data-motion="reduce"` auf `<html>`.
+
+Wird Inhalt später ersetzt, baust du die alten Instanzen ab und startest die neuen auf dem neuen Element:
+
+<CodeBlock label="Dynamisch eingefügter Inhalt" language="JavaScript" code={dynamic} />
+
+## Sicherheit
+
+- **Kein `innerHTML`:** Texte setzt das Paket als Text, Symbole als SVG per `createElementNS`, Markup per `createContextualFragment`. Ein Test prüft die Quelltexte und das Bündel auf `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval` und `new Function`.
+- **Texte aus Daten** gehören in `textContent`. Wer HTML aus Daten baut, escaped jeden Wert und prüft Adressen mit `safeHref`, das nur `http(s)`, `mailto`, `tel`, relative Adressen und Anker durchlässt (nie `javascript:` oder `data:`).
+- **`data-dss-options` ist Daten, kein Code:** es wird als JSON gelesen; ungültiges JSON, Listen und Schlüssel wie `__proto__` fallen weg.
+- **Fremde ids und Anker** (Deep-Link, `data-dss-modal-open`) werden nur mit Elementen auf der Seite verglichen, nie als Selektor oder HTML ausgewertet.
+
+### CSP und Boot-Skript
+
+Das Bündel kommt mit `script-src 'self'` aus: eine Datei von der eigenen Domain, kein `eval`, keine Inline-Handler. Styles setzt es über das CSSOM (`element.style`), das `style-src` nicht blockiert. Einzige Ausnahme ist das kleine Inline-Skript `themeBootScript()` im `<head>` gegen das Flackern im Dunkelmodus: Es braucht einen Hash oder eine nonce.
+
+<CodeBlock label="Content-Security-Policy" language="Shell und HTTP" code={cspHeader} />
+
+## Bundle-Größen
+
+Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, hält das Budget ein (`dss.min.js` höchstens {budget.minKB} KB, gzip höchstens {budget.gzipKB} KB) und prüft, dass diese Tabelle stimmt.
+
+<DocTable
+  label="Größen von dist/vanilla"
+  head={['Datei', 'Größe', 'Hinweis']}
+  rows={[
+    ['dss.js', `${(bundleSizes.js / 1024).toFixed(1)} KB`, 'ungebündelt lesbar, mit Quellkarte (dss.js.map)'],
+    ['dss.min.js', `${(bundleSizes.min / 1024).toFixed(1)} KB`, 'minifiziert, mit Quellkarte (dss.min.js.map)'],
+    ['dss.min.js (gzip)', `${(bundleSizes.gzip / 1024).toFixed(1)} KB`, 'so kommt es über das Netz, wenn der Server komprimiert'],
+    ['dss.css', `${(bundleSizes.css / 1024).toFixed(1)} KB`, 'tokens.css plus components.css, enthält --dss-version; courtlines/ liegt daneben'],
+  ]}
+/>
+
+Das Budget hat noch rund 3,5 KB Polster (min) und 2 KB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die nächste Stufe (Render-Funktionen, `initMap`) teilt sich dieses Bündel und hebt das Budget bewusst an, nicht stillschweigend.
+
+## Kopieren ins Projekt
+
+Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript im Projekt kopiert `dist/vanilla` nach `_site/dss` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript gehört in dein Projekt, nicht in dieses Paket; das Beispiel ist `stories/examples/portal-sync.mjs`:
+
+<CodeBlock label="portal-sync.mjs" language="JavaScript" code={syncSource} />
+
+Installiere das Paket mit `npm install github:OliEder/dss-design-system#v0.9.0` (der Schritt `prepare` baut `dist` mit `npm run build`) und rufe `node portal-sync.mjs` vor dem Veröffentlichen auf. Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `dss.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
+
+**Das Zielverzeichnis gehört dem Paket:** `portal-sync.mjs` ersetzt `_site/dss` bei jedem Lauf vollständig. Es baut zuerst in einem Nachbarordner und benennt dann um (bei einem Fehler bleibt das alte Ziel), schreibt die Marker-Datei `.dss-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`).
+
+## Versionsabgleich
+
+JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Projekt auseinanderlaufen (neues `dss.js`, altes `dss.css` im Browser-Cache). Das Bündel hilft beim Abgleich:
+
+- `VERSION` ist die Version des Pakets, aus dem `dss.js` gebaut wurde.
+- `dss.css` setzt `--dss-version` auf `:root`; `cssVersion()` liest sie, `checkVersion()` liefert `{ js, css, match }`. Fehlt `dss.css` (oder kommt es aus einem anderen Paket), ist `css` `null` und `match` falsch.
+- `checkVersion({ warn: true })` meldet eine Abweichung oder ein fehlendes Stylesheet zusätzlich mit `console.warn` (zum Beispiel einmal beim Start der Seite).
+- `portal-sync.mjs` schreibt zusätzlich `version.json` neben die Dateien, für einen Vergleich im Build oder in der Pipeline.
+
+## Alle Exporte
+
+`@bbv/dss-design-system/vanilla` (die Namen sind die dokumentierte Liste; ein Test vergleicht sie mit dem gebauten Bündel):
+
+<DocTable
+  label="Exporte des Bündels"
+  head={['Gruppe', 'Namen']}
+  rows={[
+    ['Start', <><code>initAll</code>, <code>DSS_BLOCKS</code>, <code>parseOptions</code>, <code>createHandle</code></>],
+    ['Accordion', <><code>initAccordion</code>, <code>initAccordions</code>, <code>nextHeader</code>, <code>hashTarget</code>, <code>revealAround</code>, <code>scrollToElement</code></>],
+    ['PageNav und Nach oben', <><code>initPageNav</code>, <code>slug</code>, <code>initBackToTop</code></>],
+    ['Dunkelmodus', <><code>initTheme</code>, <code>themeBootScript</code>, <code>parseTheme</code>, <code>resolveTheme</code>, <code>nextTheme</code>, <code>readTheme</code>, <code>writeTheme</code>, <code>THEME_KEY</code>, <code>THEME_ATTRIBUTE</code>, <code>THEME_LABEL</code></>],
+    ['Tabs', <><code>initTabs</code>, <code>nextTab</code>, <code>initialTab</code>, <code>TAB_EVENT</code></>],
+    ['Modal', <><code>initModal</code>, <code>openModal</code>, <code>closeModal</code>, <code>focusables</code>, <code>MODAL_OPEN_EVENT</code>, <code>MODAL_CLOSE_EVENT</code></>],
+    ['Hilfen', <><code>safeHref</code>, <code>reducedMotion</code></>],
+    ['Version', <><code>VERSION</code>, <code>cssVersion</code>, <code>checkVersion</code></>],
+  ]}
+/>
+
+## Handy · 390 px Breite
+
+Zwei eingebettete Seiten mit fester Breite: links das Register mit Tabs (hell), rechts ein Accordion (dunkel). Beide laufen mit `initAll`.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Vanilla · Register · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Register hell">
+      <iframe title="Handy-Vorschau: Register mit Tabs hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-vanilla--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Vanilla · Accordion · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Accordion dunkel">
+      <iframe title="Handy-Vorschau: Accordion dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=foundation-vanilla--handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+## Dos und Don'ts
+
+<DosDonts
+  pairs={[
+    {
+      title: 'Texte als Text einsetzen',
+      doText: 'Namen und Texte aus Daten gehören in textContent: Sie bleiben Text, egal was drinsteht.',
+      dontText: 'Ein String mit Markup in innerHTML macht aus einem Gegnernamen wie „<img onerror=…>“ ein Skript.',
+      good: <Story of={VanillaStories.DoText} inline />,
+      bad: <Story of={VanillaStories.DontText} inline />,
+    },
+    {
+      title: 'Boot-Skript in den head',
+      doText: 'Das Boot-Skript sitzt im head und setzt den Modus vor dem ersten Zeichnen; initTheme folgt später.',
+      dontText: 'Wer den Modus erst im Modul am Ende der Seite setzt, zeigt zuerst die falsche Farbe: die Seite flackert.',
+      good: <Story of={VanillaStories.DoBoot} inline />,
+      bad: <Story of={VanillaStories.DontBoot} inline />,
+    },
+    {
+      title: 'Kopieren statt Fremd-Adresse',
+      doText: 'Die Dateien liegen auf der eigenen Domain, in der Version, die du getestet hast; die CSP bleibt bei script-src \'self\'.',
+      dontText: 'Ein Skript von einer Fremd-Adresse ändert sich unter dir, braucht eine weitere Freigabe in der CSP und fällt aus, wenn die Adresse nicht erreichbar ist.',
+      good: <Story of={VanillaStories.DoKopie} inline />,
+      bad: <Story of={VanillaStories.DontKopie} inline />,
+    },
+  ]}
+/>

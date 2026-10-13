@@ -37,3 +37,25 @@ export const rulesOf = (text: string): [string, string][] =>
 
 /** Rumpf aller Regeln mit genau diesem Selektor, zusammengefügt. */
 export const bodyOf = (rules: [string, string][], selector: string) => rules.filter(([s]) => s === selector).map(([, b]) => b).join(';');
+
+/**
+ * Fängt Ausnahmen aus Ereignis-Listenern ab (jsdom meldet sie als `error` am Fenster, vitest zählt sie sonst als unbehandelten Fehler):
+ * Eine verfälschte Quelle, die im Listener wirft, verletzt damit die Regel, statt den Testlauf zu stören.
+ * `stop()` baut den Fang ab und gibt die gefangenen Meldungen zurück.
+ */
+export function trapErrors() {
+  const errors: string[] = [];
+  const handler = (event: Event) => {
+    errors.push(String((event as ErrorEvent).message ?? event));
+    event.preventDefault();
+    event.stopImmediatePropagation();
+  };
+  window.addEventListener('error', handler, true);
+  return {
+    errors,
+    stop() {
+      window.removeEventListener('error', handler, true);
+      return errors;
+    },
+  };
+}

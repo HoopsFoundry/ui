@@ -14,7 +14,7 @@ import { reducedMotion } from './motion.js';
 /** Mindestzahl der Einträge, ab der die Navigation erscheint. */
 export const MIN_HEADINGS = 3;
 const DEFAULTS = { selector: 'h2, [data-pagenav]', skipAttribute: 'data-pagenav-skip', label: 'Auf dieser Seite', debounce: 150, maxWait: 1000 };
-const registry = createRegistry();
+const registry = createRegistry('pagenav');
 let uid = 0;
 
 /** Id-Teil aus einem Text: Kleinbuchstaben, Umlaute aufgelöst (ä wird ae, ß wird ss), alles andere wird zu `-`; nie leer. */

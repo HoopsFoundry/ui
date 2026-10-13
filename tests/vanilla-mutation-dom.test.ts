@@ -82,12 +82,12 @@ const CSS: Mutation[] = [
 ];
 const SOURCE: { name: string; rule: string; file: 'pagenav' | 'backtop'; from: string; to: string }[] = [
   { name: 'innerHTML im Knopf', rule: 'Quelltext: kein innerHTML, kein insertAdjacentHTML, kein document.write', file: 'backtop', from: 'svg.append(path);', to: "svg.append(path); svg['inner' + 'HTML'] = ''; svg.innerHTML = '';" },
-  { name: 'Auto-Start in der Navigation', rule: 'Quelltext: kein Auto-Start beim Import', file: 'pagenav', from: 'const registry = createRegistry();', to: "const registry = createRegistry();\ndocument.addEventListener('DOMContentLoaded', () => {});" },
+  { name: 'Auto-Start in der Navigation', rule: 'Quelltext: kein Auto-Start beim Import', file: 'pagenav', from: "const registry = createRegistry('pagenav');", to: "const registry = createRegistry('pagenav');\ndocument.addEventListener('DOMContentLoaded', () => {});" },
   { name: 'eigene Bewegungsabfrage im Knopf', rule: 'Quelltext: Bewegung über reducedMotion', file: 'backtop', from: "import { reducedMotion } from './motion.js';", to: '' },
   { name: 'Accordion nicht angebunden', rule: 'Quelltext: Zugriff auf Accordion über revealAround und hashTarget', file: 'pagenav', from: 'revealAround(target)', to: 'target.closest("details")' },
   { name: 'Lebenszyklus selbst gebaut', rule: 'Quelltext: Lebenszyklus über js/lifecycle.js', file: 'backtop', from: "from './lifecycle.js'", to: "from './lifecycle2.js'" },
   { name: 'SVG per innerHTML-freier Alternative entfällt', rule: 'Quelltext: SVG per createElementNS', file: 'backtop', from: 'doc.createElementNS(SVG_NS, \'svg\')', to: 'doc.createElement(\'svg\')' },
-  { name: 'globale Zuweisung', rule: 'Quelltext: kein eigener globaler Zustand außer dem Register', file: 'pagenav', from: 'const registry = createRegistry();', to: 'const registry = createRegistry();\nwindow.__pagenav = 1;' },
+  { name: 'globale Zuweisung', rule: 'Quelltext: kein eigener globaler Zustand außer dem Register', file: 'pagenav', from: "const registry = createRegistry('pagenav');", to: "const registry = createRegistry('pagenav');\nwindow.__pagenav = 1;" },
 ];
 
 type ThemeMutation = Mutation & { after?: string };
@@ -133,7 +133,7 @@ const THEME_CSS: Mutation[] = [
 ];
 const THEME_SRC: Mutation[] = [
   { name: 'Inline-onclick', rule: 'Quelltext: kein innerHTML, kein Inline-onclick, kein eval', from: 'button.hidden = false;', to: "button.setAttribute('onclick', 'x'); button.hidden = false;" },
-  { name: 'globaler Zustand', rule: 'Quelltext: kein globaler Zustand', from: 'const registry = createRegistry();', to: 'const registry = createRegistry();\nwindow.__theme = 1;' },
+  { name: 'globaler Zustand', rule: 'Quelltext: kein globaler Zustand', from: "const registry = createRegistry('theme');", to: "const registry = createRegistry('theme');\nwindow.__theme = 1;" },
   { name: 'Speicherzugriff ohne try', rule: 'Quelltext: Speicherzugriff nur in try', from: 'try {\n      storage = opts.storage ?? win.localStorage;', to: 'if (true) {\n      storage = opts.storage ?? win.localStorage;' },
   { name: 'Lebenszyklus selbst gebaut', rule: 'Quelltext: Lebenszyklus über js/lifecycle.js', from: "from './lifecycle.js'", to: "from './own.js'" },
   { name: 'anderer Schlüssel im Quelltext', rule: 'Quelltext: Standardschlüssel dss-theme', from: "'dss-theme'", to: "'theme'" },

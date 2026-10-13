@@ -1,10 +1,11 @@
-<script>
+<script lang="ts">
   import Modal from '../../svelte/Modal.svelte';
   import Button from '../../svelte/Button.svelte';
   import ModalDemo from './ModalDemo.svelte';
+  import { initAll } from '../../js/vanilla-core.js';
+  import { dialogMarkup, divMarkup } from '../Modal.code';
 
-  /** @type {{ example: string }} */
-  let { example } = $props();
+  let { example }: { example: string } = $props();
 
   const severities = [
     { severity: 'default', title: 'Spielbericht freigeben', subtitle: 'Standard', body: 'Nach Freigabe ist eine Korrektur nur noch über den Verband möglich.', cancelLabel: 'Abbrechen', confirmLabel: 'Freigeben' },
@@ -28,7 +29,41 @@
   const stateClass = { Standard: '', Hover: 'pseudo-hover', Fokus: 'pseudo-focus-visible', Aktiv: 'pseudo-hover pseudo-active', Gesperrt: '' };
 
   let interactiveOpen = $state(false);
+
+  // Vanilla-Beispiele: das Markup aus dem Code-Beispiel (createContextualFragment statt HTML-Zuweisung), gestartet mit initAll.
+  function vanillaModal(node: HTMLElement, markup: string) {
+    node.replaceChildren(document.createRange().createContextualFragment(markup));
+    const handle = initAll(node, { only: ['modal'] });
+    return { destroy: () => handle.destroy() };
+  }
 </script>
+
+<!-- Statisches Modal (nicht gestartet) für Handy-Vorschauen und Do/Don't; focusDanger/focusSafe setzt den Fokus-Ring fest -->
+{#snippet staticModal(p: { id: string; severity?: string; title: string; subtitle: string; body: string; safe: string; danger?: string; ok?: string; ring?: string })}
+  <div class="dss-backdrop"></div>
+  <div class="dss-modal-wrap">
+    <div class="dss-modal dss-modal--sm" role="dialog" aria-modal="true" aria-labelledby="{p.id}-titel">
+      <div class="dss-m-head">
+        {#if p.severity}
+          <div class="dss-m-head-icon dss-m-head-icon--{p.severity}">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4M8 4.5v.05"/></svg>
+          </div>
+        {/if}
+        <div class="dss-m-head-text">
+          <h2 class="dss-m-title" id="{p.id}-titel">{p.title}</h2>
+          <div class="dss-m-subtitle">{p.subtitle}</div>
+        </div>
+        <button type="button" class="dss-m-close" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+      </div>
+      <div class="dss-m-body">{p.body}</div>
+      <div class="dss-m-footer">
+        <button type="button" class="dss-btn dss-btn--secondary dss-btn--md {p.ring === 'safe' ? 'pseudo-focus-visible' : ''}">{p.safe}</button>
+        {#if p.danger}<button type="button" class="dss-btn dss-btn--danger dss-btn--md {p.ring === 'danger' ? 'pseudo-focus-visible' : ''}">{p.danger}</button>{/if}
+        {#if p.ok}<button type="button" class="dss-btn dss-btn--primary dss-btn--md">{p.ok}</button>{/if}
+      </div>
+    </div>
+  </div>
+{/snippet}
 
 {#snippet mock()}
   <div class="mock" aria-hidden="true">
@@ -109,7 +144,41 @@
     </div>
   </div>
 
+{:else if example === 'vanilla-dialog'}
+  <div class="page">
+    <p class="page-t">Spielbericht · 17. Spieltag · Heim 87 : 74</p>
+    <div class="vanilla" use:vanillaModal={dialogMarkup}></div>
+  </div>
+{:else if example === 'vanilla-div'}
+  <div class="frame" style="height: 380px">
+    <div class="page">
+      <p class="page-t">Spielbericht · 17. Spieltag</p>
+      <div class="vanilla" use:vanillaModal={divMarkup}></div>
+    </div>
+  </div>
+{:else if example === 'handy'}
+  <div class="frame phone">
+    {@render mock()}
+    {@render staticModal({ id: 'hm', severity: 'warn', title: 'Anwurfzeit nach 22:00 Uhr', subtitle: 'Hallenordnung prüfen', body: 'Die Halle schließt um 23:00, Spielzeit und Verlängerung passen evtl. nicht hinein.', safe: 'Zeit ändern', ok: 'Trotzdem ansetzen' })}
+  </div>
+{:else if example === 'handy-dunkel'}
+  <div class="frame phone">
+    {@render mock()}
+    {@render staticModal({ id: 'hd', severity: 'danger', title: 'Spielbericht verwerfen?', subtitle: 'Nicht wiederherstellbar', body: 'Alle erfassten Aktionen werden gelöscht. Das lässt sich nicht rückgängig machen.', safe: 'Behalten', danger: 'Verwerfen', ring: 'safe' })}
+  </div>
+
 <!-- Dos und Don'ts -->
+{:else if example === 'do-fokus'}
+  <div class="frame" style="height: 380px">
+    {@render mock()}
+    {@render staticModal({ id: 'df', severity: 'danger', title: 'Spielbericht verwerfen?', subtitle: 'Nicht wiederherstellbar', body: 'Alle erfassten Aktionen werden gelöscht.', safe: 'Behalten', danger: 'Verwerfen', ring: 'safe' })}
+  </div>
+{:else if example === 'dont-fokus'}
+  <!-- Falsch: Der Fokus startet auf der zerstörerischen Aktion; ein versehentliches Enter verwirft den Bericht -->
+  <div class="frame" style="height: 380px">
+    {@render mock()}
+    {@render staticModal({ id: 'dg', severity: 'danger', title: 'Spielbericht verwerfen?', subtitle: 'Nicht wiederherstellbar', body: 'Alle erfassten Aktionen werden gelöscht.', safe: 'Behalten', danger: 'Verwerfen', ring: 'danger' })}
+  </div>
 {:else if example === 'do-aktion'}
   <ModalDemo size="sm" title="Spielbericht senden?" subtitle="Letzter Schritt" body="Nach dem Senden ist der Bericht final." cancelLabel="Noch prüfen" confirmLabel="Senden" />
 {:else if example === 'dont-aktion'}
@@ -140,6 +209,7 @@
   .mock-h { font-family: var(--font-display); font-weight: 700; }
   .mock-l { height: 10px; border-radius: 5px; background: var(--page-line); }
   .mock-s { width: 60%; }
+  .phone { max-width: 390px; height: 520px; }
   .page { padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
   .page-t { margin: 0; font-family: var(--font-display); font-weight: 700; color: var(--page-fg); }
   .matrix { display: flex; flex-direction: column; gap: 16px; }

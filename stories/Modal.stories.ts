@@ -85,6 +85,12 @@ export const Groessen     = { ...example('groessen', '340px'), tags: ['!dev'] };
 export const Interaktiv   = { ...example('interaktiv', '460px'), tags: ['!dev'] };
 export const Zustaende    = { ...example('zustaende', '320px'), tags: ['!dev'] };
 
+// Vanilla: ausführbare Beispiele (initAll auf dem Markup aus dem Code-Beispiel) und Handy-Vorschauen (zwei verschiedene Beispiele)
+export const VanillaDialog = { ...example('vanilla-dialog', '170px'), tags: ['!dev'] };
+export const VanillaDiv    = { ...example('vanilla-div', '420px'), tags: ['!dev'] };
+export const Handy         = { ...example('handy'), parameters: { controls: { disable: true }, layout: 'padded' }, tags: ['!dev'] };
+export const HandyDunkel   = { ...example('handy-dunkel'), parameters: { controls: { disable: true }, layout: 'padded' }, tags: ['!dev'] };
+
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAktion     = { ...example('do-aktion', '420px'), tags: ['!dev'] };
 export const DontAktion   = { ...example('dont-aktion', '420px'), tags: ['!dev'] };
@@ -94,3 +100,5 @@ export const DoAusweg     = { ...example('do-ausweg', '420px'), tags: ['!dev'] }
 export const DontAusweg   = { ...example('dont-ausweg', '420px'), tags: ['!dev'] };
 export const DoSchwere    = { ...example('do-schwere', '420px'), tags: ['!dev'] };
 export const DontSchwere  = { ...example('dont-schwere', '420px'), tags: ['!dev'] };
+export const DoFokus      = { ...example('do-fokus', '400px'), tags: ['!dev'] };
+export const DontFokus    = { ...example('dont-fokus', '400px'), tags: ['!dev'] };

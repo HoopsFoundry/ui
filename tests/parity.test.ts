@@ -3,7 +3,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { describe, it, expect } from 'vitest';
 
-type Entry = { svelte: string; react: string; css: string[]; export?: string };
+type Entry = { svelte: string; react: string; css: string[]; export?: string; vanilla?: { module: string; export: string } };
 
 const root = new URL('../', import.meta.url);
 const manifest = JSON.parse(readFileSync(new URL('parity.manifest.json', root), 'utf8')) as Record<string, Entry>;
@@ -20,6 +20,16 @@ describe.each(Object.entries(manifest))('Parität: %s', (name, entry) => {
     expect(existsSync(new URL(entry.react, root))).toBe(true);
     // `export`: Name des React-Exports, wenn er vom Dateinamen abweicht (Map heißt in React MapView, um das JS-Global Map nicht zu überdecken)
     expect(indexTs).toMatch(new RegExp(`\\b${entry.export ?? name}\\b[^;]*from '\\./${name}'`));
+  });
+
+  // Die dritte Fassung: Vanilla-Funktion `initX(root, options) → { destroy() }` auf dem Markup derselben Klassen (Pfad und Export müssen existieren)
+  it.skipIf(!entry.vanilla)('hat eine Vanilla-Fassung, die als Funktion exportiert wird und im Paket steht', async () => {
+    const { module, export: fn } = entry.vanilla!;
+    expect(existsSync(new URL(module, root))).toBe(true);
+    const mod = (await import(/* @vite-ignore */ new URL(module, root).href)) as Record<string, unknown>;
+    expect(typeof mod[fn]).toBe('function');
+    const pkg = JSON.parse(readFileSync(new URL('package.json', root), 'utf8')) as { exports: Record<string, unknown> };
+    expect(pkg.exports[`./${module.replace(/^js\//, '')}`]).toBeTruthy();
   });
 
   it.each(entry.css)('definiert die CSS-Klasse .%s', (cls) => {

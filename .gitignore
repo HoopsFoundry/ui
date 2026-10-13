@@ -46,3 +46,7 @@ coverage/
 
 # Stock-Fotos (Originale, lokal; zu groß fürs Repository)
 images/
+.bundle-tmp/
+tests/.code-tmp-*/
+tests/.portal-tmp/
+tests/.portal-direct-tmp/

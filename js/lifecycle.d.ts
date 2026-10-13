@@ -10,9 +10,12 @@ export function createCleanups(): { add(fn: unknown): void; run(): void };
 /** Fügt einen Listener hinzu und gibt die Funktion zum Entfernen zurück. */
 export function listen(target: EventTarget, type: string, handler: EventListener, options?: AddEventListenerOptions | boolean): () => void;
 /** Register je Baustein (WeakMap): ein zweites `init` für dieselbe Wurzel ersetzt das erste. */
-export function createRegistry<K extends object>(): {
+/** Mit `name` teilen sich alle Kopien des Moduls auf der Seite ein Register (`Symbol.for('dss.registry')`). */
+export function createRegistry<K extends object>(name?: string): {
   release(key: K): void;
   claim(key: K, destroy: () => void): DssHandle;
 };
 /** Das Handle eines Bausteins, der nichts tun konnte. */
 export function emptyHandle(): DssHandle;
+/** Merkt die Attribute `names` von `el`; die Rückgabe stellt sie wieder her (damals fehlende werden entfernt). */
+export function snapshotAttributes(el: Element, names: readonly string[]): () => void;

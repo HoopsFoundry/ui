@@ -53,11 +53,11 @@ Mit Einzelauswahl ist die Leiste eine Tab-Liste (`role="tablist"`, jeder Tab `ro
     ['Tab', 'Springt in die Leiste (auf den gewählten Tab) und wieder heraus', 'Springt von Schalter zu Schalter'],
     ['Pfeil rechts / links', 'Wählt den nächsten bzw. vorherigen Tab und fokussiert ihn. Gesperrte werden übersprungen, am Rand geht es von vorn weiter. Bei vertical: Pfeil unten / oben.', 'Ohne Wirkung'],
     ['Enter / Leertaste', 'Wählt den fokussierten Tab', 'Schaltet den fokussierten Tab um'],
-    ['Pos1 / Ende', 'Nicht belegt', 'Nicht belegt'],
+    ['Pos1 / Ende', <>Nicht belegt in Svelte und React; der Vanilla-Baustein (<code>initTabs</code>) springt auf den ersten bzw. letzten nicht gesperrten Tab</>, 'Nicht belegt'],
   ]}
 />
 
-Die Pfeiltasten wählen sofort, sie aktivieren also schon beim Fokussieren. Die Komponente rendert nur die Leiste: Sie vergibt weder `id` noch `aria-controls`, und das Panel (Inhalt der gewählten Ansicht) zeigt deine App selbst. Der Name der Leiste (`ariaLabel`, Standard „Tabs“) sollte benennen, was sie umschaltet.
+Die Pfeiltasten wählen sofort, sie aktivieren also schon beim Fokussieren. Die Komponenten rendern nur die Leiste: Sie vergeben weder `id` noch `aria-controls`, und das Panel (Inhalt der gewählten Ansicht) zeigt deine App selbst. Der Vanilla-Baustein `initTabs` bindet dagegen Panels an, die im Markup per `aria-controls` verbunden sind. Der Name der Leiste (`ariaLabel`, Standard „Tabs“) sollte benennen, was sie umschaltet.
 
 ## Zustände: Hover, Fokus, Gewählt, Gesperrt
 
@@ -67,9 +67,52 @@ Hover färbt die Schrift dunkler (Underline), hinterlegt den Tab (Segmented, Ver
 
 Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeugleiste **Zustand** auf Hover, Fokus oder Aktiv schalten. Marke und Hell/Dunkel in der Werkzeugleiste umschalten.
 
+## Ohne Framework: initTabs
+
+Für statische Seiten gibt es denselben Baustein als Funktion: `initTabs(leiste, options)` macht eine vorhandene `dss-tabs`-Leiste bedienbar, `initAll` startet jede Leiste mit `data-dss="tabs"`. Es gelten dieselben Regeln wie in Svelte und React (Pfeiltasten wählen sofort, gesperrte Tabs werden übersprungen, am Rand geht es von vorn weiter, roving `tabindex`; ein Test vergleicht die Tastenfolgen aller drei Fassungen), dazu Pos1/Ende, die Panels (`aria-controls`, `hidden` und `inert` am nicht gewählten) und das Ereignis `dss:tabchange`. Das Beispiel zeigt zwei Leisten des Vereinsregisters mit Panels: Alle/Heim/Auswärts und Liga/Pokal.
+
+<Canvas of={TabsStories.VanillaRegister} />
+
+Ein Filter mit Mehrfachauswahl (`role="group"`, `aria-pressed`, keine Panels) meldet jede Änderung mit `dss:tabchange`; die Seite darunter reagiert darauf:
+
+<Canvas of={TabsStories.VanillaFilter} />
+
+<DocTable
+  label="Optionen von initTabs"
+  head={['Option', 'Standard', 'Wirkung']}
+  rows={[
+    ['activation', "'auto'", <>Mit <code>'manual'</code> bewegen die Pfeiltasten nur den Fokus, Enter/Leertaste wählt. Svelte und React wählen immer sofort.</>],
+    ['hash', 'false', <>Deep-Link: <code>#id</code> eines Tabs, eines Panels oder eines Elements in einem Panel wählt den Tab (beim Start und bei <code>hashchange</code>); eine Wahl schreibt die Panel-id per <code>history.replaceState</code>. Liegt die Leiste in einem geschlossenen Accordion-Bereich, einem einklappbaren Rahmen oder einem <code>&lt;details&gt;</code>, öffnet der Deep-Link ihn (<code>revealAround</code>, wie die PageNav).</>],
+    ['value', 'erster Tab', 'Anfangstab (id, data-tab oder Index); sonst der markierte, sonst der erste nicht gesperrte.'],
+    ['vertical, multi', 'aus dem Markup', <>Die Richtung folgt <code>aria-orientation="vertical"</code> oder <code>dss-tabs--vertical</code>, die Mehrfachauswahl <code>role="group"</code>. Rechts-nach-links kehrt links/rechts um.</>],
+    ['onChange(detail)', '–', <>Wie das Ereignis <code>dss:tabchange</code> (blubbert bis zum Dokument): <code>detail</code> hat <code>index</code>, <code>id</code>, <code>tab</code>, <code>panel</code>, <code>source</code> (<code>user</code>, <code>hash</code>, <code>api</code>); bei <code>multi</code> auch <code>pressed</code> und <code>ids</code>.</>],
+  ]}
+/>
+
+Die Rückgabe `{ destroy(), select(ziel), getValue() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dieselbe Leiste ersetzt den ersten, `destroy()` entfernt Listener und stellt das Markup wieder her. Ergänzt werden nur fehlende Rollen, `id`s und `aria-labelledby` an den Panels; nichts davon wird mit `innerHTML` gebaut.
+
+## Handy · 390 px Breite
+
+Zwei eingebettete Seiten mit fester Breite: links das Register-Beispiel (hell), rechts eine Vereinsseite mit manueller Aktivierung, Zähler und gesperrtem Tab (dunkel).
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Tabs · Register · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Tabs Register hell">
+      <iframe title="Handy-Vorschau: Tabs im Register in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-tabs--handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Tabs · Vereinsseite · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Tabs Vereinsseite dunkel">
+      <iframe title="Handy-Vorschau: Tabs auf der Vereinsseite dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-tabs--handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
 ## Verwendung: Import und Props
 
-Importiere `Tabs` über den Path-Export (Svelte) bzw. aus dem React-Paket und übergib die Tabs als `items`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel enthält nur das Markup; Umschalten und Pfeiltasten brauchen dort eigenen Code.
+Importiere `Tabs` über den Path-Export (Svelte) bzw. aus dem React-Paket und übergib die Tabs als `items`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. Das Vanilla-Beispiel ist ausführbar: Markup mit `data-dss="tabs"` und `initAll`, einzeln mit `initTabs`, dazu der Filter mit Mehrfachauswahl.
 
 <FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
 
@@ -122,6 +165,13 @@ Zusätzlich gibt es in der React-Fassung:
       dontText: 'Ohne multi ist es eine Einzelauswahl: Ein Klick ersetzt die Auswahl, es bleibt immer genau ein Tab gewählt.',
       good: <Story of={TabsStories.DoMulti} inline />,
       bad: <Story of={TabsStories.DontMulti} inline />,
+    },
+    {
+      title: 'Panels im Markup verbergen',
+      doText: 'Inaktive Panels tragen schon im ausgelieferten Markup hidden (und inert). Vor dem Skript, ohne Skript und bei einem Fehler steht nur der erste Inhalt da.',
+      dontText: 'Alle Panels sichtbar im Markup: Bis zum Start des Skripts (oder ohne es) stehen alle Ansichten untereinander, und die Seite springt, sobald initTabs sie verbirgt.',
+      good: <Story of={TabsStories.DoPanels} inline />,
+      bad: <Story of={TabsStories.DontPanels} inline />,
     },
   ]}
 />
