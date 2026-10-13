@@ -466,3 +466,21 @@ describe('Parität im DOM: Vanilla gegen React (normalisiert)', () => {
     expect(norm(el)).toBe(norm(r.container));
   });
 });
+
+describe('Register über Kopien hinweg', () => {
+  it('zwei geladene Kopien von map-vanilla.js: das zweite init ersetzt das erste, die Karte der ersten wird abgebaut', async () => {
+    const { loadMap } = await import('./helpers/map-vanilla-rules');
+    const { read } = await import('./helpers/mutation');
+    const first = await loadMap();
+    const second = await loadMap({ file: 'js/map-vanilla.js', source: `${read('js/map-vanilla.js')}\n// zweite Kopie` });
+    expect(first.vanilla.initMap).not.toBe(second.vanilla.initMap);
+    host.append(document.createRange().createContextualFragment(renderMap({ ...BASE, load: 'auto' } as never)));
+    first.vanilla.initMap(host, { ...BASE, load: 'auto' });
+    await vi.waitFor(() => expect(state.maps).toHaveLength(1));
+    const h2 = second.vanilla.initMap(host, { ...BASE, load: 'auto' });
+    expect(state.maps[0].isRemoved).toBe(true);
+    await vi.waitFor(() => expect(state.maps).toHaveLength(2));
+    h2.destroy();
+    expect(state.maps[1].isRemoved).toBe(true);
+  });
+});
