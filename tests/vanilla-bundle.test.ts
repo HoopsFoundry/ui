@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Das Vanilla-Bündel (scripts/build-vanilla.mjs): lädt in Node ohne window, enthält kein Framework, kein innerHTML, keine Leaflet-Importe,
 // exportiert genau die dokumentierte Liste (Schnappschuss der Namen), bleibt im Größenbudget und liefert CSS, Typen und Quellkarten.
+import { BUDGETS } from '../scripts/vanilla-budgets.mjs';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -12,7 +13,7 @@ const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
 // Größenbudget (gemessen: 36,3 KiB min, 12,9 KiB gzip; Reserve für kleine Ergänzungen; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
-export const BUDGET = { minBytes: 40 * 1024, gzipBytes: 15 * 1024 };
+export const BUDGET = BUDGETS['dss'];
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
 export const EXPORTS = [

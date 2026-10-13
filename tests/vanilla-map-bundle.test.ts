@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Das Karten-Bündel dist/vanilla/dss-map.js: lädt in Node ohne window und document, lädt Leaflet nur über einen dynamischen Import (nicht gebündelt, nicht
 // statisch), kein innerHTML, exportiert genau die dokumentierte Liste, bleibt im eigenen Größenbudget und erzeugt dasselbe Markup wie die Quellmodule.
+import { BUDGETS } from '../scripts/vanilla-budgets.mjs';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -13,7 +14,7 @@ let mod: Record<string, (...a: unknown[]) => unknown>;
 
 // Eigenes Budget für das Karten-Bündel (gemessen: 22 053 B = 21,7 KiB min, 9 055 B = 8,9 KiB gzip). Begründung: Zustände und Markup der Karte, die
 // Leaflet-Anbindung (Marker, Gesten, Fehlerfälle) und die Logik aus map.js; Leaflet selbst gehört nicht dazu, es wird erst nach dem Klick geladen.
-export const MAP_BUDGET = { minBytes: 24 * 1024, gzipBytes: 10 * 1024 };
+export const MAP_BUDGET = BUDGETS['dss-map'];
 export const MAP_EXPORTS = ['VERSION', 'initMap', 'initMapBlock', 'mountMap', 'renderMap'];
 
 beforeAll(async () => {
