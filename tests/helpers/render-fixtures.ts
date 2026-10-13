@@ -1,10 +1,13 @@
 // Eingaben für die Render-Funktionen: vollständige Props je Komponente (alle Text- und Link-Felder gesetzt), dazu die Namen der Funktionen.
 // Die Sicherheitstests ersetzen jeden Text durch Schadtext und jedes Link-Feld durch ein `javascript:`-Ziel.
 import * as render from '../../js/render/index.js';
+import { renderMap } from '../../js/map-vanilla.js';
 
 export type Fn = (props: unknown, options?: unknown) => string;
+// Die Karte liegt im eigenen Bündel (js/map-vanilla.js), nicht im Render-Sammelexport
+const all = { ...render, renderMap } as unknown as Record<string, Fn>;
 /** `renderX#Name` ist eine weitere Eingabe für dieselbe Funktion. */
-export const fn = (name: string) => (render as unknown as Record<string, Fn>)[name.split('#')[0]];
+export const fn = (name: string) => all[name.split('#')[0]];
 
 const team = (name: string, extra: Record<string, unknown> = {}) => ({ name, short: `${name.slice(0, 3)}`, logo: '/logos/x.svg', href: '/teams/x', ...extra });
 const game = (id: string, state: string, extra: Record<string, unknown> = {}) => ({
@@ -36,6 +39,10 @@ export const FIXTURES: Record<string, Record<string, unknown>> = {
     next: { opponent: team('Gegner'), at: 'heim', date: 'Datum', time: 'Zeit', venue: 'Halle' }, last: { opponent: team('Gegner'), at: 'gast', date: 'Datum', ownScore: 2, opponentScore: 1, outcome: 'S' },
     squad: { players: 12, staff: 2 }, stats: { twoPtPct: 40, threePtPct: 30, trb: 20, to: 10 }, logos: true, href: '/team', className: 'mein',
   },
+  renderMap: {
+    label: 'Karte', markers: [{ id: 'a', lat: 49.3, lng: 7.9, label: 'Halle A', href: '/hallen/a', number: 4, own: true, kind: 'place' }, { id: 'b', lat: 49.31, lng: 7.91, label: 'Sitz', kind: 'seat' }, { id: 'c', lat: 49.32, lng: 7.92, label: 'Halle C' }],
+    appLinks: ['osm', 'geo', 'route'], load: 'click', darkTiles: 'invert', tileUrl: '/tiles/{z}/{x}/{y}.png', attribution: 'Kartendaten', privacyNote: 'Hinweis', seatLabel: 'Geschäftsstelle', height: 300, className: 'mein', showList: true,
+  },
   renderVenueCard: {
     name: 'Halle', address: { street: 'Weg 1', zip: '12345', city: 'Ort' }, lat: 49.3, lng: 7.9, info: 'Info', contact: { name: 'Name', phone: '030 123456', email: 'a@example.org' },
     games: [game('a', 'scheduled'), game('b', 'live')], limit: 5, gamesLabel: 'Spiele', href: '/halle', linkLabel: 'Seite', logos: true, names: 'short', tileUrl: '/tiles/{z}/{x}/{y}.png', privacyNote: 'Hinweis', mapHeight: 300, className: 'mein',
@@ -50,7 +57,7 @@ export const URL_KEYS = new Set(['href', 'logo', 'leagueHref', 'tileUrl']);
  * Freitextfeldern laufen; ihre Schadwerte prüft `poisonEnums` getrennt.
  */
 export const ENUM_KEYS = new Set([
-  'state', 'at', 'outcome', 'tone', 'layout', 'density', 'size', 'names', 'load', 'variant', 'titleAs', 'zone', 'sort', 'align', 'kind', 'columns', 'form', 'periods', 'live',
+  'state', 'at', 'outcome', 'tone', 'layout', 'density', 'size', 'names', 'load', 'variant', 'titleAs', 'zone', 'sort', 'align', 'kind', 'columns', 'form', 'periods', 'live', 'darkTiles', 'appLinks',
 ]);
 
 /** Ersetzt jede Zeichenkette in `value` (tief): Linkfelder durch `link`, Aufzählungsfelder bleiben, alle anderen durch `text`. */
