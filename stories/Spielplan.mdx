@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { tableVanilla, tableSvelte, tableReact, versusVanilla, versusSvelte, versusReact, gridVanilla, gridSvelte, gridReact, codeGame, namesVanilla, namesSvelte, namesReact, collapsibleVanilla, collapsibleSvelte, collapsibleReact } from './Spielplan.code';
+import { spielplanRender, rasterRender } from './Render.code';
 
 <Meta of={SpielplanStories} />
 
@@ -437,6 +438,14 @@ Was optisch durch Chip, Farbe oder Durchstreichung gezeigt wird, steht zusätzli
     ['Dunkel', <>Der seitenweite Dark Mode wirkt über die <code>--dss-*</code>-Variablen. Der dunkle Rahmen <code>dss-frame--dark</code> ist für Spielpläne nicht vorgesehen.</>],
   ]}
 />
+
+## Vanilla: Spielplan aus Daten erzeugen
+
+`renderScheduleTable(props, options)` und `renderScheduleGrid(props, options)` erzeugen Tabelle und Zeitraster als Zeichenkette, `mountScheduleTable` und `mountScheduleGrid` setzen sie ein (`{ update, destroy }`). Namen, Kurznamen, Logos, vorläufige Ergebnisse, Live-Hinweise, Dichten und `collapsible` verhalten sich wie in den Komponenten; Entscheidungen (Layout, Spalten, Sieger, Ergebnis) kommen aus `schedule.js`. Die Snippets `time` und `notice` ersetzt `options.time(game)` und `options.notice(game)`: sie liefern Text, der maskiert wird.
+
+<FrameworkCode label="ScheduleTable aus Daten (Vanilla)" vanilla={spielplanRender} />
+
+<FrameworkCode label="ScheduleGrid aus Daten (Vanilla)" vanilla={rasterRender} />
 
 ## Dos und Don'ts
 

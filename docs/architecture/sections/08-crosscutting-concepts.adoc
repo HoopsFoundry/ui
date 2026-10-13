@@ -11,7 +11,7 @@ Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusman
 
 === Sicherheit
 
-Die geplanten Vanilla-Renderer escapen Texte und prüfen URLs über gemeinsame Hilfen. Kein ungeprüftes Rohmarkup wird als normale Eingabe akzeptiert. Der Umgang mit protokollrelativen URLs ist im Lückenplan noch entscheidungsbedürftig. DOM-Erzeugung allein ersetzt keine Eingabevalidierung.
+Die Vanilla-Renderer (`js/render/`, V2a) escapen jeden Text über `esc()`, jeden Attributwert über `attr()` und prüfen Ziele und Logo-Adressen über `safeHref`; Aufzählungen nehmen nur bekannte Werte, Zahlen nur endliche; Spaltenbreiten sind auf Längen beschränkt. Kein ungeprüftes Rohmarkup wird als normale Eingabe akzeptiert (Aktionen, Zusatztext, Uhrzeit und Hinweis sind Daten oder Text). Tests prüfen Schadtext, `javascript:`, Steuerzeichen, sehr lange Eingaben und Prototyp-Schlüssel am geparsten DOM; Mutationstests lassen die Regeln kippen, wenn Escaping oder `safeHref` entfällt. Ein Editor-Hook und der Bündeltest verbieten HTML-Zuweisung per Element-Eigenschaft in `js/render`. Der Umgang mit protokollrelativen URLs ist im Lückenplan noch entscheidungsbedürftig. DOM-Erzeugung allein ersetzt keine Eingabevalidierung.
 
 === Datenschutz
 

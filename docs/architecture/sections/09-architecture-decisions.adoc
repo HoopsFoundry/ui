@@ -37,11 +37,11 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 
 === ADR-005: Vanilla-Verhalten nach dem Muster `initX(root, options) → { destroy() }`
 
-* Status: angenommen; teilweise umgesetzt. Vorhanden sind das Muster `initX`/`destroy`, `initAll`, `initTabs`, `initModal`, `initPageNav`, `initBackToTop`, `initTheme` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`); das Bündel `dist/vanilla` (`dss.js`, `dss.min.js`, `dss.d.ts`, `dss.css`) entsteht mit `npm run build:vanilla` und hat ein Größenbudget als Test. Das Register der Instanzen wird über `Symbol.for('dss.registry')` zwischen Kopien des Bündels geteilt. Die Render-Funktionen mit `esc()` und `createContextualFragment` sind erst mit V2a geplant.
+* Status: angenommen; umgesetzt bis V2a (Branch `feat/vanilla-v2a`, vor dem Merge unabhängig zu prüfen). Vorhanden sind das Muster `initX`/`destroy`, `initAll`, `initTabs`, `initModal`, `initPageNav`, `initBackToTop`, `initTheme` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`); die Render-Funktionen `renderX`/`mountX` für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips in `js/render/` mit `esc()`/`attr()`, `safeHref` und `createContextualFragment`; die Bündel `dist/vanilla/dss.js` (Kern) und `dss-render.js` (Render) entstehen mit `npm run build:vanilla`, jedes mit eigenem Größenbudget als Test (siehe ADR-007). Das Register der Instanzen wird über `Symbol.for('dss.registry')` zwischen Kopien des Bündels geteilt. Offen: `initMap`/`mountMap` und die lebendige Karte der Hallenkarte (V2b), Auslieferung und Abschluss (V3, ADR-006).
 * Kontext: Das Vereinsregister ist ein statisches Vanilla-JS-Portal; Mittelweg statt Wechsel auf Svelte/React.
 * Entscheidung: Einheitliches Muster `initX(root, options)` → `{ destroy() }`, idempotent, nur `root` und Nachfahren, kein globaler Zustand, respektiert reduzierte Bewegung. `initAll(scope)` findet Bausteine über `data-dss`. Render-Funktionen escapen Texte zentral (`esc()`), URLs laufen durch `safeHref`; Einfügen per `createContextualFragment`.
-* Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping.
-* Quellen: `2026-10-11-vanilla-paket-design.md` (Teil 1 und 2), `2026-10-11-portal-bausteine-review.md`, Plan `2026-10-12-vanilla-v2-plan.md`.
+* Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping. Die Render-Funktionen nehmen dieselben Eigenschaften wie die Komponenten und erzeugen dasselbe Markup (Parität gegen Svelte-SSR und React-SSR als Test); die Logik (Fenster, Kurznamen, Zustände, Grenzen) bleibt in den gemeinsamen Modulen und wird nicht kopiert. Bewusste Abweichungen: kein `HeadingLevel`-Kontext (`titleAs`, Standard h3), Zeilen und Zellen der Tabelle als Daten statt Snippets, `time`/`notice`/`actions`/`extra` als Text oder Daten (kein Rohmarkup), ungültige Zahlen entfallen statt „NaN“ zu zeigen, unbekannte Aufzählungswerte fallen auf den Standard. `mountX` startet bei `collapsible` das Accordion-Verhalten selbst, hält Fokus und Zustand bei `update` und stellt bei `destroy` den früheren Inhalt wieder her.
+* Quellen: `2026-10-11-vanilla-paket-design.md` (Teil 1 und 2), `2026-10-11-portal-bausteine-review.md`, Plan `2026-10-12-vanilla-v2-plan.md` (V2a).
 
 === ADR-006: Auslieferung per GitHub-Release, ab 1.0 per npm
 
@@ -50,6 +50,14 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 * Entscheidung: A bis Version 1.0, danach B. Release-Skript und `portal-sync` werden so gebaut, dass der Wechsel nur die Quelle ändert, nicht den Aufbau von `dist/vanilla`.
 * Konsequenzen: Kein npm-Konto bis 1.0 nötig, `dist/` bleibt außerhalb von Git; das Portal lädt eine feste Version.
 * Quellen: Plan `2026-10-12-vanilla-v2-plan.md`, Abschnitt V3.
+
+=== ADR-007: Render-Bündel getrennt vom Kern, mit eigenem Budget
+
+* Status: angenommen und umgesetzt mit V2a (Branch `feat/vanilla-v2a`).
+* Kontext: Der Kern `dss.min.js` liegt bei 37 KB (Budget 40 KB min, 15 KB gzip als Test). Die Render-Funktionen allein brauchen rund 45 KB min zusätzlich zum Accordion (Logik aus `league`, `schedule`, `team`, `venue`, `map`, Markup von zehn Komponenten); ein gemeinsames Bündel hätte das Budget mehr als verdoppelt und jede Seite mit Verhalten belastet, die kein Markup erzeugt.
+* Entscheidung: Zwei Dateien im selben Ordner `dist/vanilla`: `dss.js` (Kern, unverändert) und `dss-render.js` (Render). Das Render-Bündel importiert das Accordion-Verhalten aus dem Kern (`./dss.js` bzw. `./dss.min.js`), sodass es genau eine Kopie des Verhaltens und eine Instanzenverwaltung gibt; alles andere ist gebündelt. Budgets getrennt: Kern 40 KB min und 15 KB gzip, Render 52 KB min und 18 KB gzip (gemessen 48,6 und 16,4), jeweils als Test. Einzelmodule bleiben über `package.json` erreichbar (`./render.js`, `./render/*.js`), das Bündel über `./vanilla-render`.
+* Konsequenzen: Wer Markup erzeugt, lädt beide Dateien aus derselben Version; ein Test prüft, dass das Render-Bündel nur den Kern importiert und weder Framework noch Leaflet enthält. `initMap` (V2b) bekommt ausdrücklich ein eigenes Budget, nicht stillschweigend eine Erhöhung. Beim Wechsel der Auslieferung (ADR-006) bleibt der Aufbau von `dist/vanilla` gleich.
+* Quellen: Plan `2026-10-12-vanilla-v2-plan.md` (V2a, Aufgabe 8 und Risiken), Spec `2026-10-11-vanilla-paket-design.md` (Teil 3).
 
 === Offene Punkte (keine ADRs)
 

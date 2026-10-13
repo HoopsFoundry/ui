@@ -56,6 +56,7 @@ js/
   modal.js              ← Modal: `initModal`, `openModal`, `closeModal` (`./modal.js`)
   vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme|tabs|modal"` (`./vanilla-core.js`)
   vanilla.js            ← Einstieg des gebündelten Pakets `dist/vanilla` (`./vanilla`)
+  render/               ← `renderX`/`mountX` (Markup aus Daten, `./render.js`, `./render/*.js`); gebündelt `dss-render.js` (`./vanilla-render`)
   motion.js, url.js, lifecycle.js ← gemeinsame Grundlagen: `reducedMotion`, `safeHref`, das Muster `initX(root, options) → { destroy() }`
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
@@ -211,6 +212,10 @@ Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein 
 - **`initModal`**, **`openModal`**, **`closeModal`** (`modal.js`): natives `<dialog class="dss-modal-dialog">` (`showModal`) oder Markup mit `hidden` (Rolle, `aria-modal`, inerte Seite); Fokus holen und an den Auslöser zurückgeben, Escape, Fokusfalle, `dismissOnBackdrop` (Standard aus), Scroll-Sperre mit Rückbau, Auslöser `data-dss-modal-open="<id>"` und `data-dss-modal-close`, Ereignisse `dss:modalopen` und `dss:modalclose`.
 
 Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
+
+### Markup aus Daten (`renderX`, `mountX`)
+
+Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips erzeugen `renderLeagueCard(props)` & Co. dasselbe Markup wie die Svelte- und React-Komponenten als Zeichenkette (läuft in Node, etwa im Crawler); `mountLeagueCard(el, props, options)` setzt es per `createContextualFragment` ein und gibt `{ update(props), destroy() }` zurück. Alle Eingaben sind unvertraut: Texte durch `esc`, Ziele durch `safeHref`, kein Rohmarkup von außen. Die Hallenkarte liefert die Karte als Platzhalter (ohne Leaflet), `initMap` folgt in V2b. Import `@bbv/dss-design-system/render.js` (Einzelmodule `…/render/league-card.js` usw.) oder gebündelt `@bbv/dss-design-system/vanilla-render` (`dist/vanilla/dss-render.js`, importiert den Kern `dss.js` aus demselben Ordner; rund 48,6 KB min, gzip 16,4 KB, eigenes Budget 52 KB und 18 KB). Doku: Storybook `Foundation/Vanilla`, Abschnitt „Markup erzeugen“, und der Vanilla-Code-Tab auf jeder Komponentenseite.
 
 ### Gebündelt, ohne Build (`dist/vanilla`)
 

@@ -17,7 +17,13 @@ export const Seite       = { ...example('seite'), tags: ['!dev'] };
 export const Handy       = { ...example('handy'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
 export const HandyDunkel = { ...example('handy-dunkel'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
 
+export const Markup           = { ...example('markup'), tags: ['!dev'] };
+export const MarkupHandy      = { ...example('markup-handy'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
+export const MarkupHandyDunkel = { ...example('markup-handy-dunkel'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
+
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
+export const DoRender    = { ...example('do-render'), tags: ['!dev'] };
+export const DontRender  = { ...example('dont-render'), tags: ['!dev'] };
 export const DoText      = { ...example('do-text'), tags: ['!dev'] };
 export const DontText    = { ...example('dont-text'), tags: ['!dev'] };
 export const DoBoot      = { ...example('do-boot'), tags: ['!dev'] };

@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, collapsibleVanilla, collapsibleSvelte, collapsibleReact } from './Table.code';
+import { tabelleRender } from './Render.code';
 
 <Meta of={TableStories} />
 
@@ -184,6 +185,12 @@ Dazu kommen Props, die sich nicht als Steuerelement zeigen lassen:
     ['sort', "'asc' | 'desc' | null", 'Aktuelle Sortierung: kräftiger Pfeil und aria-sort.'],
   ]}
 />
+
+## Vanilla: Tabelle aus Daten erzeugen
+
+Die Zellen der Tabelle sind in Vanilla Daten, kein Markup: `rows`, `head` und `foot` sind Listen von Zeilen, eine Zeile ist eine Liste von Zellen (oder `{ cells, className }`), eine Zelle ein Text, eine Zahl oder `{ text, className, href, header, colSpan }`. Alles läuft durch `esc`, `href` durch `safeHref`; die Breite einer Spalte nimmt nur Längen wie `80px` oder `20%`.
+
+<FrameworkCode label="Table aus Daten (Vanilla)" vanilla={tabelleRender} />
 
 ## Dos und Don'ts
 

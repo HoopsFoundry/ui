@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, tokensCss } from './Stats.code';
+import { kennzahlenRender } from './Render.code';
 
 <Meta of={StatsStories} />
 
@@ -116,6 +117,12 @@ Die reinen Funktionen sind `statItems(items)` (`@bbv/dss-design-system/stats.js`
 ### Tokens
 
 <FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
+
+## Vanilla: Kennzahlen und Form aus Daten erzeugen
+
+`renderStats(props)` und `renderFormChips(props)` (mit `mountStats` und `mountFormChips`) erzeugen dasselbe Markup wie StatGrid und FormChips. Zahlen bekommen das Dezimalkomma, fehlende Werte den Gedankenstrich mit verstecktem Text, die Form zeigt höchstens die letzten fünf Einträge.
+
+<FrameworkCode label="StatGrid und FormChips aus Daten (Vanilla)" vanilla={kennzahlenRender} />
 
 ## Dos und Don'ts
 

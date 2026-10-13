@@ -3,7 +3,7 @@ import * as VanillaStories from './Vanilla.stories';
 import { DosDonts } from '../docs/blocks/DosDonts';
 import { CodeBlock } from '../docs/blocks/CodeBlock';
 import { DocTable } from '../docs/blocks/DocTable';
-import { vanilla, options, dynamic, cspHeader, bundleSizes, budget } from './Vanilla.code';
+import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget } from './Vanilla.code';
 import syncSource from '../examples/portal-sync.mjs?raw';
 import '../docs/blocks/blocks.css';
 
@@ -19,8 +19,9 @@ Jeder Baustein mit Verhalten ist eine Funktion `initX(element, options)`, die vo
 
 - **Gebündelt:** `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` und `dss.css` (Tokens plus Komponenten) im Ordner `dist/vanilla` des Pakets (Export `@bbv/dss-design-system/vanilla`). Eine Datei, keine Abhängigkeiten.
 - **Einzelmodule:** `@bbv/dss-design-system/tabs.js`, `…/modal.js`, `…/pagenav.js`, `…/backtop.js`, `…/theme.js`, `…/accordion.js`, `…/vanilla-core.js` (`initAll`) mit Typen. Für Projekte mit eigenem Bundler.
+- **Markup aus Daten:** `dss-render.js` (und `dss-render.min.js`) im selben Ordner, Export `@bbv/dss-design-system/vanilla-render`; die Einzelmodule heißen `…/render.js` und `…/render/league-card.js` usw. (Abschnitt „Markup erzeugen“).
 
-Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [PageNav und Nach oben](?path=/docs/components-pagenav--docs), [Dunkelmodus-Umschalter](?path=/docs/foundation-dark-mode--docs), [Tabs](?path=/docs/components-tabs--docs) und [Modal](?path=/docs/components-modal--docs). Die Karte ([Map](?path=/docs/components-map--docs)) lädt Leaflet erst nach Einwilligung; ein `initMap` für Vanilla ist für die nächste Stufe (V2) vorgesehen, das Bündel enthält weder Karte noch Leaflet.
+Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [PageNav und Nach oben](?path=/docs/components-pagenav--docs), [Dunkelmodus-Umschalter](?path=/docs/foundation-dark-mode--docs), [Tabs](?path=/docs/components-tabs--docs) und [Modal](?path=/docs/components-modal--docs). Die Karte ([Map](?path=/docs/components-map--docs)) lädt Leaflet erst nach Einwilligung; ein `initMap` für Vanilla ist für die nächste Stufe (V2b) vorgesehen, die Bündel enthalten weder die lebendige Karte noch Leaflet (die Hallenkarte zeigt die Karte bis dahin als Platzhalter).
 
 ## Einbindung ohne Build
 
@@ -67,6 +68,89 @@ Wird Inhalt später ersetzt, baust du die alten Instanzen ab und startest die ne
 
 <CodeBlock label="Dynamisch eingefügter Inhalt" language="JavaScript" code={dynamic} />
 
+## Markup erzeugen
+
+Neben den `initX`-Bausteinen gibt es für zehn Komponenten Funktionen, die das Markup aus Daten bauen: `renderX(props, options?)` liefert den HTML-Text (läuft im Browser und in Node), `mountX(el, props, options?)` setzt ihn per `createContextualFragment` in ein Element ein und gibt `{ update(props), destroy() }` zurück. Die Eigenschaften sind die der Svelte- und React-Komponenten, ebenso die Standardwerte und Grenzen (`limit`, `names`, `logos`, `titleAs`, `collapsible`, `id`, `open`, `size` …); die Ausgabe ist dieselbe (Tests vergleichen sie mit beiden Fassungen). Die Logik kommt aus denselben Modulen wie dort (`leagueWindow`, `venueGames`, `groupBySection` …), nichts ist doppelt.
+
+<DocTable
+  label="Funktionen zum Markup erzeugen"
+  head={['Komponente', 'Funktionen', 'Besonderheit']}
+  rows={[
+    ['LeagueCard', <><code>renderLeagueCard</code>, <code>mountLeagueCard</code></>, 'Fenster um die eigene Mannschaft, Spalten, Zonen, Live; collapsible'],
+    ['TeamCard', <><code>renderTeamCard</code>, <code>mountTeamCard</code></>, 'Link oder Button (options.onClick); nur gültige Werte'],
+    ['VenueCard', <><code>renderVenueCard</code>, <code>mountVenueCard</code></>, 'Karte als Platzhalter ohne Leaflet; initMap (V2b) macht sie lebendig'],
+    ['ScheduleTable, ScheduleGrid', <><code>renderScheduleTable</code>, <code>renderScheduleGrid</code>, <code>mountScheduleTable</code>, <code>mountScheduleGrid</code></>, 'options.time und options.notice liefern Text; collapsible'],
+    ['Table', <><code>renderTable</code>, <code>mountTable</code></>, 'Zeilen und Zellen als Daten statt Markup'],
+    ['MatchCard', <><code>renderMatchCard</code>, <code>mountMatchCard</code></>, 'Link (href) oder Button (options.onClick)'],
+    ['EmptyState', <><code>renderEmptyState</code>, <code>mountEmptyState</code></>, 'actions als Links, options.onCta'],
+    ['StatGrid, FormChips', <><code>renderStats</code>, <code>renderFormChips</code>, <code>mountStats</code>, <code>mountFormChips</code></>, 'Dezimalkomma, Gedankenstrich bei fehlendem Wert'],
+    ['Bausteine', <><code>esc</code>, <code>attr</code>, <code>mount</code></>, 'Maskieren und Einsetzen für eigene Render-Funktionen'],
+  ]}
+/>
+
+Eine Seite aus Daten, mit Kern und Render-Bündel (beide im selben Ordner):
+
+<CodeBlock label="Seite aus Daten" language="HTML und JavaScript" code={renderPage} />
+
+Das Ergebnis aus erfundenen Daten, jede Karte aus einem `mountX`-Aufruf:
+
+<Canvas of={VanillaStories.Markup} />
+
+### update und destroy
+
+- **`update(props)`** ersetzt den Inhalt zu den neuen Eigenschaften. Der Fokus bleibt, wenn der Knoten wieder auftaucht (über seine `id`, sonst über seine Lage und Klasse); eine einklappbare Karte behält ihren Zustand offen/zu, solange `open` in den Eigenschaften gleich bleibt.
+- **`destroy()`** entfernt Listener und Markup und stellt den früheren Inhalt des Elements wieder her (ein serverseitig gerenderter Text bleibt so als Rückfall). Es ist mehrfach aufrufbar, `update` danach tut nichts.
+- **Idempotent:** ein zweites `mountX` auf demselben Element ersetzt das erste.
+- **`collapsible`:** `mountX` startet das Accordion-Verhalten (`initAccordion`) selbst; steht das Element schon in einer Gruppe (`dss-acc`), bedient diese den Rahmen.
+- **ids:** ohne `id` entsteht die Kennung des Rahmens aus einem Hash der Eingabe (gleiche Eingabe, gleiche Kennung); zwei gleiche Bausteine auf einer Seite brauchen verschiedene `id`-Werte oder `options.uid`. `mountX` vergibt je Element eine eigene, stabile Kennung.
+
+### Escaping und Eingaben
+
+Jede Eingabe gilt als unvertraut. Texte laufen durch `esc`, Attributwerte durch `attr`, Links und Logo-Adressen durch `safeHref`; Aufzählungen (`state`, `tone`, `size`, `density`, `titleAs` …) nehmen nur bekannte Werte, sonst den Standard; Zahlen nur, wenn sie endlich sind (die Komponenten zeigen sonst „NaN“). Ein Link mit `javascript:` erscheint nie, die Zelle oder der Name bleibt dann Text. `titleAs` kennt h2 bis h6, der Standard ist h3. Ein Rohmarkup von außen gibt es nicht: `actions` und `extra` sind Daten, `time` und `notice` liefern Text.
+
+<CodeBlock label="esc, attr und safeHref" language="JavaScript" code={renderEscape} />
+
+### In Node und im Crawler
+
+Die Render-Funktionen brauchen kein DOM: der Import hat keine Nebenwirkung, `mountX` tut in Node nichts. Statische Seiten lassen sich so im Crawler mit demselben Markup bauen, das im Browser entsteht.
+
+<CodeBlock label="Markup in Node" language="JavaScript" code={renderNode} />
+
+### Bündel und Größe
+
+Das Render-Bündel ist eine eigene Datei: `dss-render.js` importiert das Accordion-Verhalten aus `dss.js` im selben Ordner (`dss-render.min.js` aus `dss.min.js`), damit es genau eine Kopie gibt. Es hat ein eigenes Budget, getrennt vom Kern:
+
+<DocTable
+  label="Größen des Render-Bündels"
+  head={['Datei', 'Größe', 'Budget']}
+  rows={[
+    ['dss-render.js', `${(renderSizes.js / 1024).toFixed(1)} KB`, 'ungebündelt lesbar, mit Quellkarte'],
+    ['dss-render.min.js', `${(renderSizes.min / 1024).toFixed(1)} KB`, `höchstens ${renderBudget.minKB} KB`],
+    ['dss-render.min.js (gzip)', `${(renderSizes.gzip / 1024).toFixed(1)} KB`, `höchstens ${renderBudget.gzipKB} KB`],
+  ]}
+/>
+
+Wer nur den Kern braucht, lädt nur `dss.js`; wer Markup erzeugt, lädt beide. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code> und die `render…`/`mount…`-Paare der Tabelle.
+
+### Markup auf dem Handy · 390 px Breite
+
+Zwei eingebettete Seiten aus Daten: links Ligencard, Spielkarte und Kennzahlen (hell), rechts Teamkarte, Hallenkarte und Leerzustand (dunkel).
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h4 className="dss-doc-cap">Markup erzeugen · hell</h4>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen hell">
+      <iframe title="Handy-Vorschau: Markup aus Daten hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-vanilla--markup-handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h4 className="dss-doc-cap">Markup erzeugen · dunkel</h4>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen dunkel">
+      <iframe title="Handy-Vorschau: Markup aus Daten dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:dbb;theme:Dark&id=foundation-vanilla--markup-handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
 ## Sicherheit
 
 - **Kein `innerHTML`:** Texte setzt das Paket als Text, Symbole als SVG per `createElementNS`, Markup per `createContextualFragment`. Ein Test prüft die Quelltexte und das Bündel auf `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval` und `new Function`.
@@ -95,7 +179,7 @@ Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, häl
   ]}
 />
 
-Das Budget hat noch rund 3,5 KB Polster (min) und 2 KB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die nächste Stufe (Render-Funktionen, `initMap`) teilt sich dieses Bündel und hebt das Budget bewusst an, nicht stillschweigend.
+Das Budget des Kerns hat noch rund 3,5 KB Polster (min) und 2 KB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `dss-render.js`, mit eigenem Budget (siehe „Markup erzeugen“); der Kern bleibt, was er war. `initMap` (V2b) bekommt sein Budget ebenso ausdrücklich, nicht stillschweigend.
 
 ## Kopieren ins Projekt
 
@@ -171,6 +255,13 @@ Zwei eingebettete Seiten mit fester Breite: links das Register mit Tabs (hell), 
       dontText: 'Wer den Modus erst im Modul am Ende der Seite setzt, zeigt zuerst die falsche Farbe: die Seite flackert.',
       good: <Story of={VanillaStories.DoBoot} inline />,
       bad: <Story of={VanillaStories.DontBoot} inline />,
+    },
+    {
+      title: 'Markup aus Daten mit renderX erzeugen',
+      doText: 'mountLeagueCard maskiert Texte, prüft Ziele und erzeugt dasselbe Markup wie die Komponente.',
+      dontText: 'Ein Name aus Daten in einem selbst gebauten String bricht das Markup oder führt Skript aus, sobald er < oder " enthält.',
+      good: <Story of={VanillaStories.DoRender} inline />,
+      bad: <Story of={VanillaStories.DontRender} inline />,
     },
     {
       title: 'Kopieren statt Fremd-Adresse',

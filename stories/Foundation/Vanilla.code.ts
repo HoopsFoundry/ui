@@ -92,6 +92,79 @@ printf '%s' "$(node -e "import('@bbv/dss-design-system/theme.js').then((m) => pr
 Content-Security-Policy: script-src 'self' 'nonce-<zufällig je Antwort>'
 <script nonce="<zufällig je Antwort>">…</script>`;
 
+/** Eine Seite aus Daten: Container im HTML, das Markup erzeugen die mountX-Funktionen (Kern und Render-Bündel liegen im selben Ordner). */
+export const renderPage = `<main>
+  <h1>TSV Nordhain 1920</h1>
+  <div id="tabelle"></div>
+  <div id="spielplan"></div>
+  <div id="halle"></div>
+</main>
+
+<script type="module">
+  import { initAll } from '/dss/dss.min.js';
+  import { mountLeagueCard, mountScheduleTable, mountVenueCard } from '/dss/dss-render.min.js';
+
+  // Daten aus deiner Quelle (hier erfunden); die Eigenschaften sind die der Komponenten
+  const verein = {
+    liga: {
+      title: 'Oberliga Nordhain Männer', href: '/ligen/oberliga', teamCount: 12, played: 66, total: 132,
+      teams: [
+        { rank: 2, name: 'BG Seeberg', played: 11, points: 18 },
+        { rank: 3, name: 'TSV Nordhain 1920', short: 'Nordhain', played: 11, points: 14, own: true },
+        { rank: 4, name: 'SV Kiefernau', played: 10, points: 12 },
+      ],
+    },
+    plan: {
+      title: 'Spielplan', names: 'short',
+      games: [
+        { id: 'a', state: 'finished', date: 'Sa, 10.10.2026', time: '17:00', heim: { name: 'TSV Nordhain 1920', short: 'Nordhain', own: true, score: 78 }, gast: { name: 'BG Seeberg', score: 71 } },
+        { id: 'b', state: 'scheduled', date: 'So, 18.10.2026', time: '11:00', heim: { name: 'SV Kiefernau' }, gast: { name: 'TSV Nordhain 1920', short: 'Nordhain', own: true } },
+      ],
+    },
+    halle: { name: 'Sporthalle Nordhain', address: { street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' }, lat: 49.3, lng: 7.9, href: '/hallen/nordhain' },
+  };
+
+  // Je Baustein ein Aufruf; das Ergebnis hat update(props) und destroy()
+  const tabelle = mountLeagueCard(document.querySelector('#tabelle'), verein.liga);
+  const spielplan = mountScheduleTable(document.querySelector('#spielplan'), verein.plan);
+  const halle = mountVenueCard(document.querySelector('#halle'), verein.halle);
+
+  // Danach das Verhalten der Bausteine mit data-dss (Tabs, Accordion …) wie gewohnt
+  initAll(document);
+</script>`;
+
+/** Dasselbe in Node: Markup als Zeichenkette, zum Beispiel im Crawler für statische Seiten. */
+export const renderNode = `// seite.mjs: läuft in Node ohne DOM (kein window, kein document)
+import { esc, renderLeagueCard, renderTeamCard } from '@bbv/dss-design-system/vanilla/dss-render.js';
+
+const verein = { name: 'TSV Nordhain <1920>', liga: { title: 'Oberliga', teams: [{ rank: 1, name: 'Lindenberg Hawks', points: 20 }] }, team: { name: 'TSV Nordhain 1920', rank: 3 } };
+
+// esc für jeden Text, der nicht von einer Render-Funktion kommt (hier der Seitentitel)
+const seite = \`<!doctype html>
+<html lang="de">
+<head><meta charset="utf-8"><title>\${esc(verein.name)}</title><link rel="stylesheet" href="/dss/dss.css"></head>
+<body>
+  \${renderLeagueCard(verein.liga)}
+  \${renderTeamCard(verein.team, { uid: 'team' })}
+</body>
+</html>\`;`;
+
+/** Escaping: was durch esc, attr und safeHref läuft. */
+export const renderEscape = `import { esc, attr, renderEmptyState } from '@bbv/dss-design-system/vanilla/dss-render.js';
+import { safeHref } from '@bbv/dss-design-system/vanilla';
+
+esc('<img src=x onerror=alert(1)>');   // → '&lt;img src=x onerror=alert(1)&gt;'
+esc(null);                              // → ''   (nur Text und endliche Zahlen)
+attr('" onmouseover="x');               // → '&quot; onmouseover=&quot;x'   (für Attributwerte in doppelten Anführungszeichen)
+safeHref('javascript:alert(1)');        // → undefined   (Links dieser Art erscheinen nie im Markup)
+safeHref('/ligen/oberliga');            // → '/ligen/oberliga'
+
+// Eine Render-Funktion maskiert alles selbst: das Ergebnis enthält nur Text
+renderEmptyState({ title: '<script>alert(1)</script>', actions: [{ label: 'Los', href: 'javascript:alert(1)' }] });`;
+
 /** Gemessene Größen des Bündels (Bytes); der Test misst neu und verlangt, dass die Angaben um höchstens 5 % abweichen. */
 export const bundleSizes = { js: 65507, min: 36976, gzip: 13239, css: 179156 };
 export const budget = { minKB: 40, gzipKB: 15 };
+/** Das Render-Bündel (dss-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
+export const renderSizes = { js: 76221, min: 48579, gzip: 16417 };
+export const renderBudget = { minKB: 52, gzipKB: 18 };

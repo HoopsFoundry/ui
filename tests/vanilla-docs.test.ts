@@ -59,6 +59,12 @@ describe('Bündel: Exportliste und Größen stimmen mit der Doku', () => {
     near(code.bundleSizes.min, statSync(`${bundleDir}dss.min.js`).size);
     near(code.bundleSizes.gzip, gzipSync(readFileSync(`${bundleDir}dss.min.js`)).length);
     near(code.bundleSizes.css, statSync(`${bundleDir}dss.css`).size);
+    near(code.renderSizes.js, statSync(`${bundleDir}dss-render.js`).size);
+    near(code.renderSizes.min, statSync(`${bundleDir}dss-render.min.js`).size);
+    near(code.renderSizes.gzip, gzipSync(readFileSync(`${bundleDir}dss-render.min.js`)).length);
+    expect(code.renderBudget).toEqual({ minKB: 52, gzipKB: 18 });
+    expect(code.renderSizes.min).toBeLessThanOrEqual(code.renderBudget.minKB * 1024);
+    expect(code.renderSizes.gzip).toBeLessThanOrEqual(code.renderBudget.gzipKB * 1024);
     expect(code.budget).toEqual({ minKB: 40, gzipKB: 15 });
     expect(code.bundleSizes.min).toBeLessThanOrEqual(code.budget.minKB * 1024);
     expect(code.bundleSizes.gzip).toBeLessThanOrEqual(code.budget.gzipKB * 1024);
@@ -71,7 +77,7 @@ describe('Doku-Seite', () => {
     expect(mdx.indexOf('\n## ')).toBeLessThan(mdx.indexOf('<Canvas'));
   });
   it('die Pflichtabschnitte sind da', () => {
-    for (const title of ['## Überblick', '## Einbindung ohne Build', '## data-dss: was initAll startet', '## Das Muster: init, destroy, idempotent', '## Sicherheit', '### CSP und Boot-Skript', '## Bundle-Größen', '## Kopieren ins Projekt', '## Versionsabgleich', '## Alle Exporte', '## Handy · 390 px Breite', "## Dos und Don'ts"]) expect(mdx, title).toContain(title);
+    for (const title of ['## Überblick', '## Einbindung ohne Build', '## data-dss: was initAll startet', '## Das Muster: init, destroy, idempotent', '## Markup erzeugen', '### update und destroy', '### Escaping und Eingaben', '### In Node und im Crawler', '### Bündel und Größe', '## Sicherheit', '### CSP und Boot-Skript', '## Bundle-Größen', '## Kopieren ins Projekt', '## Versionsabgleich', '## Alle Exporte', '## Handy · 390 px Breite', "## Dos und Don'ts"]) expect(mdx, title).toContain(title);
   });
   it('jede im MDX genutzte Story gibt es, jedes Beispiel gibt es in der Beispielkomponente', () => {
     for (const m of mdx.matchAll(/VanillaStories\.(\w+)/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\b`));
@@ -81,14 +87,16 @@ describe('Doku-Seite', () => {
     expect(stories).not.toContain('autodocs');
     for (const m of stories.matchAll(/export const (\w+)\s*= \{ \.\.\.example/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\s*= .*tags: \\['!dev'\\]`));
   });
-  it('Handy-Vorschauen: zwei Iframes mit verschiedenen Beispielen, drei Dos und Don\'ts', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(2);
+  it('Handy-Vorschauen: vier Iframes mit verschiedenen Beispielen, vier Dos und Don\'ts', () => {
+    expect(mdx.match(/<iframe /g)).toHaveLength(4);
     expect(mdx).toContain('id=foundation-vanilla--handy"');
     expect(mdx).toContain('theme:Dark&id=foundation-vanilla--handy-dunkel');
-    expect([...mdx.matchAll(/doText:/g)]).toHaveLength(3);
+    expect(mdx).toContain('id=foundation-vanilla--markup-handy"');
+    expect(mdx).toContain('theme:Dark&id=foundation-vanilla--markup-handy-dunkel');
+    expect([...mdx.matchAll(/doText:/g)]).toHaveLength(4);
   });
   it('die Doku nennt Muster, Sicherheit und Versionsabgleich', () => {
-    for (const part of ['idempotent', 'destroy()', 'createContextualFragment', 'textContent', 'safeHref', 'data-dss-options', '`--dss-version`', 'checkVersion', 'version.json', 'initMap', 'V2', 'npm run build:vanilla', 'script-src']) expect(mdx, part).toContain(part);
+    for (const part of ['idempotent', 'destroy()', 'createContextualFragment', 'textContent', 'safeHref', 'data-dss-options', '`--dss-version`', 'checkVersion', 'version.json', 'initMap', 'V2', 'npm run build:vanilla', 'script-src', 'dss-render.js', 'esc', 'renderLeagueCard', 'mountLeagueCard', 'Crawler']) expect(mdx, part).toContain(part);
   });
   it('die Beispielseite im Code verwendet kein innerHTML', () => {
     const script = examples.slice(0, examples.indexOf('{#if example'));

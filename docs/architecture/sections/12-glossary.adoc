@@ -14,7 +14,7 @@
 |Parität |Dokumentierte Gleichwertigkeit von Ausgabe und Verhalten; nicht zwingend identischer Quellcode
 |SSR |Serverseitige Ausgabe ohne vorausgesetzte Browserumgebung
 |Lifecycle |Initialisierung, Aktualisierung und Aufräumen einer Instanz
-|Renderfunktion |Erzeugt Ausgabe aus Eingaben; zusätzliche Vanilla-APIs sind geplant
+|Renderfunktion |Erzeugt Ausgabe aus Eingaben; in Vanilla `renderX` (Zeichenkette) und `mountX` (Einsetzen mit `update`/`destroy`), siehe ADR-005
 |Mount |Bindet Ausgabe und gegebenenfalls Verhalten an ein DOM-Element
 |ADR |Architecture Decision Record mit Kontext, Entscheidung, Status und Konsequenzen
 |MCP |Model Context Protocol; Zugriffsschicht für Agent-Werkzeuge und Kontext
