@@ -50,6 +50,11 @@ export const KartenApp    = { ...example('karten-app'), tags: ['!dev'] };
 export const Fehler       = { ...example('fehler'), tags: ['!dev'] };
 export const Handy        = { ...example('handy'), tags: ['!dev'] };
 export const Zustaende    = { ...example('zustaende'), tags: ['!dev'] };
+// Vanilla: mountMap in einen Behälter (ohne Framework); Handy-Vorschauen mit anderen Hallen als die Svelte-Fassung
+export const VanillaKarte     = { ...example('vanilla'), tags: ['!dev'] };
+export const VanillaGeladen   = { ...example('vanilla-geladen'), tags: ['!dev'] };
+export const VanillaHandy     = { ...example('vanilla-handy'), tags: ['!dev'] };
+export const VanillaHandyDunkel = { ...example('vanilla-handy-dunkel'), tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAdresse       = { ...example('do-adresse'), tags: ['!dev'] };
@@ -62,3 +67,5 @@ export const DoQuelle        = { ...example('do-quelle'), tags: ['!dev'] };
 export const DontQuelle      = { ...example('dont-quelle'), tags: ['!dev'] };
 export const DoSitz          = { ...example('do-sitz'), tags: ['!dev'] };
 export const DontSitz        = { ...example('dont-sitz'), tags: ['!dev'] };
+export const DoLokal         = { ...example('do-lokal'), tags: ['!dev'] };
+export const DontLokal       = { ...example('dont-lokal'), tags: ['!dev'] };

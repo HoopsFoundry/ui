@@ -3,7 +3,7 @@ import * as VanillaStories from './Vanilla.stories';
 import { DosDonts } from '../docs/blocks/DosDonts';
 import { CodeBlock } from '../docs/blocks/CodeBlock';
 import { DocTable } from '../docs/blocks/DocTable';
-import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget } from './Vanilla.code';
+import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget, mapSizes, mapBudget } from './Vanilla.code';
 import syncSource from '../examples/portal-sync.mjs?raw';
 import '../docs/blocks/blocks.css';
 
@@ -20,8 +20,9 @@ Jeder Baustein mit Verhalten ist eine Funktion `initX(element, options)`, die vo
 - **Gebündelt:** `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` und `dss.css` (Tokens plus Komponenten) im Ordner `dist/vanilla` des Pakets (Export `@bbv/dss-design-system/vanilla`). Eine Datei, keine Abhängigkeiten.
 - **Einzelmodule:** `@bbv/dss-design-system/tabs.js`, `…/modal.js`, `…/pagenav.js`, `…/backtop.js`, `…/theme.js`, `…/accordion.js`, `…/vanilla-core.js` (`initAll`) mit Typen. Für Projekte mit eigenem Bundler.
 - **Markup aus Daten:** `dss-render.js` (und `dss-render.min.js`) im selben Ordner, Export `@bbv/dss-design-system/vanilla-render`; die Einzelmodule heißen `…/render.js` und `…/render/league-card.js` usw. (Abschnitt „Markup erzeugen“).
+- **Karte:** `dss-map.js` (und `dss-map.min.js`) im selben Ordner, Export `@bbv/dss-design-system/vanilla-map`; das Einzelmodul heißt `…/map-vanilla.js` (Abschnitt „Karte“). Leaflet gehört nicht dazu.
 
-Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [PageNav und Nach oben](?path=/docs/components-pagenav--docs), [Dunkelmodus-Umschalter](?path=/docs/foundation-dark-mode--docs), [Tabs](?path=/docs/components-tabs--docs) und [Modal](?path=/docs/components-modal--docs). Die Karte ([Map](?path=/docs/components-map--docs)) lädt Leaflet erst nach Einwilligung; ein `initMap` für Vanilla ist für die nächste Stufe (V2b) vorgesehen, die Bündel enthalten weder die lebendige Karte noch Leaflet (die Hallenkarte zeigt die Karte bis dahin als Platzhalter).
+Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [PageNav und Nach oben](?path=/docs/components-pagenav--docs), [Dunkelmodus-Umschalter](?path=/docs/foundation-dark-mode--docs), [Tabs](?path=/docs/components-tabs--docs) und [Modal](?path=/docs/components-modal--docs). Die Karte ([Map](?path=/docs/components-map--docs)) lädt Leaflet erst nach Einwilligung; `mountMap` und `initMap` aus dem Karten-Bündel bedienen sie ohne Framework, Leaflet liefert die Seite lokal aus (Abschnitt „Karte“).
 
 ## Einbindung ohne Build
 
@@ -35,7 +36,7 @@ Die Seite aus diesem Beispiel im Kleinen, mit Tabs, Dialog und Accordion; alles 
 
 ## data-dss: was initAll startet
 
-`initAll(scope, options)` findet unterhalb von `scope` (Standard: das Dokument; ein passendes `scope` selbst zählt mit) jedes Element mit `data-dss` und startet den Baustein darauf. Es gibt sechs:
+`initAll(scope, options)` findet unterhalb von `scope` (Standard: das Dokument; ein passendes `scope` selbst zählt mit) jedes Element mit `data-dss` und startet den Baustein darauf. Es gibt sieben, die Karte braucht das Karten-Bündel (Abschnitt „Karte“):
 
 <DocTable
   label="Bausteine von initAll"
@@ -47,6 +48,7 @@ Die Seite aus diesem Beispiel im Kleinen, mit Tabs, Dialog und Accordion; alles 
     ['theme', <>ein <code>&lt;button&gt;</code></>, 'initTheme', 'Dark Mode'],
     ['tabs', <>die Leiste (<code>role="tablist"</code> oder <code>role="group"</code>)</>, 'initTabs', 'Tabs'],
     ['modal', <>das <code>&lt;dialog&gt;</code> oder das Element mit <code>hidden</code></>, 'initModal', 'Modal'],
+    ['map', <>ein leerer Behälter (wird zur Karte) oder Markup von <code>renderMap</code></>, 'initMapBlock (aus dss-map.js, über options.map.start)', 'Map'],
   ]}
 />
 
@@ -78,7 +80,7 @@ Neben den `initX`-Bausteinen gibt es für zehn Komponenten Funktionen, die das M
   rows={[
     ['LeagueCard', <><code>renderLeagueCard</code>, <code>mountLeagueCard</code></>, 'Fenster um die eigene Mannschaft, Spalten, Zonen, Live; collapsible'],
     ['TeamCard', <><code>renderTeamCard</code>, <code>mountTeamCard</code></>, 'Link oder Button (options.onClick); nur gültige Werte'],
-    ['VenueCard', <><code>renderVenueCard</code>, <code>mountVenueCard</code></>, 'Karte als Platzhalter ohne Leaflet; „Karte laden“ ist gesperrt, bis initMap (V2b) sie freigibt (options.mapActive)'],
+    ['VenueCard', <><code>renderVenueCard</code>, <code>mountVenueCard</code></>, 'Karte als Platzhalter ohne Leaflet; „Karte laden“ ist gesperrt, bis { initMap } aus dem Karten-Bündel sie startet (mountVenueCard) oder options.mapActive sie freigibt'],
     ['ScheduleTable, ScheduleGrid', <><code>renderScheduleTable</code>, <code>renderScheduleGrid</code>, <code>mountScheduleTable</code>, <code>mountScheduleGrid</code></>, 'options.time und options.notice liefern Text; collapsible'],
     ['Table', <><code>renderTable</code>, <code>mountTable</code></>, 'Zeilen und Zellen als Daten statt Markup'],
     ['MatchCard', <><code>renderMatchCard</code>, <code>mountMatchCard</code></>, 'Link (href) oder Button (options.onClick)'],
@@ -152,6 +154,36 @@ Zwei eingebettete Seiten aus Daten: links Ligencard, Spielkarte und Kennzahlen (
   </div>
 </div>
 
+## Karte
+
+Die Karte ist ein eigenes Bündel, weil sie Leaflet anbindet und eigene Zustände hat: `dss-map.js` (`dss-map.min.js`, Quellkarte, `dss-map.d.ts`) im selben Ordner wie `dss.js`, Export `@bbv/dss-design-system/vanilla-map`. Es enthält **kein Leaflet**: die Seite liefert Leaflet aus dem eigenen Projekt aus, die Karte lädt es erst nach dem Klick auf „Karte laden“ (oder bei `load: 'auto'`). Vor dem Klick gibt es keinen Netzverkehr: keine Anfrage an den Kartendienst, kein Leaflet, kein Prefetch, keine Cookies, keinen Speicher.
+
+<DocTable
+  label="Exporte des Karten-Bündels"
+  head={['Name', 'Zweck']}
+  rows={[
+    [<code>renderMap</code>, 'Markup der Karte als Zeichenkette (wie MapView im Server-Rendering); läuft auch in Node'],
+    [<code>mountMap</code>, 'renderMap einsetzen (Styles über das CSSOM) und die Karte starten; liefert update und destroy'],
+    [<code>initMap</code>, 'vorhandenes Markup (renderMap, renderVenueCard) lebendig machen; liefert update und destroy'],
+    [<code>initMapBlock</code>, 'Anbindung für initAll (data-dss="map"): vorhandenes Markup per initMap, leerer Behälter per mountMap'],
+    [<code>VERSION</code>, 'Version des Pakets (muss zu dss.js und dss.css passen)'],
+  ]}
+/>
+
+Die Option `loadLeaflet` (Funktion, die ein Promise mit Leaflet liefert) ersetzt den Standard `import('leaflet')`, der einen Bundler oder eine importmap braucht. Das Vorgehen mit lokalen Dateien, importmap und `window.L` steht auf der Seite [Map](?path=/docs/components-map--docs) im Abschnitt „Ohne Build einbinden“, die Hallenkarte auf [VenueCard](?path=/docs/components-venuecard--docs). Die Karte meldet Fehler mit dem Grund `tile-url`, `import`, `init`, `update` oder `tiles` (`onError`) und zeigt dann Statuszeile, Adresse und Links.
+
+<DocTable
+  label="Größen des Karten-Bündels"
+  head={['Datei', 'Größe', 'Budget']}
+  rows={[
+    ['dss-map.js', `${(mapSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte'],
+    ['dss-map.min.js', `${(mapSizes.min / 1024).toFixed(1)} KiB`, `höchstens ${mapBudget.minKB} KiB`],
+    ['dss-map.min.js (gzip)', `${(mapSizes.gzip / 1024).toFixed(1)} KiB`, `höchstens ${mapBudget.gzipKB} KiB`],
+  ]}
+/>
+
+Das Bündel steht allein (es braucht weder `dss.js` noch `dss-render.js`); `mountVenueCard` aus `dss-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
+
 ## Sicherheit
 
 - **Kein `innerHTML`:** Texte setzt das Paket als Text, Symbole als SVG per `createElementNS`, Markup per `createContextualFragment`. Ein Test prüft die Quelltexte und das Bündel auf `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval` und `new Function`.
@@ -180,7 +212,7 @@ Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, häl
   ]}
 />
 
-Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `dss-render.js`, mit eigenem Budget (siehe „Markup erzeugen“); der Kern bleibt, was er war. `initMap` (V2b) bekommt sein Budget ebenso ausdrücklich, nicht stillschweigend.
+Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `dss-render.js`, die Karte in `dss-map.js`, jede mit eigenem Budget (siehe „Markup erzeugen“ und „Karte“); der Kern bleibt, was er war.
 
 ## Kopieren ins Projekt
 

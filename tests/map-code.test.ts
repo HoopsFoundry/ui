@@ -105,25 +105,25 @@ describe('Funktionen aus map.js: die Aufrufe im Beispiel werden ausgewertet und 
   });
 });
 
-describe('Vanilla-Beispiel', () => {
-  const script = map.vanilla.match(/<script type="module">([\s\S]*?)<\/script>/)![1];
+describe('Beispiel „Leaflet direkt“ (leafletDirekt)', () => {
+  const script = map.leafletDirekt.match(/<script type="module">([\s\S]*?)<\/script>/)![1];
   it('der Skriptteil importiert nur vorhandene Exporte aus map.js', () => {
     const named = script.match(/import \{([^}]+)\} from '@bbv\/dss-design-system\/map\.js'/)![1].split(',').map((s) => s.trim());
     for (const name of named) expect(mapjs, name).toHaveProperty(name);
   });
   it('der Pin im Beispiel hat dieselbe Form wie der Pin der Komponente', () => {
     const path = read('js/map-leaflet.js').match(/const PIN_PATH = '([^']+)'/)![1];
-    expect(map.vanilla.split(path)).toHaveLength(3);
+    expect(map.leafletDirekt.split(path)).toHaveLength(3);
   });
   it('alle dss-map-Klassen im Markup gibt es im CSS', () => {
     const css = read('css/components.css');
-    const classes = new Set([...map.vanilla.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('dss-map')));
+    const classes = new Set([...map.leafletDirekt.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('dss-map')));
     expect(classes.size).toBeGreaterThan(8);
     for (const cls of classes) expect(css, cls).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
   });
   it('das Skript läuft gegen das gespielte Leaflet: Karte, Kachelebene, Marker, Koordinaten und Routen-Link', async () => {
     const { JSDOM } = await import('jsdom');
-    const dom = new JSDOM(`<body>${map.vanilla.replace(/<!--[\s\S]*?-->/g, '').replace(/<script[\s\S]*<\/script>/, '')}</body>`, { runScripts: 'outside-only' });
+    const dom = new JSDOM(`<body>${map.leafletDirekt.replace(/<!--[\s\S]*?-->/g, '').replace(/<script[\s\S]*<\/script>/, '')}</body>`, { runScripts: 'outside-only' });
     const mock = await import('./helpers/leaflet-mock');
     mock.reset();
     // Das Skript ist ein ES-Modul: Import-Zeilen durch die lokalen Module ersetzen und im DOM von jsdom ausführen
@@ -354,7 +354,8 @@ describe('Beispiele der Doku-Seite', () => {
     for (const example of names) {
       const html = await renderExample(example);
       expect(html, example).not.toContain('undefined');
-      if (!['zustaende', 'sitz-pins'].includes(example)) expect(html, example).toContain('dss-map-frame');
+      // Vanilla-Beispiele entstehen erst im Browser (mountMap in einer Svelte-Aktion), die Code-Beispiele sind Text
+      if (!['zustaende', 'sitz-pins'].includes(example) && !/^(vanilla|do-lokal|dont-lokal)/.test(example)) expect(html, example).toContain('dss-map-frame');
     }
   });
   it('Namen der Karten sind eindeutig: je Beispiel und über alle Beispiele einer Docs-Seite (axe landmark-unique)', async () => {
@@ -367,7 +368,7 @@ describe('Beispiele der Doku-Seite', () => {
     expect(new Set(all).size, `doppelt: ${all.filter((t, i) => all.indexOf(t) !== i).join(', ')}`).toBe(all.length);
   });
   it('Quelltext: kein Label doppelt in der Beispielkomponente', () => {
-    const found = [...examplesSrc.matchAll(/label="([^"]+)"/g)].map((m) => m[1]);
+    const found = [...examplesSrc.matchAll(/label="([^"]+)"/g), ...examplesSrc.matchAll(/label: '([^']+)'/g)].map((m) => m[1]);
     expect(found.length).toBeGreaterThanOrEqual(15);
     expect(found.filter((l, i) => found.indexOf(l) !== i)).toEqual([]);
   });
@@ -395,9 +396,9 @@ describe('Beispiele der Doku-Seite', () => {
       expect(stories, prop).toMatch(new RegExp(`\\n\\s+${prop}: \\{ control: [^\\n]*description: `));
     }
   });
-  it("fünf Dos und Don'ts, jedes mit zwei Geschichten", () => {
-    expect([...mdx.matchAll(/doText:/g)]).toHaveLength(5);
-    for (const n of ['Adresse', 'Datenschutz', 'Liste', 'Quelle', 'Sitz']) {
+  it("sechs Dos und Don'ts, jedes mit zwei Geschichten", () => {
+    expect([...mdx.matchAll(/doText:/g)]).toHaveLength(6);
+    for (const n of ['Adresse', 'Datenschutz', 'Liste', 'Quelle', 'Sitz', 'Lokal']) {
       expect(stories).toContain(`Do${n} `);
       expect(stories).toContain(`Dont${n} `);
     }

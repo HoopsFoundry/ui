@@ -1,6 +1,7 @@
 // Hallenkarte. Die Beispiele sind gegen die echten Komponenten geprüft (tests/venue-code.test.ts): Svelte per Server-Rendering, React per
 // TypeScript-Compiler, das Vanilla-Markup gegen die Ausgabe der Svelte- und der React-Fassung.
-export const vanilla = `<!-- Vanilla: die Hallenkarte ist reines Markup mit den Klassen dss-venue* (css/components.css). Die Karte links ist die Map: statt der Komponente
+export const vanilla = `<!-- Vanilla: die Hallenkarte ist reines Markup mit den Klassen dss-venue* (css/components.css); aus Daten erzeugt sie mountVenueCard
+     (Abschnitt „Vanilla: Hallenkarte aus Daten erzeugen“). Hier von Hand: Die Karte links ist die Map: statt der Komponente
      schreibst du den Platzhalter der Karte selbst (dss-map*) und lädst Leaflet nach dem Klick auf „Karte laden“ (npm install leaflet, dazu leaflet.css).
      Links tel: und mailto: baust du mit telHref() und mailHref(), die Links unter der Karte mit mapLinks() (map.js, venue.js). -->
 <div class="dss-venue dss-venue--standard dss-venue--map">

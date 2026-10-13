@@ -6,7 +6,7 @@ import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs } from './VenueCard.code';
-import { hallenRender } from './Render.code';
+import { hallenRender, hallenKarteLebendig, hallenKarteServer } from './Render.code';
 
 <Meta of={VenueCardStories} />
 
@@ -154,9 +154,40 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Sporthalle Nordhain
 
 ## Vanilla: Hallenkarte aus Daten erzeugen
 
-`renderVenueCard(props)` liefert die Hallenkarte samt Karte als Platzhalter-Markup: Region, Hinweis mit „Karte laden“, Statuszeile, Quellenangabe und Ortsliste ohne Leaflet und ohne Netzverkehr. Die Links „Größere Karte“ und „Route planen“ sowie Adresse und Kontakt stehen als Text daneben. Erst `initMap` (nächste Stufe, V2b) macht die Karte lebendig (Kacheln, Zoom, Marker); bis dahin bleibt der Platzhalter, wie bei `MapView` vor dem Klick. Grenzen wie in der Komponente: `limit` 1 bis 5 (Standard 2), ohne beendete Spiele und Freilose.
+`renderVenueCard(props)` liefert die Hallenkarte samt Karte als Platzhalter-Markup: Region, Hinweis mit „Karte laden“, Statuszeile, Quellenangabe und Ortsliste ohne Leaflet und ohne Netzverkehr. Die Links „Größere Karte“ und „Route planen“ sowie Adresse und Kontakt stehen als Text daneben. Ohne Anbindung ist die Schaltfläche „Karte laden“ gesperrt (`disabled`, `aria-disabled`), damit sie nicht tot wirkt. Grenzen wie in der Komponente: `limit` 1 bis 5 (Standard 2), ohne beendete Spiele und Freilose.
 
 <FrameworkCode label="VenueCard aus Daten (Vanilla)" vanilla={hallenRender} />
+
+### Mit lebendiger Karte: `initMap`
+
+`mountVenueCard(el, props, { initMap })` startet die eingebettete Karte über `initMap` aus dem Karten-Bündel (`dss-map.min.js`): nicht interaktiv und ohne Liste wie die Komponente, „Karte laden“ ist bedienbar, Kacheln und Leaflet kommen erst nach dem Klick (oder bei `load: 'auto'`). Leaflet liefert `loadLeaflet` aus dem eigenen Projekt (Abschnitt „Ohne Build einbinden“ auf der Seite [Map](?path=/docs/components-map--docs)). `update(props)` lässt die laufende Karte stehen, solange Koordinaten und Name gleich bleiben; `destroy()` räumt Karte und Markup ab. Die Beispiele laufen mit dem lokalen Gitterbild als Kachel:
+
+<Canvas of={VenueCardStories.VanillaKarte} />
+
+<FrameworkCode label="Hallenkarte mit lebendiger Karte (Vanilla)" vanilla={hallenKarteLebendig} />
+
+Entsteht das Markup auf dem Server (Seitengenerierung, Crawler), markiert `renderVenueCard(props, { init: true })` die Karte mit `data-dss="map"` und ihren Optionen als JSON; im Browser genügt `initAll`:
+
+<FrameworkCode label="Hallenkarte vom Server (Vanilla)" vanilla={hallenKarteServer} />
+
+### Vanilla auf dem Handy · 390 px Breite
+
+Die Vorschauen zeigen die Hallenkarte aus `mountVenueCard` mit anderen Hallen als die Svelte-Vorschauen oben: links die Ahornhalle mit Spielen, rechts die Erlenhalle kompakt mit sofort geladener Karte.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">VenueCard Vanilla · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte hell">
+      <iframe title="Handy-Vorschau: Vanilla-Hallenkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-venuecard--vanilla-handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">VenueCard Vanilla · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte dunkel">
+      <iframe title="Handy-Vorschau: Vanilla-Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--vanilla-handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
 
 ## Dos und Don'ts
 

@@ -59,6 +59,10 @@ export const Compact    = { ...example('compact'), tags: ['!dev'] };
 export const Handy      = { ...example('handy'), tags: ['!dev'] };
 export const HandyDunkel = { ...example('handy-dunkel'), tags: ['!dev'] };
 export const Zustaende  = { ...example('zustaende'), tags: ['!dev'] };
+// Vanilla: mountVenueCard mit initMap (ohne Framework); die Handy-Vorschauen zeigen andere Hallen als die Svelte-Vorschauen
+export const VanillaKarte      = { ...example('vanilla'), tags: ['!dev'] };
+export const VanillaHandy      = { ...example('vanilla-handy'), tags: ['!dev'] };
+export const VanillaHandyDunkel = { ...example('vanilla-handy-dunkel'), tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAdresse        = { ...example('do-adresse'), tags: ['!dev'] };

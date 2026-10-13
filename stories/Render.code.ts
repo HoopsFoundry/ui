@@ -94,12 +94,59 @@ export const hallenRender = `<div id="halle"></div>
     limit: 3, href: '/hallen/nordhain',
   };
 
-  // Die Karte ist hier der Platzhalter mit Hinweis und Schaltfläche „Karte laden“ (kein Netzverkehr, kein Leaflet).
-  // Adresse und Links stehen als Text daneben; lebendig wird die Karte erst mit initMap (nächste Stufe).
+  // Ohne initMap ist die Karte der Platzhalter mit Hinweis und gesperrter Schaltfläche „Karte laden“ (kein Netzverkehr, kein Leaflet).
+  // Adresse und Links stehen als Text daneben; lebendig wird die Karte mit { initMap } (zweites Beispiel unten).
   const karte = mountVenueCard(document.querySelector('#halle'), halle);
 
   const html = renderVenueCard(halle);   // beendete Spiele und Freilose fehlen, limit gilt (1 bis 5)
 </script>`;
+
+/** Hallenkarte mit lebendiger Karte: mountVenueCard startet die eingebettete Karte über initMap (aus dem Karten-Bündel); Leaflet kommt lokal. */
+export const hallenKarteLebendig = `<div id="halle"></div>
+
+<script type="module">
+  import { mountVenueCard } from '/dss/dss-render.min.js';
+  import { initMap } from '/dss/dss-map.min.js';
+
+  const halle = {
+    name: 'Sporthalle Nordhain',
+    address: { street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' },
+    lat: 49.3, lng: 7.9,
+    info: 'Zwei Spielfelder, Zugang über den Haupteingang.',
+    contact: { name: 'Jonas Weide', phone: '030 23125 100', email: 'hallenwart@example.org' },
+    games: [
+      { id: 'a', state: 'scheduled', date: 'Sa, 17.10.2026', time: '17:30', league: { name: 'Oberliga Nordhain Männer' }, heim: { name: 'TSV Nordhain 1920', short: 'Nordhain' }, gast: { name: 'BG Seeberg' } },
+    ],
+    href: '/hallen/nordhain',
+    tileUrl: '/tiles/{z}/{x}/{y}.png',   // eigener Kachel-Proxy (Datenschutz und Kachelserver auf der Seite Map)
+  };
+
+  // initMap startet die Karte der Hallenkarte (nicht interaktiv, ohne Liste wie die Komponente); „Karte laden“ wird bedienbar.
+  // Leaflet kommt aus dem eigenen Projekt und erst nach dem Klick: vorher gibt es keinen Netzverkehr.
+  const karte = mountVenueCard(document.querySelector('#halle'), halle, {
+    initMap,
+    loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js'),
+    onError: (grund) => console.warn('Karte nicht geladen:', grund),
+  });
+
+  // update ändert Name, Spiele und Kontakt, ohne die laufende Karte zu stören; ändern sich Koordinaten oder Name, baut es die Karte neu.
+  function hinweis() {
+    karte.update({ ...halle, info: 'Heute zwei Spielfelder frei.' });
+  }
+  // karte.destroy();   // räumt die Karte (map.remove) samt Markup ab
+</script>`;
+
+/** Hallenkarte vom Server: das Markup entsteht in Node, initAll macht die Karte im Browser lebendig. */
+export const hallenKarteServer = `// In Node (Seitengenerierung, Crawler): die Karte trägt data-dss="map" und ihre Optionen als JSON
+import { renderVenueCard } from '@bbv/dss-design-system/vanilla/dss-render.js';
+
+const html = renderVenueCard(halle, { init: true });   // „Karte laden“ ist ohne Skript gesperrt, Adresse und Links stehen als Text da
+
+// Im Browser, nach dem Laden der Seite:
+import { initAll } from '/dss/dss.min.js';
+import { initMapBlock } from '/dss/dss-map.min.js';
+
+initAll(document, { map: { start: initMapBlock, loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js') } });`;
 
 export const spielplanRender = `<div id="plan"></div>
 
@@ -234,6 +281,7 @@ export const DOCS = {
   ligaEinklappbar: { code: ligaEinklappbarRender, component: 'LeagueCard', mounts: [{ variable: 'ligaZu', id: 'liga-zu' }], strings: [] },
   team: { code: teamRender, component: 'TeamCard', mounts: [{ variable: 'team', id: 'team' }], strings: [{ variable: 'html', of: 'team' }] },
   halle: { code: hallenRender, component: 'VenueCard', mounts: [{ variable: 'halle', id: 'halle' }], strings: [{ variable: 'html', of: 'halle' }] },
+  halleKarte: { code: hallenKarteLebendig, component: 'VenueCard', mounts: [{ variable: 'halle', id: 'halle' }], strings: [], live: true },
   spielplan: { code: spielplanRender, component: 'ScheduleTable', mounts: [{ variable: 'plan', id: 'plan' }], strings: [{ variable: 'html', of: 'plan' }] },
   raster: { code: rasterRender, component: 'ScheduleGrid', mounts: [{ variable: 'raster', id: 'raster' }], strings: [{ variable: 'html', of: 'raster' }] },
   tabelle: { code: tabelleRender, component: 'Table', mounts: [{ variable: 'tabelle', id: 'tabelle' }], strings: [{ variable: 'html', of: 'tabelle' }] },

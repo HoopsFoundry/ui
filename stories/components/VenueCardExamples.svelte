@@ -1,5 +1,7 @@
 <script lang="ts">
   import VenueCard from '../../svelte/VenueCard.svelte';
+  import { initMap } from '../../js/map-vanilla.js';
+  import { mountVenueCard } from '../../js/render/venue-card.js';
   import { demoTileUrl } from './mapData';
   import { demoGames, venueProps } from './venueData';
 
@@ -10,6 +12,13 @@
   const games = demoGames();
   const gamesPlain = demoGames({ logos: false });
   const gamesStates = demoGames({ states: true });
+
+  // Vanilla: mountVenueCard mit initMap (die Karte ohne Framework); update und destroy folgen dem Svelte-Lebenszyklus
+  type VanillaProps = Parameters<typeof mountVenueCard>[1];
+  function vanilla(node: HTMLElement, props: VanillaProps) {
+    const handle = mountVenueCard(node, props, { initMap });
+    return { update: (next: VanillaProps) => handle.update(next), destroy: () => handle.destroy() };
+  }
 
   // Erzwingt einen Zustand auf den Links (Hover und Fokus wirken über die Pseudo-Klassen des Storybook-Addons)
   function mark(node: HTMLElement, cls: string) {
@@ -80,6 +89,16 @@
     <VenueCard {...venueProps(0)} games={games} logos names="short" tileUrl={tile} />
     <div class="gap"></div>
     <VenueCard {...venueProps(1)} size="compact" tileUrl={tile} />
+  </div>
+{:else if example === 'vanilla'}
+  <div use:vanilla={{ ...venueProps(13), games: gamesPlain, tileUrl: tile, linkLabel: 'Zur Hallenseite' } as never}></div>
+{:else if example === 'vanilla-handy'}
+  <div class="narrow">
+    <div use:vanilla={{ ...venueProps(14), games: games, logos: true, names: 'short', tileUrl: tile } as never}></div>
+  </div>
+{:else if example === 'vanilla-handy-dunkel'}
+  <div class="narrow">
+    <div use:vanilla={{ ...venueProps(21), size: 'compact', tileUrl: tile, load: 'auto' } as never}></div>
   </div>
 {:else if example === 'zustaende'}
   <!-- data-fixed-states: die Werkzeugleiste "Zustand" lässt diese Matrix in Ruhe -->
