@@ -1,0 +1,25 @@
+[[quality-requirements]]
+== Qualitätsanforderungen
+
+Die folgenden Szenarien sind Anforderungen beziehungsweise Prüfziele. Sie sind keine Aussage, dass alle Prüfungen bereits erfolgreich durchgeführt wurden.
+
+[cols="1,2,2",options="header"]
+|===
+|ID |Szenario |Prüfansatz
+|Q-01 |Gleiche Eingaben liefern gleichwertige Framework-Ausgabe |Normalisierter Markupvergleich plus visuelle und semantische Prüfung
+|Q-02 |Ein Modal ist per Tastatur bedienbar und gibt Fokus zurück |Interaktionstest in relevanten Implementierungen
+|Q-03 |Zerstörte Komponenten hinterlassen keine eigenen Listener oder Observer |Lifecycle-Tests; für Karten reproduzierbare Browsermessung
+|Q-04 |Zwei-Klick-Karten verursachen vor Freigabe keine externen Kartenanfragen |Browsertest mit Netzwerkbeobachtung
+|Q-05 |Unvertrauenswürdige Texte und URLs können keine ausführbare Ausgabe einschleusen |Gezielte Eingabe- und Sicherheitstests
+|Q-06 |Kernfunktionen laufen in Chromium, Firefox und WebKit |Browsermatrix gemäß Lückenplan
+|Q-07 |Dokumentierte Imports und Beispiele entsprechen öffentlichen APIs |Export- und Beispielprüfung
+|Q-08 |Ein Agent findet Komponente, API und Architekturregel ohne erfundene Imports |Referenzaufgabe mit dokumentiertem Ergebnis; Katalog noch aufzubauen
+|===
+
+=== Vorhandene Prüfinfrastruktur
+
+Das Repository enthält Vitest-Tests, Paritätstests, Kontrast- und Fokusprüfungen sowie zahlreiche SSR-, Dokumentations- und Verhaltenstests. Testnamen beweisen weder vollständige Abdeckung noch erfolgreiche Ausführung. Die Baseline wurde ohne Ausführung dieser Tests erstellt.
+
+=== Noch festzulegen
+
+Messgrenzen, unterstützte Browserstände, verbindliche CI-Gates sowie Umfang manueller Accessibility-Prüfungen müssen dokumentiert werden. Eine pauschale AAA-Zusage ist kein Ersatz für diese Nachweise.

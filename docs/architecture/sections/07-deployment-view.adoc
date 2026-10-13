@@ -1,0 +1,22 @@
+[[deployment-view]]
+== Verteilungssicht
+
+=== Beobachteter Stand
+
+* Storybook wird lokal mit `npm run storybook` betrieben.
+* `npm run build-storybook` erzeugt die statische Veröffentlichung.
+* `.github/workflows/deploy-storybook.yaml` baut und veröffentlicht auf GitHub Pages.
+* React-Artefakte werden über `npm run build:react` erzeugt.
+* `package.json` definiert die Inhalte und öffentlichen Exports des Pakets.
+
+Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus. Ein Qualitätsworkflow ist eine geplante Ergänzung, kein vorhandener Nachweis.
+
+=== Beschlossene Vanilla-Auslieferung
+
+Quelle: `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`.
+
+Am 12. Oktober 2026 wurde GitHub-Release mit `dist/vanilla` als erste Auslieferung festgelegt. Ab Version 1.0 ist npm vorgesehen. Release-Skript, Prüfsummen, Versionsabgleich und `portal-sync` sind laut Plan noch umzusetzen beziehungsweise abzunehmen.
+
+=== Dokumentation und MCP
+
+Der Workflow `.github/workflows/render-docs.yml` (Vorlage: Workflow „Render AsciiDoc Documentation" im Vereinsregister) löst bei Änderungen an `docs/**/*.adoc` auf `main` mit `asciidoctor-reducer` alle Includes von `docs/architecture/index.adoc` auf und committet das Ergebnis als `docs/architecture/README.adoc`. Damit zeigt GitHub das Gesamtdokument an. Mermaid-Diagramme erscheinen dort als Quelltextblöcke; ein grafisches Rendering (z. B. asciidoctor-diagram) ist nicht Teil dieses Schritts. Eine statische Storybook-Veröffentlichung ist nicht automatisch ein laufender MCP-Dienst. Lokale und öffentlich gehostete MCP-Nutzung benötigen getrennte Betriebsentscheidungen.

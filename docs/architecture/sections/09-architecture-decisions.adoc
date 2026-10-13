@@ -1,0 +1,64 @@
+[[architecture-decisions]]
+== Architekturentscheidungen
+
+Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehungsweise `docs/superpowers/plans/` getroffen wurden. Begründungen stammen aus diesen Quellen; nichts wird rückwirkend ergänzt. Ablösung erfolgt durch ein neues, verlinktes ADR.
+
+=== ADR-001: Eine CSS-Quelle, drei Fassungen
+
+* Status: angenommen, umgesetzt.
+* Kontext: Komponenten existieren als Vanilla-CSS-Klassen, Svelte und React und sollen gleich aussehen.
+* Entscheidung: Das Aussehen steht ausschließlich in `css/components.css` (Klassen `dss-*`, Tokens aus `tokens/`). Svelte-Dateien haben keinen `<style>`-Block. `parity.manifest.json` ordnet je Komponente Dateien und Klassen zu; `tests/parity.test.ts` prüft die Vollständigkeit. Die Vanilla-Fassung wird als dritte Fassung im Manifest geführt (für Tabs und Modal bereits vorhanden); für die Render-Funktionen ist das mit V2a geplant.
+* Konsequenzen: Neue Komponenten brauchen Manifest-Eintrag, Exporte und CSS an einer Stelle; Abweichungen werden über Paritätstests sichtbar.
+* Quellen: `2026-10-08-spielplan-design.md` (kein `<style>`, Manifest), `2026-10-11-vanilla-paket-design.md` (Teil 2, dritte Fassung), README (`components.css` „einzige CSS-Quelle"), `CLAUDE.md`.
+
+=== ADR-002: Überschriften-Ebenen über `titleAs` und `HeadingLevel`
+
+* Status: angenommen, umgesetzt.
+* Kontext: Ein Token kann die Ebene (HTML-Element) nicht ändern, nur das Aussehen. Ebene und Aussehen sollen getrennt und abschnittsweise vorgegeben werden.
+* Entscheidung: Komponenten geben nie `h1` aus. Rangfolge: `titleAs` > `HeadingLevel`-Kontext > Standard `h3`; Ebenen werden auf `h2`–`h6` begrenzt (`js/heading.js`). Die Größe hängt an Klassen und Tokens (`--dss-title-size` …), nie am Elementnamen. Modal und verschachtelte Bereiche erhöhen die Ebene ihres Inhalts um 1. In Vanilla gibt es keinen Kontext; die Ebene wird übergeben.
+* Konsequenzen: Eine CSS-Regel auf `h2`/`h3`/`h4` für Größen ist unzulässig und wird getestet; axe `heading-order` gehört zu den Docs-Prüfungen.
+* Quellen: `2026-10-10-ueberschriften-design.md`, `2026-10-11-vanilla-paket-design.md`.
+
+=== ADR-003: Karte mit Zwei-Klick-Freigabe und Kachel-Proxy
+
+* Status: angenommen, umgesetzt.
+* Kontext: Jede Kachel wird vom Kartenserver geladen, der die IP der Besucher sieht.
+* Entscheidung: Leaflet ist optionale Peer-Abhängigkeit und wird per `import('leaflet')` erst bei Bedarf geladen. Standard ist `load="click"` (Platzhalter mit Hinweis, erst nach Klick Leaflet und Kacheln); `load="auto"` ist für Apps mit Einwilligung oder eigenem Proxy vorgesehen. `tileUrl` erlaubt einen Kachel-Proxy der App; der Standard-OSM-Server gilt nur als Demo/Entwicklung. Das Paket enthält keinen Serverteil; Proxy-Rezepte (nginx, Node/SvelteKit) stehen nur in der Doku.
+* Konsequenzen: Datenschutzaussagen hängen vom Lademodus und von `tileUrl` ab. Svelte und React teilen den Controller `js/map-leaflet.js`.
+* Quellen: `2026-10-11-map-hallenkarte-design.md`, Plan `2026-10-11-map.md`.
+
+=== ADR-004: Accordion mit Überschrift und Button, `details` nur zusätzlich
+
+* Status: angenommen, umgesetzt.
+* Kontext: Lange Seiten mit vielen Tabellen (Vereinsregister) sollen gegliedert werden; benötigt werden Deep-Link, Sprungleiste, Tastatursteuerung (Pfeile, Home, End), „Alle öffnen" und klebender Kopf.
+* Entscheidung: Komponenten nutzen das WAI-ARIA-Muster mit Überschrift und `<button aria-expanded aria-controls>`. Im Vanilla-CSS wird zusätzlich natives `<details>`/`<summary>` mit gleichem Aussehen unterstützt.
+* Konsequenzen: Die Überschriftenregel aus ADR-002 gilt auch für Accordion-Köpfe; die Zusatzfunktionen hängen am Button-Weg.
+* Quellen: `2026-10-10-accordion-design.md`, Pläne `2026-10-10-accordion.md`, `2026-10-11-accordion-b.md`.
+
+=== ADR-005: Vanilla-Verhalten nach dem Muster `initX(root, options) → { destroy() }`
+
+* Status: angenommen; teilweise umgesetzt. Vorhanden sind das Muster `initX`/`destroy`, `initAll` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`). Die Render-Funktionen mit `esc()` und `createContextualFragment` sind erst mit V2a geplant.
+* Kontext: Das Vereinsregister ist ein statisches Vanilla-JS-Portal; Mittelweg statt Wechsel auf Svelte/React.
+* Entscheidung: Einheitliches Muster `initX(root, options)` → `{ destroy() }`, idempotent, nur `root` und Nachfahren, kein globaler Zustand, respektiert reduzierte Bewegung. `initAll(scope)` findet Bausteine über `data-dss`. Render-Funktionen escapen Texte zentral (`esc()`), URLs laufen durch `safeHref`; Einfügen per `createContextualFragment`.
+* Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping.
+* Quellen: `2026-10-11-vanilla-paket-design.md` (Teil 1 und 2), `2026-10-11-portal-bausteine-review.md`, Plan `2026-10-12-vanilla-v2-plan.md`.
+
+=== ADR-006: Auslieferung per GitHub-Release, ab 1.0 per npm
+
+* Status: angenommen am 2026-10-12; Umsetzung laut Plan.
+* Kontext: Optionen waren A (GitHub-Release mit `dist/vanilla`), B (npm-Paket), C (Git-Dependency mit `prepare`).
+* Entscheidung: A bis Version 1.0, danach B. Release-Skript und `portal-sync` werden so gebaut, dass der Wechsel nur die Quelle ändert, nicht den Aufbau von `dist/vanilla`.
+* Konsequenzen: Kein npm-Konto bis 1.0 nötig, `dist/` bleibt außerhalb von Git; das Portal lädt eine feste Version.
+* Quellen: Plan `2026-10-12-vanilla-v2-plan.md`, Abschnitt V3.
+
+=== Offene Punkte (keine ADRs)
+
+[cols="1,1,2",options="header"]
+|===
+|Thema |Status |Quelle
+|Protokollrelative URLs |Offen |Lückenplan; nicht eigenmächtig entscheiden
+|Favoriten als DSS-Komponente |Offen |Portal-Review und Lückenplan
+|PageHeader/Hero |Bedarfsabhängiger Vorschlag |Lückenplan
+|CMS-Adapter |Vorgeschlagene Erweiterung |Separater Entwurf erforderlich
+|Produktname |Offen |Kapitel 1
+|===

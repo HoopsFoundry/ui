@@ -1,0 +1,28 @@
+[[introduction-and-goals]]
+== Einführung und Ziele
+
+Das Designsystem stellt Design-Tokens, gemeinsames CSS, Framework-Komponenten (Svelte, React) und wiederverwendbare JavaScript-Hilfen für Basketball-Anwendungen bereit.
+
+=== Name (Arbeitsname, Entscheidung offen)
+
+Das System wird voraussichtlich als „HoopsFoundry DSS" (DSS = Digital Sports System) oder als „HoopsFoundry UI" geführt. Die Entscheidung steht aus; beide Namen sind Arbeitsnamen. Bis zur Entscheidung bleiben Paketname `@bbv/dss-design-system` und Repository-Name `dss-design-system` unverändert. Diese Dokumentation verwendet bis dahin die Kurzform „DSS".
+
+Hintergrund: Das Kürzel DSS stammt aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
+
+=== Stakeholder
+
+* Anwendungsentwickler integrieren DSS in Basketball-Anwendungen und Vereinsportale.
+* Maintainer entwickeln Komponenten und erhalten Implementierungsparität.
+* Gestalter definieren konsistente Marken-, Typografie- und Interaktionsregeln.
+* Nutzer benötigen zugängliche und verständliche Oberflächen.
+* Coding-Agents benötigen eindeutige APIs und Architekturregeln; ihre Unterstützung ist ein Ausbauziel.
+
+=== Priorisierte Qualitätsziele
+
+. Zugänglichkeit: semantische Ausgabe, Tastaturbedienung, Fokus und kontrastreiche Darstellung.
+. Konsistenz: gemeinsame Gestaltungsgrundlage und überprüfbare Parität.
+. Sicherheit und Datenschutz: sichere Ausgabe und kontrollierte externe Kartenanfragen.
+. Integrierbarkeit: klare öffentliche APIs und reproduzierbare Auslieferung.
+. Wartbarkeit: gemeinsame Logik statt unnötiger Duplikation.
+
+Qualitätsziele sind Anforderungen, keine pauschalen Konformitätsnachweise. Konkrete Prüfszenarien stehen in Kapitel 10.

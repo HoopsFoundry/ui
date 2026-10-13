@@ -1,0 +1,58 @@
+[[building-block-view]]
+== Bausteinsicht
+
+=== Ebene 1
+
+[source,mermaid]
+----
+flowchart TB
+  subgraph Grundlage
+    T["tokens/<br/>tokens.css, tokens.json, Tailwind-Preset"]
+    C["css/components.css<br/>einzige CSS-Quelle (dss-*)"]
+    F["fonts/, icons/"]
+  end
+  J["js/<br/>reine Logik + Vanilla initX"]
+  S["svelte/*.svelte"]
+  R["react/*.tsx → dist/react"]
+  ST["stories/ + .storybook/"]
+  TE["tests/ + parity.manifest.json"]
+  C --> T
+  S --> C
+  R --> C
+  S --> J
+  R --> J
+  ST --> S
+  ST --> R
+  TE -. prüft .-> S
+  TE -. prüft .-> R
+  TE -. prüft .-> J
+----
+
+[cols="1,2",options="header"]
+|===
+|Baustein |Verantwortung
+|`tokens/` |Token-Ausgaben und Tailwind-Preset
+|`css/` |Gemeinsame Komponentenstile
+|`fonts/`, `icons/` |Gestaltungsassets
+|`js/` |Gemeinsame Logik und Vanilla-Verhalten
+|`react/` |React-Komponenten und Typen
+|`svelte/` |Svelte-Komponenten
+|`stories/` |Stories, MDX und Framework-Codebeispiele
+|`.storybook/` |Storybook-Konfiguration (`main.ts`, `preview.ts` mit `storySort` und Toolbar-Globals, Zustands-Umschalter, `storybook.css`)
+|`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
+|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; laut Plan zusätzlich `dist/vanilla`, ausgeliefert per Release
+|`tests/` |Automatisierte Prüfungen
+|`scripts/` |Entwicklungs- und Prüfwerkzeuge
+|`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
+|`package.json` |Öffentliche Exports, Build-Kommandos und Abhängigkeiten
+|===
+
+=== Öffentliche Schnittstellen
+
+Öffentliche Imports folgen `package.json`, nicht internen Dateinamen. Beispiel: `./svelte/Input` verweist auf `svelte/TextInput.svelte`; das Manifest nennt die Komponente `TextInput`. Die React-Kartenkomponente wird als `MapView` geführt.
+
+Das Paritätsmanifest ist derzeit kein vollständiger API-Katalog: Zweck, Dokumentationsverweise und öffentliche Imports sollen gesondert ergänzt oder generiert werden.
+
+=== Erweiterungsregel
+
+Neue gemeinsame Logik gehört nicht in mehrere Framework-Komponenten kopiert. Ob eine Abstraktion sinnvoll ist, wird anhand tatsächlicher Wiederverwendung und unterschiedlicher Framework-Lifecycles entschieden.
