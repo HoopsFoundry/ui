@@ -11,7 +11,7 @@ export default {
     count: { control: { type: 'number', min: 1, max: 3, step: 1 }, description: 'Nur Demo: Anzahl der Marker (`markers`). Ab zwei zählt die Karte von 1 an und passt den Ausschnitt allen Markern an.', table: t('number', '1') },
     ownFirst: { control: 'boolean', description: 'Nur Demo: der erste Marker ist der eigene Ort (`own: true`, Marker in Gold, Hinweis „Eigener Ort“).', table: t('boolean', 'true') },
     zoom: { control: { type: 'number', min: 3, max: 19, step: 1 }, description: 'Zoomstufe 3 bis 19. Ohne `center` und `zoom` passt sich der Ausschnitt allen Markern an; ein Marker: Standard 15.', table: t('number', '15') },
-    height: { control: { type: 'number', min: 200, max: 600, step: 20 }, description: 'Höhe der Karte in Pixeln (mindestens 200).', table: t('number', '320') },
+    height: { control: { type: 'number', min: 200, max: 600, step: 20 }, description: 'Höhe der Karte in Pixeln (200 bis 2000).', table: t('number', '320') },
     interactive: { control: 'boolean', description: 'Gesten: Ziehen, Scrollzoom, Doppelklick, Pinch. Bei `false` bleiben Tasten (Pfeile, Plus, Minus) und die Zoom-Schaltflächen.', table: t('boolean', 'true') },
     load: { control: 'inline-radio', options: ['click', 'auto'], description: '`click`: Platzhalter, Kacheln erst nach „Karte laden“ (Standard, datenschutzfreundlich). `auto`: sofort laden, wenn die App eine Einwilligung hat oder einen eigenen Proxy nutzt.', table: t("'click' | 'auto'", "'click'") },
     tileUrl: { control: 'text', description: 'Adresse der Kacheln mit `{z}`, `{x}`, `{y}` (`{s}`, `{r}` erlaubt); nur `https:`, ein Pfad ab Wurzel oder `http://localhost`. Standard: `https://tile.openstreetmap.org/{z}/{x}/{y}.png` (Demo und Entwicklung; produktiv ein eigener Proxy). In der Spielwiese lädt `demo` ein lokales Bild (kein Netzverkehr); `osm` nimmt den Standard.', table: t('string', "'https://tile.openstreetmap.org/{z}/{x}/{y}.png'") },
@@ -50,6 +50,11 @@ export const KartenApp    = { ...example('karten-app'), tags: ['!dev'] };
 export const Fehler       = { ...example('fehler'), tags: ['!dev'] };
 export const Handy        = { ...example('handy'), tags: ['!dev'] };
 export const Zustaende    = { ...example('zustaende'), tags: ['!dev'] };
+// Vanilla: mountMap in einen Behälter (ohne Framework); Handy-Vorschauen mit anderen Hallen als die Svelte-Fassung
+export const VanillaKarte     = { ...example('vanilla'), tags: ['!dev'] };
+export const VanillaGeladen   = { ...example('vanilla-geladen'), tags: ['!dev'] };
+export const VanillaHandy     = { ...example('vanilla-handy'), tags: ['!dev'] };
+export const VanillaHandyDunkel = { ...example('vanilla-handy-dunkel'), tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAdresse       = { ...example('do-adresse'), tags: ['!dev'] };
@@ -62,3 +67,5 @@ export const DoQuelle        = { ...example('do-quelle'), tags: ['!dev'] };
 export const DontQuelle      = { ...example('dont-quelle'), tags: ['!dev'] };
 export const DoSitz          = { ...example('do-sitz'), tags: ['!dev'] };
 export const DontSitz        = { ...example('dont-sitz'), tags: ['!dev'] };
+export const DoLokal         = { ...example('do-lokal'), tags: ['!dev'] };
+export const DontLokal       = { ...example('dont-lokal'), tags: ['!dev'] };

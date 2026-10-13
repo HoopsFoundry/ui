@@ -120,6 +120,10 @@
       "types": "./js/modal.d.ts",
       "import": "./js/modal.js"
     },
+    "./map-vanilla.js": {
+      "types": "./js/map-vanilla.d.ts",
+      "import": "./js/map-vanilla.js"
+    },
     "./render.js": {
       "types": "./js/render/index.d.ts",
       "import": "./js/render/index.js"
@@ -175,6 +179,10 @@
     "./vanilla-render": {
       "types": "./dist/vanilla/dss-render.d.ts",
       "import": "./dist/vanilla/dss-render.js"
+    },
+    "./vanilla-map": {
+      "types": "./dist/vanilla/dss-map.d.ts",
+      "import": "./dist/vanilla/dss-map.js"
     },
     "./vanilla/*": "./dist/vanilla/*"
   },

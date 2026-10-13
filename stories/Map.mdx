@@ -5,13 +5,13 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
-import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite, sitzSvelte, sitzReact, sitzVanilla } from './Map.code';
+import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite, sitzSvelte, sitzReact, sitzVanilla, leafletDirekt, initMapBeispiel, initAllKarte, importmapVariante, globalVariante, kopieren, ohneBuildSeite } from './Map.code';
 
 <Meta of={MapStories} />
 
 # Map (Karte)
 
-Die **Karte** zeigt einen oder mehrere Orte auf einer interaktiven Karte mit [Leaflet](https://leafletjs.com) und Kacheln von [OpenStreetMap](https://www.openstreetmap.org). Sie gehört zu Hallen und Spielorten: Name, Adresse und Route stehen immer auch als Text daneben, die Karte ergänzt sie. Es gibt sie als Komponente für Svelte (`Map.svelte`) und React (`MapView`) und als Vanilla-CSS (`dss-map*`) für eigene Seiten mit Leaflet. Die Hallenkarte mit Belegung (`VenueCard`) baut später auf ihr auf.
+Die **Karte** zeigt einen oder mehrere Orte auf einer interaktiven Karte mit [Leaflet](https://leafletjs.com) und Kacheln von [OpenStreetMap](https://www.openstreetmap.org). Sie gehört zu Hallen und Spielorten: Name, Adresse und Route stehen immer auch als Text daneben, die Karte ergänzt sie. Es gibt sie als Komponente für Svelte (`Map.svelte`) und React (`MapView`) und für Seiten ohne Framework als `mountMap` (Abschnitt „Ohne Build einbinden“). Die Hallenkarte mit Belegung (`VenueCard`) baut auf ihr auf.
 
 Alle Orte, Namen und Koordinaten auf dieser Seite sind **Demo-Daten**: erfundene Hallen, frei erfundene Koordinaten in einem Waldgebiet, keine realen Gebäude oder Adressen. Die geladenen Karten in der Doku zeigen ein lokales Gitterbild als Kachel; die Doku ruft keine Kacheln von OpenStreetMap ab.
 
@@ -26,7 +26,7 @@ Die Karte hat vier Teile. `markers` und `label` sind Pflicht, alles andere ist o
 - **Statusmeldung** (`role="status"`): „Karte wird geladen …“ und im Fehlerfall „Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.“
 - **Textalternative:** die nummerierte Liste der Orte mit Name, Koordinaten und Links (siehe unten). Sie ist immer da, auch ohne Skript und beim Drucken.
 
-Die Karte ist 320 px hoch (`height`, mindestens 200 px) und so breit wie ihr Platz.
+Die Karte ist 320 px hoch (`height`, 200 bis 2000 px) und so breit wie ihr Platz.
 
 <Canvas of={MapStories.Aufbau} />
 
@@ -47,6 +47,10 @@ Die Komponente ersetzt keine Datenschutzerklärung und keine Rechtsberatung. Ob 
 ### Das Problem und die Proxy-Variante
 
 Mit dem Standard-Kartenserver `tile.openstreetmap.org` ruft der Browser jede Kachel direkt dort ab. Bei der **Proxy-Variante** stellt die App unter ihrer eigenen Adresse einen Kachel-Proxy bereit, zum Beispiel `/tiles/{z}/{x}/{y}.png`. Der Proxy ruft die Kacheln beim Kartendienst ab und speichert sie zwischen. Der Besucher spricht dann **nur mit dem Server der App**; der Kartendienst sieht nur die IP-Adresse des Proxys. Die Karte braucht dafür nur eine Zeile: `tileUrl="/tiles/{z}/{x}/{y}.png"` (in Svelte als Konstante, weil `{z}` in einem Attribut ein Ausdruck wäre). Ein eigener Proxy erlaubt `load="auto"`.
+
+### Referrer und Origin
+
+Jede Kachelanfrage überträgt den **Origin** der Seite (Standardrichtlinie `strict-origin-when-cross-origin`: bei einer Anfrage an einen anderen Host geht nur Schema, Host und Port mit, nicht der Pfad). Es gilt die Referrer-Policy deiner Seite (Header `Referrer-Policy` oder `meta name="referrer"`); die Karte setzt keine eigene. Mit einem eigenen Kachel-Proxy unter derselben Adresse wie die Seite (Same-Origin) bleibt die Anfrage bei dir, der Kartendienst sieht sie nie. **Setze `no-referrer` nicht für Kacheln von OpenStreetMap:** die Tile Usage Policy verlangt einen gültigen Referer, sonst können Kacheln blockiert werden.
 
 Das Design System liefert **nur die Komponente und diese Doku, keinen Serverteil**. Die Rezepte unten sind Beispiele zum Kopieren, nicht Teil des Pakets.
 
@@ -174,7 +178,7 @@ Schlägt das Laden fehl, bleibt die Seite benutzbar: statt der Karte steht der H
   label="Fehlerfälle der Karte"
   head={['Fall', 'Grund (`onerror`)', 'Verhalten']}
   rows={[
-    ['`tileUrl` ungültig (kein `{z}`, `{x}`, `{y}`, `http:` außer `localhost`, `//host`, Sonderzeichen)', 'tile-url', 'Fehlerhinweis sofort, ohne Klick; Leaflet wird nie geladen; in der Entwicklung eine Warnung in der Konsole.'],
+    ['`tileUrl` ungültig (kein `{z}`, `{x}`, `{y}`, `http:` außer `localhost`, `//host`, Sonderzeichen)', 'tile-url', 'Fehlerhinweis sofort, ohne Klick; Leaflet wird nie geladen; in der Entwicklung eine Warnung in der Konsole. `onerror` wird hier nicht gerufen: der Zustand ergibt sich aus der Adresse (in allen drei Fassungen), der Grund `tile-url` erreicht den Handler nur, wenn eine laufende Karte eine ungültige Adresse bekommt.'],
     ['Leaflet fehlt oder lässt sich nicht laden (nicht installiert, Chunk nicht erreichbar)', 'import', 'Fehlerhinweis; Warnung in der Entwicklung.'],
     ['Aufbau der Karte schlägt fehl', 'init', 'Fehlerhinweis.'],
     ['Aktualisierung (Marker, Ausschnitt) wirft einen Fehler', 'update', 'Fehlerhinweis statt eines Absturzes der Seite.'],
@@ -263,9 +267,94 @@ Leaflet ist eine **optionale Peer-Abhängigkeit** (`peerDependencies` mit `peerD
 
 Das JavaScript-Global `Map` (die Datenstruktur) bliebe in jeder Datei verdeckt, die eine Komponente `Map` importiert. Deshalb heißt der React-Export **`MapView`**; die Svelte-Datei heißt `Map.svelte` (Export `@bbv/dss-design-system/svelte/Map`) und wird beim Import ebenfalls `MapView` genannt. Die Doku-Seite heißt „Map“, die CSS-Klassen `dss-map*`.
 
+## Ohne Build einbinden
+
+Eine Seite ohne Bundler und ohne Framework kann die Karte vollständig betreiben: eine HTML-Datei, `<script type="module">`, die Dateien des Pakets und Leaflet **aus dem eigenen Projekt** (nicht von unpkg: sonst bekäme ein Fremdserver die IP-Adresse schon beim Laden der Seite, nicht erst nach dem Klick). Das Karten-Bündel `dss-map.min.js` enthält die Karte ohne Leaflet; es lädt Leaflet erst nach „Karte laden“ (oder bei `load="auto"`) und braucht dafür eine der drei Varianten unten. Vor dem Klick gibt es **keinen Netzverkehr**: keine Anfrage an den Kartendienst, kein Leaflet, kein Prefetch, keine Cookies, keinen Speicher.
+
+### Dateien kopieren
+
+<CodeBlock label="Dateien ins Projekt kopieren" language="Shell" code={kopieren} />
+
+**Abhängigkeiten der Bündel:** `dss-map.min.js` steht allein (Leaflet kommt zur Laufzeit über `loadLeaflet`). `dss-render.min.js` importiert statisch `./dss.min.js` aus demselben Ordner: wer die Hallenkarte aus Daten nutzt, kopiert beide, sonst meldet der Browser einen 404 und das Modul lädt nicht. Ein Test gleicht die Liste gegen die statischen Importe aller Bündel ab.
+
+Die Dateien kommen aus `@bbv/dss-design-system/vanilla-map` (`dist/vanilla/dss-map.min.js`, Quellkarte daneben) und aus dem Leaflet-Paket (BSD-2-Clause, siehe oben). `dss.css` und `leaflet.css` binden die Seiten per `<link>` ein; die Optik von Zoom, Marker, Quellenangabe und Platzhalter liefert `dss.css`, Layout und Gesten liefert `leaflet.css`.
+
+### Drei Wege, Leaflet zu laden
+
+<DocTable
+  label="Wege, Leaflet ohne Bundler zu laden"
+  head={['Weg', 'So geht es', 'Wann']}
+  rows={[
+    ['`loadLeaflet` (Standard der Doku)', 'Option `loadLeaflet`: ein Lader, der das Modul `/vendor/leaflet/leaflet-src.esm.js` per `import()` liefert; die Karte ruft ihn erst nach dem Klick', 'Immer, wenn du den Pfad selbst festlegst; funktioniert in jedem Browser mit ES-Modulen'],
+    ['importmap', '`<script type="importmap">` ordnet `leaflet` der lokalen Datei zu; ohne `loadLeaflet` löst `import(\'leaflet\')` im Bündel den Namen auf', 'Mehrere Seiten, die denselben Pfad teilen sollen; die importmap steht vor dem ersten Modul'],
+    ['`window.L`', 'Der Lader lädt das klassische `leaflet.js` als Skript und liefert `window.L`', 'Alte Seiten, auf denen Leaflet schon als Skript eingebunden ist'],
+  ]}
+/>
+
+<FrameworkCode label="Leaflet per importmap" vanilla={importmapVariante} />
+
+<FrameworkCode label="Leaflet als window.L" vanilla={globalVariante} />
+
+**Hängt der Lader** (das Promise wird weder erfüllt noch abgelehnt, etwa bei einem Netz ohne Antwort), bleibt die Karte im Zustand „Karte wird geladen …“: es gibt kein Zeitlimit und keinen Fehler. Wer eines braucht, wickelt den Lader in ein Promise mit Zeitlimit (`Promise.race`) und lässt es ablehnen; dann gilt der Grund `import`.
+
+Der Lader darf ein Modul liefern (`leaflet-src.esm.js`, ein Namensraum mit `map`, `tileLayer`, `marker`, `divIcon`) oder das Global `L`. Liefert er etwas anderes, wirft er oder ist die Datei nicht ladbar, endet die Karte im Fehlerzustand mit dem Grund `import` (`onError`): die Statuszeile nennt es, Adresse und Links der Liste bleiben.
+
+### Die ganze Seite
+
+<CodeBlock label="Seite ohne Build: Karte und Hallenkarte" language="HTML" code={ohneBuildSeite} />
+
+Die Seite ist als Datei `stories/examples/karte-ohne-build/index.html` im Repository; ihre Prüfung läuft in Chromium und WebKit (Platzhalter ohne Netz, Klick, Tastatur, mehrere Karten, Karten in geschlossenem Accordion, Tabs und Dialog, Fehlerfälle).
+
+### Geladene Karte in Vanilla
+
+Die Beispiele laufen mit `mountMap` und dem lokalen Gitterbild als Kachel (die Doku ruft keine Kacheln von OpenStreetMap ab):
+
+<Canvas of={MapStories.VanillaKarte} />
+
+Mit `load: 'auto'`, Vereinssitz und `darkTiles: 'invert'`:
+
+<Canvas of={MapStories.VanillaGeladen} />
+
+### `initMap`, `data-dss="map"` und Zeichenketten
+
+<FrameworkCode label="initMap auf vorhandenem Markup" vanilla={initMapBeispiel} />
+
+<FrameworkCode label="Karte per data-dss und initAll" vanilla={initAllKarte} />
+
+`mountMap` und `initMap` sind idempotent (ein zweiter Aufruf für dasselbe Element ersetzt den ersten); `destroy()` räumt die Leaflet-Karte (`map.remove()`), den Klick-Listener und den `ResizeObserver` ab. Styles setzt `mountMap` über das CSSOM, sodass `style-src 'self'` genügt. Beim Import des Bündels passiert nichts: kein Zugriff auf `window` oder `document`, es lädt auch in Node (`renderMap` für Crawler und Seitengenerierung).
+
+### Kachel-Proxy
+
+Ohne eigenen Proxy holt jede Kachel das Bild von `tile.openstreetmap.org` und gibt die IP-Adresse der Besucher weiter. Der Standard ist für Demo und Entwicklung gedacht; die Entscheidung dazu steht in der Architekturdokumentation (ADR-003, Karte). Rezepte (nginx und ein Node-Endpunkt) und die Pflichten gegenüber OpenStreetMap stehen im Abschnitt „Datenschutz und Kachelserver“ oben; `tileUrl` und `privacyNote` verweisen die Karte auf den eigenen Server.
+
+### Handy · 390 px Breite
+
+Die Vorschauen zeigen die Vanilla-Karte mit anderen Hallen als die Svelte-Vorschau oben: links der Platzhalter mit Seeberg und Kiefernau, rechts die geladene Karte mit der Geschäftsstelle und Kiefernau.
+
+<div className="dss-phones">
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Vanilla · hell</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte hell">
+      <iframe title="Handy-Vorschau: Vanilla-Karte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-map--vanilla-handy" loading="lazy" />
+    </div>
+  </div>
+  <div className="dss-phone">
+    <h3 className="dss-doc-cap">Vanilla · dunkel</h3>
+    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte dunkel">
+      <iframe title="Handy-Vorschau: Vanilla-Karte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--vanilla-handy-dunkel" loading="lazy" />
+    </div>
+  </div>
+</div>
+
+### Leaflet direkt
+
+Wer die Karte ganz selbst steuert, nutzt Leaflet und die reinen Funktionen aus `map.js` direkt; die Zwei-Klick-Lösung, die Zustände und die Fehlerfälle gehören dann dir.
+
+<FrameworkCode label="Leaflet direkt (ohne mountMap)" vanilla={leafletDirekt} />
+
 ## Verwendung: Import und Props
 
-Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. **Vanilla:** Eine Karten-Komponente ohne Framework gibt es nicht. Eigene Seiten nutzen Leaflet direkt mit den Klassen `dss-map*` und den reinen Funktionen aus `@bbv/dss-design-system/map.js`; das Beispiel zeigt einen Aufbau mit Rahmen, Quellenangabe, Koordinaten und Routen-Link.
+Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. **Vanilla:** `mountMap(el, props, options)` aus dem Karten-Bündel (`dss-map.min.js`) setzt dasselbe Markup wie `MapView` ein und startet das Verhalten; `renderMap(props)` liefert es als Zeichenkette, `initMap(el, props)` macht vorhandenes Markup lebendig. Wer die Karte ganz selbst steuern will, nutzt Leaflet direkt (unten, „Leaflet direkt“).
 
 <FrameworkCode label="Map" vanilla={vanilla} svelte={svelte} react={react} />
 
@@ -283,7 +372,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
     ['seatLabel', 'string', 'Text für den Sitzmarker (`kind: "seat"`) in der Liste und im Namen des Markers; Standard „Vereinssitz“.'],
     ['center', '[number, number]', 'Mittelpunkt `[Breite, Länge]`. Mit `center` ist der Standardzoom 15, ohne `center` und `zoom` passt sich der Ausschnitt den Markern an.'],
     ['onload (Svelte), onLoad (React)', '(map) => void', 'Die Karte steht. Das Argument ist die Leaflet-Karte (`L.Map`); damit lässt sich Leaflet erweitern.'],
-    ['onerror (Svelte), onError (React)', "(reason: 'tile-url' | 'import' | 'init' | 'tiles') => void", 'Laden fehlgeschlagen (siehe Fehlerfall).'],
+    ['onerror (Svelte), onError (React)', "(reason: 'tile-url' | 'import' | 'init' | 'update' | 'tiles') => void", 'Laden fehlgeschlagen (siehe Fehlerfall).'],
     ['onmarkerclick (Svelte), onMarkerClick (React)', '(marker) => void', 'Klick oder Enter an einem Marker; danach öffnet ein vorhandenes `href`.'],
     ['class (Svelte), className (React)', 'string', 'Zusätzliche Klasse am Wurzelelement.'],
   ]}
@@ -317,7 +406,7 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
   label="Maße der Karte (gemessen im Browser)"
   head={['Maß', 'Wert']}
   rows={[
-    ['Höhe der Karte', '320 px (Standard, `height`; mindestens 200 px)'],
+    ['Höhe der Karte', '320 px (Standard, `height`; 200 bis 2000 px)'],
     ['Zoom-Schaltflächen', '44 × 44 px, Abstand 8 px, 12 px vom Rand'],
     ['Marker (Fläche zum Anklicken)', '44 × 46 px, der Pin 36 × 46 px'],
     ['Quellenangabe (Link)', '28 px hoch, Schrift 13 px'],
@@ -373,6 +462,13 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
       dontText: 'Eine Karte ohne Quellenangabe verletzt die Lizenz. Die Komponente hat deshalb kein Prop zum Ausblenden; die Doku blendet sie hier mit eigenem CSS aus, um den Fehler zu zeigen.',
       good: <Story of={MapStories.DoQuelle} inline />,
       bad: <Story of={MapStories.DontQuelle} inline />,
+    },
+    {
+      title: 'Leaflet aus dem eigenen Projekt',
+      doText: 'Leaflet und `leaflet.css` liegen unter `/vendor/leaflet/`, die Karte lädt sie erst nach dem Klick. Vor dem Klick gibt es keinen Netzverkehr zu Dritten.',
+      dontText: 'Leaflet von unpkg oder einem anderen CDN: Der Fremdserver bekommt die IP-Adresse schon beim Laden der Seite, nicht erst nach der Einwilligung, und die Seite hängt an dessen Verfügbarkeit.',
+      good: <Story of={MapStories.DoLokal} inline />,
+      bad: <Story of={MapStories.DontLokal} inline />,
     },
     {
       title: 'Ein Sitz, die Hallen als Orte',

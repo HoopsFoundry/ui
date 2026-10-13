@@ -16,6 +16,7 @@
 |Lifecycle |Initialisierung, Aktualisierung und Aufräumen einer Instanz
 |Renderfunktion |Erzeugt Ausgabe aus Eingaben; in Vanilla `renderX` (Zeichenkette) und `mountX` (Einsetzen mit `update`/`destroy`), siehe ADR-005
 |Mount |Bindet Ausgabe und gegebenenfalls Verhalten an ein DOM-Element
+|Karten-Bündel |`dist/vanilla/dss-map.js`: `renderMap`, `initMap`, `mountMap`, `initMapBlock` ohne Leaflet; Leaflet liefert die Seite über die Option `loadLeaflet` (ADR-003, ADR-007)
 |ADR |Architecture Decision Record mit Kontext, Entscheidung, Status und Konsequenzen
 |MCP |Model Context Protocol; Zugriffsschicht für Agent-Werkzeuge und Kontext
 |Baseline |Erste prüfbare Architekturfassung, kein vollständiger Implementierungsnachweis

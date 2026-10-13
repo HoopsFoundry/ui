@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Hallen im Kreis Nordhain</title>
+  <!-- Ohne Build: alle Dateien liegen lokal im Projekt (kein unpkg, kein CDN). Die Ordner stammen aus dem Paket:
+       /dss/        ← dist/vanilla (dss.css, dss-map.min.js, dss-render.min.js)
+       /vendor/leaflet/  ← node_modules/leaflet/dist (leaflet.css, leaflet-src.esm.js) -->
+  <link rel="stylesheet" href="/dss/dss.css" />
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+  <style>
+    body { margin: 0; padding: 1rem; background: var(--page-bg); color: var(--page-fg); font-family: system-ui, sans-serif; }
+    main { max-width: 56rem; margin: 0 auto; display: grid; gap: 2rem; }
+    h1, h2 { margin: 0 0 0.75rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Hallen im Kreis Nordhain</h1>
+    <section aria-labelledby="h-karte">
+      <h2 id="h-karte">Karte der Hallen</h2>
+      <div id="karte"></div>
+    </section>
+    <section aria-labelledby="h-halle">
+      <h2 id="h-halle">Hallenkarte</h2>
+      <div id="halle"></div>
+    </section>
+  </main>
+
+  <script type="module">
+    import { mountMap } from '/dss/dss-map.min.js';
+    import { mountVenueCard } from '/dss/dss-render.min.js';
+    import { initMap } from '/dss/dss-map.min.js';
+
+    // Leaflet kommt aus einer lokalen Datei und wird erst nach dem Klick auf „Karte laden“ geladen (vorher kein Netzverkehr).
+    const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
+    // Kacheln: ein eigener Proxy oder Kachelserver (tileUrl); die Demo liefert ein lokales Gitterbild
+    const tileUrl = '/tiles/{z}/{x}/{y}.png';
+
+    const hallen = [
+      { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true },
+      { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg', href: '#halle-seeberg' },
+      { id: 'kiefernau', lat: 49.2955, lng: 7.8905, label: 'Gymnasium Kiefernau' },
+    ];
+    window.__karten = [];
+    mountMap(document.querySelector('#karte'), { label: 'Karte der Hallen im Kreis Nordhain', markers: hallen, tileUrl }, {
+      loadLeaflet,
+      onLoad: (karte) => window.__karten.push(karte),
+    });
+
+    mountVenueCard(document.querySelector('#halle'), {
+      name: 'Sporthalle Nordhain', address: { street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' }, lat: 49.3, lng: 7.9, tileUrl,
+      info: 'Zwei Spielfelder, Zugang über den Hof.', href: '/hallen/nordhain',
+    }, { initMap, loadLeaflet, onLoad: (karte) => window.__karten.push(karte) });
+  </script>
+</body>
+</html>

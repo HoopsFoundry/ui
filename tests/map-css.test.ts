@@ -134,7 +134,8 @@ describe('Map: Quelltext', () => {
   });
   it('Leaflet wird nur dynamisch geladen, nie statisch', () => {
     for (const path of [...sources, 'js/map.js', 'js/map-leaflet.js']) expect(read(path), path).not.toMatch(/^\s*import[^;\n]*from\s+['"]leaflet['"]/m);
-    expect(read('js/map-leaflet.js')).toMatch(/await import\('leaflet'\)/);
+    // der Standardlader ist der dynamische Import, `loadLeaflet` (hooks) ersetzt ihn für Seiten ohne Bundler
+    expect(read('js/map-leaflet.js')).toMatch(/hooks\.loadLeaflet\(\) : import\('leaflet'\)/);
   });
   it('Leaflets Standardsteuerung und -bilder werden nicht verwendet; Marker sind Inline-SVG (L.divIcon)', () => {
     const js = read('js/map-leaflet.js');

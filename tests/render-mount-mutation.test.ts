@@ -8,8 +8,12 @@ import { mutate, read, type Rules } from './helpers/mutation';
 type MountFn = (el: Element, render: (p: object, o: object) => string, props: object, options?: object) => { update(p: object): void; destroy(): void };
 const url = (file: string) => pathToFileURL(resolve(process.cwd(), file)).href;
 
-async function load(source: string): Promise<MountFn> {
-  const code = source.replace(/from '\.\.\/([\w-]+\.js)'/g, (_m, f: string) => `from '${url(`js/${f}`)}'`);
+const dataUrl = (code: string) => `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`;
+async function load(source: string, domSource?: string): Promise<MountFn> {
+  const dom = domSource ? dataUrl(domSource) : url('js/render/dom.js');
+  const code = source
+    .replace(/from '\.\.\/([\w-]+\.js)'/g, (_m, f: string) => `from '${url(`js/${f}`)}'`)
+    .replace("from './dom.js'", `from '${dom}'`);
   const mod = await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
   return mod.mount as MountFn;
 }
@@ -147,7 +151,9 @@ function rules(mount: MountFn): Rules {
 }
 
 const source = read('js/render/mount.js');
-const MUTATIONS: { name: string; rule: string; from: string; to: string; after?: string }[] = [
+const domSource = read('js/render/dom.js');
+// `file: 'dom'`: die Stelle liegt in js/render/dom.js (Styles über das CSSOM), sonst in mount.js
+const MUTATIONS: { name: string; rule: string; from: string; to: string; file?: 'dom' }[] = [
   { name: 'Fokus nicht zurückgegeben', rule: 'mount: Fokus bleibt bei update erhalten', from: 'restoreFocus(wrapper ?? el, memo);', to: '' },
   { name: 'Fokus nicht über die id', rule: 'mount: Fokus findet den Knoten über die id, auch wenn sich die Lage ändert', from: "if (memo.id) target = [...host.querySelectorAll('[id]')].find((el) => el.id === memo.id) ?? null;", to: '' },
   { name: 'Zustand wird nicht gehalten', rule: 'mount: der Zustand offen/zu bleibt bei gleichem open erhalten, ein geändertes open gilt', from: 'if (live !== undefined && next.open === previous.open) props = { ...next, open: live };', to: '' },
@@ -156,8 +162,8 @@ const MUTATIONS: { name: string; rule: string; from: string; to: string; after?:
   { name: 'Panel ignoriert', rule: 'mount: im Panel eines fremden Bereichs bekommt der Rahmen eine eigene Gruppe', from: 'return Boolean(panel) && panel.closest(`.${GROUP}`) === group && group !== el;', to: 'return false;' },
   { name: 'identisches Markup wird ersetzt', rule: 'mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', from: 'if (previous && html === lastHtml && wantsGroup === Boolean(wrapper)) {', to: 'if (false) {' },
   { name: 'Scrollposition geht verloren', rule: 'mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', from: 'restoreScrolls(wrapper ?? el, scrolls);', to: '' },
-  { name: 'style bleibt Attribut', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', from: "host.replaceChildren(range.createContextualFragment(deferStyles(html)));\n    applyStyles(host);", to: 'host.replaceChildren(range.createContextualFragment(html));' },
-  { name: 'beliebige Eigenschaften', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', from: 'if (STYLE_PROPS.has(name) && ', to: 'if (' },
+  { name: 'style bleibt Attribut', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', file: 'dom', from: "export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style=\"$1\"');", to: 'export const deferStyles = (html) => html;' },
+  { name: 'beliebige Eigenschaften', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', file: 'dom', from: 'if (STYLE_PROPS.has(name) && ', to: 'if (' },
   { name: 'Handler ohne el.contains', rule: 'mount: ein Ereignis außerhalb von el (Vorfahr passt zum Selektor) löst den Handler nicht aus', from: 'if (target && el.contains(target)) rule.handler(event, target);', to: 'if (target) rule.handler(event, target);' },
   { name: 'Accordion nicht gestartet', rule: 'mount: ohne Gruppe legt mount eine an und bedient den Rahmen', from: 'if (wantsGroup && !accordion) accordion = initAccordion(wrapper);', to: '' },
   { name: 'immer eine Gruppe', rule: 'mount: in einer vorhandenen Gruppe keine zweite', from: 'if (!next.collapsible) return false;', to: 'if (!next.collapsible) return false;\n    if (true) return true;' },
@@ -180,9 +186,9 @@ describe('Mutationstests: mount', () => {
     const all = rules(await load(source));
     expect(Object.entries(all).filter(([, ok]) => !ok).map(([name]) => name)).toEqual([]);
   });
-  it.each(MUTATIONS)('$name', async ({ rule, from, to }) => {
+  it.each(MUTATIONS)('$name', async ({ rule, from, to, file }) => {
     expect(rules(await load(source))[rule], `Regel fehlt: ${rule}`).toBe(true);
-    const mutated = rules(await load(mutate(source, from, to)));
+    const mutated = rules(file === 'dom' ? await load(source, mutate(domSource, from, to)) : await load(mutate(source, from, to)));
     expect(mutated[rule], `Regel kippt nicht: ${rule}`).toBe(false);
   });
 });

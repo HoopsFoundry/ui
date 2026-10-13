@@ -14,10 +14,12 @@ export interface MapControllerOptions {
 export interface MapControllerHooks {
   /** Die Karte steht; Argument ist die Leaflet-Karte. */
   onReady?: (map: unknown) => void;
-  /** Gründe: `tile-url`, `import`, `init`, `tiles`. */
+  /** Gründe: `tile-url`, `import`, `init`, `update`, `tiles`. */
   onError?: (reason: string) => void;
   onZoom?: (state: { zoom: number; min: number; max: number }) => void;
   onMarkerClick?: (item: MapItem) => void;
+  /** Liefert Leaflet (das Modul oder das Global `L`); Standard `import('leaflet')`. Für Seiten ohne Bundler: lokale Datei laden. */
+  loadLeaflet?: () => Promise<unknown>;
 }
 
 export interface MapController {

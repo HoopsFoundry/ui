@@ -11,11 +11,11 @@ Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusman
 
 === Sicherheit
 
-Die Vanilla-Renderer (`js/render/`, V2a) escapen jeden Text über `esc()`, jeden Attributwert über `attr()` und prüfen Ziele und Logo-Adressen über `safeHref`; Aufzählungen nehmen nur bekannte Werte, Zahlen nur endliche; Spaltenbreiten sind auf Längen beschränkt. Kein ungeprüftes Rohmarkup wird als normale Eingabe akzeptiert (Aktionen, Zusatztext, Uhrzeit und Hinweis sind Daten oder Text). Tests prüfen Schadtext, `javascript:`, Steuerzeichen, sehr lange Eingaben und Prototyp-Schlüssel am geparsten DOM; Mutationstests lassen die Regeln kippen, wenn Escaping oder `safeHref` entfällt. Ein Editor-Hook und der Bündeltest verbieten HTML-Zuweisung per Element-Eigenschaft in `js/render`. Der Umgang mit protokollrelativen URLs ist im Lückenplan noch entscheidungsbedürftig. DOM-Erzeugung allein ersetzt keine Eingabevalidierung.
+Die Vanilla-Renderer (`js/render/`) und die Karte (`js/map-vanilla.js`) escapen jeden Text über `esc()`, jeden Attributwert über `attr()` und prüfen Ziele und Logo-Adressen über `safeHref`; Aufzählungen nehmen nur bekannte Werte, Zahlen nur endliche; Spaltenbreiten sind auf Längen beschränkt. Kein ungeprüftes Rohmarkup wird als normale Eingabe akzeptiert (Aktionen, Zusatztext, Uhrzeit und Hinweis sind Daten oder Text). Tests prüfen Schadtext, `javascript:`, Steuerzeichen, sehr lange Eingaben und Prototyp-Schlüssel am geparsten DOM; Mutationstests lassen die Regeln kippen, wenn Escaping oder `safeHref` entfällt. Ein Editor-Hook und die Bündeltests verbieten HTML-Zuweisung per Element-Eigenschaft in `js/render` und im Karten-Bündel; die Karte setzt Texte als `textContent`, Klassen als einzelne Tokens und Styles über das CSSOM. Der Umgang mit protokollrelativen URLs ist im Lückenplan noch entscheidungsbedürftig. DOM-Erzeugung allein ersetzt keine Eingabevalidierung.
 
 === Datenschutz
 
-Kartenanfragen und externe Assets müssen explizit dokumentiert sein. Lokale Leaflet-Auslieferung und Zwei-Klick-Freigabe sind Bestandteile des Vanilla-Plans.
+Kartenanfragen und externe Assets müssen explizit dokumentiert sein. Leaflet und `leaflet.css` werden aus dem eigenen Projekt ausgeliefert (kein CDN, Option `loadLeaflet` oder importmap) und erst nach der Freigabe geladen; die Zwei-Klick-Freigabe gilt in allen Fassungen. Kacheln kommen von `tileUrl` (eigener Proxy) oder, als Demo, von OpenStreetMap; in der Content-Security-Policy gehört der Kachel-Host in `img-src`. Ein Browsertest zählt die Anfragen vor und nach dem Klick (nur der eigene Host, keine Cookies, kein Storage) und läuft in Chromium und WebKit.
 
 === Parität und SSR
 

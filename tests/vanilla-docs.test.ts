@@ -46,12 +46,13 @@ describe('Bündel: Exportliste und Größen stimmen mit der Doku', () => {
   it('DSS_BLOCKS: die Tabelle nennt jeden Baustein von initAll mit seiner Funktion', async () => {
     const { DSS_BLOCKS } = (await import('../js/vanilla-core.js')) as { DSS_BLOCKS: string[] };
     const section = mdx.slice(mdx.indexOf('## data-dss'), mdx.indexOf('## Das Muster'));
-    expect(DSS_BLOCKS).toHaveLength(6);
+    expect(DSS_BLOCKS).toHaveLength(7);
     for (const name of DSS_BLOCKS) {
       expect(section, name).toContain(`['${name}',`);
-      expect(section, name).toContain(`init${name === 'backtop' ? 'BackToTop' : name === 'pagenav' ? 'PageNav' : name[0].toUpperCase() + name.slice(1)}`);
+      // die Karte startet über initMapBlock aus dem Karten-Bündel
+      expect(section, name).toContain(name === 'map' ? 'initMapBlock' : `init${name === 'backtop' ? 'BackToTop' : name === 'pagenav' ? 'PageNav' : name[0].toUpperCase() + name.slice(1)}`);
     }
-    expect(section).toContain('sechs');
+    expect(section).toContain('sieben');
   });
   it('die Größenangaben weichen höchstens 5 % von der Messung ab; das Budget gilt', () => {
     const near = (documented: number, measured: number) => expect(Math.abs(documented - measured) / measured, `${documented} gegen ${measured}`).toBeLessThanOrEqual(0.05);
@@ -65,6 +66,12 @@ describe('Bündel: Exportliste und Größen stimmen mit der Doku', () => {
     expect(code.renderBudget).toEqual({ minKB: 52, gzipKB: 18 });
     expect(code.renderSizes.min).toBeLessThanOrEqual(code.renderBudget.minKB * 1024);
     expect(code.renderSizes.gzip).toBeLessThanOrEqual(code.renderBudget.gzipKB * 1024);
+    near(code.mapSizes.js, statSync(`${bundleDir}dss-map.js`).size);
+    near(code.mapSizes.min, statSync(`${bundleDir}dss-map.min.js`).size);
+    near(code.mapSizes.gzip, gzipSync(readFileSync(`${bundleDir}dss-map.min.js`)).length);
+    expect(code.mapBudget).toEqual({ minKB: 24, gzipKB: 10 });
+    expect(code.mapSizes.min).toBeLessThanOrEqual(code.mapBudget.minKB * 1024);
+    expect(code.mapSizes.gzip).toBeLessThanOrEqual(code.mapBudget.gzipKB * 1024);
     expect(code.budget).toEqual({ minKB: 40, gzipKB: 15 });
     expect(code.bundleSizes.min).toBeLessThanOrEqual(code.budget.minKB * 1024);
     expect(code.bundleSizes.gzip).toBeLessThanOrEqual(code.budget.gzipKB * 1024);
@@ -96,7 +103,7 @@ describe('Doku-Seite', () => {
     expect([...mdx.matchAll(/doText:/g)]).toHaveLength(4);
   });
   it('die Doku nennt Muster, Sicherheit und Versionsabgleich', () => {
-    for (const part of ['idempotent', 'destroy()', 'createContextualFragment', 'textContent', 'safeHref', 'data-dss-options', '`--dss-version`', 'checkVersion', 'version.json', 'initMap', 'V2', 'npm run build:vanilla', 'script-src', 'dss-render.js', 'esc', 'renderLeagueCard', 'mountLeagueCard', 'Crawler']) expect(mdx, part).toContain(part);
+    for (const part of ['idempotent', 'destroy()', 'createContextualFragment', 'textContent', 'safeHref', 'data-dss-options', '`--dss-version`', 'checkVersion', 'version.json', 'initMap', 'dss-map.js', 'loadLeaflet', 'npm run build:vanilla', 'script-src', 'dss-render.js', 'esc', 'renderLeagueCard', 'mountLeagueCard', 'Crawler']) expect(mdx, part).toContain(part);
   });
   it('die Beispielseite im Code verwendet kein innerHTML', () => {
     const script = examples.slice(0, examples.indexOf('{#if example'));

@@ -14,16 +14,9 @@
  */
 import { initAccordion } from '../accordion.js';
 import { createRegistry } from '../lifecycle.js';
+import { insertMarkup, nextUid } from './dom.js';
 
 const registry = createRegistry('render-mount');
-// Zähler für erzeugte Kennungen: einer je Seite über alle Kopien des Moduls (Symbol.for), damit zwei Bündel keine gleiche id vergeben
-const COUNTER = Symbol.for('dss.render.counter');
-const nextUid = () => {
-  const store = (globalThis[COUNTER] ??= { n: 0 });
-  store.n += 1;
-  return `m${store.n}`;
-};
-
 const GROUP = 'dss-acc';
 const noop = { update() {}, destroy() {} };
 
@@ -74,27 +67,6 @@ function restoreScrolls(host, list) {
   });
 }
 
-// Inline-Styles der Render-Funktionen: nur diese Eigenschaften, und nur aus unserem eigenen Markup
-const STYLE_PROPS = new Set(['left', 'top', 'width', '--dss-map-h']);
-const STYLE_ATTR = /\sstyle="([^"]*)"/g;
-
-/** Ersetzt `style="…"` im Markup durch `data-dss-style="…"`: das Attribut wird nach dem Einsetzen über das CSSOM angewendet (CSP `style-src`). */
-const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style="$1"');
-
-/** Wendet `data-dss-style` über `style.setProperty` an (nur bekannte Eigenschaften) und entfernt das Attribut. */
-function applyStyles(host) {
-  for (const el of host.querySelectorAll('[data-dss-style]')) {
-    for (const part of el.getAttribute('data-dss-style').split(';')) {
-      const at = part.indexOf(':');
-      if (at < 0) continue;
-      const name = part.slice(0, at).trim();
-      const value = part.slice(at + 1).trim();
-      if (STYLE_PROPS.has(name) && !/[;{}()\\]/.test(value)) el.style.setProperty(name, value);
-    }
-    el.removeAttribute('data-dss-style');
-  }
-}
-
 /**
  * @param {Element} el Container
  * @param {(props: object, options: object) => string} render Render-Funktion (liefert Markup)
@@ -117,12 +89,6 @@ export function mount(el, render, props, options = {}) {
   let done = false;
   let lastHtml = null;
 
-  const insert = (host, html) => {
-    const range = doc.createRange();
-    range.selectNodeContents(host);
-    host.replaceChildren(range.createContextualFragment(deferStyles(html)));
-    applyStyles(host);
-  };
   const openState = () => {
     const trigger = (wrapper ?? el).querySelector('.dss-acc-trigger[aria-expanded]');
     return trigger ? trigger.getAttribute('aria-expanded') === 'true' : undefined;
@@ -165,7 +131,7 @@ export function mount(el, render, props, options = {}) {
       wrapper.className = GROUP;
       el.replaceChildren(wrapper);
     }
-    insert(wrapper ?? el, html);
+    insertMarkup(wrapper ?? el, html);
     lastHtml = html;
     if (wantsGroup && !accordion) accordion = initAccordion(wrapper);
     restoreScrolls(wrapper ?? el, scrolls);

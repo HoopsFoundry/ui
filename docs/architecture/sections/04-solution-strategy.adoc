@@ -10,9 +10,9 @@
 . Storybook vermittelt Verwendung und Referenzzustände.
 . Tests prüfen ausgewählte Aspekte von Ausgabe, Verhalten und Parität.
 
-=== Beschlossene beziehungsweise geplante Entwicklung
+=== Vanilla ohne Framework
 
-Der Vanilla-V2-Plan ergänzt Render- und Mount-Funktionen. Das Ziel ist Nutzung ohne Framework und ohne selbst geschriebenes Komponentenmarkup. Diese Erweiterung ist laut Plan offen und muss vor einer Zusage des Funktionsumfangs gegen Code und Exports geprüft werden.
+Die Vanilla-Fassung ergänzt Render- und Mount-Funktionen (`js/render/`) und die Karte (`js/map-vanilla.js`): Nutzung ohne Framework und ohne selbst geschriebenes Komponentenmarkup, in drei Bündeln mit je eigenem Budget (ADR-007). Der Funktionsumfang ist gegen Code und Exports in `package.json` zu prüfen; die Auslieferung ist in ADR-006 beschlossen.
 
 === Vorgeschlagene Agent-Unterstützung
 

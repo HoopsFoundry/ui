@@ -17,7 +17,7 @@ export interface MapViewProps {
   center?: [number, number];
   /** Zoomstufe 3 bis 19 (Standard 15 bei Mittelpunkt oder einem Marker). */
   zoom?: number;
-  /** Höhe der Karte in Pixeln (Standard 320, mindestens 200). */
+  /** Höhe der Karte in Pixeln (Standard 320, 200 bis 2000). */
   height?: number;
   /** `false`: kein Ziehen, Scrollzoom und Doppelklick; Tasten und Zoom-Schaltflächen bleiben. */
   interactive?: boolean;
@@ -166,7 +166,7 @@ export function MapView({
       data-state={state}
       data-dim={dimInDark ? 'true' : 'false'}
       data-tiles={tilesMode(darkTiles)}
-      style={{ '--dss-map-h': `${Number.isFinite(height) ? Math.max(200, height) : 320}px` } as React.CSSProperties}
+      style={{ '--dss-map-h': `${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px` } as React.CSSProperties}
     >
       <a className="dss-map-skip" href={`#${textId}`}>
         {mapText.skip}

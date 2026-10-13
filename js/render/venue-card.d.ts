@@ -6,6 +6,26 @@ import type { RenderOptions } from './core.js';
 export interface VenueCardRenderOptions extends RenderOptions {
   /** `true`: „Karte laden“ ist bedienbar (die Seite startet `initMap`). Standard: gesperrt, solange keine Karte angebunden ist. */
   mapActive?: boolean;
+  /**
+   * `true`: markiert die Karte für `initAll` (`data-dss="map"` am Behälter `.dss-venue-map`, die Optionen als JSON in `data-dss-options`).
+   * Für Markup, das auf dem Server entsteht; „Karte laden“ bleibt ohne Skript gesperrt.
+   */
+  init?: boolean;
+}
+
+/** Optionen von `mountVenueCard`: die Karte startet, wenn `initMap` (aus dem Karten-Bündel `dss-map.js`) übergeben wird. */
+export interface VenueCardMountOptions extends MountOptions {
+  /** `initMap` aus `dss-map.js` oder `js/map-vanilla.js`: startet die eingebettete Karte (nicht interaktiv, ohne Liste). */
+  initMap?: (el: Element, options: Record<string, unknown>) => { update(props: Record<string, unknown>): void; destroy(): void };
+  /** Liefert Leaflet (das Modul oder das Global `L`); Standard `import('leaflet')`. */
+  loadLeaflet?: () => Promise<unknown>;
+  /** Die Karte steht; Argument ist die Leaflet-Karte. */
+  onLoad?: (map: unknown) => void;
+  /** Laden fehlgeschlagen: `tile-url`, `import`, `init`, `update` oder `tiles`. */
+  onError?: (reason: string) => void;
+  onMarkerClick?: (marker: unknown) => void;
+  /** „Karte laden“ ohne `initMap` bedienbar machen (die Seite startet die Karte selbst). */
+  mapActive?: boolean;
 }
 import type { MountHandle, MountOptions } from './mount.js';
 
@@ -40,6 +60,6 @@ export interface VenueCardProps {
   className?: string;
 }
 
-/** Markup der Hallenkarte, die Karte als Platzhalter (ohne Leaflet); `initMap` (V2b) macht sie lebendig. */
+/** Markup der Hallenkarte, die Karte als Platzhalter (ohne Leaflet); `initMap` (js/map-vanilla.js) macht sie lebendig. */
 export function renderVenueCard(props: VenueCardProps, options?: VenueCardRenderOptions): string;
-export function mountVenueCard(el: Element, props: VenueCardProps, options?: MountOptions & { mapActive?: boolean }): MountHandle<VenueCardProps>;
+export function mountVenueCard(el: Element, props: VenueCardProps, options?: VenueCardMountOptions): MountHandle<VenueCardProps>;

@@ -4,6 +4,7 @@ import { act, cleanup, render } from '@testing-library/react';
 import { flushSync, mount, tick, unmount } from 'svelte';
 import MapHost from './MapHost.svelte';
 import { MapView } from '../../react/Map';
+import { mountMap } from '../../js/map-vanilla.js';
 
 export interface Driver {
   name: string;
@@ -63,5 +64,26 @@ const reactDriverOf = (name: string, strict: boolean): Driver => ({
 
 export const reactDriver = reactDriverOf('React', false);
 export const reactStrictDriver = reactDriverOf('React (StrictMode)', true);
-export const drivers: Driver[] = [svelteDriver, reactDriver];
+// Vanilla: mountMap in einen Behälter; `set` aktualisiert mit allen bisherigen Eigenschaften (wie die Fassungen mit Zustand)
+export const vanillaDriver: Driver = {
+  name: 'Vanilla',
+  mount(initial) {
+    const target = document.createElement('div');
+    document.body.appendChild(target);
+    let current = { ...initial };
+    const handle = mountMap(target, current as never);
+    let gone = false;
+    const settle = async () => { await nextTick(); await nextTick(); };
+    return {
+      root: target,
+      // ein ausdrücklich auf undefined gesetzter Wert heißt hier „zurücknehmen“: die Karte kennt dafür null (undefined wird ignoriert)
+      async set(patch) { current = { ...current, ...patch }; handle.update(Object.fromEntries(Object.entries(current).map(([k, v]) => [k, v === undefined ? null : v])) as never); await settle(); },
+      async unmount() { if (!gone) { gone = true; handle.destroy(); } target.remove(); await settle(); },
+      settle,
+      async act(fn) { fn(); await settle(); },
+    };
+  },
+};
+
+export const drivers: Driver[] = [svelteDriver, reactDriver, vanillaDriver];
 export const cleanupAll = () => { cleanup(); document.body.replaceChildren(); };

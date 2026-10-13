@@ -4,9 +4,11 @@
  * `renderVenueCard(props, options?)`/`mountVenueCard(el, props, options?)`: dasselbe Markup wie die Komponente VenueCard (Svelte, React),
  * auch die Karte: `renderVenueCard` liefert das Platzhalter-Markup der Karte (Region, Hinweis mit Schaltfläche „Karte laden“, Statuszeile,
  * Quellenangabe, Ortsliste mit Adresse als Text, Links „Größere Karte“ und „Route planen“) ohne Leaflet und ohne Netzverkehr. Lebendig
- * (Kacheln, Zoom, Marker) wird sie erst mit `initMap` (V2b) auf `.dss-map` in `.dss-venue-map`; bis dahin bleibt der Platzhalter mit
- * Adresse und Links. Die Schaltfläche „Karte laden“ ist ohne `initMap` gesperrt (`disabled`, `aria-disabled`), damit sie nicht tot wirkt;
- * `options.mapActive: true` gibt sie frei (V2b setzt das, das Markup ist dann das von `MapView`). Props: `name`, `address`, `lat`, `lng`, `info`, `contact`, `games`, `limit`, `gamesLabel`, `href`, `linkLabel`, `names`,
+ * (Kacheln, Zoom, Marker) wird sie mit `initMap` (js/map-vanilla.js) auf `.dss-map` in `.dss-venue-map`: `mountVenueCard(el, props, { initMap })`
+ * startet sie selbst (nicht interaktiv, ohne Liste wie die Komponente), und `update` lässt die laufende Karte stehen, solange Ort und Name gleich bleiben.
+ * Ohne `initMap` ist die Schaltfläche „Karte laden“ gesperrt (`disabled`, `aria-disabled`), damit sie nicht tot wirkt; `options.mapActive: true`
+ * gibt sie frei (das Markup ist dann das von `MapView`). `options.init: true` markiert die Karte für `initAll` (`data-dss="map"` mit den Optionen
+ * als JSON in `data-dss-options`), für Seiten, deren Markup auf dem Server entsteht. Props: `name`, `address`, `lat`, `lng`, `info`, `contact`, `games`, `limit`, `gamesLabel`, `href`, `linkLabel`, `names`,
  * `logos`, `size`, `titleAs`, `load`, `tileUrl`, `privacyNote`, `mapHeight`, `className`. Spiele, Kontakt, Adresse und Links kommen aus
  * js/venue.js (Grenzen: `limit` 1 bis 5, ohne beendete und Spielfrei). Typen: js/render/venue-card.d.ts.
  */
@@ -15,8 +17,12 @@ import {
 } from '../venue.js';
 import { attr, esc } from './escape.js';
 import { headingOf, klass, list, logoBadge, nameText, obj, pick, str, teamOf, uidFor } from './core.js';
+import { createRegistry } from '../lifecycle.js';
 import { mount } from './mount.js';
 import { renderMapView } from './map-view.js';
+
+// Je Behälter höchstens eine Hallenkarte samt Karte: ein zweites mountVenueCard räumt die erste (auch ihre Leaflet-Karte) ab
+const registry = createRegistry('venue-card');
 
 /** Ein Spiel aus unvertrauten Daten: nur, was die Hallenkarte zeigt (Texte als Text, Mannschaften geprüft). */
 function gameOf(raw) {
@@ -28,6 +34,17 @@ function gameOf(raw) {
     league: g.league && typeof g.league === 'object' ? { name: str(obj(g.league).name) } : undefined,
     heim: team(g.heim), gast: team(g.gast),
   };
+}
+
+/** Eigenschaften der eingebetteten Karte (wie die Komponente: nicht interaktiv, ohne Liste, ohne App-Links, ein Marker „halle“). */
+function venueMapProps(p, title, lat, lng) {
+  const props = {
+    markers: [{ id: 'halle', lat, lng, label: title }], interactive: false, showList: false, appLinks: [],
+    height: typeof p.mapHeight === 'number' ? p.mapHeight : 250, load: p.load === 'auto' ? 'auto' : 'click',
+  };
+  if (typeof p.tileUrl === 'string') props.tileUrl = p.tileUrl;
+  if (typeof p.privacyNote === 'string') props.privacyNote = p.privacyNote;
+  return props;
 }
 
 /** Eine Mannschaft der Spielzeile: Trikotpunkt, optional Logo, versteckter Hinweis „Heim“/„Gast“, Name mit Kurzform. */
@@ -61,15 +78,10 @@ export function renderVenueCard(props, options) {
   const tag = headingOf(p.titleAs);
   const uid = uidFor(p, options);
 
+  const mapProps = hasMap ? venueMapProps(p, title, lat, lng) : null;
   const map = hasMap
-    ? '<div class="dss-venue-map">' +
-      renderMapView(
-        {
-          label: venueMapLabel(title), markers: [{ id: 'halle', lat, lng, label: title }], showList: false, height: typeof p.mapHeight === 'number' ? p.mapHeight : 250,
-          load: p.load === 'auto' ? 'auto' : 'click', tileUrl: p.tileUrl, privacyNote: p.privacyNote, appLinks: [], loadReady: obj(options).mapActive === true,
-        },
-        uid,
-      ) +
+    ? `<div class="dss-venue-map"${obj(options).init === true ? ` data-dss="map" data-dss-options="${attr(JSON.stringify(mapProps))}"` : ''}>` +
+      renderMapView({ ...mapProps, label: venueMapLabel(title), loadReady: obj(options).mapActive === true }, uid) +
       `<div class="dss-venue-maplinks">${venueMapLinks({ lat, lng, name: title })
         .map((link) => `<a class="dss-link" href="${attr(link.href)}">${esc(link.text)}${title ? `<span class="dss-sr-only">, ${esc(title)}</span>` : ''}</a>`)
         .join('')}</div></div>`
@@ -109,5 +121,61 @@ export function renderVenueCard(props, options) {
   );
 }
 
-/** Setzt `renderVenueCard` in `el` ein. Die Karte bleibt der Platzhalter, bis `initMap` (V2b) sie startet. */
-export const mountVenueCard = (el, props, options) => mount(el, renderVenueCard, props, options);
+/**
+ * Setzt `renderVenueCard` in `el` ein. `options.initMap` (die Funktion aus js/map-vanilla.js bzw. dem Karten-Bündel) startet die eingebettete Karte;
+ * dazu `loadLeaflet`, `onLoad`, `onError`, `onMarkerClick` wie bei `initMap`. Ohne `initMap` bleibt die Karte der Platzhalter mit gesperrter Schaltfläche.
+ */
+export function mountVenueCard(el, props, options) {
+  const o = obj(options);
+  const { initMap, loadLeaflet, onLoad, onError, onMarkerClick, ...rest } = o;
+  // Zuerst die frühere Fassung abbauen (auch mit Karte, wenn diesmal keine angebunden wird), erst danach Knoten lesen
+  if (el && typeof el === 'object') registry.release(el);
+  if (typeof initMap !== 'function' || typeof document === 'undefined' || !el || typeof el.querySelector !== 'function') return mount(el, renderVenueCard, props, rest);
+
+  const behavior = {};
+  for (const [name, fn] of Object.entries({ loadLeaflet, onLoad, onError, onMarkerClick })) if (typeof fn === 'function') behavior[name] = fn;
+  let live = null;
+  let done = false;
+  const keyOf = (p) => {
+    const lat = typeof p.lat === 'number' ? p.lat : undefined;
+    const lng = typeof p.lng === 'number' ? p.lng : undefined;
+    return isCoord(lat, lng) ? JSON.stringify([lat, lng, str(p.name).trim()]) : null;
+  };
+  // `null` nimmt eine frühere Angabe zurück (initMap.update führt Eigenschaften zusammen): fehlt tileUrl oder privacyNote, gilt wieder der Standard
+  const optionsOf = (p) => ({ tileUrl: null, privacyNote: null, ...venueMapProps(p, str(p.name).trim(), p.lat, p.lng), ...behavior });
+  const start = (p) => {
+    const node = keyOf(p) ? el.querySelector('.dss-venue-map') : null;
+    live = node ? { node, key: keyOf(p), handle: initMap(node, optionsOf(p)) } : null;
+  };
+
+  const inner = mount(el, renderVenueCard, props, { ...rest, mapActive: true });
+  start(obj(props));
+
+  const handle = registry.claim(el, () => {
+    done = true;
+    live?.handle.destroy();
+    live = null;
+    inner.destroy();
+  });
+  return {
+    update(next) {
+      if (done) return;
+      const p = obj(next);
+      const keep = live && live.key === keyOf(p) ? live : null;
+      if (live && !keep) {
+        live.handle.destroy();
+        live = null;
+      }
+      inner.update(p);
+      const fresh = el.querySelector('.dss-venue-map');
+      // Die laufende Karte bleibt stehen: ein neuer Platzhalter an ihrer Stelle wird durch sie ersetzt
+      if (keep && fresh && fresh !== keep.node) fresh.replaceWith(keep.node);
+      if (keep && (fresh || keep.node.isConnected)) keep.handle.update(optionsOf(p));
+      else if (keep) {
+        keep.handle.destroy();
+        live = null;
+      } else start(p);
+    },
+    destroy: handle.destroy,
+  };
+}

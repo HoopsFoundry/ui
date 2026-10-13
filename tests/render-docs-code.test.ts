@@ -33,7 +33,9 @@ async function run(code: string, names: string[]) {
   const script = code.match(/<script type="module">([\s\S]*)<\/script>/)![1];
   const markup = code.replace(/<script type="module">[\s\S]*<\/script>/, '');
   document.body.replaceChildren(document.createRange().createContextualFragment(markup));
-  const source = `${script.replace('@bbv/dss-design-system/render.js', indexUrl)}\nexport { ${names.join(', ')} };\n// Lauf ${++runs}`; // jeder Lauf ein eigenes Modul (gleicher Text wäre zwischengespeichert)
+  // Die Seitenpfade (/dss/…) zeigen im Test auf die Quellmodule; Leaflet kommt aus dem gespielten Modul (der Lader wird erst nach dem Klick gerufen)
+  const mapUrl = pathToFileURL(resolve(process.cwd(), 'js/map-bundle.js')).href;
+  const source = `${script.replace('@bbv/dss-design-system/render.js', indexUrl).replace('/dss/dss-render.min.js', indexUrl).replace('/dss/dss-map.min.js', mapUrl)}\nexport { ${names.join(', ')} };\n// Lauf ${++runs}`; // jeder Lauf ein eigenes Modul (gleicher Text wäre zwischengespeichert)
   return (await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)) as Record<string, unknown>;
 }
 
@@ -68,11 +70,12 @@ describe.each(Object.entries(DOCS))('Beispiel %s', (_name, doc) => {
       const shown = document.getElementById(id)!.innerHTML;
       // einklappbar: mountX legt für das Accordion-Verhalten eine Gruppe an
       const grouped = props.collapsible === true;
-      // die Hallenkarte sperrt „Karte laden“, solange initMap fehlt (die Komponente ist bedienbar): sonst gleiches Markup
+      // die Hallenkarte sperrt „Karte laden“, solange initMap fehlt (die Komponente ist bedienbar), mit initMap ist sie bedienbar: sonst gleiches Markup
       if (doc.component === 'VenueCard') {
         const load = document.querySelector<HTMLButtonElement>('.dss-map-load')!;
-        expect(load.disabled).toBe(true);
-        expect(load.getAttribute('aria-disabled')).toBe('true');
+        const live = 'live' in doc && doc.live === true;
+        expect(load.disabled).toBe(!live);
+        expect(load.hasAttribute('aria-disabled')).toBe(!live);
       }
       const actual = normalize((grouped ? shown.replace(/^<div class="dss-acc">([\s\S]*)<\/div>$/, '$1') : shown).replace(' disabled=""', '').replace(' aria-disabled="true"', ''));
       expect(actual.length, `${id} ist nicht leer`).toBeGreaterThan(50);
@@ -86,7 +89,7 @@ describe.each(Object.entries(DOCS))('Beispiel %s', (_name, doc) => {
     }
   });
   it('das Beispiel nutzt die Pfade des Pakets und kein innerHTML', () => {
-    expect(doc.code).toContain("from '@bbv/dss-design-system/render.js'");
+    expect(doc.code).toMatch(/from '(@bbv\/dss-design-system\/render\.js|\/dss\/dss-render\.min\.js)'/);
     expect(doc.code).not.toMatch(/innerHTML\s*=/);
     expect(doc.code).toContain('document.querySelector(');
   });

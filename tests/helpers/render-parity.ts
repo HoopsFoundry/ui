@@ -35,9 +35,9 @@ export function useParity() {
       const { className, ...rest } = props;
       return normalize(render(component, { props: className === undefined ? rest : { ...rest, class: className } }).body);
     },
-    /** React-SSR (`renderToStaticMarkup`) einer Komponente aus `react/<name>.tsx`. */
-    async react(name: string, props: Props = {}, children?: unknown) {
-      const component = await load(`react/${name}.tsx`, name);
+    /** React-SSR (`renderToStaticMarkup`) einer Komponente aus `react/<name>.tsx` (`file`, wenn die Datei anders heißt als der Export, z. B. `MapView` in `Map.tsx`). */
+    async react(name: string, props: Props = {}, children?: unknown, file = name) {
+      const component = await load(`react/${file}.tsx`, name);
       const element = children === undefined ? createElement(component as never, props as never) : createElement(component as never, props as never, children as never);
       return normalize(renderToStaticMarkup(element));
     },

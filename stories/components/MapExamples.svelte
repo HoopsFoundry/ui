@@ -1,6 +1,7 @@
 <script lang="ts">
   import MapView from '../../svelte/Map.svelte';
   import { pinElement } from '../../js/map-leaflet.js';
+  import { mountMap } from '../../js/map-vanilla.js';
   import { HALLEN, SITZ, demoTileUrl } from './mapData';
 
   let { example }: { example: string } = $props();
@@ -15,6 +16,12 @@
     node.appendChild(pinElement({ number: options.number, kind: options.kind }));
     if (options.kind === 'seat') node.classList.add('is-seat');
     if (options.own) node.classList.add('is-own');
+  }
+  // Vanilla: mountMap in einen Behälter (die Karte ohne Framework); update und destroy folgen dem Svelte-Lebenszyklus
+  type VanillaProps = Parameters<typeof mountMap>[1];
+  function vanilla(node: HTMLElement, props: VanillaProps) {
+    const handle = mountMap(node, props);
+    return { update: (next: VanillaProps) => handle.update(next), destroy: () => handle.destroy() };
   }
   const stateClass = ['', 'pseudo-hover', 'pseudo-focus-visible', ''] as const;
   const stateName = ['Standard', 'Hover', 'Fokus', 'Gesperrt'] as const;
@@ -133,6 +140,22 @@
       </div>
     </div>
   </div>
+{:else if example === 'vanilla'}
+  <div use:vanilla={{ label: 'Vanilla: Karte der Sporthalle Nordhain', markers: one, tileUrl: tile } as never}></div>
+{:else if example === 'vanilla-geladen'}
+  <div use:vanilla={{ label: 'Vanilla: Vereinssitz und zwei Hallen', markers: [SITZ, HALLEN[0], HALLEN[1]], tileUrl: tile, load: 'auto', darkTiles: 'invert', height: 300 } as never}></div>
+{:else if example === 'vanilla-handy'}
+  <div class="narrow">
+    <div use:vanilla={{ label: 'Vanilla: Hallen Seeberg und Kiefernau (Handy)', markers: [HALLEN[1], HALLEN[2]], tileUrl: tile, height: 240 } as never}></div>
+  </div>
+{:else if example === 'vanilla-handy-dunkel'}
+  <div class="narrow">
+    <div use:vanilla={{ label: 'Vanilla: Geschäftsstelle und Gymnasium Kiefernau (Handy)', markers: [SITZ, HALLEN[2]], tileUrl: tile, load: 'auto', height: 240 } as never}></div>
+  </div>
+{:else if example === 'do-lokal'}
+  <pre class="code">{`<link rel="stylesheet" href="/vendor/leaflet/leaflet.css">\nloadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js')`}</pre>
+{:else if example === 'dont-lokal'}
+  <pre class="code">{`<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">\nloadLeaflet: () => import('https://unpkg.com/leaflet/…')`}</pre>
 {:else if example === 'do-adresse'}
   <div class="narrow">
     <MapView label="Do: Karte mit Adresse als Text" markers={one} height={280} />
@@ -188,4 +211,5 @@
   .swatch--light { background: #ecebe6; }
   .swatch--dark { background: #3b3d40; }
   .attr-static { position: static; border-radius: var(--radius-md); }
+  .code { margin: 0; padding: 12px 14px; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--fs-caption); line-height: 1.5; background: var(--surface-2); border: 1px solid var(--page-line); border-radius: var(--radius-md); color: var(--page-fg); white-space: pre-wrap; }
 </style>

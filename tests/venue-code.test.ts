@@ -131,7 +131,9 @@ describe('Doku', () => {
   it('Beispiele rendern, jede Halle höchstens einmal je Seite (landmark-unique) und die Don\'t-Stages sind inert', async () => {
     const Examples = ((await vite.ssrLoadModule(`${rootDir}stories/components/VenueCardExamples.svelte`)) as { default: unknown }).default;
     // 'handy' und 'handy-dunkel' erscheinen als Iframes (eigene Dokumente), alle anderen stehen inline auf einer Seite
-    const iframes = ['handy', 'handy-dunkel'];
+    // Die Vanilla-Beispiele entstehen erst im Browser (mountVenueCard in einer Svelte-Aktion): im Server-Rendering ist der Behälter leer
+    const browserOnly = ['vanilla', 'vanilla-handy', 'vanilla-handy-dunkel'];
+    const iframes = ['handy', 'handy-dunkel', ...browserOnly];
     const names = [...stories.matchAll(/example\('([\w-]+)'\)/g)].map((m) => m[1]);
     const labelsOf = (n: string) => render(Examples, { props: { example: n } }).body.match(/aria-label="Karte: [^"]*"/g) ?? [];
     expect(labelsOf('handy').filter((l) => labelsOf('handy-dunkel').includes(l))).toEqual([]);
@@ -146,6 +148,29 @@ describe('Doku', () => {
       }
     }
     expect(read('stories/docs/blocks/DosDonts.tsx')).toContain('INERT');
+  });
+  it('Vanilla-Beispiele: eigene Hallen (nicht von anderen Beispielen genutzt), Handy-Vorschauen verschieden, Kachel lokal', () => {
+    const indexOf = (name: string) => {
+      const block = examples.slice(examples.indexOf(`example === '${name}'`));
+      return Number(block.match(/venueProps\((\d+)\)/)![1]);
+    };
+    const mine = ['vanilla', 'vanilla-handy', 'vanilla-handy-dunkel'].map(indexOf);
+    expect(new Set(mine).size).toBe(3);
+    const vanillaStart = examples.indexOf("example === 'vanilla'");
+    const vanillaEnd = examples.indexOf("example === 'zustaende'");
+    // inline auf der Seite: die Region „Karte: <Name>“ kommt nur einmal vor (landmark-unique). Die anderen Beispiele nutzen die Hallen 0 bis 23, deshalb trägt
+    // das Seitenbeispiel einen eigenen Namen; die Handy-Vorschauen sind Iframes und zeigen andere Hallen als die Svelte-Vorschauen (0, 1, 10, 11)
+    const block0 = examples.slice(vanillaStart, vanillaEnd);
+    const ownNames = [...block0.matchAll(/venueProps\(\d+\), name: '([^']+)'/g)].map((m) => m[1]);
+    expect(ownNames).toEqual(['Buchenhalle Süd', 'Ahornhalle Nord', 'Erlenhalle Ost']);
+    for (const own of ownNames) {
+      expect(examples.split(own), own).toHaveLength(2);
+      expect(read('stories/components/venueData.ts'), own).not.toContain(own);
+    }
+    for (const index of mine.slice(1)) expect([0, 1, 10, 11], `Halle ${index}`).not.toContain(index);
+    const block = examples.slice(vanillaStart, vanillaEnd);
+    expect((block.match(/tileUrl: tile/g) ?? []).length).toBe(3);
+    expect(block).not.toMatch(/openstreetmap/);
   });
   it('Demo-Daten erfunden: keine Bezüge auf images/, Adressen unter example.org, Rufnummern im Fiktionsbereich', () => {
     const data = read('stories/components/venueData.ts') + read('stories/VenueCard.code.ts') + examples;

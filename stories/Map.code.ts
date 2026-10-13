@@ -2,12 +2,45 @@
 // das Vanilla-Beispiel gegen die Funktionen aus js/map.js, die Kachel-Rezepte als echte Dateien (stories/examples/).
 import kachelEndpunkt from './examples/kachel-endpunkt.ts?raw';
 import nginxTiles from './examples/nginx-tiles.conf?raw';
+import ohneBuildHtml from './examples/karte-ohne-build/index.html?raw';
 
 export const kachelEndpunktTs = kachelEndpunkt;
 export const nginxConf = nginxTiles;
+export const ohneBuildSeite = ohneBuildHtml;
 
-export const vanilla = `<!-- Vanilla: es gibt keine Karten-Komponente ohne Framework. Du nutzt Leaflet direkt, dazu die Klassen dss-map* (Rahmen, Zoom,
-     Quellenangabe, Liste) und die reinen Funktionen aus map.js. Leaflet und leaflet.css lädt die Seite selbst (npm install leaflet). -->
+export const vanilla = `<!-- Vanilla: mountMap setzt das Markup der Karte in einen Behälter und startet das Verhalten (Zwei-Klick-Platzhalter, Zoom, Marker, Fehler).
+     Leaflet und leaflet.css liefert deine Seite lokal aus (Abschnitt „Ohne Build einbinden“), nicht von unpkg. -->
+<link rel="stylesheet" href="/dss/dss.css" />
+<link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+
+<div id="karte"></div>
+
+<script type="module">
+  import { mountMap } from '/dss/dss-map.min.js';
+
+  // dieselben Eigenschaften wie bei MapView (React) und Map (Svelte); ein Marker ohne href ist kein Link
+  const halle = { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true };
+  const props = {
+    label: 'Karte der Sporthalle Nordhain',   // Pflicht: der Name der Region, je Karte verschieden
+    markers: [halle],
+    tileUrl: '/tiles/{z}/{x}/{y}.png',        // eigener Kachel-Proxy oder Kachelserver (Datenschutz und Kachelserver)
+  };
+
+  const karte = mountMap(document.querySelector('#karte'), props, {
+    loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js'),   // erst nach „Karte laden“: vorher kein Netzverkehr
+    onError: (grund) => console.warn('Karte nicht geladen:', grund),   // tile-url, import, init, update oder tiles
+  });
+
+  // Später: Marker, Mitte, Zoom und Kachel-Adresse ändern (die Karte wird nicht neu gebaut; gleiche id, gleicher Marker)
+  karte.update({ ...props, markers: [halle, { id: 'seeberg', lat: 49.3055, lng: 7.912, label: 'Mehrzweckhalle Seeberg' }] });
+  // karte.destroy();   // räumt Karte, Listener und Beobachter ab und stellt den Behälter wieder her
+
+  // Als Zeichenkette (Server, Crawler): renderMap(props) liefert dasselbe Markup; initMap(el, props) macht vorhandenes Markup lebendig
+</script>`;
+
+export const leafletDirekt = `<!-- Leaflet direkt, ohne mountMap: die Klassen dss-map* (Rahmen, Zoom, Quellenangabe, Liste) und die reinen Funktionen aus map.js. Das ist der
+     Weg, wenn du die Karte ganz selbst steuern willst; die Zwei-Klick-Lösung, die Zustände und die Fehlerfälle von mountMap hast du dann nicht.
+     Leaflet und leaflet.css lädt die Seite selbst (npm install leaflet). -->
 <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
 
 <div class="dss-map" data-state="ready" data-dim="true" data-tiles="dim" style="--dss-map-h:320px">
@@ -54,6 +87,77 @@ export const vanilla = `<!-- Vanilla: es gibt keine Karten-Komponente ohne Frame
   document.getElementById('karte-koordinaten').textContent = formatCoords(halle.lat, halle.lng); // '49,3000° N, 7,9000° O'
   document.getElementById('karte-route').href = mapLinks(halle).route;
 </script>`;
+
+
+export const initMapBeispiel = `<!-- Markup vom Server (oder aus renderMap): initMap macht es lebendig. Die Eigenschaften sind dieselben wie bei renderMap;
+     ohne markers weiß die Karte nicht, wo sie hinsoll. -->
+<div id="karte">${'$'}{renderMap(props)}</div>
+
+<script type="module">
+  import { initMap } from '/dss/dss-map.min.js';
+
+  const karte = initMap(document.querySelector('#karte'), {
+    label: 'Karte der Sporthalle Nordhain',
+    markers: [{ id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true }],
+    tileUrl: '/tiles/{z}/{x}/{y}.png',
+    loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js'),
+  });
+  // karte.update(neueEigenschaften);  karte.destroy();   // destroy stellt das Markup vom Anfang wieder her
+</script>`;
+
+export const initAllKarte = `<!-- Ohne eigenes Skript je Karte: data-dss="map" und die Eigenschaften als JSON. Ein leerer Behälter wird zur Karte (mountMap),
+     vorhandenes Markup von renderMap oder renderVenueCard(props, { init: true }) wird lebendig (initMap). -->
+<div data-dss="map" data-dss-options='{"label":"Karte der Sporthalle Nordhain","markers":[{"id":"nordhain","lat":49.3,"lng":7.9,"label":"Sporthalle Nordhain"}],"tileUrl":"/tiles/{z}/{x}/{y}.png"}'></div>
+
+<script type="module">
+  import { initAll } from '/dss/dss.min.js';
+  import { initMapBlock } from '/dss/dss-map.min.js';
+
+  // Die Karte gehört nicht zum Kern: initAll startet sie über start (initMapBlock aus dem Karten-Bündel). Gemeinsame Optionen
+  // (loadLeaflet, tileUrl …) stehen daneben und gelten für jede Karte; data-dss-options überschreibt sie je Element.
+  initAll(document, {
+    map: { start: initMapBlock, loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js') },
+  });
+</script>`;
+
+export const importmapVariante = `<!-- Variante 1: eine importmap. Das Karten-Bündel lädt Leaflet per import('leaflet'); der Browser löst den Namen über die Karte auf.
+     Die importmap muss vor dem ersten Modul stehen. -->
+<script type="importmap">
+  { "imports": { "leaflet": "/vendor/leaflet/leaflet-src.esm.js" } }
+</script>
+<script type="module">
+  import { mountMap } from '/dss/dss-map.min.js';
+  mountMap(document.querySelector('#karte'), { label: 'Karte der Sporthalle Nordhain', markers: [{ id: 'a', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain' }], tileUrl: '/tiles/{z}/{x}/{y}.png' });
+</script>`;
+
+export const globalVariante = `<!-- Variante 3: das klassische leaflet.js (UMD, setzt window.L), erst nach dem Klick als Skript nachgeladen -->
+<script type="module">
+  import { mountMap } from '/dss/dss-map.min.js';
+
+  const loadLeaflet = () => window.L
+    ? Promise.resolve(window.L)
+    : new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = '/vendor/leaflet/leaflet.js';
+        script.onload = () => resolve(window.L);
+        script.onerror = () => reject(new Error('leaflet.js nicht geladen'));
+        document.head.append(script);
+      });
+
+  mountMap(document.querySelector('#karte'), { label: 'Karte der Sporthalle Nordhain', markers: [{ id: 'a', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain' }], tileUrl: '/tiles/{z}/{x}/{y}.png' }, { loadLeaflet });
+</script>`;
+
+export const kopieren = `# Einmal beim Bau der Seite (oder per portal-sync.mjs, siehe Foundation/Vanilla): die Dateien liegen danach im eigenen Projekt
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss.css            _site/dss/
+cp -r node_modules/@bbv/dss-design-system/dist/vanilla/courtlines      _site/dss/                # nur, wenn deine Seiten die Court-Linien nutzen
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss-map.min.js     _site/dss/
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss-render.min.js  _site/dss/                # nur für die Hallenkarte aus Daten ...
+cp node_modules/@bbv/dss-design-system/dist/vanilla/dss.min.js         _site/dss/                # ... und der Kern, den dss-render.min.js einbindet (sonst 404)
+cp node_modules/leaflet/dist/leaflet.css                                _site/vendor/leaflet/
+cp node_modules/leaflet/dist/leaflet-src.esm.js                         _site/vendor/leaflet/   # als ES-Modul (Variante 1 und 2)
+cp node_modules/leaflet/dist/leaflet.js                                 _site/vendor/leaflet/   # nur für Variante 3 (window.L)
+cp -r node_modules/leaflet/dist/images                                  _site/vendor/leaflet/   # nur, wenn du Leaflets eigene Bilder brauchst (die Marker der Karte sind SVG)`;
+
 
 export const svelte = `<script lang="ts">
   import MapView from '@bbv/dss-design-system/svelte/Map';

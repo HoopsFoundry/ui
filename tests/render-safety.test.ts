@@ -26,7 +26,9 @@ function violations(html: string): string[] {
       if (name.startsWith('on')) out.push(`Ereignis-Attribut ${name}`);
       if (['srcdoc', 'formaction', 'action', 'xlink:href'].includes(name)) out.push(`Attribut ${name}`);
       if ((name === 'href' || name === 'src') && /^(javascript|data|vbscript):/.test(value)) out.push(`${name}=${value.slice(0, 30)}`);
-      if (name === 'href' && !value.startsWith('#') && safeHref(attribute.value) === undefined) out.push(`unsicherer href ${value.slice(0, 30)}`);
+      // geo:-Links der Karte entstehen aus Zahlen und einer prozentkodierten Bezeichnung (js/map.js), nicht aus einem Eingabe-Ziel
+      const geo = /^geo:-?\d+(\.\d+)?,-?\d+(\.\d+)?\?q=-?\d+(\.\d+)?,-?\d+(\.\d+)?(\((%[0-9A-F]{2}|[A-Za-z0-9._~-])*\))?$/.test(attribute.value);
+      if (name === 'href' && !value.startsWith('#') && !geo && safeHref(attribute.value) === undefined) out.push(`unsicherer href ${value.slice(0, 30)}`);
       if (name === 'style' && !STYLE.test(attribute.value)) out.push(`style=${attribute.value.slice(0, 50)}`);
     }
   }
@@ -160,6 +162,7 @@ describe('Aufzählungen: nur bekannte Werte erreichen das Markup', () => {
       fn('renderTeamCard')({ name: 'x', size: bad, next: { opponent: { name: 'b' }, at: bad } }),
       fn('renderVenueCard')({ name: 'x', size: bad, load: bad }),
       fn('renderFormChips')({ form: ['S'], variant: bad }),
+      fn('renderMap')({ label: 'K', markers: [{ id: 'a', lat: 49.3, lng: 7.9, label: 'H', kind: bad }], appLinks: [bad, 'constructor', '__proto__'], load: bad, darkTiles: bad }),
     ].join('');
     expect(html).not.toContain('onload');
     expect(html).not.toContain('<x ');
