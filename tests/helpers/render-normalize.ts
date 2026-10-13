@@ -20,7 +20,8 @@ export const normalize = (html: string) => {
   // Attribute je Tag nach Name sortieren (Reihenfolge ist in HTML bedeutungslos), Klassen sortieren, Stil glätten
   text = text.replace(TAG, (_m, name: string, attrs: string) => {
     const list: [string, string | undefined][] = [];
-    for (const m of attrs.matchAll(ATTR)) list.push([m[1], m[2]]);
+    // Attributnamen sind in HTML ohne Groß-/Kleinschreibung (React schreibt `colSpan`, Svelte und Vanilla `colspan`)
+    for (const m of attrs.matchAll(ATTR)) list.push([m[1].toLowerCase(), m[2]]);
     list.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
     const out = list
       .filter(([k, v]) => !(k === 'class' && (v ?? '').trim() === ''))
