@@ -11,11 +11,22 @@
 
 Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus. Ein Qualitätsworkflow ist eine geplante Ergänzung, kein vorhandener Nachweis.
 
-=== Beschlossene Vanilla-Auslieferung
+=== Vanilla-Auslieferung
 
-Quelle: `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`.
+Entscheidung und Begründung: ADR-006.
 
-Am 12. Oktober 2026 wurde GitHub-Release mit `dist/vanilla` als erste Auslieferung festgelegt. Ab Version 1.0 ist npm vorgesehen. Release-Skript, Prüfsummen, Versionsabgleich und `portal-sync` sind laut Plan noch umzusetzen beziehungsweise abzunehmen. `dist/vanilla` enthält drei Bündel nebeneinander: `dss.js` (Kern), `dss-render.js` (importiert `./dss.js`) und `dss-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
+Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält drei Bündel nebeneinander: `dss.js` (Kern), `dss-render.js` (importiert `./dss.js`) und `dss-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
+
+[cols="1,2,2",options="header"]
+|===
+|Schritt |Wo |Was
+|Bau und Release-Dateien |Entwicklungsrechner oder Workflow `release-vanilla.yml` |`npm run build`, dann `node scripts/release-vanilla.mjs`: prüft die Version an acht Stellen, schreibt `release/dss-vanilla-<version>.tgz`, `.sha256` und `manifest.json`
+|Veröffentlichung |GitHub-Release `v<version>` |Anhänge: Tarball, Prüfsummen, Manifest; angelegt vom Release-Job des Workflows bei einem Tag `v*`
+|Übernahme |Projekt des Portals, `portal-sync.mjs --from-release <version>` |Download, Prüfung, Ersetzen von `_site/dss`; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
+|Betrieb |Statischer Host (GitHub Pages) |Dateien auf der eigenen Domain; strenge CSP (`script-src 'self'` plus Hash des Boot-Skripts, `style-src 'self'`, `img-src 'self'` und Kachel-Host)
+|===
+
+Nachgewiesen ist der Weg durch `scripts/check-portal-seite.mjs`: bauen, Release erzeugen, mit `portal-sync --from-release` von einem lokalen Server holen und die Beispielseite unter strenger CSP in Chromium und WebKit prüfen. Nicht nachgewiesen ist der Lauf des Workflows `release-vanilla.yml` auf GitHub (kein Tag, kein Release erzeugt); ein Test prüft nur seinen Aufbau (Auslöser, Rechte, Reihenfolge). Er lässt sich mit `workflow_dispatch` und `dry_run: true` ohne Release erproben.
 
 === Dokumentation und MCP
 

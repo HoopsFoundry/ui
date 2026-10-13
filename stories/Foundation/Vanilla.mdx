@@ -3,8 +3,9 @@ import * as VanillaStories from './Vanilla.stories';
 import { DosDonts } from '../docs/blocks/DosDonts';
 import { CodeBlock } from '../docs/blocks/CodeBlock';
 import { DocTable } from '../docs/blocks/DocTable';
-import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget, mapSizes, mapBudget } from './Vanilla.code';
+import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget, mapSizes, mapBudget, releaseSync, manualCheck, updateFlow, npmSwitch, compat } from './Vanilla.code';
 import syncSource from '../examples/portal-sync.mjs?raw';
+import portalSource from '../examples/portal-seite/portal.js?raw';
 import '../docs/blocks/blocks.css';
 
 <Meta of={VanillaStories} />
@@ -218,13 +219,66 @@ Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Z
 
 ## Kopieren ins Projekt
 
-Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript im Projekt kopiert `dist/vanilla` nach `_site/dss` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript gehört in dein Projekt, nicht in dieses Paket; das Beispiel ist `stories/examples/portal-sync.mjs`:
+Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript im Projekt legt `dist/vanilla` nach `_site/dss` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript gehört in dein Projekt, nicht in dieses Paket; das Beispiel ist `stories/examples/portal-sync.mjs`. Es hat drei austauschbare Quellen für denselben Aufbau von `dist/vanilla`:
+
+<DocTable
+  label="Quellen von portal-sync"
+  head={['Aufruf', 'Quelle', 'Wann']}
+  rows={[
+    [<code>--from-release 0.9.0</code>, <>Release-Anhang <code>dss-vanilla-0.9.0.tgz</code> auf GitHub, geprüft gegen <code>.sha256</code></>, 'bis Version 1.0 (Entscheidung zur Auslieferung)'],
+    [<code>--from-package</code>, <>das installierte Paket in <code>node_modules</code></>, 'ab Version 1.0 über npm; schon jetzt für Projekte mit eigenem Paketlauf'],
+    [<code>--from-dir pfad</code>, 'ein entpackter Release-Ordner oder ein Paketordner', 'offline, in der Pipeline, nach manuellem Download'],
+  ]}
+/>
 
 <CodeBlock label="portal-sync.mjs" language="JavaScript" code={syncSource} />
 
-Installiere das Paket mit `npm install github:OliEder/dss-design-system#v0.9.0` (der Schritt `prepare` baut `dist` mit `npm run build`) und rufe `node portal-sync.mjs` vor dem Veröffentlichen auf. Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `dss.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
+**Das Zielverzeichnis gehört dem Paket:** `portal-sync.mjs` ersetzt `_site/dss` bei jedem Lauf vollständig. Es holt und prüft die Quelle zuerst vollständig, baut dann in einem Nachbarordner und benennt um (bei einem Fehler bleibt das alte Ziel), schreibt die Marker-Datei `.dss-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`, Schalter `--leaflet` verlangt es). Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `dss.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
 
-**Das Zielverzeichnis gehört dem Paket:** `portal-sync.mjs` ersetzt `_site/dss` bei jedem Lauf vollständig. Es baut zuerst in einem Nachbarordner und benennt dann um (bei einem Fehler bleibt das alte Ziel), schreibt die Marker-Datei `.dss-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`).
+## Einbinden aus dem Release
+
+Jedes Release hat drei Anhänge: den Tarball `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball) und `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Hinweis zu Leaflet). Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--dss-version` in `dss.css` dieselbe Version tragen, und ist reproduzierbar (zwei Läufe ergeben dieselben Bytes). Es schreibt nach `release/` (nicht im Git) und braucht weder Netz noch Git-Schreibrechte.
+
+<CodeBlock label="Holen, prüfen, einsetzen" language="Shell" code={releaseSync} />
+
+Ohne das Skript prüfst du von Hand:
+
+<CodeBlock label="Prüfsumme von Hand" language="Shell" code={manualCheck} />
+
+Der Tarball enthält nur das Bündel; Leaflet gehört nicht dazu (`manifest.json` nennt den Bereich `^1.9.0` aus den Peer-Abhängigkeiten, die Karte braucht es nur nach dem Klick). Eine komplette Seite aus genau diesen Dateien steht im Repository unter `stories/examples/portal-seite/` (Vereinsseite `index.html`, Teamseite `team.html`, Daten in `data.json`): Seitenkopf mit Theme-Umschalter, Seitennavigation, Ligakarten, Teamkarten, Spielplan mit Tabs, Hallenkarte mit Karte, einklappbare Tabellen, Dialog „Fehler melden“ und Nach-oben; alle Bausteine entstehen aus den Daten per `mountX`, Tabs und Dialog aus den kleinen Hilfen am Anfang von `portal.js`.
+
+<CodeBlock label="portal.js (Beispiel-Portalseite)" language="JavaScript" code={portalSource} />
+
+## Aktualisieren
+
+1. **Neue Version holen:** `node portal-sync.mjs --from-release <version>`. Das Skript bricht bei jeder Abweichung ab (Prüfsumme des Tarballs oder einer Datei, falsche Version in `version.json` oder im Ordnernamen, unzulässige Pfade im Archiv, Verknüpfungen, doppelte Einträge, 404, abgebrochener Download); dann ist `_site/dss` unverändert.
+2. **Versionen abgleichen:** `dss.js`, `dss-render.js`, `dss-map.js` und `dss.css` müssen aus derselben Version stammen. Die Beispielseite setzt `data-dss-versions` auf `<html>` (die gemeinsame Version oder die Abweichung) und warnt in der Konsole; in eigenen Seiten vergleichst du `VERSION` aus den drei Bündeln mit `checkVersion().css`.
+3. **Browser-Cache:** statische Hosts liefern `dss.css` und `dss.js` oft mit langem Cache; hänge die Version an die Adresse (`/dss/dss.min.js?v=0.10.0`) oder lege jede Version in einen eigenen Ordner.
+4. **Rollback:** dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt, es bleiben keine Dateien der neueren Version liegen.
+
+<CodeBlock label="Aktualisieren und Zurückrollen" language="Shell" code={updateFlow} />
+
+Der Release-Workflow `.github/workflows/release-vanilla.yml` führt bei einem Tag `v*` Tests, Typprüfung und Bau aus, erzeugt dieselben Dateien und legt das Release an. Er ist bis zum ersten Tag ungetestet (ein Test prüft seinen Aufbau, nicht seinen Lauf). Mit „Run workflow“ (Eingabe `version`, `dry_run` auf wahr) läuft er ohne Release und lädt nur ein Workflow-Artefakt hoch.
+
+## Kompatibilität
+
+Die Bündel sind ES-Module mit Ziel `es2020`. Die Beispiel-Portalseite läuft in dieser Prüfung (`node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox`) gegen strenge Content-Security-Policy, über den echten Weg Release → `portal-sync --from-release`:
+
+<DocTable
+  label="Ergebnis der Browser-Prüfung"
+  head={['Browser', 'Version', 'Prüfungen', 'Ergebnis', 'Anmerkung']}
+  rows={compat.browsers.map((b) => [b.name, b.version, String(b.checks), b.result, b.note])}
+/>
+
+Geprüft werden je Browser: keine Konsolen- und Seitenfehler, keine fremden Anfragen und kein Leaflet vor dem Klick, keine Verletzung der CSP (Karte und Kacheln eingeschlossen), Versionsabgleich, Tab-Reihenfolge, Dialog (Fokus, Escape, Fokus zurück), Accordion, Tabs, kein seitliches Scrollen bei 420 und 360 px, Theme-Umschalter mit Merken, Nach-oben, Seitennavigation und axe (WCAG 2.x A/AA/AAA, 2.2, best-practice, Kontrast AAA, Zielgröße). Firefox ist in dieser Umgebung nicht gelaufen: der von Playwright gelieferte Build startet nicht (der Fehler tritt auch bei frischer Installation und mit eigenem Profilordner auf); ein Lauf auf einem anderen Rechner steht aus.
+
+## Wechsel auf npm ab 1.0
+
+Bis Version 1.0 liefert das Release die Dateien, ab 1.0 zusätzlich das npm-Paket `@bbv/dss-design-system` (dasselbe `dist/vanilla`, die Exporte `@bbv/dss-design-system/vanilla`, `…/vanilla-render` und `…/vanilla-map`). Für ein Portal ändert sich nur die Quelle des Skripts:
+
+<CodeBlock label="Von Release auf npm" language="Shell" code={npmSwitch} />
+
+Das Paket veröffentlicht `dist/` mit (`files` in der `package.json`); `npm pack --dry-run` zeigt die Liste. Die Veröffentlichung selbst, das Setzen von Tag und Release gehören dem Maintainer und sind nicht Teil dieser Seite.
 
 ## Versionsabgleich
 

@@ -11,7 +11,7 @@ const page = meta('dss-page');
 // Leaflet kommt aus einer lokalen Datei und wird erst nach dem Klick auf „Karte laden“ geladen (vorher kein Netzverkehr)
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
 
-/** Setzt geprüftes Markup ein (Fragment statt innerHTML); alle Werte darin laufen durch esc oder attr. */
+/** Setzt geprüftes Markup ein (als Fragment geparst); alle Werte darin laufen durch esc oder attr. */
 const setMarkup = (el, markup) => el.replaceChildren(document.createRange().createContextualFragment(markup));
 
 const CLOSE_ICON = '<svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg>';

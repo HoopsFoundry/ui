@@ -173,3 +173,52 @@ export const renderBudget = { minKB: 52, gzipKB: 18 };
 /** Das Karten-Bündel (dss-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
 export const mapSizes = { js: 38745, min: 22173, gzip: 9104 };
 export const mapBudget = { minKB: 24, gzipKB: 10 };
+
+/** Auslieferung bis Version 1.0: Release-Anhänge auf GitHub. Der Befehl holt, prüft und ersetzt `_site/dss` in einem Schritt. */
+export const releaseSync = `# Im Projekt (nicht im Paket): portal-sync.mjs liegt neben der package.json des Portals
+node portal-sync.mjs --from-release 0.9.0
+# → lädt dss-vanilla-0.9.0.tgz und dss-vanilla-0.9.0.sha256 von
+#   https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/
+# → prüft die SHA-256 des Tarballs und jeder Datei darin, die Version in version.json und den Ordnernamen
+# → ersetzt erst danach _site/dss (bei einer Abweichung bleibt das alte Ziel unverändert, Exit-Code 1)
+
+# Weitere Quellen (derselbe Aufbau von dist/vanilla):
+node portal-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard)
+node portal-sync.mjs --from-dir ./dss-vanilla-0.9.0 # entpackter Release-Ordner, offline
+node portal-sync.mjs --from-release 0.9.0 --base-url https://intern.example/dss   # eigener Spiegel`;
+
+/** Prüfsumme von Hand, ohne das Skript. */
+export const manualCheck = `# Beide Dateien eines Releases in einen leeren Ordner laden, den Tarball daneben entpacken, dann prüfen
+mkdir dss-0.9.0 && cd dss-0.9.0
+curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.tgz
+curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.sha256
+tar xzf dss-vanilla-0.9.0.tgz
+shasum -a 256 -c dss-vanilla-0.9.0.sha256      # jede Zeile muss "OK" sein (Linux: sha256sum -c)`;
+
+/** Aktualisieren und Zurückrollen im Portal. */
+export const updateFlow = `# 1. Neue Version holen und prüfen
+node portal-sync.mjs --from-release 0.10.0
+
+# 2. Versionen im Browser abgleichen (data-dss-versions am html-Element der Beispielseite, oder checkVersion() im Start-Skript)
+# 3. Portal veröffentlichen
+
+# Rollback: dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt
+node portal-sync.mjs --from-release 0.9.0`;
+
+/** Wechsel auf npm ab 1.0: nur die Quelle ändert sich. */
+export const npmSwitch = `# bis 1.0 (Release-Anhang)
+node portal-sync.mjs --from-release 0.9.0
+
+# ab 1.0 (npm, Paketname und Aufbau von dist/vanilla bleiben)
+npm install @bbv/dss-design-system@1.0.0
+node portal-sync.mjs --from-package`;
+
+/** Das Ergebnis der Browser-Prüfung der Beispiel-Portalseite (scripts/check-portal-seite.mjs); Stand der Messung. */
+export const compat = {
+  checks: 73,
+  browsers: [
+    { name: 'Chromium', version: '153.0.8010.12', checks: 42, result: 'bestanden', note: 'Seiten, Karte, Tastatur, Layout, axe in BBV und DBB, hell und dunkel, 1280 und 420 px' },
+    { name: 'WebKit (Safari-Engine)', version: '26.6', checks: 28, result: 'bestanden', note: 'wie Chromium; axe nur BBV hell bei 420 px; auf macOS erreicht Tab Links und Schaltflächen nur mit Alt+Tab (Systemeinstellung)' },
+    { name: 'Firefox', version: '155.0 (Playwright 1543)', checks: 0, result: 'nicht gelaufen', note: 'Der Browser startet in dieser Umgebung nicht („Could not find profile folder“); die Ursache liegt im Playwright-Build, nicht im Paket' },
+  ],
+};
