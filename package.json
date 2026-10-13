@@ -120,9 +120,61 @@
       "types": "./js/modal.d.ts",
       "import": "./js/modal.js"
     },
+    "./render.js": {
+      "types": "./js/render/index.d.ts",
+      "import": "./js/render/index.js"
+    },
+    "./render/escape.js": {
+      "types": "./js/render/escape.d.ts",
+      "import": "./js/render/escape.js"
+    },
+    "./render/core.js": {
+      "types": "./js/render/core.d.ts",
+      "import": "./js/render/core.js"
+    },
+    "./render/mount.js": {
+      "types": "./js/render/mount.d.ts",
+      "import": "./js/render/mount.js"
+    },
+    "./render/stats.js": {
+      "types": "./js/render/stats.d.ts",
+      "import": "./js/render/stats.js"
+    },
+    "./render/empty-state.js": {
+      "types": "./js/render/empty-state.d.ts",
+      "import": "./js/render/empty-state.js"
+    },
+    "./render/table.js": {
+      "types": "./js/render/table.d.ts",
+      "import": "./js/render/table.js"
+    },
+    "./render/league-card.js": {
+      "types": "./js/render/league-card.d.ts",
+      "import": "./js/render/league-card.js"
+    },
+    "./render/schedule.js": {
+      "types": "./js/render/schedule.d.ts",
+      "import": "./js/render/schedule.js"
+    },
+    "./render/match-card.js": {
+      "types": "./js/render/match-card.d.ts",
+      "import": "./js/render/match-card.js"
+    },
+    "./render/team-card.js": {
+      "types": "./js/render/team-card.d.ts",
+      "import": "./js/render/team-card.js"
+    },
+    "./render/venue-card.js": {
+      "types": "./js/render/venue-card.d.ts",
+      "import": "./js/render/venue-card.js"
+    },
     "./vanilla": {
       "types": "./dist/vanilla/dss.d.ts",
       "import": "./dist/vanilla/dss.js"
+    },
+    "./vanilla-render": {
+      "types": "./dist/vanilla/dss-render.d.ts",
+      "import": "./dist/vanilla/dss-render.js"
     },
     "./vanilla/*": "./dist/vanilla/*"
   },
