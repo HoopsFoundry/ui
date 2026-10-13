@@ -21,7 +21,7 @@ const MUTATIONS: Mutation[] = [
   { name: 'Sitz zählt in der Nummerierung', file: 'js/map.js', rule: 'Karte: Sitzmarker zählen in der Nummerierung nicht mit', from: 'if (!seat) running += 1;', to: 'running += 1;' },
   { name: 'Fehlerstatus leer', file: V, rule: 'Karte: der Fehler hat eine Statuszeile', from: "const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';", to: "const status = state === 'loading' ? mapText.loading : '';" },
   { name: 'Fehler baut die Karte nicht ab', file: V, rule: 'Karte: der Fehler baut die Karte ab', from: '        active = null;\n        controller.destroy();\n        controller = null;', to: '        active = null;\n        controller = null;' },
-  { name: 'init nicht idempotent', file: V, rule: 'Karte: ein zweites init ersetzt das erste', from: '  registry.release(root);\n\n  let props', to: '  let props' },
+  { name: 'init nicht idempotent', file: V, rule: 'Karte: ein zweites init ersetzt das erste', from: '  registry.release(root);\n', to: '' },
   { name: 'loadLeaflet wird ignoriert', file: L, rule: 'Karte: loadLeaflet liefert Leaflet', from: "typeof hooks.loadLeaflet === 'function' ? hooks.loadLeaflet() :", to: 'false ? 0 :' },
   { name: 'Lader ohne Funktionsprüfung', file: L, rule: 'Karte: ein Lader, der keine Funktion ist, fällt auf den Standard zurück', from: "typeof hooks.loadLeaflet === 'function' ? hooks.loadLeaflet() :", to: 'hooks.loadLeaflet ? hooks.loadLeaflet() :' },
   { name: 'Lader ohne Leaflet wird als init gemeldet', file: L, rule: 'Karte: ein Lader ohne Leaflet ergibt den Fehlergrund import', from: "if (!L || typeof L.map !== 'function' || typeof L.tileLayer !== 'function') return fail('import', new Error('Leaflet fehlt: `map` oder `tileLayer` nicht gefunden'));", to: '' },
@@ -41,6 +41,7 @@ const MUTATIONS: Mutation[] = [
   { name: 'VenueCard ersetzt die Karte bei jedem Update', file: 'js/render/venue-card.js', rule: 'Karte: mountVenueCard lässt die Karte beim Update stehen', from: 'const keep = live && live.key === keyOf(p) ? live : null;', to: 'const keep = null;' },
   { name: 'style bleibt Attribut im Markup', file: 'js/render/dom.js', rule: 'Karte: Styles gehen über das CSSOM, nie als style-Attribut im Markup', from: "export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style=\"$1\"');", to: 'export const deferStyles = (html) => html;' },
   { name: 'beliebige Eigenschaften im CSSOM', file: 'js/render/dom.js', rule: 'Karte: nur bekannte Eigenschaften gelangen ins CSSOM', from: 'if (STYLE_PROPS.has(name) && ', to: 'if (' },
+  { name: 'Server-Styles werden nicht über das CSSOM angewendet', file: V, rule: 'Karte: initMap wendet die style-Attribute von Server-Markup über das CSSOM an', from: '  if (restore) reapplyStyles(root);\n', to: '' },
   { name: 'data-dss-options ohne Schlüsselfilter', file: 'js/vanilla-core.js', rule: 'Karte: data-dss-options ohne Prototyp-Schlüssel', from: "filter(([key]) => key !== '__proto__' && key !== 'constructor' && key !== 'prototype')", to: 'filter(() => true)' },
   { name: 'start wird als Option weitergegeben', file: 'js/vanilla-core.js', rule: 'Karte: initAll startet die Karte nur mit start und gibt start nicht weiter', from: "name === 'map' ? Object.fromEntries(Object.entries(shared).filter(([key]) => key !== 'start')) : shared", to: 'shared' },
 ];

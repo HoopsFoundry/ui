@@ -91,14 +91,14 @@
     <VenueCard {...venueProps(1)} size="compact" tileUrl={tile} />
   </div>
 {:else if example === 'vanilla'}
-  <div use:vanilla={{ ...venueProps(13), games: gamesPlain, tileUrl: tile, linkLabel: 'Zur Hallenseite' } as never}></div>
+  <div use:vanilla={{ ...venueProps(13), name: 'Buchenhalle Süd', games: gamesPlain, tileUrl: tile, linkLabel: 'Zur Hallenseite' } as never}></div>
 {:else if example === 'vanilla-handy'}
   <div class="narrow">
-    <div use:vanilla={{ ...venueProps(14), games: games, logos: true, names: 'short', tileUrl: tile } as never}></div>
+    <div use:vanilla={{ ...venueProps(14), name: 'Ahornhalle Nord', games: games, logos: true, names: 'short', tileUrl: tile } as never}></div>
   </div>
 {:else if example === 'vanilla-handy-dunkel'}
   <div class="narrow">
-    <div use:vanilla={{ ...venueProps(21), size: 'compact', tileUrl: tile, load: 'auto' } as never}></div>
+    <div use:vanilla={{ ...venueProps(21), name: 'Erlenhalle Ost', size: 'compact', tileUrl: tile, load: 'auto' } as never}></div>
   </div>
 {:else if example === 'zustaende'}
   <!-- data-fixed-states: die Werkzeugleiste "Zustand" lässt diese Matrix in Ruhe -->

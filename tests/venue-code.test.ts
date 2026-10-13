@@ -158,12 +158,16 @@ describe('Doku', () => {
     expect(new Set(mine).size).toBe(3);
     const vanillaStart = examples.indexOf("example === 'vanilla'");
     const vanillaEnd = examples.indexOf("example === 'zustaende'");
-    const others = (examples.slice(0, vanillaStart) + examples.slice(vanillaEnd)).match(/venueProps\((\d+)/g)!.map((m) => Number(m.slice(11)));
-    // inline auf der Seite: die Halle kommt nur einmal vor (landmark-unique); die Handy-Vorschauen sind Iframes, aber zeigen andere Hallen als die Svelte-Vorschauen
-    expect(others, `Halle ${mine[0]}`).not.toContain(mine[0]);
-    const phones = examples.slice(examples.indexOf("example === 'handy'"), examples.indexOf("example === 'zustaende'")).match(/venueProps\((\d+)/g)!.map((m) => Number(m.slice(11)));
+    // inline auf der Seite: die Region „Karte: <Name>“ kommt nur einmal vor (landmark-unique). Die anderen Beispiele nutzen die Hallen 0 bis 23, deshalb trägt
+    // das Seitenbeispiel einen eigenen Namen; die Handy-Vorschauen sind Iframes und zeigen andere Hallen als die Svelte-Vorschauen (0, 1, 10, 11)
+    const block0 = examples.slice(vanillaStart, vanillaEnd);
+    const ownNames = [...block0.matchAll(/venueProps\(\d+\), name: '([^']+)'/g)].map((m) => m[1]);
+    expect(ownNames).toEqual(['Buchenhalle Süd', 'Ahornhalle Nord', 'Erlenhalle Ost']);
+    for (const own of ownNames) {
+      expect(examples.split(own), own).toHaveLength(2);
+      expect(read('stories/components/venueData.ts'), own).not.toContain(own);
+    }
     for (const index of mine.slice(1)) expect([0, 1, 10, 11], `Halle ${index}`).not.toContain(index);
-    expect(phones.length).toBeGreaterThan(4);
     const block = examples.slice(vanillaStart, vanillaEnd);
     expect((block.match(/tileUrl: tile/g) ?? []).length).toBe(3);
     expect(block).not.toMatch(/openstreetmap/);

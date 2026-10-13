@@ -22,17 +22,34 @@ const STYLE_ATTR = /\sstyle="([^"]*)"/g;
 /** Ersetzt `style="…"` im Markup durch `data-dss-style="…"`: das Attribut wird nach dem Einsetzen über das CSSOM angewendet (CSP `style-src`). */
 export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style="$1"');
 
+/** Schreibt die Angaben aus `text` (`left:10%;top:20%`) über das CSSOM an `el`: nur bekannte Eigenschaften, nur schlichte Werte. */
+function setDeclarations(el, text) {
+  for (const part of text.split(';')) {
+    const at = part.indexOf(':');
+    if (at < 0) continue;
+    const name = part.slice(0, at).trim();
+    const value = part.slice(at + 1).trim();
+    if (STYLE_PROPS.has(name) && !/[;{}()\\]/.test(value)) el.style.setProperty(name, value);
+  }
+}
+
 /** Wendet `data-dss-style` über `style.setProperty` an (nur bekannte Eigenschaften) und entfernt das Attribut. */
 export function applyStyles(host) {
   for (const el of host.querySelectorAll('[data-dss-style]')) {
-    for (const part of el.getAttribute('data-dss-style').split(';')) {
-      const at = part.indexOf(':');
-      if (at < 0) continue;
-      const name = part.slice(0, at).trim();
-      const value = part.slice(at + 1).trim();
-      if (STYLE_PROPS.has(name) && !/[;{}()\\]/.test(value)) el.style.setProperty(name, value);
-    }
+    setDeclarations(el, el.getAttribute('data-dss-style'));
     el.removeAttribute('data-dss-style');
+  }
+}
+
+/**
+ * Für Markup, das die Seite selbst eingesetzt hat (Server, `renderX`): die `style`-Attribute von `host` und seinen Nachfahren noch einmal über das
+ * CSSOM anwenden. Eine Seite mit `style-src 'self'` blockiert das Attribut beim Parsen (der Wert bleibt am Element stehen, wirkt aber nicht);
+ * `style.setProperty` ist erlaubt. Bekannte Eigenschaften und schlichte Werte nur; wirkt das Attribut schon, ändert sich nichts.
+ */
+export function reapplyStyles(host) {
+  for (const el of [host, ...host.querySelectorAll('[style]')]) {
+    const text = el.getAttribute('style');
+    if (text) setDeclarations(el, text);
   }
 }
 

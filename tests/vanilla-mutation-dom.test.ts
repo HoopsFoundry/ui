@@ -286,7 +286,7 @@ describe('Mutationstests: Sitzmarker und darkTiles der Karte', () => {
 describe('Mutationstests: initAll (vanilla-core.js)', () => {
   const coreJs = read('js/vanilla-core.js');
   const CORE: Mutation[] = [
-    { name: 'nur das erste Element je Baustein', rule: 'initAll: jedes Element eines Bausteins wird gestartet', from: 'for (const el of found) handles.push(', to: 'for (const el of [...found].slice(0, 1)) handles.push(' },
+    { name: 'nur das erste Element je Baustein', rule: 'initAll: jedes Element eines Bausteins wird gestartet', from: 'for (const el of found) {\n      // `start` der Karte', to: 'for (const el of [...found].slice(0, 1)) {\n      // `start` der Karte' },
     { name: 'Optionen nur vom ersten Element', rule: 'initAll: jedes Element bekommt seine eigenen Optionen', from: "parseOptions(el.getAttribute('data-dss-options'))", to: "parseOptions(found.values().next().value.getAttribute('data-dss-options'))" },
     { name: 'destroy nur des ersten', rule: 'initAll: destroy baut alle Elemente ab', from: 'for (const h of handles.splice(0).reverse()) h.destroy();', to: 'handles.splice(0).slice(0, 1).forEach((h) => h.destroy());' },
     { name: 'ohne data-dss wird etwas gestartet', rule: 'initAll: ohne data-dss nichts', from: "accordion: { selector: '[data-dss=\"accordion\"], [data-dss-acc]'", to: "accordion: { selector: 'div, [data-dss-acc]'" },

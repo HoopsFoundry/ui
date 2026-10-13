@@ -22,6 +22,8 @@ import { fileURLToPath } from 'node:url';
 import { build as esbuild } from 'esbuild';
 import { chromium, firefox, webkit } from 'playwright';
 import { buildVanilla } from './build-vanilla.mjs';
+import { renderVenueCard } from '../js/render/venue-card.js';
+import { renderMap } from '../js/map-vanilla.js';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')));
@@ -119,6 +121,47 @@ window.__cycle = async (n) => {
 };
 </script></body></html>`;
 
+/**
+ * Markup vom Server (Node: renderVenueCard mit init, renderMap) und initAll im Browser, mit strenger Content-Security-Policy:
+ * style-src 'self' (kein unsafe-inline): mountMap und initMap setzen Styles über das CSSOM, keine Verletzung darf gemeldet werden.
+ */
+const HALLE = { name: 'Sporthalle Nordhain', address: { street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' }, lat: 49.3, lng: 7.9, tileUrl: '/tiles/{z}/{x}/{y}.png' };
+const pageInitAll = () => `${head('<script>window.__csp = []; document.addEventListener("securitypolicyviolation", (e) => window.__csp.push(e.violatedDirective + " " + e.blockedURI));</script>')}<main><h1>Vom Server</h1>
+<section aria-labelledby="hh"><h2 id="hh">Hallenkarte</h2><div id="v">${renderVenueCard(HALLE, { init: true, uid: 'srv' })}</div></section>
+<section aria-labelledby="hk"><h2 id="hk">Karte</h2><div data-dss="map" data-dss-options='${JSON.stringify({ label: 'Karte aus data-dss-options', markers: HALLEN, tileUrl: '/tiles/{z}/{x}/{y}.png' })}'></div></section>
+<section aria-labelledby="hm"><h2 id="hm">Karte aus Markup</h2><div id="m">${renderMap({ label: 'Karte aus renderMap', markers: [HALLEN[1]], tileUrl: '/tiles/{z}/{x}/{y}.png', height: 260 }, { uid: 'srv2' })}</div></section></main>
+<script type="module" src="/t/initall.js"></script></body></html>`;
+const initAllScript = `import { initAll } from '/dss/dss.min.js';
+import { initMapBlock, initMap, mountMap } from '/dss/dss-map.min.js';
+import { mountVenueCard } from '/dss/dss-render.min.js';
+window.__maps = [];
+const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
+// Das Markup von renderMap (id m) trägt kein data-dss: es wird gezielt mit initMap gestartet
+initMap(document.getElementById('m'), { markers: ${JSON.stringify([HALLEN[1]])}, tileUrl: '/tiles/{z}/{x}/{y}.png', loadLeaflet, onLoad: (map) => window.__maps.push(map) });
+initAll(document, { map: { start: initMapBlock, loadLeaflet, onLoad: (map) => window.__maps.push(map) } });
+// zusätzlich eine Karte und eine Hallenkarte per mount (Styles über das CSSOM)
+const extra = document.createElement('div');
+document.querySelector('main').append(extra);
+mountMap(extra, { label: 'Karte per mountMap', markers: ${JSON.stringify([HALLEN[2]])}, tileUrl: '/tiles/{z}/{x}/{y}.png' }, { loadLeaflet });
+const extra2 = document.createElement('div');
+document.querySelector('main').append(extra2);
+mountVenueCard(extra2, { name: 'Gymnasium Kiefernau', lat: 49.2955, lng: 7.8905, tileUrl: '/tiles/{z}/{x}/{y}.png' }, { initMap, loadLeaflet });
+window.__ready = true;
+`;
+
+/** Nur mountMap und mountVenueCard, strenge Content-Security-Policy: es darf keine Verletzung gemeldet werden. */
+const pageCsp = () => `${head('<script>window.__csp = []; document.addEventListener("securitypolicyviolation", (e) => window.__csp.push(e.violatedDirective + " " + e.blockedURI));</script>')}<main><h1>Strenge CSP</h1><div id="k"></div><div id="v"></div></main>
+<script type="module" src="/t/csp.js"></script></body></html>`;
+const cspScript = `import { mountMap } from '/dss/dss-map.min.js';
+import { initMap } from '/dss/dss-map.min.js';
+import { mountVenueCard } from '/dss/dss-render.min.js';
+const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
+window.__maps = [];
+mountMap(document.getElementById('k'), { label: 'Karte unter CSP', markers: ${JSON.stringify(HALLEN)}, tileUrl: '/tiles/{z}/{x}/{y}.png', height: 280, darkTiles: 'invert' }, { loadLeaflet, onLoad: (m) => window.__maps.push(m) });
+mountVenueCard(document.getElementById('v'), { name: 'Sporthalle Nordhain', lat: 49.3, lng: 7.9, tileUrl: '/tiles/{z}/{x}/{y}.png', mapHeight: 230 }, { initMap, loadLeaflet, onLoad: (m) => window.__maps.push(m) });
+window.__ready = true;
+`;
+
 /** React-Fassung derselben Karte (Vergleich der Rechtecke und Stile). */
 const pageReact = () => `${head()}<main><h1>React</h1><div id="root"></div></main><script type="module" src="/react-map.js"></script></body></html>`;
 const pageVanillaSame = (extra = '') => `${head()}<main><h1>Vanilla</h1><div id="root"></div></main><script type="module">
@@ -134,7 +177,7 @@ async function startServer({ dist, reactJs }) {
   const counts = { tiles: 0, requests: [] };
   const pages = {
     '/t/many': pageMany(), '/t/importmap': pageLoader('importmap'), '/t/global': pageLoader('global'), '/t/lader404': pageLoader('lader404'),
-    '/t/kachel404': pageLoader('kachel404'), '/t/cycle': pageCycle(), '/t/react': pageReact(), '/t/vanilla': pageVanillaSame(),
+    '/t/kachel404': pageLoader('kachel404'), '/t/cycle': pageCycle(), '/t/react': pageReact(), '/t/vanilla': pageVanillaSame(), '/t/initall': pageInitAll(), '/t/csp': pageCsp(),
   };
   const server = createServer(async (req, res) => {
     const url = new URL(req.url, 'http://x');
@@ -146,7 +189,14 @@ async function startServer({ dist, reactJs }) {
     };
     if (path.startsWith('/tiles/')) { counts.tiles += 1; return send(200, demo, 'image/png'); }
     if (path.startsWith('/tiles-fehlt/')) return send(404, 'nicht da');
-    if (pages[path]) return send(200, pages[path], TYPES['.html']);
+    if (path === '/t/initall.js') return send(200, initAllScript, TYPES['.js']);
+    if (path === '/t/csp.js') return send(200, cspScript, TYPES['.js']);
+    if (pages[path]) {
+      // /t/initall: strenge Content-Security-Policy (kein unsafe-inline bei style-src); der Inline-Hörer im Kopf braucht script-src 'unsafe-inline'
+      const csp = path === '/t/initall' || path === '/t/csp' ? { 'content-security-policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self'; img-src 'self' data:" } : {};
+      res.writeHead(200, { 'content-type': TYPES['.html'], 'cache-control': 'no-store', ...csp });
+      return res.end(pages[path]);
+    }
     if (path === '/react-map.js') return send(200, reactJs, TYPES['.js']);
     const files = [
       [/^\/dss\//, dist], [/^\/vendor\/leaflet\//, join(ROOT, 'node_modules/leaflet/dist')], [/^\/vendor\/leaflet-chunks\//, join(dist, '..', 'react-chunks')],
@@ -359,6 +409,42 @@ async function checkMany(ctx, origin, browserName) {
   await page.close();
 }
 
+async function checkInitAll(ctx, origin, browserName) {
+  // Server-Markup und initAll unter strenger CSP: das Markup der Seite selbst (style-Attribute) wird blockiert, die Karte wendet die Werte über das CSSOM an
+  const page = await ctx.newPage();
+  const errors = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto(`${origin}/t/initall`, { waitUntil: 'networkidle' });
+  await waitFor(() => page.evaluate(() => window.__ready), 'Seite');
+  const idle = await page.evaluate(() => ({
+    states: [...document.querySelectorAll('.dss-map')].map((m) => m.getAttribute('data-state')),
+    disabled: [...document.querySelectorAll('.dss-map-load')].filter((b) => b.disabled).length,
+    heights: [...document.querySelectorAll('.dss-map')].map((m) => Math.round(m.querySelector('.dss-map-frame').getBoundingClientRect().height)),
+    csp: window.__csp,
+  }));
+  const onlyAttr = idle.csp.every((v) => v.startsWith('style-src-attr'));
+  record(`${browserName} · Server-Markup: fünf Karten idle, Schaltflächen bedienbar; blockiert ist nur das style-Attribut des Server-Markups (style-src-attr), die Höhe gilt über das CSSOM`,
+    idle.states.length === 5 && idle.states.every((s) => s === 'idle') && idle.disabled === 0 && onlyAttr && idle.heights.every((h) => h >= 150), idle);
+  for (const btn of await page.$$('.dss-map-load')) await btn.click();
+  await waitFor(async () => (await page.evaluate(() => [...document.querySelectorAll('.dss-map')].every((m) => m.getAttribute('data-state') === 'ready'))), 'alle bereit');
+  const live = await page.evaluate(() => ({ markers: document.querySelectorAll('.leaflet-marker-icon').length, csp: window.__csp, maps: window.__maps.length, dragging: window.__maps.map((m) => m.dragging.enabled()) }));
+  record(`${browserName} · Server-Markup nach dem Klick: lebendig, Hallenkarte nicht interaktiv, keine weitere CSP-Verletzung`, live.markers >= 5 && live.csp.every((v) => v.startsWith('style-src-attr')) && live.csp.length === idle.csp.length && errors.length === 0 && live.dragging.includes(false), { live, errors });
+  await page.close();
+
+  // nur mountMap und mountVenueCard: strenge CSP ohne eine Verletzung
+  const strict = await ctx.newPage();
+  await strict.goto(`${origin}/t/csp`, { waitUntil: 'networkidle' });
+  await waitFor(() => strict.evaluate(() => window.__ready), 'CSP-Seite');
+  for (const btn of await strict.$$('.dss-map-load')) await btn.click();
+  await waitFor(async () => (await strict.evaluate(() => [...document.querySelectorAll('.dss-map')].every((m) => m.getAttribute('data-state') === 'ready'))), 'beide bereit');
+  const info = await strict.evaluate(() => ({
+    csp: window.__csp, heights: [...document.querySelectorAll('.dss-map-frame')].map((f) => Math.round(f.getBoundingClientRect().height)),
+    pins: document.querySelectorAll('.leaflet-marker-icon').length, styleAttr: [...document.querySelectorAll('.dss-map [style]')].filter((el) => !el.className.toString().includes('leaflet')).length,
+  }));
+  record(`${browserName} · mountMap und mountVenueCard unter style-src 'self': keine CSP-Verletzung, Höhen und Pins gelten (CSSOM)`, info.csp.length === 0 && info.heights.every((h) => h >= 200) && info.pins === 4, info);
+  await strict.close();
+}
+
 async function checkLoaders(ctx, origin, browserName) {
   for (const variant of ['importmap', 'global']) {
     const page = await ctx.newPage();
@@ -514,6 +600,7 @@ try {
       if (wants('privacy')) await checkPrivacy(ctx, started.origin, started.counts, name);
       if (wants('keyboard')) await checkKeyboard(ctx, started.origin, name);
       if (wants('many')) await checkMany(ctx, started.origin, name);
+      if (wants('initall')) await checkInitAll(ctx, started.origin, name);
       if (wants('loaders')) await checkLoaders(ctx, started.origin, name);
       if (wants('cycles') && name === 'chromium') await checkCycles(ctx, started.origin, name);
       await ctx.close();

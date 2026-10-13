@@ -18,7 +18,7 @@ import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, tilesMode, validT
 import { createMapController, devWarn } from './map-leaflet.js';
 import { createRegistry } from './lifecycle.js';
 import { attr } from './render/escape.js';
-import { insertMarkup, nextUid, fragmentOf } from './render/dom.js';
+import { insertMarkup, nextUid, fragmentOf, reapplyStyles } from './render/dom.js';
 import { mapCardMarkup, mapHeightPx, mapListMarkup, mapPinsMarkup, renderMapView } from './render/map-view.js';
 import { list, obj, str, uidFor } from './render/core.js';
 
@@ -68,6 +68,8 @@ function attach(root, options, { restore }) {
     return noop();
   }
   registry.release(root);
+  // Markup vom Server: eine Seite mit `style-src 'self'` blockiert dessen style-Attribute; über das CSSOM gelten Höhe und Pins trotzdem
+  if (restore) reapplyStyles(root);
 
   let props = obj(options);
   let hooks = hooksOf(props);

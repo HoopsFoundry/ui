@@ -315,6 +315,18 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     const skip = host.querySelector<HTMLElement>('.dss-map-skip')!;
     return skip.style.color === '' && skip.style.left === '1px';
   });
+  await rule('Karte: initMap wendet die style-Attribute von Server-Markup über das CSSOM an', (host) => {
+    host.append(document.createRange().createContextualFragment(renderMap({ ...BASE, markers: [A, B], height: 333 }, { uid: 'srv' })));
+    const calls: string[] = [];
+    const set = CSSStyleDeclaration.prototype.setProperty;
+    const spy = vi.spyOn(CSSStyleDeclaration.prototype, 'setProperty').mockImplementation(function (this: CSSStyleDeclaration, name: string, value: string) {
+      calls.push(`${name}:${value}`);
+      return set.call(this, name, value);
+    });
+    initMap(host, { ...BASE, markers: [A, B] });
+    spy.mockRestore();
+    return calls.includes('--dss-map-h:333px') && calls.filter((c) => c.startsWith('left:')).length >= 2;
+  });
   await rule('Karte: data-dss-options ohne Prototyp-Schlüssel', (host) => {
     host.setAttribute('data-dss', 'map');
     host.setAttribute('data-dss-options', '{"__proto__":{"load":"auto"},"constructor":{"x":1},"prototype":{"y":2},"label":"K","markers":[]}');
@@ -336,4 +348,4 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   return R;
 }
 
-export const MAP_RULE_COUNT = 32;
+export const MAP_RULE_COUNT = 33;

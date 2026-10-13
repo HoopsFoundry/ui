@@ -13,6 +13,8 @@ npm run typecheck                 # tsc -p react/tsconfig.json --noEmit
 npm run build:react               # tsup → dist/react
 npm run build:vanilla             # scripts/build-vanilla.mjs → dist/vanilla (dss.js, dss.min.js, dss.d.ts, dss.css)
 npm run build                     # beides; läuft auch als `prepare` bei npm install
+node scripts/check-map-browser.mjs   # Browser-Prüfung der Karte ohne Build (Chromium/WebKit via Playwright; --browsers=, --only=); nicht Teil von npm test
+node scripts/check-map-docs.mjs <ordner>  # axe auf den Karten-Seiten eines Storybook-Builds (npx storybook build -o <ordner>)
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```
@@ -27,7 +29,7 @@ Es gibt keinen Linter. CI (`.github/workflows/deploy-storybook.yaml`) baut nur S
 
 **Überschriften:** Komponenten geben nie `h1` aus. Rangfolge der Ebene: `titleAs` > `HeadingLevel`-Kontext > `h3`. Größe hängt an Klassen/Tokens (`--dss-title-size` …), nie am Elementnamen.
 
-**Karte:** Leaflet ist optionale Peer-Abhängigkeit, wird per dynamischem `import('leaflet')` erst nach Klick geladen (Datenschutz: Zwei-Klick-Platzhalter, `tileUrl` für eigenen Kachel-Proxy). Controller `js/map-leaflet.js` wird von Svelte und React gemeinsam genutzt; in Tests ist `leaflet` auf `tests/helpers/leaflet-mock.ts` aliasiert.
+**Karte:** Leaflet ist optionale Peer-Abhängigkeit, wird per dynamischem `import('leaflet')` erst nach Klick geladen (Datenschutz: Zwei-Klick-Platzhalter, `tileUrl` für eigenen Kachel-Proxy). Controller `js/map-leaflet.js` wird von Svelte, React und Vanilla gemeinsam genutzt; in Tests ist `leaflet` auf `tests/helpers/leaflet-mock.ts` aliasiert. Vanilla: `js/map-vanilla.js` (`renderMap`, `initMap`, `mountMap`) im eigenen Bündel `dist/vanilla/dss-map.js` ohne Leaflet; die Option `loadLeaflet` liefert Leaflet aus dem eigenen Projekt (ADR-003, ADR-007).
 
 ## Dokumentation (Storybook)
 
