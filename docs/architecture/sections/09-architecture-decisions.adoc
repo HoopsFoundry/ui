@@ -7,7 +7,7 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 
 * Status: angenommen, umgesetzt.
 * Kontext: Komponenten existieren als Vanilla-CSS-Klassen, Svelte und React und sollen gleich aussehen.
-* Entscheidung: Das Aussehen steht ausschließlich in `css/components.css` (Klassen `dss-*`, Tokens aus `tokens/`). Svelte-Dateien haben keinen `<style>`-Block. `parity.manifest.json` ordnet je Komponente Dateien und Klassen zu; `tests/parity.test.ts` prüft die Vollständigkeit. Die Vanilla-Render-Funktionen werden als dritte Fassung im Manifest geführt.
+* Entscheidung: Das Aussehen steht ausschließlich in `css/components.css` (Klassen `dss-*`, Tokens aus `tokens/`). Svelte-Dateien haben keinen `<style>`-Block. `parity.manifest.json` ordnet je Komponente Dateien und Klassen zu; `tests/parity.test.ts` prüft die Vollständigkeit. Die Vanilla-Fassung wird als dritte Fassung im Manifest geführt (für Tabs und Modal bereits vorhanden); für die Render-Funktionen ist das mit V2a geplant.
 * Konsequenzen: Neue Komponenten brauchen Manifest-Eintrag, Exporte und CSS an einer Stelle; Abweichungen werden über Paritätstests sichtbar.
 * Quellen: `2026-10-08-spielplan-design.md` (kein `<style>`, Manifest), `2026-10-11-vanilla-paket-design.md` (Teil 2, dritte Fassung), README (`components.css` „einzige CSS-Quelle"), `CLAUDE.md`.
 
@@ -37,7 +37,7 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 
 === ADR-005: Vanilla-Verhalten nach dem Muster `initX(root, options) → { destroy() }`
 
-* Status: angenommen, umgesetzt für vorhandene Module; weitere laut Plan.
+* Status: angenommen; teilweise umgesetzt. Vorhanden sind das Muster `initX`/`destroy`, `initAll` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`). Die Render-Funktionen mit `esc()` und `createContextualFragment` sind erst mit V2a geplant.
 * Kontext: Das Vereinsregister ist ein statisches Vanilla-JS-Portal; Mittelweg statt Wechsel auf Svelte/React.
 * Entscheidung: Einheitliches Muster `initX(root, options)` → `{ destroy() }`, idempotent, nur `root` und Nachfahren, kein globaler Zustand, respektiert reduzierte Bewegung. `initAll(scope)` findet Bausteine über `data-dss`. Render-Funktionen escapen Texte zentral (`esc()`), URLs laufen durch `safeHref`; Einfügen per `createContextualFragment`.
 * Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping.

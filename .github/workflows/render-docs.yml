@@ -8,6 +8,11 @@ on:
       - 'docs/**/*.adoc'
       - '.github/workflows/render-docs.yml'
       - 'Gemfile'
+  pull_request:
+    paths:
+      - 'docs/**/*.adoc'
+      - '.github/workflows/render-docs.yml'
+      - 'Gemfile'
   workflow_dispatch:
 
 permissions:
@@ -21,8 +26,30 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check:
+    # Pull Requests: nur prüfen, ob die Includes zusammengeführt werden können (kein Commit)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Flatten AsciiDoc (check only)
+        run: |
+          set -euo pipefail
+          bundle exec asciidoctor-reducer docs/architecture/index.adoc -o "$RUNNER_TEMP/README.adoc"
+          test -s "$RUNNER_TEMP/README.adoc"
+          if grep -n '^include::' "$RUNNER_TEMP/README.adoc"; then
+            echo "Flattened output still contains include directives."
+            exit 1
+          fi
+
   render:
-    if: github.ref == 'refs/heads/main'
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
 
     steps:
