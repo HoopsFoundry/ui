@@ -10,18 +10,20 @@ Das Repository ist ein Design System für Basketball-Apps (`@bbv/dss-design-syst
 npm test                          # vitest run (jsdom), alle Tests, ca. 1 Minute
 npx vitest run tests/map.test.ts  # eine Datei; -t "Teil des Testnamens" für einen Test
 npm run typecheck                 # tsc -p react/tsconfig.json --noEmit
-npm run build:react               # tsup → dist/react (läuft auch als `prepare` bei npm install)
+npm run build:react               # tsup → dist/react
+npm run build:vanilla             # scripts/build-vanilla.mjs → dist/vanilla (dss.js, dss.min.js, dss.d.ts, dss.css)
+npm run build                     # beides; läuft auch als `prepare` bei npm install
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```
 
-Es gibt keinen Linter. CI (`.github/workflows/deploy-storybook.yaml`) baut nur Storybook und deployt auf GitHub Pages bei jedem Push auf `main`; Tests laufen dort nicht, deshalb vor dem Push lokal `npm test`, `typecheck`, `build:react` und `build-storybook` ausführen.
+Es gibt keinen Linter. CI (`.github/workflows/deploy-storybook.yaml`) baut nur Storybook und deployt auf GitHub Pages bei jedem Push auf `main`; Tests laufen dort nicht, deshalb vor dem Push lokal `npm test`, `typecheck`, `build` und `build-storybook` ausführen.
 
 ## Architektur
 
 **Eine CSS-Quelle, mehrere Fassungen.** Das Aussehen steckt ausschließlich in `css/components.css` (Klassen `dss-*`, Tokens aus `tokens/tokens.css`). Jede Komponente existiert als Vanilla-CSS-Klassen, als `svelte/*.svelte` und als `react/*.tsx` (Export in `react/index.ts`; `Map` heißt in React `MapView`). Svelte-Dateien dürfen **keinen `<style>`-Block** haben. `parity.manifest.json` listet je Komponente Svelte-Datei, React-Datei, React-Exportnamen und CSS-Klassen; `tests/parity.test.ts` erzwingt Vollständigkeit. Neue Komponente = Eintrag im Manifest, Export in `react/index.ts`, `package.json`-`exports`, `README.md`, `CHANGELOG.md`.
 
-**Gemeinsame Logik in `js/`** (reine Funktionen, ESM, mit `.d.ts`, einzeln über `package.json`-`exports` veröffentlicht): `schedule.js`, `league.js`, `team.js`, `venue.js`, `map.js`, `heading.js`, `periods.js`, `stats.js`, `accordion.js` … Svelte und React rufen dieselben Funktionen, damit beide Fassungen dasselbe Verhalten und Markup erzeugen. Verhalten für Vanilla-Seiten sind `initX(root, options) → { destroy() }`-Funktionen (`pagenav`, `backtop`, `theme`, `accordion`, `vanilla-core.js` mit `initAll` über `data-dss`), gemeinsame Hilfen in `lifecycle.js`, `motion.js`, `url.js` (`safeHref`).
+**Gemeinsame Logik in `js/`** (reine Funktionen, ESM, mit `.d.ts`, einzeln über `package.json`-`exports` veröffentlicht): `schedule.js`, `league.js`, `team.js`, `venue.js`, `map.js`, `heading.js`, `periods.js`, `stats.js`, `accordion.js` … Svelte und React rufen dieselben Funktionen, damit beide Fassungen dasselbe Verhalten und Markup erzeugen. Verhalten für Vanilla-Seiten sind `initX(root, options) → { destroy() }`-Funktionen (`accordion`, `tabs`, `modal`, `pagenav`, `backtop`, `theme`, `vanilla-core.js` mit `initAll` über `data-dss`); `npm run build:vanilla` bündelt sie nach `dist/vanilla` (Größenbudget als Test; `dist/` ist gitignored, Auslieferung per GitHub-Release, siehe `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`), gemeinsame Hilfen in `lifecycle.js`, `motion.js`, `url.js` (`safeHref`).
 
 **Überschriften:** Komponenten geben nie `h1` aus. Rangfolge der Ebene: `titleAs` > `HeadingLevel`-Kontext > `h3`. Größe hängt an Klassen/Tokens (`--dss-title-size` …), nie am Elementnamen.
 
@@ -43,6 +45,7 @@ Text mindestens 7:1 (`color-contrast-enhanced`), Zielgrößen ≥ 24 px (AA) bzw
 
 ## Arbeitsweise im Projekt
 
+- **Architektur dokumentieren:** Jede Architekturänderung und jede Architekturentscheidung (neue Bausteine oder Module, Änderungen an öffentlichen Schnittstellen/`exports`, Auslieferung, Abhängigkeiten, Querschnittsregeln wie Sicherheit, Datenschutz, Zugänglichkeit) muss in der arc42-Dokumentation `docs/architecture/` festgehalten werden: betroffene Kapitel unter `sections/` anpassen und Entscheidungen als ADR in `sections/09-architecture-decisions.adoc` mit Kontext, Entscheidung, Status, Konsequenzen und Quellen (Specs/Pläne) ergänzen. `docs/architecture/README.adoc` wird per Workflow erzeugt und nicht von Hand bearbeitet. Eine Änderung ohne diesen Eintrag gilt als unvollständig; Planstände gehören nicht dorthin, sondern in `docs/superpowers/plans/`.
 - Spezifikationen und Pläne liegen in `docs/superpowers/specs/` und `docs/superpowers/plans/` (Datum im Dateinamen); größere Pakete: Spec → Plan → Worktree unter `.worktrees/<paket>` (gitignored, Branch `feat/<paket>`) → Umsetzung → unabhängiger Review → Fixes → `git merge --no-ff` nach `main` → Push → Worktree entfernen. Der Nutzer hat Merge und Push auf `main` für diese Pakete freigegeben.
 - `images/` (Stockfotos) ist gitignored und wird nie referenziert; Demo-Fotos sind verkleinerte Kopien in `stories/assets/players/` (mit `CREDITS.md`). Demo-Daten sind erfunden (keine echten Personen, Adressen, Telefonnummern).
 - Vitest-Dateien, die Dateien über `new URL(...)` lesen, brauchen `// @vitest-environment node` in der ersten Zeile.
