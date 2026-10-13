@@ -10,7 +10,7 @@
  * Rückgabe `{ destroy(), select(), getValue() }` (js/lifecycle.js); `destroy` stellt das Markup wieder her. Kein `innerHTML`,
  * kein Zugriff auf `window` oder `document` beim Import. Typen: js/tabs.d.ts.
  */
-import { currentHash, hashTarget, scrollToElement, writeHash } from './accordion.js';
+import { currentHash, hashTarget, revealAround, scrollToElement, writeHash } from './accordion.js';
 import { createCleanups, createHandle, createRegistry, listen, snapshotAttributes } from './lifecycle.js';
 
 export const TAB_EVENT = 'dss:tabchange';
@@ -187,9 +187,10 @@ export function initTabs(root, options = {}) {
     current = initialTab(states(), hashed >= 0 ? hashed : index(opts.value), marked);
     paint();
     if (hashed >= 0 && hashed === current) {
-      const hash = currentHash();
-      const el = doc.getElementById(hash);
-      scrollToElement(el && el !== tabs[current] ? el : panels[current] ?? tabs[current]);
+      const el = doc.getElementById(currentHash());
+      const goal = el && el !== tabs[current] ? el : panels[current] ?? tabs[current];
+      revealAround(goal); // liegt die Leiste in einem geschlossenen Accordion-Bereich oder <details>, wird er geöffnet
+      scrollToElement(goal);
     }
   }
 
@@ -221,7 +222,9 @@ export function initTabs(root, options = {}) {
       if (hashed >= 0) {
         select(hashed, 'hash');
         const el = doc.getElementById(currentHash());
-        scrollToElement(el && el !== tabs[hashed] ? el : panels[hashed] ?? tabs[hashed]);
+        const goal = el && el !== tabs[hashed] ? el : panels[hashed] ?? tabs[hashed];
+        revealAround(goal);
+        scrollToElement(goal);
       }
     }));
   }

@@ -128,5 +128,7 @@ export function tabsLogicRules(mod: Tabs): Rules {
       second.destroy();
     }
   });
+  rule('Tabs: ein Deep-Link öffnet das umgebende details', () => (document.getElementById('d') as HTMLDetailsElement).open && attr('r-ausw', 'aria-selected') === 'true',
+    `<details id="d"><summary>Mehr</summary>${tabsMarkup()}</details>`, { hash: true }, '/#r-p-ausw');
   return out;
 }

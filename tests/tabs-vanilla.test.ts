@@ -469,3 +469,25 @@ describe('bösartige Eingaben', () => {
     expect(tab('alle').hidden).toBe(false);
   });
 });
+
+describe('Deep-Link in einem geschlossenen Bereich', () => {
+  const inDetails = `<details id="d"><summary>Mehr</summary>${tabsMarkup()}</details>`;
+  it('der Anker auf ein Panel öffnet das umgebende details und wählt den Tab', () => {
+    window.history.replaceState(null, '', '/#r-p-ausw');
+    start(inDetails, { hash: true });
+    expect((document.getElementById('d') as HTMLDetailsElement).open).toBe(true);
+    expect(selected()).toEqual(['ausw']);
+  });
+  it('hashchange öffnet den Bereich ebenfalls', () => {
+    start(inDetails, { hash: true });
+    expect((document.getElementById('d') as HTMLDetailsElement).open).toBe(false);
+    window.history.replaceState(null, '', '/#r-in-heim');
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    expect((document.getElementById('d') as HTMLDetailsElement).open).toBe(true);
+    expect(selected()).toEqual(['heim']);
+  });
+  it('ohne Anker bleibt der Bereich geschlossen', () => {
+    start(inDetails, { hash: true });
+    expect((document.getElementById('d') as HTMLDetailsElement).open).toBe(false);
+  });
+});

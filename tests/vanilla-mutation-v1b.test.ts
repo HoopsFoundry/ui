@@ -45,6 +45,7 @@ const TABS: Mutation[] = [
   { name: 'destroy lässt Attribute stehen', rule: 'Tabs: destroy stellt das Markup wieder her', from: "cleanups.add(snapshotAttributes(tab, ['role', 'aria-selected', 'aria-pressed', 'tabindex', 'id', 'class']));", to: "" },
   { name: 'destroy lässt Panels stehen', rule: 'Tabs: destroy stellt das Markup wieder her', from: "cleanups.add(snapshotAttributes(panel, ['role', 'aria-labelledby', 'hidden', 'inert']));", to: "" },
   { name: 'zweiter Aufruf ersetzt nicht', rule: 'Tabs: ein zweiter Aufruf ersetzt den ersten (ein Ereignis je Wechsel)', from: "registry.release(root);", to: "" },
+  { name: 'Deep-Link öffnet nichts', rule: 'Tabs: ein Deep-Link öffnet das umgebende details', from: "      revealAround(goal); // liegt die Leiste", to: "      void 0; // liegt die Leiste" },
 ];
 
 const MODAL: Mutation[] = [
