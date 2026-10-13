@@ -1,6 +1,6 @@
 // Regeln für initAll mit tabs und modal (mehrere Elemente je Baustein, Optionen je Element, only, destroy, nur das erste Element).
 // tests/vanilla-core-v1b.test.ts prüft sie am echten Quelltext, tests/vanilla-mutation-v1b.test.ts verfälscht ihn.
-import type { Rules } from './mutation';
+import { trapErrors, type Rules } from './mutation';
 import { tabsMarkup } from './tabs-markup';
 import { dialogMarkup, divMarkup } from './modal-markup';
 
@@ -15,10 +15,16 @@ export function tabsModalCoreRules(mod: Core): Rules {
   const run = (name: string, fn: (api: { destroy(): void; count: number }) => unknown, options: Record<string, unknown> = {}, html = PAGE_V1B) => {
     document.body.replaceChildren(document.createRange().createContextualFragment(html));
     let api: { destroy(): void; count: number } | undefined;
+    const trap = trapErrors();
     try {
       out[name] = safe(() => { api = mod.initAll(document, options); return fn(api); });
     } finally {
-      api?.destroy();
+      try {
+        api?.destroy();
+      } catch {
+        // verfälschte Quelle
+      }
+      if (trap.stop().length) out[name] = false;
       document.body.replaceChildren();
       document.documentElement.removeAttribute('style');
     }

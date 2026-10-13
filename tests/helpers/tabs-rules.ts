@@ -1,6 +1,6 @@
 // Regeln für Tabs (js/tabs.js) als prüfbare Aussagen: tests/tabs-rules.test.ts prüft sie am echten Quelltext, tests/vanilla-mutation-v1b.test.ts
 // verfälscht den Quelltext und prüft, dass jede Aussage kippt. Läuft unter jsdom.
-import type { Rules } from './mutation';
+import { trapErrors, type Rules } from './mutation';
 import { tabsMarkup } from './tabs-markup';
 
 type Tabs = {
@@ -17,13 +17,19 @@ export function tabsLogicRules(mod: Tabs): Rules {
     window.history.replaceState(null, '', hash);
     document.body.replaceChildren(document.createRange().createContextualFragment(html));
     let handle: { destroy(): void } | undefined;
+    const trap = trapErrors();
     try {
       handle = mod.initTabs(document.getElementById('r-bar') ?? document.querySelector('.dss-tabs')!, options);
       out[name] = fn() === true;
     } catch {
       out[name] = false;
     } finally {
-      handle?.destroy();
+      try {
+        handle?.destroy();
+      } catch {
+        // verfälschte Quelle
+      }
+      if (trap.stop().length) out[name] = false; // eine Ausnahme im Listener der (verfälschten) Quelle verletzt die Regel
       document.body.replaceChildren();
       window.history.replaceState(null, '', '/');
     }

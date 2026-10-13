@@ -1,6 +1,6 @@
 // Regeln für das Modal (js/modal.js) als prüfbare Aussagen: tests/modal-rules.test.ts prüft sie am echten Quelltext, tests/vanilla-mutation-v1b.test.ts
 // verfälscht den Quelltext und prüft, dass jede Aussage kippt. Läuft unter jsdom.
-import type { Rules } from './mutation';
+import { trapErrors, type Rules } from './mutation';
 import { dialogMarkup, divMarkup, polyfillDialog, removeDialogPolyfill } from './modal-markup';
 
 type Modal = {
@@ -18,13 +18,19 @@ export function modalLogicRules(mod: Modal): Rules {
     else removeDialogPolyfill();
     document.body.replaceChildren(document.createRange().createContextualFragment(html));
     let handle: ReturnType<Modal['initModal']> | undefined;
+    const trap = trapErrors();
     try {
       handle = mod.initModal(el(id), options);
       out[name] = fn(handle) === true;
     } catch {
       out[name] = false;
     } finally {
-      handle?.destroy();
+      try {
+        handle?.destroy();
+      } catch {
+        // verfälschte Quelle
+      }
+      if (trap.stop().length) out[name] = false; // eine Ausnahme im Listener der (verfälschten) Quelle verletzt die Regel
       document.body.replaceChildren();
       document.documentElement.removeAttribute('style');
       removeDialogPolyfill();
