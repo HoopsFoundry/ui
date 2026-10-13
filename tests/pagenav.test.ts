@@ -39,6 +39,14 @@ describe('reine Funktionen', () => {
     expect(slug('')).toBe('abschnitt');
     expect(slug(undefined)).toBe('undefined');
   });
+  it('labelOf: Teile mit aria-hidden zählen nicht (Kurzname neben dem vollen Namen), sonst Rückfall auf den ganzen Text', () => {
+    const el = document.createElement('h2');
+    el.append(document.createRange().createContextualFragment('<span>TSV Nordhain 1920</span><span aria-hidden="true">Nordhain</span>'));
+    expect(labelOf(el)).toBe('TSV Nordhain 1920');
+    const only = document.createElement('h2');
+    only.append(document.createRange().createContextualFragment('<span aria-hidden="true">Nur versteckt</span>'));
+    expect(labelOf(only)).toBe('Nur versteckt');
+  });
   it('labelOf: data-pagenav gewinnt, Leerraum zusammengefasst', () => {
     const el = document.createElement('div');
     el.textContent = '  Mannschaft \n  Kader ';

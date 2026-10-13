@@ -27,7 +27,18 @@ export function slug(text) {
 /** Beschriftung eines Ziels: `data-pagenav`, falls gesetzt (für Blöcke ohne Überschrift), sonst der Text; Leerraum zusammengefasst. */
 export function labelOf(el) {
   const custom = typeof el.getAttribute === 'function' ? el.getAttribute('data-pagenav') : null;
-  return String(custom || el.textContent || '').replace(/\s+/g, ' ').trim();
+  const clean = (text) => String(text || '').replace(/\s+/g, ' ').trim();
+  return clean(custom) || clean(textWithoutHidden(el)) || clean(el.textContent);
+}
+
+/** Text eines Knotens ohne Teile mit `aria-hidden="true"` (zum Beispiel der Kurzname neben dem vollen Namen in Mannschaftsüberschriften). */
+function textWithoutHidden(node) {
+  let out = '';
+  for (const child of node.childNodes ?? []) {
+    if (child.nodeType === 3) out += child.nodeValue;
+    else if (child.nodeType === 1 && child.getAttribute('aria-hidden') !== 'true') out += textWithoutHidden(child);
+  }
+  return out;
 }
 
 /**

@@ -1,0 +1,135 @@
+{
+  "verein": {
+    "name": "TSV Nordhain 1920",
+    "ort": "Nordhain",
+    "intro": "Basketball in Nordhain seit 1920: vier Herren- und Jugendmannschaften, eine Halle, ein Verein. Alle Namen, Adressen und Ergebnisse auf dieser Seite sind erfunden."
+  },
+  "ligen": [
+    {
+      "id": "liga-herren",
+      "title": "Oberliga Nordhain Männer",
+      "href": "#liga-herren",
+      "linkLabel": "Ganze Tabelle",
+      "teamCount": 12,
+      "played": 66,
+      "total": 132,
+      "columns": ["won", "lost", "diff", "form"],
+      "teams": [
+        { "rank": 2, "name": "BG Seeberg", "played": 11, "points": 18, "won": 9, "lost": 2, "diff": 61, "form": ["S", "S", "N", "S", "S"] },
+        { "rank": 3, "name": "TSV Nordhain 1920", "short": "Nordhain", "played": 11, "points": 14, "won": 7, "lost": 4, "diff": 22, "form": ["S", "N", "S", "S", "N"], "own": true },
+        { "rank": 4, "name": "SV Kiefernau", "played": 10, "points": 12, "won": 6, "lost": 4, "diff": 9, "form": ["N", "S", "S", "N", "S"] },
+        { "rank": 5, "name": "Lindenberg Hawks", "short": "Hawks", "played": 11, "points": 12, "won": 6, "lost": 5, "diff": -4, "form": ["S", "N", "N", "S", "N"] }
+      ]
+    },
+    {
+      "id": "liga-u16",
+      "title": "U16 Bezirksliga Nordhain",
+      "href": "#liga-u16",
+      "linkLabel": "Ganze Tabelle",
+      "teamCount": 8,
+      "played": 24,
+      "total": 56,
+      "teams": [
+        { "rank": 1, "name": "TSV Nordhain 1920 U16", "short": "Nordhain U16", "played": 6, "points": 12, "own": true },
+        { "rank": 2, "name": "BG Seeberg U16", "short": "Seeberg U16", "played": 6, "points": 10 },
+        { "rank": 3, "name": "Lindenberg Hawks U16", "short": "Hawks U16", "played": 5, "points": 8 }
+      ]
+    }
+  ],
+  "mannschaften": [
+    {
+      "id": "team-herren",
+      "href": "team.html",
+      "name": "TSV Nordhain 1920",
+      "short": "Nordhain",
+      "league": "Oberliga Nordhain Männer",
+      "season": "2026/27",
+      "record": { "w": 7, "l": 4 },
+      "rank": 3,
+      "rankOf": 12,
+      "points": 14,
+      "next": { "date": "So, 18.10.2026", "time": "11:00", "opponent": { "name": "SV Kiefernau" }, "at": "gast", "venue": "Gymnasium Kiefernau" },
+      "last": { "date": "Sa, 10.10.2026", "opponent": { "name": "BG Seeberg" }, "ownScore": 78, "opponentScore": 71, "at": "heim" },
+      "squad": { "players": 14, "staff": 3 },
+      "stats": { "twoPtPct": 52.4, "threePtPct": 34.1, "trb": 38.5, "to": 12.3 }
+    },
+    {
+      "id": "team-u16",
+      "href": "team.html",
+      "name": "TSV Nordhain 1920 U16",
+      "short": "Nordhain U16",
+      "league": "U16 Bezirksliga Nordhain",
+      "season": "2026/27",
+      "record": { "w": 6, "l": 0 },
+      "rank": 1,
+      "rankOf": 8,
+      "points": 12,
+      "next": { "date": "Sa, 17.10.2026", "time": "14:00", "opponent": { "name": "Lindenberg Hawks U16" }, "at": "heim", "venue": "Sporthalle Nordhain" },
+      "squad": { "players": 12, "staff": 2 }
+    }
+  ],
+  "team": {
+    "name": "TSV Nordhain 1920",
+    "short": "Nordhain",
+    "league": "Oberliga Nordhain Männer",
+    "season": "2026/27",
+    "record": { "w": 7, "l": 4 },
+    "rank": 3,
+    "rankOf": 12,
+    "points": 14,
+    "next": { "date": "So, 18.10.2026", "time": "11:00", "opponent": { "name": "SV Kiefernau" }, "at": "gast", "venue": "Gymnasium Kiefernau" },
+    "last": { "date": "Sa, 10.10.2026", "opponent": { "name": "BG Seeberg" }, "ownScore": 78, "opponentScore": 71, "at": "heim" },
+    "squad": { "players": 14, "staff": 3 },
+    "stats": { "twoPtPct": 52.4, "threePtPct": 34.1, "trb": 38.5, "to": 12.3 }
+  },
+  "spiele": [
+    { "id": "s1", "nr": "#41", "section": "Spieltag 9", "date": "Sa, 12.09.2026", "time": "17:00", "state": "finished", "at": "heim", "opponent": { "name": "Lindenberg Hawks", "short": "Hawks", "score": 66 }, "ownScore": 81, "venue": "Sporthalle Nordhain" },
+    { "id": "s2", "nr": "#47", "section": "Spieltag 10", "date": "Sa, 26.09.2026", "time": "19:30", "state": "finished", "at": "gast", "opponent": { "name": "BG Seeberg", "score": 84 }, "ownScore": 79, "venue": "Mehrzweckhalle Seeberg" },
+    { "id": "s3", "nr": "#52", "section": "Spieltag 11", "date": "Sa, 10.10.2026", "time": "17:00", "state": "finished", "at": "heim", "opponent": { "name": "BG Seeberg", "score": 71 }, "ownScore": 78, "venue": "Sporthalle Nordhain" },
+    { "id": "s4", "nr": "#58", "section": "Spieltag 12", "date": "So, 18.10.2026", "time": "11:00", "state": "scheduled", "at": "gast", "opponent": { "name": "SV Kiefernau" }, "venue": "Gymnasium Kiefernau" },
+    { "id": "s5", "nr": "#63", "section": "Spieltag 13", "date": "Sa, 31.10.2026", "time": "17:00", "state": "scheduled", "at": "heim", "opponent": { "name": "Lindenberg Hawks", "short": "Hawks" }, "venue": "Sporthalle Nordhain" },
+    { "id": "s6", "nr": "#69", "section": "Spieltag 14", "date": "Sa, 14.11.2026", "time": "19:30", "state": "scheduled", "at": "heim", "provisional": true, "opponent": { "name": "SV Kiefernau" }, "venue": "Sporthalle Nordhain" }
+  ],
+  "kader": {
+    "title": "Kader",
+    "caption": "Kader der Herren 1 mit Spielen, Punkten und Rebounds je Spiel",
+    "columns": [
+      { "key": "nr", "label": "Nr.", "align": "right" },
+      { "key": "name", "label": "Name" },
+      { "key": "pos", "label": "Position" },
+      { "key": "spiele", "label": "Spiele", "align": "right" },
+      { "key": "pkt", "label": "Punkte", "align": "right" }
+    ],
+    "rows": [
+      ["4", { "text": "Jonas Brandt", "header": true }, "Aufbau", "11", "14,2"],
+      ["7", { "text": "Felix Hartmann", "header": true }, "Flügel", "10", "11,8"],
+      ["11", { "text": "Tim Ostermann", "header": true }, "Flügel", "11", "9,4"],
+      ["21", { "text": "David Kessler", "header": true }, "Center", "9", "8,1"]
+    ]
+  },
+  "statistik": {
+    "title": "Mannschaftsstatistik",
+    "caption": "Mannschaftswerte je Spiel im Vergleich zum Ligaschnitt",
+    "columns": [
+      { "key": "wert", "label": "Wert" },
+      { "key": "team", "label": "Nordhain", "align": "right" },
+      { "key": "liga", "label": "Ligaschnitt", "align": "right" }
+    ],
+    "rows": [
+      [{ "text": "Punkte", "header": true }, "76,4", "72,9"],
+      [{ "text": "Rebounds", "header": true }, "38,5", "36,2"],
+      [{ "text": "Ballverluste", "header": true }, "12,3", "13,8"]
+    ]
+  },
+  "halle": {
+    "name": "Sporthalle Nordhain",
+    "address": { "street": "Am Sportpark 4", "zip": "12345", "city": "Nordhain" },
+    "lat": 49.3,
+    "lng": 7.9,
+    "info": "Zwei Spielfelder, Zugang über den Hof, Parkplätze vor der Halle.",
+    "contact": { "name": "Hallenwart Rolf Beispiel", "phone": "0 00 00 / 000 00 00", "email": "halle@beispiel.example" },
+    "href": "index.html#halle",
+    "linkLabel": "Zur Hallenseite",
+    "mapHeight": 260
+  }
+}
