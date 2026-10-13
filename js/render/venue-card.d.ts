@@ -2,6 +2,11 @@ import type { HeadingTag } from '../heading.js';
 import type { ScheduleGame } from '../schedule.js';
 import type { VenueAddress, VenueContact } from '../venue.js';
 import type { RenderOptions } from './core.js';
+
+export interface VenueCardRenderOptions extends RenderOptions {
+  /** `true`: „Karte laden“ ist bedienbar (die Seite startet `initMap`). Standard: gesperrt, solange keine Karte angebunden ist. */
+  mapActive?: boolean;
+}
 import type { MountHandle, MountOptions } from './mount.js';
 
 export interface VenueCardProps {
@@ -36,5 +41,5 @@ export interface VenueCardProps {
 }
 
 /** Markup der Hallenkarte, die Karte als Platzhalter (ohne Leaflet); `initMap` (V2b) macht sie lebendig. */
-export function renderVenueCard(props: VenueCardProps, options?: RenderOptions): string;
-export function mountVenueCard(el: Element, props: VenueCardProps, options?: MountOptions): MountHandle<VenueCardProps>;
+export function renderVenueCard(props: VenueCardProps, options?: VenueCardRenderOptions): string;
+export function mountVenueCard(el: Element, props: VenueCardProps, options?: MountOptions & { mapActive?: boolean }): MountHandle<VenueCardProps>;

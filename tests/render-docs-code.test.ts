@@ -68,14 +68,20 @@ describe.each(Object.entries(DOCS))('Beispiel %s', (_name, doc) => {
       const shown = document.getElementById(id)!.innerHTML;
       // einklappbar: mountX legt für das Accordion-Verhalten eine Gruppe an
       const grouped = props.collapsible === true;
-      const actual = normalize(grouped ? shown.replace(/^<div class="dss-acc">([\s\S]*)<\/div>$/, '$1') : shown);
+      // die Hallenkarte sperrt „Karte laden“, solange initMap fehlt (die Komponente ist bedienbar): sonst gleiches Markup
+      if (doc.component === 'VenueCard') {
+        const load = document.querySelector<HTMLButtonElement>('.dss-map-load')!;
+        expect(load.disabled).toBe(true);
+        expect(load.getAttribute('aria-disabled')).toBe('true');
+      }
+      const actual = normalize((grouped ? shown.replace(/^<div class="dss-acc">([\s\S]*)<\/div>$/, '$1') : shown).replace(' disabled=""', '').replace(' aria-disabled="true"', ''));
       expect(actual.length, `${id} ist nicht leer`).toBeGreaterThan(50);
       expect(actual).toBe(expected.react);
       expect(actual).toBe(expected.svelte);
       if (grouped) expect(shown.startsWith('<div class="dss-acc">')).toBe(true);
       for (const { variable: htmlVariable, of } of doc.strings) {
         if (of !== variable) continue;
-        expect(normalize(out[htmlVariable] as string)).toBe(expected.react);
+        expect(normalize((out[htmlVariable] as string).replace(' disabled aria-disabled="true"', ''))).toBe(expected.react);
       }
     }
   });

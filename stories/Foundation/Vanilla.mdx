@@ -78,7 +78,7 @@ Neben den `initX`-Bausteinen gibt es für zehn Komponenten Funktionen, die das M
   rows={[
     ['LeagueCard', <><code>renderLeagueCard</code>, <code>mountLeagueCard</code></>, 'Fenster um die eigene Mannschaft, Spalten, Zonen, Live; collapsible'],
     ['TeamCard', <><code>renderTeamCard</code>, <code>mountTeamCard</code></>, 'Link oder Button (options.onClick); nur gültige Werte'],
-    ['VenueCard', <><code>renderVenueCard</code>, <code>mountVenueCard</code></>, 'Karte als Platzhalter ohne Leaflet; initMap (V2b) macht sie lebendig'],
+    ['VenueCard', <><code>renderVenueCard</code>, <code>mountVenueCard</code></>, 'Karte als Platzhalter ohne Leaflet; „Karte laden“ ist gesperrt, bis initMap (V2b) sie freigibt (options.mapActive)'],
     ['ScheduleTable, ScheduleGrid', <><code>renderScheduleTable</code>, <code>renderScheduleGrid</code>, <code>mountScheduleTable</code>, <code>mountScheduleGrid</code></>, 'options.time und options.notice liefern Text; collapsible'],
     ['Table', <><code>renderTable</code>, <code>mountTable</code></>, 'Zeilen und Zellen als Daten statt Markup'],
     ['MatchCard', <><code>renderMatchCard</code>, <code>mountMatchCard</code></>, 'Link (href) oder Button (options.onClick)'],
@@ -101,18 +101,19 @@ Das Ergebnis aus erfundenen Daten, jede Karte aus einem `mountX`-Aufruf:
 - **`update(props)`** ersetzt den Inhalt zu den neuen Eigenschaften. Der Fokus bleibt, wenn der Knoten wieder auftaucht (über seine `id`, sonst über seine Lage und Klasse); eine einklappbare Karte behält ihren Zustand offen/zu, solange `open` in den Eigenschaften gleich bleibt.
 - **`destroy()`** entfernt Listener und Markup und stellt den früheren Inhalt des Elements wieder her (ein serverseitig gerenderter Text bleibt so als Rückfall). Es ist mehrfach aufrufbar, `update` danach tut nichts.
 - **Idempotent:** ein zweites `mountX` auf demselben Element ersetzt das erste.
-- **`collapsible`:** `mountX` startet das Accordion-Verhalten (`initAccordion`) selbst; steht das Element schon in einer Gruppe (`dss-acc`), bedient diese den Rahmen.
-- **ids:** ohne `id` entsteht die Kennung des Rahmens aus einem Hash der Eingabe (gleiche Eingabe, gleiche Kennung); zwei gleiche Bausteine auf einer Seite brauchen verschiedene `id`-Werte oder `options.uid`. `mountX` vergibt je Element eine eigene, stabile Kennung.
+- **`collapsible`:** `mountX` startet das Accordion-Verhalten (`initAccordion`) selbst. Steht das Element schon in einer Gruppe (`dss-acc`), bedient diese den Rahmen; steht es im Panel eines Bereichs dieser Gruppe, bekommt der Rahmen eine eigene Gruppe (ein einzelner Rahmen im Panel zählt nicht zur äußeren Gruppe).
+- **Scrollposition:** `update` erhält die Scrollposition der Tabellenbereiche; bei gleichem Markup ändert es nichts.
+- **ids:** ohne `id` entsteht die Kennung des Rahmens aus einem Hash der Eingabe (gleiche Eingabe, gleiche Kennung); zwei Bausteine mit genau gleichen Eigenschaften auf einer Seite brauchen verschiedene `id`-Werte oder `options.uid` (von `options.uid` bleiben nur Buchstaben, Ziffern, `_` und `-`). `mountX` vergibt je Element eine eigene, seitenweit eindeutige Kennung.
 
 ### Escaping und Eingaben
 
-Jede Eingabe gilt als unvertraut. Texte laufen durch `esc`, Attributwerte durch `attr`, Links und Logo-Adressen durch `safeHref`; Aufzählungen (`state`, `tone`, `size`, `density`, `titleAs` …) nehmen nur bekannte Werte, sonst den Standard; Zahlen nur, wenn sie endlich sind (die Komponenten zeigen sonst „NaN“). Ein Link mit `javascript:` erscheint nie, die Zelle oder der Name bleibt dann Text. `titleAs` kennt h2 bis h6, der Standard ist h3. Ein Rohmarkup von außen gibt es nicht: `actions` und `extra` sind Daten, `time` und `notice` liefern Text.
+Jede Eingabe gilt als unvertraut. Texte laufen durch `esc`, Attributwerte durch `attr`, Links und Logo-Adressen durch `safeHref`; Aufzählungen (`state`, `tone`, `size`, `density`, `titleAs` …) nehmen nur bekannte Werte, sonst den Standard; Zahlen nur, wenn sie endlich sind (die Komponenten zeigen sonst „NaN“); `mapHeight` liegt zwischen 200 und 2000 Pixeln. Ein Link mit `javascript:` erscheint nie, die Zelle oder der Name bleibt dann Text. `titleAs` kennt h2 bis h6, der Standard ist h3. Die Svelte-Komponenten trimmen Leerraum an einzelnen Stellen (der Trenner „ – “ im Spielplan, der Abstand zwischen Liga und Spieltag der MatchCard); das ist ein Altbefund, die Vanilla-Ausgabe folgt React und dem Markup der Doku-Seiten. Ein Rohmarkup von außen gibt es nicht: `actions` und `extra` sind Daten, `time` und `notice` liefern Text.
 
 <CodeBlock label="esc, attr und safeHref" language="JavaScript" code={renderEscape} />
 
 ### In Node und im Crawler
 
-Die Render-Funktionen brauchen kein DOM: der Import hat keine Nebenwirkung, `mountX` tut in Node nichts. Statische Seiten lassen sich so im Crawler mit demselben Markup bauen, das im Browser entsteht.
+Die Render-Funktionen brauchen kein DOM: der Import hat keine Nebenwirkung, `mountX` tut in Node nichts. Statische Seiten lassen sich so im Crawler mit demselben Markup bauen, das im Browser entsteht. Ohne JavaScript bleibt ein einklappbarer Rahmen geschlossen (Bereich `hidden inert`): für statische Seiten, die ohne Skript lesbar sein sollen, setze `open: true`. Das Ergebnis von `renderX` ist Markup mit `style`-Attributen (siehe CSP).
 
 <CodeBlock label="Markup in Node" language="JavaScript" code={renderNode} />
 
@@ -124,13 +125,13 @@ Das Render-Bündel ist eine eigene Datei: `dss-render.js` importiert das Accordi
   label="Größen des Render-Bündels"
   head={['Datei', 'Größe', 'Budget']}
   rows={[
-    ['dss-render.js', `${(renderSizes.js / 1024).toFixed(1)} KB`, 'ungebündelt lesbar, mit Quellkarte'],
-    ['dss-render.min.js', `${(renderSizes.min / 1024).toFixed(1)} KB`, `höchstens ${renderBudget.minKB} KB`],
-    ['dss-render.min.js (gzip)', `${(renderSizes.gzip / 1024).toFixed(1)} KB`, `höchstens ${renderBudget.gzipKB} KB`],
+    ['dss-render.js', `${(renderSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte'],
+    ['dss-render.min.js', `${(renderSizes.min / 1024).toFixed(1)} KiB`, `höchstens ${renderBudget.minKB} KiB`],
+    ['dss-render.min.js (gzip)', `${(renderSizes.gzip / 1024).toFixed(1)} KiB`, `höchstens ${renderBudget.gzipKB} KiB`],
   ]}
 />
 
-Wer nur den Kern braucht, lädt nur `dss.js`; wer Markup erzeugt, lädt beide. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code> und die `render…`/`mount…`-Paare der Tabelle.
+Wer nur den Kern braucht, lädt nur `dss.js`; wer Markup erzeugt, lädt beide aus derselben Version. `VERSION` gibt es in beiden Bündeln (und `--dss-version` in `dss.css`); sie müssen übereinstimmen, `checkVersion()` des Kerns prüft nur `dss.js` gegen `dss.css`, ein Vergleich mit `VERSION` aus `dss-render.js` gehört in dein Start-Skript. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code>, <code>VERSION</code> und die `render…`/`mount…`-Paare der Tabelle.
 
 ### Markup auf dem Handy · 390 px Breite
 
@@ -160,26 +161,26 @@ Zwei eingebettete Seiten aus Daten: links Ligencard, Spielkarte und Kennzahlen (
 
 ### CSP und Boot-Skript
 
-Das Bündel kommt mit `script-src 'self'` aus: eine Datei von der eigenen Domain, kein `eval`, keine Inline-Handler. Styles setzt es über das CSSOM (`element.style`), das `style-src` nicht blockiert. Einzige Ausnahme ist das kleine Inline-Skript `themeBootScript()` im `<head>` gegen das Flackern im Dunkelmodus: Es braucht einen Hash oder eine nonce.
+Das Bündel kommt mit `script-src 'self'` aus: eine Datei von der eigenen Domain, kein `eval`, keine Inline-Handler. Die `initX`-Bausteine setzen Styles über das CSSOM (`element.style`), das `style-src` nicht blockiert. Die Render-Funktionen schreiben für Pins der Karte, die Höhe der Karte (`--dss-map-h`) und die Breite von Tabellenspalten `style`-Attribute ins Markup; `mountX` wendet sie nach dem Einsetzen über das CSSOM an (und entfernt das Attribut), sodass `style-src 'self'` reicht. Setzt du das Ergebnis von `renderX` selbst ein (Crawler, `createContextualFragment` im eigenen Code), blockiert Chromium diese Attribute unter `style-src 'self'`: erlaube sie mit `style-src-attr 'unsafe-inline'` (oder einem Hash je Attributwert) oder nimm `mountX`. Das kleine Inline-Skript `themeBootScript()` im `<head>` gegen das Flackern im Dunkelmodus braucht einen Hash oder eine nonce.
 
 <CodeBlock label="Content-Security-Policy" language="Shell und HTTP" code={cspHeader} />
 
 ## Bundle-Größen
 
-Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, hält das Budget ein (`dss.min.js` höchstens {budget.minKB} KB, gzip höchstens {budget.gzipKB} KB) und prüft, dass diese Tabelle stimmt.
+Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, hält das Budget ein (`dss.min.js` höchstens {budget.minKB} KiB, gzip höchstens {budget.gzipKB} KiB) und prüft, dass diese Tabelle stimmt.
 
 <DocTable
   label="Größen von dist/vanilla"
   head={['Datei', 'Größe', 'Hinweis']}
   rows={[
-    ['dss.js', `${(bundleSizes.js / 1024).toFixed(1)} KB`, 'ungebündelt lesbar, mit Quellkarte (dss.js.map)'],
-    ['dss.min.js', `${(bundleSizes.min / 1024).toFixed(1)} KB`, 'minifiziert, mit Quellkarte (dss.min.js.map)'],
-    ['dss.min.js (gzip)', `${(bundleSizes.gzip / 1024).toFixed(1)} KB`, 'so kommt es über das Netz, wenn der Server komprimiert'],
-    ['dss.css', `${(bundleSizes.css / 1024).toFixed(1)} KB`, 'tokens.css plus components.css, enthält --dss-version; courtlines/ liegt daneben'],
+    ['dss.js', `${(bundleSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte (dss.js.map)'],
+    ['dss.min.js', `${(bundleSizes.min / 1024).toFixed(1)} KiB`, 'minifiziert, mit Quellkarte (dss.min.js.map)'],
+    ['dss.min.js (gzip)', `${(bundleSizes.gzip / 1024).toFixed(1)} KiB`, 'so kommt es über das Netz, wenn der Server komprimiert'],
+    ['dss.css', `${(bundleSizes.css / 1024).toFixed(1)} KiB`, 'tokens.css plus components.css, enthält --dss-version; courtlines/ liegt daneben'],
   ]}
 />
 
-Das Budget des Kerns hat noch rund 3,5 KB Polster (min) und 2 KB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `dss-render.js`, mit eigenem Budget (siehe „Markup erzeugen“); der Kern bleibt, was er war. `initMap` (V2b) bekommt sein Budget ebenso ausdrücklich, nicht stillschweigend.
+Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `dss-render.js`, mit eigenem Budget (siehe „Markup erzeugen“); der Kern bleibt, was er war. `initMap` (V2b) bekommt sein Budget ebenso ausdrücklich, nicht stillschweigend.
 
 ## Kopieren ins Projekt
 

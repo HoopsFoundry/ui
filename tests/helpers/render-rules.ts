@@ -14,20 +14,29 @@ type Mod = Record<string, (...args: any[]) => any>;
 export type Mods = Record<RenderFile, Mod>;
 
 const pathOf = (file: FileName) => (file.startsWith('js:') ? `js/${file.slice(3)}.js` : `js/render/${file}.js`);
+const BAD_TEXT = '<img src=x onerror=alert(1)>';
+/** Ersetzungen, die ein gemeinsames Modul Schadtext liefern lassen (gesprochener Ergebnistext, Abschnittsbezeichnung). */
+export const HOSTILE_SHARED = [
+  { file: 'js:schedule' as FileName, from: "return parts.join(', ');", to: `return '${BAD_TEXT}';` },
+  { file: 'js:periods' as FileName, from: 'export function resolvePeriod({ period, periods, quarter } = {}) {', to: `export function resolvePeriod({ period, periods, quarter } = {}) {\n  if (period !== undefined || quarter !== undefined) return { label: '${BAD_TEXT}', short: '', alias: false };` },
+];
+
 export const sourceOf = (file: FileName) => read(pathOf(file));
 
 /**
  * Lädt die Render-Module und die gemeinsamen Module, aus denen sie bestehen, jeweils aus Quelltext (data-URL); relative Importe zeigen auf diese
  * Fassungen, sodass eine verfälschte Datei (`override`) bei allen wirkt, die sie importieren. Alles andere (mount.js, accordion.js …) kommt aus den Dateien.
  */
-export async function loadAll(override?: { file: FileName; source: string }): Promise<Mods> {
+export async function loadAll(override?: { file: FileName; source: string }, patches: { file: FileName; from: string; to: string }[] = []): Promise<Mods> {
   const known = new Set<string>([...FILES.map((f) => `js/render/${f}.js`), ...SHARED.map((f) => `js/${f}.js`)]);
   const urls = new Map<string, string>();
   const urlOf = (path: string): string => {
     if (!known.has(path)) return pathToFileURL(resolve(process.cwd(), path)).href;
     const cached = urls.get(path);
     if (cached) return cached;
-    const source = override && pathOf(override.file) === path ? override.source : read(path);
+    let source = override && pathOf(override.file) === path ? override.source : read(path);
+    // Anpassungen für „Defense in Depth“-Läufe: ein gemeinsames Modul liefert Schadtext, die Render-Funktion muss ihn maskieren
+    for (const patch of patches) if (pathOf(patch.file) === path) source = source.replace(patch.from, patch.to);
     const dir = path.slice(0, path.lastIndexOf('/'));
     const code = source.replace(/from '(\.{1,2}\/[\w-]+\.js)'/g, (_m, spec: string) => {
       const target = spec.startsWith('../') ? `${dir.slice(0, dir.lastIndexOf('/'))}/${spec.slice(3)}` : `${dir}/${spec.slice(2)}`;
@@ -56,7 +65,7 @@ const HOSTILE = '<img src=x onerror=alert(1)>';
 const JS = 'javascript:alert(1)';
 const game = (extra: Record<string, unknown> = {}) => ({ id: 'a', state: 'scheduled', heim: { name: 'Heim' }, gast: { name: 'Gast' }, ...extra });
 
-export function renderRules(m: Mods): Rules {
+export function renderRules(m: Mods, hostile?: Mods): Rules {
   const { esc, attr } = m.escape as unknown as { esc: (v: unknown) => string; attr: (v: unknown) => string };
   const c = m.core;
   const league = (props: Record<string, unknown>, options?: unknown) => m['league-card'].renderLeagueCard(props, options) as string;
@@ -329,6 +338,49 @@ export function renderRules(m: Mods): Rules {
   rule('VenueCard: Ortsliste mit Adresse als Text und Links', () => {
     const html = venue({ name: 'Halle', lat: 49.3, lng: 7.9, address: { street: 'Weg 1', zip: '12345', city: 'Ort' } });
     return html.includes('<address class="dss-venue-address"><span class="dss-venue-line">Weg 1</span><span class="dss-venue-line">12345 Ort</span></address>') && html.includes('Größere Karte') && html.includes('Route planen') && html.includes('openstreetmap.org');
+  });
+
+  // ── Defense in Depth: Schadtext aus gemeinsamen Funktionen und aus Freitext ──
+  if (hostile) {
+    const hs = (props: Record<string, unknown>, options?: unknown) => hostile.schedule.renderScheduleTable(props, options) as string;
+    const hg = (props: Record<string, unknown>) => hostile.schedule.renderScheduleGrid(props) as string;
+    const clean = (html: string) => !html.includes('<img src=x') && html.includes('&lt;img src=x');
+    const done = { heim: { name: 'A', score: 3 }, gast: { name: 'B', score: 2 } };
+    rule('Spielplan: der gesprochene Ergebnistext wird maskiert', () => clean(hs({ games: [game({ ...done, state: 'finished' })] })));
+    rule('Raster: der gesprochene Ergebnistext wird maskiert', () => clean(hg({ games: [game({ ...done, state: 'finished', time: '09:00', column: 'a' })], columns: [{ id: 'a', label: 'A' }] })));
+    rule('TeamCard: der Ergebnistext wird maskiert', () => clean(hostile['team-card'].renderTeamCard({ name: 'H', last: { opponent: { name: 'B' }, ownScore: 3, opponentScore: 2 } }) as string));
+    rule('MatchCard: Abschnitt und Uhr im Live-Text werden maskiert', () => clean(hostile['match-card'].renderMatchCard({ state: 'live', period: 2, heim: { name: 'A' }, gast: { name: 'B' } }) as string));
+  }
+  rule('MatchCard: Uhr und quarter (Live-Text) werden maskiert', () => {
+    const html = match({ state: 'live', clock: HOSTILE, quarter: HOSTILE, heim: { name: 'A' }, gast: { name: 'B' } });
+    return !html.includes('<img') && html.includes('&lt;img');
+  });
+  rule('TeamCard: outcome nur als S, N oder U (kein Schadtext in Text und Klasse)', () => {
+    const bad = [HOSTILE, 'constructor', '__proto__', '"><svg onload=1>'].map((outcome) => tc({ last: { opponent: { name: 'B' }, ownScore: 1, opponentScore: 2, outcome } }));
+    const good = tc({ last: { opponent: { name: 'B' }, ownScore: 1, opponentScore: 2, outcome: 'S' } });
+    return bad.every((html) => !html.includes('<img') && !html.includes('function') && !html.includes('<svg')) && good.includes('dss-chip--ok" aria-hidden="true">S<');
+  });
+  rule('Spielplan: outcome nur als S, N oder U', () => {
+    const html = (outcome: string) => sched({ games: [game({ heim: undefined, gast: undefined, state: 'finished', ownScore: 1, opponent: { name: 'X', score: 2 }, outcome })] });
+    return !html(HOSTILE).includes('<img') && !html('constructor').includes('function') && html('S').includes('dss-chip--ok" aria-hidden="true">S<');
+  });
+  rule('Logo: die Adresse steht maskiert im Attribut (kein Ausbruch über ein Anführungszeichen)', () => {
+    const html = c.logoBadge({ name: 'A', logo: '/a"onerror="x' }) as string;
+    return !html.includes('"onerror="') && html.includes('src="/a&quot;onerror=&quot;x"');
+  });
+  rule('Table: Kopfzelle im Rumpf als th scope="row", im Kopf scope="col"', () => {
+    const body = table({ rows: [[{ text: 'Zeile', header: true }, 'x']] });
+    const head = table({ head: [['K1']] });
+    return body.includes('<th scope="row">Zeile</th>') && head.includes('<th scope="col">K1</th>');
+  });
+  rule('mapHeight: zwischen 200 und 2000 Pixel', () => venue({ name: 'H', lat: 49.3, lng: 7.9, mapHeight: 99999 }).includes('--dss-map-h:2000px') && venue({ name: 'H', lat: 49.3, lng: 7.9, mapHeight: 10 }).includes('--dss-map-h:200px'));
+  rule('VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', () =>
+    venue({ name: 'H', lat: 49.3, lng: 7.9 }).includes('dss-map-load" disabled aria-disabled="true"') && (m['venue-card'].renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 }, { mapActive: true }) as string).includes('dss-map-load">'));
+  rule('ids: andere Eingabe, andere Kennung (zwei Ligencards gleichen Titels)', () => {
+    const a = league({ title: 'Liga', teams: many.slice(0, 2), collapsible: true });
+    const b = league({ title: 'Liga', teams: many.slice(2, 4), collapsible: true });
+    const id = (html: string) => html.match(/id="(dss-cf-[^"]+)-trigger"/)?.[1];
+    return Boolean(id(a)) && id(a) !== id(b) && id(a) === id(league({ title: 'Liga', teams: many.slice(0, 2), collapsible: true }));
   });
   return R;
 }

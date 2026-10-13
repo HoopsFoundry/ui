@@ -12,6 +12,7 @@ import { attr, esc } from './escape.js';
 import { headingOf, klass, logoBadge, nameText, num, obj, pick, str, teamOf, url } from './core.js';
 import { mount } from './mount.js';
 
+const OUTCOMES = ['S', 'N', 'U'];
 const OUTCOME_CHIP = { S: 'dss-chip--ok', N: 'dss-chip--err', U: '' };
 
 const tile = (value, label, aria) =>
@@ -46,7 +47,10 @@ export function renderTeamCard(props, options) {
   const next = p.next && typeof p.next === 'object' ? obj(p.next) : undefined;
   const last = p.last && typeof p.last === 'object' ? obj(p.last) : undefined;
   const at = (value) => (value === 'gast' ? 'gast' : value === 'heim' ? 'heim' : undefined);
-  const res = last ? lastResult({ ...last, ownScore: num(last.ownScore), opponentScore: num(last.opponentScore), opponent: obj(last.opponent) }) : undefined;
+  // `outcome` (Forfait, Wertung) nur als S, N oder U: der Wert fließt in Klasse und Text
+  const res = last
+    ? lastResult({ ...last, ownScore: num(last.ownScore), opponentScore: num(last.opponentScore), opponent: obj(last.opponent), outcome: OUTCOMES.includes(last.outcome) ? last.outcome : undefined })
+    : undefined;
 
   const name = nameText(own, names);
   const nameBlock = href
@@ -87,7 +91,7 @@ export function renderTeamCard(props, options) {
       (last
         ? `<div class="dss-team-game"><div class="dss-team-game-l">${lastDate ? `Letztes Spiel · ${esc(lastDate)}` : 'Letztes Spiel'}</div><div class="dss-team-game-row">${opponent(last.opponent, at(last.at), names, logos)}` +
           (res
-            ? `<span class="dss-team-game-end">${res.outcome ? `<span class="dss-chip dss-chip--mono${OUTCOME_CHIP[res.outcome] ? ` ${OUTCOME_CHIP[res.outcome]}` : ''}" aria-hidden="true">${res.outcome}</span>` : ''}<span class="dss-team-game-score" aria-hidden="true">${esc(res.score)}</span><span class="dss-sr-only">${esc(res.aria)}</span></span>`
+            ? `<span class="dss-team-game-end">${OUTCOMES.includes(res.outcome) ? `<span class="dss-chip dss-chip--mono${OUTCOME_CHIP[res.outcome] ? ` ${OUTCOME_CHIP[res.outcome]}` : ''}" aria-hidden="true">${esc(res.outcome)}</span>` : ''}<span class="dss-team-game-score" aria-hidden="true">${esc(res.score)}</span><span class="dss-sr-only">${esc(res.aria)}</span></span>`
             : '') +
           '</div></div>'
         : '') +

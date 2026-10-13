@@ -164,8 +164,9 @@ safeHref('/ligen/oberliga');            // → '/ligen/oberliga'
 renderEmptyState({ title: '<script>alert(1)</script>', actions: [{ label: 'Los', href: 'javascript:alert(1)' }] });`;
 
 /** Gemessene Größen des Bündels (Bytes); der Test misst neu und verlangt, dass die Angaben um höchstens 5 % abweichen. */
-export const bundleSizes = { js: 65507, min: 36976, gzip: 13239, css: 179156 };
+export const bundleSizes = { js: 65423, min: 36976, gzip: 13209, css: 179156 };
+/** Budgets in KiB (1 KiB = 1024 Byte); die Namen behalten das alte Kürzel. */
 export const budget = { minKB: 40, gzipKB: 15 };
 /** Das Render-Bündel (dss-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
-export const renderSizes = { js: 76221, min: 48579, gzip: 16417 };
+export const renderSizes = { js: 78417, min: 49877, gzip: 16902 };
 export const renderBudget = { minKB: 52, gzipKB: 18 };

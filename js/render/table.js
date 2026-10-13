@@ -75,7 +75,7 @@ export function renderTable(props, options) {
     return collapsibleFrame({
       kind: 'frame', rootClass, id, title, titleAs: p.titleAs, open,
       meta: meta || live ? `<span class="dss-frame-meta">${metaInner}</span>` : undefined,
-      content: region, uid: uidFor([title, meta, id], options),
+      content: region, uid: uidFor(p, options),
     });
   }
   const tag = headingOf(p.titleAs);

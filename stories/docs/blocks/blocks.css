@@ -3,6 +3,7 @@
 .dss-doc-code { border: 1px solid var(--page-line); border-radius: 14px; background: var(--base-1000); color: var(--n-100); padding: 16px 24px 22px; overflow-x: auto; margin: 0 0 16px; }
 .dss-doc-code pre { margin: 0; font-family: var(--font-mono); font-size: 13px; line-height: 1.6; font-variant-ligatures: none; white-space: pre; background: none; border: 0; padding: 0; color: inherit; }
 .dss-doc-chip { display: inline-block; margin-bottom: 12px; padding: 2px 8px; border-radius: 4px; background: var(--amber-800); color: var(--n-0); font-family: var(--font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+:not(pre) > code { white-space: normal !important; overflow-wrap: anywhere; word-break: break-word; } /* lange Befehle im Fließtext brechen um (kein horizontales Scrollen der Seite bei 420 px) */
 .dss-doc-code p { margin: 0; color: var(--n-100); font-style: italic; }
 
 .dss-dd { display: flex; flex-direction: column; gap: 32px; }

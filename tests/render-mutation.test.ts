@@ -3,7 +3,12 @@
 // zugehörigen Quelltext gezielt verfälscht: Escaping weglassen, safeHref weglassen, Grenze limit, Filter finished/bye, Fensterregel, titleAs.
 import { describe, expect, it } from 'vitest';
 import { mutate } from './helpers/mutation';
-import { loadAll, renderRules, sourceOf, type FileName } from './helpers/render-rules';
+import { HOSTILE_SHARED, loadAll, renderRules, sourceOf, type FileName } from './helpers/render-rules';
+
+/** Alle Regeln: einmal mit den echten gemeinsamen Modulen, einmal mit solchen, die Schadtext liefern (Defense in Depth). */
+async function rulesFor(override?: { file: FileName; source: string }) {
+  return renderRules(await loadAll(override), await loadAll(override, HOSTILE_SHARED));
+}
 
 type Mutation = { file: FileName; name: string; rule: string; from: string; to: string };
 
@@ -97,6 +102,20 @@ const M: Mutation[] = [
   { file: 'schedule', name: 'Pausen fehlen', rule: 'Raster: Pausen und Freilose als eigene Zeilen', from: "const breaks = list(p.breaks).map(", to: "const breaks = [].map(" },
   { file: 'schedule', name: 'Spaltenkopf ohne esc', rule: 'Raster: Spalten- und Zellenbeschriftung maskiert', from: 'role="columnheader">${esc(c.label)}</th>', to: 'role="columnheader">${c.label}</th>' },
   { file: 'schedule', name: 'data-label ohne attr', rule: 'Raster: Spalten- und Zellenbeschriftung maskiert', from: 'data-label="${attr(columns[index].label)}"', to: 'data-label="${columns[index].label}"' },
+  // Review V2a: XSS über outcome, Schadtext aus gemeinsamen Funktionen, Logo, Kopfzellen, Höhe, Sperre der Karte, ids
+  { file: 'team-card', name: 'outcome ungeprüft (XSS)', rule: 'TeamCard: outcome nur als S, N oder U (kein Schadtext in Text und Klasse)', from: 'outcome: OUTCOMES.includes(last.outcome) ? last.outcome : undefined', to: 'outcome: last.outcome' },
+  { file: 'team-card', name: 'Ergebnistext ohne esc (X2)', rule: 'TeamCard: der Ergebnistext wird maskiert', from: '<span class="dss-sr-only">${esc(res.aria)}</span>', to: '<span class="dss-sr-only">${res.aria}</span>' },
+  { file: 'schedule', name: 'gesprochener Text ohne esc (X1)', rule: 'Spielplan: der gesprochene Ergebnistext wird maskiert', from: '<span class="dss-sr-only">${esc(spoken)}</span>', to: '<span class="dss-sr-only">${spoken}</span>' },
+  { file: 'schedule', name: 'gesprochener Text ohne esc im Raster (X1)', rule: 'Raster: der gesprochene Ergebnistext wird maskiert', from: '<span class="dss-sr-only">${esc(spoken)}</span>', to: '<span class="dss-sr-only">${spoken}</span>' },
+  { file: 'schedule', name: 'outcome des Spiels ungeprüft', rule: 'Spielplan: outcome nur als S, N oder U', from: 'outcome: OUTCOMES.includes(g.outcome) ? g.outcome : undefined,', to: 'outcome: g.outcome,' },
+  { file: 'match-card', name: 'Live-Text ohne esc (M26)', rule: 'MatchCard: Uhr und quarter (Live-Text) werden maskiert', from: 'Live · ${esc(liveText)}', to: 'Live · ${liveText}' },
+  { file: 'match-card', name: 'Live-Text ohne esc, Abschnitt aus gemeinsamer Funktion', rule: 'MatchCard: Abschnitt und Uhr im Live-Text werden maskiert', from: 'Live · ${esc(liveText)}', to: 'Live · ${liveText}' },
+  { file: 'core', name: 'Logo-Adresse ohne attr (M03)', rule: 'Logo: die Adresse steht maskiert im Attribut (kein Ausbruch über ein Anführungszeichen)', from: '<img src="${attr(team.logo)}" alt="" loading="lazy">', to: '<img src="${team.logo}" alt="" loading="lazy">' },
+  { file: 'table', name: 'Kopfzelle im Kopf mit scope row (M28)', rule: 'Table: Kopfzelle im Rumpf als th scope="row", im Kopf scope="col"', from: "tag === 'th' ? 'col' : 'row'", to: "'row'" },
+  { file: 'map-view', name: 'Höhe ohne Obergrenze', rule: 'mapHeight: zwischen 200 und 2000 Pixel', from: 'Math.min(2000, Math.max(200, height))', to: 'Math.max(200, height)' },
+  { file: 'map-view', name: 'Karte laden immer bedienbar', rule: 'VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', from: "${p.loadReady === true ? '' : ' disabled aria-disabled=\"true\"'}", to: '' },
+  { file: 'venue-card', name: 'mapActive ignoriert', rule: 'VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', from: 'loadReady: obj(options).mapActive === true,', to: 'loadReady: false,' },
+  { file: 'league-card', name: 'ids nur aus dem Titel', rule: 'ids: andere Eingabe, andere Kennung (zwei Ligencards gleichen Titels)', from: 'uid: uidFor(p, options)', to: 'uid: uidFor(title, options)' },
   // match-card.js
   { file: 'match-card', name: 'Verlierer ohne Zustand', rule: 'MatchCard: Verlierer nur bei beendetem Spiel', from: "const gastWin = state === 'finished' && ", to: 'const gastWin = ' },
   { file: 'match-card', name: 'Verlierer bei live', rule: 'MatchCard: Verlierer nur bei beendetem Spiel', from: "const heimWin = state === 'finished' && ", to: "const heimWin = state !== 'scheduled' && " },
@@ -149,20 +168,20 @@ const M: Mutation[] = [
 
 describe('Mutationstests: Render-Funktionen', () => {
   it('Ausgangslage: alle Aussagen gelten', async () => {
-    const rules = renderRules(await loadAll());
+    const rules = await rulesFor();
     expect(Object.entries(rules).filter(([, ok]) => !ok).map(([name]) => name)).toEqual([]);
     expect(Object.keys(rules).length).toBeGreaterThan(80);
   });
   it('jede Regel wird von mindestens einer Mutation geprüft', async () => {
-    const rules = Object.keys(renderRules(await loadAll()));
+    const rules = Object.keys(await rulesFor());
     const covered = new Set(M.map((m) => m.rule));
     expect(rules.filter((name) => !covered.has(name))).toEqual([]);
     expect([...covered].filter((name) => !rules.includes(name))).toEqual([]);
   });
   it.each(M)('$file: $name', async ({ file, rule, from, to }) => {
-    const base = renderRules(await loadAll());
+    const base = await rulesFor();
     expect(base[rule], `Regel fehlt oder gilt nicht: ${rule}`).toBe(true);
-    const mutated = renderRules(await loadAll({ file, source: mutate(sourceOf(file), from, to) }));
+    const mutated = await rulesFor({ file, source: mutate(sourceOf(file), from, to) });
     expect(mutated[rule], `Regel kippt nicht: ${rule}`).toBe(false);
   });
 });

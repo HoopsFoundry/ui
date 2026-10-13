@@ -104,7 +104,7 @@ export function renderLeagueCard(props, options) {
   if (p.collapsible === true && title) {
     return collapsibleFrame({
       kind: 'league', rootClass, id, title, sub: summary, titleAs: p.titleAs, open: p.open === true,
-      meta: liveTag ? liveMeta(liveTag) : undefined, content: panel, uid: uidFor([title, summary, id], options),
+      meta: liveTag ? liveMeta(liveTag) : undefined, content: panel, uid: uidFor(p, options),
     });
   }
   const tag = headingOf(p.titleAs);

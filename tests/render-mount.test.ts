@@ -107,6 +107,23 @@ describe('update', () => {
     expect(document.activeElement?.id).toBe('oberliga-trigger');
     expect(document.activeElement).toBe(host.querySelector('#oberliga-trigger'));
   });
+  it('hält den Fokus im Shadow DOM', () => {
+    const shadow = host.attachShadow({ mode: 'open' });
+    const inner = document.createElement('div');
+    shadow.append(inner);
+    const handle = mountLeagueCard(inner, { title: 'Oberliga', teams: TEAMS });
+    shadow.querySelectorAll<HTMLAnchorElement>('a.dss-league-link')[1].focus();
+    expect(shadow.activeElement?.getAttribute('href')).toBe('/teams/seeberg');
+    handle.update({ title: 'Oberliga', teams: TEAMS.map((t) => ({ ...t, points: 1 })) });
+    expect(shadow.activeElement?.getAttribute('href')).toBe('/teams/seeberg');
+  });
+  it('verschwindet der fokussierte Knoten, bekommt der Rahmen den Fokus, nicht <body>', () => {
+    const handle = mountLeagueCard(host, { title: 'Oberliga', teams: TEAMS, collapsible: true, id: 'o', open: true });
+    host.querySelectorAll<HTMLAnchorElement>('a.dss-league-link')[1].focus();
+    handle.update({ title: 'Oberliga', teams: TEAMS.slice(0, 1), collapsible: true, id: 'o', open: true });
+    expect(document.activeElement).not.toBe(document.body);
+    expect(document.activeElement?.id).toBe('o-trigger');
+  });
   it('update nach destroy tut nichts', () => {
     const handle = mountStats(host, { items: [{ label: 'a', value: 1 }] });
     handle.destroy();

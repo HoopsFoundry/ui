@@ -12,7 +12,7 @@ import { klass, list, num, obj, str } from './core.js';
 
 /**
  * @param {object} props `markers`, `label`, `height`, `load` (`click`/`auto`), `tileUrl`, `attribution`, `privacyNote`, `appLinks`, `showList`,
- *   `dimInDark`, `darkTiles`, `seatLabel`, `className`
+ *   `dimInDark`, `darkTiles`, `seatLabel`, `className`, `loadReady` (die Schaltfläche „Karte laden“ ist bedienbar; ohne `initMap` bleibt sie gesperrt)
  * @param {string} uid Basis der ids (Kartenfläche und Text)
  */
 export function renderMapView(props, uid) {
@@ -40,7 +40,7 @@ export function renderMapView(props, uid) {
     .join('');
   const card =
     state === 'idle'
-      ? `<div class="dss-map-ph-card"><p class="dss-map-note">${esc(privacy)}</p><button type="button" class="dss-btn dss-btn--primary dss-btn--md dss-map-load">${esc(mapText.load)}</button></div>`
+      ? `<div class="dss-map-ph-card"><p class="dss-map-note">${esc(privacy)}</p><button type="button" class="dss-btn dss-btn--primary dss-btn--md dss-map-load"${p.loadReady === true ? '' : ' disabled aria-disabled="true"'}>${esc(mapText.load)}</button></div>`
       : '';
   const canvas =
     state === 'loading' ? `<div class="dss-map-canvas" id="${attr(canvasId)}" role="group" aria-label="${attr(mapText.canvasHint)}" inert></div>` : '';
@@ -67,7 +67,7 @@ export function renderMapView(props, uid) {
     .join('');
 
   return (
-    `<div class="${klass('dss-map', str(p.className))}" data-state="${state}" data-dim="${dimInDark ? 'true' : 'false'}" data-tiles="${tilesMode(p.darkTiles)}" style="--dss-map-h:${height !== undefined ? Math.max(200, height) : 320}px">` +
+    `<div class="${klass('dss-map', str(p.className))}" data-state="${state}" data-dim="${dimInDark ? 'true' : 'false'}" data-tiles="${tilesMode(p.darkTiles)}" style="--dss-map-h:${height !== undefined ? Math.min(2000, Math.max(200, height)) : 320}px">` +
     `<a class="dss-map-skip" href="#${attr(textId)}">${esc(mapText.skip)}</a>` +
     `<div class="dss-map-frame" role="region" aria-label="${attr(str(p.label))}"><div class="dss-map-stage">${canvas}` +
     `<div class="dss-map-ph">${pinMarkup}${card}</div>` +

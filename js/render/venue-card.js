@@ -5,7 +5,8 @@
  * auch die Karte: `renderVenueCard` liefert das Platzhalter-Markup der Karte (Region, Hinweis mit Schaltfläche „Karte laden“, Statuszeile,
  * Quellenangabe, Ortsliste mit Adresse als Text, Links „Größere Karte“ und „Route planen“) ohne Leaflet und ohne Netzverkehr. Lebendig
  * (Kacheln, Zoom, Marker) wird sie erst mit `initMap` (V2b) auf `.dss-map` in `.dss-venue-map`; bis dahin bleibt der Platzhalter mit
- * Adresse und Links. Props: `name`, `address`, `lat`, `lng`, `info`, `contact`, `games`, `limit`, `gamesLabel`, `href`, `linkLabel`, `names`,
+ * Adresse und Links. Die Schaltfläche „Karte laden“ ist ohne `initMap` gesperrt (`disabled`, `aria-disabled`), damit sie nicht tot wirkt;
+ * `options.mapActive: true` gibt sie frei (V2b setzt das, das Markup ist dann das von `MapView`). Props: `name`, `address`, `lat`, `lng`, `info`, `contact`, `games`, `limit`, `gamesLabel`, `href`, `linkLabel`, `names`,
  * `logos`, `size`, `titleAs`, `load`, `tileUrl`, `privacyNote`, `mapHeight`, `className`. Spiele, Kontakt, Adresse und Links kommen aus
  * js/venue.js (Grenzen: `limit` 1 bis 5, ohne beendete und Spielfrei). Typen: js/render/venue-card.d.ts.
  */
@@ -58,14 +59,14 @@ export function renderVenueCard(props, options) {
   const gamesLabel = typeof p.gamesLabel === 'string' ? p.gamesLabel : venueText.gamesLabel;
   const linkLabel = typeof p.linkLabel === 'string' ? p.linkLabel : venueText.linkLabel;
   const tag = headingOf(p.titleAs);
-  const uid = uidFor([title, lat, lng, p.load], options);
+  const uid = uidFor(p, options);
 
   const map = hasMap
     ? '<div class="dss-venue-map">' +
       renderMapView(
         {
           label: venueMapLabel(title), markers: [{ id: 'halle', lat, lng, label: title }], showList: false, height: typeof p.mapHeight === 'number' ? p.mapHeight : 250,
-          load: p.load === 'auto' ? 'auto' : 'click', tileUrl: p.tileUrl, privacyNote: p.privacyNote, appLinks: [],
+          load: p.load === 'auto' ? 'auto' : 'click', tileUrl: p.tileUrl, privacyNote: p.privacyNote, appLinks: [], loadReady: obj(options).mapActive === true,
         },
         uid,
       ) +

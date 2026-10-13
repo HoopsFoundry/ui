@@ -4,15 +4,25 @@
  * `mount(el, render, props, options)` setzt das Markup einer Render-Funktion in `el` ein (über `Range.createContextualFragment`, nie über
  * eine HTML-Eigenschaft), startet bei einklappbaren Rahmen das Accordion-Verhalten (`initAccordion`) und gibt `{ update(props), destroy() }`
  * zurück. Muster wie die `initX`-Bausteine (js/lifecycle.js): idempotent je Element (ein zweiter Aufruf ersetzt den ersten), `destroy()`
- * entfernt Listener und Markup und stellt den früheren Inhalt von `el` wieder her. `update` ersetzt den Inhalt und hält den Fokus (über
- * `id` oder die Lage im Baum) und den Zustand offen/zu eines einklappbaren Rahmens, solange `props.open` sich nicht ändert.
+ * entfernt Listener und Markup und stellt den früheren Inhalt von `el` wieder her. `update` ersetzt den Inhalt (bei gleichem Markup passiert
+ * nichts) und hält den Fokus (über `id` oder die Lage im Baum, auch im Shadow DOM), die Scrollposition der Tabellenbereiche und den Zustand
+ * offen/zu eines einklappbaren Rahmens, solange `props.open` sich nicht ändert.
+ * Styles: Die Render-Funktionen schreiben wenige `style`-Attribute (Pins, Kartenhöhe, Spaltenbreite). `mount` setzt sie nach dem Einsetzen
+ * über das CSSOM (`style.setProperty`), sodass eine Seite mit `style-src 'self'` sie nicht blockiert; wer das Markup einer Render-Funktion selbst
+ * einsetzt, braucht `style-src-attr 'unsafe-inline'` (oder `mountX`).
  * Typen: js/render/mount.d.ts.
  */
 import { initAccordion } from '../accordion.js';
 import { createRegistry } from '../lifecycle.js';
 
 const registry = createRegistry('render-mount');
-let counter = 0;
+// Zähler für erzeugte Kennungen: einer je Seite über alle Kopien des Moduls (Symbol.for), damit zwei Bündel keine gleiche id vergeben
+const COUNTER = Symbol.for('dss.render.counter');
+const nextUid = () => {
+  const store = (globalThis[COUNTER] ??= { n: 0 });
+  store.n += 1;
+  return `m${store.n}`;
+};
 
 const GROUP = 'dss-acc';
 const noop = { update() {}, destroy() {} };
@@ -26,9 +36,16 @@ function pathOf(root, node) {
   return path;
 }
 
+/** Das fokussierte Element im Baum von `host` (im Shadow DOM das des Shadow-Wurzel), sonst `null`. */
+function activeIn(host) {
+  const root = typeof host.getRootNode === 'function' ? host.getRootNode() : host.ownerDocument;
+  const active = (root && root.activeElement) || host.ownerDocument.activeElement;
+  return active || null;
+}
+
 /** Merkt den fokussierten Knoten unterhalb von `host`: seine `id` und seine Lage im Baum. */
 function rememberFocus(host) {
-  const active = host.ownerDocument.activeElement;
+  const active = activeIn(host);
   if (!active || active === host || !host.contains(active)) return null;
   return { id: active.id || '', path: pathOf(host, active), tag: active.tagName, className: active.className };
 }
@@ -43,7 +60,39 @@ function restoreFocus(host, memo) {
     for (const index of memo.path) node = node?.childNodes?.[index];
     if (node && node.nodeType === 1 && node.tagName === memo.tag && node.className === memo.className) target = node;
   }
+  // Ist der Knoten verschwunden, bekommt der Kopf des Rahmens (oder der Scrollbereich, sonst das erste bedienbare Element) den Fokus, nicht <body>
+  if (!target) target = host.querySelector('.dss-acc-trigger') ?? host.querySelector('.dss-table-scroll') ?? host.querySelector('a[href], button:not([disabled])');
   if (target && typeof target.focus === 'function') target.focus({ preventScroll: true });
+}
+
+/** Scrollpositionen der Tabellenbereiche (in Dokumentreihenfolge) merken und zurückgeben. */
+const scrollsOf = (host) => [...host.querySelectorAll('.dss-table-scroll')].map((el) => el.scrollLeft);
+function restoreScrolls(host, list) {
+  const areas = host.querySelectorAll('.dss-table-scroll');
+  list.forEach((left, index) => {
+    if (left && areas[index]) areas[index].scrollLeft = left;
+  });
+}
+
+// Inline-Styles der Render-Funktionen: nur diese Eigenschaften, und nur aus unserem eigenen Markup
+const STYLE_PROPS = new Set(['left', 'top', 'width', '--dss-map-h']);
+const STYLE_ATTR = /\sstyle="([^"]*)"/g;
+
+/** Ersetzt `style="…"` im Markup durch `data-dss-style="…"`: das Attribut wird nach dem Einsetzen über das CSSOM angewendet (CSP `style-src`). */
+const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style="$1"');
+
+/** Wendet `data-dss-style` über `style.setProperty` an (nur bekannte Eigenschaften) und entfernt das Attribut. */
+function applyStyles(host) {
+  for (const el of host.querySelectorAll('[data-dss-style]')) {
+    for (const part of el.getAttribute('data-dss-style').split(';')) {
+      const at = part.indexOf(':');
+      if (at < 0) continue;
+      const name = part.slice(0, at).trim();
+      const value = part.slice(at + 1).trim();
+      if (STYLE_PROPS.has(name) && !/[;{}()\\]/.test(value)) el.style.setProperty(name, value);
+    }
+    el.removeAttribute('data-dss-style');
+  }
 }
 
 /**
@@ -59,25 +108,34 @@ export function mount(el, render, props, options = {}) {
 
   const { on = [], ...renderOptions } = options && typeof options === 'object' ? options : {};
   const doc = el.ownerDocument;
-  const uid = typeof renderOptions.uid === 'string' && renderOptions.uid ? renderOptions.uid : `m${++counter}`;
+  const uid = typeof renderOptions.uid === 'string' && renderOptions.uid ? renderOptions.uid : nextUid();
   const original = [...el.childNodes];
   const cleanups = [];
   let current = props && typeof props === 'object' ? props : {};
   let wrapper = null;
   let accordion = null;
   let done = false;
+  let lastHtml = null;
 
   const insert = (host, html) => {
     const range = doc.createRange();
     range.selectNodeContents(host);
-    host.replaceChildren(range.createContextualFragment(html));
+    host.replaceChildren(range.createContextualFragment(deferStyles(html)));
+    applyStyles(host);
   };
   const openState = () => {
     const trigger = (wrapper ?? el).querySelector('.dss-acc-trigger[aria-expanded]');
     return trigger ? trigger.getAttribute('aria-expanded') === 'true' : undefined;
   };
-  // Gibt es schon eine Gruppe (el oder ein Vorfahr), bedient sie den Rahmen; sonst legt mount eine eigene an
-  const needsGroup = (next) => Boolean(next.collapsible) && !el.closest(`.${GROUP}`);
+  // Gibt es schon eine Gruppe (el oder ein Vorfahr), bedient sie den Rahmen; sonst legt mount eine an. Steht el im Panel eines Bereichs dieser
+  // Gruppe, zählt ein einzelner Rahmen dort nicht zur Gruppe (initAccordion): dann bekommt er eine eigene.
+  const needsGroup = (next) => {
+    if (!next.collapsible) return false;
+    const group = el.closest(`.${GROUP}`);
+    if (!group) return true;
+    const panel = el.closest('.dss-acc-panel');
+    return Boolean(panel) && panel.closest(`.${GROUP}`) === group && group !== el;
+  };
 
   const paint = (next, previous) => {
     // `current` bleibt, was die Aufrufer übergeben haben: „open geändert“ heißt, die Eingabe hat sich geändert, nicht der Zustand im Dokument
@@ -87,8 +145,15 @@ export function mount(el, render, props, options = {}) {
       if (live !== undefined && next.open === previous.open) props = { ...next, open: live };
     }
     const host = wrapper ?? el;
-    const memo = previous ? rememberFocus(host) : null;
     const wantsGroup = needsGroup(props);
+    const html = render(props, { ...renderOptions, uid });
+    // gleiches Markup, gleiche Gruppe: nichts zu tun (kein Flackern, kein Fokusverlust)
+    if (previous && html === lastHtml && wantsGroup === Boolean(wrapper)) {
+      current = next;
+      return;
+    }
+    const memo = previous ? rememberFocus(host) : null;
+    const scrolls = previous ? scrollsOf(host) : [];
     if (!wantsGroup && wrapper) {
       accordion?.destroy();
       accordion = null;
@@ -100,8 +165,10 @@ export function mount(el, render, props, options = {}) {
       wrapper.className = GROUP;
       el.replaceChildren(wrapper);
     }
-    insert(wrapper ?? el, render(props, { ...renderOptions, uid }));
+    insert(wrapper ?? el, html);
+    lastHtml = html;
     if (wantsGroup && !accordion) accordion = initAccordion(wrapper);
+    restoreScrolls(wrapper ?? el, scrolls);
     restoreFocus(wrapper ?? el, memo);
     current = next;
   };

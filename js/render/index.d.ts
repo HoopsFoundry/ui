@@ -17,4 +17,7 @@ export type { MatchCardProps, MatchTeam, MatchCardRenderOptions, MatchCardMountO
 export { renderTeamCard, mountTeamCard } from './team-card.js';
 export type { TeamCardProps, TeamCardRenderOptions, TeamCardMountOptions } from './team-card.js';
 export { renderVenueCard, mountVenueCard } from './venue-card.js';
-export type { VenueCardProps } from './venue-card.js';
+export type { VenueCardProps, VenueCardRenderOptions } from './venue-card.js';
+
+/** Version des Pakets, aus dem dieses Bündel gebaut wurde; sie muss zu `VERSION` von dss.js und zu dss.css passen. */
+export const VERSION: string;

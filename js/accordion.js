@@ -1,5 +1,7 @@
 // Accordion: reine Funktionen (React, Svelte und Vanilla nutzen dieselben) und das Vanilla-Skript `initAccordion`.
-// ESM ohne Abhängigkeiten. Beim Import wird nichts ausgeführt und weder `window` noch `document` gelesen (SSR-sicher).
+// ESM; einzige Abhängigkeit ist das Register in lifecycle.js. Beim Import wird nichts ausgeführt und weder `window` noch `document` gelesen (SSR-sicher).
+
+import { createRegistry } from './lifecycle.js';
 
 // ── Reine Funktionen ─────────────────────────────────────────
 
@@ -281,7 +283,8 @@ function handle(fn) {
 // Bereiche: Karten (`.dss-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
 const ITEM = '.dss-acc-item, .dss-frame.is-collapsible, .dss-league.is-collapsible';
 const DETAILS = 'details.dss-acc-item';
-const instances = new WeakMap();
+// Register der Instanzen: gleicher Name, gleiches Register über alle Kopien (dss.js, dss.min.js, Einzelmodul), damit ein Wurzelelement nie doppelt geschaltet wird
+const registry = createRegistry('accordion');
 let uid = 0;
 
 const TEXT = { all: 'Alle öffnen', none: 'Alle schließen', nav: 'Bereiche' };
@@ -350,7 +353,7 @@ function make(tag, className, attrs = {}) {
 export function initAccordion(root, options = {}) {
   const noop = handle(() => {});
   if (typeof document === 'undefined' || !root || typeof root.querySelectorAll !== 'function') return noop;
-  instances.get(root)?.();
+  registry.release(root);
 
   const { exclusive = false, syncHash = true, expandAll = false, nav = false, sticky = false, navLabel = TEXT.nav } = options;
   const cleanups = [];
@@ -550,10 +553,9 @@ export function initAccordion(root, options = {}) {
   const destroy = () => {
     for (const fn of cleanups.splice(0)) fn();
     for (const el of created.splice(0)) el.remove();
-    if (instances.get(root) === destroy) instances.delete(root);
   };
-  instances.set(root, destroy);
-  return handle(destroy);
+  const claimed = registry.claim(root, destroy);
+  return handle(() => claimed.destroy());
 }
 
 /** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument) mit denselben Optionen; gibt eine Funktion zum Aufräumen aller zurück. */

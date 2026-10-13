@@ -34,8 +34,10 @@ export const klass = (...parts) => attr(cls(...parts));
 // ── Kennung ──────────────────────────────────────────────────
 
 /**
- * Basis für erzeugte ids (Rahmenkopf, Karte): `options.uid`, sonst ein Hash über die Eingabe. Dieselben Eingaben ergeben dieselben ids
- * (das Markup ist für Crawler und Vergleiche stabil); zwei gleiche Bausteine auf einer Seite brauchen verschiedene `id`-Werte oder `options.uid`.
+ * Basis für erzeugte ids (Rahmenkopf, Karte): `options.uid` (nur Buchstaben, Ziffern, `_` und `-` bleiben, alles andere entfällt), sonst ein Hash über
+ * die gesamte Eingabe (`seed`, die Eigenschaften der Komponente). Dieselben Eingaben ergeben dieselben ids (das Markup ist für Crawler und
+ * Vergleiche stabil), verschiedene Eingaben verschiedene; zwei Bausteine mit genau gleichen Eigenschaften auf einer Seite brauchen verschiedene
+ * `id`-Werte oder `options.uid`.
  */
 export function uidFor(seed, options) {
   const given = typeof options?.uid === 'string' ? options.uid.replace(/[^A-Za-z0-9_-]/g, '') : '';

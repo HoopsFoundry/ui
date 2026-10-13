@@ -15,3 +15,7 @@ export { renderScheduleTable, renderScheduleGrid, mountScheduleTable, mountSched
 export { renderMatchCard, mountMatchCard } from './match-card.js';
 export { renderTeamCard, mountTeamCard } from './team-card.js';
 export { renderVenueCard, mountVenueCard } from './venue-card.js';
+
+/** Version des Pakets, aus dem dieses Bündel gebaut wurde (ohne Build `dev`); sie muss zu `VERSION` von dss.js und zu dss.css passen. */
+// eslint-disable-next-line no-undef
+export const VERSION = typeof __DSS_VERSION__ === 'string' ? __DSS_VERSION__ : 'dev';

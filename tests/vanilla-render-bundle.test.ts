@@ -11,14 +11,14 @@ import * as source from '../js/render/index.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Render-Bündel (gemessen: 48,6 KB min, 16,4 KB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts).
+// Eigenes Budget für das Render-Bündel (gemessen: 49 877 B = 48,7 KiB min, 16 902 B = 16,5 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 36 976 B, 13 209 B).
 // Begründung: zehn Komponenten mit Markup, Logik aus league/schedule/team/venue/map; das Accordion kommt aus dem Kern und zählt hier nicht.
 export const RENDER_BUDGET = { minBytes: 52 * 1024, gzipBytes: 18 * 1024 };
 
 export const RENDER_EXPORTS = [
   'attr', 'esc', 'mount', 'mountEmptyState', 'mountFormChips', 'mountLeagueCard', 'mountMatchCard', 'mountScheduleGrid', 'mountScheduleTable',
   'mountStats', 'mountTable', 'mountTeamCard', 'mountVenueCard', 'renderEmptyState', 'renderFormChips', 'renderLeagueCard', 'renderMatchCard',
-  'renderScheduleGrid', 'renderScheduleTable', 'renderStats', 'renderTable', 'renderTeamCard', 'renderVenueCard',
+  'renderScheduleGrid', 'renderScheduleTable', 'renderStats', 'renderTable', 'renderTeamCard', 'renderVenueCard', 'VERSION',
 ];
 
 beforeAll(async () => {
@@ -63,6 +63,10 @@ describe('Render-Bündel dist/vanilla/dss-render', () => {
       expect(html.length, name).toBeGreaterThan(100);
     }
     expect(mod.esc('<a href="x">&\'</a>')).toBe('&lt;a href=&quot;x&quot;&gt;&amp;&#39;&lt;/a&gt;');
+  });
+  it('VERSION ist die Version der package.json (wie im Kern)', () => {
+    const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
+    expect((mod as unknown as { VERSION: string }).VERSION).toBe(pkg.version);
   });
   it('Größenbudget: min und gzip, getrennt vom Kern', () => {
     const min = statSync(`${out}dss-render.min.js`).size;

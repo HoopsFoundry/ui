@@ -42,10 +42,18 @@ describe('VenueCard: renderVenueCard gegen Svelte und React', () => {
     className: { ...BASE, className: 'meine' },
   };
   it.each(Object.entries(cases))('%s', async (_name, props) => {
-    const v = normalize(renderVenueCard(props as never));
+    // mapActive: die Schaltfläche der Karte ist bedienbar wie bei MapView (ohne initMap ist sie gesperrt)
+    const v = normalize(renderVenueCard(props as never, { mapActive: true }));
     const r = await p.react('VenueCard', props);
     expect(v).toBe(r);
     expect(await p.svelte('VenueCard', props)).toBe(r);
+  });
+  it('ohne mapActive ist „Karte laden“ gesperrt, sonst unverändert', () => {
+    const off = renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 } as never);
+    const on = renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 } as never, { mapActive: true });
+    expect(off).toContain('dss-map-load" disabled aria-disabled="true">Karte laden');
+    expect(on).toContain('dss-map-load">Karte laden');
+    expect(off.replace(' disabled aria-disabled="true"', '')).toBe(on);
   });
   it('limit: höchstens 5, ohne beendete und Spielfrei', () => {
     const many = Array.from({ length: 9 }, (_v, i) => ({ id: `s${i}`, state: i === 0 ? 'finished' : i === 1 ? 'bye' : 'scheduled', heim: { name: `Heim ${i}` }, gast: { name: `Gast ${i}` } }));

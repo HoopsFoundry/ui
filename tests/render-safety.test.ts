@@ -3,7 +3,7 @@
 import { describe, expect, it } from 'vitest';
 import { attr, esc } from '../js/render/escape.js';
 import { safeHref } from '../js/url.js';
-import { FIXTURES, fn, poison } from './helpers/render-fixtures';
+import { ENUM_KEYS, FIXTURES, fn, poison, poisonEnums } from './helpers/render-fixtures';
 
 const ALLOWED_TAGS = new Set([
   'div', 'span', 'a', 'p', 'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
@@ -107,6 +107,44 @@ describe.each(Object.keys(FIXTURES))('%s: Sicherheit', (name) => {
     expect(() => render(deep)).not.toThrow();
     expect(() => render(Object.fromEntries(Object.keys(FIXTURES[name]).map((k) => [k, { x: [null, 1, {}] }])))).not.toThrow();
     expect(() => render(Object.fromEntries(Object.keys(FIXTURES[name]).map((k) => [k, [null, 'x', 5, { name: 5, id: {}, heim: 'x', opponent: [] }]])))).not.toThrow();
+  });
+});
+
+describe.each(Object.keys(FIXTURES))('%s: Aufzählungsfelder mit Schadwert', (name) => {
+  const render = fn(name);
+  const BAD = ['"><img src=x onerror=alert(1)>', '<img src=x onerror=window.pwned=1>', 'constructor', '__proto__', 'toString', 'hasOwnProperty'];
+  it.each(BAD)('Schadwert %j in jedem Aufzählungsfeld: kein Verstoß, nichts aus Object.prototype', (bad) => {
+    const html = render(poisonEnums(FIXTURES[name], bad));
+    expect(violations(html)).toEqual([]);
+    expect(html).not.toContain('<img src=x');
+    expect(html).not.toMatch(/function|undefined|\[object|native code/);
+  });
+  it('Schadtext in den Freitextfeldern bei unveränderten Aufzählungen (Live-, Endstand- und Ergebniszweige laufen mit)', () => {
+    const html = render(poison(FIXTURES[name], '"><img src=x onerror=alert(1)>', 'javascript:alert(1)'));
+    expect(violations(html)).toEqual([]);
+    expect(html).not.toContain('<img src=x');
+  });
+});
+
+describe('Aufzählungsfelder der Fixtures', () => {
+  it('die Liste der Aufzählungsfelder enthält die Felder, die in Klassen oder Elementnamen münden', () => {
+    for (const key of ['state', 'at', 'outcome', 'tone', 'layout', 'density', 'size', 'names', 'titleAs', 'zone', 'variant']) expect(ENUM_KEYS.has(key), key).toBe(true);
+  });
+  it('outcome mit Schadtext: TeamCard und Spielplan geben ihn nie aus (XSS-Nachweis des Reviews)', () => {
+    for (const outcome of ['<img src=x onerror=window.pwned=1>', 'constructor', '"><svg onload=1>']) {
+      const team = fn('renderTeamCard')({ name: 'A', last: { opponent: { name: 'B' }, ownScore: 1, opponentScore: 2, outcome } }) as string;
+      expect(violations(team)).toEqual([]);
+      expect(team).not.toContain('<img');
+      expect(team).not.toContain('function');
+      const plan = fn('renderScheduleTable')({ games: [{ id: 'a', state: 'finished', ownScore: 1, outcome, opponent: { name: 'B', score: 2 }, at: 'heim' }] }) as string;
+      expect(violations(plan)).toEqual([]);
+      expect(plan).not.toContain('function');
+    }
+  });
+  it('quarter, clock und period: Schadtext bleibt Text', () => {
+    const html = fn('renderMatchCard')({ state: 'live', quarter: '<img src=x onerror=1>', clock: '<img src=x onerror=2>', heim: { name: 'A' }, gast: { name: 'B' } }) as string;
+    expect(violations(html)).toEqual([]);
+    expect(html).toContain('&lt;img src=x onerror=1&gt;');
   });
 });
 

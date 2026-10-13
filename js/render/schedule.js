@@ -66,7 +66,7 @@ const extraOf = (fn, game) => {
 };
 
 /** Rahmen um den Scrollbereich: einklappbar (Kopf als Bereichskopf) oder mit einfachem Kopf. */
-function framed(p, region, uidSeed, options) {
+function framed(p, region, options) {
   const title = str(p.title);
   const meta = str(p.meta);
   const rootClass = cls('dss-frame', str(p.className));
@@ -74,7 +74,7 @@ function framed(p, region, uidSeed, options) {
     return collapsibleFrame({
       kind: 'frame', rootClass, id: str(p.id), title, titleAs: p.titleAs, open: p.open === true,
       meta: meta ? `<span class="dss-frame-meta"><span>${esc(meta)}</span></span>` : undefined,
-      content: region, uid: uidFor(uidSeed, options),
+      content: region, uid: uidFor(p, options),
     });
   }
   const tag = headingOf(p.titleAs);
@@ -152,7 +152,7 @@ export function renderScheduleTable(props, options) {
         if (!scored) return '<td role="cell" class="dss-sch-res"><span class="dss-sch-none">–</span></td>';
         const result = mode === 'opponent' ? resolveOutcome(game) : undefined;
         const visible = mode === 'opponent' && game.opponent ? `${game.ownScore} : ${game.opponent.score}` : `${game.heim?.score} : ${game.gast?.score}`;
-        const chip = result ? `<span class="dss-chip dss-chip--mono${OUTCOME_CHIP[result] ? ` ${OUTCOME_CHIP[result]}` : ''}" aria-hidden="true">${result}</span>` : '';
+        const chip = OUTCOMES.includes(result) ? `<span class="dss-chip dss-chip--mono${OUTCOME_CHIP[result] ? ` ${OUTCOME_CHIP[result]}` : ''}" aria-hidden="true">${esc(result)}</span>` : '';
         return `<td role="cell" class="dss-sch-res">${resultText(visible, ariaForResult(game, mode), game.provisional, chip)}</td>`;
       }
       case 'notice':
@@ -181,7 +181,7 @@ export function renderScheduleTable(props, options) {
     (caption ? `<caption class="dss-sr-only">${esc(caption)}</caption>` : '') +
     `<thead role="rowgroup"${mode === 'columns' ? '' : ' class="dss-sr-only"'}><tr role="row">${cols.map((col) => `<th scope="col" role="columnheader">${esc(col.label)}</th>`).join('')}</tr></thead>` +
     `<tbody role="rowgroup">${body}</tbody></table></div>`;
-  return framed(p, region, [title, str(p.meta), str(p.id), games.length], options);
+  return framed(p, region, options);
 }
 
 /** Zeitraster: Anwurfzeiten als Zeilen, Hallen oder Felder als Spalten. `options.notice(game)`: zusätzlicher Text in der Spielzelle. */
@@ -247,7 +247,7 @@ export function renderScheduleGrid(props, options) {
     (caption ? `<caption class="dss-sr-only">${esc(caption)}</caption>` : '') +
     `<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader" class="dss-sg-time">Zeit</th>${columns.map((c) => `<th scope="col" role="columnheader">${esc(c.label)}</th>`).join('')}</tr></thead>` +
     `<tbody role="rowgroup">${body}</tbody></table></div>`;
-  return framed(p, region, [title, str(p.meta), str(p.id), games.length, columns.length], options);
+  return framed(p, region, options);
 }
 
 /** Setzt `renderScheduleTable` in `el` ein (`options.time`, `options.notice` wie bei der Render-Funktion). */

@@ -38,7 +38,7 @@ function rules(mount: MountFn): Rules {
     return document.activeElement === host.querySelector('#tab-trigger') && host.querySelector('a')?.textContent === 'b';
   });
   run('mount: Fokus findet den Knoten über die id, auch wenn sich die Lage ändert', (host) => {
-    const render = ((p: { shift?: boolean }) => (p.shift ? '<div><p>x</p><button id="b">b</button></div>' : '<div><button id="b">b</button></div>')) as never;
+    const render = ((p: { shift?: boolean }) => (p.shift ? '<div><button id="a0">a</button><p>x</p><button id="b">b</button></div>' : '<div><button id="a0">a</button><button id="b">b</button></div>')) as never;
     const h = mount(host, render, {});
     host.querySelector<HTMLElement>('#b')!.focus();
     h.update({ shift: true });
@@ -57,6 +57,38 @@ function rules(mount: MountFn): Rules {
     mount(host, renderTable as never, props);
     click(host.querySelector('#tab-trigger')!);
     return host.querySelector(':scope > .dss-acc') !== null && host.querySelector<HTMLElement>('#tab-panel')!.hidden === false;
+  });
+  run('mount: im Panel eines fremden Bereichs bekommt der Rahmen eine eigene Gruppe', (host) => {
+    host.className = 'dss-acc';
+    host.append(document.createRange().createContextualFragment('<div class="dss-acc-item"><div class="dss-acc-panel"><div id="inner"></div></div></div>'));
+    const inner = host.querySelector<HTMLElement>('#inner')!;
+    mount(inner, renderTable as never, props);
+    click(inner.querySelector('#tab-trigger')!);
+    return inner.querySelector(':scope > .dss-acc') !== null && inner.querySelector('#tab-trigger')!.getAttribute('aria-expanded') === 'true';
+  });
+  run('mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', (host) => {
+    const h = mount(host, renderTable as never, { title: 'T', rows: [['a']] });
+    const before = host.querySelector('table');
+    h.update({ title: 'T', rows: [['a']] });
+    const same = host.querySelector('table') === before;
+    host.querySelector<HTMLElement>('.dss-table-scroll')!.scrollLeft = 40;
+    h.update({ title: 'T', rows: [['b']] });
+    return same && host.querySelector('table') !== before && host.querySelector<HTMLElement>('.dss-table-scroll')!.scrollLeft === 40;
+  });
+  run('mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', (host) => {
+    mount(host, ((p: object) => `<div id="d" style="left:10%;top:20%"></div><div id="e" style="color:red;left:1px"></div>${JSON.stringify(p) ? '' : ''}`) as never, {});
+    const d = host.querySelector<HTMLElement>('#d')!;
+    const e = host.querySelector<HTMLElement>('#e')!;
+    return d.style.left === '10%' && d.style.top === '20%' && !d.hasAttribute('data-dss-style') && e.style.color === '' && e.style.left === '1px';
+  });
+  run('mount: ein Ereignis außerhalb von el (Vorfahr passt zum Selektor) löst den Handler nicht aus', (host) => {
+    host.className = 'x';
+    const inner = document.createElement('div');
+    host.append(inner);
+    let calls = 0;
+    mount(inner, (() => '<span id="s">s</span>') as never, {}, { on: [{ type: 'click', selector: '.x', handler: () => { calls += 1; } }] });
+    click(inner.querySelector('#s')!);
+    return calls === 0;
   });
   run('mount: in einer vorhandenen Gruppe keine zweite', (host) => {
     host.className = 'dss-acc';
@@ -99,9 +131,9 @@ function rules(mount: MountFn): Rules {
     return first === 0 && second === 1;
   });
   run('mount: update nach destroy ändert nichts', (host) => {
-    const h = mount(host, (() => '<p>neu</p>') as never, {});
+    const h = mount(host, ((p: { v?: boolean }) => (p.v ? '<p>neu</p>' : '<i></i>')) as never, {});
     h.destroy();
-    h.update({});
+    h.update({ v: true });
     return host.querySelector('p') === null;
   });
   run('mount: uid gleich bei update (ids bleiben stabil)', (host) => {
@@ -120,9 +152,15 @@ const MUTATIONS: { name: string; rule: string; from: string; to: string; after?:
   { name: 'Fokus nicht über die id', rule: 'mount: Fokus findet den Knoten über die id, auch wenn sich die Lage ändert', from: "if (memo.id) target = [...host.querySelectorAll('[id]')].find((el) => el.id === memo.id) ?? null;", to: '' },
   { name: 'Zustand wird nicht gehalten', rule: 'mount: der Zustand offen/zu bleibt bei gleichem open erhalten, ein geändertes open gilt', from: 'if (live !== undefined && next.open === previous.open) props = { ...next, open: live };', to: '' },
   { name: 'open-Änderung wird ignoriert', rule: 'mount: der Zustand offen/zu bleibt bei gleichem open erhalten, ein geändertes open gilt', from: 'next.open === previous.open', to: 'true' },
-  { name: 'keine eigene Gruppe', rule: 'mount: ohne Gruppe legt mount eine an und bedient den Rahmen', from: 'const needsGroup = (next) => Boolean(next.collapsible) && !el.closest(`.${GROUP}`);', to: 'const needsGroup = () => false;' },
+  { name: 'keine eigene Gruppe', rule: 'mount: ohne Gruppe legt mount eine an und bedient den Rahmen', from: 'if (!group) return true;', to: 'if (!group) return false;' },
+  { name: 'Panel ignoriert', rule: 'mount: im Panel eines fremden Bereichs bekommt der Rahmen eine eigene Gruppe', from: 'return Boolean(panel) && panel.closest(`.${GROUP}`) === group && group !== el;', to: 'return false;' },
+  { name: 'identisches Markup wird ersetzt', rule: 'mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', from: 'if (previous && html === lastHtml && wantsGroup === Boolean(wrapper)) {', to: 'if (false) {' },
+  { name: 'Scrollposition geht verloren', rule: 'mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', from: 'restoreScrolls(wrapper ?? el, scrolls);', to: '' },
+  { name: 'style bleibt Attribut', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', from: "host.replaceChildren(range.createContextualFragment(deferStyles(html)));\n    applyStyles(host);", to: 'host.replaceChildren(range.createContextualFragment(html));' },
+  { name: 'beliebige Eigenschaften', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', from: 'if (STYLE_PROPS.has(name) && ', to: 'if (' },
+  { name: 'Handler ohne el.contains', rule: 'mount: ein Ereignis außerhalb von el (Vorfahr passt zum Selektor) löst den Handler nicht aus', from: 'if (target && el.contains(target)) rule.handler(event, target);', to: 'if (target) rule.handler(event, target);' },
   { name: 'Accordion nicht gestartet', rule: 'mount: ohne Gruppe legt mount eine an und bedient den Rahmen', from: 'if (wantsGroup && !accordion) accordion = initAccordion(wrapper);', to: '' },
-  { name: 'immer eine Gruppe', rule: 'mount: in einer vorhandenen Gruppe keine zweite', from: '&& !el.closest(`.${GROUP}`)', to: '' },
+  { name: 'immer eine Gruppe', rule: 'mount: in einer vorhandenen Gruppe keine zweite', from: 'if (!next.collapsible) return false;', to: 'if (!next.collapsible) return false;\n    if (true) return true;' },
   { name: 'Inhalt nicht wiederhergestellt', rule: 'mount: destroy stellt den früheren Inhalt wieder her', from: 'el.replaceChildren(...original);', to: 'el.replaceChildren();' },
   { name: 'Markup bleibt nach destroy', rule: 'mount: destroy stellt den früheren Inhalt wieder her', from: 'el.replaceChildren(...original);', to: '' },
   { name: 'Accordion bleibt nach destroy', rule: 'mount: destroy baut das Accordion ab (Klick bleibt ohne Wirkung)', from: '    done = true;\n    accordion?.destroy();', to: '    done = true;' },
