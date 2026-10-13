@@ -65,8 +65,8 @@ describe('ScheduleTable: renderScheduleTable gegen Svelte und React', () => {
   it('time und notice als Text je Spiel', async () => {
     const time = (g: { time?: string }) => `um ${g.time}`;
     const notice = (g: { id: string }) => `Konflikt ${g.id} <x>`;
-    const v = normalize(renderScheduleTable({ games: VERSUS.slice(0, 3) } as never, { time, notice }));
-    const react = await p.react('ScheduleTable', { games: VERSUS.slice(0, 3), renderTime: time, renderNotice: notice });
+    const v = normalize(renderScheduleTable({ games: VERSUS.slice(0, 3), layout: 'columns' } as never, { time, notice }));
+    const react = await p.react('ScheduleTable', { games: VERSUS.slice(0, 3), layout: 'columns', renderTime: time, renderNotice: notice });
     expect(v).toBe(react);
     expect(v).toContain('Konflikt a');
     expect(v).not.toContain('<x>');
