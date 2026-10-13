@@ -13,7 +13,7 @@ Der neuere Vanilla-Plan konkretisiert den älteren Review. Aufgaben aus historis
 
 . Fokusmanagement und Tastaturparität: Modal und Tabs laut Lückenplan.
 . Eingabesicherheit: URL-Regeln und künftige Renderer.
-. Karten-Lifecycle: widersprüchlicher Speicherbefund und fehlender Retry laut Plan.
+. Karten-Lifecycle: in Chromium bei wiederholtem Auf- und Abbau stabil gemessen; ein eigener Wiederholen-Knopf nach einem Fehler fehlt (neue `tileUrl` löst einen neuen Versuch aus). Firefox ist im Prüflauf noch nicht abgedeckt.
 . Prüflücken: Browsermatrix, CSP und vollständige Docs-Prüfungen.
 . Auslieferung: noch nicht abgeschlossener Vanilla-Releaseprozess.
 . Dokumentationsdrift: abweichende Versionen, Begriffe und Planstände.
