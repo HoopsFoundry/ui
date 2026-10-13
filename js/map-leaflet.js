@@ -61,7 +61,8 @@ export function pinElement(item) {
 
 /**
  * Erzeugt die Karte in `el`. `opts`: markers, appLinks, center, zoom, interactive, tileUrl (alles wie die Props der Komponente).
- * `hooks`: onReady(map), onError(reason), onZoom({ zoom, min, max }), onMarkerClick(item).
+ * `hooks`: onReady(map), onError(reason), onZoom({ zoom, min, max }), onMarkerClick(item), loadLeaflet() (liefert Leaflet als Promise; ohne
+ * Angabe `import('leaflet')`: so kann eine Seite ohne Bundler Leaflet aus einer lokalen Datei laden).
  * Gründe für `onError`: 'tile-url' (ungültige Adresse), 'import' (Leaflet fehlt oder lässt sich nicht laden), 'init' (Aufbau der Karte schlägt fehl), 'update' (Aktualisierung wirft), 'tiles' (die ersten sichtbaren Kacheln alle fehlgeschlagen; eine Karte, die schon Kacheln zeigte, kippt nicht mehr).
  * Rückgabe: `update(opts)`, `zoomIn()`, `zoomOut()`, `destroy()` (ruft `map.remove()`; auch während des Ladens sicher).
  */
@@ -163,13 +164,15 @@ export function createMapController(el, opts, hooks = {}) {
     if (!validTileUrl(url)) return fail('tile-url', url);
     let mod;
     try {
-      mod = await import('leaflet');
+      mod = await (typeof hooks.loadLeaflet === 'function' ? hooks.loadLeaflet() : import('leaflet'));
     } catch (error) {
       return fail('import', error);
     }
     if (destroyed) return;
     try {
-      L = mod.default ?? mod;
+      L = mod?.default && typeof mod.default.map === 'function' ? mod.default : mod;
+      // Ein Lader, der etwas anderes als Leaflet liefert (undefined, ein Modul ohne `map`), ist ein Importfehler, kein Fehler im Aufbau
+      if (!L || typeof L.map !== 'function' || typeof L.tileLayer !== 'function') return fail('import', new Error('Leaflet fehlt: `map` oder `tileLayer` nicht gefunden'));
       const calm = reducedMotion();
       map = L.map(el, {
         zoomControl: false, attributionControl: false, minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM,

@@ -11,7 +11,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
-// Größenbudget (gemessen: 36,1 KB min, 12,9 KB gzip; Reserve für kleine Ergänzungen, V2 hebt es bewusst an)
+// Größenbudget (gemessen: 36,3 KiB min, 12,9 KiB gzip; Reserve für kleine Ergänzungen; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
 export const BUDGET = { minBytes: 40 * 1024, gzipBytes: 15 * 1024 };
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
@@ -53,7 +53,7 @@ describe('Bündel dist/vanilla', () => {
     expect(text('dss.css')).toContain(`--dss-version: "${pkg.version}"`);
   });
   it('DSS_BLOCKS nennt alle Bausteine von initAll', () => {
-    expect(mod.DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme', 'tabs', 'modal']);
+    expect(mod.DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme', 'tabs', 'modal', 'map']);
   });
   it('kein import, kein require: das Bündel ist eine Datei ohne Abhängigkeiten (kein React, Svelte, Radix, Leaflet)', () => {
     for (const name of ['dss.js', 'dss.min.js']) {

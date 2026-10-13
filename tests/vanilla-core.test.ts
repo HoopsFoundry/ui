@@ -124,8 +124,8 @@ describe('parseOptions', () => {
 });
 
 describe('Modul', () => {
-  it('kennt sechs Bausteine und exportiert die gemeinsamen Hilfen', () => {
-    expect(DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme', 'tabs', 'modal']);
+  it('kennt sieben Bausteine (die Karte kommt aus dem Karten-Bündel) und exportiert die gemeinsamen Hilfen', () => {
+    expect(DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme', 'tabs', 'modal', 'map']);
     expect(core.reducedMotion).toBe(reducedMotion);
     expect(core.safeHref).toBe(safeHref);
     expect(typeof core.createHandle).toBe('function');

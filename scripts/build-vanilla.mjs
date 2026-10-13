@@ -1,5 +1,5 @@
-// Baut das Vanilla-Paket: dist/vanilla/dss.js (Kern: initX, initAll …) und dss-render.js (renderX/mountX), je als ES-Modul und minifiziert
-// (.min.js), mit Quellkarten und zusammengeführten Typen (dss.d.ts, dss-render.d.ts), dazu dss.css (tokens + components) und die Court-Linien,
+// Baut das Vanilla-Paket: dist/vanilla/dss.js (Kern: initX, initAll …), dss-render.js (renderX/mountX) und dss-map.js (Karte: renderMap/initMap/
+// mountMap), je als ES-Modul und minifiziert (.min.js), mit Quellkarten und zusammengeführten Typen (dss.d.ts, dss-render.d.ts, dss-map.d.ts), dazu dss.css (tokens + components) und die Court-Linien,
 // auf die dss.css verweist. dss-render.js bringt das Accordion-Verhalten nicht selbst mit, sondern importiert es aus dem Kern (./dss.js
 // bzw. ./dss.min.js im selben Ordner): so gibt es genau eine Kopie des Verhaltens auf der Seite. `npm run build:vanilla`; die Tests rufen buildVanilla() mit einem eigenen Zielordner auf.
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
@@ -32,6 +32,12 @@ export async function buildVanilla({ outDir = `${root}dist/vanilla` } = {}) {
   await build({ ...common, entry: { 'dss-render': renderEntry }, minify: false, esbuildPlugins: [coreAs('dss.js')] });
   await build({ ...common, entry: { 'dss-render.min': renderEntry }, minify: true, esbuildPlugins: [coreAs('dss.min.js')] });
   await build({ ...common, entry: { 'dss-render': `${root}js/render/index.d.ts` }, dts: { only: true }, sourcemap: false });
+
+  // Karten-Bündel: eigenes Bündel (Leaflet-Anbindung, Zustände, Markup), Leaflet bleibt außerhalb (dynamischer Import erst nach dem Klick)
+  const mapEntry = `${root}js/map-bundle.js`;
+  await build({ ...common, entry: { 'dss-map': mapEntry }, minify: false, external: ['leaflet'] });
+  await build({ ...common, entry: { 'dss-map.min': mapEntry }, minify: true, external: ['leaflet'] });
+  await build({ ...common, entry: { 'dss-map': `${root}js/map-bundle.d.ts` }, dts: { only: true }, sourcemap: false });
 
   // CSS: Tokens zuerst, dann die Komponenten; die Version steht als Eigenschaft auf :root (Abgleich mit VERSION im Bündel)
   const tokens = await readFile(`${root}tokens/tokens.css`, 'utf8');

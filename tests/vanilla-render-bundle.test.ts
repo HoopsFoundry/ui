@@ -11,7 +11,7 @@ import * as source from '../js/render/index.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Render-Bündel (gemessen: 49 877 B = 48,7 KiB min, 16 902 B = 16,5 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 36 976 B, 13 209 B).
+// Eigenes Budget für das Render-Bündel (gemessen: 51 288 B = 50,1 KiB min, 17 443 B = 17,0 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 37 164 B, 13 241 B; die Karte liegt im Bündel dss-map).
 // Begründung: zehn Komponenten mit Markup, Logik aus league/schedule/team/venue/map; das Accordion kommt aus dem Kern und zählt hier nicht.
 export const RENDER_BUDGET = { minBytes: 52 * 1024, gzipBytes: 18 * 1024 };
 
@@ -41,7 +41,9 @@ describe('Render-Bündel dist/vanilla/dss-render', () => {
       expect(imports, name).toEqual([core]);
       expect(code, name).not.toMatch(/\brequire\(/);
       expect(code, name).not.toMatch(/import\(/);
-      for (const word of ['react', 'svelte', 'radix', 'leaflet']) expect(code.toLowerCase(), `${name}: ${word}`).not.toContain(word);
+      for (const word of ['react', 'svelte', 'radix']) expect(code.toLowerCase(), `${name}: ${word}`).not.toContain(word);
+      // Leaflet gehört nicht ins Bündel (die Karte kommt über die Option `initMap` aus dss-map.js); `loadLeaflet` ist nur ein Optionsname
+      expect(code, `${name}: leaflet`).not.toMatch(/from\s*["']leaflet|import\(\s*["']leaflet|require\(\s*["']leaflet/);
     }
   });
   it('kein innerHTML, outerHTML, insertAdjacentHTML, document.write, eval oder new Function', () => {

@@ -113,8 +113,8 @@ const M: Mutation[] = [
   { file: 'core', name: 'Logo-Adresse ohne attr (M03)', rule: 'Logo: die Adresse steht maskiert im Attribut (kein Ausbruch über ein Anführungszeichen)', from: '<img src="${attr(team.logo)}" alt="" loading="lazy">', to: '<img src="${team.logo}" alt="" loading="lazy">' },
   { file: 'table', name: 'Kopfzelle im Kopf mit scope row (M28)', rule: 'Table: Kopfzelle im Rumpf als th scope="row", im Kopf scope="col"', from: "tag === 'th' ? 'col' : 'row'", to: "'row'" },
   { file: 'map-view', name: 'Höhe ohne Obergrenze', rule: 'mapHeight: zwischen 200 und 2000 Pixel', from: 'Math.min(2000, Math.max(200, height))', to: 'Math.max(200, height)' },
-  { file: 'map-view', name: 'Karte laden immer bedienbar', rule: 'VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', from: "${p.loadReady === true ? '' : ' disabled aria-disabled=\"true\"'}", to: '' },
-  { file: 'venue-card', name: 'mapActive ignoriert', rule: 'VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', from: 'loadReady: obj(options).mapActive === true,', to: 'loadReady: false,' },
+  { file: 'map-view', name: 'Karte laden immer bedienbar', rule: 'VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', from: "${enabled ? '' : ' disabled aria-disabled=\"true\"'}", to: '' },
+  { file: 'venue-card', name: 'mapActive ignoriert', rule: 'VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', from: 'loadReady: obj(options).mapActive === true }, uid)', to: 'loadReady: false }, uid)' },
   { file: 'league-card', name: 'ids nur aus dem Titel', rule: 'ids: andere Eingabe, andere Kennung (zwei Ligencards gleichen Titels)', from: 'uid: uidFor(p, options)', to: 'uid: uidFor(title, options)' },
   // match-card.js
   { file: 'match-card', name: 'Verlierer ohne Zustand', rule: 'MatchCard: Verlierer nur bei beendetem Spiel', from: "const gastWin = state === 'finished' && ", to: 'const gastWin = ' },
