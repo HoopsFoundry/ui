@@ -163,7 +163,7 @@ const M: Mutation[] = [
   { file: 'map-view', name: 'immer laden', rule: 'VenueCard: vor dem Klick keine Kartenfläche und kein Bild (kein Netz)', from: "p.load === 'auto' ? 'loading' : 'idle'", to: "'loading'" },
   { file: 'map-view', name: 'auto ohne Fläche', rule: 'VenueCard: load=auto zeigt die Kartenfläche (inert) ohne Schaltfläche', from: "state === 'loading' ? `<div class=\"dss-map-canvas\"", to: "false ? `<div class=\"dss-map-canvas\"" },
   { file: 'map-view', name: 'Hinweis ohne esc', rule: 'VenueCard: Name, Adresse, Info, Spiele maskiert', from: '<p class="dss-map-note">${esc(privacy)}</p>', to: '<p class="dss-map-note">${privacy}</p>' },
-  { file: 'map-view', name: 'Beschriftung ohne attr', rule: 'VenueCard: Name, Adresse, Info, Spiele maskiert', from: 'aria-label="${attr(str(p.label))}"', to: 'aria-label="${str(p.label)}"' },
+  { file: 'map-view', name: 'Beschriftung ohne attr', rule: 'VenueCard: Name, Adresse, Info, Spiele maskiert', from: 'aria-label="${attr(p.label)}"', to: 'aria-label="${p.label}"' },
 ];
 
 describe('Mutationstests: Render-Funktionen', () => {
