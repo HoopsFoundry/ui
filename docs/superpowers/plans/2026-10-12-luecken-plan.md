@@ -37,6 +37,16 @@ Aufwand: S = unter einem halben Tag, M = bis ein Tag, L = mehrere Tage. Jedes Pa
 | 3.5 | Entscheidung `FavoriteButton` (Merken) im DSS | Rückfrage an dich; wenn ja: Komponente `aria-pressed` + `js/favorites.js` mit Speicher-Adapter | M |
 | 3.6 | Seitenkopf/Hero des Portals als DSS-Bausteine (`PageHeader`, `Hero`) | Nur wenn mehrere Seiten sie brauchen; Bedarf mit dir klären | M |
 
+### Rahmenentscheidung: Frameworks und Storybook (Stand 2026-10-13)
+Die meisten eigenen Anwendungen nutzen Vanilla oder Svelte; für die Verbreitung nach außen sind React, Vue und Angular wichtig. Vorgehen: Storybook bleibt vorerst bei Svelte (kein Umbau wegen des MCP-Addons). Die Vanilla-Fassung (CSS, `init*`, `render*`/`mount*`) ist die gemeinsame Brücke für Vue und Angular (dünne Wrapper, keine eigenen Komponenten). React bleibt die dritte native Fassung.
+
+| # | Aufgabe | Plan | Aufwand |
+|---|---|---|---|
+| 3.7 | Storybook-MCP-Addon (Dev-Toolset) | Addon installieren, Storybook auf 10.6.2 anheben; Docs-Toolset entfällt (kein Manifest für Svelte) | S |
+| 3.8 | Komponentenkatalog für Agenten (Q-08) | aus `parity.manifest.json`, Props-Tabellen und `exports` generieren (`docs/catalog`), Test gegen Exports | M |
+| 3.9 | Vue/Angular-Einbindung | Doku-Seite mit Wrapper-Mustern über `mount*`/`init*`; erst bei konkretem Bedarf eigene Pakete | S |
+| 3.10 | React-Storybook (Composition) | nur bei Bedarf der externen Verbreitung; zweites Storybook neben dem Svelte-Storybook | L |
+
 ## Welle 4: Projekt-Pflege und Release
 | # | Lücke | Plan | Aufwand |
 |---|---|---|---|
