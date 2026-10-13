@@ -11,7 +11,7 @@ import * as source from '../js/map-bundle.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Karten-Bündel (gemessen: 21 913 B = 21,4 KiB min, 9 007 B = 8,8 KiB gzip). Begründung: Zustände und Markup der Karte, die
+// Eigenes Budget für das Karten-Bündel (gemessen: 22 053 B = 21,5 KiB min, 9 055 B = 8,8 KiB gzip). Begründung: Zustände und Markup der Karte, die
 // Leaflet-Anbindung (Marker, Gesten, Fehlerfälle) und die Logik aus map.js; Leaflet selbst gehört nicht dazu, es wird erst nach dem Klick geladen.
 export const MAP_BUDGET = { minBytes: 24 * 1024, gzipBytes: 10 * 1024 };
 export const MAP_EXPORTS = ['VERSION', 'initMap', 'initMapBlock', 'mountMap', 'renderMap'];

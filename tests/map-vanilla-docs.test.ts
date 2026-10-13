@@ -157,3 +157,33 @@ describe('Beispiel Hallenkarte vom Server', () => {
     expect(html).toContain('data-dss-options="');
   });
 });
+
+describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
+  it('README, CHANGELOG, Einführung und Foundation/Vanilla nennen die Karte ohne Framework', () => {
+    expect(read('README.md')).toContain('dss-map.js');
+    expect(read('README.md')).toContain('loadLeaflet');
+    expect(read('CHANGELOG.md')).toContain('Vanilla-Paket V2b');
+    expect(read('stories/Introduction.mdx')).toContain('mountMap');
+    expect(read('stories/Foundation/Vanilla.mdx')).toContain('## Karte');
+    expect(read('stories/Map.mdx')).toContain('## Ohne Build einbinden');
+    expect(read('stories/Map.mdx')).toContain('ADR-003');
+    expect(read('stories/VenueCard.mdx')).toContain('initMap');
+  });
+  it('arc42: ADR-003, ADR-005 und ADR-007 nennen die Vanilla-Karte, das Karten-Bündel und seine Größen in KiB; keine Planstände', () => {
+    const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
+    expect(adr).toContain('Vanilla-Fassung: `js/map-vanilla.js`');
+    expect(adr).toContain('`dss-map.js` (Karte)');
+    expect(adr).toContain('Karte 24 KiB min und 10 KiB gzip');
+    expect(read('docs/architecture/sections/05-building-block-view.adoc')).toContain('`js/map-vanilla.js`');
+    expect(read('docs/architecture/sections/06-runtime-view.adoc')).toContain('`initMap` und `mountMap`');
+    for (const file of ['01-introduction-and-goals', '04-solution-strategy', '05-building-block-view', '06-runtime-view', '07-deployment-view', '08-crosscutting-concepts', '09-architecture-decisions', '11-risks-and-technical-debt', '12-glossary']) {
+      const text = read(`docs/architecture/sections/${file}.adoc`);
+      expect(text, file).not.toMatch(/\bV[123][ab]?\b|feat\/|\bKB\b|\bMB\b/);
+    }
+  });
+  it('die Zahlen der Doku stimmen mit dem Bündel überein (KiB)', () => {
+    const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
+    expect(adr).toMatch(/gemessen 21,5 und 8,8/);
+    expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 24, gzipKB: 10 };');
+  });
+});

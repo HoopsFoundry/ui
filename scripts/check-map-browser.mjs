@@ -379,6 +379,22 @@ async function checkMany(ctx, origin, browserName) {
   await waitFor(() => page.evaluate(() => Object.keys(window.__maps).length >= 3), 'k2 im Platzhalter, k3..k5 verborgen');
   // k1 bleibt idle, k2 lädt automatisch, k3 bis k5 laden in verborgenen Behältern
   record(`${browserName} · mehrere Karten: k1 idle, k2 (auto) ready, jede Karte eine eigene Leaflet-Karte`, (await stateOf(page, '#k1 .dss-map')) === 'idle' && (await stateOf(page, '#k2 .dss-map')) === 'ready');
+  // Vereinssitz: Haus statt Nummer, Name mit Zusatz, Nummerierung der übrigen Orte von 1 an; darkTiles invert wirkt im Dunkelmodus auf die Kachelebene
+  const seat = await page.evaluate(() => {
+    const markers = [...document.querySelectorAll('#k2 .leaflet-marker-icon')];
+    const seatMarker = markers.find((m) => m.classList.contains('is-seat'));
+    return {
+      seats: markers.filter((m) => m.classList.contains('is-seat')).length,
+      house: seatMarker?.querySelector('.dss-map-pin-house') !== null,
+      name: seatMarker?.getAttribute('aria-label') ?? '',
+      numbers: markers.filter((m) => !m.classList.contains('is-seat')).map((m) => m.querySelector('.dss-map-pin-num')?.textContent).sort(),
+      tiles: document.querySelector('#k2 .dss-map').getAttribute('data-tiles'),
+    };
+  });
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
+  const filter = await page.evaluate(() => getComputedStyle(document.querySelector('#k2 .leaflet-tile-pane .dss-map-tiles') ?? document.querySelector('#k2 .dss-map-tiles')).filter);
+  await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+  record(`${browserName} · Vereinssitz und darkTiles: Haus, Name „…, Vereinssitz“, Orte von 1 an, im Dunkelmodus invertiert`, seat.seats === 1 && seat.house && seat.name.endsWith('Vereinssitz') && seat.numbers.join() === '1,2,3' && seat.tiles === 'invert' && /invert/.test(filter), { seat, filter });
   const sizeOk = (id) => page.evaluate((id) => {
     const el = document.querySelector(`#${id} .dss-map-canvas`); const m = window.__maps[id];
     if (!el || !m) return { ok: false, why: 'fehlt' };

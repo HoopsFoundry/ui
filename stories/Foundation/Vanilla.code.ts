@@ -168,8 +168,8 @@ export const bundleSizes = { js: 65891, min: 37164, gzip: 13241, css: 179156 };
 /** Budgets in KiB (1 KiB = 1024 Byte); die Namen behalten das alte Kürzel. */
 export const budget = { minKB: 40, gzipKB: 15 };
 /** Das Render-Bündel (dss-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
-export const renderSizes = { js: 80984, min: 51288, gzip: 17443 };
+export const renderSizes = { js: 81042, min: 51312, gzip: 17450 };
 export const renderBudget = { minKB: 52, gzipKB: 18 };
 /** Das Karten-Bündel (dss-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
-export const mapSizes = { js: 38203, min: 21913, gzip: 9007 };
+export const mapSizes = { js: 38482, min: 22053, gzip: 9055 };
 export const mapBudget = { minKB: 24, gzipKB: 10 };
