@@ -17,6 +17,8 @@ import { chromium } from 'playwright';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const STATIC = resolve(process.argv[2] ?? 'storybook-static');
+// optional: nur Seiten, deren id den Text enthält (z. B. `venuecard`)
+const FILTER = process.argv[3] ?? '';
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.map': 'application/json' };
 const PAGES = [
   ['docs', 'components-map--docs'], ['docs', 'components-venuecard--docs'], ['docs', 'foundation-vanilla--docs'], ['docs', 'introduction--docs'],
@@ -49,7 +51,7 @@ for (const brand of ['bbv', 'dbb']) {
   for (const theme of ['Light', 'Dark']) {
     for (const width of [1280, 420]) {
       const ctx = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: theme === 'Dark' ? 'dark' : 'light' });
-      for (const [kind, id] of PAGES) {
+      for (const [kind, id] of PAGES.filter(([, pageId]) => pageId.includes(FILTER))) {
         const page = await ctx.newPage();
         const url = `${origin}/iframe.html?viewMode=${kind}&id=${id}&globals=brand:${brand};theme:${theme}`;
         await page.goto(url, { waitUntil: 'networkidle' });
@@ -60,8 +62,8 @@ for (const brand of ['bbv', 'dbb']) {
             const rules = { ...Object.fromEntries(extra.map((r) => [r, { enabled: true }])), ...Object.fromEntries(off.map((r) => [r, { enabled: false }])) };
             const target = document.querySelector(context) ?? document;
             const out = await window.axe.run({ include: [target], exclude: exclude.map((s) => [s]) }, { runOnly: { type: 'tag', values: tags }, rules });
-            // Storybook selbst (Links der MDX-Seiten, Schalter „Show code“, Hilfsklassen `css-…`) gehört nicht zu den Komponenten
-            const chrome = (n) => n.target.some((t) => /\.sbdocs|\.docblock|\.sb-|\.css-[a-z0-9]+/.test(t));
+            // Storybook selbst (Links der MDX-Seiten, Schalter „Show code“, Syntaxfarben, Hilfsklassen `css-…`) gehört nicht zu den Komponenten
+            const chrome = (n) => n.target.some((t) => /\.sbdocs|\.docblock|\.sb-|\.css-[a-z0-9]+|react-aria|\.token/.test(t));
             return out.violations
               .map((v) => ({ id: v.id, nodes: v.nodes.filter((n) => !chrome(n)).slice(0, 3).map((n) => `${n.target.join(' ')}: ${(n.failureSummary || '').split('\n')[1] ?? ''}`) }))
               .filter((v) => v.nodes.length > 0);

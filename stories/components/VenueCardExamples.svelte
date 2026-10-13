@@ -86,9 +86,9 @@
 {:else if example === 'handy-dunkel'}
   <!-- andere Hallen als bei 'handy': beide Vorschauen stehen auf einer Seite -->
   <div class="narrow">
-    <VenueCard {...venueProps(0)} games={games} logos names="short" tileUrl={tile} />
+    <VenueCard {...venueProps(0)} name="Sporthalle Nordhain Nord" games={games} logos names="short" tileUrl={tile} />
     <div class="gap"></div>
-    <VenueCard {...venueProps(1)} size="compact" tileUrl={tile} />
+    <VenueCard {...venueProps(1)} name="Mehrzweckhalle Seeberg Süd" size="compact" tileUrl={tile} />
   </div>
 {:else if example === 'vanilla'}
   <div use:vanilla={{ ...venueProps(13), name: 'Buchenhalle Süd', games: gamesPlain, tileUrl: tile, linkLabel: 'Zur Hallenseite' } as never}></div>
