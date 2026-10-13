@@ -11,7 +11,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
-// Größenbudget (gemessen: 34,7 KB min, 12,3 KB gzip; Reserve für kleine Ergänzungen, V2 hebt es bewusst an)
+// Größenbudget (gemessen: 36,1 KB min, 12,9 KB gzip; Reserve für kleine Ergänzungen, V2 hebt es bewusst an)
 export const BUDGET = { minBytes: 40 * 1024, gzipBytes: 15 * 1024 };
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
@@ -108,5 +108,13 @@ describe('Bündel dist/vanilla', () => {
     expect(pkg.scripts['build:react']).toBe('tsup');
     expect(pkg.scripts.prepare).toBe('npm run build');
     expect(pkg.scripts.build).toBe('npm run build:react && npm run build:vanilla');
+  });
+});
+
+describe('Paket: Peer-Abhängigkeiten', () => {
+  it('React 18 und 19 sind freigegeben (npm install im leeren Projekt ohne ERESOLVE)', () => {
+    expect(pkg.peerDependencies.react).toBe('^18.0.0 || ^19.0.0');
+    expect(pkg.peerDependencies['react-dom']).toBe('^18.0.0 || ^19.0.0');
+    expect(pkg.peerDependenciesMeta.react.optional).toBe(true);
   });
 });

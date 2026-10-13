@@ -69,6 +69,23 @@ describe('minifiziertes Bündel im Browser-Modell', () => {
     style.textContent = ':root { --dss-version: "0.1.0"; }';
     expect(bundle.checkVersion().match).toBe(false);
   });
+  it('checkVersion({ warn: true }) meldet fehlendes oder abweichendes Stylesheet mit console.warn, sonst still', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    bundle.checkVersion(document, { warn: true } as never);
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(String(warn.mock.calls[0][0])).toContain('dss.css ist nicht geladen');
+    bundle.checkVersion({ warn: true } as never);
+    expect(warn).toHaveBeenCalledTimes(2);
+    const style = document.createElement('style');
+    style.textContent = ':root { --dss-version: "0.0.1"; }';
+    document.head.append(style);
+    bundle.checkVersion(document, { warn: true } as never);
+    expect(String(warn.mock.calls[2][0])).toContain('passen nicht zusammen');
+    style.textContent = `:root { --dss-version: "${bundle.VERSION}"; }`;
+    bundle.checkVersion(document, { warn: true } as never);
+    expect(warn).toHaveBeenCalledTimes(3);
+    warn.mockRestore();
+  });
   it('dss.css enthält die Version, die das Bündel meldet', () => {
     expect(readFileSync(`${out}dss.css`, 'utf8')).toContain(`--dss-version: "${bundle.VERSION}"`);
   });

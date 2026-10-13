@@ -115,7 +115,7 @@ Probiere beide aus. Das Dialog öffnet sich über die ganze Seite, das zweite in
   ]}
 />
 
-Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das oberste auf Escape, Tab und Fokus; nach dem Schließen geht der Fokus an den Auslöser im darunter liegenden Modal. Die Rückgabe `{ destroy(), open(auslöser), close(grund), isOpen() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dasselbe Element ersetzt den ersten, `destroy()` schließt ein offenes Modal still, baut Fokus, Sperre und `inert` zurück und stellt das Markup wieder her.
+Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das oberste auf Escape, Tab und Fokus. Das gilt auch ohne `<dialog>`: das zweite Modal bekommt den Fokus, das darunter wird inert und mit dem Schließen des obersten wieder frei; nach dem Schließen geht der Fokus an den Auslöser im darunter liegenden Modal. Ist der Auslöser entfernt oder verborgen, bekommt die Fläche des darunter offenen Modals den Fokus, sonst `main` (sonst bleibt er unberührt), nie `body`. Ein Modal ohne zugänglichen Namen (kein `aria-labelledby`, kein `aria-label`, kein `.dss-m-title`) warnt in der Konsole. Im Druck gilt die Scroll-Sperre nicht (`@media print`). Die Rückgabe `{ destroy(), open(auslöser), close(grund), isOpen() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dasselbe Element ersetzt den ersten, `destroy()` schließt ein offenes Modal still, baut Fokus, Sperre und `inert` zurück und stellt das Markup wieder her.
 
 ### Überschriftenebene im Markup
 

@@ -15,7 +15,7 @@ import { createCleanups, createRegistry, listen, snapshotAttributes } from './li
 
 export const MODAL_OPEN_EVENT = 'dss:modalopen';
 export const MODAL_CLOSE_EVENT = 'dss:modalclose';
-const registry = createRegistry();
+const registry = createRegistry('modal');
 const instances = new WeakMap(); // Wurzel -> Handle
 const stack = []; // offene Modals, das oberste zuletzt (nur es reagiert auf Tastatur und Fokus)
 const locks = new WeakMap(); // Dokument -> Scroll-Sperre

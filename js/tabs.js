@@ -14,7 +14,7 @@ import { currentHash, hashTarget, revealAround, scrollToElement, writeHash } fro
 import { createCleanups, createHandle, createRegistry, listen, snapshotAttributes } from './lifecycle.js';
 
 export const TAB_EVENT = 'dss:tabchange';
-const registry = createRegistry();
+const registry = createRegistry('tabs');
 let uid = 0;
 
 const HORIZONTAL_KEYS = ['ArrowLeft', 'ArrowRight', 'Home', 'End'];

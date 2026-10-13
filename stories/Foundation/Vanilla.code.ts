@@ -93,5 +93,5 @@ Content-Security-Policy: script-src 'self' 'nonce-<zufällig je Antwort>'
 <script nonce="<zufällig je Antwort>">…</script>`;
 
 /** Gemessene Größen des Bündels (Bytes); der Test misst neu und verlangt, dass die Angaben um höchstens 5 % abweichen. */
-export const bundleSizes = { js: 62961, min: 35563, gzip: 12596, css: 178941 };
+export const bundleSizes = { js: 65507, min: 36976, gzip: 13239, css: 179156 };
 export const budget = { minKB: 40, gzipKB: 15 };

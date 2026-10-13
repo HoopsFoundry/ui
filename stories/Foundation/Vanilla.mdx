@@ -24,7 +24,7 @@ Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [
 
 ## Einbindung ohne Build
 
-Kopiere `dist/vanilla` (und optional `fonts/`) in dein Projekt (Abschnitt „Kopieren ins Projekt“), binde das Stylesheet ein und rufe `initAll` einmal auf. Eine vollständige Seite:
+Kopiere `dist/vanilla` (und optional `fonts/`) in dein Projekt (Abschnitt „Kopieren ins Projekt“), binde das Stylesheet ein und rufe `initAll` einmal auf. ES-Module laufen nur über `http(s)`: eine Seite, die per Doppelklick als `file://` geöffnet wird, lädt `dss.js` nicht (der Browser blockiert Modul-Skripte von `file://`); nimm einen lokalen Server (`npx serve _site`). Eine vollständige Seite:
 
 <CodeBlock label="Eine Seite ohne Build" language="HTML" code={vanilla} />
 
@@ -58,7 +58,7 @@ Mehrere Elemente je Baustein sind der Normalfall: jede Leiste, jedes Modal und j
 Alle Bausteine folgen derselben Regel (js/lifecycle.js):
 
 - **Nur `element` und seine Nachfahren:** kein globaler Zustand. Ausnahmen sind benannt: Das Modal sperrt das Scrollen von `<html>` und macht die Seite dahinter inert, solange es offen ist; der Dunkelmodus setzt ein Attribut auf `<html>`.
-- **Idempotent:** ein zweiter Aufruf für dasselbe Element baut die erste Fassung ab und ersetzt sie. Es gibt nie doppelte Listener oder doppelte Ereignisse.
+- **Idempotent:** ein zweiter Aufruf für dasselbe Element baut die erste Fassung ab und ersetzt sie. Es gibt nie doppelte Listener oder doppelte Ereignisse, auch wenn zwei Kopien des Bündels (oder Bündel und Einzelmodul) auf der Seite laufen: die Kopien teilen sich ein Register unter `Symbol.for('dss.registry')`. Zwei Kopien bleiben trotzdem unnötig; lade eine.
 - **`destroy()`** entfernt Listener, Beobachter, Zeitgeber und alles, was der Baustein erzeugt hat, und stellt Attribute wieder her, die er geändert hat (ein Test vergleicht das Markup vor `initAll` und nach `destroy()`). Er ist mehrfach aufrufbar.
 - **Beim Import passiert nichts:** kein Auto-Start, kein Zugriff auf `window` oder `document`. Das Bündel lässt sich in Node laden (für Tests und Server), die Init-Funktionen tun dort nichts.
 - **Bewegung:** sanftes Scrollen und Höhenanimationen entfallen bei „Bewegung reduzieren“ und `data-motion="reduce"` auf `<html>`.
@@ -95,7 +95,7 @@ Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, häl
   ]}
 />
 
-Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu).
+Das Budget hat noch rund 3,5 KB Polster (min) und 2 KB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die nächste Stufe (Render-Funktionen, `initMap`) teilt sich dieses Bündel und hebt das Budget bewusst an, nicht stillschweigend.
 
 ## Kopieren ins Projekt
 
@@ -103,7 +103,9 @@ Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines
 
 <CodeBlock label="portal-sync.mjs" language="JavaScript" code={syncSource} />
 
-Installiere das Paket mit `npm install github:OliEder/dss-design-system#v0.9.0` (der Schritt `prepare` baut `dist` mit `npm run build`) und rufe `node portal-sync.mjs` vor dem Veröffentlichen auf. Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `dss.css`.
+Installiere das Paket mit `npm install github:OliEder/dss-design-system#v0.9.0` (der Schritt `prepare` baut `dist` mit `npm run build`) und rufe `node portal-sync.mjs` vor dem Veröffentlichen auf. Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `dss.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
+
+**Das Zielverzeichnis gehört dem Paket:** `portal-sync.mjs` ersetzt `_site/dss` bei jedem Lauf vollständig. Es baut zuerst in einem Nachbarordner und benennt dann um (bei einem Fehler bleibt das alte Ziel), schreibt die Marker-Datei `.dss-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`).
 
 ## Versionsabgleich
 
@@ -111,6 +113,7 @@ JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Proj
 
 - `VERSION` ist die Version des Pakets, aus dem `dss.js` gebaut wurde.
 - `dss.css` setzt `--dss-version` auf `:root`; `cssVersion()` liest sie, `checkVersion()` liefert `{ js, css, match }`. Fehlt `dss.css` (oder kommt es aus einem anderen Paket), ist `css` `null` und `match` falsch.
+- `checkVersion({ warn: true })` meldet eine Abweichung oder ein fehlendes Stylesheet zusätzlich mit `console.warn` (zum Beispiel einmal beim Start der Seite).
 - `portal-sync.mjs` schreibt zusätzlich `version.json` neben die Dateien, für einen Vergleich im Build oder in der Pipeline.
 
 ## Alle Exporte

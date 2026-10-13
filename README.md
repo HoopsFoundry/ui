@@ -214,7 +214,7 @@ Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-sc
 
 ### Gebündelt, ohne Build (`dist/vanilla`)
 
-`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--dss-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 35 KB groß (gzip 12,3 KB, Budget 40 KB und 15 KB als Test). Beim Import passiert nichts, es lädt auch in Node.
+`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--dss-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 36 KB groß (gzip 12,9 KB, Budget 40 KB und 15 KB als Test, Polster gut 3,5 KB). Beim Import passiert nichts, es lädt auch in Node.
 
 ```html
 <link rel="stylesheet" href="/dss/dss.css" />
@@ -224,7 +224,7 @@ Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-sc
 </script>
 ```
 
-`stories/examples/portal-sync.mjs` zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet) aus `node_modules` nach `_site/dss` kopiert. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
+`stories/examples/portal-sync.mjs` zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet, falls installiert) aus `node_modules` nach `_site/dss` kopiert; das Ziel gehört dem Skript (Marker `.dss-sync`, Ersetzen über einen temporären Ordner). Die Peer-Abhängigkeiten sind optional, React `^18 || ^19`; `npm install` im leeren Projekt braucht kein `--legacy-peer-deps`. ES-Module brauchen `http(s)`, nicht `file://`. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
 
 ## Leisten mit begrenzter Inhaltsbreite
 

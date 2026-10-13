@@ -30,8 +30,20 @@ export function cssVersion(doc) {
   return raw || null;
 }
 
-/** Vergleicht JS und CSS: `{ js, css, match }`; `css` ist `null`, wenn `dss.css` nicht (aus demselben Paket) geladen ist. */
-export function checkVersion(doc) {
+/**
+ * Vergleicht JS und CSS: `{ js, css, match }`; `css` ist `null`, wenn `dss.css` nicht (aus demselben Paket) geladen ist.
+ * Aufruf `checkVersion(doc?, { warn })` oder `checkVersion({ warn })`: mit `warn: true` meldet `console.warn` eine Abweichung oder ein fehlendes Stylesheet.
+ */
+export function checkVersion(docOrOptions, maybeOptions) {
+  const isOptions = docOrOptions && typeof docOrOptions === 'object' && !('documentElement' in docOrOptions);
+  const doc = isOptions ? undefined : docOrOptions;
+  const options = (isOptions ? docOrOptions : maybeOptions) ?? {};
   const css = cssVersion(doc);
-  return { js: VERSION, css, match: css !== null && css === VERSION };
+  const result = { js: VERSION, css, match: css !== null && css === VERSION };
+  if (options.warn === true && !result.match) {
+    console.warn(css === null
+      ? `DSS: dss.css ist nicht geladen (JavaScript ${VERSION}). Binde dss.css aus demselben Paket ein.`
+      : `DSS: JavaScript ${VERSION} und CSS ${css} passen nicht zusammen. Kopiere dss.js und dss.css aus derselben Version.`);
+  }
+  return result;
 }

@@ -16,7 +16,7 @@ export const THEME_LABEL = 'Dunkelmodus';
 const MODES = ['light', 'dark', 'system'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const SYNC_EVENT = 'dss-theme-sync';
-const registry = createRegistry();
+const registry = createRegistry('theme');
 
 /** Gültiger Modus (`light`, `dark`, `system`) oder `null`. */
 export function parseTheme(value) {

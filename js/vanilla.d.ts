@@ -21,5 +21,6 @@ export type { ModalOptions, ModalHandle, ModalOpenDetail, ModalCloseDetail, Moda
 export const VERSION: string;
 /** Die Version des geladenen Stylesheets (`dss.css` setzt `--dss-version` auf `:root`) oder `null`, wenn es fehlt. */
 export function cssVersion(doc?: Document | null): string | null;
-/** Vergleicht JS und CSS; `css` ist `null`, wenn `dss.css` nicht geladen ist. */
-export function checkVersion(doc?: Document | null): { js: string; css: string | null; match: boolean };
+/** Vergleicht JS und CSS; `css` ist `null`, wenn `dss.css` nicht geladen ist. Mit `warn: true` meldet `console.warn` eine Abweichung. */
+export function checkVersion(doc?: Document | null, options?: { warn?: boolean }): { js: string; css: string | null; match: boolean };
+export function checkVersion(options: { warn?: boolean }): { js: string; css: string | null; match: boolean };

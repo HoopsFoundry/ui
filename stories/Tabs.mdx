@@ -82,7 +82,7 @@ Ein Filter mit Mehrfachauswahl (`role="group"`, `aria-pressed`, keine Panels) me
   head={['Option', 'Standard', 'Wirkung']}
   rows={[
     ['activation', "'auto'", <>Mit <code>'manual'</code> bewegen die Pfeiltasten nur den Fokus, Enter/Leertaste wählt. Svelte und React wählen immer sofort.</>],
-    ['hash', 'false', <>Deep-Link: <code>#id</code> eines Tabs, eines Panels oder eines Elements in einem Panel wählt den Tab (beim Start und bei <code>hashchange</code>); eine Wahl schreibt die Panel-id per <code>history.replaceState</code>.</>],
+    ['hash', 'false', <>Deep-Link: <code>#id</code> eines Tabs, eines Panels oder eines Elements in einem Panel wählt den Tab (beim Start und bei <code>hashchange</code>); eine Wahl schreibt die Panel-id per <code>history.replaceState</code>. Liegt die Leiste in einem geschlossenen Accordion-Bereich, einem einklappbaren Rahmen oder einem <code>&lt;details&gt;</code>, öffnet der Deep-Link ihn (<code>revealAround</code>, wie die PageNav).</>],
     ['value', 'erster Tab', 'Anfangstab (id, data-tab oder Index); sonst der markierte, sonst der erste nicht gesperrte.'],
     ['vertical, multi', 'aus dem Markup', <>Die Richtung folgt <code>aria-orientation="vertical"</code> oder <code>dss-tabs--vertical</code>, die Mehrfachauswahl <code>role="group"</code>. Rechts-nach-links kehrt links/rechts um.</>],
     ['onChange(detail)', '–', <>Wie das Ereignis <code>dss:tabchange</code> (blubbert bis zum Dokument): <code>detail</code> hat <code>index</code>, <code>id</code>, <code>tab</code>, <code>panel</code>, <code>source</code> (<code>user</code>, <code>hash</code>, <code>api</code>); bei <code>multi</code> auch <code>pressed</code> und <code>ids</code>.</>],

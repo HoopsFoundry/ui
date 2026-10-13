@@ -13,7 +13,7 @@ import { reducedMotion } from './motion.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const DEFAULTS = { label: 'Nach oben', showAfter: 480, gap: 16, avoid: '.dss-bnav' };
-const registry = createRegistry();
+const registry = createRegistry('backtop');
 
 /** Pfeil nach oben als SVG (aria-hidden), mit DOM-Aufrufen erzeugt. */
 function arrow(doc) {
