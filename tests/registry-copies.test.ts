@@ -42,4 +42,19 @@ describe('Register über Kopien hinweg', () => {
     keydown(document.getElementById('r-heim')!, 'ArrowRight');
     expect(spy).toHaveBeenCalledTimes(1);
   });
+  it('zwei geladene Kopien von accordion.js: ein Klick schaltet einmal, die erste Fassung wird abgebaut', async () => {
+    const source = read('js/accordion.js');
+    const first = (await loadModule(source)) as typeof import('../js/accordion.js');
+    const second = (await loadModule(`${source}\n// zweite Kopie`)) as typeof import('../js/accordion.js');
+    mountHtml('<div class="dss-acc" id="grp"><div class="dss-acc-item" id="a1"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a1t" aria-expanded="false" aria-controls="a1p">T</button></h3><div class="dss-acc-panel" id="a1p" hidden></div></div></div>');
+    const root = document.getElementById('grp')!;
+    const h1 = first.initAccordion(root, { syncHash: false });
+    const h2 = second.initAccordion(root, { syncHash: false });
+    document.getElementById('a1t')!.click();
+    expect(document.getElementById('a1t')!.getAttribute('aria-expanded')).toBe('true');
+    h2.destroy();
+    h1.destroy();
+    document.getElementById('a1t')!.click();
+    expect(document.getElementById('a1t')!.getAttribute('aria-expanded')).toBe('true');
+  });
 });

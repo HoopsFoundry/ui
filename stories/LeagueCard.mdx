@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs, collapsibleVanilla, collapsibleSvelte, collapsibleReact } from './LeagueCard.code';
+import { ligaRender, ligaEinklappbarRender } from './Render.code';
 
 <Meta of={LeagueCardStories} />
 
@@ -217,6 +218,16 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Oberliga Nordhain M
     ['zone', "'up' | 'playoff' | 'down'", 'Aufstieg, Relegation, Abstieg: Streifen, versteckter Text und Legende.'],
   ]}
 />
+
+## Vanilla: Ligencard aus Daten erzeugen
+
+Ohne Svelte und React erzeugt `renderLeagueCard(props)` aus denselben Eigenschaften den HTML-Text der Karte (läuft auch in Node, etwa im Crawler); `mountLeagueCard(el, props)` setzt ihn in ein Element ein und gibt `{ update(props), destroy() }` zurück. Texte laufen durch `esc`, Adressen durch `safeHref`, kein Markup von außen. Die Ausgabe ist dieselbe wie die der Komponente (ein Test vergleicht beide Fassungen). Der Ausschnitt der Tabelle (`limit`, eigene Mannschaft) kommt aus `leagueWindow`, derselben Funktion wie in Svelte und React. Zum Paket: die Seite `Foundation/Vanilla` (Abschnitt „Markup erzeugen“).
+
+<FrameworkCode label="LeagueCard aus Daten (Vanilla)" vanilla={ligaRender} />
+
+Mit `collapsible` startet `mountLeagueCard` das Accordion-Verhalten selbst; `update` hält den Zustand offen/zu, solange `open` gleich bleibt.
+
+<FrameworkCode label="Einklappbare Ligencard (Vanilla)" vanilla={ligaEinklappbarRender} />
 
 ## Dos und Don'ts
 

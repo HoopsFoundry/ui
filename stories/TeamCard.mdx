@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './TeamCard.code';
+import { teamRender } from './Render.code';
 
 <Meta of={TeamCardStories} />
 
@@ -101,6 +102,12 @@ Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket. Di
 Die Spielwiese zeigt die echte Komponente und ergänzt erfundene Logos für TSV Nordhain 1920 und die Gegner Lindenberg Hawks und BG Seeberg. Die Objekt-Felder (`record`, `next`, `last`, `squad`, `stats`) lassen sich im Controls-Reiter als JSON bearbeiten; leere Objekte oder weggelassene Felder blenden den jeweiligen Block aus.
 
 <Controls of={TeamCardStories.Spielwiese} />
+
+## Vanilla: Teamkarte aus Daten erzeugen
+
+`renderTeamCard(props)` liefert das Markup der Karte als Zeichenkette (auch in Node), `mountTeamCard(el, props, options)` setzt es ein und gibt `{ update(props), destroy() }` zurück. `href` und `leagueHref` gelten nur als sichere Ziele (`safeHref`); ein Klick-Handler kommt über `options.onClick` und macht den Namen zum Button. Die Ausgabe entspricht der Komponente; Bilanz, Platz, Kader und Statistik kommen aus `team.js`.
+
+<FrameworkCode label="TeamCard aus Daten (Vanilla)" vanilla={teamRender} />
 
 ## Dos und Don'ts
 

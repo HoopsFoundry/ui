@@ -12,6 +12,8 @@ flowchart TB
     F["fonts/, icons/"]
   end
   J["js/<br/>reine Logik + Vanilla initX"]
+  JR["js/render/<br/>renderX / mountX (Markup aus Daten)"]
+  B["dist/vanilla/<br/>dss.js (Kern) + dss-render.js"]
   S["svelte/*.svelte"]
   R["react/*.tsx → dist/react"]
   ST["stories/ + .storybook/"]
@@ -21,11 +23,15 @@ flowchart TB
   R --> C
   S --> J
   R --> J
+  JR --> J
+  B -. bündelt .-> J
+  B -. bündelt .-> JR
   ST --> S
   ST --> R
   TE -. prüft .-> S
   TE -. prüft .-> R
   TE -. prüft .-> J
+  TE -. prüft .-> JR
 ----
 
 [cols="1,2",options="header"]
@@ -35,12 +41,13 @@ flowchart TB
 |`css/` |Gemeinsame Komponentenstile
 |`fonts/`, `icons/` |Gestaltungsassets
 |`js/` |Gemeinsame Logik und Vanilla-Verhalten
+|`js/render/` |Vanilla-Render-Funktionen `renderX(props, options?) → string` und `mountX(el, props, options?) → { update, destroy }` für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips; `escape.js` (`esc`, `attr`), `core.js` (Teamname, Logo, Form, einklappbarer Rahmen), `mount.js` (`createContextualFragment`, Fokus, Accordion), `map-view.js` (Karten-Platzhalter, intern); die Logik kommt aus `js/*.js`
 |`react/` |React-Komponenten und Typen
 |`svelte/` |Svelte-Komponenten
 |`stories/` |Stories, MDX und Framework-Codebeispiele
 |`.storybook/` |Storybook-Konfiguration (`main.ts`, `preview.ts` mit `storySort` und Toolbar-Globals, Zustands-Umschalter, `storybook.css`)
 |`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
-|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
+|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (`dss.js` als Kern, `dss-render.js` als Render-Bündel mit eigenem Budget, siehe ADR-007; ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
 |`tests/` |Automatisierte Prüfungen
 |`scripts/` |Entwicklungs- und Prüfwerkzeuge
 |`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen

@@ -15,7 +15,7 @@
 . `update` aktualisiert unterstützte Optionen beziehungsweise Inhalte.
 . `destroy` entfernt eigene Listener, Observer und Ressourcen.
 
-Die tatsächlich vorhandenen Methoden unterscheiden sich je API. Der Vanilla-V2-Plan beschreibt zusätzliche `render*`- und `mount*`-APIs; sie sind nicht pauschal als verfügbar anzusehen.
+Die tatsächlich vorhandenen Methoden unterscheiden sich je API. Die `render*`- und `mount*`-APIs (V2a, `js/render/`) folgen demselben Muster: `renderX(props, options?)` erzeugt Markup als Zeichenkette (Browser und Node), `mountX(el, props, options?)` setzt es per `createContextualFragment` ein, startet bei `collapsible` `initAccordion`, hält bei `update` Fokus und Zustand offen/zu und stellt bei `destroy` den früheren Inhalt wieder her. `initMap`/`mountMap` (V2b) gibt es noch nicht; die Karte der Hallenkarte ist bis dahin ein Platzhalter ohne Netzverkehr.
 
 === Kartenfreigabe
 

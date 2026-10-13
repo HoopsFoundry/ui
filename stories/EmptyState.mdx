@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './EmptyState.code';
+import { leerRender } from './Render.code';
 
 <Meta of={EmptyStateStories} />
 
@@ -65,6 +66,12 @@ Dazu kommen Props, die sich nicht als Steuerelement zeigen lassen:
     ['className (nur React)', 'string', 'Zusätzliche Klasse am Wurzelelement.'],
   ]}
 />
+
+## Vanilla: EmptyState aus Daten erzeugen
+
+`renderEmptyState(props)` und `mountEmptyState(el, props, options)` erzeugen den Zustand aus den Eigenschaften der Komponente. Statt Snippets gibt es Daten: `actions` sind Links (`{ label, href }`), `extra` ein Zusatztext; das Symbol ist eine Sprite-ID wie `i-calendar`. Den Klick auf `cta` meldet `options.onCta`.
+
+<FrameworkCode label="EmptyState aus Daten (Vanilla)" vanilla={leerRender} />
 
 ## Dos und Don'ts
 

@@ -6,6 +6,7 @@ import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs } from './VenueCard.code';
+import { hallenRender } from './Render.code';
 
 <Meta of={VenueCardStories} />
 
@@ -150,6 +151,12 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Sporthalle Nordhain
     ['lat, lng', 'number', 'Koordinaten; nur beide gültig ergeben die Karte.'],
   ]}
 />
+
+## Vanilla: Hallenkarte aus Daten erzeugen
+
+`renderVenueCard(props)` liefert die Hallenkarte samt Karte als Platzhalter-Markup: Region, Hinweis mit „Karte laden“, Statuszeile, Quellenangabe und Ortsliste ohne Leaflet und ohne Netzverkehr. Die Links „Größere Karte“ und „Route planen“ sowie Adresse und Kontakt stehen als Text daneben. Erst `initMap` (nächste Stufe, V2b) macht die Karte lebendig (Kacheln, Zoom, Marker); bis dahin bleibt der Platzhalter, wie bei `MapView` vor dem Klick. Grenzen wie in der Komponente: `limit` 1 bis 5 (Standard 2), ohne beendete Spiele und Freilose.
+
+<FrameworkCode label="VenueCard aus Daten (Vanilla)" vanilla={hallenRender} />
 
 ## Dos und Don'ts
 

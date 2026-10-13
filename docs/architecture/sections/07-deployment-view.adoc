@@ -15,7 +15,7 @@ Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus
 
 Quelle: `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`.
 
-Am 12. Oktober 2026 wurde GitHub-Release mit `dist/vanilla` als erste Auslieferung festgelegt. Ab Version 1.0 ist npm vorgesehen. Release-Skript, Prüfsummen, Versionsabgleich und `portal-sync` sind laut Plan noch umzusetzen beziehungsweise abzunehmen.
+Am 12. Oktober 2026 wurde GitHub-Release mit `dist/vanilla` als erste Auslieferung festgelegt. Ab Version 1.0 ist npm vorgesehen. Release-Skript, Prüfsummen, Versionsabgleich und `portal-sync` sind laut Plan noch umzusetzen beziehungsweise abzunehmen. `dist/vanilla` enthält seit V2a zwei Bündel nebeneinander: `dss.js` (Kern) und `dss-render.js` (importiert `./dss.js`, siehe ADR-007); beide Dateien einer Version gehören zusammen kopiert.
 
 === Dokumentation und MCP
 

@@ -56,6 +56,7 @@ js/
   modal.js              ← Modal: `initModal`, `openModal`, `closeModal` (`./modal.js`)
   vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme|tabs|modal"` (`./vanilla-core.js`)
   vanilla.js            ← Einstieg des gebündelten Pakets `dist/vanilla` (`./vanilla`)
+  render/               ← `renderX`/`mountX` (Markup aus Daten, `./render.js`, `./render/*.js`); gebündelt `dss-render.js` (`./vanilla-render`)
   motion.js, url.js, lifecycle.js ← gemeinsame Grundlagen: `reducedMotion`, `safeHref`, das Muster `initX(root, options) → { destroy() }`
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
@@ -212,9 +213,13 @@ Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein 
 
 Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
 
+### Markup aus Daten (`renderX`, `mountX`)
+
+Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips erzeugen `renderLeagueCard(props)` & Co. dasselbe Markup wie die Svelte- und React-Komponenten als Zeichenkette (läuft in Node, etwa im Crawler); `mountLeagueCard(el, props, options)` setzt es per `createContextualFragment` ein und gibt `{ update(props), destroy() }` zurück. Alle Eingaben sind unvertraut: Texte durch `esc`, Ziele durch `safeHref`, kein Rohmarkup von außen. Die Hallenkarte liefert die Karte als Platzhalter (ohne Leaflet; „Karte laden“ ist bis `initMap` in V2b gesperrt). `mountX` setzt die wenigen `style`-Attribute über das CSSOM (CSP `style-src 'self'`); das Ergebnis von `renderX` braucht dafür `style-src-attr 'unsafe-inline'`. Import `@bbv/dss-design-system/render.js` (Einzelmodule `…/render/league-card.js` usw.) oder gebündelt `@bbv/dss-design-system/vanilla-render` (`dist/vanilla/dss-render.js`, importiert den Kern `dss.js` aus demselben Ordner; rund 48,7 KiB min, gzip 16,5 KiB, eigenes Budget 52 KiB und 18 KiB; `VERSION` muss zu `dss.js` und `dss.css` passen). Doku: Storybook `Foundation/Vanilla`, Abschnitt „Markup erzeugen“, und der Vanilla-Code-Tab auf jeder Komponentenseite.
+
 ### Gebündelt, ohne Build (`dist/vanilla`)
 
-`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--dss-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 36 KB groß (gzip 12,9 KB, Budget 40 KB und 15 KB als Test, Polster gut 3,5 KB). Beim Import passiert nichts, es lädt auch in Node.
+`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--dss-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 36 KiB groß (gzip 12,9 KiB, Budget 40 KiB und 15 KiB als Test, Polster gut 3,5 KiB). Beim Import passiert nichts, es lädt auch in Node.
 
 ```html
 <link rel="stylesheet" href="/dss/dss.css" />

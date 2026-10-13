@@ -5,6 +5,7 @@ import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, namesVanilla, namesSvelte, namesReact, photoVanilla, photoSvelte, photoReact } from './CardLibrary.code';
+import { spielRender } from './Render.code';
 
 <Meta of={CardLibraryStories} />
 
@@ -138,6 +139,12 @@ Die Props zeigen drei Spielwiesen mit den echten Komponenten. Die Spielkarte hat
 ### Skeleton
 
 <Controls of={CardLibraryStories.LadezustandSpielwiese} />
+
+## Vanilla: MatchCard aus Daten erzeugen
+
+`renderMatchCard(props)` und `mountMatchCard(el, props, options)` erzeugen die Spielkarte in drei Zuständen mit denselben Eigenschaften wie die Komponente. Mit `href` ist die Karte ein Link, mit `options.onClick` ein Button; ungültige Punktzahlen (`NaN`, `Infinity`) werden nicht angezeigt.
+
+<FrameworkCode label="MatchCard aus Daten (Vanilla)" vanilla={spielRender} />
 
 ## Dos und Don'ts
 
