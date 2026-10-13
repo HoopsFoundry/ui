@@ -26,11 +26,13 @@ export const state = {
   removed: 0,
   /** Wird gesetzt, um beim nächsten Aufbau einen Fehler zu werfen */
   throwOnMap: false,
+  /** Zahl der Aufbauversuche in einem abgehängten Behälter */
+  detached: 0,
   /** Wird gesetzt, damit setView und fitBounds (Aktualisierung) werfen */
   throwOnView: false,
 };
 export const reset = () => {
-  state.maps = []; state.layers = []; state.markers = []; state.removed = 0; state.throwOnMap = false; state.throwOnView = false;
+  state.maps = []; state.layers = []; state.markers = []; state.removed = 0; state.detached = 0; state.throwOnMap = false; state.throwOnView = false;
 };
 
 class Handler {
@@ -52,6 +54,8 @@ export class FakeMap extends Evented {
     // wie Leaflet: ein Element oder die id eines Elements
     const el = typeof target === 'string' ? document.getElementById(target)! : target;
     if (state.throwOnMap) throw new Error('Aufbau schlägt fehl');
+    // wie im Browser nützt eine Karte in einem abgehängten Behälter nichts: der Test soll es merken (Mehrfach-init auf Server-Markup)
+    if (!el.isConnected) { state.detached += 1; throw new Error('Map container is detached from the document'); }
     this.el = el; this.options = options;
     if ((el as any)._leaflet_id) throw new Error('Map container is already initialized.');
     (el as any)._leaflet_id = state.maps.length + 1;

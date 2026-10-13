@@ -484,3 +484,68 @@ describe('Register über Kopien hinweg', () => {
     expect(state.maps[1].isRemoved).toBe(true);
   });
 });
+
+describe('Zweimal init auf demselben Server-Markup (die Karte lebt im sichtbaren DOM)', () => {
+  it('renderMap + initMap zweimal: nach dem Klick steht genau ein .leaflet-container im Dokument, kein Aufbau im abgehängten Knoten', async () => {
+    host.append(document.createRange().createContextualFragment(renderMap(BASE as never)));
+    initMap(host, BASE as never);
+    initMap(host, BASE as never);
+    click(host.querySelector('.dss-map-load'));
+    await vi.waitFor(() => expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready'));
+    expect(host.querySelectorAll('.leaflet-container')).toHaveLength(1);
+    expect(host.querySelector('.dss-map-canvas')!.classList.contains('leaflet-container')).toBe(true);
+    expect(state.detached).toBe(0);
+    expect(host.querySelectorAll('.dss-map-zoom-btn')).toHaveLength(2);
+  });
+  it('renderVenueCard(init) + initAll zweimal: die Schaltfläche ist bedienbar und die Karte entsteht im Dokument', async () => {
+    const { initAll } = await import('../js/vanilla-core.js');
+    const { initMapBlock } = await import('../js/map-vanilla.js');
+    host.append(document.createRange().createContextualFragment(renderVenueCard({ name: 'Halle', lat: 49.3, lng: 7.9 } as never, { init: true, uid: 'm1' })));
+    const options = { map: { start: initMapBlock } };
+    initAll(document, options);
+    const second = initAll(document, options);
+    const button = host.querySelector<HTMLButtonElement>('.dss-map-load')!;
+    expect(button.disabled).toBe(false);
+    click(button);
+    await vi.waitFor(() => expect(host.querySelectorAll('.leaflet-container')).toHaveLength(1));
+    expect(state.detached).toBe(0);
+    second.destroy();
+    expect(host.querySelector<HTMLButtonElement>('.dss-map-load')!.disabled).toBe(true);
+  });
+  it('mountMap zweimal und mountVenueCard zweimal mit initMap: je eine lebendige Karte im Dokument', async () => {
+    mountMap(host, { ...BASE, load: 'auto' } as never);
+    mountMap(host, { ...BASE, load: 'auto' } as never);
+    await vi.waitFor(() => expect(host.querySelectorAll('.leaflet-container')).toHaveLength(1));
+    const other = document.createElement('div');
+    document.body.append(other);
+    const { mountVenueCard } = await import('../js/render/venue-card.js');
+    mountVenueCard(other, { name: 'H', lat: 49.3, lng: 7.9, load: 'auto' } as never, { initMap });
+    mountVenueCard(other, { name: 'H', lat: 49.3, lng: 7.9, load: 'auto' } as never, { initMap });
+    await vi.waitFor(() => expect(other.querySelectorAll('.leaflet-container')).toHaveLength(1));
+    expect(state.detached).toBe(0);
+  });
+});
+
+describe('update mit Teilen (kein stiller Rückfall auf den Standardserver)', () => {
+  it('Proxy-tileUrl, load auto, update({ label }): Kachel-Adresse, Marker, Mitte bleiben; es gibt nie eine Anfrage an den OSM-Server', async () => {
+    const handle = mountMap(host, { ...BASE, markers: [A, B], load: 'auto', tileUrl: '/proxy/{z}/{x}/{y}.png', center: [50, 9], zoom: 12, appLinks: ['geo'] } as never);
+    await vi.waitFor(() => expect(state.maps).toHaveLength(1));
+    handle.update({ label: 'Neuer Name' });
+    expect(host.querySelector('[role="region"]')!.getAttribute('aria-label')).toBe('Neuer Name');
+    expect(state.layers[0].urls).toEqual(['/proxy/{z}/{x}/{y}.png']);
+    expect(state.layers.every((l) => l.urls.every((u) => !u.includes('openstreetmap')))).toBe(true);
+    expect(state.markers.filter((m) => !m.isRemoved)).toHaveLength(2);
+    expect(host.querySelectorAll('.dss-map-item')).toHaveLength(2);
+    expect(host.querySelector('.dss-map-links a')!.getAttribute('href')).toMatch(/^geo:/);
+    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
+    expect(lastMap().view.at(-1)).toMatchObject({ center: [50, 9], zoom: 12 });
+  });
+  it('undefined wird ignoriert, null nimmt zurück (Standard), die Adresse wird erst dann der Standard', async () => {
+    const handle = mountMap(host, { ...BASE, load: 'auto', tileUrl: '/proxy/{z}/{x}/{y}.png' } as never);
+    await vi.waitFor(() => expect(state.maps).toHaveLength(1));
+    handle.update({ tileUrl: undefined, zoom: 10 });
+    expect(lastLayer().url).toBe('/proxy/{z}/{x}/{y}.png');
+    handle.update({ tileUrl: null });
+    expect(lastLayer().url).toBe('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
+  });
+});

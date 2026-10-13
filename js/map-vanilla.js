@@ -61,13 +61,14 @@ const zoomMarkup = (canvasId) =>
 
 /** Hängt die Karte an `root` (ein Element `.dss-map`). `restore`: `destroy` stellt das Markup vom Beginn wieder her. */
 function attach(root, options, { restore }) {
+  // Zuerst die frühere Fassung abbauen: ihr destroy ersetzt die Kinder von `root`; Knoten dürfen erst danach gelesen werden
+  registry.release(root);
   const doc = root.ownerDocument;
   const stage = root.querySelector('.dss-map-stage');
   if (!stage) {
     devWarn('[dss-map] initMap: im Element fehlt das Markup der Karte (.dss-map-stage); renderMap erzeugt es.');
     return noop();
   }
-  registry.release(root);
   // Markup vom Server: eine Seite mit `style-src 'self'` blockiert dessen style-Attribute; über das CSSOM gelten Höhe und Pins trotzdem
   if (restore) reapplyStyles(root);
 
@@ -348,8 +349,16 @@ function attach(root, options, { restore }) {
     update(next) {
       if (destroyed) return;
       const before = tileUrlOf(props);
-      props = obj(next);
-      hooks = hooksOf(props, hooks);
+      // Teilweise Eigenschaften: Angegebenes ersetzt, `undefined` wird ignoriert, `null` nimmt die Eigenschaft zurück (es gilt wieder der Standard).
+      // Nie ein stiller Rückfall: fehlt `tileUrl`, bleibt die bisherige Adresse (kein Kachelabruf beim Standardserver)
+      const merged = { ...props };
+      for (const [key, value] of Object.entries(obj(next))) {
+        if (value === undefined) continue;
+        if (value === null) delete merged[key];
+        else merged[key] = value;
+      }
+      props = merged;
+      hooks = hooksOf(obj(next), hooks);
       // Neue Kachel-Adresse: ein früherer Fehler gilt nicht mehr, die Karte versucht es erneut
       if (tileUrlOf(props) !== before) failure = null;
       const had = controller;
@@ -380,7 +389,8 @@ export function initMap(el, options) {
 
 /**
  * Setzt `renderMap(props)` in `el` ein und startet `initMap`. `options`: `uid`, `loadLeaflet`, `onLoad`, `onError`, `onMarkerClick`.
- * `update(props)` aktualisiert Marker, Mitte, Zoom, Kachel-Adresse und Texte, ohne die Karte neu aufzubauen; `destroy()` räumt Karte,
+ * `update(partial)` aktualisiert Marker, Mitte, Zoom, Kachel-Adresse und Texte, ohne die Karte neu aufzubauen (nur Angegebenes ändert sich;
+ * `null` nimmt eine Eigenschaft zurück); `destroy()` räumt Karte,
  * Listener und Beobachter auf und stellt den früheren Inhalt von `el` wieder her.
  */
 export function mountMap(el, props, options) {

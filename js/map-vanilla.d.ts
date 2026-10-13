@@ -64,8 +64,11 @@ export interface MapRenderOptions {
 }
 
 export interface MapMountHandle extends DssHandle {
-  /** Aktualisiert Marker, Mitte, Zoom, Gesten, Kachel-Adresse und Texte, ohne die Karte neu aufzubauen. */
-  update(props: Partial<MapProps> & MapBehavior): void;
+  /**
+   * Aktualisiert Marker, Mitte, Zoom, Gesten, Kachel-Adresse und Texte, ohne die Karte neu aufzubauen. Teilweise Eigenschaften: nur Angegebenes ändert
+   * sich, `undefined` wird ignoriert, `null` nimmt eine Eigenschaft zurück (es gilt wieder der Standard). Eine fehlende `tileUrl` bleibt die bisherige.
+   */
+  update(props: Partial<{ [K in keyof MapProps]: MapProps[K] | null }> & MapBehavior): void;
 }
 
 /** Markup der Karte wie `MapView` im Server-Rendering; „Karte laden“ ist bedienbar. Ohne Leaflet, ohne Netzverkehr, läuft in Node. */

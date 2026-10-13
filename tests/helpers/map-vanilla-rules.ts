@@ -249,12 +249,26 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     h.destroy();
     release(mock.L);
     await settle();
-    return mapState.maps.length === 0;
+    return mapState.maps.length === 0 && mapState.detached === 0;
   });
   await rule('Karte: ein werfender Handler kippt die Karte nicht', async (host) => {
     mountMap(host, { ...BASE, load: 'auto' }, { onLoad: () => { throw new Error('x'); } });
     await settle();
     return stateOf() === 'ready';
+  });
+  await rule('Karte: zweimal initMap auf Server-Markup ergibt eine lebendige Karte im Dokument', async (host) => {
+    host.append(document.createRange().createContextualFragment(renderMap(BASE, { uid: 'twice' })));
+    initMap(host, BASE);
+    initMap(host, BASE);
+    click(host.querySelector('.dss-map-load'));
+    await settle();
+    return host.querySelectorAll('.leaflet-container').length === 1 && mapState.detached === 0 && stateOf() === 'ready';
+  });
+  await rule('Karte: update mit Teilen behält Kachel-Adresse und Marker (kein Rückfall auf den Standardserver)', async (host) => {
+    const h = mountMap(host, { ...BASE, markers: [A, B], load: 'auto', tileUrl: '/proxy/{z}/{x}/{y}.png' });
+    await settle();
+    h.update({ label: 'Neu' });
+    return mock.lastLayer().url === '/proxy/{z}/{x}/{y}.png' && mapState.layers.length === 1 && mapState.markers.filter((m) => !m.isRemoved).length === 2;
   });
   await rule('Karte: initMap stellt das Markup bei destroy wieder her', (host) => {
     host.append(document.createRange().createContextualFragment(renderMap(BASE, { uid: 'r1' })));
@@ -348,4 +362,4 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   return R;
 }
 
-export const MAP_RULE_COUNT = 33;
+export const MAP_RULE_COUNT = 35;

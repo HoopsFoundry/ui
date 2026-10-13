@@ -128,8 +128,9 @@ export function renderVenueCard(props, options) {
 export function mountVenueCard(el, props, options) {
   const o = obj(options);
   const { initMap, loadLeaflet, onLoad, onError, onMarkerClick, ...rest } = o;
+  // Zuerst die frühere Fassung abbauen (auch mit Karte, wenn diesmal keine angebunden wird), erst danach Knoten lesen
+  if (el && typeof el === 'object') registry.release(el);
   if (typeof initMap !== 'function' || typeof document === 'undefined' || !el || typeof el.querySelector !== 'function') return mount(el, renderVenueCard, props, rest);
-  registry.release(el);
 
   const behavior = {};
   for (const [name, fn] of Object.entries({ loadLeaflet, onLoad, onError, onMarkerClick })) if (typeof fn === 'function') behavior[name] = fn;
@@ -140,7 +141,8 @@ export function mountVenueCard(el, props, options) {
     const lng = typeof p.lng === 'number' ? p.lng : undefined;
     return isCoord(lat, lng) ? JSON.stringify([lat, lng, str(p.name).trim()]) : null;
   };
-  const optionsOf = (p) => ({ ...venueMapProps(p, str(p.name).trim(), p.lat, p.lng), ...behavior });
+  // `null` nimmt eine frühere Angabe zurück (initMap.update führt Eigenschaften zusammen): fehlt tileUrl oder privacyNote, gilt wieder der Standard
+  const optionsOf = (p) => ({ tileUrl: null, privacyNote: null, ...venueMapProps(p, str(p.name).trim(), p.lat, p.lng), ...behavior });
   const start = (p) => {
     const node = keyOf(p) ? el.querySelector('.dss-venue-map') : null;
     live = node ? { node, key: keyOf(p), handle: initMap(node, optionsOf(p)) } : null;

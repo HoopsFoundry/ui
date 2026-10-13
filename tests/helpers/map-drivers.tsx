@@ -76,7 +76,8 @@ export const vanillaDriver: Driver = {
     const settle = async () => { await nextTick(); await nextTick(); };
     return {
       root: target,
-      async set(patch) { current = { ...current, ...patch }; handle.update(current as never); await settle(); },
+      // ein ausdrücklich auf undefined gesetzter Wert heißt hier „zurücknehmen“: die Karte kennt dafür null (undefined wird ignoriert)
+      async set(patch) { current = { ...current, ...patch }; handle.update(Object.fromEntries(Object.entries(current).map(([k, v]) => [k, v === undefined ? null : v])) as never); await settle(); },
       async unmount() { if (!gone) { gone = true; handle.destroy(); } target.remove(); await settle(); },
       settle,
       async act(fn) { fn(); await settle(); },
