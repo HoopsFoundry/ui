@@ -239,14 +239,17 @@ export function initModal(root, options = {}) {
       return;
     }
     if (event.key !== 'Tab' || event.altKey || event.ctrlKey || event.metaKey) return;
+    // Tab läuft immer über uns (in allen Browsern gleich): WebKit überspringt Links, und aus einer Fläche mit tabindex="-1" springt der
+    // Browser sonst an den Rand des Dialogs oder aus ihm heraus
+    event.preventDefault();
     const list = focusables(dialogEl);
-    const first = list[0] ?? surface;
-    const last = list[list.length - 1] ?? surface;
-    const active = doc.activeElement;
-    if (!dialogEl.contains(active) || (event.shiftKey && (active === first || active === surface)) || (!event.shiftKey && active === last)) {
-      event.preventDefault();
-      (event.shiftKey ? last : first).focus();
+    if (!list.length) {
+      surface.focus();
+      return;
     }
+    const index = list.indexOf(doc.activeElement);
+    const next = index < 0 ? (event.shiftKey ? list.length - 1 : 0) : (index + (event.shiftKey ? -1 : 1) + list.length) % list.length;
+    list[next].focus();
   }, true));
   // Fokus, der doch herausfällt (z. B. per Programm), kommt zurück
   cleanups.add(listen(doc, 'focusin', (event) => {

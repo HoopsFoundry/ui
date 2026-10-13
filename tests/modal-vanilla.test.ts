@@ -225,12 +225,27 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
     keydown(document.activeElement!, 'Tab', { shiftKey: true });
     expect(document.activeElement).toBe(list[2]);
   });
-  it('Tab in der Mitte bleibt dem Browser', () => {
+  it('Tab in der Mitte geht ebenfalls über das Modal: auf das nächste Element, deterministisch in jedem Browser', () => {
     start(divMarkup(), 'verwerfen');
     click(el('verwerfen-auf'));
     const list = focusables(el('verwerfen'));
     list[0].focus();
-    expect(keydown(list[0], 'Tab').defaultPrevented).toBe(false);
+    expect(keydown(list[0], 'Tab').defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(list[1]);
+    keydown(list[1], 'Tab', { shiftKey: true });
+    expect(document.activeElement).toBe(list[0]);
+  });
+  it('Tab von der Fläche (tabindex -1) geht auf das erste, Umschalt+Tab auf das letzte Element', () => {
+    start(divMarkup(), 'verwerfen');
+    click(el('verwerfen-auf'));
+    const list = focusables(el('verwerfen'));
+    const surface = el('verwerfen').querySelector('.dss-modal') as HTMLElement;
+    surface.focus();
+    keydown(surface, 'Tab');
+    expect(document.activeElement).toBe(list[0]);
+    surface.focus();
+    keydown(surface, 'Tab', { shiftKey: true });
+    expect(document.activeElement).toBe(list[list.length - 1]);
   });
   it('Tab mit Fokus außerhalb holt ihn herein; ohne Fokusziele bleibt er auf der Fläche', () => {
     start(divMarkup(), 'verwerfen');

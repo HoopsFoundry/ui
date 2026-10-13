@@ -88,11 +88,19 @@ export function modalLogicRules(mod: Modal): Rules {
     key(list[0], 'Tab', { shiftKey: true });
     return wrapped && document.activeElement === list[2];
   });
-  rule('Modal: Tab in der Mitte bleibt dem Browser', () => {
+  rule('Modal: Tab geht auch in der Mitte über das Modal auf das nächste Element', () => {
     click(el('verwerfen-auf'));
     const list = [...el('verwerfen').querySelectorAll<HTMLElement>('button')];
     list[0].focus();
-    return !key(list[0], 'Tab') === false;
+    key(list[0], 'Tab');
+    return document.activeElement === list[1];
+  });
+  rule('Modal: Tab von der Fläche geht auf das erste Element', () => {
+    click(el('verwerfen-auf'));
+    const list = [...el('verwerfen').querySelectorAll<HTMLElement>('button')];
+    modalEl().focus();
+    key(modalEl(), 'Tab');
+    return document.activeElement === list[0];
   });
   rule('Modal: Fokus von außen kommt zurück', () => {
     click(el('verwerfen-auf'));
