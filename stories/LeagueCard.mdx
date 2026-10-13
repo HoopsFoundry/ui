@@ -221,7 +221,7 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Oberliga Nordhain M
 
 ## Vanilla: Ligencard aus Daten erzeugen
 
-Ohne Svelte und React erzeugt `renderLeagueCard(props)` aus denselben Eigenschaften den HTML-Text der Karte (läuft auch in Node, etwa im Crawler); `mountLeagueCard(el, props)` setzt ihn in ein Element ein und gibt `{ update(props), destroy() }` zurück. Texte laufen durch `esc`, Adressen durch `safeHref`, kein Markup von außen. Die Ausgabe ist dieselbe wie die der Komponente (ein Test vergleicht beide Fassungen). Der Ausschnitt der Tabelle (`limit`, eigene Mannschaft) kommt aus `leagueWindow`, derselben Funktion wie in Svelte und React. Zum Paket: [Foundation/Vanilla](?path=/docs/foundation-vanilla--docs).
+Ohne Svelte und React erzeugt `renderLeagueCard(props)` aus denselben Eigenschaften den HTML-Text der Karte (läuft auch in Node, etwa im Crawler); `mountLeagueCard(el, props)` setzt ihn in ein Element ein und gibt `{ update(props), destroy() }` zurück. Texte laufen durch `esc`, Adressen durch `safeHref`, kein Markup von außen. Die Ausgabe ist dieselbe wie die der Komponente (ein Test vergleicht beide Fassungen). Der Ausschnitt der Tabelle (`limit`, eigene Mannschaft) kommt aus `leagueWindow`, derselben Funktion wie in Svelte und React. Zum Paket: die Seite `Foundation/Vanilla` (Abschnitt „Markup erzeugen“).
 
 <FrameworkCode label="LeagueCard aus Daten (Vanilla)" vanilla={ligaRender} />
 

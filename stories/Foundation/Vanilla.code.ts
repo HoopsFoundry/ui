@@ -104,10 +104,11 @@ export const renderPage = `<main>
   import { initAll } from '/dss/dss.min.js';
   import { mountLeagueCard, mountScheduleTable, mountVenueCard } from '/dss/dss-render.min.js';
 
-  // Daten aus deiner Quelle (hier erfunden); die Eigenschaften sind die der Komponenten
+  // Daten aus deiner Quelle (hier erfunden); die Eigenschaften sind die der Komponenten.
+  // titleAs gibt die Ebene der Überschrift vor (h2 bis h6, Standard h3): hier folgt sie der h1 der Seite
   const verein = {
     liga: {
-      title: 'Oberliga Nordhain Männer', href: '/ligen/oberliga', teamCount: 12, played: 66, total: 132,
+      title: 'Oberliga Nordhain Männer', titleAs: 'h2', href: '/ligen/oberliga', teamCount: 12, played: 66, total: 132,
       teams: [
         { rank: 2, name: 'BG Seeberg', played: 11, points: 18 },
         { rank: 3, name: 'TSV Nordhain 1920', short: 'Nordhain', played: 11, points: 14, own: true },
@@ -115,13 +116,13 @@ export const renderPage = `<main>
       ],
     },
     plan: {
-      title: 'Spielplan', names: 'short',
+      title: 'Spielplan', titleAs: 'h2', names: 'short',
       games: [
         { id: 'a', state: 'finished', date: 'Sa, 10.10.2026', time: '17:00', heim: { name: 'TSV Nordhain 1920', short: 'Nordhain', own: true, score: 78 }, gast: { name: 'BG Seeberg', score: 71 } },
         { id: 'b', state: 'scheduled', date: 'So, 18.10.2026', time: '11:00', heim: { name: 'SV Kiefernau' }, gast: { name: 'TSV Nordhain 1920', short: 'Nordhain', own: true } },
       ],
     },
-    halle: { name: 'Sporthalle Nordhain', address: { street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' }, lat: 49.3, lng: 7.9, href: '/hallen/nordhain' },
+    halle: { name: 'Sporthalle Nordhain', titleAs: 'h2', address: { street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' }, lat: 49.3, lng: 7.9, href: '/hallen/nordhain' },
   };
 
   // Je Baustein ein Aufruf; das Ergebnis hat update(props) und destroy()

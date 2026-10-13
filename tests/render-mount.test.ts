@@ -54,7 +54,7 @@ describe('mount: einsetzen', () => {
     expect(host.querySelector('h3.dss-league-title')?.textContent).toBe('Oberliga');
   });
   it('ersetzt den früheren Inhalt und stellt ihn bei destroy wieder her', () => {
-    host.innerHTML = '<p id="alt">Serverseitig gerendert</p>';
+    host.append(document.createRange().createContextualFragment('<p id="alt">Serverseitig gerendert</p>'));
     const handle = mountStats(host, { items: [{ label: 'Siege', value: 3 }] });
     expect(host.querySelector('#alt')).toBeNull();
     expect(host.querySelector('.dss-stat-value')?.textContent).toBe('3');
