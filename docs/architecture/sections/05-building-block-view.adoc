@@ -40,7 +40,7 @@ flowchart TB
 |`stories/` |Stories, MDX und Framework-Codebeispiele
 |`.storybook/` |Storybook-Konfiguration (`main.ts`, `preview.ts` mit `storySort` und Toolbar-Globals, Zustands-Umschalter, `storybook.css`)
 |`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
-|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; laut Plan zusätzlich `dist/vanilla`, ausgeliefert per Release
+|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
 |`tests/` |Automatisierte Prüfungen
 |`scripts/` |Entwicklungs- und Prüfwerkzeuge
 |`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
