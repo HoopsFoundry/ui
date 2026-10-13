@@ -9,6 +9,7 @@
 * Storybook verwendet `@storybook/svelte-vite`.
 * React wird mit tsup gebaut; die dokumentierte Typprüfung verwendet `react/tsconfig.json`.
 * Gemeinsame Stile liegen in `css/components.css`; Tokens in `tokens/`.
+* `package.json` verlangt `engines.node` `>=18.0.0`; der CI-Workflow `.github/workflows/deploy-storybook.yaml` baut mit Node 22.
 
 === Entwicklungsregeln aus bestehenden Plänen
 
@@ -19,4 +20,4 @@
 
 === Abgrenzung
 
-Konkrete Framework- und Node-Versionen werden in `package.json` gepflegt, nicht hier dupliziert. Die Kompatibilität aller angegebenen Bereiche ist gesondert zu prüfen. Diagramm- und Dokumentationswerkzeuge sind in dieser Baseline noch nicht installiert.
+Weitere Framework-Versionen (Peer-Abhängigkeiten) werden in `package.json` gepflegt, nicht hier dupliziert. Die Kompatibilität aller angegebenen Bereiche ist gesondert zu prüfen. Für die Architekturdokumentation wird Asciidoctor über Ruby/Bundler (`Gemfile`) im Workflow `render-docs.yml` verwendet, nicht über npm (Kapitel 7).

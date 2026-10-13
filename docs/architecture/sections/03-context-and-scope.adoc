@@ -3,14 +3,36 @@
 
 DSS ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
 
+=== Fachlicher Kontext
+
+[source,mermaid]
+----
+flowchart LR
+  VR["Vereinsregister-Portal<br/>(statisch, Vanilla-JS)"]
+  TM["Turnier-Manager"]
+  APP["Weitere Basketball-Apps"]
+  DSS(["DSS Design System<br/>@bbv/dss-design-system"])
+  SB["Storybook<br/>(GitHub Pages)"]
+  MAP["Kachelserver / Proxy<br/>(OSM)"]
+  VR -- "CSS, Tokens, Vanilla init/render" --> DSS
+  TM -- "Komponenten, ScheduleGame" --> DSS
+  APP -- "Svelte/React, CSS, js/" --> DSS
+  DSS -- "Stories, MDX" --> SB
+  DSS -. "tileUrl, erst nach Freigabe" .-> MAP
+----
+
 [cols="1,2,2",options="header"]
 |===
 |Partner |Verantwortung des Partners |DSS-Schnittstelle
-|Anwendung |Datenbeschaffung, Authentifizierung, Speicherung und Fachprozesse |Props, öffentliche Hilfsfunktionen, CSS und Lifecycle-APIs
-|Datenanbieter |Bereitstellung von Spiel-, Team- oder Vereinsdaten |Keine vorausgesetzte direkte Integration; Anwendung normalisiert Daten
-|Karteninfrastruktur |Leaflet-Auslieferung, Kachelzugriff und Betriebsregeln |Konfigurierbare Kartenoptionen und dokumentierte Integrationsrezepte
+|Vereinsregister-Portal (Hauptnutzer) |Statisches Portal (Vanilla-JS, GitHub Pages), eigene Datenbeschaffung; Seiten entstehen im Browser und im Node-Crawler |`tokens.css`/`components.css`, Vanilla-Module (`init*`, geplant `render*`/`mount*`), Synchronisation per `portal-sync` aus Release (Spec `2026-10-11-vanilla-paket-design.md`, Plan `2026-10-12-vanilla-v2-plan.md`). Auslöser des Vanilla-Pakets
+|Turnier-Manager |Turnierplanung, Spiele, PDF-Export (`@react-pdf/renderer`, außerhalb des DSS) |Komponenten wie `ScheduleTable`/`ScheduleGrid`, `TopBar`; Zuordnung `Game` → `ScheduleGame` laut README (Spec `2026-10-08-spielplan-design.md`)
+|Weitere Anwendungen |Datenbeschaffung, Authentifizierung, Speicherung und Fachprozesse |Props, öffentliche Hilfsfunktionen, CSS und Lifecycle-APIs
+|Datenanbieter |Bereitstellung von Spiel-, Team- oder Vereinsdaten |Keine direkte Integration; die Anwendung normalisiert Daten
+|Karteninfrastruktur |Leaflet-Auslieferung, Kachelzugriff, Proxy und Betriebsregeln |`tileUrl`, `load`, `privacyNote`; Proxy-Rezepte nur als Doku (Spec `2026-10-11-map-hallenkarte-design.md`)
 |Storybook-Nutzer |Auswahl und Verständnis der Komponenten |Stories, MDX, Controls und Codebeispiele
 |===
+
+Vereinsregister-Portal und Turnier-Manager liegen in eigenen Repositorys und sind nicht Teil dieses Repositorys.
 
 === Geplante Erweiterungen
 

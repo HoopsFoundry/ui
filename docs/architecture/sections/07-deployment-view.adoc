@@ -19,4 +19,4 @@ Am 12. Oktober 2026 wurde GitHub-Release mit `dist/vanilla` als erste Auslieferu
 
 === Dokumentation und MCP
 
-Ein Asciidoctor-HTML-Build ist vorgesehen, aber noch nicht Teil dieser Baseline. Eine statische Storybook-Veröffentlichung ist nicht automatisch ein laufender MCP-Dienst. Lokale und öffentlich gehostete MCP-Nutzung benötigen getrennte Betriebsentscheidungen.
+Der Workflow `.github/workflows/render-docs.yml` (Vorlage: Workflow „Render AsciiDoc Documentation" im Vereinsregister) löst bei Änderungen an `docs/**/*.adoc` auf `main` mit `asciidoctor-reducer` alle Includes von `docs/architecture/index.adoc` auf und committet das Ergebnis als `docs/architecture/README.adoc`. Damit zeigt GitHub das Gesamtdokument an. Mermaid-Diagramme erscheinen dort als Quelltextblöcke; ein grafisches Rendering (z. B. asciidoctor-diagram) ist nicht Teil dieses Schritts. Eine statische Storybook-Veröffentlichung ist nicht automatisch ein laufender MCP-Dienst. Lokale und öffentlich gehostete MCP-Nutzung benötigen getrennte Betriebsentscheidungen.

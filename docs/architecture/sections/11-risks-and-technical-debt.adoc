@@ -19,9 +19,9 @@ Der neuere Vanilla-Plan konkretisiert den älteren Review. Aufgaben aus historis
 . Dokumentationsdrift: abweichende Versionen, Begriffe und Planstände.
 . Agent-Zugriff: kein zentraler Root-Einstieg in der geprüften Struktur; Katalog noch unvollständig.
 
-=== Dokumentierter Planstand
+=== Umsetzungsstand
 
-V1a ist laut Vanilla-Plan fertig und gemergt. V1b ist fertig, im Review. V2a/V2b und Abschluss sind offen. Diese Zustände sind vor Umsetzung gegen aktuellen Code, Branches und Reviews zu prüfen.
+Der Umsetzungsstand einzelner Pakete wird hier nicht geführt. Maßgeblich sind die Pläne unter `docs/superpowers/plans/`, insbesondere `2026-10-12-vanilla-v2-plan.md` und `2026-10-12-luecken-plan.md`, abgeglichen mit Code und Branches.
 
 === Pflege
 

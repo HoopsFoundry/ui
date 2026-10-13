@@ -1,9 +1,11 @@
 = DSS – Softwarearchitektur
 include::_attributes.adoc[]
 
-Stand: 2026-10-12. Status: Architektur-Baseline zur Prüfung.
+Stand: 2026-10-13. Status: Architektur-Baseline zur Prüfung. Produktname: Arbeitsname, Entscheidung offen (Kapitel 1).
 
 Diese Dokumentation trennt geprüfte Repository-Strukturen, dokumentierte Planstände und vorgeschlagene Erweiterungen. Sie ersetzt keine Komponentenreferenz und keinen Testbericht.
+
+Quelle sind die Kapitel unter `sections/`, zusammengeführt über diese Datei. `README.adoc` in diesem Ordner wird per Workflow erzeugt und nicht von Hand bearbeitet.
 
 include::sections/01-introduction-and-goals.adoc[]
 
