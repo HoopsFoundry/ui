@@ -1,0 +1,411 @@
+= DSS – Softwarearchitektur
+:lang: de
+:doctype: book
+:toc: left
+:toclevels: 3
+:sectnums:
+:sectanchors:
+:icons: font
+:source-highlighter: rouge
+
+Stand: 2026-10-13. Status: Architektur-Baseline zur Prüfung. Produktname: Arbeitsname, Entscheidung offen (Kapitel 1).
+
+Diese Dokumentation trennt geprüfte Repository-Strukturen, dokumentierte Planstände und vorgeschlagene Erweiterungen. Sie ersetzt keine Komponentenreferenz und keinen Testbericht.
+
+Quelle sind die Kapitel unter `sections/`, zusammengeführt über diese Datei. `README.adoc` in diesem Ordner wird per Workflow erzeugt und nicht von Hand bearbeitet.
+
+[[introduction-and-goals]]
+== Einführung und Ziele
+
+Das Designsystem stellt Design-Tokens, gemeinsames CSS, Framework-Komponenten (Svelte, React) und wiederverwendbare JavaScript-Hilfen für Basketball-Anwendungen bereit.
+
+=== Name (Arbeitsname, Entscheidung offen)
+
+Das System wird voraussichtlich als „HoopsFoundry DSS" (DSS = Digital Sports System) oder als „HoopsFoundry UI" geführt. Die Entscheidung steht aus; beide Namen sind Arbeitsnamen. Bis zur Entscheidung bleiben Paketname `@bbv/dss-design-system` und Repository-Name `dss-design-system` unverändert. Diese Dokumentation verwendet bis dahin die Kurzform „DSS".
+
+Hintergrund: Das Kürzel DSS stammt aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
+
+=== Stakeholder
+
+* Anwendungsentwickler integrieren DSS in Basketball-Anwendungen und Vereinsportale.
+* Maintainer entwickeln Komponenten und erhalten Implementierungsparität.
+* Gestalter definieren konsistente Marken-, Typografie- und Interaktionsregeln.
+* Nutzer benötigen zugängliche und verständliche Oberflächen.
+* Coding-Agents benötigen eindeutige APIs und Architekturregeln; ihre Unterstützung ist ein Ausbauziel.
+
+=== Priorisierte Qualitätsziele
+
+. Zugänglichkeit: semantische Ausgabe, Tastaturbedienung, Fokus und kontrastreiche Darstellung.
+. Konsistenz: gemeinsame Gestaltungsgrundlage und überprüfbare Parität.
+. Sicherheit und Datenschutz: sichere Ausgabe und kontrollierte externe Kartenanfragen.
+. Integrierbarkeit: klare öffentliche APIs und reproduzierbare Auslieferung.
+. Wartbarkeit: gemeinsame Logik statt unnötiger Duplikation.
+
+Qualitätsziele sind Anforderungen, keine pauschalen Konformitätsnachweise. Konkrete Prüfszenarien stehen in Kapitel 10.
+
+[[constraints]]
+== Randbedingungen
+
+=== Beobachteter Repository-Stand
+
+* Das Paket heißt `@bbv/dss-design-system`; die gelesene Paketversion ist `0.9.0`.
+* JavaScript-Module verwenden ESM.
+* Komponentenimplementierungen liegen in `react/` und `svelte/`.
+* Storybook verwendet `@storybook/svelte-vite`.
+* React wird mit tsup gebaut; die dokumentierte Typprüfung verwendet `react/tsconfig.json`.
+* Gemeinsame Stile liegen in `css/components.css`; Tokens in `tokens/`.
+* `package.json` verlangt `engines.node` `>=18.0.0`; der CI-Workflow `.github/workflows/deploy-storybook.yaml` baut mit Node 22.
+
+=== Entwicklungsregeln aus bestehenden Plänen
+
+* Gemeinsame Fach- und Hilfslogik wiederverwenden.
+* Initialisierung und Aufräumen explizit anbieten.
+* Eingaben in Renderfunktionen als unvertrauenswürdig behandeln.
+* Änderungen mit Tests und unabhängigem Review prüfen.
+
+=== Abgrenzung
+
+Weitere Framework-Versionen (Peer-Abhängigkeiten) werden in `package.json` gepflegt, nicht hier dupliziert. Die Kompatibilität aller angegebenen Bereiche ist gesondert zu prüfen. Für die Architekturdokumentation wird Asciidoctor über Ruby/Bundler (`Gemfile`) im Workflow `render-docs.yml` verwendet, nicht über npm (Kapitel 7).
+
+[[context-and-scope]]
+== Kontext und Abgrenzung
+
+DSS ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
+
+=== Fachlicher Kontext
+
+[source,mermaid]
+----
+flowchart LR
+  VR["Vereinsregister-Portal<br/>(statisch, Vanilla-JS)"]
+  TM["Turnier-Manager"]
+  APP["Weitere Basketball-Apps"]
+  DSS(["DSS Design System<br/>@bbv/dss-design-system"])
+  SB["Storybook<br/>(GitHub Pages)"]
+  MAP["Kachelserver / Proxy<br/>(OSM)"]
+  VR -- "CSS, Tokens, Vanilla init/render" --> DSS
+  TM -- "Komponenten, ScheduleGame" --> DSS
+  APP -- "Svelte/React, CSS, js/" --> DSS
+  DSS -- "Stories, MDX" --> SB
+  DSS -. "tileUrl, erst nach Freigabe" .-> MAP
+----
+
+[cols="1,2,2",options="header"]
+|===
+|Partner |Verantwortung des Partners |DSS-Schnittstelle
+|Vereinsregister-Portal (Hauptnutzer) |Statisches Portal (Vanilla-JS, GitHub Pages), eigene Datenbeschaffung; Seiten entstehen im Browser und im Node-Crawler |`tokens.css`/`components.css`, Vanilla-Module (`init*`, geplant `render*`/`mount*`), Synchronisation per `portal-sync` aus Release (Spec `2026-10-11-vanilla-paket-design.md`, Plan `2026-10-12-vanilla-v2-plan.md`). Auslöser des Vanilla-Pakets
+|Turnier-Manager |Turnierplanung und Spiele; rendert PDFs (Angabe des Auftraggebers, 2026-10-13; die PDF-Erzeugung liegt außerhalb des DSS) |Komponenten wie `ScheduleTable`/`ScheduleGrid`, `TopBar`; Zuordnung `Game` → `ScheduleGame` laut README (Spec `2026-10-08-spielplan-design.md`)
+|Weitere Anwendungen |Datenbeschaffung, Authentifizierung, Speicherung und Fachprozesse |Props, öffentliche Hilfsfunktionen, CSS und Lifecycle-APIs
+|Datenanbieter |Bereitstellung von Spiel-, Team- oder Vereinsdaten |Keine direkte Integration; die Anwendung normalisiert Daten
+|Karteninfrastruktur |Leaflet-Auslieferung, Kachelzugriff, Proxy und Betriebsregeln |`tileUrl`, `load`, `privacyNote`; Proxy-Rezepte nur als Doku (Spec `2026-10-11-map-hallenkarte-design.md`)
+|Storybook-Nutzer |Auswahl und Verständnis der Komponenten |Stories, MDX, Controls und Codebeispiele
+|===
+
+Vereinsregister-Portal und Turnier-Manager liegen in eigenen Repositorys und sind nicht Teil dieses Repositorys.
+
+=== Geplante Erweiterungen
+
+WordPress-Plugin/-Theme und Drupal-Modul/-Theme wurden als mögliche Adapter diskutiert. Diese Baseline beschreibt sie nicht als implementiert. Speicherung, Synchronisation und Berechtigungen sollen außerhalb des UI-Kerns bleiben. Die verbindliche CMS-Architektur benötigt einen eigenen Entwurf.
+
+=== Live-Daten
+
+DSS darf einen gelieferten Live-Zustand darstellen. Abrufintervalle, Quellenvalidierung und Saisonumschaltung sind Anwendungsverantwortung. Verfügbarkeit echter Live-Daten ist keine Eigenschaft der UI-Bibliothek.
+
+[[solution-strategy]]
+== Lösungsstrategie
+
+=== Bestehende Grundlage
+
+. Gemeinsame Tokens definieren Gestaltungswerte.
+. Gemeinsames Komponenten-CSS reduziert visuelle Unterschiede.
+. Native React- und Svelte-Komponenten binden diese Grundlage ein.
+. JavaScript-Hilfen bündeln wiederverwendbare Logik.
+. Storybook vermittelt Verwendung und Referenzzustände.
+. Tests prüfen ausgewählte Aspekte von Ausgabe, Verhalten und Parität.
+
+=== Beschlossene beziehungsweise geplante Entwicklung
+
+Der Vanilla-V2-Plan ergänzt Render- und Mount-Funktionen. Das Ziel ist Nutzung ohne Framework und ohne selbst geschriebenes Komponentenmarkup. Diese Erweiterung ist laut Plan offen und muss vor einer Zusage des Funktionsumfangs gegen Code und Exports geprüft werden.
+
+=== Vorgeschlagene Agent-Unterstützung
+
+Ein zentraler Agent-Einstieg, ein generierter Komponentenkatalog und Textdokumentation sollen vorhandene Quellen erschließen. MCP ist eine Zugriffsschicht, keine neue Quelle der Wahrheit. Framework-spezifische Fähigkeiten müssen vor Integration geprüft werden.
+
+[[building-block-view]]
+== Bausteinsicht
+
+=== Ebene 1
+
+[source,mermaid]
+----
+flowchart TB
+  subgraph Grundlage
+    T["tokens/<br/>tokens.css, tokens.json, Tailwind-Preset"]
+    C["css/components.css<br/>einzige CSS-Quelle (dss-*)"]
+    F["fonts/, icons/"]
+  end
+  J["js/<br/>reine Logik + Vanilla initX"]
+  S["svelte/*.svelte"]
+  R["react/*.tsx → dist/react"]
+  ST["stories/ + .storybook/"]
+  TE["tests/ + parity.manifest.json"]
+  C --> T
+  S --> C
+  R --> C
+  S --> J
+  R --> J
+  ST --> S
+  ST --> R
+  TE -. prüft .-> S
+  TE -. prüft .-> R
+  TE -. prüft .-> J
+----
+
+[cols="1,2",options="header"]
+|===
+|Baustein |Verantwortung
+|`tokens/` |Token-Ausgaben und Tailwind-Preset
+|`css/` |Gemeinsame Komponentenstile
+|`fonts/`, `icons/` |Gestaltungsassets
+|`js/` |Gemeinsame Logik und Vanilla-Verhalten
+|`react/` |React-Komponenten und Typen
+|`svelte/` |Svelte-Komponenten
+|`stories/` |Stories, MDX und Framework-Codebeispiele
+|`.storybook/` |Storybook-Konfiguration (`main.ts`, `preview.ts` mit `storySort` und Toolbar-Globals, Zustands-Umschalter, `storybook.css`)
+|`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
+|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
+|`tests/` |Automatisierte Prüfungen
+|`scripts/` |Entwicklungs- und Prüfwerkzeuge
+|`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
+|`package.json` |Öffentliche Exports, Build-Kommandos und Abhängigkeiten
+|===
+
+=== Öffentliche Schnittstellen
+
+Öffentliche Imports folgen `package.json`, nicht internen Dateinamen. Beispiel: `./svelte/Input` verweist auf `svelte/TextInput.svelte`; das Manifest nennt die Komponente `TextInput`. Die React-Kartenkomponente wird als `MapView` geführt.
+
+Das Paritätsmanifest ist derzeit kein vollständiger API-Katalog: Zweck, Dokumentationsverweise und öffentliche Imports sollen gesondert ergänzt oder generiert werden.
+
+=== Erweiterungsregel
+
+Neue gemeinsame Logik gehört nicht in mehrere Framework-Komponenten kopiert. Ob eine Abstraktion sinnvoll ist, wird anhand tatsächlicher Wiederverwendung und unterschiedlicher Framework-Lifecycles entschieden.
+
+[[runtime-view]]
+== Laufzeitsicht
+
+=== Allgemeine Komponentennutzung
+
+. Die Anwendung beschafft und normalisiert Daten.
+. Eine native Komponente erhält dokumentierte Eingaben.
+. Gemeinsame Hilfen berechnen darstellungsrelevante Werte.
+. Die Komponente gibt semantisches Markup mit DSS-Klassen aus.
+. Die Anwendung aktualisiert Eingaben bei Änderungen.
+
+=== Vanilla-Lifecycle als Architekturziel
+
+. `init*` bindet Verhalten explizit an ein Element.
+. `update` aktualisiert unterstützte Optionen beziehungsweise Inhalte.
+. `destroy` entfernt eigene Listener, Observer und Ressourcen.
+
+Die tatsächlich vorhandenen Methoden unterscheiden sich je API. Der Vanilla-V2-Plan beschreibt zusätzliche `render*`- und `mount*`-APIs; sie sind nicht pauschal als verfügbar anzusehen.
+
+=== Kartenfreigabe
+
+Für den Zwei-Klick-Modus gilt als Anforderung: Vor der Freigabe werden keine externen Kartenanfragen ausgelöst. Nach Freigabe wird die Kartenintegration gestartet. Fehler sollen einen verständlichen Status und gegebenenfalls einen erneuten Versuch ermöglichen. Retry und Speicherverhalten sind im Lückenplan noch Prüf- beziehungsweise Umsetzungsaufgaben.
+
+=== Aufräumen
+
+Wiederholtes Ein-/Aushängen darf keine komponenteneigenen Ressourcen dauerhaft zurücklassen. Ein dokumentierter Verdacht auf Speicherzuwachs der Karte ist noch widersprüchlich und benötigt reproduzierbare Messungen.
+
+[[deployment-view]]
+== Verteilungssicht
+
+=== Beobachteter Stand
+
+* Storybook wird lokal mit `npm run storybook` betrieben.
+* `npm run build-storybook` erzeugt die statische Veröffentlichung.
+* `.github/workflows/deploy-storybook.yaml` baut und veröffentlicht auf GitHub Pages.
+* React-Artefakte werden über `npm run build:react` erzeugt.
+* `package.json` definiert die Inhalte und öffentlichen Exports des Pakets.
+
+Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus. Ein Qualitätsworkflow ist eine geplante Ergänzung, kein vorhandener Nachweis.
+
+=== Beschlossene Vanilla-Auslieferung
+
+Quelle: `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`.
+
+Am 12. Oktober 2026 wurde GitHub-Release mit `dist/vanilla` als erste Auslieferung festgelegt. Ab Version 1.0 ist npm vorgesehen. Release-Skript, Prüfsummen, Versionsabgleich und `portal-sync` sind laut Plan noch umzusetzen beziehungsweise abzunehmen.
+
+=== Dokumentation und MCP
+
+Der Workflow `.github/workflows/render-docs.yml` (Vorlage: Workflow „Render AsciiDoc Documentation" im Vereinsregister) löst bei Änderungen an `docs/**/*.adoc` auf `main` mit `asciidoctor-reducer` alle Includes von `docs/architecture/index.adoc` auf und committet das Ergebnis als `docs/architecture/README.adoc`. Damit zeigt GitHub das Gesamtdokument an. Mermaid-Diagramme erscheinen dort als Quelltextblöcke; ein grafisches Rendering (z. B. asciidoctor-diagram) ist nicht Teil dieses Schritts. Eine statische Storybook-Veröffentlichung ist nicht automatisch ein laufender MCP-Dienst. Lokale und öffentlich gehostete MCP-Nutzung benötigen getrennte Betriebsentscheidungen.
+
+[[crosscutting-concepts]]
+== Querschnittliche Konzepte
+
+=== Gestaltung
+
+Neue Gestaltung soll dokumentierte semantische Rollen-Tokens verwenden. Direkte primitive Farbwerte sind kein Ersatz für ein bestehendes semantisches Token. Marken- und Theme-Varianten gehören in die gemeinsame Grundlage.
+
+=== Accessibility
+
+Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusmanagement sind Bestandteil der API-Verantwortung. Modal- und Tabs-Parität weisen laut Lückenplan noch offene Punkte auf. Aussagen zu WCAG-Konformität müssen einen benannten Prüfungsumfang haben; Kontrasttests allein beweisen keine vollständige Konformität.
+
+=== Sicherheit
+
+Die geplanten Vanilla-Renderer escapen Texte und prüfen URLs über gemeinsame Hilfen. Kein ungeprüftes Rohmarkup wird als normale Eingabe akzeptiert. Der Umgang mit protokollrelativen URLs ist im Lückenplan noch entscheidungsbedürftig. DOM-Erzeugung allein ersetzt keine Eingabevalidierung.
+
+=== Datenschutz
+
+Kartenanfragen und externe Assets müssen explizit dokumentiert sein. Lokale Leaflet-Auslieferung und Zwei-Klick-Freigabe sind Bestandteile des Vanilla-Plans.
+
+=== Parität und SSR
+
+Gleiche fachliche Eingaben sollen gleichwertige Ausgabe liefern. Framework-spezifische Unterschiede werden dokumentiert, nicht verborgen. Browser-APIs müssen in SSR-tauglichen Komponenten an geeignete Lifecycle-Grenzen gebunden werden.
+
+=== Dokumentationszuständigkeit
+
+Storybook erklärt Verwendung. Diese arc42 erklärt Architektur. Superpowers dokumentiert Entwürfe und Umsetzung. `CLAUDE.md` enthält die kurzen Arbeitsregeln für Coding-Agents (Befehle, Architekturregeln, Storybook-Konventionen, Arbeitsweise) und verweist für Begründungen auf diese Dokumentation statt sie zu wiederholen. Generierte APIs folgen Code und Exports. Widersprüche sind zu bereinigen, nicht durch weitere Kopien zu vervielfachen.
+
+[[architecture-decisions]]
+== Architekturentscheidungen
+
+Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehungsweise `docs/superpowers/plans/` getroffen wurden. Begründungen stammen aus diesen Quellen; nichts wird rückwirkend ergänzt. Ablösung erfolgt durch ein neues, verlinktes ADR.
+
+=== ADR-001: Eine CSS-Quelle, drei Fassungen
+
+* Status: angenommen, umgesetzt.
+* Kontext: Komponenten existieren als Vanilla-CSS-Klassen, Svelte und React und sollen gleich aussehen.
+* Entscheidung: Das Aussehen steht ausschließlich in `css/components.css` (Klassen `dss-*`, Tokens aus `tokens/`). Svelte-Dateien haben keinen `<style>`-Block. `parity.manifest.json` ordnet je Komponente Dateien und Klassen zu; `tests/parity.test.ts` prüft die Vollständigkeit. Die Vanilla-Fassung wird als dritte Fassung im Manifest geführt (für Tabs und Modal bereits vorhanden); für die Render-Funktionen ist das mit V2a geplant.
+* Konsequenzen: Neue Komponenten brauchen Manifest-Eintrag, Exporte und CSS an einer Stelle; Abweichungen werden über Paritätstests sichtbar.
+* Quellen: `2026-10-08-spielplan-design.md` (kein `<style>`, Manifest), `2026-10-11-vanilla-paket-design.md` (Teil 2, dritte Fassung), README (`components.css` „einzige CSS-Quelle"), `CLAUDE.md`.
+
+=== ADR-002: Überschriften-Ebenen über `titleAs` und `HeadingLevel`
+
+* Status: angenommen, umgesetzt.
+* Kontext: Ein Token kann die Ebene (HTML-Element) nicht ändern, nur das Aussehen. Ebene und Aussehen sollen getrennt und abschnittsweise vorgegeben werden.
+* Entscheidung: Komponenten geben nie `h1` aus. Rangfolge: `titleAs` > `HeadingLevel`-Kontext > Standard `h3`; Ebenen werden auf `h2`–`h6` begrenzt (`js/heading.js`). Die Größe hängt an Klassen und Tokens (`--dss-title-size` …), nie am Elementnamen. Modal und verschachtelte Bereiche erhöhen die Ebene ihres Inhalts um 1. In Vanilla gibt es keinen Kontext; die Ebene wird übergeben.
+* Konsequenzen: Eine CSS-Regel auf `h2`/`h3`/`h4` für Größen ist unzulässig und wird getestet; axe `heading-order` gehört zu den Docs-Prüfungen.
+* Quellen: `2026-10-10-ueberschriften-design.md`, `2026-10-11-vanilla-paket-design.md`.
+
+=== ADR-003: Karte mit Zwei-Klick-Freigabe und Kachel-Proxy
+
+* Status: angenommen, umgesetzt.
+* Kontext: Jede Kachel wird vom Kartenserver geladen, der die IP der Besucher sieht.
+* Entscheidung: Leaflet ist optionale Peer-Abhängigkeit und wird per `import('leaflet')` erst bei Bedarf geladen. Standard ist `load="click"` (Platzhalter mit Hinweis, erst nach Klick Leaflet und Kacheln); `load="auto"` ist für Apps mit Einwilligung oder eigenem Proxy vorgesehen. `tileUrl` erlaubt einen Kachel-Proxy der App; der Standard-OSM-Server gilt nur als Demo/Entwicklung. Das Paket enthält keinen Serverteil; Proxy-Rezepte (nginx, Node/SvelteKit) stehen nur in der Doku.
+* Konsequenzen: Datenschutzaussagen hängen vom Lademodus und von `tileUrl` ab. Svelte und React teilen den Controller `js/map-leaflet.js`.
+* Quellen: `2026-10-11-map-hallenkarte-design.md`, Plan `2026-10-11-map.md`.
+
+=== ADR-004: Accordion mit Überschrift und Button, `details` nur zusätzlich
+
+* Status: angenommen, umgesetzt.
+* Kontext: Lange Seiten mit vielen Tabellen (Vereinsregister) sollen gegliedert werden; benötigt werden Deep-Link, Sprungleiste, Tastatursteuerung (Pfeile, Home, End), „Alle öffnen" und klebender Kopf.
+* Entscheidung: Komponenten nutzen das WAI-ARIA-Muster mit Überschrift und `<button aria-expanded aria-controls>`. Im Vanilla-CSS wird zusätzlich natives `<details>`/`<summary>` mit gleichem Aussehen unterstützt.
+* Konsequenzen: Die Überschriftenregel aus ADR-002 gilt auch für Accordion-Köpfe; die Zusatzfunktionen hängen am Button-Weg.
+* Quellen: `2026-10-10-accordion-design.md`, Pläne `2026-10-10-accordion.md`, `2026-10-11-accordion-b.md`.
+
+=== ADR-005: Vanilla-Verhalten nach dem Muster `initX(root, options) → { destroy() }`
+
+* Status: angenommen; teilweise umgesetzt. Vorhanden sind das Muster `initX`/`destroy`, `initAll`, `initTabs`, `initModal`, `initPageNav`, `initBackToTop`, `initTheme` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`); das Bündel `dist/vanilla` (`dss.js`, `dss.min.js`, `dss.d.ts`, `dss.css`) entsteht mit `npm run build:vanilla` und hat ein Größenbudget als Test. Das Register der Instanzen wird über `Symbol.for('dss.registry')` zwischen Kopien des Bündels geteilt. Die Render-Funktionen mit `esc()` und `createContextualFragment` sind erst mit V2a geplant.
+* Kontext: Das Vereinsregister ist ein statisches Vanilla-JS-Portal; Mittelweg statt Wechsel auf Svelte/React.
+* Entscheidung: Einheitliches Muster `initX(root, options)` → `{ destroy() }`, idempotent, nur `root` und Nachfahren, kein globaler Zustand, respektiert reduzierte Bewegung. `initAll(scope)` findet Bausteine über `data-dss`. Render-Funktionen escapen Texte zentral (`esc()`), URLs laufen durch `safeHref`; Einfügen per `createContextualFragment`.
+* Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping.
+* Quellen: `2026-10-11-vanilla-paket-design.md` (Teil 1 und 2), `2026-10-11-portal-bausteine-review.md`, Plan `2026-10-12-vanilla-v2-plan.md`.
+
+=== ADR-006: Auslieferung per GitHub-Release, ab 1.0 per npm
+
+* Status: angenommen am 2026-10-12; Umsetzung laut Plan.
+* Kontext: Optionen waren A (GitHub-Release mit `dist/vanilla`), B (npm-Paket), C (Git-Dependency mit `prepare`).
+* Entscheidung: A bis Version 1.0, danach B. Release-Skript und `portal-sync` werden so gebaut, dass der Wechsel nur die Quelle ändert, nicht den Aufbau von `dist/vanilla`.
+* Konsequenzen: Kein npm-Konto bis 1.0 nötig, `dist/` bleibt außerhalb von Git; das Portal lädt eine feste Version.
+* Quellen: Plan `2026-10-12-vanilla-v2-plan.md`, Abschnitt V3.
+
+=== Offene Punkte (keine ADRs)
+
+[cols="1,1,2",options="header"]
+|===
+|Thema |Status |Quelle
+|Protokollrelative URLs |Offen |Lückenplan; nicht eigenmächtig entscheiden
+|Favoriten als DSS-Komponente |Offen |Portal-Review und Lückenplan
+|PageHeader/Hero |Bedarfsabhängiger Vorschlag |Lückenplan
+|CMS-Adapter |Vorgeschlagene Erweiterung |Separater Entwurf erforderlich
+|Produktname |Offen |Kapitel 1
+|===
+
+[[quality-requirements]]
+== Qualitätsanforderungen
+
+Die folgenden Szenarien sind Anforderungen beziehungsweise Prüfziele. Sie sind keine Aussage, dass alle Prüfungen bereits erfolgreich durchgeführt wurden.
+
+[cols="1,2,2",options="header"]
+|===
+|ID |Szenario |Prüfansatz
+|Q-01 |Gleiche Eingaben liefern gleichwertige Framework-Ausgabe |Normalisierter Markupvergleich plus visuelle und semantische Prüfung
+|Q-02 |Ein Modal ist per Tastatur bedienbar und gibt Fokus zurück |Interaktionstest in relevanten Implementierungen
+|Q-03 |Zerstörte Komponenten hinterlassen keine eigenen Listener oder Observer |Lifecycle-Tests; für Karten reproduzierbare Browsermessung
+|Q-04 |Zwei-Klick-Karten verursachen vor Freigabe keine externen Kartenanfragen |Browsertest mit Netzwerkbeobachtung
+|Q-05 |Unvertrauenswürdige Texte und URLs können keine ausführbare Ausgabe einschleusen |Gezielte Eingabe- und Sicherheitstests
+|Q-06 |Kernfunktionen laufen in Chromium, Firefox und WebKit |Browsermatrix gemäß Lückenplan
+|Q-07 |Dokumentierte Imports und Beispiele entsprechen öffentlichen APIs |Export- und Beispielprüfung
+|Q-08 |Ein Agent findet Komponente, API und Architekturregel ohne erfundene Imports |Referenzaufgabe mit dokumentiertem Ergebnis; Katalog noch aufzubauen
+|===
+
+=== Vorhandene Prüfinfrastruktur
+
+Das Repository enthält Vitest-Tests, Paritätstests, Kontrast- und Fokusprüfungen sowie zahlreiche SSR-, Dokumentations- und Verhaltenstests. Testnamen beweisen weder vollständige Abdeckung noch erfolgreiche Ausführung. Die Baseline wurde ohne Ausführung dieser Tests erstellt.
+
+=== Noch festzulegen
+
+Messgrenzen, unterstützte Browserstände, verbindliche CI-Gates sowie Umfang manueller Accessibility-Prüfungen müssen dokumentiert werden. Eine pauschale AAA-Zusage ist kein Ersatz für diese Nachweise.
+
+[[risks-and-technical-debt]]
+== Risiken und technische Schulden
+
+=== Quellen
+
+* `docs/superpowers/plans/2026-10-12-luecken-plan.md`
+* `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`
+* `docs/superpowers/specs/2026-10-11-portal-bausteine-review.md`
+
+Der neuere Vanilla-Plan konkretisiert den älteren Review. Aufgaben aus historischen Reviews dürfen nicht ungeprüft erneut als offen behandelt werden.
+
+=== Priorisierte Risiken
+
+. Fokusmanagement und Tastaturparität: Modal und Tabs laut Lückenplan.
+. Eingabesicherheit: URL-Regeln und künftige Renderer.
+. Karten-Lifecycle: widersprüchlicher Speicherbefund und fehlender Retry laut Plan.
+. Prüflücken: Browsermatrix, CSP und vollständige Docs-Prüfungen.
+. Auslieferung: noch nicht abgeschlossener Vanilla-Releaseprozess.
+. Dokumentationsdrift: abweichende Versionen, Begriffe und Planstände.
+. Agent-Zugriff: kein zentraler Root-Einstieg in der geprüften Struktur; Katalog noch unvollständig.
+
+=== Umsetzungsstand
+
+Der Umsetzungsstand einzelner Pakete wird hier nicht geführt. Maßgeblich sind die Pläne unter `docs/superpowers/plans/`, insbesondere `2026-10-12-vanilla-v2-plan.md` und `2026-10-12-luecken-plan.md`, abgeglichen mit Code und Branches.
+
+=== Pflege
+
+Diese Seite ist kein zweites Aufgabenboard. Detaillierte Aufgaben bleiben in den verlinkten Plänen. Statusänderungen sollen hier nur Architekturfolgen aktualisieren. Print/PDF-Baukasten und neue Portal-Komponenten sind optionale Erweiterungen, nicht Voraussetzung für diese Baseline.
+
+[[glossary]]
+== Glossar
+
+[cols="1,3",options="header"]
+|===
+|Begriff |Bedeutung in dieser Dokumentation
+|DSS |Kurzform des Systems. Arbeitsname, Entscheidung offen: „HoopsFoundry DSS" (DSS = Digital Sports System) oder „HoopsFoundry UI". Ursprünglich aus dem Kontext „Digitaler Spielbericht"
+|HoopsFoundry |Arbeitsname der Produktfamilie, Entscheidung offen; Paket- und Repository-Name bleiben bis dahin unverändert
+|Vereinsregister-Portal |Statisches Portal (Vanilla-JS, GitHub Pages) im Repository `basketball-vereinsregister-deutschland`; Hauptnutzer und Auslöser des Vanilla-Pakets
+|Turnier-Manager |Anwendung im Repository `basketball-turnier-manager` (Name laut Auftraggeber); rendert PDFs und nutzt u. a. die Spielplan-Bausteine
+|Token |Benannter Gestaltungswert beziehungsweise Verweis auf einen Wert
+|Rollen-Token |Semantischer Wert wie Aktion, Oberfläche oder Text statt konkreter Farbpalette
+|Adapter |Plattformspezifische Umsetzung gemeinsamer Verträge
+|Parität |Dokumentierte Gleichwertigkeit von Ausgabe und Verhalten; nicht zwingend identischer Quellcode
+|SSR |Serverseitige Ausgabe ohne vorausgesetzte Browserumgebung
+|Lifecycle |Initialisierung, Aktualisierung und Aufräumen einer Instanz
+|Renderfunktion |Erzeugt Ausgabe aus Eingaben; zusätzliche Vanilla-APIs sind geplant
+|Mount |Bindet Ausgabe und gegebenenfalls Verhalten an ein DOM-Element
+|ADR |Architecture Decision Record mit Kontext, Entscheidung, Status und Konsequenzen
+|MCP |Model Context Protocol; Zugriffsschicht für Agent-Werkzeuge und Kontext
+|Baseline |Erste prüfbare Architekturfassung, kein vollständiger Implementierungsnachweis
+|===
