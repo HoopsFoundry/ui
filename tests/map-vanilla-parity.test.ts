@@ -61,3 +61,25 @@ describe('Karte: ids', () => {
     expect(html).not.toContain('disabled');
   });
 });
+
+describe('Karte: Höhe und Beschriftung in allen Fassungen gleich', () => {
+  const cases: Record<string, Record<string, unknown>> = {
+    'Höhe 2001': { ...BASE, height: 2001 },
+    'Höhe 5000': { ...BASE, height: 5000 },
+    'Höhe 199': { ...BASE, height: 199 },
+    'Höhe NaN': { ...BASE, height: Number.NaN },
+    'ohne label': { markers: [HALLEN[0]] },
+    'label leer': { label: '', markers: [HALLEN[0]] },
+  };
+  it.each(Object.entries(cases))('%s', async (_name, props) => {
+    const v = normalize(renderMap(props as never));
+    const r = await p.react('MapView', props, undefined, 'Map');
+    expect(v).toBe(r);
+    expect(await p.svelte('Map', props)).toBe(r);
+  });
+  it('2001 und 5000 werden 2000 px, 199 wird 200 px; ohne label kein aria-label', () => {
+    expect(renderMap({ ...BASE, height: 5000 } as never)).toContain('--dss-map-h:2000px');
+    expect(renderMap({ ...BASE, height: 199 } as never)).toContain('--dss-map-h:200px');
+    expect(renderMap({ markers: [] } as never)).not.toContain('role="region" aria-label');
+  });
+});

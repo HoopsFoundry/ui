@@ -208,3 +208,18 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
     expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 24, gzipKB: 10 };');
   });
 });
+
+describe('Doku: Referrer, hängender Lader, Fehlergründe, Höhe', () => {
+  const mdx = read('stories/Map.mdx');
+  it('Referrer: Origin, Policy der Seite, Proxy, kein no-referrer für OSM', () => {
+    for (const needle of ['### Referrer und Origin', 'strict-origin-when-cross-origin', 'Same-Origin', 'no-referrer', 'gültigen Referer']) expect(mdx, needle).toContain(needle);
+  });
+  it('hängender Lader, Grund update, onerror bei ungültiger Anfangsadresse, Höhe 200 bis 2000', () => {
+    expect(mdx).toContain('**Hängt der Lader**');
+    expect(mdx).toContain("'tile-url' | 'import' | 'init' | 'update' | 'tiles'");
+    expect(mdx).toContain('`onerror` wird hier nicht gerufen');
+    expect(mdx).toContain('200 bis 2000 px');
+    expect(read('svelte/Map.svelte')).toContain('Math.min(2000, Math.max(200, height))');
+    expect(read('react/Map.tsx')).toContain('Math.min(2000, Math.max(200, height))');
+  });
+});

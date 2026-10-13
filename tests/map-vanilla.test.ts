@@ -549,3 +549,67 @@ describe('update mit Teilen (kein stiller Rückfall auf den Standardserver)', ()
     expect(lastLayer().url).toBe('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
   });
 });
+
+describe('Verhalten (nicht nur Quelltextmuster)', () => {
+  it('Importfehler, dann update mit neuer tileUrl: der Fehler ist weg und loadLeaflet läuft erneut', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const mockL = (await import('./helpers/leaflet-mock')).default;
+    let calls = 0;
+    const loader = () => (++calls === 1 ? Promise.reject(new Error('404')) : Promise.resolve(mockL));
+    const errors: string[] = [];
+    const handle = mountMap(host, { ...BASE, load: 'auto', tileUrl: '/a/{z}/{x}/{y}.png' } as never, { loadLeaflet: loader, onError: (r) => errors.push(r) });
+    await vi.waitFor(() => expect(errors).toEqual(['import']));
+    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
+    // gleiche Adresse: bleibt im Fehler, der Lader wird nicht erneut gerufen
+    handle.update({ label: 'Name' });
+    expect(calls).toBe(1);
+    handle.update({ tileUrl: '/b/{z}/{x}/{y}.png' });
+    await vi.waitFor(() => expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready'));
+    expect(calls).toBe(2);
+    expect(lastLayer().url).toBe('/b/{z}/{x}/{y}.png');
+    expect(host.querySelector('.dss-map-status')!.textContent).toBe('');
+  });
+  it('hängender Lader: die Karte bleibt im Zustand „Laden“, ohne Fehler und ohne Karte', async () => {
+    const errors: string[] = [];
+    mountMap(host, { ...BASE, load: 'auto' } as never, { loadLeaflet: () => new Promise(() => {}), onError: (r) => errors.push(r) });
+    await tick();
+    await tick();
+    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('loading');
+    expect(host.querySelector('.dss-map-status')!.textContent).toBe('Karte wird geladen …');
+    expect(errors).toEqual([]);
+    expect(state.maps).toHaveLength(0);
+  });
+  it('Vereinssitz zählt nicht mit: Liste, Pins im Platzhalter und Marker der Karte nummerieren die Orte von 1 an', async () => {
+    const handle = mountMap(host, { label: 'K', markers: [{ ...C, kind: 'seat' }, A, B], load: 'auto' } as never);
+    expect([...host.querySelectorAll('.dss-map-ph-pin')].map((p) => p.textContent)).toEqual(['', '1', '2']);
+    await vi.waitFor(() => expect(state.markers).toHaveLength(3));
+    expect([...host.querySelectorAll('.dss-map-item')].map((li) => li.querySelector('.dss-map-num')?.textContent)).toEqual(['', '1', '2']);
+    expect(state.markers.map((m) => m.options.title)).toEqual(['Gymnasium Lindenberg, Vereinssitz', '1, Sporthalle Nordhain', '2, Halle Süd & West']);
+    handle.destroy();
+  });
+  it('Style-Whitelist und reapplyStyles: nur left, top, width und --dss-map-h gelangen ins CSSOM', async () => {
+    const { insertMarkup, reapplyStyles } = await import('../js/render/dom.js');
+    const box = document.createElement('div');
+    insertMarkup(box, '<span id="a" style="left:10%;top:20%;color:red;background:url(javascript:1);width:5px;--dss-map-h:300px;--evil:1"></span><i id="b" style="left:calc(1px + 2px)"></i>');
+    const a = box.querySelector<HTMLElement>('#a')!;
+    expect([a.style.left, a.style.top, a.style.width, a.style.getPropertyValue('--dss-map-h')]).toEqual(['10%', '20%', '5px', '300px']);
+    expect(a.style.color).toBe('');
+    expect(a.style.getPropertyValue('--evil')).toBe('');
+    expect(a.style.background).toBe('');
+    expect(box.querySelector<HTMLElement>('#b')!.style.left).toBe('');
+    // reapplyStyles: die Attribute eines vorhandenen Baums werden über das CSSOM (erneut) angewendet, nur bekannte Eigenschaften
+    const calls: string[] = [];
+    const set = CSSStyleDeclaration.prototype.setProperty;
+    vi.spyOn(CSSStyleDeclaration.prototype, 'setProperty').mockImplementation(function (this: CSSStyleDeclaration, name: string, value: string) {
+      calls.push(name);
+      return set.call(this, name, value);
+    });
+    const server = document.createElement('div');
+    server.setAttribute('style', '--dss-map-h:410px;color:blue');
+    const pin = document.createElement('span');
+    pin.setAttribute('style', 'left:30%;top:40%;position:fixed');
+    server.append(pin);
+    reapplyStyles(server);
+    expect(calls.sort()).toEqual(['--dss-map-h', 'left', 'top']);
+  });
+});

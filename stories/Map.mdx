@@ -26,7 +26,7 @@ Die Karte hat vier Teile. `markers` und `label` sind Pflicht, alles andere ist o
 - **Statusmeldung** (`role="status"`): „Karte wird geladen …“ und im Fehlerfall „Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.“
 - **Textalternative:** die nummerierte Liste der Orte mit Name, Koordinaten und Links (siehe unten). Sie ist immer da, auch ohne Skript und beim Drucken.
 
-Die Karte ist 320 px hoch (`height`, mindestens 200 px) und so breit wie ihr Platz.
+Die Karte ist 320 px hoch (`height`, 200 bis 2000 px) und so breit wie ihr Platz.
 
 <Canvas of={MapStories.Aufbau} />
 
@@ -47,6 +47,10 @@ Die Komponente ersetzt keine Datenschutzerklärung und keine Rechtsberatung. Ob 
 ### Das Problem und die Proxy-Variante
 
 Mit dem Standard-Kartenserver `tile.openstreetmap.org` ruft der Browser jede Kachel direkt dort ab. Bei der **Proxy-Variante** stellt die App unter ihrer eigenen Adresse einen Kachel-Proxy bereit, zum Beispiel `/tiles/{z}/{x}/{y}.png`. Der Proxy ruft die Kacheln beim Kartendienst ab und speichert sie zwischen. Der Besucher spricht dann **nur mit dem Server der App**; der Kartendienst sieht nur die IP-Adresse des Proxys. Die Karte braucht dafür nur eine Zeile: `tileUrl="/tiles/{z}/{x}/{y}.png"` (in Svelte als Konstante, weil `{z}` in einem Attribut ein Ausdruck wäre). Ein eigener Proxy erlaubt `load="auto"`.
+
+### Referrer und Origin
+
+Jede Kachelanfrage überträgt den **Origin** der Seite (Standardrichtlinie `strict-origin-when-cross-origin`: bei einer Anfrage an einen anderen Host geht nur Schema, Host und Port mit, nicht der Pfad). Es gilt die Referrer-Policy deiner Seite (Header `Referrer-Policy` oder `meta name="referrer"`); die Karte setzt keine eigene. Mit einem eigenen Kachel-Proxy unter derselben Adresse wie die Seite (Same-Origin) bleibt die Anfrage bei dir, der Kartendienst sieht sie nie. **Setze `no-referrer` nicht für Kacheln von OpenStreetMap:** die Tile Usage Policy verlangt einen gültigen Referer, sonst können Kacheln blockiert werden.
 
 Das Design System liefert **nur die Komponente und diese Doku, keinen Serverteil**. Die Rezepte unten sind Beispiele zum Kopieren, nicht Teil des Pakets.
 
@@ -174,7 +178,7 @@ Schlägt das Laden fehl, bleibt die Seite benutzbar: statt der Karte steht der H
   label="Fehlerfälle der Karte"
   head={['Fall', 'Grund (`onerror`)', 'Verhalten']}
   rows={[
-    ['`tileUrl` ungültig (kein `{z}`, `{x}`, `{y}`, `http:` außer `localhost`, `//host`, Sonderzeichen)', 'tile-url', 'Fehlerhinweis sofort, ohne Klick; Leaflet wird nie geladen; in der Entwicklung eine Warnung in der Konsole.'],
+    ['`tileUrl` ungültig (kein `{z}`, `{x}`, `{y}`, `http:` außer `localhost`, `//host`, Sonderzeichen)', 'tile-url', 'Fehlerhinweis sofort, ohne Klick; Leaflet wird nie geladen; in der Entwicklung eine Warnung in der Konsole. `onerror` wird hier nicht gerufen: der Zustand ergibt sich aus der Adresse (in allen drei Fassungen), der Grund `tile-url` erreicht den Handler nur, wenn eine laufende Karte eine ungültige Adresse bekommt.'],
     ['Leaflet fehlt oder lässt sich nicht laden (nicht installiert, Chunk nicht erreichbar)', 'import', 'Fehlerhinweis; Warnung in der Entwicklung.'],
     ['Aufbau der Karte schlägt fehl', 'init', 'Fehlerhinweis.'],
     ['Aktualisierung (Marker, Ausschnitt) wirft einen Fehler', 'update', 'Fehlerhinweis statt eines Absturzes der Seite.'],
@@ -291,6 +295,8 @@ Die Dateien kommen aus `@bbv/dss-design-system/vanilla-map` (`dist/vanilla/dss-m
 
 <FrameworkCode label="Leaflet als window.L" vanilla={globalVariante} />
 
+**Hängt der Lader** (das Promise wird weder erfüllt noch abgelehnt, etwa bei einem Netz ohne Antwort), bleibt die Karte im Zustand „Karte wird geladen …“: es gibt kein Zeitlimit und keinen Fehler. Wer eines braucht, wickelt den Lader in ein Promise mit Zeitlimit (`Promise.race`) und lässt es ablehnen; dann gilt der Grund `import`.
+
 Der Lader darf ein Modul liefern (`leaflet-src.esm.js`, ein Namensraum mit `map`, `tileLayer`, `marker`, `divIcon`) oder das Global `L`. Liefert er etwas anderes, wirft er oder ist die Datei nicht ladbar, endet die Karte im Fehlerzustand mit dem Grund `import` (`onError`): die Statuszeile nennt es, Adresse und Links der Liste bleiben.
 
 ### Die ganze Seite
@@ -366,7 +372,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
     ['seatLabel', 'string', 'Text für den Sitzmarker (`kind: "seat"`) in der Liste und im Namen des Markers; Standard „Vereinssitz“.'],
     ['center', '[number, number]', 'Mittelpunkt `[Breite, Länge]`. Mit `center` ist der Standardzoom 15, ohne `center` und `zoom` passt sich der Ausschnitt den Markern an.'],
     ['onload (Svelte), onLoad (React)', '(map) => void', 'Die Karte steht. Das Argument ist die Leaflet-Karte (`L.Map`); damit lässt sich Leaflet erweitern.'],
-    ['onerror (Svelte), onError (React)', "(reason: 'tile-url' | 'import' | 'init' | 'tiles') => void", 'Laden fehlgeschlagen (siehe Fehlerfall).'],
+    ['onerror (Svelte), onError (React)', "(reason: 'tile-url' | 'import' | 'init' | 'update' | 'tiles') => void", 'Laden fehlgeschlagen (siehe Fehlerfall).'],
     ['onmarkerclick (Svelte), onMarkerClick (React)', '(marker) => void', 'Klick oder Enter an einem Marker; danach öffnet ein vorhandenes `href`.'],
     ['class (Svelte), className (React)', 'string', 'Zusätzliche Klasse am Wurzelelement.'],
   ]}
@@ -400,7 +406,7 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
   label="Maße der Karte (gemessen im Browser)"
   head={['Maß', 'Wert']}
   rows={[
-    ['Höhe der Karte', '320 px (Standard, `height`; mindestens 200 px)'],
+    ['Höhe der Karte', '320 px (Standard, `height`; 200 bis 2000 px)'],
     ['Zoom-Schaltflächen', '44 × 44 px, Abstand 8 px, 12 px vom Rand'],
     ['Marker (Fläche zum Anklicken)', '44 × 46 px, der Pin 36 × 46 px'],
     ['Quellenangabe (Link)', '28 px hoch, Schrift 13 px'],

@@ -16,7 +16,7 @@ export interface MapProps {
   center?: [number, number];
   /** Zoomstufe 3 bis 19 (Standard 15 bei Mittelpunkt oder einem Marker). */
   zoom?: number;
-  /** Höhe in Pixeln (Standard 320, mindestens 200). */
+  /** Höhe in Pixeln (Standard 320, 200 bis 2000). */
   height?: number;
   /** `false`: kein Ziehen, Scrollzoom und Doppelklick; Tasten und Zoom-Schaltflächen bleiben. */
   interactive?: boolean;

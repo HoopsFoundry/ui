@@ -113,6 +113,8 @@ Jede Eingabe gilt als unvertraut. Texte laufen durch `esc`, Attributwerte durch 
 
 <CodeBlock label="esc, attr und safeHref" language="JavaScript" code={renderEscape} />
 
+**Bekannte Abweichungen zu den Komponenten:** `esc` entfernt Steuerzeichen außer Tabulator, Zeilenvorschub und Wagenrücklauf (auch NUL); Svelte und React lassen sie im Text stehen, der Browser macht daraus beim Parsen etwas Eigenwilliges. Der Paritätstest normalisiert Leerraum (aufeinanderfolgender Leerraum zählt als ein Zeichen, Leerraum an Tag-Grenzen entfällt), die Ausgabe ist sonst Zeichen für Zeichen dieselbe. Beides ändert nichts, was ein Mensch sieht.
+
 ### In Node und im Crawler
 
 Die Render-Funktionen brauchen kein DOM: der Import hat keine Nebenwirkung, `mountX` tut in Node nichts. Statische Seiten lassen sich so im Crawler mit demselben Markup bauen, das im Browser entsteht. Ohne JavaScript bleibt ein einklappbarer Rahmen geschlossen (Bereich `hidden inert`): für statische Seiten, die ohne Skript lesbar sein sollen, setze `open: true`. Das Ergebnis von `renderX` ist Markup mit `style`-Attributen (siehe CSP).
