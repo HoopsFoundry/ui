@@ -11,7 +11,7 @@ import * as source from '../js/render/index.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Render-Bündel (gemessen: 51 312 B = 50,1 KiB min, 17 450 B = 17,0 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 37 164 B, 13 241 B; die Karte liegt im Bündel dss-map).
+// Eigenes Budget für das Render-Bündel (gemessen: 51 312 B = 50,2 KiB min, 17 450 B = 17,1 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 37 164 B, 13 241 B; die Karte liegt im Bündel dss-map).
 // Begründung: zehn Komponenten mit Markup, Logik aus league/schedule/team/venue/map; das Accordion kommt aus dem Kern und zählt hier nicht.
 export const RENDER_BUDGET = { minBytes: 52 * 1024, gzipBytes: 18 * 1024 };
 
