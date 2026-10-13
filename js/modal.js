@@ -62,11 +62,14 @@ function unlockScroll(doc) {
 function inertAround(el) {
   const changed = [];
   const body = el.ownerDocument.body;
+  // Geschlossene Modal-Wurzeln bleiben unberührt (sonst wäre ein zweites, gestapeltes Modal inert); offene gehören zur Seite dahinter
+  const openRoots = new Set(stack.map((record) => record.root));
   for (let node = el; node && node !== body; node = node.parentElement) {
     const parent = node.parentElement;
     if (!parent) break;
     for (const sibling of parent.children) {
       if (sibling === node || sibling.hasAttribute('inert') || /^(SCRIPT|STYLE|LINK|TEMPLATE)$/.test(sibling.tagName)) continue;
+      if (instances.has(sibling) && !openRoots.has(sibling)) continue;
       sibling.setAttribute('inert', '');
       changed.push(sibling);
     }
@@ -75,6 +78,14 @@ function inertAround(el) {
     for (const sibling of changed) sibling.removeAttribute('inert');
   };
 }
+
+const productionBuild = () => {
+  try {
+    return process.env.NODE_ENV === 'production';
+  } catch {
+    return false;
+  }
+};
 
 const isElement = (value) => Boolean(value) && typeof value === 'object' && value.nodeType === 1;
 
@@ -119,13 +130,16 @@ export function initModal(root, options = {}) {
     }
   }
   if (!surface.hasAttribute('tabindex')) surface.setAttribute('tabindex', '-1');
+  if (!dialogEl.hasAttribute('aria-labelledby') && !dialogEl.hasAttribute('aria-label') && !productionBuild()) {
+    console.warn('DSS Modal: Das Modal hat keinen zugänglichen Namen. Gib dem Titel class="dss-m-title" (oder data-dss-modal-title) oder dem Dialog aria-label/aria-labelledby.', root);
+  }
 
   let opened = false;
   let nativeOpen = false;
   let restoreInert = null;
   let returnTo = null;
   let lastTrigger = null;
-  const record = { root };
+  const record = { root, surface };
 
   const emit = (type, detail, callback) => {
     root.dispatchEvent(new CustomEvent(type, { bubbles: true, detail }));
@@ -154,7 +168,21 @@ export function initModal(root, options = {}) {
     if (locksScroll) unlockScroll(doc);
     const target = returnTo;
     returnTo = null;
-    if (target && target.isConnected && typeof target.focus === 'function') target.focus();
+    const usable = (el) => isElement(el) && el.isConnected && typeof el.focus === 'function' && !el.closest('[hidden], [inert]');
+    if (usable(target)) target.focus();
+    else if (target) {
+      // Der Auslöser ist weg oder verborgen: erst die Fläche eines darunter offenen Modals, dann main, sonst bleibt der Fokus unberührt
+      const below = stack[stack.length - 1];
+      const main = doc.querySelector('main, [role="main"]');
+      const fallback = below && usable(below.surface) ? below.surface : usable(main) ? main : null;
+      if (fallback) {
+        if (!fallback.hasAttribute('tabindex')) {
+          fallback.setAttribute('tabindex', '-1');
+          fallback.addEventListener('blur', () => fallback.removeAttribute('tabindex'), { once: true });
+        }
+        fallback.focus({ preventScroll: true });
+      }
+    }
     if (!quiet) emit(MODAL_CLOSE_EVENT, { reason, trigger: lastTrigger }, opts.onClose);
   };
 
@@ -183,10 +211,19 @@ export function initModal(root, options = {}) {
         nativeOpen = false;
       }
     }
+    let ownInert = false;
     if (!nativeOpen) {
+      if (root.hasAttribute('inert')) {
+        root.removeAttribute('inert');
+        ownInert = true;
+      }
       if (isDialog) root.setAttribute('open', '');
       else root.hidden = false;
-      restoreInert = inertAround(root);
+      const restore = inertAround(root);
+      restoreInert = () => {
+        restore();
+        if (ownInert) root.setAttribute('inert', '');
+      };
     }
     if (locksScroll) lockScroll(doc);
     focusTarget().focus({ preventScroll: true });
@@ -223,7 +260,8 @@ export function initModal(root, options = {}) {
       if (opened && closable && isTop()) close('escape');
     }));
     cleanups.add(listen(root, 'close', () => {
-      if (!opened) return;
+      // Das native close-Ereignis kommt asynchron: ist das Modal inzwischen wieder offen (open, close, open im selben Tick), gilt es nicht
+      if (!opened || root.open) return;
       opened = false;
       nativeOpen = false;
       finish('native');
@@ -239,7 +277,7 @@ export function initModal(root, options = {}) {
   // Schließen-Knöpfe und Hintergrund
   let downOnBackdrop = false;
   const onBackdrop = (target) => target === backdropEl || target === wrapEl || (isDialog && target === root);
-  for (const type of ['mousedown', 'pointerdown', 'touchstart']) cleanups.add(listen(root, type, (event) => { downOnBackdrop = onBackdrop(event.target); }, true));
+  for (const type of ['mousedown', 'pointerdown', 'touchstart']) cleanups.add(listen(root, type, (event) => { downOnBackdrop = onBackdrop(event.target); }, { capture: true, passive: true }));
   cleanups.add(listen(root, 'click', (event) => {
     const target = event.target;
     if (!(target instanceof doc.defaultView.Element)) return;

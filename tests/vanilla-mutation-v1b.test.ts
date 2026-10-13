@@ -49,7 +49,7 @@ const TABS: Mutation[] = [
 
 const MODAL: Mutation[] = [
   { name: 'Fokus bleibt draußen', rule: 'Modal: Öffnen holt den Fokus auf die Fläche und gibt ihn beim Schließen an den Auslöser zurück', from: "focusTarget().focus({ preventScroll: true });", to: "" },
-  { name: 'Fokus kehrt nicht zurück', rule: 'Modal: Öffnen holt den Fokus auf die Fläche und gibt ihn beim Schließen an den Auslöser zurück', from: "if (target && target.isConnected && typeof target.focus === 'function') target.focus();", to: "" },
+  { name: 'Fokus kehrt nicht zurück', rule: 'Modal: Öffnen holt den Fokus auf die Fläche und gibt ihn beim Schließen an den Auslöser zurück', from: "if (usable(target)) target.focus();", to: "if (false) target.focus();" },
   { name: 'Fokusziel ignoriert', rule: 'Modal: data-dss-modal-focus bekommt den Fokus', from: "?? root.querySelector('[data-dss-modal-focus], [autofocus]') ?? surface;", to: "?? surface;" },
   { name: 'Escape ohne Wirkung', rule: 'Modal: Escape schließt', from: "if (closable) close('escape');", to: "" },
   { name: 'Escape ignoriert closable', rule: 'Modal: closable false: Escape schließt nicht, der Schließen-Knopf schon', from: "if (closable) close('escape');", to: "close('escape');" },
@@ -62,7 +62,7 @@ const MODAL: Mutation[] = [
   { name: 'keine Falle am Anfang', rule: 'Modal: Tab von der letzten zur ersten Schaltfläche, Umschalt+Tab zurück', from: "(event.shiftKey && (active === first || active === surface))", to: "false" },
   { name: 'Tab in der Mitte wird abgefangen', rule: 'Modal: Tab in der Mitte bleibt dem Browser', from: "if (!dialogEl.contains(active) || (event.shiftKey", to: "if (true || (event.shiftKey" },
   { name: 'Fokus von außen bleibt draußen', rule: 'Modal: Fokus von außen kommt zurück', from: "if (!opened || !isTop() || dialogEl.contains(event.target)) return;\n    (focusables(dialogEl)[0] ?? surface).focus();", to: "return;" },
-  { name: 'Hintergrund nicht inert', rule: 'Modal: der Hintergrund wird inert und beim Schließen zurückgebaut', from: "restoreInert = inertAround(root);", to: "" },
+  { name: 'Hintergrund nicht inert', rule: 'Modal: der Hintergrund wird inert und beim Schließen zurückgebaut', from: "const restore = inertAround(root);", to: "const restore = () => {};" },
   { name: 'inert bleibt stehen', rule: 'Modal: der Hintergrund wird inert und beim Schließen zurückgebaut', from: "for (const sibling of changed) sibling.removeAttribute('inert');", to: "" },
   { name: 'kein aria-modal', rule: 'Modal: role dialog, aria-modal und aria-labelledby aus dem Titel', from: "if (!isDialog) dialogEl.setAttribute('aria-modal', 'true');", to: "" },
   { name: 'keine Beschriftung', rule: 'Modal: role dialog, aria-modal und aria-labelledby aus dem Titel', from: "dialogEl.setAttribute('aria-labelledby', title.id);", to: "" },
@@ -81,6 +81,9 @@ const MODAL: Mutation[] = [
   { name: 'cancel läuft durch', rule: 'Modal: natives Dialog: cancel wird abgefangen', from: "cleanups.add(listen(root, 'cancel', (event) => {\n      event.preventDefault();", to: "cleanups.add(listen(root, 'cancel', (event) => {" },
   { name: 'Dialog selbst ist kein Hintergrund', rule: 'Modal: natives Dialog: Klick auf das Dialog selbst ist der Hintergrund', from: "|| (isDialog && target === root);", to: ";" },
   { name: 'Dialog ohne showModal bleibt ohne inert', rule: 'Modal: ein Dialog ohne showModal bekommt inert statt Top-Layer', from: "if (!nativeOpen) {", to: "if (false) {" },
+  { name: 'spätes close-Ereignis zählt', rule: 'Modal: open, close, open im selben Tick auf natives Dialog: das späte close-Ereignis ändert nichts', from: "if (!opened || root.open) return;", to: "if (!opened) return;" },
+  { name: 'geschlossene Modal-Wurzeln werden inert', rule: 'Modal: ohne dialog gestapelt: das zweite Modal ist nicht inert, hat den Fokus, das erste ist inert und wird beim Schließen frei', from: "if (instances.has(sibling) && !openRoots.has(sibling)) continue;", to: "" },
+  { name: 'kein Rückfall auf main', rule: 'Modal: ist der Auslöser weg, bekommt main den Fokus', from: "const fallback = below && usable(below.surface) ? below.surface : usable(main) ? main : null;", to: "const fallback = null;" },
 ];
 
 const CORE: Mutation[] = [

@@ -198,5 +198,30 @@ export function modalLogicRules(mod: Modal): Rules {
     click(el('freigabe-auf'));
     return el('freigabe').hasAttribute('open') && el('freigabe-auf').hasAttribute('inert');
   }, dialogMarkup(), {}, 'freigabe', false);
+  rule('Modal: open, close, open im selben Tick auf natives Dialog: das späte close-Ereignis ändert nichts', (h) => {
+    h.open();
+    h.close();
+    h.open();
+    el('freigabe').dispatchEvent(new Event('close'));
+    return h.isOpen() && el('freigabe').hasAttribute('open') && document.documentElement.style.overflow === 'hidden';
+  }, dialogMarkup(), {}, 'freigabe');
+  rule('Modal: ohne dialog gestapelt: das zweite Modal ist nicht inert, hat den Fokus, das erste ist inert und wird beim Schließen frei', () => {
+    const second = mod.initModal(el('b'));
+    try {
+      click(el('verwerfen-auf'));
+      second.open();
+      const ok = !el('b').hasAttribute('inert') && el('b').contains(document.activeElement) && el('verwerfen').hasAttribute('inert');
+      second.close();
+      return ok && !el('verwerfen').hasAttribute('inert') && el('verwerfen').contains(document.activeElement) === true && !el('b').hasAttribute('inert');
+    } finally {
+      second.destroy();
+    }
+  }, divMarkup() + divMarkup('b'));
+  rule('Modal: ist der Auslöser weg, bekommt main den Fokus', () => {
+    click(el('verwerfen-auf'));
+    el('verwerfen-auf').remove();
+    key(document.activeElement!, 'Escape');
+    return document.activeElement === el('verwerfen-seite');
+  });
   return out;
 }

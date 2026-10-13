@@ -1985,3 +1985,8 @@ details[open].dss-acc-item > summary.dss-acc-trigger { border-bottom-left-radius
   .dss-acc--sticky > .dss-frame.is-collapsible > .dss-frame-head--acc, .dss-acc--sticky > .dss-league.is-collapsible > .dss-league-head--acc { position: static; }
   .dss-frame-head--acc .dss-acc-trigger:hover, .dss-league-head--acc .dss-acc-trigger:hover { background: transparent; }
 }
+
+/* Druck: eine offene Modal-Sperre (overflow: hidden auf <html>) darf den Druck nicht auf die erste Seite beschränken */
+@media print {
+  html { overflow: visible !important; padding-inline-end: 0 !important; }
+}
