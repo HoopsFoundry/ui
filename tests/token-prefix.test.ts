@@ -15,6 +15,9 @@ export const ALLOWLIST: { muster: string; grund: string }[] = [
   { muster: '--docblock-', grund: 'Dritt-Variablen von Storybook (Docs-Blöcke)' },
 ];
 
+/** Dateien, die die alten Namen als Migrationshinweis nennen dürfen (Ersetzungsregel, Kollisionsauflösung). Der CHANGELOG ist als Historie ohnehin ausgenommen. */
+const MIGRATIONSHINWEISE = new Set(['README.md', 'docs/architecture/sections/09-architecture-decisions.adoc']);
+
 const OK = /^--_?hoops-/;
 const erlaubt = (name: string, allow = ALLOWLIST) => OK.test(name) || allow.some((a) => (a.muster.endsWith('-') ? name.startsWith(a.muster) : name === a.muster));
 
@@ -24,6 +27,7 @@ export function findTokenViolations(files: Map<string, string>, allow = ALLOWLIS
   const names = collectNames(files, new Map());
   for (const [name, where] of names) if (!erlaubt(name, allow)) out.push(`unpräfixiert: ${name} (${[...where].slice(0, 3).join(', ')})`);
   for (const [file, text] of files) {
+    if (MIGRATIONSHINWEISE.has(file)) continue;
     for (const m of text.matchAll(/(?<![\w-])--_?dss-[\w-]*/g)) out.push(`alter Name: ${m[0]} (${file})`);
     // Schablonen mit fremdem Präfix: `--ink-${x}`, `var(--fs-${x})`
     for (const m of text.matchAll(/(?<![\w-])(--[a-z][\w-]*-)\$\{/g)) if (!erlaubt(m[1] + 'x', allow)) out.push(`unpräfixierte Schablone: ${m[1]}\${…} (${file})`);
@@ -78,7 +82,9 @@ describe('Präfix --hoops- (Stufe T)', () => {
   });
   it('Mutation: der alte Name --dss-… kehrt zurück', () => {
     expect(findTokenViolations(withEdit('css/components.css', '--hoops-fg:', '--dss-fg:')).join('\n')).toContain('alter Name: --dss-fg');
-    expect(findTokenViolations(withEdit('README.md', 'Farben laufen über die semantischen Variablen `--hoops-*`', 'Farben laufen über die semantischen Variablen `--dss-*`')).join('\n')).toContain('alter Name: --dss-');
+    // Migrationshinweise (README, ADR) dürfen die alten Namen nennen
+    expect(findTokenViolations(withEdit('README.md', 'Farben laufen über die semantischen Variablen `--hoops-*`', 'Farben laufen über die semantischen Variablen `--dss-*`'))).toEqual([]);
+    expect(findTokenViolations(withEdit('stories/Introduction.mdx', 'Rollen-Tokens und `--hoops-*`', 'Rollen-Tokens und `--dss-*`')).join('\n')).toContain('alter Name: --dss-');
   });
   it('Mutation: private Hilfsvariable ohne Präfix', () => {
     expect(findTokenViolations(withEdit('css/components.css', '--_hoops-acc-chev:', '--_acc-chev:')).join('\n')).toContain('unpräfixiert: --_acc-chev');
