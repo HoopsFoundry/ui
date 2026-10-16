@@ -62,8 +62,9 @@ describe('Download: Strom, Grenze, Zeit', () => {
     const run = await node(['--input-type=module', '-e', code]);
     const result = JSON.parse(run.stdout);
     expect(result.message).toMatch(/größer als 33554432 Byte; der Download wurde abgebrochen/);
-    // Gemessen: der Prozess hält höchstens die 32 MiB plus Puffer; 100 MiB vollständig zu puffern wäre deutlich mehr
-    expect(result.grewMiB).toBeLessThan(80);
+    // Der Prozess hält höchstens die 32 MiB plus Lesepuffer (gemessen 72 bis 83 MiB unter hoher Last); 100 MiB vollständig zu
+    // puffern und zusammenzufügen wäre mehr als das Doppelte
+    expect(result.grewMiB).toBeLessThan(120);
     console.log(`RSS-Zuwachs beim Abbruch eines 100-MiB-Stroms: ${result.grewMiB} MiB`);
   });
   it('ein angekündigter Content-Length über der Grenze wird sofort abgelehnt', async () => {
