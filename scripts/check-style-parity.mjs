@@ -237,7 +237,7 @@ export function classify(r, { kind, erlaubtLayout = false }) {
 
 async function compare(fa, fb, opts) {
   const tol = Number(opts.tol ?? 0.6);
-  // --klassen-alt=<alt>:<neu>[,<alt>:<neu>]: Umbenennung der Klassennamen in der Elementgestalt der VORHER-Aufnahme (Präfix an Wortgrenzen), z. B. dss-:hoops-
+  // --klassen-alt=<alt>:<neu>[,<alt>:<neu>]: Umbenennung der Klassennamen in der Elementgestalt der VORHER-Aufnahme (Präfix an Wortgrenzen), z. B. alt:neu mit altem und neuem Präfix
   const paare = String(opts['klassen-alt'] ?? '').split(',').filter(Boolean).map((x) => x.split(':'));
   const maskiere = (x) => x.replace(/[.*+?^$()|\\[\]{}]/g, (c) => `\\${c}`);
   const umbenennen = (sig) => paare.reduce((t, [alt, neu]) => t.replace(new RegExp(`(?<![\\w-])${maskiere(alt)}`, 'g'), neu), sig);
