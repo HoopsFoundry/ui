@@ -2,6 +2,8 @@
 // Release-Ablauf des Vanilla-Pakets (scripts/release-vanilla.mjs): Version-Abgleich, Schritte, Tarball, Prüfsummen, Manifest, Aufräumen.
 import { existsSync } from 'node:fs';
 import { readdir, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { gunzipSync } from 'node:zlib';
 import { createHash } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -9,9 +11,11 @@ import { BUDGETS } from '../scripts/vanilla-budgets.mjs';
 import { bundleDir } from './helpers/bundle-dir';
 import { copyBundle, releaseScript, tmpRoot } from './helpers/release-fixture';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { buildManifest, checkVersions, createTar, releaseVanilla, STEPS, BUNDLE_FILES } from '../scripts/release-vanilla.mjs';
+import { assertBudgets, buildManifest, checkVersions, createTar, releaseVanilla, shownPath, STEPS, BUNDLE_FILES } from '../scripts/release-vanilla.mjs';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { readTgz } from '../stories/examples/portal-sync.mjs';
+import { gzipNormalized } from '../scripts/lib/tar.mjs';
+// @ts-expect-error reines ES-Modul ohne Typen
+import { readTgz } from '../scripts/portal-sync.mjs';
 
 const pkg = JSON.parse(await readFile(`${process.cwd()}/package.json`, 'utf8'));
 const clean = async () => '';
@@ -52,19 +56,21 @@ describe('Version-Abgleich', () => {
 
 describe('Ablauf', () => {
   it('Schritte in fester Reihenfolge; ohne Bauen entfällt build', async () => {
-    expect(STEPS).toEqual(['clean', 'version', 'build', 'pack', 'verify']);
+    expect(STEPS).toEqual(['clean', 'build', 'version', 'budget', 'pack', 'verify']);
     const out = `${tmpRoot}/ablauf`;
     const result = await releaseVanilla({ bundleDir, outDir: out, build: false, gitStatus: clean });
-    expect(result.steps).toEqual(['clean', 'version', 'pack', 'verify']);
+    expect(result.steps).toEqual(['clean', 'version', 'budget', 'pack', 'verify']);
     const built: string[] = [];
     const again = await releaseVanilla({ bundleDir, outDir: `${tmpRoot}/ablauf2`, gitStatus: clean, build: async () => { built.push('b'); } });
-    expect(again.steps).toEqual(['clean', 'build', 'version', 'pack', 'verify']);
+    expect(again.steps).toEqual(['clean', 'build', 'version', 'budget', 'pack', 'verify']);
+    // die tatsächliche Reihenfolge ist die der Konstante
+    expect(again.steps).toEqual(STEPS);
     expect(built).toEqual(['b']);
   });
-  it('schreibt tgz, sha256 und manifest.json und sonst nichts', async () => {
+  it('schreibt tgz, beide sha256-Dateien, manifest.json, dss-sync.mjs mit Prüfsumme und die Marker-Datei, sonst nichts', async () => {
     const out = `${tmpRoot}/ausgabe`;
     await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
-    expect((await readdir(out)).sort()).toEqual([`dss-vanilla-${pkg.version}.sha256`, `dss-vanilla-${pkg.version}.tgz`, 'manifest.json']);
+    expect((await readdir(out)).sort()).toEqual(['.dss-release', 'dss-sync.mjs', 'dss-sync.mjs.sha256', `dss-vanilla-${pkg.version}.sha256`, `dss-vanilla-${pkg.version}.tgz`, `dss-vanilla-${pkg.version}.tgz.sha256`, 'manifest.json']);
     expect((await readdir(tmpRoot)).filter((n) => n.includes('.tmp-'))).toEqual([]);
   });
   it('ein schmutziger Arbeitsbaum bricht ab, --allow-dirty erlaubt ihn; es wird nichts geschrieben', async () => {
@@ -98,6 +104,7 @@ describe('Ablauf', () => {
     const out = `${tmpRoot}/ersetzen`;
     await mkdir(out, { recursive: true });
     await writeFile(`${out}/alt.txt`, 'alt');
+    await writeFile(`${out}/.dss-release`, '');
     const bad = await copyBundle('ersetzen-falsch');
     await rm(`${bad}/dss.css`);
     await expect(releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true })).rejects.toThrow();
@@ -190,5 +197,105 @@ describe('Tarball, Prüfsummen, Manifest', () => {
   it('das Skript liegt im Repository, ruft kein Netz und kein git push', async () => {
     const code = await readFile(releaseScript, 'utf8');
     expect(code).not.toMatch(/https?:\/\/|git['", ]+push|git['", ]+tag|fetch\(/);
+  });
+});
+
+describe('Kopf des gzip-Stroms und Tar-Aufbau (plattformunabhängig)', () => {
+  let tgz: Buffer;
+  beforeAll(async () => {
+    tgz = (await releaseVanilla({ bundleDir, outDir: `${tmpRoot}/kopf`, build: false, allowDirty: true })).tgz;
+  });
+  it('gzip-Kopf: Magic, Deflate, keine Flags (kein Dateiname), MTIME 0, Betriebssystem-Byte 3', () => {
+    expect([...tgz.subarray(0, 4)]).toEqual([0x1f, 0x8b, 0x08, 0x00]);
+    expect([...tgz.subarray(4, 8)]).toEqual([0, 0, 0, 0]);
+    expect(tgz[8]).toBe(2); // XFL: höchste Stufe
+    expect(tgz[9]).toBe(3); // OS: Unix, unabhängig von der Plattform (macOS schreibt sonst 19)
+  });
+  it('gzipNormalized setzt das Betriebssystem-Byte und den Zeitstempel, egal was zlib schreibt', () => {
+    const out = gzipNormalized(Buffer.from('abc'));
+    expect(out[9]).toBe(3);
+    expect([...out.subarray(4, 8)]).toEqual([0, 0, 0, 0]);
+    expect(gunzipSync(out).toString()).toBe('abc');
+  });
+  it('tar-Köpfe: uid und gid 0, Modus 0644, Zeitstempel 0, Typ Datei, ustar; Reihenfolge sortiert', () => {
+    const tar = gunzipSync(tgz);
+    const names: string[] = [];
+    for (let offset = 0; offset + 512 <= tar.length; ) {
+      const h = tar.subarray(offset, offset + 512);
+      if (h.every((b) => b === 0)) break;
+      const field = (from: number, len: number) => h.toString('latin1', from, from + len).replace(/\0.*$/s, '');
+      names.push(field(0, 100));
+      expect(field(100, 8)).toBe('0000644');
+      expect(field(108, 8)).toBe('0000000');
+      expect(field(116, 8)).toBe('0000000');
+      expect(field(136, 12)).toBe('00000000000');
+      expect(field(156, 1)).toBe('0');
+      expect(field(257, 6)).toBe('ustar');
+      expect(field(265, 32)).toBe('');
+      offset += 512 + Math.ceil(parseInt(field(124, 12), 8) / 512) * 512;
+    }
+    expect(names.length).toBeGreaterThan(30);
+    expect(names).toEqual([...names].sort());
+  });
+});
+
+describe('Budgets, Ausgabeordner, Hilfsskript', () => {
+  it('ein Bündel über dem Budget bricht ab, nichts wird geschrieben', async () => {
+    const dir = await copyBundle('budget');
+    await writeFile(`${dir}/dss.min.js`, `${await readFile(`${dir}/dss.min.js`, 'utf8')}\n//${'x'.repeat(5000)}`);
+    const out = `${tmpRoot}/budget-out`;
+    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von dss.min.js liegt bei 40 KiB
+    await writeFile(`${dir}/dss.min.js`, `${await readFile(`${dir}/dss.min.js`, 'utf8')}\n//${'y'.repeat(BUDGETS.dss.minBytes)}`);
+    await expect(releaseVanilla({ bundleDir: dir, outDir: out, build: false, allowDirty: true })).rejects.toThrow(/Größenbudget überschritten: dss\.min\.js/);
+    expect(existsSync(out)).toBe(false);
+  });
+  it('assertBudgets nennt min und gzip getrennt', () => {
+    const b = { file: 'a.min.js', minBytes: 11, gzipBytes: 5, minKiB: 0, gzipKiB: 0, budget: { minBytes: 10, gzipBytes: 4, minKiB: 0, gzipKiB: 0 } };
+    expect(() => assertBudgets({ a: b })).toThrow(/\(min\).*\(gzip\)/);
+    expect(() => assertBudgets({ a: { ...b, minBytes: 10, gzipBytes: 4 } })).not.toThrow();
+  });
+  it('--out löscht einen vorhandenen Ordner nur mit Marker .dss-release oder wenn er leer ist', async () => {
+    const fremd = `${tmpRoot}/fremd`;
+    await mkdir(fremd, { recursive: true });
+    await writeFile(`${fremd}/wichtig.txt`, 'x');
+    await expect(releaseVanilla({ bundleDir, outDir: fremd, build: false, allowDirty: true })).rejects.toThrow(/Marker-Datei \.dss-release/);
+    expect(existsSync(`${fremd}/wichtig.txt`)).toBe(true);
+    const leer = `${tmpRoot}/leer`;
+    await mkdir(leer, { recursive: true });
+    await expect(releaseVanilla({ bundleDir, outDir: leer, build: false, allowDirty: true })).resolves.toBeTruthy();
+    // zweiter Lauf: jetzt trägt der Ordner den Marker
+    await expect(releaseVanilla({ bundleDir, outDir: leer, build: false, allowDirty: true })).resolves.toBeTruthy();
+  });
+  it('Projekt-Root, Elternordner und Dateisystem-Wurzel sind als Ausgabe verboten', async () => {
+    for (const outDir of [process.cwd(), resolve(process.cwd(), '..'), '/']) {
+      await expect(releaseVanilla({ bundleDir, outDir, build: false, allowDirty: true, dryRun: true })).rejects.toThrow(/nicht erlaubt/);
+    }
+  });
+  it('shownPath: relativ unter dem aktuellen Ordner, sonst absolut, nie ../../..', () => {
+    expect(shownPath('/a/b/release', '/a/b')).toBe('release');
+    expect(shownPath('/a/b', '/a/b')).toBe('.');
+    expect(shownPath('/x/y/release', '/a/b')).toBe('/x/y/release');
+  });
+  it('die Tarball-only-Datei .tgz.sha256 passt zum Tarball und ist sha256sum-lesbar', async () => {
+    const out = `${tmpRoot}/tgzsum`;
+    const r = await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
+    const line = await readFile(`${out}/dss-vanilla-${pkg.version}.tgz.sha256`, 'utf8');
+    expect(line).toBe(`${sha(r.tgz)}  dss-vanilla-${pkg.version}.tgz\n`);
+    expect(r.sums.startsWith(line)).toBe(true);
+    expect(r.manifest.tarball.sha256TarballOnly).toBe(`dss-vanilla-${pkg.version}.tgz.sha256`);
+  });
+  it('dss-sync.mjs ist eine Datei ohne relative Importe, trägt die Startzeile, hat eine Prüfsumme und läuft allein', async () => {
+    const out = `${tmpRoot}/sync`;
+    const r = await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
+    const code = await readFile(`${out}/dss-sync.mjs`, 'utf8');
+    expect(code.startsWith('#!/usr/bin/env node')).toBe(true);
+    expect(code.match(/(?:from|import)\s*\(?\s*["']\.{1,2}\//)).toBeNull();
+    expect(await readFile(`${out}/dss-sync.mjs.sha256`, 'utf8')).toBe(`${sha(code)}  dss-sync.mjs\n`);
+    expect(r.manifest.sync).toMatchObject({ name: 'dss-sync.mjs', bytes: Buffer.byteLength(code), sha256: sha(code), sha256File: 'dss-sync.mjs.sha256', node: '>=18' });
+    // läuft aus einem fremden Ordner ohne das Repository: bekannte deutsche Meldung statt Stack
+    const run = spawnSync(process.execPath, [`${out}/dss-sync.mjs`, '--from-dir', `${tmpRoot}/gibt-es-nicht`], { cwd: tmpRoot, encoding: 'utf8' });
+    expect(run.status).toBe(1);
+    expect(run.stderr).toMatch(/Quellordner .* existiert nicht/);
+    expect(run.stderr).not.toMatch(/\bat \w+.*\(/);
   });
 });

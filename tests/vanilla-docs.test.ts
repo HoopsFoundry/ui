@@ -32,7 +32,7 @@ describe('Code-Beispiele', () => {
   });
   it('das Skript im Beispiel ist das Beispiel der Doku: portal-sync.mjs wird roh eingebunden', () => {
     expect(mdx).toContain("import syncSource from '../examples/portal-sync.mjs?raw'");
-    expect(read('stories/examples/portal-sync.mjs')).toContain('export async function syncDss');
+    expect(read('scripts/portal-sync.mjs')).toContain('export async function syncDss');
   });
 });
 

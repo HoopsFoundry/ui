@@ -51,4 +51,4 @@ tests/.code-tmp-*/
 tests/.portal-tmp/
 tests/.portal-direct-tmp/
 release/
-tests/.release-tmp/
+tests/.release-tmp*/

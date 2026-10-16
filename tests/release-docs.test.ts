@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { BUDGETS } from '../scripts/vanilla-budgets.mjs';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { parseArgs } from '../stories/examples/portal-sync.mjs';
+import { parseArgs } from '../scripts/portal-sync.mjs';
 import { budget, compat, manualCheck, npmSwitch, releaseSync, renderBudget, mapBudget, updateFlow } from '../stories/Foundation/Vanilla.code';
 import { mutate, read } from './helpers/mutation';
 
@@ -30,7 +30,7 @@ describe('Aufrufe in der Doku', () => {
   });
   it('die Adresse im Beispiel ist die Standard-Adresse des Skripts', () => {
     expect(releaseSync).toContain('https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/');
-    expect(read('stories/examples/portal-sync.mjs')).toContain("'https://github.com/OliEder/dss-design-system/releases/download'");
+    expect(read('scripts/portal-sync.mjs')).toContain("'https://github.com/OliEder/dss-design-system/releases/download'");
     expect(manualCheck).toContain('shasum -a 256 -c dss-vanilla-0.9.0.sha256');
   });
   it('der Rollback nennt dieselbe Zeile mit der alten Version', () => {

@@ -2,13 +2,14 @@
 // portal-sync mit --from-release: Download vom lokalen http-Server (kein Netz), Prüfsumme, Version, Archivinhalt, Zielschutz, Schreibrechte.
 import { existsSync, readdirSync } from 'node:fs';
 import { chmod, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { parseArgs, readTgz, syncDss } from '../stories/examples/portal-sync.mjs';
+import { parseArgs, readTgz, syncDss } from '../scripts/portal-sync.mjs';
 // @ts-expect-error reines ES-Modul ohne Typen
 import { createTar } from '../scripts/release-vanilla.mjs';
 import { startServer, type Route } from './helpers/release-server';
@@ -19,7 +20,9 @@ const FILES = { 'dss.js': 'export const VERSION = "0.9.0";', 'dss.css': ':root{-
 const sha = (d: Buffer | string) => createHash('sha256').update(d).digest('hex');
 const project = `${tmpRoot}-sync/projekt`;
 const dirs = `${tmpRoot}-sync/releases`;
+// jeder Test bekommt ein eigenes TMPDIR: parallele Läufe anderer Tests oder Prozesse im geteilten Temp-Ordner stören die Zählung nicht
 const tmpCount = () => readdirSync(tmpdir()).filter((n) => n.startsWith('dss-release-')).length;
+const realTmp = process.env.TMPDIR;
 
 type Server = Awaited<ReturnType<typeof startServer>>;
 let server: Server;
@@ -41,6 +44,8 @@ afterAll(async () => {
   await rm(`${tmpRoot}-sync`, { recursive: true, force: true });
 });
 beforeEach(async () => {
+  await mkdir(`${tmpRoot}-sync`, { recursive: true });
+  process.env.TMPDIR = mkdtempSync(`${tmpRoot}-sync/tmp-`);
   routes.clear();
   server.requests.length = 0;
   await rm(project, { recursive: true, force: true });
@@ -51,6 +56,8 @@ beforeEach(async () => {
   await writeFile(`${project}/node_modules/leaflet/dist/leaflet.js`, '//l');
 });
 afterEach(async () => {
+  if (realTmp === undefined) delete process.env.TMPDIR;
+  else process.env.TMPDIR = realTmp;
   await chmod(`${project}/_site`, 0o755).catch(() => {});
 });
 
@@ -238,7 +245,7 @@ describe('Quelle und Befehlszeile', () => {
     expect(() => parseArgs(['--foo'])).toThrow(/unbekannte Option/);
   });
   it('die Standard-Adresse zeigt auf die Release-Anhänge dieses Repositorys', async () => {
-    const { RELEASE_BASE_URL } = await import(/* @vite-ignore */ '../stories/examples/portal-sync.mjs');
+    const { RELEASE_BASE_URL } = await import(/* @vite-ignore */ '../scripts/portal-sync.mjs');
     expect(RELEASE_BASE_URL).toBe('https://github.com/OliEder/dss-design-system/releases/download');
   });
 });

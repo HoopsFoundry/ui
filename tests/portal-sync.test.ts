@@ -1,11 +1,11 @@
 // @vitest-environment node
-// Das Beispiel stories/examples/portal-sync.mjs kopiert dist/vanilla (und optional Schriften, Leaflet) aus node_modules nach _site/dss.
+// Das Beispiel scripts/portal-sync.mjs kopiert dist/vanilla (und optional Schriften, Leaflet) aus node_modules nach _site/dss.
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { syncDss } from '../stories/examples/portal-sync.mjs';
+import { syncDss } from '../scripts/portal-sync.mjs';
 import { bundleDir } from './helpers/bundle-dir';
 
 const project = resolve(process.cwd(), 'tests/.portal-tmp');
@@ -83,7 +83,7 @@ describe('portal-sync.mjs', () => {
     await mkdir(`${empty}/node_modules/@bbv/dss-design-system/fonts`, { recursive: true });
     await cp(bundleDir, `${empty}/node_modules/@bbv/dss-design-system/dist/vanilla`, { recursive: true });
     await writeFile(`${empty}/node_modules/@bbv/dss-design-system/package.json`, JSON.stringify({ name: '@bbv/dss-design-system', version: '1.2.3' }));
-    const script = resolve(process.cwd(), 'stories/examples/portal-sync.mjs');
+    const script = resolve(process.cwd(), 'scripts/portal-sync.mjs');
     const cwd = process.cwd();
     const argv1 = process.argv[1];
     const exitCode = process.exitCode;
@@ -102,7 +102,7 @@ describe('portal-sync.mjs', () => {
     }
   });
   it('das Beispiel nennt kein Shell-Kommando und ändert nichts im Paket selbst', async () => {
-    const code = await readFile(resolve(process.cwd(), 'stories/examples/portal-sync.mjs'), 'utf8');
+    const code = await readFile(resolve(process.cwd(), 'scripts/portal-sync.mjs'), 'utf8');
     expect(code).not.toMatch(/child_process|execSync|spawn/);
   });
 });

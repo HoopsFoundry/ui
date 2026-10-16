@@ -6,10 +6,11 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { bundleDir } from './helpers/bundle-dir';
 import { mutate, read } from './helpers/mutation';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { readTgz } from '../stories/examples/portal-sync.mjs';
-import { copyBundle, loadScript, tmpRoot } from './helpers/release-fixture';
+import { readTgz } from '../scripts/portal-sync.mjs';
+import { cleanLoaded, copyBundle, loadScript, tmpRoot } from './helpers/release-fixture';
 
 const pkg = JSON.parse(read('package.json'));
+const POINTS = ['dss.js', 'dss.min.js', 'dss-render.js', 'dss-render.min.js', 'dss-map.js', 'dss-map.min.js', 'dss.css'];
 const sha = (d: Buffer | string) => createHash('sha256').update(d).digest('hex');
 const SOURCE = read('scripts/release-vanilla.mjs');
 const root = `${tmpRoot}-mut`;
@@ -20,7 +21,10 @@ beforeAll(async () => {
   await rm(root, { recursive: true, force: true });
   await mkdir(root, { recursive: true });
 });
-afterAll(() => rm(root, { recursive: true, force: true }));
+afterAll(async () => {
+  await cleanLoaded();
+  await rm(root, { recursive: true, force: true });
+});
 
 /** Wahr, wenn der Aufruf wirft (und die Meldung zum Muster passt). */
 const throws = async (fn: () => Promise<unknown>, pattern: RegExp) => {
@@ -33,6 +37,40 @@ const throws = async (fn: () => Promise<unknown>, pattern: RegExp) => {
 };
 
 const RULES: Record<string, (mod: any) => Promise<boolean>> = {
+  ...Object.fromEntries(POINTS.filter((p) => p !== 'dss.css').map((point) => [
+    `Version: ${point} wird einzeln geprüft`,
+    async (mod: any) => {
+      const dir = await copyBundle(`m-pt-${counter++}`);
+      const text = await readFile(`${dir}/${point}`, 'utf8');
+      await writeFile(`${dir}/${point}`, text.replace(`"${pkg.version}"`, '"0.0.1"'));
+      return throws(() => mod.checkVersions({ bundleDir: dir }), new RegExp(`${point.replace(/\./g, '\\.')} 0\\.0\\.1`));
+    },
+  ])),
+  'Schritte: die tatsächliche Reihenfolge ist die der Konstante STEPS': async (mod) => {
+    const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), allowDirty: true, build: async () => {} });
+    return JSON.stringify(r.steps) === JSON.stringify(mod.STEPS.filter((s: string) => s !== 'clean'));
+  },
+  'Budget: ein Bündel über dem Budget bricht ab': async (mod) => {
+    const dir = await copyBundle(`m-bud-${counter++}`);
+    await writeFile(`${dir}/dss.min.js`, `${await readFile(`${dir}/dss.min.js`, 'utf8')}\n//${'y'.repeat(41 * 1024)}`);
+    return throws(() => mod.releaseVanilla({ bundleDir: dir, outDir: outName(), build: false, allowDirty: true }), /Größenbudget überschritten/);
+  },
+  'Ausgabeordner: ein fremder nicht leerer Ordner bleibt': async (mod) => {
+    const out = outName();
+    await mkdir(out, { recursive: true });
+    await writeFile(`${out}/wichtig.txt`, 'x');
+    await mod.releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true }).catch(() => {});
+    return readFile(`${out}/wichtig.txt`, 'utf8').then((t) => t === 'x', () => false);
+  },
+  'Ausgabeordner: Projekt-Root ist verboten': (mod) => throws(() => mod.releaseVanilla({ bundleDir, outDir: process.cwd(), build: false, allowDirty: true, dryRun: true }), /nicht erlaubt/),
+  'Manifest: dss-sync.mjs mit Prüfsumme und Mindest-Node': async (mod) => {
+    const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
+    return r.manifest.sync?.name === 'dss-sync.mjs' && r.manifest.sync.sha256 === sha(r.sync) && r.manifest.sync.node === '>=18';
+  },
+  'gzip-Kopf: Betriebssystem-Byte 3 und Zeitstempel 0': async (mod) => {
+    const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
+    return r.tgz[9] === 3 && r.tgz.subarray(4, 8).every((b: number) => b === 0);
+  },
   'Version: package.json wird mit den Bündeln verglichen': async (mod) => {
     const fake = `${root}/pkg-root`;
     await mkdir(fake, { recursive: true });
@@ -43,12 +81,6 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     const dir = await copyBundle(`m-css-${counter++}`);
     await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`"${pkg.version}"`, '"0.0.1"'));
     return throws(() => mod.checkVersions({ bundleDir: dir }), /dss\.css 0\.0\.1/);
-  },
-  'Version: jede Bündeldatei wird geprüft': async (mod) => {
-    const dir = await copyBundle(`m-js-${counter++}`);
-    const text = await readFile(`${dir}/dss-map.min.js`, 'utf8');
-    await writeFile(`${dir}/dss-map.min.js`, text.replace(`"${pkg.version}"`, '"0.0.1"'));
-    return throws(() => mod.checkVersions({ bundleDir: dir }), /dss-map\.min\.js 0\.0\.1/);
   },
   'Version: --expect-version (Tag) wird geprüft': (mod) => throws(() => mod.checkVersions({ bundleDir, expect: '9.9.9' }), /expect-version/),
   'Arbeitsbaum: schmutzig bricht ab': (mod) =>
@@ -112,11 +144,10 @@ type Mutation = { name: string; rule: string; from: string; to: string; after?: 
 const MUTATIONS: Mutation[] = [
   { name: 'package.json nicht verglichen', rule: 'Version: package.json wird mit den Bündeln verglichen', from: "const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);", to: "const wrong = Object.entries(found).filter(([k, v]) => k !== 'package.json' && v !== found['dss.js']);" },
   { name: 'CSS-Version aus package.json', rule: 'Version: dss.css wird geprüft', from: "'dss.css': cssVersion };", to: "'dss.css': pkg.version };" },
-  { name: 'nur dss.js geprüft', rule: 'Version: jede Bündeldatei wird geprüft', from: 'for (const file of BUNDLE_FILES) {', to: "for (const file of BUNDLE_FILES.slice(0, 1)) {" },
   { name: 'expect ignoriert', rule: 'Version: --expect-version (Tag) wird geprüft', from: 'if (expect !== undefined && expect !== pkg.version)', to: 'if (false)' },
   { name: 'sauberer Baum nicht verlangt', rule: 'Arbeitsbaum: schmutzig bricht ab', from: 'if (status.trim()) throw', to: 'if (false) throw' },
   { name: 'Probelauf schreibt trotzdem', rule: 'Probelauf schreibt nichts', from: 'if (!dryRun) {', to: 'if (true) {' },
-  { name: 'Tarball-Hash fehlt', rule: 'Prüfsumme: die erste Zeile gehört dem Tarball', from: "const sums = [`${sha256(tgz)}  ${tgzName}`, ...files", to: "const sums = [`${sha256(Buffer.from('x'))}  ${tgzName}`, ...files" },
+  { name: 'Tarball-Hash fehlt', rule: 'Prüfsumme: die erste Zeile gehört dem Tarball', from: "const tarballLine = `${sha256(tgz)}  ${tgzName}\\n`;", to: "const tarballLine = `${sha256(Buffer.from('x'))}  ${tgzName}\\n`;" },
   { name: 'Dateizeilen fehlen', rule: 'Prüfsumme: jede Datei hat eine Zeile mit ihrem Hash', from: "...files.map((f) => `${sha256(f.data)}  ${f.path}`)", to: "...files.slice(1).map((f) => `${sha256(f.data)}  ${f.path}`)" },
   { name: 'falscher Hash je Datei', rule: 'Prüfsumme: jede Datei hat eine Zeile mit ihrem Hash', from: "...files.map((f) => `${sha256(f.data)}  ${f.path}`)", to: "...files.map((f) => `${sha256(f.path)}  ${f.path}`)" },
   { name: 'Budget nicht aus der Datei', rule: 'Manifest: Budgets stammen aus vanilla-budgets', from: 'budget: { minBytes: budget.minBytes, gzipBytes: budget.gzipBytes,', to: 'budget: { minBytes: budget.minBytes + 1, gzipBytes: budget.gzipBytes,' },
@@ -128,6 +159,17 @@ const MUTATIONS: Mutation[] = [
   { name: 'ohne Ordner im Tarball', rule: 'Tarball: Dateien liegen unter dss-vanilla-<version>', from: "files.push({ path: `${prefix}/version.json`,", to: "files.push({ path: `version.json`," },
   { name: 'Reihenfolge unsortiert', rule: 'Tarball: Reihenfolge ist sortiert (reproduzierbar)', from: 'files.sort((a, b) => (a.path < b.path ? -1 : 1));', to: 'files.reverse();' },
   { name: 'Ausgabeordner vorab geleert', rule: 'Aufräumen: bei einem Fehler bleibt der alte Ausgabeordner unverändert', from: 'const steps = [];', to: 'const steps = [];\n  await rm(outDir, { recursive: true, force: true });' },
+  ...POINTS.filter((p) => p !== 'dss.css').map((point) => ({
+    name: `${point} nicht geprüft`, rule: `Version: ${point} wird einzeln geprüft`,
+    from: 'const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);', to: `const wrong = Object.entries(found).filter(([k, v]) => k !== '${point}' && v !== pkg.version);`,
+  })),
+  { name: 'Schritt-Konstante vertauscht', rule: 'Schritte: die tatsächliche Reihenfolge ist die der Konstante STEPS', from: "export const STEPS = ['clean', 'build', 'version', 'budget', 'pack', 'verify'];", to: "export const STEPS = ['clean', 'version', 'build', 'budget', 'pack', 'verify'];" },
+  { name: 'Budgetprüfung entfällt', rule: 'Budget: ein Bündel über dem Budget bricht ab', from: 'assertBudgets(await measureBundles({ bundleDir }));', to: '' },
+  { name: 'gzip-Budget ignoriert, min-Budget ignoriert', rule: 'Budget: ein Bündel über dem Budget bricht ab', from: 'if (b.minBytes > b.budget.minBytes)', to: 'if (false)' },
+  { name: 'Marker nicht verlangt', rule: 'Ausgabeordner: ein fremder nicht leerer Ordner bleibt', from: 'if (entries.length && !entries.includes(MARKER)) {', to: 'if (false) {' },
+  { name: 'Root-Schutz entfällt', rule: 'Ausgabeordner: Projekt-Root ist verboten', from: 'if (out === r || r.startsWith(out + sep) || out === parse(out).root) {', to: 'if (false) {' },
+  { name: 'Manifest ohne Hilfsskript', rule: 'Manifest: dss-sync.mjs mit Prüfsumme und Mindest-Node', from: 'sync: sync ?? null,', to: 'sync: null,' },
+  { name: 'Mindest-Node geändert', rule: 'Manifest: dss-sync.mjs mit Prüfsumme und Mindest-Node', from: "node: '>=18'", to: "node: '>=16'" },
 ];
 
 describe('Release-Ablauf: Mutationen', () => {
@@ -142,18 +184,19 @@ describe('Release-Ablauf: Mutationen', () => {
     });
   }
   it('Gegenprobe (verify): ein inhaltlich beschädigter Tarball wird erkannt, ohne die Prüfung nicht', async () => {
-    const corrupt = mutate(SOURCE, 'blocks.push(header, data,', 'blocks.push(header, Buffer.alloc(data.length),');
+    const corruptTar = mutate(read('scripts/lib/tar.mjs'), 'blocks.push(header, data,', 'blocks.push(header, Buffer.alloc(data.length),');
     const args = { bundleDir, build: false, allowDirty: true };
-    const base = await loadScript(corrupt);
+    const base = await loadScript(SOURCE, 'release-vanilla.mjs', { 'lib/tar.mjs': corruptTar });
     await expect(base.releaseVanilla({ ...args, outDir: outName() })).rejects.toThrow(/stimmt beim Zurücklesen nicht/);
-    const off = await loadScript(mutate(corrupt, 'if (!same) throw', 'if (false) throw'));
+    const off = await loadScript(mutate(SOURCE, 'if (!same) throw', 'if (false) throw'), 'release-vanilla.mjs', { 'lib/tar.mjs': corruptTar });
     await expect(off.releaseVanilla({ ...args, outDir: outName() })).resolves.toBeTruthy();
   });
-  it('die Schritte tragen die dokumentierte Reihenfolge (Mutation: build nach version)', async () => {
-    const swapped = mutate(SOURCE, "export const STEPS = ['clean', 'version', 'build', 'pack', 'verify'];", "export const STEPS = ['clean', 'build', 'version', 'pack', 'verify'];");
-    const mod = await loadScript(swapped);
-    expect(mod.STEPS).not.toEqual(['clean', 'version', 'build', 'pack', 'verify']);
-    const result = await (await loadScript(SOURCE)).releaseVanilla({ bundleDir, outDir: outName(), allowDirty: true, build: async () => {} });
-    expect(result.steps).toEqual(['build', 'version', 'pack', 'verify']);
+  it('Gegenprobe (Bündel): bleibt ein relativer Import im Hilfsskript, bricht der Lauf ab, ohne die Prüfung nicht', async () => {
+    const unbundled = mutate(SOURCE, 'bundle: true,', 'bundle: false,');
+    const args = { bundleDir, build: false, allowDirty: true };
+    const base = await loadScript(unbundled);
+    await expect(base.releaseVanilla({ ...args, outDir: outName() })).rejects.toThrow(/relativen Import/);
+    const off = await loadScript(mutate(unbundled, "if (text.match(/(?:from|import)\\s*\\(?\\s*[\"']\\.{1,2}\\//)) throw", 'if (false) throw'));
+    await expect(off.releaseVanilla({ ...args, outDir: outName() })).resolves.toBeTruthy();
   });
 });

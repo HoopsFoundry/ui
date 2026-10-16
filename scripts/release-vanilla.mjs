@@ -7,22 +7,32 @@
 //   clean    der Arbeitsbaum ist sauber (git status --porcelain); mit --allow-dirty übersprungen
 //   version  package.json == VERSION in allen sechs Bündeldateien == `--dss-version` in dss.css (und == --expect-version, falls gesetzt)
 //   build    npm run build:vanilla (mit --no-build übersprungen: das vorhandene dist/vanilla wird geprüft)
-//   pack     release/dss-vanilla-<version>.tgz (dist/vanilla und fonts/ unter dem Ordner dss-vanilla-<version>/, dazu version.json),
-//            reproduzierbar (feste Reihenfolge, Zeitstempel 0), .sha256 (sha256sum-Format) und manifest.json
-//   verify   der Tarball wird mit dem Leser von portal-sync.mjs gelesen, jede Datei gegen die Prüfsummen geprüft
+//   budget   jedes Bündel (minifiziert und gzip) bleibt im Größenbudget aus scripts/vanilla-budgets.mjs, sonst Abbruch
+//   pack     release/dss-vanilla-<version>.tgz (dist/vanilla und fonts/ unter dem Ordner dss-vanilla-<version>/, dazu version.json), .sha256 (sha256sum-Format,
+//            eine Zeile je Datei, die erste für den Tarball), .tgz.sha256 (nur der Tarball), manifest.json und dss-sync.mjs (portal-sync.mjs mit allen
+//            Hilfen zu einer Datei gebündelt, ohne Abhängigkeiten) mit dss-sync.mjs.sha256.
+//            Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf normiert);
+//            zlib-Versionen können abweichen, maßgeblich ist die veröffentlichte .sha256.
+//   verify   der Tarball wird mit dem Leser von portal-sync gelesen, jede Datei gegen die Prüfsummen geprüft; dss-sync.mjs darf keinen relativen Import enthalten
 // Scheitert ein Schritt, bleibt in `release/` nichts Halbfertiges zurück (geschrieben wird in einen temporären Ordner, erst danach verschoben).
-// --dry-run führt alle Prüfungen aus (außer build bei --no-build), schreibt aber nichts.
+// Ein vorhandenes Ausgabeverzeichnis wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.dss-release` trägt.
+// --dry-run führt alle Prüfungen aus (außer build bei --no-build), schreibt aber nichts. --debug zeigt bei Fehlern den Stack.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
-import { join, relative, resolve, sep } from 'node:path';
+import { isAbsolute, join, parse, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
+import { runCli } from './lib/errors.mjs';
+import { assertNode } from './lib/runtime.mjs';
+import { createTar, gzipNormalized, readTgz } from './lib/tar.mjs';
 import { BUDGETS } from './vanilla-budgets.mjs';
-import { readTgz } from '../stories/examples/portal-sync.mjs';
 
-export const STEPS = ['clean', 'version', 'build', 'pack', 'verify'];
+export { createTar };
+
+export const STEPS = ['clean', 'build', 'version', 'budget', 'pack', 'verify'];
+export const MARKER = '.dss-release';
 export const NAME = '@bbv/dss-design-system';
 export const BUNDLE_FILES = ['dss.js', 'dss.min.js', 'dss-render.js', 'dss-render.min.js', 'dss-map.js', 'dss-map.min.js'];
 
@@ -39,36 +49,6 @@ async function listFiles(dir, base = dir) {
     else if (entry.isFile()) out.push(relative(base, path).split(sep).join('/'));
   }
   return out;
-}
-
-/** Schreibt eine Zahl als nullterminiertes Oktalfeld der Länge `length`. */
-function octal(value, length) {
-  return Buffer.from(`${value.toString(8).padStart(length - 1, '0')}\0`, 'latin1');
-}
-
-/** Baut einen ustar-Tarball (nur Dateien; Namen bis 100 Zeichen; Zeitstempel 0, Besitzer 0, Modus 0644). */
-export function createTar(entries) {
-  const blocks = [];
-  for (const { path: name, data } of entries) {
-    if (Buffer.byteLength(name) > 100) throw new Error(`release-vanilla: Dateiname zu lang für ustar: ${name}`);
-    const header = Buffer.alloc(512);
-    header.write(name, 0, 'latin1');
-    octal(0o644, 8).copy(header, 100);
-    octal(0, 8).copy(header, 108);
-    octal(0, 8).copy(header, 116);
-    octal(data.length, 12).copy(header, 124);
-    octal(0, 12).copy(header, 136);
-    header.fill(0x20, 148, 156);
-    header.write('0', 156, 'latin1');
-    header.write('ustar\0', 257, 'latin1');
-    header.write('00', 263, 'latin1');
-    let sum = 0;
-    for (const byte of header) sum += byte;
-    Buffer.from(`${sum.toString(8).padStart(6, '0')}\0 `, 'latin1').copy(header, 148);
-    blocks.push(header, data, Buffer.alloc((512 - (data.length % 512)) % 512));
-  }
-  blocks.push(Buffer.alloc(1024));
-  return Buffer.concat(blocks);
 }
 
 /** Liest VERSION aus den Bündeldateien (sie werden importiert: so ist auch geprüft, dass sie ladbar sind). */
@@ -101,9 +81,8 @@ export async function checkVersions({ root = ROOT, bundleDir = join(root, 'dist/
 /** Importe des Bündels auf Dateien desselben Ordners (`from "./dss.js"`). */
 const importsOf = (code) => [...new Set([...code.matchAll(/from\s*["']\.\/([\w.-]+\.js)["']/g)].map((m) => m[1]))];
 
-/** Inhalt von manifest.json: Dateien mit Größen (Byte und KiB, min und gzip), Budgets, Abhängigkeiten, Leaflet-Hinweis. */
-export async function buildManifest({ root = ROOT, bundleDir, version, files, tarball }) {
-  const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+/** Misst die drei Bündel (minifizierte Datei und gzip) und vergleicht mit den Budgets aus scripts/vanilla-budgets.mjs. */
+export async function measureBundles({ bundleDir }) {
   const bundles = {};
   for (const [id, budget] of Object.entries(BUDGETS)) {
     const min = await readFile(join(bundleDir, budget.file));
@@ -115,11 +94,45 @@ export async function buildManifest({ root = ROOT, bundleDir, version, files, ta
       requires, css: 'dss.css',
     };
   }
+  return bundles;
+}
+
+/** Wirft, wenn ein Bündel sein Budget überschreitet (min oder gzip). */
+export function assertBudgets(bundles) {
+  const over = [];
+  for (const [id, b] of Object.entries(bundles)) {
+    if (b.minBytes > b.budget.minBytes) over.push(`${b.file} ${b.minKiB} KiB > ${b.budget.minKiB} KiB (min)`);
+    if (b.gzipBytes > b.budget.gzipBytes) over.push(`${b.file} ${b.gzipKiB} KiB > ${b.budget.gzipKiB} KiB (gzip)`);
+    void id;
+  }
+  if (over.length) throw new Error(`release-vanilla: Größenbudget überschritten: ${over.join('; ')}. Budget in scripts/vanilla-budgets.mjs nur mit Begründung erhöhen.`);
+}
+
+/**
+ * Bündelt scripts/portal-sync.mjs mit allen Hilfen aus scripts/lib zu einer Datei ohne Abhängigkeiten (dss-sync.mjs) und prüft,
+ * dass kein relativer Import übrig bleibt.
+ */
+export async function bundleSync({ root = ROOT } = {}) {
+  const { build } = await import('esbuild');
+  const result = await build({
+    entryPoints: [join(root, 'scripts/portal-sync.mjs')], bundle: true, platform: 'node', format: 'esm', target: 'node18', write: false, legalComments: 'none', logLevel: 'silent',
+  });
+  const text = result.outputFiles[0].text;
+  if (text.match(/(?:from|import)\s*\(?\s*["']\.{1,2}\//)) throw new Error('release-vanilla: dss-sync.mjs enthält noch einen relativen Import.');
+  if (!text.startsWith('#!/usr/bin/env node')) throw new Error('release-vanilla: dss-sync.mjs hat keine Startzeile (#!/usr/bin/env node).');
+  return Buffer.from(text);
+}
+
+/** Inhalt von manifest.json: Dateien mit Größen (Byte und KiB, min und gzip), Budgets, Abhängigkeiten, Leaflet-Hinweis, Hilfsskript. */
+export async function buildManifest({ root = ROOT, bundleDir, version, files, tarball, sync }) {
+  const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
+  const bundles = await measureBundles({ bundleDir });
   const leafletRange = pkg.peerDependencies?.leaflet ?? null;
   return {
     name: NAME,
     version,
     tarball,
+    sync: sync ?? null,
     files: files.map((f) => ({ path: f.path, bytes: f.data.length, sha256: sha256(f.data) })),
     bundles,
     modules: 'ES-Module (script type="module"), Ziel es2020',
@@ -132,10 +145,33 @@ export async function buildManifest({ root = ROOT, bundleDir, version, files, ta
   };
 }
 
+/** Pfad für die Ausgabe: relativ zum aktuellen Ordner, wenn er darunter liegt, sonst absolut (nie ../../..). */
+export function shownPath(path, cwd = process.cwd()) {
+  const rel = relative(cwd, path);
+  if (rel === '') return '.';
+  return rel.startsWith('..') || isAbsolute(rel) ? resolve(path) : rel;
+}
+
+/** Wirft, wenn `outDir` nicht ersetzt werden darf: Projekt-Root, Elternordner, Wurzel oder ein nicht leerer Ordner ohne Marker `.dss-release`. */
+async function assertOutDir(outDir, root) {
+  const out = resolve(outDir);
+  const r = resolve(root);
+  if (out === r || r.startsWith(out + sep) || out === parse(out).root) {
+    throw new Error(`release-vanilla: Ausgabeordner ${out} ist nicht erlaubt (Projekt-Root, Elternordner oder Wurzel).`);
+  }
+  if (!existsSync(out)) return;
+  const entries = await readdir(out).catch(() => {
+    throw new Error(`release-vanilla: Ausgabeziel ${out} ist kein Ordner.`);
+  });
+  if (entries.length && !entries.includes(MARKER)) {
+    throw new Error(`release-vanilla: ${shownPath(out)} ist nicht leer und hat keine Marker-Datei ${MARKER}; der Ordner gehört nicht diesem Skript und wird nicht gelöscht.`);
+  }
+}
+
 /**
  * Führt den Ablauf aus. Optionen: `root`, `bundleDir` (Standard `dist/vanilla`), `outDir` (Standard `release`), `allowDirty`, `dryRun`,
  * `build` (Funktion, Standard npm run build:vanilla; `false` = nicht bauen), `sourcemaps` (Standard true), `expect` (erwartete Version),
- * `gitStatus` (Funktion, gibt die porcelain-Ausgabe zurück), `log`. Gibt `{ version, steps, files, outDir, dryRun }` zurück.
+ * `gitStatus` (Funktion, gibt die porcelain-Ausgabe zurück), `log`. Gibt `{ version, steps, files, outDir, dryRun, manifest, sums, tgz, sync }` zurück.
  */
 export async function releaseVanilla({
   root = ROOT, bundleDir = join(root, 'dist/vanilla'), outDir = join(root, 'release'), allowDirty = false, dryRun = false,
@@ -146,12 +182,13 @@ export async function releaseVanilla({
     steps.push(name);
     log(`${name}${detail ? `: ${detail}` : ''}`);
   };
+  await assertOutDir(outDir, root);
   if (!allowDirty) {
     const status = gitStatus ? await gitStatus() : execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' });
     if (status.trim()) throw new Error('release-vanilla: Der Arbeitsbaum ist nicht sauber (git status --porcelain). Committe oder verwende --allow-dirty.');
     step('clean');
   }
-  // Version vor dem Bauen gegen package.json prüfen ist sinnlos (alte Bündel): erst bauen, dann prüfen
+  // erst bauen, dann prüfen: gegen alte Bündel wäre der Versionsabgleich sinnlos
   if (build !== false) {
     if (build) await build();
     else execFileSync('npm', ['run', 'build:vanilla', '--silent'], { cwd: root, stdio: 'inherit' });
@@ -159,6 +196,8 @@ export async function releaseVanilla({
   }
   const { version, found } = await checkVersions({ root, bundleDir, expect });
   step('version', `${version} (${Object.keys(found).length} Stellen)`);
+  assertBudgets(await measureBundles({ bundleDir }));
+  step('budget', 'alle Bündel im Budget');
 
   const prefix = `dss-vanilla-${version}`;
   const names = (await listFiles(bundleDir)).filter((n) => sourcemaps || !n.endsWith('.map'));
@@ -169,14 +208,17 @@ export async function releaseVanilla({
   files.push({ path: `${prefix}/version.json`, data: Buffer.from(`${JSON.stringify({ name: NAME, version })}\n`) });
   files.sort((a, b) => (a.path < b.path ? -1 : 1));
 
-  const tgz = gzipSync(createTar(files), { level: 9 });
+  const tgz = gzipNormalized(createTar(files));
   const tgzName = `${prefix}.tgz`;
-  const sums = [`${sha256(tgz)}  ${tgzName}`, ...files.map((f) => `${sha256(f.data)}  ${f.path}`)].join('\n') + '\n';
+  const tarballLine = `${sha256(tgz)}  ${tgzName}\n`;
+  const sums = [tarballLine.trim(), ...files.map((f) => `${sha256(f.data)}  ${f.path}`)].join('\n') + '\n';
+  const syncData = await bundleSync({ root });
+  const sync = { name: 'dss-sync.mjs', bytes: syncData.length, sha256: sha256(syncData), sha256File: 'dss-sync.mjs.sha256', node: '>=18' };
   const manifest = await buildManifest({
-    root, bundleDir, version, files,
-    tarball: { name: tgzName, bytes: tgz.length, sha256: sha256(tgz), sha256File: `${prefix}.sha256` },
+    root, bundleDir, version, files, sync,
+    tarball: { name: tgzName, bytes: tgz.length, sha256: sha256(tgz), sha256File: `${prefix}.sha256`, sha256TarballOnly: `${tgzName}.sha256` },
   });
-  step('pack', `${tgzName}, ${kib(tgz.length)} KiB, ${files.length} Dateien`);
+  step('pack', `${tgzName}, ${kib(tgz.length)} KiB, ${files.length} Dateien; dss-sync.mjs, ${kib(syncData.length)} KiB`);
 
   // Gegenprobe mit dem Leser der Verbraucher-Seite: Namen, Reihenfolge und Inhalt müssen mit den Prüfsummen übereinstimmen
   const read = readTgz(tgz, { expectedTop: prefix });
@@ -189,9 +231,13 @@ export async function releaseVanilla({
     await rm(tmp, { recursive: true, force: true });
     await mkdir(tmp, { recursive: true });
     try {
+      await writeFile(join(tmp, MARKER), 'Dieser Ordner gehört release-vanilla.mjs und wird bei jedem Lauf ersetzt.\n');
       await writeFile(join(tmp, tgzName), tgz);
       await writeFile(join(tmp, `${prefix}.sha256`), sums);
+      await writeFile(join(tmp, `${tgzName}.sha256`), tarballLine);
       await writeFile(join(tmp, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
+      await writeFile(join(tmp, 'dss-sync.mjs'), syncData);
+      await writeFile(join(tmp, 'dss-sync.mjs.sha256'), `${sync.sha256}  dss-sync.mjs\n`);
       await rm(outDir, { recursive: true, force: true });
       await rename(tmp, outDir);
     } catch (error) {
@@ -199,21 +245,19 @@ export async function releaseVanilla({
       throw error;
     }
   }
-  return { version, steps, files: files.map((f) => f.path), outDir, dryRun, manifest, sums, tgz };
+  return { version, steps, files: files.map((f) => f.path), outDir, dryRun, manifest, sums, tgz, sync: syncData };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
   const flags = new Set(process.argv.slice(2).filter((a) => !a.includes('=')));
   const values = Object.fromEntries(process.argv.slice(2).filter((a) => a.includes('=')).map((a) => a.replace(/^--/, '').split('=')));
-  try {
+  await runCli('release-vanilla', async () => {
+    assertNode('release-vanilla');
     const result = await releaseVanilla({
       allowDirty: flags.has('--allow-dirty'), dryRun: flags.has('--dry-run'), build: flags.has('--no-build') ? false : undefined,
       sourcemaps: !flags.has('--no-sourcemaps'), expect: values['expect-version'], outDir: values.out ? resolve(values.out) : undefined,
       log: (line) => console.log(`  ${line}`),
     });
-    console.log(`${result.dryRun ? 'Probelauf (nichts geschrieben)' : `geschrieben nach ${relative(ROOT, result.outDir) || '.'}`}: ${NAME} ${result.version}`);
-  } catch (error) {
-    console.error(error.message);
-    process.exitCode = 1;
-  }
+    console.log(`${result.dryRun ? 'Probelauf (nichts geschrieben)' : `geschrieben nach ${shownPath(result.outDir)}`}: ${NAME} ${result.version}`);
+  }, { debug: flags.has('--debug') });
 }
