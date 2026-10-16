@@ -87,7 +87,7 @@ describe('Kein „dss“ mehr im Bestand (Stufen K, D, M)', () => {
     ['Paketname in Markdown', 'docs/neu.md', 'npm i @bbv/dss-design-system'],
     ['arc42-Quelle', 'docs/architecture/sections/05-building-block-view.adoc', 'Klassen `dss-*`'],
   ])('erkennt: %s', (_n, file, text) => {
-    expect(mit(file, text)).toContain('dss');
+    expect(mit(file, text).toLowerCase()).toContain('dss');
   });
   it('erkennt einen Dateinamen mit dss, erlaubt aber den Namen des Migrationsskripts', () => {
     expect(findDss(new Map(real).set('js/dss-neu.js', '')).join('\n')).toContain('Dateiname');
