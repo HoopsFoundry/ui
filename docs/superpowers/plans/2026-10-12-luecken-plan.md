@@ -56,6 +56,32 @@ Die meisten eigenen Anwendungen nutzen Vanilla oder Svelte; für die Verbreitung
 | 4.4 | Lockfile: Svelte-Peer-Bereich und `peer`-Flags durch npm verändert | beobachten; bei nächstem `npm install` prüfen | S |
 | 4.5 | Print/PDF-Baukasten (nicht begonnen) | Brainstorming mit dir (Spielbericht, Tabellen, Spielplan als PDF? Papierformat, Schrift, Kopf/Fuß); dann Spec | L |
 
+## Umbenennung auf HoopsFoundry UI
+
+Das System heißt künftig „HoopsFoundry UI“ (npm-Paket später `@hoopsfoundry/ui`). Das Kürzel DSS (Digitaler Spielbericht) soll vollständig verschwinden. Architekturentscheidung: ADR-008.
+
+**Entscheidungen**
+- Präfix `hoops-`: Klassen `.hoops-btn`, Tokens `--hoops-*`, `data-hoops`, Ereignisse `hoops:…`, Dateien `hoops.js` und `hoops.css`, Speicherschlüssel `hoops-theme`, Symbol `hoops.registry`. Auch bisher unpräfixierte Tokens (`--n-0`, `--ring-w`, `--radius-md`, `--fs-h3` …) bekommen das Präfix.
+- Nur interne Konsumenten, daher keine Kompatibilitätsschicht, aber ein Migrationsskript mit Ersetzungstabelle (`scripts/migrate-from-dss.mjs`, `scripts/migration-table.mjs`).
+- Version höchstens 0.10.0; Release-Namen `hoops-ui-<version>`; ein Paket mit Einstiegen statt je Framework ein Paket.
+- Die historischen Design-HTMLs im Wurzelordner bleiben unverändert und werden nach `docs/entwuerfe/` verschoben; die darin enthaltenen Ideen (Scoreboard u. a.) werden ausgewertet.
+- Hosting und Domain: führend ist hoopsfoundry.com (das System ist nicht deutschspezifisch: Schwerpunkt deutscher Basketball, aber internationale Vereine und Verbände können es mit eigenem Theme nutzen). hoopsfoundry.de und hoopsfoundry.org leiten per 301 auf hoopsfoundry.com weiter, auch mit `www.`. Doku, Storybook und Releases unter ui.hoopsfoundry.com. Ziel-Hosting: All-Inkl-Webspace in Deutschland (rsync über SSH), GitHub Pages als Rückfall. Zwischenstand: die Pages-Domain ui.hoopsfoundry.com ist auf GitHub gesetzt.
+- Organisation HoopsFoundry auf GitHub; das Repository ist nach https://github.com/HoopsFoundry/UI umgezogen (Name aktuell „UI“ in Großbuchstaben; Umbenennung auf „ui“ offen, GitHub-Adressen sind nicht zwischen Groß- und Kleinschreibung unterscheidend).
+
+**Stufen** (jede einzeln mergbar und testbar)
+| Stufe | Inhalt | Stand |
+|---|---|---|
+| T | Design-Tokens (CSS-Custom-Properties) auf `--hoops-*`; Codemod, Migrationsskript, Verbotstest, Stilparitätsprüfung | umgesetzt |
+| K | CSS-Klassen `.dss-` → `.hoops-` | offen |
+| D | data-Attribute, Ereignisse, JS- und Dateinamen, Speicherschlüssel, Release-Namen | offen |
+| M | Marke und Texte, historische HTMLs nach `docs/entwuerfe/` | offen |
+
+**Neue Pakete aus den Entscheidungen** (geplant, nicht umgesetzt)
+1. Paket „Konfiguration“ (nach Stufe T, Teil von Stufe D oder eigenes Paket C): keine fest eingetragenen Repo-Adressen oder Domain mehr. Eine einzige Quelle (`project.config.json` oder Felder in `package.json`) mit Besitzer und Repo, Domain, Release-Basis-URL und Paketname. Build- und Release-Skripte bauen die Werte ins Bündel ein (esbuild `define`, auch in `hoops-sync`); eine Überschreibung zur Laufzeit gibt es nur bei `hoops-sync`: Option `--base-url`, Umgebungsvariable `HOOPS_UI_BASE_URL`, Vorrang Option vor Variable vor eingebautem Wert. Workflows nutzen `${{ github.repository }}` und `github.server_url` statt fester Adresse; Doku-Seiten und Tests lesen aus der Konfiguration. Ein Test verbietet feste Repo-Adressen außerhalb der Konfiguration, des CHANGELOG (Historie) und der Migrationshinweise. Im Browser gibt es keine Umgebungsvariablen, nur Bauzeitwerte und Optionen. Bestand fester Adressen (OliEder/dss-design-system): `README.md`, `package.json`, `stories/Introduction.mdx`, `stories/Foundation/Vanilla.code.ts`, `scripts/portal-sync.mjs`, `.github/workflows/release-vanilla.yml`, `tests/portal-sync-release.test.ts`, `tests/release-docs.test.ts`.
+2. Internationalisierung der eingebauten Texte: heute sind sie deutsch fest verdrahtet in Komponenten und Vanilla (z. B. „Karte laden“, „Nach oben“, „Dunkelmodus“, „vorläufig“). Geplant: Locale-Option mit Textkatalogen, Standard `de`, `en` als zweite Sprache.
+3. Englische Dokumentation: zuerst README und Introduction, später das Storybook; Deutsch bleibt die Arbeitssprache.
+4. Theme-Guide für eigene Marken und Themes: `data-brand`, Token-Rollen, `--hoops-*`, Beispiel „mein-verein“, eventuell Theme-Generator oder Prüfskript für den Kontrast 7:1.
+
 ## Reihenfolge
 1. Welle 1 in drei Paketen: (a) Modal 1.1 + 1.2 (zusammen, gleiche Dateien), (b) kleine Korrekturen 1.3–1.5 und 1.8–1.10, (c) Map-Speicher und Retry 1.6 + 1.7.
 2. Welle 2.4 sofort (kostet nichts), danach 2.1–2.3, 2.5 parallel zu Welle 1 möglich, weil sie nur lesen.

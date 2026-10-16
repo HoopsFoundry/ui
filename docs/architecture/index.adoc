@@ -1,7 +1,7 @@
 = DSS – Softwarearchitektur
 include::_attributes.adoc[]
 
-Stand: 2026-10-13. Status: Architektur-Baseline zur Prüfung. Produktname: Arbeitsname, Entscheidung offen (Kapitel 1).
+Stand: 2026-10-13. Status: Architektur-Baseline zur Prüfung. Produktname: HoopsFoundry UI (ADR-008), Umbenennung in Stufen.
 
 Diese Dokumentation trennt geprüfte Repository-Strukturen, dokumentierte Planstände und vorgeschlagene Erweiterungen. Sie ersetzt keine Komponentenreferenz und keinen Testbericht.
 

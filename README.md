@@ -91,11 +91,11 @@ Dann tokens benutzen:
 
 ```css
 .button-primary {
-  background: var(--ink-900);
+  background: var(--hoops-ink-900);
   color: white;
-  height: var(--touch-md);
-  border-radius: var(--radius-md);
-  font-family: var(--font-body);
+  height: var(--hoops-touch-md);
+  border-radius: var(--hoops-radius-md);
+  font-family: var(--hoops-font-body);
 }
 ```
 
@@ -139,8 +139,12 @@ Svelte-Komponenten (`dss-btn`, `dss-card`, `dss-tabs`, `dss-tbl`, `dss-chip`, �
 <span class="dss-chip dss-chip--sky">Männlich</span>
 ```
 
-Farben laufen über die semantischen Variablen `--dss-*`; Dark schaltet `data-theme="dark"` oder die
+Farben laufen über die semantischen Variablen `--hoops-*`; Dark schaltet `data-theme="dark"` oder die
 OS-Präferenz.
+
+**Umbenennung der Tokens (Bruch):** Alle Design-Tokens heißen jetzt `--hoops-*` (vorher `--dss-*` und unpräfixierte wie `--n-0`,
+`--ring-w`, `--radius-md`). Ein eigenes Projekt stellt man mit `node scripts/migrate-from-dss.mjs <projektordner>` um (Probelauf
+als Standard, `--write` schreibt; vorher Git-Stand sichern). Die Ersetzungstabelle steht im CHANGELOG und in `scripts/migration-table.mjs`.
 
 ## React
 
@@ -207,12 +211,12 @@ Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein 
 ```
 
 - **`initPageNav`** (`pagenav.js`): Seitennavigation „Auf dieser Seite“ aus den Überschriften; ein Sprung öffnet Accordion-Bereiche und `details`, setzt den Fokus auf das Ziel, beobachtet nachgeladene Überschriften. Optionen `selector`, `container`, `label`, `minHeadings`, `skipAttribute`, `observe`, `syncHash`.
-- **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `dss-bnav`, mit `--dss-backtop-offset`, Sicherheitsabständen und Druckregel.
+- **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `dss-bnav`, mit `--hoops-backtop-offset`, Sicherheitsabständen und Druckregel.
 - **`initTheme`** und **`themeBootScript`** (`theme.js`): Umschalter hell/dunkel/System mit `aria-pressed`, Speicherschlüssel `dss-theme`; das Boot-Skript gehört in den `<head>` und verhindert das Flackern.
 - **`initTabs`** (`tabs.js`): Tab-Leiste mit Pfeiltasten, Pos1/Ende (roving `tabindex`, `aria-selected`), Panels über `aria-controls` (`hidden` und `inert`), `role="group"` mit `aria-pressed` als Mehrfachauswahl, optionaler Deep-Link (`hash`), manuelle Aktivierung, Ereignis `dss:tabchange`. Dieselben Regeln wie die Svelte- und React-Tabs.
 - **`initModal`**, **`openModal`**, **`closeModal`** (`modal.js`): natives `<dialog class="dss-modal-dialog">` (`showModal`) oder Markup mit `hidden` (Rolle, `aria-modal`, inerte Seite); Fokus holen und an den Auslöser zurückgeben, Escape, Fokusfalle, `dismissOnBackdrop` (Standard aus), Scroll-Sperre mit Rückbau, Auslöser `data-dss-modal-open="<id>"` und `data-dss-modal-close`, Ereignisse `dss:modalopen` und `dss:modalclose`.
 
-Scrollabstände laufen über `--dss-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
+Scrollabstände laufen über `--hoops-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
 
 ### Markup aus Daten (`renderX`, `mountX`)
 
@@ -220,7 +224,7 @@ Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchC
 
 ### Gebündelt, ohne Build (`dist/vanilla`)
 
-`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--dss-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 36 KiB groß (gzip 12,9 KiB, Budget 40 KiB und 15 KiB als Test, Polster gut 3,5 KiB).
+`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--hoops-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 36 KiB groß (gzip 12,9 KiB, Budget 40 KiB und 15 KiB als Test, Polster gut 3,5 KiB).
 
 #### Karte ohne Framework (`dss-map.js`)
 
@@ -236,12 +240,12 @@ Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchC
 
 `scripts/portal-sync.mjs` (Befehl `dss-sync`) zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet, falls installiert) aus `node_modules` nach `_site/dss` kopiert; das Ziel gehört dem Skript (Marker `.dss-sync`, Ersetzen über einen temporären Ordner). Die Peer-Abhängigkeiten sind optional, React `^18 || ^19`; `npm install` im leeren Projekt braucht kein `--legacy-peer-deps`. ES-Module brauchen `http(s)`, nicht `file://`. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
 
-**Auslieferung bis Version 1.0: GitHub-Release.** `npm run build` und `node scripts/release-vanilla.mjs` erzeugen in `release/` (nicht im Git) `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/`, `version.json` unter `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (Format von `sha256sum`), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Dateien, Größen in KiB, Budgets, Abhängigkeiten, Leaflet-Hinweis) sowie `dss-sync.mjs` mit `dss-sync.mjs.sha256`; vorher prüft das Skript, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--dss-version` in `dss.css` übereinstimmen und jedes Bündel sein Größenbudget einhält (`--dry-run`, `--allow-dirty`, `--no-build`, `--no-sourcemaps`, `--expect-version=`, `--debug`). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (gzip-Kopf normiert); maßgeblich ist die veröffentlichte `.sha256`. Der Workflow `.github/workflows/release-vanilla.yml` macht dasselbe bei einem Tag `v*` und legt das Release an (bis zum ersten Tag ungetestet; `workflow_dispatch` mit `dry_run` lädt nur ein Artefakt hoch). Das Portal holt und prüft das Release mit `node dss-sync.mjs --from-release 0.9.0` (Anhang `dss-sync.mjs`, eine Datei, Node 18 oder neuer; im npm-Paket als Befehl `dss-sync`; Alternativen `--from-package`, `--from-dir`); ab 1.0 ist `--from-package` mit dem npm-Paket die Quelle, der Aufbau von `dist/vanilla` bleibt. Eine komplette Beispielseite ohne Build (Vereins- und Teamseite aus einem JSON-Datensatz, relative Pfade): `stories/examples/portal-seite/`, geprüft mit `node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox` (Chromium und WebKit bestanden; Firefox ist in der Entwicklungsumgebung nicht gelaufen, Ursache ungeklärt). Einbinden, Aktualisieren, Rollback und Kompatibilität: Storybook `Foundation/Vanilla`.
+**Auslieferung bis Version 1.0: GitHub-Release.** `npm run build` und `node scripts/release-vanilla.mjs` erzeugen in `release/` (nicht im Git) `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/`, `version.json` unter `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (Format von `sha256sum`), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Dateien, Größen in KiB, Budgets, Abhängigkeiten, Leaflet-Hinweis) sowie `dss-sync.mjs` mit `dss-sync.mjs.sha256`; vorher prüft das Skript, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `dss.css` übereinstimmen und jedes Bündel sein Größenbudget einhält (`--dry-run`, `--allow-dirty`, `--no-build`, `--no-sourcemaps`, `--expect-version=`, `--debug`). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (gzip-Kopf normiert); maßgeblich ist die veröffentlichte `.sha256`. Der Workflow `.github/workflows/release-vanilla.yml` macht dasselbe bei einem Tag `v*` und legt das Release an (bis zum ersten Tag ungetestet; `workflow_dispatch` mit `dry_run` lädt nur ein Artefakt hoch). Das Portal holt und prüft das Release mit `node dss-sync.mjs --from-release 0.9.0` (Anhang `dss-sync.mjs`, eine Datei, Node 18 oder neuer; im npm-Paket als Befehl `dss-sync`; Alternativen `--from-package`, `--from-dir`); ab 1.0 ist `--from-package` mit dem npm-Paket die Quelle, der Aufbau von `dist/vanilla` bleibt. Eine komplette Beispielseite ohne Build (Vereins- und Teamseite aus einem JSON-Datensatz, relative Pfade): `stories/examples/portal-seite/`, geprüft mit `node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox` (Chromium und WebKit bestanden; Firefox ist in der Entwicklungsumgebung nicht gelaufen, Ursache ungeklärt). Einbinden, Aktualisieren, Rollback und Kompatibilität: Storybook `Foundation/Vanilla`.
 
 ## Leisten mit begrenzter Inhaltsbreite
 
 `TopBar` und `AppNav` laufen mit ihrem Hintergrund über die volle Breite. Mit `contained` richtet sich der Inhalt
-an `--dss-shell-max` (Standard `64rem`, entspricht Tailwind `max-w-5xl`) aus und fluchtet so mit einem zentrierten
+an `--hoops-shell-max` (Standard `64rem`, entspricht Tailwind `max-w-5xl`) aus und fluchtet so mit einem zentrierten
 Inhaltscontainer:
 
 ```tsx
@@ -250,12 +254,12 @@ Inhaltscontainer:
 ```
 
 Vanilla: Klassen `dss-topbar dss-topbar--dark dss-topbar--contained` bzw. `dss-appnav dss-appnav--contained`.
-Die Breite lässt sich über `--dss-shell-max` ändern.
+Die Breite lässt sich über `--hoops-shell-max` ändern.
 
 ## CourtLines
 
 Dezente Spielfeldlinien (FIBA 28 × 15 m) als Seitenhintergrund, rein dekorativ (`aria-hidden`). Die Linien sind
-eine SVG-Maske über `--dss-line` (dark-sicher); auf dem Handy wird die Hochformat-Variante genutzt. Die SVGs liegen
+eine SVG-Maske über `--hoops-line` (dark-sicher); auf dem Handy wird die Hochformat-Variante genutzt. Die SVGs liegen
 unter `css/courtlines/`.
 
 ```tsx
@@ -270,7 +274,7 @@ Vanilla:
 ```
 
 Der Seiteninhalt braucht `position: relative; z-index: 1`, damit er über dem Hintergrund liegt.
-Die Linienfarbe kommt aus `--dss-court-color` (BBV: schwaches Amber, DBB: Gold).
+Die Linienfarbe kommt aus `--hoops-court-color` (BBV: schwaches Amber, DBB: Gold).
 
 ## Identitäts-Achsen
 
@@ -286,11 +290,11 @@ Komponenten greifen nicht auf `ink-*`, `amber-*` oder `sky-*` zu, sondern auf Ro
 
 | Rolle | BBV (Standard) | DBB (`data-brand="dbb"`) |
 |---|---|---|
-| `--base-*` · Text, Flächen | `ink` | reine Grautöne; `base-900` = `#000`, `base-1000` = Anthrazit `#191919` |
-| `--signal-*` · CTA, Highlight, Uhr | `amber` | `gold` (`gold-400` ≈ `#c9ae64`) |
-| `--cool-*` · Links, Heim, Info | `sky` | Grautöne (kein Blau, Links erben die Textfarbe) |
-| `--action-bg`, `--action-bg-2`, `--action-bg-hover` · primäre Buttons | `ink-900`, `ink-800`, `ink-700` | Anthrazit, Anthrazit, `n-700` |
-| `--indicator` · aktiver Tab, Nav-Unterstrich | `amber-400` | `orange-600` ≈ `#eb6909` (3.2:1 auf Weiß); im Dark Mode `orange-500` ≈ `#ff9900` |
+| `--hoops-base-*` · Text, Flächen | `ink` | reine Grautöne; `base-900` = `#000`, `base-1000` = Anthrazit `#191919` |
+| `--hoops-signal-*` · CTA, Highlight, Uhr | `amber` | `gold` (`gold-400` ≈ `#c9ae64`) |
+| `--hoops-cool-*` · Links, Heim, Info | `sky` | Grautöne (kein Blau, Links erben die Textfarbe) |
+| `--hoops-action-bg`, `--hoops-action-bg-2`, `--hoops-action-bg-hover` · primäre Buttons | `ink-900`, `ink-800`, `ink-700` | Anthrazit, Anthrazit, `n-700` |
+| `--hoops-indicator` · aktiver Tab, Nav-Unterstrich | `amber-400` | `orange-600` ≈ `#eb6909` (3.2:1 auf Weiß); im Dark Mode `orange-500` ≈ `#ff9900` |
 
 Die DBB-Werte stammen von basketball-bund.de (Theme `dbb21`, Stand 2026-10-08): Schwarz, Weiß, Anthrazit, Gold als
 Markenfarbe, Orange für aktive Zustände.
@@ -301,11 +305,11 @@ Umschalten über ein Attribut auf `<html>`:
 <html data-brand="dbb">
 ```
 
-Das Attribut muss auf `<html>` stehen, weil abgeleitete Tokens (`--team-heim`, `--page-fg`) am Root aufgelöst werden.
+Das Attribut muss auf `<html>` stehen, weil abgeleitete Tokens (`--hoops-team-heim`, `--hoops-page-fg`) am Root aufgelöst werden.
 Gold und Orange haben pro Stufe ähnliche Helligkeit wie Amber, die AAA-Slots (`fill` / `text` / `deep`) bleiben daher
 gleich. Gold und `#ff9900` taugen nicht als Text auf Weiß (je etwa 2.1:1); Text nutzt `signal-800` (≈ 8.5:1). Der Indikator nutzt auf hellem Grund das dunklere `orange-600`, damit er 3:1 erreicht.
-Der Fokus-Ring (`--ring-color`) ist Gold/Amber (BBV `amber-600`, DBB `gold-600`) und gestrichelt (`--ring-style`), mit mindestens 3:1 auf Weiß und Anthrazit. Im Dunkelmodus und auf immer dunklen Flächen gilt der dezentere `--ring-color-on-dark` (BBV `amber-700`, DBB `gold-700`); eine Marke muss das einhalten.
-Neue Komponenten verwenden nur die Rollen-Tokens und `--dss-*`, keine Farbfamilien direkt. Im Storybook schaltet die
+Der Fokus-Ring (`--hoops-ring-color`) ist Gold/Amber (BBV `amber-600`, DBB `gold-600`) und gestrichelt (`--hoops-ring-style`), mit mindestens 3:1 auf Weiß und Anthrazit. Im Dunkelmodus und auf immer dunklen Flächen gilt der dezentere `--hoops-ring-color-on-dark` (BBV `amber-700`, DBB `gold-700`); eine Marke muss das einhalten.
+Neue Komponenten verwenden nur die Rollen-Tokens und `--hoops-*`, keine Farbfamilien direkt. Im Storybook schaltet die
 Toolbar zwischen beiden Marken um.
 
 ### Schrift (`data-type`)
@@ -334,7 +338,7 @@ Die Datei ist optional; wer eigene Schriften ausliefert, lässt sie weg. Im Stor
 
 ### Type scale
 
-13 Stufen, als CSS-Variablen (`--fs-*`, `--lh-*`, `--ls-*`, `--fw-*`) und als Klassen (`.dss-t-*`):
+13 Stufen, als CSS-Variablen (`--hoops-fs-*`, `--hoops-lh-*`, `--hoops-ls-*`, `--hoops-fw-*`) und als Klassen (`.dss-t-*`):
 
 | Stufe | Größe / Zeilenhöhe | Verwendung |
 |---|---|---|
@@ -348,9 +352,9 @@ Die Datei ist optional; wer eigene Schriften ausliefert, lässt sie weg. Im Stor
 | `label` | 12 · 600 · Versalien | Feld-Beschriftung, Tabellenkopf |
 | `caption` | 11 · 600 · Mono · Versalien | Chips, Meta |
 
-Auf dem Handy (≤ 640 px) nutzen die Klassen `.dss-t-display`, `-clock`, `-h1` und `-h2` die kleineren Größen `--fs-display-sm` (56), `--fs-clock-sm` (48), `--fs-h1-sm` (32) und `--fs-h2-sm` (24). Komponenten mit fester Kachelgröße bleiben bei `--fs-*`. Alle Komponenten in `css/components.css` und `svelte/` setzen `font-size` ausschließlich über `--fs-*`. Zahlen in Spalten (Spielstand, Uhr,
+Auf dem Handy (≤ 640 px) nutzen die Klassen `.dss-t-display`, `-clock`, `-h1` und `-h2` die kleineren Größen `--hoops-fs-display-sm` (56), `--hoops-fs-clock-sm` (48), `--hoops-fs-h1-sm` (32) und `--hoops-fs-h2-sm` (24). Komponenten mit fester Kachelgröße bleiben bei `--hoops-fs-*`. Alle Komponenten in `css/components.css` und `svelte/` setzen `font-size` ausschließlich über `--hoops-fs-*`. Zahlen in Spalten (Spielstand, Uhr,
 Statistik) setzen `font-variant-numeric: tabular-nums` (`.dss-tnum`, bei `display` und `clock` eingebaut). Fließtext begrenzt
-`--measure` (65ch, `.dss-measure`). Die DBB-Schrift setzt Display, H1 und H2 in Versalien und ohne negatives Tracking.
+`--hoops-measure` (65ch, `.dss-measure`). Die DBB-Schrift setzt Display, H1 und H2 in Versalien und ohne negatives Tracking.
 Das Storybook (`Foundation/Typography`) zeigt Skala, Familien, Zahlen und einen Seiten-Ausschnitt; der Reiter *Audit* zählt die
 Schriftgrößen in den Komponenten gegen die Skala.
 
@@ -363,18 +367,18 @@ lesen nur die Rollen-Tokens; eine Marke ist ein Block, der sie überschreibt (Vo
 :root[data-brand="mein-verein"] {
   /* Skalen mit gleicher Helligkeits-Staffelung wie die Standard-Skalen (AAA-Slots bleiben gleich):
      50–900 für signal und cool, 0–1000 für base */
-  --base-0: …;  /* … bis --base-1000 */
-  --signal-50: …;  /* … bis --signal-900 · CTA, Highlight, Uhr */
-  --cool-50: …;    /* … bis --cool-900 · Links, Heim-Team, Info */
-  --action-bg: …;  --action-bg-2: …;  --action-bg-hover: …;  /* primäre Buttons */
-  --indicator: …;  /* aktiver Tab / Nav-Unterstrich, auf Weiß ≥ 3:1 */
-  --h-cool: …;  --h-signal: …;  --c-cool: …;  /* Hue/Chroma für Chips und Fokus-Ring */
-  --ring-color: …;  --ring-color-on-dark: …;  /* Gold/Amber, ≥ 3:1 auf Weiß bzw. auf Anthrazit */
-  --dss-court-color: …;  --dss-court-opacity: …;  /* Courtlines, Text darüber ≥ 7:1 */
+  --hoops-base-0: …;  /* … bis --hoops-base-1000 */
+  --hoops-signal-50: …;  /* … bis --hoops-signal-900 · CTA, Highlight, Uhr */
+  --hoops-cool-50: …;    /* … bis --hoops-cool-900 · Links, Heim-Team, Info */
+  --hoops-action-bg: …;  --hoops-action-bg-2: …;  --hoops-action-bg-hover: …;  /* primäre Buttons */
+  --hoops-indicator: …;  /* aktiver Tab / Nav-Unterstrich, auf Weiß ≥ 3:1 */
+  --hoops-h-cool: …;  --hoops-h-signal: …;  --hoops-c-cool: …;  /* Hue/Chroma für Chips und Fokus-Ring */
+  --hoops-ring-color: …;  --hoops-ring-color-on-dark: …;  /* Gold/Amber, ≥ 3:1 auf Weiß bzw. auf Anthrazit */
+  --hoops-court-color: …;  --hoops-court-opacity: …;  /* Courtlines, Text darüber ≥ 7:1 */
 }
 ```
 
-Dazu optional ein `data-type`-Block mit `--font-display`, `--font-heading` und `--font-body`. Nach dem Anlegen:
+Dazu optional ein `data-type`-Block mit `--hoops-font-display`, `--hoops-font-heading` und `--hoops-font-body`. Nach dem Anlegen:
 Kontraste messen (Text ≥ 7:1, UI-Elemente ≥ 3:1) und im Storybook alle Stories in der neuen Marke durchsehen.
 
 ---
@@ -401,7 +405,7 @@ Zwei Bausteine für Spielpläne (Vanilla-Klassen, Svelte, React), gemeinsames Da
   den Text „abgesagt“ bzw. „verschoben“ (nicht nur über Farbe oder Durchstreichung erkennbar).
 - Unter 640 px werden Zeilen zu Karten (Tabelle) bzw. Anwurfzeiten zu Blöcken (Raster).
 - Kurznamen und Logos (auch an `MatchCard`): `ScheduleTeam.short` und `logo`; Prop `names="full" | "short"` (Standard `full`; bis 640 px Breite erscheint der Kurzname automatisch, per CSS) und `logos` (Standard aus; Logo-Bild mit leerem Alternativtext oder Initialen; im Layout `opponent` an, solange nicht `false`). Der volle Name bleibt für Screenreader lesbar.
-- Kein dunkler Rahmen (`dss-frame--dark`); der seitenweite Dark Mode wirkt über die `--dss-*`-Variablen.
+- Kein dunkler Rahmen (`dss-frame--dark`); der seitenweite Dark Mode wirkt über die `--hoops-*`-Variablen.
 
 ```tsx
 <ScheduleTable
@@ -436,7 +440,7 @@ Zuordnung Turnier-Manager: `Game` wird zu `ScheduleGame` mit `nr: '#' + gameNumb
 
 ## Überschriften
 
-Komponenten mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamCard, LeagueCard, EmptyState, PlayByPlay, Modal) geben nie eine `h1` aus; die gehört der App. Die **Ebene** (`h2` bis `h6`) wählst du mit `titleAs` an der Komponente oder für einen ganzen Abschnitt mit `HeadingLevel` (React: `@bbv/dss-design-system/react`, Svelte: `@bbv/dss-design-system/svelte/HeadingLevel`). Rangfolge: `titleAs` vor `HeadingLevel` vor dem Standard `h3`. Das Modal hat `titleAs` (Standard `h2`) und gibt seinem Inhalt die nächste Ebene weiter. In Vanilla-HTML schreibst du das Element selbst. Die **Größe** hängt nie an der Ebene, sondern an Tokens: `--dss-title-size`, `--dss-title-weight`, `--dss-title-leading`, `--dss-frame-title-size` (Tabellen, Spielplan, PlayByPlay) und `--dss-card-title-size` (Karten, EmptyState); ohne Wert gelten die bisherigen Größen.
+Komponenten mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamCard, LeagueCard, EmptyState, PlayByPlay, Modal) geben nie eine `h1` aus; die gehört der App. Die **Ebene** (`h2` bis `h6`) wählst du mit `titleAs` an der Komponente oder für einen ganzen Abschnitt mit `HeadingLevel` (React: `@bbv/dss-design-system/react`, Svelte: `@bbv/dss-design-system/svelte/HeadingLevel`). Rangfolge: `titleAs` vor `HeadingLevel` vor dem Standard `h3`. Das Modal hat `titleAs` (Standard `h2`) und gibt seinem Inhalt die nächste Ebene weiter. In Vanilla-HTML schreibst du das Element selbst. Die **Größe** hängt nie an der Ebene, sondern an Tokens: `--hoops-title-size`, `--hoops-title-weight`, `--hoops-title-leading`, `--hoops-frame-title-size` (Tabellen, Spielplan, PlayByPlay) und `--hoops-card-title-size` (Karten, EmptyState); ohne Wert gelten die bisherigen Größen.
 
 ```tsx
 <h1>Mannschaft</h1>
