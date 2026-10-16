@@ -189,7 +189,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   'Weiterleitungsschleife endet': async (mod) => {
     const dl = await loadSibling(mod, 'lib/download.mjs');
     routes.set('/loop', { redirect: `${server.baseUrl}/loop` });
-    return within(4000, () => throws(() => dl.download(`${server.baseUrl}/loop`, { timeoutMs: 1500 }), /zu viele Weiterleitungen/));
+    return within(4000, () => throws(() => dl.download(`${server.baseUrl}/loop`, { timeoutMs: 250 }), /zu viele Weiterleitungen/));
   },
   'http außerhalb von Loopback ist abgelehnt, mit Freigabe erlaubt': async (mod) => {
     const dl = await loadSibling(mod, 'lib/download.mjs');
