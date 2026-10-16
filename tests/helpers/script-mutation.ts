@@ -8,12 +8,17 @@ import { expect } from 'vitest';
 let counter = 0;
 
 /** Kopiert scripts/ in einen eigenen Ordner, ersetzt in `file` (relativ zu scripts/) die erste Fundstelle von `from` durch `to` und lädt `entry`. */
-export async function loadMutated(entry: string, file: string, from: string, to: string) {
+export function mutateScripts(file: string, from: string, to: string) {
   const dir = mkdtempSync(join(tmpdir(), `hoops-mut-${process.pid}-${counter++}-`));
   cpSync(resolve(process.cwd(), 'scripts'), join(dir, 'scripts'), { recursive: true });
   const path = join(dir, 'scripts', file);
   const text = readFileSync(path, 'utf8');
   expect(text.includes(from), `Textstelle nicht gefunden in ${file}: ${from}`).toBe(true);
   writeFileSync(path, text.replace(from, () => to));
-  return import(/* @vite-ignore */ pathToFileURL(join(dir, 'scripts', entry)).href);
+  return join(dir, 'scripts');
+}
+
+/** Wie mutateScripts, lädt aber das Modul `entry` (relativ zu scripts/). */
+export async function loadMutated(entry: string, file: string, from: string, to: string) {
+  return import(/* @vite-ignore */ pathToFileURL(join(mutateScripts(file, from, to), entry)).href);
 }

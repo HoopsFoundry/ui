@@ -2,7 +2,7 @@
 /**
  * Stilparität eines Storybook-Builds vor und nach einem mechanischen Umbau (Umbenennungen, Refactorings).
  *
- * Erfasst für ALLE Stories (und die Docs-Seiten unter Foundation/ und Introduction) in der Matrix
+ * Erfasst für ALLE Stories und ALLE Docs-Seiten (MDX) in der Matrix
  * Marke BBV/DBB × hell/dunkel × 1280/420 px die Rechtecke und die BERECHNETEN Stilwerte aller sichtbaren
  * Elemente (Farben, Abstände, Schriftgrößen, Radien, Schatten, Ringe; computed values, keine Variablennamen).
  *
@@ -10,9 +10,10 @@
  *   node scripts/check-style-parity.mjs capture <storybook-ordner> <ausgabe.ndjson.gz> [--only=teil-der-id] [--workers=4]
  *   node scripts/check-style-parity.mjs compare <vorher.ndjson.gz> <nachher.ndjson.gz> [--tol=0.6] [--json]
  *
- * Ausgabe von `compare`: Anzahl Seiten und Elemente, Abweichungen je Seite (Struktur, Rechteck, Stil). Rechteck-Abweichungen auf
- * Docs-Seiten werden getrennt gezählt (dort ändern geänderte Texte, etwa längere Tokennamen in Tabellen, legitim den Umbruch);
- * Stilabweichungen zählen überall. Exit-Code 1 bei Abweichungen, 2 bei falschem Aufruf.
+ * Ausgabe von `compare`: Anzahl Seiten und Elemente, Abweichungen je Seite (Struktur, Rechteck, Layout-Stil, Stil). Bei STORIES zählen
+ * Rechteck und Größen (width, height, top …, Toleranz ±0,6 px) als Abweichung, ebenso Struktur und jeder andere Stil. Nur bei Docs-Seiten
+ * (und bei Stories, die mit `--erlaubt-layout=<id>,<id>` ausdrücklich benannt sind, weil sie geänderten Text zeigen, etwa längere
+ * Tokennamen) sind Rechteck und Größen nur ein Hinweis („NUR LAYOUT“). Exit-Code 1 bei Abweichungen, 2 bei falschem Aufruf oder fehlender Datei.
  * Ladezeit-Flakes: den Lauf (oder mit `--only=<teil-der-id>` einzelne Seiten) wiederholen.
  */
 import { createServer } from 'node:http';
@@ -30,7 +31,7 @@ export const WIDTHS = [1280, 420];
 
 /** Eigenschaften, deren Zahlen vom Layout abhängen (Toleranz ±tol px); alle anderen Zahlen müssen (fast) exakt gleich sein. */
 const LAYOUT_PROPS = new Set(['width', 'height', 'inline-size', 'block-size', 'min-width', 'min-height', 'top', 'left', 'right', 'bottom', 'perspective-origin', 'transform-origin', 'translate']);
-const PROPS = [
+export const PROPS = [
   'display', 'position', 'color', 'background-color', 'background-image', 'opacity', 'visibility',
   'border-top-color', 'border-right-color', 'border-bottom-color', 'border-left-color',
   'border-top-width', 'border-right-width', 'border-bottom-width', 'border-left-width',
@@ -45,7 +46,7 @@ const PROPS = [
   'fill', 'stroke', 'stroke-width', 'width', 'height', 'min-width', 'min-height', 'transform', 'z-index', 'overflow-x', 'overflow-y',
   'accent-color', 'caret-color', 'cursor', 'content',
 ];
-const PSEUDO_PROPS = ['content', 'display', 'color', 'background-color', 'background-image', 'width', 'height', 'border-top-color', 'border-top-width', 'border-top-left-radius', 'box-shadow', 'opacity', 'font-size', 'transform'];
+export const PSEUDO_PROPS = ['content', 'display', 'color', 'background-color', 'background-image', 'width', 'height', 'border-top-color', 'border-top-width', 'border-top-left-radius', 'box-shadow', 'opacity', 'font-size', 'transform'];
 
 /** Läuft im Browser: sammelt Rechtecke und berechnete Stile aller sichtbaren Elemente. */
 function collectInBrowser({ PROPS, PSEUDO_PROPS }) {
@@ -90,7 +91,7 @@ export function pageList(index, only = '') {
   const list = [];
   for (const e of entries) {
     if (e.type === 'story') list.push({ kind: 'story', id: e.id });
-    else if (e.type === 'docs' && (e.title === 'Introduction' || e.title.startsWith('Foundation/'))) list.push({ kind: 'docs', id: e.id });
+    else if (e.type === 'docs') list.push({ kind: 'docs', id: e.id });
   }
   return list.filter((p) => p.id.includes(only));
 }
@@ -197,7 +198,7 @@ export function stylesDiffer(a, b, props, tol) {
   return diffs;
 }
 
-export function compareRows(ra, rb, { kind, tol }) {
+export function compareRows(ra, rb, { tol = 0.6 } = {}) {
   const out = { structure: 0, rect: 0, style: 0, layout: 0, details: [] };
   if (ra.length !== rb.length) { out.structure++; out.details.push(`Elementanzahl ${ra.length} → ${rb.length}`); }
   const n = Math.min(ra.length, rb.length);
@@ -216,10 +217,20 @@ export function compareRows(ra, rb, { kind, tol }) {
   return out;
 }
 
+/** Ordnet das Ergebnis von compareRows ein: 'abweichung' (zählt), 'nur-layout' (Hinweis) oder 'gleich'. */
+export function classify(r, { kind, erlaubtLayout = false }) {
+  if (r.structure || r.style) return 'abweichung';
+  if (r.rect || r.layout) return kind === 'story' && !erlaubtLayout ? 'abweichung' : 'nur-layout';
+  return 'gleich';
+}
+
 async function compare(fa, fb, opts) {
   const tol = Number(opts.tol ?? 0.6);
-  const a = await load(fa);
-  const b = await load(fb);
+  const erlaubt = new Set(String(opts['erlaubt-layout'] ?? '').split(',').filter(Boolean));
+  for (const f of [fa, fb]) if (!existsSync(f)) { console.error(`Datei nicht gefunden: ${f}`); process.exit(2); }
+  let a;
+  let b;
+  try { a = await load(fa); b = await load(fb); } catch (error) { console.error(`Aufnahme nicht lesbar (${String(error.message).split('\n')[0]}). Erwartet wird die Ausgabe von „capture“ (.ndjson.gz).`); process.exit(2); }
   let elements = 0;
   const bad = [];
   const layoutOnly = [];
@@ -228,10 +239,12 @@ async function compare(fa, fb, opts) {
     const pb = b.get(key);
     if (!pb) { missing.push(key); continue; }
     elements += pa.rows.length;
-    const r = compareRows(pa.rows, pb.rows, { kind: pa.kind, tol });
-    // streng: Struktur und Stil außer Layout; Rechteck und Layout-Stil nur als Hinweis, wenn sie auf Seiten mit geändertem Text vorkommen
-    if (r.structure || r.style) bad.push({ key, ...r });
-    else if (r.rect || r.layout) layoutOnly.push({ key, ...r });
+    const r = compareRows(pa.rows, pb.rows, { tol });
+    if (Boolean(pa.error) !== Boolean(pb.error)) { r.structure++; r.details.unshift(`Fehleranzeige ${Boolean(pa.error)} → ${Boolean(pb.error)}`); }
+    const id = key.split('|')[0];
+    const verdict = classify(r, { kind: pa.kind, erlaubtLayout: erlaubt.has(id.replace(/^story:/, '')) });
+    if (verdict === 'abweichung') bad.push({ key, ...r });
+    else if (verdict === 'nur-layout') layoutOnly.push({ key, ...r });
   }
   for (const key of b.keys()) if (!a.has(key)) missing.push(`${key} (nur nachher)`);
   const stories = new Set([...a.keys()].map((k) => k.split('|')[0]));
@@ -244,7 +257,7 @@ async function compare(fa, fb, opts) {
     const seiten = new Map();
     for (const x of layoutOnly) { const id = x.key.split('|')[0]; seiten.set(id, (seiten.get(id) ?? 0) + 1); }
     for (const [id, n] of seiten) console.log(`NUR LAYOUT ${id} (${n} Zustände)`);
-    console.log(`\n${bad.length === 0 && missing.length === 0 ? 'Keine Abweichungen in Struktur und Stil.' : `${bad.length} abweichende Zustände (Struktur oder Stil), ${missing.length} fehlend.`} Nur Layout (Rechteck, Breite, Höhe): ${layoutOnly.length} Zustände auf ${seiten.size} Seiten, einzeln zu bewerten (geänderter Text).`);
+    console.log(`\n${bad.length === 0 && missing.length === 0 ? 'Keine Abweichungen.' : `${bad.length} abweichende Zustände, ${missing.length} fehlend.`} Nur Layout (Hinweis, Docs-Seiten und erlaubte Stories): ${layoutOnly.length} Zustände auf ${seiten.size} Seiten.`);
   }
   if (bad.length || missing.length) process.exitCode = 1;
 }
@@ -262,7 +275,10 @@ function parse(argv) {
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const { pos, opts } = parse(process.argv.slice(2));
-  if (pos[0] === 'capture' && pos[1] && pos[2]) await capture(pos[1], pos[2], opts);
+  if (pos[0] === 'capture' && pos[1] && pos[2]) {
+    if (!existsSync(join(resolve(pos[1]), 'index.json'))) { console.error(`Kein Storybook-Build gefunden: ${pos[1]} (index.json fehlt). Zuerst: npx storybook build -o <ordner>`); process.exit(2); }
+    await capture(pos[1], pos[2], opts);
+  }
   else if (pos[0] === 'compare' && pos[1] && pos[2]) await compare(pos[1], pos[2], opts);
-  else { console.error('Aufruf: check-style-parity.mjs capture <storybook-ordner> <aus.ndjson.gz> [--only=] [--workers=] | compare <vorher> <nachher> [--tol=0.6] [--json]'); process.exit(2); }
+  else { console.error('Aufruf: check-style-parity.mjs capture <storybook-ordner> <aus.ndjson.gz> [--only=] [--workers=] | compare <vorher> <nachher> [--tol=0.6] [--erlaubt-layout=<story-id>,…] [--json]'); process.exit(2); }
 }
