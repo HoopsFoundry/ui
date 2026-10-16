@@ -1,10 +1,12 @@
 // Gemeinsame Hilfen der Release-Tests: Bündel kopieren, Skript aus Text laden (für Mutationen), Tarball lesen.
 import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { randomBytes } from 'node:crypto';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { bundleDir } from './bundle-dir';
 
-export const tmpRoot = resolve(process.cwd(), 'tests/.release-tmp');
+// Jede Testdatei bekommt eigene Arbeitsordner (Vitest führt Dateien parallel aus): das Hilfsmodul wird je Datei neu geladen, die Marke ist je Datei verschieden
+export const tmpRoot = resolve(process.cwd(), `tests/.release-tmp-${randomBytes(4).toString('hex')}`);
 export const releaseScript = resolve(process.cwd(), 'scripts/release-vanilla.mjs');
 export const syncScript = resolve(process.cwd(), 'scripts/portal-sync.mjs');
 const loadRoot = `${tmpRoot}-load`;
