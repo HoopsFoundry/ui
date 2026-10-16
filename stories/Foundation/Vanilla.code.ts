@@ -174,51 +174,69 @@ export const renderBudget = { minKB: 52, gzipKB: 18 };
 export const mapSizes = { js: 38745, min: 22173, gzip: 9104 };
 export const mapBudget = { minKB: 24, gzipKB: 10 };
 
+/** Das Hilfsskript holen und prüfen: Release-Anhang `dss-sync.mjs` mit eigener Prüfsumme. */
+export const getSync = `# Im Projekt des Portals (neben der package.json): das Skript und seine Prüfsumme aus demselben Release laden und prüfen
+curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-sync.mjs
+curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-sync.mjs.sha256
+shasum -a 256 -c dss-sync.mjs.sha256        # muss "dss-sync.mjs: OK" melden (Linux: sha256sum -c)
+node --version                              # Node 18 oder neuer
+
+# Alternative aus dem npm-Paket (ab 1.0 der Regelweg): derselbe Code, Befehl dss-sync
+npm install --save-dev @bbv/dss-design-system
+npx dss-sync --from-package`;
+
 /** Auslieferung bis Version 1.0: Release-Anhänge auf GitHub. Der Befehl holt, prüft und ersetzt `_site/dss` in einem Schritt. */
-export const releaseSync = `# Im Projekt (nicht im Paket): portal-sync.mjs liegt neben der package.json des Portals
-node portal-sync.mjs --from-release 0.9.0
+export const releaseSync = `# Im Projekt (nicht im Paket): dss-sync.mjs liegt neben der package.json des Portals
+node dss-sync.mjs --from-release 0.9.0
 # → lädt dss-vanilla-0.9.0.tgz und dss-vanilla-0.9.0.sha256 von
 #   https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/
 # → prüft die SHA-256 des Tarballs und jeder Datei darin, die Version in version.json und den Ordnernamen
 # → ersetzt erst danach _site/dss (bei einer Abweichung bleibt das alte Ziel unverändert, Exit-Code 1)
 
 # Weitere Quellen (derselbe Aufbau von dist/vanilla):
-node portal-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard)
-node portal-sync.mjs --from-dir ./dss-vanilla-0.9.0 # entpackter Release-Ordner, offline
-node portal-sync.mjs --from-release 0.9.0 --base-url https://intern.example/dss   # eigener Spiegel`;
+node dss-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard)
+node dss-sync.mjs --from-dir ./dss-vanilla-0.9.0 # entpackter Release-Ordner, offline
+node dss-sync.mjs --from-release 0.9.0 --base-url https://intern.example/dss   # eigener Spiegel (https; Weiterleitungen nur auf denselben Host)
+node dss-sync.mjs --from-release 0.9.0 --base-url http://spiegel.lan/dss --allow-insecure-http   # unverschlüsselt nur mit ausdrücklicher Freigabe
+node dss-sync.mjs --from-release 0.9.0 --debug   # bei einem Fehler zusätzlich der Stack`;
 
 /** Prüfsumme von Hand, ohne das Skript. */
 export const manualCheck = `# Beide Dateien eines Releases in einen leeren Ordner laden, den Tarball daneben entpacken, dann prüfen
 mkdir dss-0.9.0 && cd dss-0.9.0
 curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.tgz
 curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.sha256
+curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.tgz.sha256
+shasum -a 256 -c dss-vanilla-0.9.0.tgz.sha256   # nur der Tarball (Linux: sha256sum -c)
 tar xzf dss-vanilla-0.9.0.tgz
-shasum -a 256 -c dss-vanilla-0.9.0.sha256      # jede Zeile muss "OK" sein (Linux: sha256sum -c)`;
+shasum -a 256 -c dss-vanilla-0.9.0.sha256      # Tarball und jede Datei darin; jede Zeile muss "OK" sein`;
 
 /** Aktualisieren und Zurückrollen im Portal. */
 export const updateFlow = `# 1. Neue Version holen und prüfen
-node portal-sync.mjs --from-release 0.10.0
+node dss-sync.mjs --from-release 0.10.0
 
 # 2. Versionen im Browser abgleichen (data-dss-versions am html-Element der Beispielseite, oder checkVersion() im Start-Skript)
 # 3. Portal veröffentlichen
 
 # Rollback: dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt
-node portal-sync.mjs --from-release 0.9.0`;
+node dss-sync.mjs --from-release 0.9.0`;
 
 /** Wechsel auf npm ab 1.0: nur die Quelle ändert sich. */
 export const npmSwitch = `# bis 1.0 (Release-Anhang)
-node portal-sync.mjs --from-release 0.9.0
+node dss-sync.mjs --from-release 0.9.0
 
 # ab 1.0 (npm, Paketname und Aufbau von dist/vanilla bleiben)
 npm install @bbv/dss-design-system@1.0.0
-node portal-sync.mjs --from-package`;
+npx dss-sync --from-package`;
 
 /** Das Ergebnis der Browser-Prüfung der Beispiel-Portalseite (scripts/check-portal-seite.mjs); Stand der Messung. */
 export const compat = {
-  checks: 73,
+  checks: 89,
   browsers: [
-    { name: 'Chromium', version: '153.0.8010.12', checks: 42, result: 'bestanden', note: 'Seiten, Karte, Tastatur, Layout, axe in BBV und DBB, hell und dunkel, 1280 und 420 px' },
-    { name: 'WebKit (Safari-Engine)', version: '26.6', checks: 28, result: 'bestanden', note: 'wie Chromium; axe nur BBV hell bei 420 px; auf macOS erreicht Tab Links und Schaltflächen nur mit Alt+Tab (Systemeinstellung)' },
-    { name: 'Firefox', version: '155.0 (Playwright 1543)', checks: 0, result: 'nicht gelaufen', note: 'Der Browser startet in dieser Umgebung nicht („Could not find profile folder“); die Ursache liegt im Playwright-Build, nicht im Paket' },
+    { name: 'Chromium', version: '153.0.8010.12', checks: 50, result: 'bestanden', note: 'Seiten, Karte, Tastatur, Layout bis 320 px, Unterpfad, ohne JavaScript, axe in BBV und DBB, hell und dunkel, 1280 und 420 px' },
+    { name: 'WebKit (Safari-Engine)', version: '26.6', checks: 36, result: 'bestanden', note: 'wie Chromium; axe nur BBV hell bei 420 px; auf macOS erreicht Tab Links und Schaltflächen nur mit Alt+Tab (Systemeinstellung); der Fokus darf am Dialogende kurz in die Browser-Oberfläche laufen' },
+    { name: 'Firefox', version: 'Playwright 1543 (155.0) und System-Firefox 138.0.1', checks: 0, result: 'nicht gelaufen', note: 'Ursache ungeklärt: Playwrights Build bricht beim Start mit „Could not find profile folder“ ab, der System-Firefox öffnet keinen Debug-Port. Befehl für einen anderen Rechner: node scripts/check-portal-seite.mjs --browsers=firefox' },
   ],
 };
+
+/** Node-Versionen, mit denen das Release-Skript und dss-sync.mjs (--from-dir und --from-release gegen einen lokalen Server) gelaufen sind. */
+export const nodeVersions = ['18.20.8', '20.20.2', '22.21.0'];

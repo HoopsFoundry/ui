@@ -31,7 +31,7 @@ describe('Code-Beispiele', () => {
     for (const part of ["script-src 'self'", 'sha256', 'nonce', 'eval', 'CSSOM']) expect(code.cspHeader, part).toContain(part);
   });
   it('das Skript im Beispiel ist das Beispiel der Doku: portal-sync.mjs wird roh eingebunden', () => {
-    expect(mdx).toContain("import syncSource from '../examples/portal-sync.mjs?raw'");
+    expect(mdx).toContain("import syncSource from '../../scripts/portal-sync.mjs?raw'");
     expect(read('scripts/portal-sync.mjs')).toContain('export async function syncDss');
   });
 });

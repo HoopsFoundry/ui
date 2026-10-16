@@ -10,7 +10,7 @@
 //   --base-url <url> (Standard: GitHub-Release-Adresse dieses Pakets), --allow-insecure-http (http außerhalb von Loopback),
 //   --allow-redirect-host <host> (weiteren Host für Weiterleitungen freigeben), --debug (Stack bei Fehlern).
 // Ergebnis:  _site/dss/dss.js, dss.min.js, dss-render*.js, dss-map*.js, dss.css, *.d.ts, Quellkarten, courtlines/, version.json  (und optional fonts/).
-// Voraussetzung: Node 18 oder neuer (getestet mit 20 und 22).
+// Voraussetzung: Node 18 oder neuer (getestet mit 18.20.8, 20.20.2 und 22.21.0).
 //
 // Die Quelle ist austauschbar: Der Aufbau von dist/vanilla ist in allen drei Fällen derselbe. Der Wechsel auf npm ab 1.0 ändert nur die Quelle
 // (aus --from-release wird --from-package), nicht das Ergebnis.
