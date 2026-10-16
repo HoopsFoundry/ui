@@ -1,14 +1,15 @@
 name: Deploy Storybook to Webspace
 
 # Baut das Storybook und überträgt es per rsync über SSH auf den All-Inkl-Webspace (Domain: siehe project.config.json).
-#  - Zunächst nur manuell (workflow_dispatch): `dry_run: true` (Standard) zeigt mit `rsync -n`, was sich ändern würde, und überträgt nichts;
-#    `dry_run: false` überträgt wirklich.
-#  - Nach einem erfolgreichen Probelauf und einem ersten echten Lauf den Push-Trigger einschalten (Block `push:` unter `on:` ergänzen:
-#    `push:` mit `branches: [main]`) und dann `DRY_RUN` für Pushes weiter auf false lassen.
+#  - Push auf main: echtes Deployment.
+#  - Manuell (workflow_dispatch): `dry_run: true` (Standard) zeigt mit `rsync -n`, was sich ändern würde, und überträgt nichts.
 # Zugangsdaten stehen als Repository-Secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS, DEPLOY_PATH.
 # Der Ordner `releases/` auf dem Webspace wird nicht gelöscht. Rückfall: deploy-storybook.yaml (GitHub Pages, nur manuell).
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       dry_run:

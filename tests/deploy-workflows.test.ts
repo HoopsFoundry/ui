@@ -10,7 +10,7 @@ const pages = read('.github/workflows/deploy-storybook.yaml');
 const htaccess = read('deploy/htaccess');
 
 const deployRules = (y: string) => ({
-  'Trigger: zunächst nur manuell': !/\n {2}push:|\n {2}pull_request/.test(y.slice(0, y.indexOf('\njobs:'))) && y.includes('workflow_dispatch:'),
+  'Trigger: Push auf main und manuell, kein pull_request': /\n {2}push:\n {4}branches:\n {6}- main/.test(y) && !/pull_request/.test(y) && y.includes('workflow_dispatch:'),
   'Probelauf ist Standard und nutzt rsync -n': /default: true/.test(y) && y.includes('flags+=(-n)'),
   'Rechte nur lesen': /\npermissions:\n  contents: read\n/.test(y) && !/id-token|contents: write/.test(y),
   'Secrets nur über env, nicht in run': runBlocks(y).every((b) => !b.includes('${{')),
