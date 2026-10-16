@@ -11,6 +11,7 @@ body { margin: 0; background: var(--page-bg); color: var(--page-fg); font-family
 .portal-main h1, .portal-main h2 { margin: 0; }
 .portal-intro { margin: 0; max-width: 46rem; }
 .portal-block { display: grid; gap: 0.75rem; min-width: 0; }
+.portal-body { min-width: 0; }
 .portal-grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr)); }
 .portal-grid > * { min-width: 0; }
 .portal-foot { padding: 1rem; border-top: 1px solid currentColor; }
@@ -19,3 +20,8 @@ body { margin: 0; background: var(--page-bg); color: var(--page-fg); font-family
 .portal-form label { font-weight: 600; }
 .portal-form textarea { width: 100%; box-sizing: border-box; min-height: 6rem; padding: 0.5rem; font: inherit; color: inherit; background: var(--page-bg); border: 1px solid currentColor; border-radius: 4px; }
 .portal-stack { display: grid; gap: 1.5rem; }
+/* Sichtbarer Fokus für Sprunglink und Menü: dieselben Ring-Tokens wie die Komponenten (gestrichelt, 3 px) */
+.portal-skip:focus-visible, .portal-menu a:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }
+.portal-noscript { margin: 0; padding: 0.75rem 1rem; border: 2px solid currentColor; }
+/* Das Attribut hidden muss gegen display aus Klassen (.dss-btn) gewinnen: ohne JavaScript bleiben Theme-Umschalter und Meldeknopf verborgen */
+[hidden] { display: none !important; }

@@ -1,15 +1,15 @@
 // Beispiel-Portalseite ohne Build: Vereinsseite (index.html) und Teamseite (team.html) aus einem JSON-Datensatz.
 // Das Seitenlayout steht im HTML, alle Bausteine kommen aus den Funktionen des Pakets (mountX, initAll). Tabs und Dialog haben keine
 // Render-Funktion im Paket; die kleinen Hilfen dafür unten setzen ihre Texte über esc/attr aus den Daten zusammen.
-import { initAll, checkVersion, VERSION as CORE_VERSION } from '/dss/dss.min.js';
-import { esc, attr, mountLeagueCard, mountTeamCard, mountScheduleTable, mountTable, mountVenueCard, VERSION as RENDER_VERSION } from '/dss/dss-render.min.js';
-import { initMap, VERSION as MAP_VERSION } from '/dss/dss-map.min.js';
+import { initAll, checkVersion, VERSION as CORE_VERSION } from './dss/dss.min.js';
+import { esc, attr, mountLeagueCard, mountTeamCard, mountScheduleTable, mountTable, mountVenueCard, VERSION as RENDER_VERSION } from './dss/dss-render.min.js';
+import { initMap, VERSION as MAP_VERSION } from './dss/dss-map.min.js';
 
 const meta = (name) => document.querySelector(`meta[name="${name}"]`)?.getAttribute('content') ?? '';
 const tileUrl = meta('dss-tile-url');
 const page = meta('dss-page');
 // Leaflet kommt aus einer lokalen Datei und wird erst nach dem Klick auf „Karte laden“ geladen (vorher kein Netzverkehr)
-const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
+const loadLeaflet = () => import('./vendor/leaflet/leaflet-src.esm.js');
 
 /** Setzt geprüftes Markup ein (als Fragment geparst); alle Werte darin laufen durch esc oder attr. */
 const setMarkup = (el, markup) => el.replaceChildren(document.createRange().createContextualFragment(markup));
@@ -27,6 +27,7 @@ function block(parent, id, heading) {
     el.append(h);
   }
   const body = document.createElement('div');
+  body.className = 'portal-body';
   el.append(body);
   parent.append(el);
   return body;
@@ -37,6 +38,7 @@ function tabs(parent, { id, label, items, style = 'segmented' }) {
   const bar = items.map((item, i) => `<button type="button" class="dss-tab${i === 0 ? ' is-active' : ''}" role="tab" id="${attr(id)}-${attr(item.id)}" aria-selected="${i === 0}" aria-controls="${attr(id)}-${attr(item.id)}-panel" tabindex="${i === 0 ? 0 : -1}"><span class="dss-tab-label">${esc(item.label)}</span>${item.count === undefined ? '' : `<span class="dss-tab-count">${esc(item.count)}</span>`}</button>`).join('');
   const panels = items.map((item, i) => `<div id="${attr(id)}-${attr(item.id)}-panel" role="tabpanel" aria-labelledby="${attr(id)}-${attr(item.id)}" tabindex="0"${i === 0 ? '' : ' hidden inert'}></div>`).join('');
   const holder = document.createElement('div');
+  holder.className = 'portal-body';
   parent.append(holder);
   setMarkup(holder, `<div class="dss-tabs dss-tabs--${attr(style)} dss-tabs--md" role="tablist" aria-label="${attr(label)}" data-dss="tabs">${bar}</div>${panels}`);
   return Object.fromEntries(items.map((item) => [item.id, holder.querySelector(`#${CSS.escape(`${id}-${item.id}-panel`)}`)]));
@@ -108,6 +110,8 @@ async function main() {
     venue(block(root, 'halle'), data.halle, 'halle-karte');
   }
   reportDialog(document.getElementById('dialoge'));
+  // der Knopf „Fehler melden“ ist ohne JavaScript verborgen und erscheint erst, wenn der Dialog da ist
+  for (const button of document.querySelectorAll('[data-dss-modal-open]')) button.hidden = false;
 
   // Danach das Verhalten: Seitennavigation, Tabs, Dialog, Theme-Umschalter, Nach oben, Accordion der einklappbaren Karten
   const dss = initAll(document);

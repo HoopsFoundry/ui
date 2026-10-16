@@ -7,14 +7,16 @@
  *   node scripts/check-portal-seite.mjs --only=csp,keyboard
  *
  * Die Prüfung geht den echten Auslieferungsweg: baut dist/vanilla in einen temporären Ordner, erzeugt daraus das Release (scripts/release-vanilla.mjs),
- * legt es auf einen lokalen Server, holt es mit portal-sync --from-release (Prüfsumme) in ein leeres Projekt und liefert die Seite von dort aus,
+ * legt es auf einen lokalen Server, holt es mit dem Release-Anhang dss-sync.mjs (--from-release, Prüfsumme) in ein leeres Projekt und liefert die Seite von dort aus,
  * mit strenger Content-Security-Policy (default-src 'self'; script-src 'self' 'sha256-<Boot-Skript>'; style-src 'self'; img-src 'self' <Kachel-Host>).
  * Der Kachel-Host ist ein zweiter lokaler Server (localhost, anderer Port). Geprüft wird: keine Konsolenfehler, keine fremden Anfragen vor dem Klick,
- * keine CSP-Verletzung, Karte nach dem Klick, Tastatur (Tab-Reihenfolge, Dialog, Accordion, Tabs), kein seitliches Scrollen bei 420 px,
+ * keine CSP-Verletzung, Karte nach dem Klick, Tastatur (Tab-Reihenfolge, sichtbarer Fokusring, Dialog, Accordion, Tabs), kein seitliches Scrollen bei
+ * 420, 360 und 320 px (WCAG 1.4.10), Betrieb unter einem Unterpfad (GitHub-Pages-Projektseite), Verhalten ohne JavaScript (noscript, Knopf verborgen),
  * Theme-Umschalter, Seitennavigation, Nach oben, Versionsabgleich JS↔CSS, axe (WCAG 2.x A/AA/AAA, 2.2, best-practice, Kontrast AAA, Zielgröße)
  * in BBV/DBB × hell/dunkel × 1280/420 px. Ergebnis als JSON (Tabelle der Prüfungen) auf stdout; Exit-Code 1 bei jedem Fehlschlag. Läuft nicht
  * unter `npm test` (braucht Browser).
  */
+import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
 import { createHash } from 'node:crypto';
 import { cp, mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
@@ -25,7 +27,6 @@ import { fileURLToPath } from 'node:url';
 import { chromium, firefox, webkit } from 'playwright';
 import { buildVanilla } from './build-vanilla.mjs';
 import { releaseVanilla } from './release-vanilla.mjs';
-import { syncDss } from '../stories/examples/portal-sync.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')));
@@ -71,11 +72,20 @@ async function setup() {
   const project = join(dir, 'projekt');
   await mkdir(join(project, 'node_modules'), { recursive: true });
   await symlink(join(ROOT, 'node_modules/leaflet'), join(project, 'node_modules/leaflet'));
-  const synced = await syncDss({
-    root: project, leaflet: true, fonts: false,
-    source: { type: 'release', version: release.version, baseUrl: `http://127.0.0.1:${releaseServer.address().port}` },
+  // der Release-Anhang dss-sync.mjs (eine Datei) läuft in einem fremden Ordner, ohne Zugriff auf dieses Repository
+  const syncFile = join(dir, 'release', 'dss-sync.mjs');
+  // asynchron: der Release-Server läuft in diesem Prozess und muss antworten können, während dss-sync.mjs lädt
+  const run = await new Promise((done) => {
+    const child = spawn(process.execPath, [syncFile, '--from-release', release.version, '--base-url', `http://127.0.0.1:${releaseServer.address().port}`, '--leaflet', '--no-fonts'], { cwd: project });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (d) => (stdout += d));
+    child.stderr.on('data', (d) => (stderr += d));
+    child.on('close', (status) => done({ status, stdout, stderr }));
   });
   await new Promise((r) => releaseServer.close(r));
+  if (run.status !== 0) throw new Error(`dss-sync.mjs ist fehlgeschlagen: ${run.stderr}`);
+  const synced = { version: run.stdout.match(/ (\d+\.\d+\.\d+\S*) nach /)?.[1], leaflet: /Leaflet nach/.test(run.stdout) };
   const site = join(project, '_site');
   await cp(join(ROOT, 'stories/examples/portal-seite'), site, { recursive: true });
   return { dir, site, version: release.version, synced, releaseBytes: release.tgz.length };
@@ -96,6 +106,8 @@ async function startServers(site) {
   const csp = `default-src 'self'; script-src 'self' 'sha256-${bootHash}'; style-src 'self'; img-src 'self' ${tileOrigin}`;
   const server = createServer(async (req, res) => {
     let path = normalize(decodeURIComponent(new URL(req.url, 'http://x').pathname)).replace(/^(\.\.[/\\])+/, '');
+    // Unterpfad wie bei einer GitHub-Pages-Projektseite (https://<nutzer>.github.io/<repo>/): die relativen Pfade der Seite müssen auch dort tragen
+    if (path.startsWith('/projekt/') || path === '/projekt') path = path.slice('/projekt'.length);
     if (path === '/' || path === '') path = '/index.html';
     log.site.push(path);
     const file = join(site, path);
@@ -219,12 +231,16 @@ async function checkKeyboard(ctx, srv, name) {
     const positive = await page.evaluate(() => document.querySelectorAll('[tabindex]:not([tabindex="0"]):not([tabindex="-1"])').length);
     await page.evaluate(() => { window.__order = []; document.addEventListener('focusin', (e) => window.__order.push(e.target), true); });
     const names = [];
+    let ring = null;
     for (let i = 0; i < 70; i++) {
       await page.keyboard.press(TAB);
       const d = await describeFocus(page);
       if (!d) break;
       names.push(d);
+      // Fokusring des ersten Ziels (Sprunglink) messen, solange er den Fokus hat
+      if (i === 0) ring = await page.evaluate(() => { const cs = getComputedStyle(document.activeElement); return { style: cs.outlineStyle, width: parseFloat(cs.outlineWidth) }; });
     }
+    record(`${name} · ${label}: der Sprunglink hat beim Fokus den gestrichelten Ring der Tokens (3 px)`, ring?.style === 'dashed' && ring.width >= 3, ring);
     const ordered = await page.evaluate(() => window.__order.every((el, i, a) => i === 0 || (a[i - 1].compareDocumentPosition(el) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0 || a[i - 1] === el));
     const visible = await page.evaluate(() => window.__order.every((el) => el.getClientRects().length > 0));
     record(`${name} · ${label}: Tab-Reihenfolge folgt dem Dokument, nur sichtbare Ziele, kein positives tabindex`,
@@ -283,7 +299,7 @@ async function checkKeyboard(ctx, srv, name) {
 
 async function checkLayout(browser, srv, name) {
   for (const [path, label] of PAGES) {
-    for (const width of [420, 360]) {
+    for (const width of [420, 360, 320]) {
       const ctx = await browser.newContext({ viewport: { width, height: 900 } });
       const { page } = await openPage(ctx, srv.origin, path);
       await page.click('.dss-map-load');
@@ -293,6 +309,37 @@ async function checkLayout(browser, srv, name) {
       await ctx.close();
     }
   }
+}
+
+async function checkSubpath(ctx, srv, name) {
+  const page = await ctx.newPage();
+  const seen = { console: [], errors: [], failed: [] };
+  page.on('console', (m) => { if (m.type() === 'error') seen.console.push(m.text()); });
+  page.on('pageerror', (e) => seen.errors.push(String(e.message ?? e)));
+  page.on('requestfailed', (r) => seen.failed.push(r.url()));
+  for (const path of ['projekt/index.html', 'projekt/team.html']) {
+    await page.goto(`${srv.origin}/${path}`, { waitUntil: 'networkidle' });
+    await waitFor(() => page.evaluate(() => document.documentElement.getAttribute('data-portal')), `Unterpfad ${path}`);
+    const info = await page.evaluate(() => ({ ready: document.documentElement.getAttribute('data-portal'), versions: document.documentElement.getAttribute('data-dss-versions'), cards: document.querySelectorAll('.dss-league, .dss-team, [class*="dss-venue"]').length }));
+    record(`${name} · Unterpfad /${path}: Seite fertig (relative Pfade tragen), 0 Konsolenfehler, keine fehlgeschlagene Anfrage`, info.ready === 'ready' && seen.console.length === 0 && seen.errors.length === 0 && seen.failed.length === 0, { info, ...seen });
+  }
+  await page.close();
+}
+
+async function checkNoJs(browser, srv, name) {
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, javaScriptEnabled: false });
+  for (const [path, label] of PAGES) {
+    const page = await ctx.newPage();
+    await page.goto(`${srv.origin}/${path}`, { waitUntil: 'load' });
+    const info = await page.evaluate(() => null).catch(() => null);
+    void info;
+    const visible = await page.locator('.portal-noscript').isVisible();
+    const report = await page.locator('[data-dss-modal-open]').isVisible();
+    const h1 = await page.locator('h1').count();
+    record(`${name} · ${label} ohne JavaScript: Hinweis sichtbar, Knopf „Fehler melden“ verborgen (er wäre wirkungslos), Überschrift vorhanden`, visible && !report && h1 === 1, { visible, report, h1 });
+    await page.close();
+  }
+  await ctx.close();
 }
 
 async function checkBehavior(ctx, srv, name) {
@@ -360,7 +407,7 @@ const context = await setup();
 context.site = context.site;
 const srv = await startServers(context.site);
 srv.site = context.site;
-record(`Auslieferung: Release ${context.version} erzeugt, mit portal-sync --from-release (Prüfsumme) geholt, Leaflet kopiert`, context.synced.version === context.version && context.synced.leaflet === true, { version: context.synced.version, tgzBytes: context.releaseBytes });
+record(`Auslieferung: Release ${context.version} erzeugt, mit dem Anhang dss-sync.mjs (--from-release, Prüfsumme) geholt, Leaflet kopiert`, context.synced.version === context.version && context.synced.leaflet === true, { version: context.synced.version, tgzBytes: context.releaseBytes });
 await checkContentChecks(null, srv, 'Inhalt');
 
 const versionsOfBrowsers = {};
@@ -390,8 +437,10 @@ try {
       if (wants('map')) await guard('map', () => checkMap(ctx, srv, name));
       if (wants('keyboard')) await guard('keyboard', () => checkKeyboard(ctx, srv, name));
       if (wants('behavior')) await guard('behavior', () => checkBehavior(ctx, srv, name));
+      if (wants('subpath')) await guard('subpath', () => checkSubpath(ctx, srv, name));
       await ctx.close();
       if (wants('layout')) await guard('layout', () => checkLayout(browser, srv, name));
+      if (wants('nojs')) await guard('nojs', () => checkNoJs(browser, srv, name));
       if (wants('axe')) await guard('axe', () => checkAxe(browser, srv, name, name === 'chromium'));
     } finally {
       await browser.close();

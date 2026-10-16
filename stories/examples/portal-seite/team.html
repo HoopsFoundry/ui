@@ -4,11 +4,12 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Herren 1 · TSV Nordhain 1920</title>
-  <!-- Ohne Build: alle Dateien liegen lokal im Projekt (kein CDN, kein unpkg). Die Ordner stammen aus dem Paket (portal-sync.mjs):
-       /dss/             dist/vanilla (dss.css, dss.min.js, dss-render.min.js, dss-map.min.js)
-       /vendor/leaflet/  Leaflet (leaflet.css, leaflet-src.esm.js), erst nach dem Klick auf "Karte laden" geladen -->
-  <link rel="stylesheet" href="/dss/dss.css" />
-  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
+  <!-- Ohne Build: alle Dateien liegen lokal im Projekt (kein CDN, kein unpkg). Die Ordner stammen aus dem Paket (dss-sync.mjs / portal-sync.mjs):
+       dss/             dist/vanilla (dss.css, dss.min.js, dss-render.min.js, dss-map.min.js)
+       vendor/leaflet/  Leaflet (leaflet.css, leaflet-src.esm.js), erst nach dem Klick auf "Karte laden" geladen
+       Die Pfade sind relativ zur Seite: sie funktionieren auch auf einer GitHub-Pages-Projektseite unter /<repo>/ (ein Pfad mit führendem / täte es nicht). -->
+  <link rel="stylesheet" href="dss/dss.css" />
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css" />
   <link rel="stylesheet" href="portal.css" />
   <!-- Kachel-Adresse der Karte: ein eigener Proxy oder Kachelserver; der Host gehört in img-src der CSP -->
   <meta name="dss-tile-url" content="/tiles/{z}/{x}/{y}.png" />
@@ -24,13 +25,15 @@
     <p class="portal-brand">TSV Nordhain 1920</p>
     <nav class="portal-menu" aria-label="Hauptmenü"><a href="index.html">Verein</a> <a href="team.html" aria-current="page">Herren 1</a></nav>
     <div class="portal-tools">
-      <button type="button" class="dss-btn dss-btn--secondary dss-btn--md" data-dss-modal-open="fehler-melden">Fehler melden</button>
+      <!-- ohne JavaScript ohne Wirkung: bleibt verborgen, portal.js zeigt ihn -->
+      <button type="button" class="dss-btn dss-btn--secondary dss-btn--md" data-dss-modal-open="fehler-melden" hidden>Fehler melden</button>
       <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" hidden></button>
     </div>
   </header>
   <main id="inhalt" class="portal-main" data-dss="pagenav" data-dss-options='{"label":"Auf dieser Seite"}'>
     <h1>Herren 1</h1>
     <p class="portal-intro" id="intro"></p>
+    <noscript><p class="portal-noscript">Diese Seite baut Tabellen, Spielplan und Karte mit JavaScript aus den Daten auf. Bitte aktiviere JavaScript, um sie zu sehen.</p></noscript>
     <div id="inhalt-dynamisch" class="portal-stack"></div>
   </main>
   <footer class="portal-foot">
