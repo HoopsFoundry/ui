@@ -16,7 +16,7 @@ Tabellen sind das Rückgrat des Spielberichts. **Table** ist die Datentabelle f�
 - 4 Dichte-Stufen: **touch (60 px)** · default (48 px) · compact (40 px) · dense (32 px).
 - Helle und dunkle Fläche (Kampfgericht-Tisch).
 - Sticky Kopf, Sortier-Pfeile, optionale Streifen und eine `tfoot`-Summenzeile.
-- Hilfsklassen für Basketball-Zellen: `.dss-tn` (Trikotnummer), `.dss-pos` (Position), `.dss-player` (Namen-Layout), `.dss-pill-s` (Status-Chips).
+- Hilfsklassen für Basketball-Zellen: `.hoops-tn` (Trikotnummer), `.hoops-pos` (Position), `.hoops-player` (Namen-Layout), `.hoops-pill-s` (Status-Chips).
 
 Der Live-Ereignisstrom steht auf der Seite [PlayByPlay](?path=/docs/components-playbyplay--docs). Spielpläne haben eine eigene Seite: [Spielplan](?path=/docs/components-spielplan--docs) zeigt **ScheduleTable** und **ScheduleGrid** mit allen Varianten, Zuständen und der Handy-Ansicht.
 
@@ -69,10 +69,10 @@ Vier Dekorations-Klassen füllen die Zellen. Sie liegen im Rahmen der Tabelle, f
   label="Zellbausteine"
   head={['Klasse', 'Wirkung']}
   rows={[
-    ['.dss-tn', 'Trikot-Marke, 44 px Quadrat, Display-Schrift. Mit .heim oder .gast in der Teamfarbe, .captain mit Amber-Ring, Größen .small (32 px), .large (64 px) und .hero (110 px).'],
-    ['.dss-pos', 'Positionsmarke in Mono. .pg, .sg, .sf, .pf und .c färben sie (Chip-Tokens, folgen dem Theme); ohne Zusatz grau.'],
-    ['.dss-pill-s', 'Status-Chip in Mono-Versalien. .on grün, .cap Amber, .dnp rot; ohne Zusatz grau. Der Text trägt die Aussage, die Farbe unterstützt.'],
-    ['.dss-player', 'Namen-Layout mit .dss-player-info, .dss-player-name und .dss-player-meta. .bench dämpft den Namen, .dnp streicht ihn durch.'],
+    ['.hoops-tn', 'Trikot-Marke, 44 px Quadrat, Display-Schrift. Mit .heim oder .gast in der Teamfarbe, .captain mit Amber-Ring, Größen .small (32 px), .large (64 px) und .hero (110 px).'],
+    ['.hoops-pos', 'Positionsmarke in Mono. .pg, .sg, .sf, .pf und .c färben sie (Chip-Tokens, folgen dem Theme); ohne Zusatz grau.'],
+    ['.hoops-pill-s', 'Status-Chip in Mono-Versalien. .on grün, .cap Amber, .dnp rot; ohne Zusatz grau. Der Text trägt die Aussage, die Farbe unterstützt.'],
+    ['.hoops-player', 'Namen-Layout mit .hoops-player-info, .hoops-player-name und .hoops-player-meta. .bench dämpft den Namen, .dnp streicht ihn durch.'],
     ['td.num', 'Zahlenzelle: rechtsbündig, Mono, tabellarische Ziffern, Gewicht 500. .lead fett und stark, .dim gedämpft, .plus grün, .minus rot.'],
     ['.center', 'Zentriert die Zelle (th und td).'],
     ['tr.is-own', 'Hebt eine Zeile hervor (z. B. die eigene Mannschaft): Auswahlfläche und fette Schrift.'],
@@ -101,13 +101,13 @@ Zahlen stehen rechtsbündig in Mono mit tabellarischen Ziffern (`td.num`, in der
 
 ### Kopf bleibt stehen
 
-Der Kopf (`th`) ist `position: sticky; top: 0`. Er bleibt stehen, sobald der Scrollbereich (`.dss-table-scroll`) eine Höhe bekommt, hier `max-height: 200px`. Ohne Höhe wächst die Tabelle mit und es gibt nichts zu scrollen.
+Der Kopf (`th`) ist `position: sticky; top: 0`. Er bleibt stehen, sobald der Scrollbereich (`.hoops-table-scroll`) eine Höhe bekommt, hier `max-height: 200px`. Ohne Höhe wächst die Tabelle mit und es gibt nichts zu scrollen.
 
 <Canvas of={TableStories.Sticky} />
 
 ## Schmale Bildschirme
 
-Zellen brechen nicht um (`white-space: nowrap`). Wenn die Tabelle breiter ist als der Platz, scrollt sie im Rahmen seitlich (`.dss-table-scroll`, `overflow-x: auto`). Der Scrollbereich ist eine Region mit Namen (`caption`, sonst `title`, sonst „Tabelle“) und per Tab erreichbar, damit Tastaturnutzer ihn mit den Pfeiltasten bewegen können. Ordne die wichtigsten Spalten nach vorn (siehe Dos und Don'ts).
+Zellen brechen nicht um (`white-space: nowrap`). Wenn die Tabelle breiter ist als der Platz, scrollt sie im Rahmen seitlich (`.hoops-table-scroll`, `overflow-x: auto`). Der Scrollbereich ist eine Region mit Namen (`caption`, sonst `title`, sonst „Tabelle“) und per Tab erreichbar, damit Tastaturnutzer ihn mit den Pfeiltasten bewegen können. Ordne die wichtigsten Spalten nach vorn (siehe Dos und Don'ts).
 
 ## Tabellen einklappen
 
@@ -133,7 +133,7 @@ Innerhalb von `Accordion` melden sich einklappbare Rahmen selbst an: Sprungleist
 
 ## Zustände: Zeile, Link, Schalter, Kontrollkästchen
 
-Die Tabelle selbst hat nur einen Zustand, den Hover der Zeile (`--hoops-hover-bg`). Alles Bedienbare in den Zellen kommt aus den eigenen Bausteinen: Link (`.dss-link`), Schalter (`.dss-btn`), Kontrollkästchen (`.dss-check-input`). Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand; auf dunklen Flächen dezenter). Der Scrollbereich hat den Ring innen, weil der Rahmen außen abschneidet. Ein Gedrückt (Aktiv) gibt es für die Zeile nicht; die Spalte zeigt Hover der Zeile plus Aktiv des Elements. Gesperrt gibt es bei Schalter und Kontrollkästchen.
+Die Tabelle selbst hat nur einen Zustand, den Hover der Zeile (`--hoops-hover-bg`). Alles Bedienbare in den Zellen kommt aus den eigenen Bausteinen: Link (`.hoops-link`), Schalter (`.hoops-btn`), Kontrollkästchen (`.hoops-check-input`). Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand; auf dunklen Flächen dezenter). Der Scrollbereich hat den Ring innen, weil der Rahmen außen abschneidet. Ein Gedrückt (Aktiv) gibt es für die Zeile nicht; die Spalte zeigt Hover der Zeile plus Aktiv des Elements. Gesperrt gibt es bei Schalter und Kontrollkästchen.
 
 <Canvas of={TableStories.Zustaende} />
 

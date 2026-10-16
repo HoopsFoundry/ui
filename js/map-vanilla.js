@@ -1,10 +1,10 @@
 /**
- * DSS Map · Karte in Vanilla (`renderMap`, `initMap`, `mountMap`)
+ * HoopsFoundry UI Map · Karte in Vanilla (`renderMap`, `initMap`, `mountMap`)
  * --------------------------------------------------------------
  * Die Karte (Svelte `Map`, React `MapView`) für Seiten ohne Framework:
  *  - `renderMap(props, options?)` → Markup als Zeichenkette (dasselbe wie `MapView` im Server-Rendering, die Schaltfläche „Karte laden“ ist
  *    bedienbar); kein Leaflet, kein Netzverkehr, läuft auch in Node.
- *  - `initMap(el, options)` → `{ update(props), destroy() }` hängt das Verhalten an vorhandenes Markup (`.dss-map` in oder an `el`): der
+ *  - `initMap(el, options)` → `{ update(props), destroy() }` hängt das Verhalten an vorhandenes Markup (`.hoops-map` in oder an `el`): der
  *    Zwei-Klick-Platzhalter, `load: 'auto'`, Leaflet (Marker, Zoom, Fokus, Tasten), Fehlerzustände mit Statuszeile, Zoom-Schaltflächen.
  *  - `mountMap(el, props, options?)` → `renderMap` einsetzen (Styles über das CSSOM) und `initMap` starten.
  * Leaflet bleibt außerhalb des Bündels: Standard ist `import('leaflet')` erst nach dem Klick (Bundler oder importmap); `options.loadLeaflet`
@@ -22,7 +22,7 @@ import { insertMarkup, nextUid, fragmentOf, reapplyStyles } from './render/dom.j
 import { mapCardMarkup, mapHeightPx, mapListMarkup, mapPinsMarkup, renderMapView } from './render/map-view.js';
 import { list, obj, str, uidFor } from './render/core.js';
 
-// Je Wurzelelement `.dss-map` (initMap) und je Behälter (mountMap) höchstens eine Fassung; zwei Kopien des Moduls teilen sich das Register
+// Je Wurzelelement `.hoops-map` (initMap) und je Behälter (mountMap) höchstens eine Fassung; zwei Kopien des Moduls teilen sich das Register
 const registry = createRegistry('map');
 const noop = () => ({ update() {}, destroy() {} });
 const SAFE_ATTRS = ['data-state', 'data-dim', 'data-tiles', 'class'];
@@ -48,25 +48,25 @@ const call = (fn, arg) => {
   try {
     fn(arg);
   } catch (error) {
-    devWarn('[dss-map] Ein Ereignis-Handler hat einen Fehler geworfen.', error);
+    devWarn('[hoops-map] Ein Ereignis-Handler hat einen Fehler geworfen.', error);
   }
 };
 
 const zoomIcon = (path) =>
   `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="${path}"></path></svg>`;
 const zoomMarkup = (canvasId) =>
-  `<div class="dss-map-zoom" role="group" aria-label="${attr(mapText.zoomGroup)}">` +
-  `<button type="button" class="dss-map-zoom-btn" aria-label="${attr(mapText.zoomIn)}" aria-controls="${attr(canvasId)}">${zoomIcon('M10 4v12M4 10h12')}</button>` +
-  `<button type="button" class="dss-map-zoom-btn" aria-label="${attr(mapText.zoomOut)}" aria-controls="${attr(canvasId)}">${zoomIcon('M4 10h12')}</button></div>`;
+  `<div class="hoops-map-zoom" role="group" aria-label="${attr(mapText.zoomGroup)}">` +
+  `<button type="button" class="hoops-map-zoom-btn" aria-label="${attr(mapText.zoomIn)}" aria-controls="${attr(canvasId)}">${zoomIcon('M10 4v12M4 10h12')}</button>` +
+  `<button type="button" class="hoops-map-zoom-btn" aria-label="${attr(mapText.zoomOut)}" aria-controls="${attr(canvasId)}">${zoomIcon('M4 10h12')}</button></div>`;
 
-/** Hängt die Karte an `root` (ein Element `.dss-map`). `restore`: `destroy` stellt das Markup vom Beginn wieder her. */
+/** Hängt die Karte an `root` (ein Element `.hoops-map`). `restore`: `destroy` stellt das Markup vom Beginn wieder her. */
 function attach(root, options, { restore }) {
   // Zuerst die frühere Fassung abbauen: ihr destroy ersetzt die Kinder von `root`; Knoten dürfen erst danach gelesen werden
   registry.release(root);
   const doc = root.ownerDocument;
-  const stage = root.querySelector('.dss-map-stage');
+  const stage = root.querySelector('.hoops-map-stage');
   if (!stage) {
-    devWarn('[dss-map] initMap: im Element fehlt das Markup der Karte (.dss-map-stage); renderMap erzeugt es.');
+    devWarn('[hoops-map] initMap: im Element fehlt das Markup der Karte (.hoops-map-stage); renderMap erzeugt es.');
     return noop();
   }
   // Markup vom Server: eine Seite mit `style-src 'self'` blockiert dessen style-Attribute; über das CSSOM gelten Höhe und Pins trotzdem
@@ -87,8 +87,8 @@ function attach(root, options, { restore }) {
   })();
   const heightBefore = root.style.getPropertyValue('--hoops-map-h');
 
-  const textId = root.querySelector('.dss-map-text')?.id ?? '';
-  const canvasId = root.querySelector('.dss-map-canvas')?.id || (textId.startsWith('dss-map-text-') ? `dss-map-canvas-${textId.slice(13)}` : `dss-map-canvas-${nextUid()}`);
+  const textId = root.querySelector('.hoops-map-text')?.id ?? '';
+  const canvasId = root.querySelector('.hoops-map-canvas')?.id || (textId.startsWith('hoops-map-text-') ? `hoops-map-canvas-${textId.slice(13)}` : `hoops-map-canvas-${nextUid()}`);
 
   const markupState = root.getAttribute('data-state');
   let phase = props.load === 'auto' || (props.load === undefined && markupState === 'loading') ? 'loading' : 'idle';
@@ -136,7 +136,7 @@ function attach(root, options, { restore }) {
 
   const applyClass = (value) => {
     const next = value.split(/\s+/).filter(Boolean);
-    root.classList.remove(...appliedClass.filter((name) => !next.includes(name) && name !== 'dss-map'));
+    root.classList.remove(...appliedClass.filter((name) => !next.includes(name) && name !== 'hoops-map'));
     root.classList.add(...next);
     appliedClass = next;
   };
@@ -175,7 +175,7 @@ function attach(root, options, { restore }) {
     const running = state === 'loading' || state === 'ready';
     if (!urlOk && warnedUrl !== tileUrl) {
       warnedUrl = tileUrl;
-      devWarn(`[dss-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
+      devWarn(`[hoops-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
     }
     const showList = props.showList !== false;
     const privacy = typeof props.privacyNote === 'string' ? props.privacyNote : mapText.privacy;
@@ -186,18 +186,18 @@ function attach(root, options, { restore }) {
     if (has('darkTiles')) root.setAttribute('data-tiles', tilesMode(props.darkTiles));
     if (has('height')) root.style.setProperty('--hoops-map-h', `${mapHeightPx(props.height)}px`);
     if (has('className')) applyClass(str(props.className));
-    if (has('label')) root.querySelector('.dss-map-frame')?.setAttribute('aria-label', str(props.label));
+    if (has('label')) root.querySelector('.hoops-map-frame')?.setAttribute('aria-label', str(props.label));
     if (has('attribution')) {
-      const link = stage.querySelector('.dss-map-attr a');
+      const link = stage.querySelector('.hoops-map-attr a');
       if (link) link.textContent = str(props.attribution).trim() || mapText.attribution;
     }
 
     // Kartenfläche und Controller: laufen nur im Zustand „loading“ oder „ready“
-    let canvas = stage.querySelector('.dss-map-canvas');
+    let canvas = stage.querySelector('.hoops-map-canvas');
     if (running) {
       if (!canvas) {
         canvas = doc.createElement('div');
-        canvas.className = 'dss-map-canvas';
+        canvas.className = 'hoops-map-canvas';
         canvas.id = canvasId;
         canvas.setAttribute('role', 'group');
         canvas.setAttribute('aria-label', mapText.canvasHint);
@@ -217,39 +217,39 @@ function attach(root, options, { restore }) {
     }
 
     // Platzhalter: Pins, Hinweis und Schaltfläche; mit der Karte entfällt er
-    let ph = stage.querySelector('.dss-map-ph');
+    let ph = stage.querySelector('.hoops-map-ph');
     if (state === 'ready') {
       ph?.remove();
     } else {
       if (!ph) {
         ph = doc.createElement('div');
-        ph.className = 'dss-map-ph';
+        ph.className = 'hoops-map-ph';
         stage.insertBefore(ph, canvas ? canvas.nextSibling : stage.firstChild);
       }
       if (has('markers') || state === 'error') {
         const pinsHtml = mapPinsMarkup(state === 'error' ? [] : placeholderPins(items));
         if (pinsHtml !== lastPins) {
-          for (const pin of ph.querySelectorAll('.dss-map-ph-pin')) pin.remove();
+          for (const pin of ph.querySelectorAll('.hoops-map-ph-pin')) pin.remove();
           const holder = doc.createElement('div');
           insertMarkup(holder, pinsHtml);
           ph.prepend(...holder.childNodes);
           lastPins = pinsHtml;
         }
       }
-      let card = ph.querySelector('.dss-map-ph-card');
+      let card = ph.querySelector('.hoops-map-ph-card');
       if (state === 'idle') {
         let created = false;
         if (!card) {
           ph.append(fragmentOf(doc, mapCardMarkup(privacy, true)));
-          card = ph.querySelector('.dss-map-ph-card');
+          card = ph.querySelector('.hoops-map-ph-card');
           created = true;
         }
         if (created || has('privacyNote')) {
-          const note = card.querySelector('.dss-map-note');
+          const note = card.querySelector('.hoops-map-note');
           if (note) note.textContent = privacy;
         }
         // Mit initMap ist die Schaltfläche bedienbar (renderVenueCard liefert sie ohne Anbindung gesperrt)
-        const button = card.querySelector('.dss-map-load');
+        const button = card.querySelector('.hoops-map-load');
         button?.removeAttribute('disabled');
         button?.removeAttribute('aria-disabled');
       } else {
@@ -258,14 +258,14 @@ function attach(root, options, { restore }) {
     }
 
     // Zoom-Schaltflächen: nur mit der Karte, aria-disabled an den Grenzen (nie `disabled`: der Fokus bleibt)
-    let zoom = stage.querySelector('.dss-map-zoom');
+    let zoom = stage.querySelector('.hoops-map-zoom');
     if (state === 'ready') {
       if (!zoom) {
         const fragment = fragmentOf(doc, zoomMarkup(canvasId));
         zoom = fragment.firstChild;
-        stage.insertBefore(fragment, stage.querySelector('.dss-map-status'));
+        stage.insertBefore(fragment, stage.querySelector('.hoops-map-status'));
       }
-      const [zoomIn, zoomOut] = zoom.querySelectorAll('.dss-map-zoom-btn');
+      const [zoomIn, zoomOut] = zoom.querySelectorAll('.hoops-map-zoom-btn');
       const setDisabled = (button, off) => (off ? button.setAttribute('aria-disabled', 'true') : button.removeAttribute('aria-disabled'));
       if (zoomIn) setDisabled(zoomIn, !(zoomNow.zoom < zoomNow.max));
       if (zoomOut) setDisabled(zoomOut, !(zoomNow.zoom > zoomNow.min));
@@ -274,14 +274,14 @@ function attach(root, options, { restore }) {
     }
 
     const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';
-    const statusEl = stage.querySelector('.dss-map-status');
+    const statusEl = stage.querySelector('.hoops-map-status');
     if (statusEl && statusEl.textContent !== status) statusEl.textContent = status;
 
     // Liste der Orte (die Textalternative): nur ersetzen, wenn sich das Markup ändert
-    if (has('showList')) root.querySelector('.dss-map-text')?.classList.toggle('is-quiet', !showList);
+    if (has('showList')) root.querySelector('.hoops-map-text')?.classList.toggle('is-quiet', !showList);
     if (has('markers')) {
       const html = mapListMarkup(items, showList);
-      const ol = root.querySelector('.dss-map-list');
+      const ol = root.querySelector('.hoops-map-list');
       if (ol && html !== lastList) {
         replaceList(ol, html);
         lastList = html;
@@ -313,9 +313,9 @@ function attach(root, options, { restore }) {
   };
 
   const onClick = (event) => {
-    const target = event.target && typeof event.target.closest === 'function' ? event.target.closest('.dss-map-load, .dss-map-zoom-btn') : null;
+    const target = event.target && typeof event.target.closest === 'function' ? event.target.closest('.hoops-map-load, .hoops-map-zoom-btn') : null;
     if (!target || !root.contains(target)) return;
-    if (target.classList.contains('dss-map-load')) {
+    if (target.classList.contains('hoops-map-load')) {
       if (phase !== 'idle' || failure || !validTileUrl(tileUrlOf(props))) return;
       userStarted = true;
       phase = 'loading';
@@ -369,11 +369,11 @@ function attach(root, options, { restore }) {
   };
 }
 
-/** Das Wurzelelement `.dss-map` an oder unter `el`. */
-const rootOf = (el) => (typeof el.matches === 'function' && el.matches('.dss-map') ? el : el.querySelector('.dss-map'));
+/** Das Wurzelelement `.hoops-map` an oder unter `el`. */
+const rootOf = (el) => (typeof el.matches === 'function' && el.matches('.hoops-map') ? el : el.querySelector('.hoops-map'));
 
 /**
- * Macht vorhandenes Markup lebendig: `el` ist das Element `.dss-map` (von `renderMap`) oder ein Vorfahr (die Hallenkarte, ein Behälter).
+ * Macht vorhandenes Markup lebendig: `el` ist das Element `.hoops-map` (von `renderMap`) oder ein Vorfahr (die Hallenkarte, ein Behälter).
  * `options`: die Eigenschaften wie bei `renderMap` (`markers` ist nötig; `label`, `height`, `showList` … ändern das Markup nur, wenn sie angegeben sind)
  * plus `loadLeaflet`, `onLoad`, `onError`, `onMarkerClick`. Ein zweiter Aufruf für dasselbe Element ersetzt den ersten.
  */
@@ -381,7 +381,7 @@ export function initMap(el, options) {
   if (typeof document === 'undefined' || !el || typeof el.querySelector !== 'function') return noop();
   const root = rootOf(el);
   if (!root) {
-    devWarn('[dss-map] initMap: kein Element .dss-map gefunden.');
+    devWarn('[hoops-map] initMap: kein Element .hoops-map gefunden.');
     return noop();
   }
   return attach(root, options, { restore: true });
@@ -401,7 +401,7 @@ export function mountMap(el, props, options) {
   const p = obj(props);
   const original = [...el.childNodes];
   insertMarkup(el, renderMap(p, { uid }));
-  const root = el.querySelector('.dss-map');
+  const root = el.querySelector('.hoops-map');
   const hooks = hooksOf(o);
   const inner = attach(root, { ...p, loadLeaflet: p.loadLeaflet ?? hooks.loadLeaflet, onLoad: p.onLoad ?? hooks.onLoad, onError: p.onError ?? hooks.onError, onMarkerClick: p.onMarkerClick ?? hooks.onMarkerClick }, { restore: false });
   const handle = registry.claim(el, () => {
@@ -412,8 +412,8 @@ export function mountMap(el, props, options) {
 }
 
 /**
- * Anbindung für `initAll` (`data-dss="map"`): ein Element mit Karten-Markup wird per `initMap` gestartet, ein leerer Behälter per `mountMap`
- * (die Eigenschaften stehen in `data-dss-options`).
+ * Anbindung für `initAll` (`data-hoops="map"`): ein Element mit Karten-Markup wird per `initMap` gestartet, ein leerer Behälter per `mountMap`
+ * (die Eigenschaften stehen in `data-hoops-options`).
  */
 export function initMapBlock(el, options) {
   if (typeof document === 'undefined' || !el || typeof el.querySelector !== 'function') return noop();

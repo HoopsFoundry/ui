@@ -2,10 +2,10 @@
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
   /**
-   * DSS PlayerCard · Svelte 5
+   * HoopsFoundry UI PlayerCard · Svelte 5
    * --------------------------------------------------------------
    * Drei Maßstäbe derselben Spielerprimitive. Nutzt nur Klassen aus css/components.css
-   * (`.dss-tn`/`.dss-pos` teilt sie mit der Table).
+   * (`.hoops-tn`/`.hoops-pos` teilt sie mit der Table).
    *
    *   compact  — Listenzeile (Roster / Bank); mit `onclick` ein Button, sonst ein div
    *   standard — Karte mit Kopf + 4 Kennzahlen
@@ -57,7 +57,7 @@
 
   const heading = useHeadingTag(() => titleAs);
 
-  const posClass = $derived(position ? `dss-pos ${position.toLowerCase()}` : '');
+  const posClass = $derived(position ? `hoops-pos ${position.toLowerCase()}` : '');
 
   // Eine URL, die nicht lädt, wird gemerkt: dann erscheint wieder die Trikotmarke (kein kaputtes Bildsymbol)
   let failedUrl = $state('');
@@ -66,9 +66,9 @@
 </script>
 
 {#snippet roleLine()}
-  <div class="dss-pc-role">
+  <div class="hoops-pc-role">
     {#if position}<span class={posClass}>{position}</span>{/if}
-    {#if captain}<span class="dss-pc-cap">Kapitän</span>{/if}
+    {#if captain}<span class="hoops-pc-cap">Kapitän</span>{/if}
     {#if age}<span>{age}</span>{/if}
     {#if height_cm}<span>{height_cm} cm</span>{/if}
   </div>
@@ -76,11 +76,11 @@
 
 {#snippet vitalsGrid()}
   {#if vitals.length}
-    <div class="dss-pc-vitals">
+    <div class="hoops-pc-vitals">
       {#each vitals as v (v.label)}
         <div>
-          <div class={`dss-pc-v ${v.accent ? 'dss-pc-v--amber' : ''}`}>{v.value}</div>
-          <div class="dss-pc-l">{v.label}</div>
+          <div class={`hoops-pc-v ${v.accent ? 'hoops-pc-v--amber' : ''}`}>{v.value}</div>
+          <div class="hoops-pc-l">{v.label}</div>
         </div>
       {/each}
     </div>
@@ -88,27 +88,27 @@
 {/snippet}
 
 {#snippet photoImg()}
-  <img class="dss-pc-img" src={photo} alt={photoAlt} width={imgSize} height={imgSize} loading="lazy" decoding="async" onerror={() => (failedUrl = photo)} />
+  <img class="hoops-pc-img" src={photo} alt={photoAlt} width={imgSize} height={imgSize} loading="lazy" decoding="async" onerror={() => (failedUrl = photo)} />
 {/snippet}
 
 {#snippet compactBody()}
   {#if showPhoto}
-    <span class="dss-pc-av">{@render photoImg()}<span class={`dss-tn dss-tn--badge ${team} ${captain ? 'captain' : ''}`}>{jersey}</span></span>
+    <span class="hoops-pc-av">{@render photoImg()}<span class={`hoops-tn hoops-tn--badge ${team} ${captain ? 'captain' : ''}`}>{jersey}</span></span>
   {:else}
-    <span class={`dss-tn ${team} small ${captain ? 'captain' : ''}`}>{jersey}</span>
+    <span class={`hoops-tn ${team} small ${captain ? 'captain' : ''}`}>{jersey}</span>
   {/if}
-  <span class="dss-pc-who">
-    <span class="dss-pc-name">{name}{captain ? ' (C)' : ''}</span>
+  <span class="hoops-pc-who">
+    <span class="hoops-pc-name">{name}{captain ? ' (C)' : ''}</span>
     {#if role || position}
-      <span class="dss-pc-meta">{position}{role ? ` · ${role}` : ''}</span>
+      <span class="hoops-pc-meta">{position}{role ? ` · ${role}` : ''}</span>
     {/if}
   </span>
   <!-- Pill nur visuell: die Position steht schon in der Meta-Zeile. Leeres span = Platzhalter für die Grid-Spalte. -->
   {#if position}<span class={posClass} aria-hidden="true">{position}</span>{:else}<span></span>{/if}
   {#if stat !== null}
-    <span class="dss-pc-stat">
+    <span class="hoops-pc-stat">
       {stat}
-      {#if statLabel}<span class="dss-pc-stat-l">{statLabel}</span>{/if}
+      {#if statLabel}<span class="hoops-pc-stat-l">{statLabel}</span>{/if}
     </span>
   {:else}
     <span></span>
@@ -117,21 +117,21 @@
 
 {#if size === 'compact'}
   {#if onclick}
-    <button class="dss-pc-row" {onclick} type="button">{@render compactBody()}</button>
+    <button class="hoops-pc-row" {onclick} type="button">{@render compactBody()}</button>
   {:else}
-    <div class="dss-pc-row">{@render compactBody()}</div>
+    <div class="hoops-pc-row">{@render compactBody()}</div>
   {/if}
 
 {:else if size === 'standard'}
-  <div class="dss-pc-card">
-    <div class="dss-pc-head">
+  <div class="hoops-pc-card">
+    <div class="hoops-pc-head">
       {#if showPhoto}
-        <span class="dss-pc-av dss-pc-av--lg">{@render photoImg()}<span class={`dss-tn dss-tn--badge dss-tn--badge-lg ${team} ${captain ? 'captain' : ''}`}>{jersey}</span></span>
+        <span class="hoops-pc-av hoops-pc-av--lg">{@render photoImg()}<span class={`hoops-tn hoops-tn--badge hoops-tn--badge-lg ${team} ${captain ? 'captain' : ''}`}>{jersey}</span></span>
       {:else}
-        <span class={`dss-tn ${team} large ${captain ? 'captain' : ''}`}>{jersey}</span>
+        <span class={`hoops-tn ${team} large ${captain ? 'captain' : ''}`}>{jersey}</span>
       {/if}
-      <div class="dss-pc-who">
-        <svelte:element this={heading.tag} class="dss-pc-nm">{name}</svelte:element>
+      <div class="hoops-pc-who">
+        <svelte:element this={heading.tag} class="hoops-pc-nm">{name}</svelte:element>
         {@render roleLine()}
       </div>
     </div>
@@ -139,17 +139,17 @@
   </div>
 
 {:else}
-  <div class={showPhoto ? 'dss-pc-hero dss-pc-hero--photo' : 'dss-pc-hero'}>
-    <div class="dss-pc-hero-left">
+  <div class={showPhoto ? 'hoops-pc-hero hoops-pc-hero--photo' : 'hoops-pc-hero'}>
+    <div class="hoops-pc-hero-left">
       {#if showPhoto}
         {@render photoImg()}
-        <span class={`dss-tn dss-tn--badge dss-tn--badge-lg ${team} ${captain ? 'captain' : ''}`}>{jersey}</span>
+        <span class={`hoops-tn hoops-tn--badge hoops-tn--badge-lg ${team} ${captain ? 'captain' : ''}`}>{jersey}</span>
       {:else}
-        <span class={`dss-tn hero ${team} ${captain ? 'captain' : ''}`}>{jersey}</span>
+        <span class={`hoops-tn hero ${team} ${captain ? 'captain' : ''}`}>{jersey}</span>
       {/if}
     </div>
-    <div class="dss-pc-hero-right">
-      <svelte:element this={heading.tag} class="dss-pc-nm">{name}</svelte:element>
+    <div class="hoops-pc-hero-right">
+      <svelte:element this={heading.tag} class="hoops-pc-nm">{name}</svelte:element>
       {@render roleLine()}
       {@render vitalsGrid()}
     </div>

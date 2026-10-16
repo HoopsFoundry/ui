@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS EmptyState · Svelte 5
+   * HoopsFoundry UI EmptyState · Svelte 5
    * --------------------------------------------------------------
    * Drei Tonalitäten für „hier ist nichts“-Zustände:
    *
@@ -43,8 +43,8 @@
   const ctaVariant = $derived(tone === 'error' ? 'danger' : tone === 'action' ? 'amber' : 'primary');
 </script>
 
-<div class={`dss-empty dss-empty--${tone}`}>
-  <div class="dss-empty-icon">
+<div class={`hoops-empty hoops-empty--${tone}`}>
+  <div class="hoops-empty-icon">
     {#if icon}
       <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
         <use href={`#${icon}`}></use>
@@ -57,15 +57,15 @@
       <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/></svg>
     {/if}
   </div>
-  <svelte:element this={heading.tag} class="dss-empty-title">{title}</svelte:element>
-  {#if body}<p class="dss-empty-body">{body}</p>{/if}
+  <svelte:element this={heading.tag} class="hoops-empty-title">{title}</svelte:element>
+  {#if body}<p class="hoops-empty-body">{body}</p>{/if}
   {#if cta || actions}
-    <div class="dss-empty-actions">
+    <div class="hoops-empty-actions">
       {#if cta}
-        <button type="button" class={`dss-btn dss-btn--md dss-btn--${ctaVariant}`} {onclick}>{cta}</button>
+        <button type="button" class={`hoops-btn hoops-btn--md hoops-btn--${ctaVariant}`} {onclick}>{cta}</button>
       {/if}
       {#if actions}{@render actions()}{/if}
     </div>
   {/if}
-  {#if children}<div class="dss-empty-extra">{@render children()}</div>{/if}
+  {#if children}<div class="hoops-empty-extra">{@render children()}</div>{/if}
 </div>

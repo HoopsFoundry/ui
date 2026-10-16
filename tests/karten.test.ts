@@ -16,34 +16,34 @@ const px = (text: string, prop: string) => Number(text.match(new RegExp(`${prop}
 
 describe('PlayerCard mit Foto: CSS', () => {
   it('Avatar 32 px (compact) = Trikotmarke 32 px: die Zeilenhöhe wächst nicht; standard 64 px', () => {
-    expect(px(rule('.dss-pc-av'), 'width')).toBe(px(rule('.dss-tn.small'), 'width'));
-    expect(px(rule('.dss-pc-av'), 'height')).toBe(px(rule('.dss-tn.small'), 'height'));
-    expect(px(rule('.dss-pc-av--lg'), 'width')).toBe(px(rule('.dss-tn.large'), 'width'));
-    expect(px(rule('.dss-pc-av--lg'), 'height')).toBe(64);
+    expect(px(rule('.hoops-pc-av'), 'width')).toBe(px(rule('.hoops-tn.small'), 'width'));
+    expect(px(rule('.hoops-pc-av'), 'height')).toBe(px(rule('.hoops-tn.small'), 'height'));
+    expect(px(rule('.hoops-pc-av--lg'), 'width')).toBe(px(rule('.hoops-tn.large'), 'width'));
+    expect(px(rule('.hoops-pc-av--lg'), 'height')).toBe(64);
   });
 
   it('Foto: cover, oben ausgerichtet (Gesicht), compact rund, standard abgerundet wie die Trikotmarke', () => {
-    expect(rule('.dss-pc-img')).toMatch(/object-fit:\s*cover/);
-    expect(rule('.dss-pc-img')).toMatch(/object-position:\s*center top/);
-    expect(rule('.dss-pc-av .dss-pc-img')).toMatch(/border-radius:\s*50%/);
-    expect(rule('.dss-pc-av--lg .dss-pc-img')).toMatch(/border-radius:\s*14px/);
+    expect(rule('.hoops-pc-img')).toMatch(/object-fit:\s*cover/);
+    expect(rule('.hoops-pc-img')).toMatch(/object-position:\s*center top/);
+    expect(rule('.hoops-pc-av .hoops-pc-img')).toMatch(/border-radius:\s*50%/);
+    expect(rule('.hoops-pc-av--lg .hoops-pc-img')).toMatch(/border-radius:\s*14px/);
   });
 
   it('die Trikotnummer ist ein Badge an der Ecke und behält die Teamfarbe (weiß auf Teamfarbe, ≥ 7:1)', () => {
-    const badge = rule('.dss-tn.dss-tn--badge');
+    const badge = rule('.hoops-tn.hoops-tn--badge');
     expect(badge).toMatch(/position:\s*absolute/);
     expect(badge).toMatch(/bottom:\s*-\d+px/);
-    expect(rule('.dss-tn.heim')).toMatch(/color:\s*white/);
-    expect(rule('.dss-tn.gast')).toMatch(/color:\s*white/);
+    expect(rule('.hoops-tn.heim')).toMatch(/color:\s*white/);
+    expect(rule('.hoops-tn.gast')).toMatch(/color:\s*white/);
   });
 
   it('hero mit Foto: Porträtfläche mit Verlauf nach --hoops-base-1000; unter 560 px Banner oben', () => {
-    expect(rule('.dss-pc-hero--photo')).toMatch(/padding:\s*0/);
-    expect(rule('.dss-pc-hero--photo .dss-pc-hero-left::after')).toMatch(/linear-gradient\(90deg, transparent \d+%, var\(--hoops-base-1000\)/);
-    expect(rule('.dss-pc-hero--photo .dss-pc-img')).toMatch(/position:\s*absolute/);
-    const mobile = css.slice(css.indexOf('@media (max-width: 560px)', css.indexOf('.dss-pc-hero--photo')));
-    expect(mobile).toMatch(/\.dss-pc-hero--photo \.dss-pc-hero-left::after \{ background: linear-gradient\(180deg/);
-    expect(mobile).toMatch(/\.dss-pc-hero--photo \.dss-pc-hero-right \{ margin-top: -48px/);
+    expect(rule('.hoops-pc-hero--photo')).toMatch(/padding:\s*0/);
+    expect(rule('.hoops-pc-hero--photo .hoops-pc-hero-left::after')).toMatch(/linear-gradient\(90deg, transparent \d+%, var\(--hoops-base-1000\)/);
+    expect(rule('.hoops-pc-hero--photo .hoops-pc-img')).toMatch(/position:\s*absolute/);
+    const mobile = css.slice(css.indexOf('@media (max-width: 560px)', css.indexOf('.hoops-pc-hero--photo')));
+    expect(mobile).toMatch(/\.hoops-pc-hero--photo \.hoops-pc-hero-left::after \{ background: linear-gradient\(180deg/);
+    expect(mobile).toMatch(/\.hoops-pc-hero--photo \.hoops-pc-hero-right \{ margin-top: -48px/);
   });
 
   it('weißer Name über dem Bild: auch bei einem weißen Foto unter dem Verlauf (92 % Deckkraft) ≥ 7:1, beide Marken', () => {
@@ -161,47 +161,47 @@ describe('Spielabschnitte: Paket, Quelltext, Demo-Daten', () => {
 
 describe('TeamCard: CSS', () => {
   it('Karte ist positioniert; klickbar: Hover wie die Spielkarte (Rand, Schatten, 1 px hoch)', () => {
-    expect(rule('.dss-team')).toMatch(/position:\s*relative/);
-    expect(rule('.dss-team--link:hover')).toMatch(/border-color:\s*var\(--hoops-line-strong\)/);
-    expect(rule('.dss-team--link:hover')).toMatch(/box-shadow:\s*var\(--hoops-shadow-md\)/);
-    expect(rule('.dss-team--link:hover')).toMatch(/translateY\(-1px\)/);
+    expect(rule('.hoops-team')).toMatch(/position:\s*relative/);
+    expect(rule('.hoops-team--link:hover')).toMatch(/border-color:\s*var\(--hoops-line-strong\)/);
+    expect(rule('.hoops-team--link:hover')).toMatch(/box-shadow:\s*var\(--hoops-shadow-md\)/);
+    expect(rule('.hoops-team--link:hover')).toMatch(/translateY\(-1px\)/);
   });
 
   it('der Link deckt die ganze Karte ab (::after) und trägt den gestrichelten Ring um die Karte', () => {
-    expect(rule('.dss-team-link::after')).toMatch(/position:\s*absolute;\s*inset:\s*0/);
-    const ring = rule('.dss-team-link:focus-visible::after');
+    expect(rule('.hoops-team-link::after')).toMatch(/position:\s*absolute;\s*inset:\s*0/);
+    const ring = rule('.hoops-team-link:focus-visible::after');
     expect(ring).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     expect(ring).toMatch(/outline-offset:\s*2px/);
-    expect(rule('.dss-team-link:focus-visible')).toMatch(/outline:\s*none/);
+    expect(rule('.hoops-team-link:focus-visible')).toMatch(/outline:\s*none/);
   });
 
   it('Bewegung: Übergang aus bei prefers-reduced-motion', () => {
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{ \.dss-team \{ transition: none; \} \}/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\) \{ \.hoops-team \{ transition: none; \} \}/);
   });
 
   it('Logo 48 px im Kopf, 32 px in compact, 20 px beim Gegner; Initialen als Kreis (Baustein aus Paket 3)', () => {
-    expect(px(rule('.dss-team-logo--lg'), 'width')).toBe(48);
-    expect(px(rule('.dss-team-logo--sm'), 'width')).toBe(20);
-    expect(px(rule('.dss-team--compact .dss-team-logo'), 'width')).toBe(32);
-    expect(px(rule('.dss-team-head'), 'gap')).toBe(14);
-    expect(rule('.dss-team-head')).toMatch(/grid-template-columns:\s*48px/);
-    expect(rule('.dss-team-logo--initials')).toMatch(/border-radius:\s*50%/);
+    expect(px(rule('.hoops-team-logo--lg'), 'width')).toBe(48);
+    expect(px(rule('.hoops-team-logo--sm'), 'width')).toBe(20);
+    expect(px(rule('.hoops-team--compact .hoops-team-logo'), 'width')).toBe(32);
+    expect(px(rule('.hoops-team-head'), 'gap')).toBe(14);
+    expect(rule('.hoops-team-head')).toMatch(/grid-template-columns:\s*48px/);
+    expect(rule('.hoops-team-logo--initials')).toMatch(/border-radius:\s*50%/);
   });
 
   it('compact: Listenzeile mit Logo 32, Name und rechter Spalte (Bilanz über Platz)', () => {
-    expect(rule('.dss-team--compact')).toMatch(/grid-template-columns:\s*32px minmax\(0, 1fr\) auto\b(?! auto)/);
+    expect(rule('.hoops-team--compact')).toMatch(/grid-template-columns:\s*32px minmax\(0, 1fr\) auto\b(?! auto)/);
   });
 
   it('Kennzahlen und Werte mit tabular-nums', () => {
-    expect(rule('.dss-pc-v')).toMatch(/font-variant-numeric:\s*tabular-nums/);
-    expect(rule('.dss-team-rec')).toMatch(/font-variant-numeric:\s*tabular-nums/);
-    expect(rule('.dss-team-game-end')).toMatch(/font-variant-numeric:\s*tabular-nums/);
+    expect(rule('.hoops-pc-v')).toMatch(/font-variant-numeric:\s*tabular-nums/);
+    expect(rule('.hoops-team-rec')).toMatch(/font-variant-numeric:\s*tabular-nums/);
+    expect(rule('.hoops-team-game-end')).toMatch(/font-variant-numeric:\s*tabular-nums/);
   });
 
   it('Spielzeilen brechen um statt die Seite zu verbreitern', () => {
-    expect(rule('.dss-team-game-row')).toMatch(/flex-wrap:\s*wrap/);
-    expect(rule('.dss-team-game-opp')).toMatch(/min-width:\s*0/);
-    expect(rule('.dss-team-who')).toMatch(/min-width:\s*0/);
+    expect(rule('.hoops-team-game-row')).toMatch(/flex-wrap:\s*wrap/);
+    expect(rule('.hoops-team-game-opp')).toMatch(/min-width:\s*0/);
+    expect(rule('.hoops-team-who')).toMatch(/min-width:\s*0/);
   });
 
   it('keine nackten --*-text/--*-soft-Farben und keine festen Farbwerte im TeamCard-Block', () => {
@@ -269,20 +269,20 @@ describe('TeamCard: Quelltext', () => {
 
 describe('nachgebessert: Spielkarten-Kopf, Link mit onclick, Badge, Statistik-Raster', () => {
   it('der Kopf der Spielkarte bleibt einzeilig (kein flex-wrap); nur die Live-Karte darf umbrechen', () => {
-    expect(rule('.dss-match-head')).not.toMatch(/flex-wrap/);
-    expect(rule('.dss-match-head')).not.toMatch(/gap/);
-    expect(css).not.toMatch(/\n\.dss-match-head > :last-child/);
-    expect(rule('.dss-match--live .dss-match-head')).toMatch(/flex-wrap:\s*wrap/);
-    expect(rule('.dss-match--live .dss-match-head > :last-child')).toMatch(/margin-left:\s*auto/);
+    expect(rule('.hoops-match-head')).not.toMatch(/flex-wrap/);
+    expect(rule('.hoops-match-head')).not.toMatch(/gap/);
+    expect(css).not.toMatch(/\n\.hoops-match-head > :last-child/);
+    expect(rule('.hoops-match--live .hoops-match-head')).toMatch(/flex-wrap:\s*wrap/);
+    expect(rule('.hoops-match--live .hoops-match-head > :last-child')).toMatch(/margin-left:\s*auto/);
   });
 
-  it('die tote Regel für .dss-team-squad (border-bottom) ist entfernt', () => {
-    expect(css).not.toMatch(/\.dss-team-squad:last-child/);
-    expect(css).not.toMatch(/\.dss-team-stats \+ \.dss-team-squad/);
+  it('die tote Regel für .hoops-team-squad (border-bottom) ist entfernt', () => {
+    expect(css).not.toMatch(/\.hoops-team-squad:last-child/);
+    expect(css).not.toMatch(/\.hoops-team-stats \+ \.hoops-team-squad/);
   });
 
   it('compact-Badge: kleiner (16 px) und weiter außen, damit das Gesicht im 32-px-Avatar frei bleibt', () => {
-    const badge = css.slice(css.indexOf('.dss-pc-av:not(.dss-pc-av--lg) .dss-tn--badge'), css.indexOf('}', css.indexOf('.dss-pc-av:not(.dss-pc-av--lg) .dss-tn--badge')));
+    const badge = css.slice(css.indexOf('.hoops-pc-av:not(.hoops-pc-av--lg) .hoops-tn--badge'), css.indexOf('}', css.indexOf('.hoops-pc-av:not(.hoops-pc-av--lg) .hoops-tn--badge')));
     expect(badge).toMatch(/height:\s*16px/);
     expect(badge).toMatch(/right:\s*-8px/);
     expect(badge).toMatch(/bottom:\s*-8px/);
@@ -291,13 +291,13 @@ describe('nachgebessert: Spielkarten-Kopf, Link mit onclick, Badge, Statistik-Ra
   });
 
   it('Statistik unter 560 px 2 × 2 (statt 3 + 1)', () => {
-    const mobile = css.slice(css.indexOf('@media (max-width: 560px) {\n  .dss-team-head'));
-    expect(mobile).toMatch(/\.dss-team-stats \.dss-team-vitals \{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
+    const mobile = css.slice(css.indexOf('@media (max-width: 560px) {\n  .hoops-team-head'));
+    expect(mobile).toMatch(/\.hoops-team-stats \.hoops-team-vitals \{[^}]*grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   });
 
   it('Svelte-TeamCard gibt onclick auch an den Link weiter (wie React onClick)', () => {
-    expect(read('svelte/TeamCard.svelte')).toMatch(/<a class="dss-team-link" \{href\} \{onclick\}>/);
-    expect(read('react/TeamCard.tsx')).toMatch(/<a className="dss-team-link" href=\{href\} onClick=\{onClick\}>/);
+    expect(read('svelte/TeamCard.svelte')).toMatch(/<a class="hoops-team-link" \{href\} \{onclick\}>/);
+    expect(read('react/TeamCard.tsx')).toMatch(/<a className="hoops-team-link" href=\{href\} onClick=\{onClick\}>/);
     expect(read('svelte/MatchCard.svelte')).toContain("onclick={tag === 'div' ? undefined : onclick}");
     expect(read('react/MatchCard.tsx')).toMatch(/<a className=\{cls\} href=\{href\} onClick=\{onClick\}>/);
   });

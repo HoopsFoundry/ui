@@ -60,20 +60,20 @@ describe('DosDonts', () => {
     expect(screen.getByRole('heading', { level: 3, name: 'Eine Haupt-Aktion pro Ansicht' })).toBeInTheDocument();
     expect(screen.getByText('Ein amber Button, daneben Secondary.', { exact: false })).toBeInTheDocument();
     expect(screen.getByText('Zwei amber Buttons konkurrieren.', { exact: false })).toBeInTheDocument();
-    expect(container.querySelector('.dss-dd-do .dss-dd-badge')?.textContent).toBe('✓ Do');
-    expect(container.querySelector('.dss-dd-dont .dss-dd-badge')?.textContent).toContain("✗ Don't");
+    expect(container.querySelector('.hoops-dd-do .hoops-dd-badge')?.textContent).toBe('✓ Do');
+    expect(container.querySelector('.hoops-dd-dont .hoops-dd-badge')?.textContent).toContain("✗ Don't");
   });
 
   it('macht das falsche Beispiel inert, das richtige nicht', () => {
     const { container } = render(<DosDonts pairs={pairs} />);
-    const stages = container.querySelectorAll('.dss-dd-stage');
+    const stages = container.querySelectorAll('.hoops-dd-stage');
     expect(stages[0]).not.toHaveAttribute('inert');
     expect(stages[1]).toHaveAttribute('inert');
   });
 
   it('benennt das falsche Beispiel für Screenreader', () => {
     render(<DosDonts pairs={pairs} />);
-    expect(screen.getByText('Beispiel für falsche Verwendung')).toHaveClass('dss-sr-only');
+    expect(screen.getByText('Beispiel für falsche Verwendung')).toHaveClass('hoops-sr-only');
   });
 });
 

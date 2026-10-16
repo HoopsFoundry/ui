@@ -49,7 +49,7 @@ describe('Svelte-Code-Beispiele rendern (SSR)', () => {
   it.each(Object.entries(SVELTE))('%s', async (name, source) => {
     const file = `${tmpDir}${name}.svelte`;
     const fixed = source
-      .replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`)
+      .replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`)
       .replace('<script>', '<script>\n  const openSpieler = () => {};');
     writeFileSync(file, fixed);
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
@@ -70,7 +70,7 @@ describe('React-Code-Beispiele bestehen den TypeScript-Compiler', () => {
       const head = split < 0 ? '' : rest.slice(0, split);
       const body = split < 0 ? rest : rest.slice(split);
       const text = [
-        ...imports.map((line) => line.replace('@bbv/dss-design-system/react', './index')),
+        ...imports.map((line) => line.replace('@hoopsfoundry/ui/react', './index')),
         head,
         'const openSpieler = () => {};',
         `export const Demo_${name} = () => (\n<>${body}</>\n);`,

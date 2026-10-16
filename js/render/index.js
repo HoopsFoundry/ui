@@ -1,5 +1,5 @@
 /**
- * DSS Render · Sammelexport
+ * HoopsFoundry UI Render · Sammelexport
  * --------------------------------------------------------------
  * Alle `renderX(props, options?) → string` und `mountX(el, props, options?) → { update, destroy }` des Vanilla-Pakets, dazu die
  * Bausteine `esc`, `attr` und `mount`. Beim Import passiert nichts (kein Zugriff auf `window`/`document`); alles läuft auch in Node (Crawler).
@@ -16,6 +16,6 @@ export { renderMatchCard, mountMatchCard } from './match-card.js';
 export { renderTeamCard, mountTeamCard } from './team-card.js';
 export { renderVenueCard, mountVenueCard } from './venue-card.js';
 
-/** Version des Pakets, aus dem dieses Bündel gebaut wurde (ohne Build `dev`); sie muss zu `VERSION` von dss.js und zu dss.css passen. */
+/** Version des Pakets, aus dem dieses Bündel gebaut wurde (ohne Build `dev`); sie muss zu `VERSION` von hoops.js und zu hoops.css passen. */
 // eslint-disable-next-line no-undef
-export const VERSION = typeof __DSS_VERSION__ === 'string' ? __DSS_VERSION__ : 'dev';
+export const VERSION = typeof __HOOPS_VERSION__ === 'string' ? __HOOPS_VERSION__ : 'dev';

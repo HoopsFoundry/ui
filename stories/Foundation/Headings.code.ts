@@ -3,15 +3,15 @@
 
 // Seite mit zwei Abschnitten: die h1 gehört der App, die Abschnitte sind h2, die Komponenten darin h3.
 export const seiteVanilla = `<!-- Vanilla: kein Provider. Die Ebene schreibst du selbst ins Markup (h2 bis h6),
-     die Größe hängt an der Klasse (dss-frame-title, dss-pc-nm …), nie am Elementnamen. -->
-<h1 class="dss-t-h1">Mannschaft</h1>
+     die Größe hängt an der Klasse (hoops-frame-title, hoops-pc-nm …), nie am Elementnamen. -->
+<h1 class="hoops-t-h1">Mannschaft</h1>
 
 <section>
-  <h2 class="dss-t-h2">Spiele</h2>
-  <div class="dss-frame">
-    <div class="dss-frame-head"><h3 class="dss-frame-title">Nächste Spiele</h3><div class="dss-frame-meta"></div></div>
-    <div class="dss-table-scroll" role="region" tabindex="0" aria-label="Nächste Spiele">
-      <table class="dss-tbl dss-tbl--default">
+  <h2 class="hoops-t-h2">Spiele</h2>
+  <div class="hoops-frame">
+    <div class="hoops-frame-head"><h3 class="hoops-frame-title">Nächste Spiele</h3><div class="hoops-frame-meta"></div></div>
+    <div class="hoops-table-scroll" role="region" tabindex="0" aria-label="Nächste Spiele">
+      <table class="hoops-tbl hoops-tbl--default">
         <thead><tr><th scope="col" class="left">Datum</th><th scope="col" class="left">Gegner</th></tr></thead>
         <tbody><tr><td>Sa 12.10.</td><td>Lindenberg Hawks</td></tr></tbody>
       </table>
@@ -20,15 +20,15 @@ export const seiteVanilla = `<!-- Vanilla: kein Provider. Die Ebene schreibst du
 </section>
 
 <section>
-  <h2 class="dss-t-h2">Kader</h2>
-  <div class="dss-pc-card"><div class="dss-pc-head"><span class="dss-tn heim large ">4</span> <div class="dss-pc-who"><h3 class="dss-pc-nm">J. Tanner</h3> <div class="dss-pc-role"><span class="dss-pos pg">PG</span></div></div></div></div>
-  <div class="dss-pc-card"><div class="dss-pc-head"><span class="dss-tn gast large ">11</span> <div class="dss-pc-who"><h3 class="dss-pc-nm">M. Kraus</h3> <div class="dss-pc-role"><span class="dss-pos c">C</span></div></div></div></div>
+  <h2 class="hoops-t-h2">Kader</h2>
+  <div class="hoops-pc-card"><div class="hoops-pc-head"><span class="hoops-tn heim large ">4</span> <div class="hoops-pc-who"><h3 class="hoops-pc-nm">J. Tanner</h3> <div class="hoops-pc-role"><span class="hoops-pos pg">PG</span></div></div></div></div>
+  <div class="hoops-pc-card"><div class="hoops-pc-head"><span class="hoops-tn gast large ">11</span> <div class="hoops-pc-who"><h3 class="hoops-pc-nm">M. Kraus</h3> <div class="hoops-pc-role"><span class="hoops-pos c">C</span></div></div></div></div>
 </section>`;
 
 export const seiteSvelte = `<script lang="ts">
-  import HeadingLevel from '@bbv/dss-design-system/svelte/HeadingLevel';
-  import Table from '@bbv/dss-design-system/svelte/Table';
-  import PlayerCard from '@bbv/dss-design-system/svelte/PlayerCard';
+  import HeadingLevel from '@hoopsfoundry/ui/svelte/HeadingLevel';
+  import Table from '@hoopsfoundry/ui/svelte/Table';
+  import PlayerCard from '@hoopsfoundry/ui/svelte/PlayerCard';
 
   const spalten = [
     { key: 'datum', label: 'Datum' },
@@ -37,10 +37,10 @@ export const seiteSvelte = `<script lang="ts">
 </script>
 
 <!-- Die h1 gehört der App, die Komponenten geben nie eine h1 aus -->
-<h1 class="dss-t-h1">Mannschaft</h1>
+<h1 class="hoops-t-h1">Mannschaft</h1>
 
 <section>
-  <h2 class="dss-t-h2">Spiele</h2>
+  <h2 class="hoops-t-h2">Spiele</h2>
   <!-- Alles darin bekommt h3, ohne titleAs an jeder Komponente -->
   <HeadingLevel level={3}>
     <Table title="Nächste Spiele" columns={spalten}>
@@ -52,14 +52,14 @@ export const seiteSvelte = `<script lang="ts">
 </section>
 
 <section>
-  <h2 class="dss-t-h2">Kader</h2>
+  <h2 class="hoops-t-h2">Kader</h2>
   <HeadingLevel level={3}>
     <PlayerCard jersey="4" name="J. Tanner" position="PG" />
     <PlayerCard jersey="11" name="M. Kraus" position="C" team="gast" />
   </HeadingLevel>
 </section>`;
 
-export const seiteReact = `import { HeadingLevel, PlayerCard, Table } from '@bbv/dss-design-system/react';
+export const seiteReact = `import { HeadingLevel, PlayerCard, Table } from '@hoopsfoundry/ui/react';
 
 const spalten = [
   { key: 'datum', label: 'Datum' },
@@ -67,10 +67,10 @@ const spalten = [
 ];
 
 {/* Die h1 gehört der App, die Komponenten geben nie eine h1 aus */}
-<h1 className="dss-t-h1">Mannschaft</h1>
+<h1 className="hoops-t-h1">Mannschaft</h1>
 
 <section>
-  <h2 className="dss-t-h2">Spiele</h2>
+  <h2 className="hoops-t-h2">Spiele</h2>
   {/* Alles darin bekommt h3, ohne titleAs an jeder Komponente */}
   <HeadingLevel level={3}>
     <Table title="Nächste Spiele" columns={spalten}>
@@ -80,7 +80,7 @@ const spalten = [
 </section>
 
 <section>
-  <h2 className="dss-t-h2">Kader</h2>
+  <h2 className="hoops-t-h2">Kader</h2>
   <HeadingLevel level={3}>
     <PlayerCard jersey="4" name="J. Tanner" position="PG" />
     <PlayerCard jersey="11" name="M. Kraus" position="C" team="gast" />
@@ -89,8 +89,8 @@ const spalten = [
 
 // Verschachtelt und relativ: by zählt vom übergeordneten HeadingLevel aus (ohne Vorfahr von Ebene 2 aus)
 export const relativSvelte = `<script lang="ts">
-  import HeadingLevel from '@bbv/dss-design-system/svelte/HeadingLevel';
-  import EmptyState from '@bbv/dss-design-system/svelte/EmptyState';
+  import HeadingLevel from '@hoopsfoundry/ui/svelte/HeadingLevel';
+  import EmptyState from '@hoopsfoundry/ui/svelte/EmptyState';
 </script>
 
 <!-- Ausgangsebene 2, by=1 ergibt h3 -->
@@ -110,7 +110,7 @@ export const relativSvelte = `<script lang="ts">
   </HeadingLevel>
 </HeadingLevel>`;
 
-export const relativReact = `import { EmptyState, HeadingLevel } from '@bbv/dss-design-system/react';
+export const relativReact = `import { EmptyState, HeadingLevel } from '@hoopsfoundry/ui/react';
 
 {/* Ausgangsebene 2, by=1 ergibt h3 */}
 <HeadingLevel>
@@ -131,8 +131,8 @@ export const relativReact = `import { EmptyState, HeadingLevel } from '@bbv/dss-
 
 // Modal: Titel h2, Inhalt eine Ebene tiefer
 export const modalSvelte = `<script lang="ts">
-  import Modal from '@bbv/dss-design-system/svelte/Modal';
-  import Table from '@bbv/dss-design-system/svelte/Table';
+  import Modal from '@hoopsfoundry/ui/svelte/Modal';
+  import Table from '@hoopsfoundry/ui/svelte/Table';
 
   let open = $state(true);
 </script>
@@ -146,7 +146,7 @@ export const modalSvelte = `<script lang="ts">
   </Table>
 </Modal>`;
 
-export const modalReact = `import { Modal, Table } from '@bbv/dss-design-system/react';
+export const modalReact = `import { Modal, Table } from '@hoopsfoundry/ui/react';
 
 {/* Titel h2 (titleAs ändert das), die Tabelle darin bekommt automatisch h3 */}
 <Modal open onOpenChange={() => {}} title="Kader">
@@ -157,16 +157,16 @@ export const modalReact = `import { Modal, Table } from '@bbv/dss-design-system/
 
 // Eigene Überschrift, die der Ebene der Komponenten folgt (React)
 export const hookReact = `import type { ReactNode } from 'react';
-import { useHeadingLevel } from '@bbv/dss-design-system/react';
-import { headingTag } from '@bbv/dss-design-system/heading.js';
+import { useHeadingLevel } from '@hoopsfoundry/ui/react';
+import { headingTag } from '@hoopsfoundry/ui/heading.js';
 
 // Liest die Ebene aus dem nächsten HeadingLevel (ohne: 3) und gibt das passende Element aus
 export function SectionTitle({ children }: { children: ReactNode }) {
   const Tag = headingTag(useHeadingLevel());
-  return <Tag className="dss-t-h3">{children}</Tag>;
+  return <Tag className="hoops-t-h3">{children}</Tag>;
 }`;
 
-export const funktionenJs = `import { headingTag, nextLevel } from '@bbv/dss-design-system/heading.js';
+export const funktionenJs = `import { headingTag, nextLevel } from '@hoopsfoundry/ui/heading.js';
 
 headingTag(4);        // 'h4'
 headingTag(1);        // 'h2'   (Komponenten geben nie eine h1 aus)

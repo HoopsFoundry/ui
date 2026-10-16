@@ -75,7 +75,7 @@ for (const brand of ['bbv', 'dbb']) {
           }
         };
         await run('Ausgangslage');
-        const buttons = await page.$$('.dss-map-load');
+        const buttons = await page.$$('.hoops-map-load');
         if (kind === 'story' && buttons.length) {
           for (const button of buttons) await button.click().catch(() => {});
           await page.waitForTimeout(900);

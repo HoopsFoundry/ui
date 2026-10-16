@@ -29,18 +29,18 @@ const mediaBlock = (head: string) => {
 describe('Accordion-CSS: Klassen und Tokens', () => {
   it('der Abschnitt ist vorhanden', () => expect(START).toBeGreaterThan(0));
   it.each([
-    'dss-acc', 'dss-acc--card', 'dss-acc--flat', 'dss-acc--nested', 'dss-acc--sticky', 'dss-acc-item', 'dss-acc-title', 'dss-acc-trigger', 'dss-acc-label',
-    'dss-acc-meta', 'dss-acc-sep', 'dss-acc-chevron', 'dss-acc-panel', 'dss-acc-panel-inner', 'dss-acc-body', 'dss-acc-tools', 'dss-acc-bar',
-    'dss-acc-nav', 'dss-acc-nav-list', 'dss-acc-nav-link', 'dss-acc-nav-toggle',
+    'hoops-acc', 'hoops-acc--card', 'hoops-acc--flat', 'hoops-acc--nested', 'hoops-acc--sticky', 'hoops-acc-item', 'hoops-acc-title', 'hoops-acc-trigger', 'hoops-acc-label',
+    'hoops-acc-meta', 'hoops-acc-sep', 'hoops-acc-chevron', 'hoops-acc-panel', 'hoops-acc-panel-inner', 'hoops-acc-body', 'hoops-acc-tools', 'hoops-acc-bar',
+    'hoops-acc-nav', 'hoops-acc-nav-list', 'hoops-acc-nav-link', 'hoops-acc-nav-toggle',
   ])('definiert .%s', (cls) => {
     expect(acc).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
   });
   it('Karte ist die Grundform des Bereichs (Rand, Radius, Schatten), flach nimmt sie weg', () => {
-    const item = rule('.dss-acc-item');
+    const item = rule('.hoops-acc-item');
     expect(item).toMatch(/border:\s*1px solid var\(--hoops-line\)/);
     expect(item).toMatch(/border-radius:\s*var\(--hoops-acc-radius,\s*var\(--hoops-radius-lg\)\)/);
     expect(item).toMatch(/box-shadow:\s*var\(--hoops-shadow-sm\)/);
-    const flat = rule('.dss-acc--flat > .dss-acc-item');
+    const flat = rule('.hoops-acc--flat > .hoops-acc-item');
     expect(flat).toMatch(/border-radius:\s*0/);
     expect(flat).toMatch(/box-shadow:\s*none/);
     expect(flat).toMatch(/border:\s*0/);
@@ -60,101 +60,101 @@ describe('Accordion-CSS: Klassen und Tokens', () => {
     expect(acc).not.toMatch(/(^|[\s,}])h[1-6]\s*[,{]/);
   });
   it('das Komma zwischen Titel und Zusatzinfo hat Schriftgröße 0 (nicht sichtbar, im Namen)', () => {
-    expect(rule('.dss-acc-sep')).toMatch(/font-size:\s*0/);
-    expect(rule('.dss-acc-sep')).not.toMatch(/display:\s*none|visibility:\s*hidden/);
+    expect(rule('.hoops-acc-sep')).toMatch(/font-size:\s*0/);
+    expect(rule('.hoops-acc-sep')).not.toMatch(/display:\s*none|visibility:\s*hidden/);
   });
   it('Kopf als button und als summary sehen gleich aus: box-sizing, font, margin, appearance, Breite, Ausrichtung', () => {
-    const r = rule('.dss-acc-trigger');
+    const r = rule('.hoops-acc-trigger');
     expect(r).toMatch(/box-sizing:\s*border-box/);
     expect(r).toMatch(/font:\s*inherit/);
     expect(r).toMatch(/margin:\s*0/);
     expect(r).toMatch(/appearance:\s*none/);
     expect(r).toMatch(/width:\s*100%/);
     expect(r).toMatch(/text-align:\s*left/);
-    expect(rule('summary.dss-acc-trigger')).toMatch(/list-style:\s*none/);
+    expect(rule('summary.hoops-acc-trigger')).toMatch(/list-style:\s*none/);
     // font: inherit steht vor den einzelnen font-Angaben (die Kurzform würde sie sonst zurücksetzen)
     expect(r.indexOf('font: inherit')).toBeLessThan(r.indexOf('font-family'));
     expect(r.indexOf('font: inherit')).toBeLessThan(r.indexOf('line-height'));
   });
   it('der Kopf ist mindestens 44 px hoch; Nav-Link und Nav-Schalter ebenso', () => {
-    expect(rule('.dss-acc-trigger')).toMatch(/min-height:\s*44px/);
-    expect(rule('.dss-acc-nav-link')).toMatch(/min-height:\s*44px/);
-    expect(rule('.dss-acc-nav-toggle')).toMatch(/min-height:\s*44px/);
-    expect(acc).toMatch(/\.dss-acc--nested > \.dss-acc-item > \.dss-acc-title > \.dss-acc-trigger[^{]*\{[^}]*min-height:\s*44px/);
+    expect(rule('.hoops-acc-trigger')).toMatch(/min-height:\s*44px/);
+    expect(rule('.hoops-acc-nav-link')).toMatch(/min-height:\s*44px/);
+    expect(rule('.hoops-acc-nav-toggle')).toMatch(/min-height:\s*44px/);
+    expect(acc).toMatch(/\.hoops-acc--nested > \.hoops-acc-item > \.hoops-acc-title > \.hoops-acc-trigger[^{]*\{[^}]*min-height:\s*44px/);
   });
   it('verwendet keine nackten --*-text/--*-soft-Farben (nur --hoops-*)', () => {
     expect(acc).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft)\)/);
     expect(acc).not.toMatch(/var\(--hoops-(ok|err|warn|info|signal|cool|base)-(text|soft)\)/);
   });
   it('Elemente mit Hintergrund nutzen semantische Aliase', () => {
-    for (const sel of ['.dss-acc-item', '.dss-acc-nav-link', '.dss-acc-nav-toggle']) expect(rule(sel)).toMatch(/background:\s*var\(--hoops-/);
+    for (const sel of ['.hoops-acc-item', '.hoops-acc-nav-link', '.hoops-acc-nav-toggle']) expect(rule(sel)).toMatch(/background:\s*var\(--hoops-/);
   });
 });
 
 describe('Accordion-CSS: Fokus und Zustände', () => {
   it('Fokus gestrichelt (--hoops-ring-style), innen mit -3px am Kopf', () => {
-    expect(rule('.dss-acc-trigger:focus-visible')).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
-    expect(rule('.dss-acc-trigger:focus-visible')).toMatch(/outline-offset:\s*-3px/);
-    for (const sel of ['.dss-acc-nav-link:focus-visible', '.dss-acc-nav-toggle:focus-visible']) {
+    expect(rule('.hoops-acc-trigger:focus-visible')).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
+    expect(rule('.hoops-acc-trigger:focus-visible')).toMatch(/outline-offset:\s*-3px/);
+    for (const sel of ['.hoops-acc-nav-link:focus-visible', '.hoops-acc-nav-toggle:focus-visible']) {
       expect(rule(sel)).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     }
   });
   it('Hover, Aktiv, Offen und Gesperrt sind gestaltet', () => {
-    expect(acc).toMatch(/\.dss-acc-trigger:hover:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--hoops-hover-bg\)/);
-    expect(acc).toMatch(/\.dss-acc-trigger:active:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--hoops-surface-2\)/);
-    expect(acc).toMatch(/\.dss-acc-trigger\[aria-expanded="true"\][^{]*\{\s*background:\s*var\(--hoops-hover-bg\)/);
-    expect(acc).toMatch(/\.dss-acc-trigger\[aria-disabled="true"\]\s*\{[^}]*cursor:\s*not-allowed/);
+    expect(acc).toMatch(/\.hoops-acc-trigger:hover:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--hoops-hover-bg\)/);
+    expect(acc).toMatch(/\.hoops-acc-trigger:active:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--hoops-surface-2\)/);
+    expect(acc).toMatch(/\.hoops-acc-trigger\[aria-expanded="true"\][^{]*\{\s*background:\s*var\(--hoops-hover-bg\)/);
+    expect(acc).toMatch(/\.hoops-acc-trigger\[aria-disabled="true"\]\s*\{[^}]*cursor:\s*not-allowed/);
   });
   it('der Pfeil dreht sich um 180° bei offen (Button und details)', () => {
-    expect(acc).toMatch(/\[aria-expanded="true"\] \.dss-acc-chevron[^{]*\{\s*transform:\s*rotate\(180deg\)/);
-    expect(acc).toMatch(/details\[open\] > summary\.dss-acc-trigger::after[^{]*\{\s*transform:\s*rotate\(180deg\)/);
+    expect(acc).toMatch(/\[aria-expanded="true"\] \.hoops-acc-chevron[^{]*\{\s*transform:\s*rotate\(180deg\)/);
+    expect(acc).toMatch(/details\[open\] > summary\.hoops-acc-trigger::after[^{]*\{\s*transform:\s*rotate\(180deg\)/);
   });
   it('natives details: ohne Dreieck, eigener Pfeil per ::after', () => {
-    expect(rule('summary.dss-acc-trigger')).toMatch(/list-style:\s*none/);
-    expect(acc).toMatch(/summary\.dss-acc-trigger::-webkit-details-marker\s*\{\s*display:\s*none/);
-    expect(acc).toMatch(/summary\.dss-acc-trigger::after[^{]*\{[^}]*content:\s*""/);
+    expect(rule('summary.hoops-acc-trigger')).toMatch(/list-style:\s*none/);
+    expect(acc).toMatch(/summary\.hoops-acc-trigger::-webkit-details-marker\s*\{\s*display:\s*none/);
+    expect(acc).toMatch(/summary\.hoops-acc-trigger::after[^{]*\{[^}]*content:\s*""/);
   });
   it('geschlossen: hidden bleibt im Layout (Animation), verborgen per visibility; Höhe 0fr → 1fr in 200 ms', () => {
-    expect(rule('.dss-acc-panel')).toMatch(/grid-template-rows:\s*1fr/);
-    expect(rule('.dss-acc-panel')).toMatch(/transition:\s*grid-template-rows 0\.2s ease/);
-    const closed = rule('.dss-acc-panel[hidden]');
+    expect(rule('.hoops-acc-panel')).toMatch(/grid-template-rows:\s*1fr/);
+    expect(rule('.hoops-acc-panel')).toMatch(/transition:\s*grid-template-rows 0\.2s ease/);
+    const closed = rule('.hoops-acc-panel[hidden]');
     expect(closed).toMatch(/grid-template-rows:\s*0fr/);
     expect(closed).toMatch(/visibility:\s*hidden/);
     expect(closed).toMatch(/display:\s*grid/);
-    expect(rule('.dss-acc-panel-inner')).toMatch(/min-height:\s*0/);
-    expect(rule('.dss-acc-panel-inner')).toMatch(/overflow:\s*hidden/);
+    expect(rule('.hoops-acc-panel-inner')).toMatch(/min-height:\s*0/);
+    expect(rule('.hoops-acc-panel-inner')).toMatch(/overflow:\s*hidden/);
   });
 });
 
 describe('Accordion-CSS: Bewegung reduzieren, data-motion, Druck', () => {
   const reduced = mediaBlock('@media (prefers-reduced-motion: reduce)');
-  const motionRules = acc.slice(acc.indexOf(':root[data-motion="reduce"] .dss-acc-panel,'), acc.indexOf('/* Druck'));
+  const motionRules = acc.slice(acc.indexOf(':root[data-motion="reduce"] .hoops-acc-panel,'), acc.indexOf('/* Druck'));
   it('bei prefers-reduced-motion: keine Übergänge, geschlossene Bereiche sofort weg', () => {
-    expect(reduced).toMatch(/\.dss-acc-panel,\s*\.dss-acc-panel\[hidden\]\s*\{\s*transition:\s*none/);
-    expect(reduced).toMatch(/\.dss-acc-panel\[hidden\]\s*\{\s*display:\s*none/);
-    expect(reduced).toMatch(/\.dss-acc-chevron[^{]*\{\s*transition:\s*none/);
+    expect(reduced).toMatch(/\.hoops-acc-panel,\s*\.hoops-acc-panel\[hidden\]\s*\{\s*transition:\s*none/);
+    expect(reduced).toMatch(/\.hoops-acc-panel\[hidden\]\s*\{\s*display:\s*none/);
+    expect(reduced).toMatch(/\.hoops-acc-chevron[^{]*\{\s*transition:\s*none/);
   });
   it('bei data-motion="reduce" dieselben Regeln', () => {
-    expect(motionRules).toMatch(/\[data-motion="reduce"\] \.dss-acc-panel,\s*:root\[data-motion="reduce"\] \.dss-acc-panel\[hidden\]\s*\{\s*transition:\s*none/);
-    expect(motionRules).toMatch(/:root\[data-motion="reduce"\] \.dss-acc-panel\[hidden\]\s*\{\s*display:\s*none/);
-    expect(motionRules).toMatch(/:root\[data-motion="reduce"\] \.dss-acc-chevron[^{]*\{\s*transition:\s*none/);
+    expect(motionRules).toMatch(/\[data-motion="reduce"\] \.hoops-acc-panel,\s*:root\[data-motion="reduce"\] \.hoops-acc-panel\[hidden\]\s*\{\s*transition:\s*none/);
+    expect(motionRules).toMatch(/:root\[data-motion="reduce"\] \.hoops-acc-panel\[hidden\]\s*\{\s*display:\s*none/);
+    expect(motionRules).toMatch(/:root\[data-motion="reduce"\] \.hoops-acc-chevron[^{]*\{\s*transition:\s*none/);
   });
   it('beide Regelgruppen decken dieselben Selektoren ab', () => {
-    const sels = (text: string) => new Set([...text.matchAll(/\.dss-acc-[\w-]+(?:::after)?/g)].map((m) => m[0]));
+    const sels = (text: string) => new Set([...text.matchAll(/\.hoops-acc-[\w-]+(?:::after)?/g)].map((m) => m[0]));
     expect(sels(motionRules)).toEqual(sels(reduced));
   });
   it('Druck: alle Bereiche sichtbar, auch bei data-motion; keine Bedienelemente; kein klebender Kopf', () => {
     const print = mediaBlock('@media print');
-    expect(print).toMatch(/\.dss-acc-panel\[hidden\][^{]*\{[^}]*display:\s*grid[^}]*grid-template-rows:\s*1fr[^}]*visibility:\s*visible/);
-    expect(print).toContain(':root[data-motion="reduce"] .dss-acc-panel[hidden]');
-    expect(print).toMatch(/\.dss-acc-tools[^{]*\{\s*display:\s*none/);
-    expect(print).toMatch(/\.dss-acc--sticky \.dss-acc-title[^{]*\{\s*position:\s*static/);
+    expect(print).toMatch(/\.hoops-acc-panel\[hidden\][^{]*\{[^}]*display:\s*grid[^}]*grid-template-rows:\s*1fr[^}]*visibility:\s*visible/);
+    expect(print).toContain(':root[data-motion="reduce"] .hoops-acc-panel[hidden]');
+    expect(print).toMatch(/\.hoops-acc-tools[^{]*\{\s*display:\s*none/);
+    expect(print).toMatch(/\.hoops-acc--sticky \.hoops-acc-title[^{]*\{\s*position:\s*static/);
     expect(print).toMatch(/overflow:\s*visible/);
   });
 });
 
 describe('Accordion-CSS: Kopf klebt (sticky)', () => {
-  const sticky = rule('.dss-acc--sticky:not(.dss-acc--nested) > .dss-acc-item.is-open > .dss-acc-title,\n.dss-acc--sticky:not(.dss-acc--nested) > details[open].dss-acc-item > summary.dss-acc-trigger');
+  const sticky = rule('.hoops-acc--sticky:not(.hoops-acc--nested) > .hoops-acc-item.is-open > .hoops-acc-title,\n.hoops-acc--sticky:not(.hoops-acc--nested) > details[open].hoops-acc-item > summary.hoops-acc-trigger');
   it('position sticky mit Abstand aus --hoops-acc-sticky-top, undurchsichtig, unter Overlays (z-index < 100)', () => {
     expect(sticky).toMatch(/position:\s*sticky/);
     expect(sticky).toMatch(/top:\s*var\(--hoops-acc-sticky-top,\s*0px\)/);
@@ -164,36 +164,36 @@ describe('Accordion-CSS: Kopf klebt (sticky)', () => {
     expect(z).toBeGreaterThan(1);
   });
   it('scroll-margin-top berücksichtigt den klebenden Kopf', () => {
-    expect(rule('.dss-acc-item')).toMatch(/scroll-margin-top:\s*calc\(var\(--hoops-acc-sticky-top,\s*0px\) \+ 8px\)/);
+    expect(rule('.hoops-acc-item')).toMatch(/scroll-margin-top:\s*calc\(var\(--hoops-acc-sticky-top,\s*0px\) \+ 8px\)/);
   });
   it('kein overflow:hidden zwischen Bereich und Kopf (würde position: sticky brechen)', () => {
-    expect(rule('.dss-acc-item')).not.toMatch(/overflow/);
-    expect(rule('.dss-acc')).not.toMatch(/overflow/);
-    expect(rule('.dss-acc-title')).not.toMatch(/overflow/);
+    expect(rule('.hoops-acc-item')).not.toMatch(/overflow/);
+    expect(rule('.hoops-acc')).not.toMatch(/overflow/);
+    expect(rule('.hoops-acc-title')).not.toMatch(/overflow/);
   });
 });
 
 describe('Accordion-CSS: reservierter Platz der Leiste (kein Layout-Sprung nach dem Hydrieren)', () => {
   it('Platzhalter ist 44 px hoch, bei Leiste plus Sprungleiste unter 640 px 100 px (44 + 12 + 44)', () => {
-    expect(rule('.dss-acc-tools--pending')).toMatch(/min-height:\s*44px/);
-    expect(mediaBlock('@media (max-width: 639.98px) { .dss-acc-tools--pending')).toMatch(/\[data-parts="both"\]\s*\{\s*min-height:\s*100px/);
+    expect(rule('.hoops-acc-tools--pending')).toMatch(/min-height:\s*44px/);
+    expect(mediaBlock('@media (max-width: 639.98px) { .hoops-acc-tools--pending')).toMatch(/\[data-parts="both"\]\s*\{\s*min-height:\s*100px/);
   });
   it('Sprunglink und Schalter messen mit Rand genau 44 px (border-box)', () => {
-    expect(rule('.dss-acc-nav-link')).toMatch(/box-sizing:\s*border-box/);
-    expect(rule('.dss-acc-nav-toggle')).toMatch(/box-sizing:\s*border-box/);
+    expect(rule('.hoops-acc-nav-link')).toMatch(/box-sizing:\s*border-box/);
+    expect(rule('.hoops-acc-nav-toggle')).toMatch(/box-sizing:\s*border-box/);
   });
 });
 
 describe('Accordion-CSS: Sprungleiste unter und über 640 px', () => {
   it('unter 640 px ist die Liste einklappbar, der Schalter sichtbar; darüber nebeneinander', () => {
-    const small = mediaBlock('@media (max-width: 639.98px) {\n  .dss-acc-nav-toggle');
-    expect(small).toMatch(/\.dss-acc-nav-toggle\s*\{\s*display:\s*flex/);
-    expect(small).toMatch(/\.dss-acc-nav:not\(\.is-open\) \.dss-acc-nav-list\s*\{\s*display:\s*none/);
-    expect(rule('.dss-acc-nav-toggle')).toMatch(/display:\s*none/);
-    expect(rule('.dss-acc-nav-list')).toMatch(/flex-wrap:\s*wrap/);
+    const small = mediaBlock('@media (max-width: 639.98px) {\n  .hoops-acc-nav-toggle');
+    expect(small).toMatch(/\.hoops-acc-nav-toggle\s*\{\s*display:\s*flex/);
+    expect(small).toMatch(/\.hoops-acc-nav:not\(\.is-open\) \.hoops-acc-nav-list\s*\{\s*display:\s*none/);
+    expect(rule('.hoops-acc-nav-toggle')).toMatch(/display:\s*none/);
+    expect(rule('.hoops-acc-nav-list')).toMatch(/flex-wrap:\s*wrap/);
   });
   it('der aktuelle Link ist hervorgehoben (aria-current)', () => {
-    expect(acc).toMatch(/\.dss-acc-nav-link\[aria-current="true"\]\s*\{[^}]*background:\s*var\(--hoops-btn-bg\)[^}]*color:\s*var\(--hoops-btn-fg\)/);
+    expect(acc).toMatch(/\.hoops-acc-nav-link\[aria-current="true"\]\s*\{[^}]*background:\s*var\(--hoops-btn-bg\)[^}]*color:\s*var\(--hoops-btn-fg\)/);
   });
 });
 

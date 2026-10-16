@@ -5,17 +5,17 @@
 //
 // Schritte (in dieser Reihenfolge, STEPS):
 //   clean    der Arbeitsbaum ist sauber (git status --porcelain); mit --allow-dirty übersprungen
-//   version  package.json == VERSION in allen sechs Bündeldateien == `--hoops-version` in dss.css (und == --expect-version, falls gesetzt)
+//   version  package.json == VERSION in allen sechs Bündeldateien == `--hoops-version` in hoops.css (und == --expect-version, falls gesetzt)
 //   build    npm run build:vanilla (mit --no-build übersprungen: das vorhandene dist/vanilla wird geprüft)
 //   budget   jedes Bündel (minifiziert und gzip) bleibt im Größenbudget aus scripts/vanilla-budgets.mjs, sonst Abbruch
-//   pack     release/dss-vanilla-<version>.tgz (dist/vanilla und fonts/ unter dem Ordner dss-vanilla-<version>/, dazu version.json), .sha256 (sha256sum-Format,
-//            eine Zeile je Datei, die erste für den Tarball), .tgz.sha256 (nur der Tarball), manifest.json und dss-sync.mjs (portal-sync.mjs mit allen
-//            Hilfen zu einer Datei gebündelt, ohne Abhängigkeiten) mit dss-sync.mjs.sha256.
+//   pack     release/hoops-ui-<version>.tgz (dist/vanilla und fonts/ unter dem Ordner hoops-ui-<version>/, dazu version.json), .sha256 (sha256sum-Format,
+//            eine Zeile je Datei, die erste für den Tarball), .tgz.sha256 (nur der Tarball), manifest.json und hoops-sync.mjs (portal-sync.mjs mit allen
+//            Hilfen zu einer Datei gebündelt, ohne Abhängigkeiten) mit hoops-sync.mjs.sha256.
 //            Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf normiert);
 //            zlib-Versionen können abweichen, maßgeblich ist die veröffentlichte .sha256.
-//   verify   der Tarball wird mit dem Leser von portal-sync gelesen, jede Datei gegen die Prüfsummen geprüft; dss-sync.mjs darf keinen relativen Import enthalten
+//   verify   der Tarball wird mit dem Leser von portal-sync gelesen, jede Datei gegen die Prüfsummen geprüft; hoops-sync.mjs darf keinen relativen Import enthalten
 // Scheitert ein Schritt, bleibt in `release/` nichts Halbfertiges zurück (geschrieben wird in einen temporären Ordner, erst danach verschoben).
-// Ein vorhandenes Ausgabeverzeichnis wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.dss-release` trägt.
+// Ein vorhandenes Ausgabeverzeichnis wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.hoops-release` trägt.
 // --dry-run führt alle Prüfungen aus (außer build bei --no-build), schreibt aber nichts. --debug zeigt bei Fehlern den Stack.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -32,9 +32,9 @@ import { BUDGETS } from './vanilla-budgets.mjs';
 export { createTar };
 
 export const STEPS = ['clean', 'build', 'version', 'budget', 'pack', 'verify'];
-export const MARKER = '.dss-release';
-export const NAME = '@bbv/dss-design-system';
-export const BUNDLE_FILES = ['dss.js', 'dss.min.js', 'dss-render.js', 'dss-render.min.js', 'dss-map.js', 'dss-map.min.js'];
+export const MARKER = '.hoops-release';
+export const NAME = '@hoopsfoundry/ui';
+export const BUNDLE_FILES = ['hoops.js', 'hoops.min.js', 'hoops-render.js', 'hoops-render.min.js', 'hoops-map.js', 'hoops-map.min.js'];
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
@@ -62,14 +62,14 @@ async function bundleVersions(bundleDir) {
 }
 
 /**
- * Prüft, dass package.json, alle Bündeldateien und dss.css dieselbe Version tragen. Gibt `{ version, found }` zurück
+ * Prüft, dass package.json, alle Bündeldateien und hoops.css dieselbe Version tragen. Gibt `{ version, found }` zurück
  * und wirft mit allen Abweichungen in einer Meldung.
  */
 export async function checkVersions({ root = ROOT, bundleDir = join(root, 'dist/vanilla'), expect } = {}) {
   const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
-  const css = await readFile(join(bundleDir, 'dss.css'), 'utf8');
+  const css = await readFile(join(bundleDir, 'hoops.css'), 'utf8');
   const cssVersion = css.match(/--hoops-version:\s*"([^"]+)"/)?.[1] ?? null;
-  const found = { 'package.json': pkg.version, ...(await bundleVersions(bundleDir)), 'dss.css': cssVersion };
+  const found = { 'package.json': pkg.version, ...(await bundleVersions(bundleDir)), 'hoops.css': cssVersion };
   const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);
   if (expect !== undefined && expect !== pkg.version) wrong.push(['--expect-version', expect]);
   if (wrong.length) {
@@ -78,7 +78,7 @@ export async function checkVersions({ root = ROOT, bundleDir = join(root, 'dist/
   return { version: pkg.version, found };
 }
 
-/** Importe des Bündels auf Dateien desselben Ordners (`from "./dss.js"`). */
+/** Importe des Bündels auf Dateien desselben Ordners (`from "./hoops.js"`). */
 const importsOf = (code) => [...new Set([...code.matchAll(/from\s*["']\.\/([\w.-]+\.js)["']/g)].map((m) => m[1]))];
 
 /** Misst die drei Bündel (minifizierte Datei und gzip) und vergleicht mit den Budgets aus scripts/vanilla-budgets.mjs. */
@@ -91,7 +91,7 @@ export async function measureBundles({ bundleDir }) {
     bundles[id] = {
       file: budget.file, minBytes: min.length, gzipBytes: gz, minKiB: kib(min.length), gzipKiB: kib(gz),
       budget: { minBytes: budget.minBytes, gzipBytes: budget.gzipBytes, minKiB: kib(budget.minBytes), gzipKiB: kib(budget.gzipBytes) },
-      requires, css: 'dss.css',
+      requires, css: 'hoops.css',
     };
   }
   return bundles;
@@ -109,7 +109,7 @@ export function assertBudgets(bundles) {
 }
 
 /**
- * Bündelt scripts/portal-sync.mjs mit allen Hilfen aus scripts/lib zu einer Datei ohne Abhängigkeiten (dss-sync.mjs) und prüft,
+ * Bündelt scripts/portal-sync.mjs mit allen Hilfen aus scripts/lib zu einer Datei ohne Abhängigkeiten (hoops-sync.mjs) und prüft,
  * dass kein relativer Import übrig bleibt.
  */
 export async function bundleSync({ root = ROOT } = {}) {
@@ -118,8 +118,8 @@ export async function bundleSync({ root = ROOT } = {}) {
     entryPoints: [join(root, 'scripts/portal-sync.mjs')], bundle: true, platform: 'node', format: 'esm', target: 'node18', write: false, legalComments: 'none', logLevel: 'silent',
   });
   const text = result.outputFiles[0].text;
-  if (text.match(/(?:from|import)\s*\(?\s*["']\.{1,2}\//)) throw new Error('release-vanilla: dss-sync.mjs enthält noch einen relativen Import.');
-  if (!text.startsWith('#!/usr/bin/env node')) throw new Error('release-vanilla: dss-sync.mjs hat keine Startzeile (#!/usr/bin/env node).');
+  if (text.match(/(?:from|import)\s*\(?\s*["']\.{1,2}\//)) throw new Error('release-vanilla: hoops-sync.mjs enthält noch einen relativen Import.');
+  if (!text.startsWith('#!/usr/bin/env node')) throw new Error('release-vanilla: hoops-sync.mjs hat keine Startzeile (#!/usr/bin/env node).');
   return Buffer.from(text);
 }
 
@@ -141,7 +141,7 @@ export async function buildManifest({ root = ROOT, bundleDir, version, files, ta
       range: leafletRange,
       note: 'Leaflet gehört nicht zum Release. Es wird nur für die Karte gebraucht, lokal ausgeliefert (loadLeaflet) und erst nach dem Klick geladen.',
     },
-    pairing: 'dss.js, dss-render.js, dss-map.js und dss.css einer Version gehören zusammen (VERSION im Bündel == --hoops-version in dss.css).',
+    pairing: 'hoops.js, hoops-render.js, hoops-map.js und hoops.css einer Version gehören zusammen (VERSION im Bündel == --hoops-version in hoops.css).',
   };
 }
 
@@ -152,7 +152,7 @@ export function shownPath(path, cwd = process.cwd()) {
   return rel.startsWith('..') || isAbsolute(rel) ? resolve(path) : rel;
 }
 
-/** Wirft, wenn `outDir` nicht ersetzt werden darf: Projekt-Root, Elternordner, Wurzel oder ein nicht leerer Ordner ohne Marker `.dss-release`. */
+/** Wirft, wenn `outDir` nicht ersetzt werden darf: Projekt-Root, Elternordner, Wurzel oder ein nicht leerer Ordner ohne Marker `.hoops-release`. */
 async function assertOutDir(outDir, root) {
   const out = resolve(outDir);
   const r = resolve(root);
@@ -199,7 +199,7 @@ export async function releaseVanilla({
   assertBudgets(await measureBundles({ bundleDir }));
   step('budget', 'alle Bündel im Budget');
 
-  const prefix = `dss-vanilla-${version}`;
+  const prefix = `hoops-ui-${version}`;
   const names = (await listFiles(bundleDir)).filter((n) => sourcemaps || !n.endsWith('.map'));
   const files = [];
   for (const name of names) files.push({ path: `${prefix}/${name}`, data: await readFile(join(bundleDir, name)) });
@@ -213,12 +213,12 @@ export async function releaseVanilla({
   const tarballLine = `${sha256(tgz)}  ${tgzName}\n`;
   const sums = [tarballLine.trim(), ...files.map((f) => `${sha256(f.data)}  ${f.path}`)].join('\n') + '\n';
   const syncData = await bundleSync({ root });
-  const sync = { name: 'dss-sync.mjs', bytes: syncData.length, sha256: sha256(syncData), sha256File: 'dss-sync.mjs.sha256', node: '>=18' };
+  const sync = { name: 'hoops-sync.mjs', bytes: syncData.length, sha256: sha256(syncData), sha256File: 'hoops-sync.mjs.sha256', node: '>=18' };
   const manifest = await buildManifest({
     root, bundleDir, version, files, sync,
     tarball: { name: tgzName, bytes: tgz.length, sha256: sha256(tgz), sha256File: `${prefix}.sha256`, sha256TarballOnly: `${tgzName}.sha256` },
   });
-  step('pack', `${tgzName}, ${kib(tgz.length)} KiB, ${files.length} Dateien; dss-sync.mjs, ${kib(syncData.length)} KiB`);
+  step('pack', `${tgzName}, ${kib(tgz.length)} KiB, ${files.length} Dateien; hoops-sync.mjs, ${kib(syncData.length)} KiB`);
 
   // Gegenprobe mit dem Leser der Verbraucher-Seite: Namen, Reihenfolge und Inhalt müssen mit den Prüfsummen übereinstimmen
   const read = readTgz(tgz, { expectedTop: prefix });
@@ -236,8 +236,8 @@ export async function releaseVanilla({
       await writeFile(join(tmp, `${prefix}.sha256`), sums);
       await writeFile(join(tmp, `${tgzName}.sha256`), tarballLine);
       await writeFile(join(tmp, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);
-      await writeFile(join(tmp, 'dss-sync.mjs'), syncData);
-      await writeFile(join(tmp, 'dss-sync.mjs.sha256'), `${sync.sha256}  dss-sync.mjs\n`);
+      await writeFile(join(tmp, 'hoops-sync.mjs'), syncData);
+      await writeFile(join(tmp, 'hoops-sync.mjs.sha256'), `${sync.sha256}  hoops-sync.mjs\n`);
       await rm(outDir, { recursive: true, force: true });
       await rename(tmp, outDir);
     } catch (error) {

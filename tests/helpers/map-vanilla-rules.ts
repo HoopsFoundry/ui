@@ -58,7 +58,7 @@ const A = { id: 'a', lat: 49.4875, lng: 8.466, label: 'Sporthalle Nordhain' };
 const B = { id: 'b', lat: 49.5, lng: 8.5, label: 'Halle Süd' };
 const BASE = { label: 'Karte', markers: [A] };
 const click = (el: Element | null) => (el as HTMLElement | null)?.click();
-const root = () => document.querySelector('.dss-map');
+const root = () => document.querySelector('.hoops-map');
 const stateOf = () => root()?.getAttribute('data-state');
 const settle = async () => { for (let i = 0; i < 4; i++) await tick(); };
 
@@ -113,11 +113,11 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   await rule('Karte: ungültige Kachel-Adresse ergibt sofort den Fehlerzustand ohne Schaltfläche', async (host) => {
     mountMap(host, { ...BASE, tileUrl: 'http://tiles.example.org/{z}/{x}/{y}.png' });
     await settle();
-    return stateOf() === 'error' && host.querySelector('.dss-map-load') === null && mapState.maps.length === 0;
+    return stateOf() === 'error' && host.querySelector('.hoops-map-load') === null && mapState.maps.length === 0;
   });
   await rule('Karte: Ziele laufen durch safeHref (Liste ohne Link)', (host) => {
     mountMap(host, { label: 'K', markers: [{ ...A, href: 'javascript:alert(1)' }, { ...B, href: 'https://example.org/halle' }] });
-    return host.querySelectorAll('.dss-map-name a').length === 1 && host.querySelector('.dss-map-name a')!.getAttribute('href') === 'https://example.org/halle';
+    return host.querySelectorAll('.hoops-map-name a').length === 1 && host.querySelector('.hoops-map-name a')!.getAttribute('href') === 'https://example.org/halle';
   });
   await rule('Karte: destroy entfernt die Listener', (host) => {
     const l = ledger();
@@ -161,20 +161,20 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   });
   await rule('Karte: Sitzmarker zählen in der Nummerierung nicht mit', (host) => {
     mountMap(host, { label: 'K', markers: [{ ...A, kind: 'seat' }, B, { ...A, id: 'c', lat: 49.6 }] });
-    const nums = [...host.querySelectorAll('.dss-map-num')].map((n) => n.textContent);
-    return JSON.stringify(nums) === JSON.stringify(['', '1', '2']) && host.querySelectorAll('.dss-map-num.is-seat').length === 1;
+    const nums = [...host.querySelectorAll('.hoops-map-num')].map((n) => n.textContent);
+    return JSON.stringify(nums) === JSON.stringify(['', '1', '2']) && host.querySelectorAll('.hoops-map-num.is-seat').length === 1;
   });
   await rule('Karte: der Fehler hat eine Statuszeile', async (host) => {
     mock.state.throwOnMap = true;
     mountMap(host, { ...BASE, load: 'auto' });
     await settle();
-    return stateOf() === 'error' && (host.querySelector('.dss-map-status')?.textContent ?? '').includes('konnte nicht geladen werden');
+    return stateOf() === 'error' && (host.querySelector('.hoops-map-status')?.textContent ?? '').includes('konnte nicht geladen werden');
   });
   await rule('Karte: der Fehler baut die Karte ab', async (host) => {
     mountMap(host, { ...BASE, load: 'auto' });
     await settle();
     mock.finishTiles(mock.lastLayer(), 'fail');
-    return stateOf() === 'error' && mock.lastMap().isRemoved && host.querySelector('.dss-map-canvas') === null;
+    return stateOf() === 'error' && mock.lastMap().isRemoved && host.querySelector('.hoops-map-canvas') === null;
   });
   await rule('Karte: ein zweites init ersetzt das erste', async (host) => {
     host.append(document.createRange().createContextualFragment(renderMap(BASE)));
@@ -230,9 +230,9 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   });
   await rule('Karte: nach „Karte laden“ liegt der Fokus auf der Kartenfläche', async (host) => {
     mountMap(host, BASE);
-    click(host.querySelector('.dss-map-load'));
+    click(host.querySelector('.hoops-map-load'));
     await settle();
-    return document.activeElement === host.querySelector('.dss-map-canvas');
+    return document.activeElement === host.querySelector('.hoops-map-canvas');
   });
   await rule('Karte: Zoom-Schaltfläche an der Grenze hat aria-disabled', async (host) => {
     mountMap(host, { ...BASE, load: 'auto' });
@@ -240,7 +240,7 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     const map = mock.lastMap();
     map.zoom = map.options.maxZoom;
     map.fire('zoomend');
-    const [plus, minus] = [...host.querySelectorAll('.dss-map-zoom-btn')];
+    const [plus, minus] = [...host.querySelectorAll('.hoops-map-zoom-btn')];
     return plus.getAttribute('aria-disabled') === 'true' && !minus.hasAttribute('aria-disabled') && !plus.hasAttribute('disabled');
   });
   await rule('Karte: Unmount während des Imports baut keine Karte', async (host) => {
@@ -260,7 +260,7 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     host.append(document.createRange().createContextualFragment(renderMap(BASE, { uid: 'twice' })));
     initMap(host, BASE);
     initMap(host, BASE);
-    click(host.querySelector('.dss-map-load'));
+    click(host.querySelector('.hoops-map-load'));
     await settle();
     return host.querySelectorAll('.leaflet-container').length === 1 && mapState.detached === 0 && stateOf() === 'ready';
   });
@@ -280,14 +280,14 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   });
   await rule('Karte: während des Ladens ist die Kartenfläche inert', async (host) => {
     mountMap(host, BASE, { loadLeaflet: () => new Promise(() => {}) });
-    click(host.querySelector('.dss-map-load'));
-    return host.querySelector('.dss-map-canvas')?.hasAttribute('inert') === true;
+    click(host.querySelector('.hoops-map-load'));
+    return host.querySelector('.hoops-map-canvas')?.hasAttribute('inert') === true;
   });
   await rule('Karte: initMap macht die gesperrte Schaltfläche der Hallenkarte bedienbar', async (host) => {
     host.append(document.createRange().createContextualFragment(renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 }, { uid: 'v' })));
-    const sperre = host.querySelector<HTMLButtonElement>('.dss-map-load')!.disabled;
-    initMap(host.querySelector('.dss-venue-map'), { markers: [{ id: 'halle', lat: 49.3, lng: 7.9, label: 'H' }] });
-    return sperre && host.querySelector<HTMLButtonElement>('.dss-map-load')!.disabled === false;
+    const sperre = host.querySelector<HTMLButtonElement>('.hoops-map-load')!.disabled;
+    initMap(host.querySelector('.hoops-venue-map'), { markers: [{ id: 'halle', lat: 49.3, lng: 7.9, label: 'H' }] });
+    return sperre && host.querySelector<HTMLButtonElement>('.hoops-map-load')!.disabled === false;
   });
   await rule('Karte: mountVenueCard startet die eingebettete Karte', async (host) => {
     mountVenueCard(host, { name: 'Halle', lat: 49.3, lng: 7.9, load: 'auto' }, { initMap });
@@ -303,9 +303,9 @@ export async function mapRules(m: Loaded): Promise<Rules> {
   await rule('Karte: mountVenueCard lässt die Karte beim Update stehen', async (host) => {
     const h = mountVenueCard(host, { name: 'Halle', lat: 49.3, lng: 7.9, load: 'auto' }, { initMap });
     await settle();
-    const canvas = host.querySelector('.dss-map-canvas');
+    const canvas = host.querySelector('.hoops-map-canvas');
     h.update({ name: 'Halle', lat: 49.3, lng: 7.9, load: 'auto', info: 'Info' });
-    return mapState.maps.length === 1 && host.querySelector('.dss-map-canvas') === canvas && host.querySelector('.dss-venue-info')?.textContent === 'Info';
+    return mapState.maps.length === 1 && host.querySelector('.hoops-map-canvas') === canvas && host.querySelector('.hoops-venue-info')?.textContent === 'Info';
   });
   await rule('Karte: Styles gehen über das CSSOM, nie als style-Attribut im Markup', (host) => {
     const seen: string[] = [];
@@ -316,17 +316,17 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     });
     mountMap(host, { ...BASE, markers: [A, B], height: 300 });
     spy.mockRestore();
-    const pin = host.querySelector<HTMLElement>('.dss-map-ph-pin');
+    const pin = host.querySelector<HTMLElement>('.hoops-map-ph-pin');
     return seen.length > 0 && seen.every((html) => !/\sstyle="/.test(html)) && pin?.style.left !== '' && root()!.style.getPropertyValue('--hoops-map-h') === '300px';
   });
   await rule('Karte: nur bekannte Eigenschaften gelangen ins CSSOM', (host) => {
     const create = Range.prototype.createContextualFragment;
     const spy = vi.spyOn(Range.prototype, 'createContextualFragment').mockImplementation(function (this: Range, html: string) {
-      return create.call(this, html.replace('class="dss-map-skip"', 'class="dss-map-skip" data-dss-style="color:red;left:1px"'));
+      return create.call(this, html.replace('class="hoops-map-skip"', 'class="hoops-map-skip" data-hoops-style="color:red;left:1px"'));
     });
     mountMap(host, BASE);
     spy.mockRestore();
-    const skip = host.querySelector<HTMLElement>('.dss-map-skip')!;
+    const skip = host.querySelector<HTMLElement>('.hoops-map-skip')!;
     return skip.style.color === '' && skip.style.left === '1px';
   });
   await rule('Karte: initMap wendet die style-Attribute von Server-Markup über das CSSOM an', (host) => {
@@ -341,17 +341,17 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     spy.mockRestore();
     return calls.includes('--hoops-map-h:333px') && calls.filter((c) => c.startsWith('left:')).length >= 2;
   });
-  await rule('Karte: data-dss-options ohne Prototyp-Schlüssel', (host) => {
-    host.setAttribute('data-dss', 'map');
-    host.setAttribute('data-dss-options', '{"__proto__":{"load":"auto"},"constructor":{"x":1},"prototype":{"y":2},"label":"K","markers":[]}');
+  await rule('Karte: data-hoops-options ohne Prototyp-Schlüssel', (host) => {
+    host.setAttribute('data-hoops', 'map');
+    host.setAttribute('data-hoops-options', '{"__proto__":{"load":"auto"},"constructor":{"x":1},"prototype":{"y":2},"label":"K","markers":[]}');
     let seen: string[] = [];
     const all = initAll(document, { map: { start: (el: Element, o: object) => { seen = Object.getOwnPropertyNames(o); return initMapBlock(el, o); } } });
     all.destroy();
     return seen.includes('label') && !seen.includes('__proto__') && !seen.includes('constructor') && !seen.includes('prototype');
   });
   await rule('Karte: initAll startet die Karte nur mit start und gibt start nicht weiter', (host) => {
-    host.setAttribute('data-dss', 'map');
-    host.setAttribute('data-dss-options', '{"label":"K","markers":[]}');
+    host.setAttribute('data-hoops', 'map');
+    host.setAttribute('data-hoops-options', '{"label":"K","markers":[]}');
     const without = initAll(document);
     let seen: string[] = [];
     const withStart = initAll(document, { map: { start: (el: Element, o: object) => { seen = Object.keys(o); return initMapBlock(el, o); }, tileUrl: '/t/{z}/{x}/{y}.png' } });

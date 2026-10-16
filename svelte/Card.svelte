@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Card · Svelte 5 example
+   * HoopsFoundry UI Card · Svelte 5 example
    * --------------------------------------------------------------
    * Frame/container component matching the v0.6 Cards & Lists spec.
    * Nutzt ausschließlich die Klassen aus css/components.css (kein eigener Scoped-Style);
@@ -61,17 +61,17 @@
   href={href}
   {onclick}
   {onkeydown}
-  class={`dss-card dss-card--${variant} dss-card--pad-${padding} ${klass}`}
+  class={`hoops-card hoops-card--${variant} hoops-card--pad-${padding} ${klass}`}
   role={tag === 'div' && onclick ? 'button' : undefined}
   tabindex={tag === 'div' && onclick ? 0 : undefined}
 >
   {#if header}
-    <div class="dss-card-head">{@render header()}</div>
+    <div class="hoops-card-head">{@render header()}</div>
   {/if}
-  <div class="dss-card-body">
+  <div class="hoops-card-body">
     {@render children()}
   </div>
   {#if footer}
-    <div class="dss-card-foot">{@render footer()}</div>
+    <div class="hoops-card-foot">{@render footer()}</div>
   {/if}
 </svelte:element>

@@ -1,5 +1,5 @@
 import type { MapAppLink, MapDarkTiles, MapItem, MapMarker } from './map.js';
-import type { DssHandle } from './lifecycle.js';
+import type { HoopsHandle } from './lifecycle.js';
 
 export type { MapAppLink, MapDarkTiles, MapMarker };
 export type MapLoad = 'click' | 'auto';
@@ -63,7 +63,7 @@ export interface MapRenderOptions {
   uid?: string;
 }
 
-export interface MapMountHandle extends DssHandle {
+export interface MapMountHandle extends HoopsHandle {
   /**
    * Aktualisiert Marker, Mitte, Zoom, Gesten, Kachel-Adresse und Texte, ohne die Karte neu aufzubauen. Teilweise Eigenschaften: nur Angegebenes ändert
    * sich, `undefined` wird ignoriert, `null` nimmt eine Eigenschaft zurück (es gilt wieder der Standard). Eine fehlende `tileUrl` bleibt die bisherige.
@@ -74,11 +74,11 @@ export interface MapMountHandle extends DssHandle {
 /** Markup der Karte wie `MapView` im Server-Rendering; „Karte laden“ ist bedienbar. Ohne Leaflet, ohne Netzverkehr, läuft in Node. */
 export function renderMap(props: MapProps, options?: MapRenderOptions): string;
 /**
- * Macht vorhandenes Markup lebendig. `el` ist das Element `.dss-map` (von `renderMap`) oder ein Vorfahr (auch die Hallenkarte).
+ * Macht vorhandenes Markup lebendig. `el` ist das Element `.hoops-map` (von `renderMap`) oder ein Vorfahr (auch die Hallenkarte).
  * `options`: die Eigenschaften der Karte (`markers` ist nötig) plus `loadLeaflet`, `onLoad`, `onError`, `onMarkerClick`.
  */
 export function initMap(el: Element, options: Partial<MapProps> & MapBehavior): MapMountHandle;
 /** `renderMap` in `el` einsetzen (Styles über das CSSOM) und `initMap` starten; `destroy` stellt den früheren Inhalt wieder her. */
 export function mountMap(el: Element, props: MapProps, options?: MapBehavior & MapRenderOptions): MapMountHandle;
-/** Anbindung für `initAll` (`data-dss="map"`): Markup vorhanden → `initMap`, leerer Behälter → `mountMap`. */
+/** Anbindung für `initAll` (`data-hoops="map"`): Markup vorhanden → `initMap`, leerer Behälter → `mountMap`. */
 export function initMapBlock(el: Element, options: Partial<MapProps> & MapBehavior): MapMountHandle;

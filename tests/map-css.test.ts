@@ -21,7 +21,7 @@ describe('Map: CSS-Abschnitt', () => {
   });
 
   it('Zoom-Schaltflächen sind mindestens 44 px breit und hoch (Zahl aus px oder aus --hoops-touch-sm gerechnet)', () => {
-    const btn = body('.dss-map-zoom-btn');
+    const btn = body('.hoops-map-zoom-btn');
     const px = (value: string) => {
       const token = value.match(/^var\((--[\w-]+)\)$/);
       if (token) return px(tokens.match(new RegExp(`${token[1]}:\\s*([^;]+);`))![1].trim());
@@ -41,53 +41,53 @@ describe('Map: CSS-Abschnitt', () => {
   });
 
   it('Fokus-Ringe sind gestrichelt (--hoops-ring-style) an Zoom, Kartenfläche, Marker, Quellenlink und Sprungmarke', () => {
-    for (const selector of ['.dss-map-zoom-btn:focus-visible', '.dss-map-canvas.leaflet-container:focus-visible', '.dss-map-marker:focus-visible', '.dss-map-attr a:focus-visible', '.dss-map-skip:focus-visible']) {
+    for (const selector of ['.hoops-map-zoom-btn:focus-visible', '.hoops-map-canvas.leaflet-container:focus-visible', '.hoops-map-marker:focus-visible', '.hoops-map-attr a:focus-visible', '.hoops-map-skip:focus-visible']) {
       expect(body(selector), selector).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     }
     expect(map).not.toMatch(/outline:\s*(?!var\(--hoops-ring-w\)|none)[^;]*solid/);
   });
 
   it('gesperrter Zoom: aria-disabled grau und mit Cursor-Hinweis, kein Hover', () => {
-    expect(body('.dss-map-zoom-btn[aria-disabled="true"]')).toMatch(/opacity:\s*0\.45/);
-    expect(RULES.map(([s]) => s)).toContain('.dss-map-zoom-btn:hover:not([aria-disabled="true"])');
+    expect(body('.hoops-map-zoom-btn[aria-disabled="true"]')).toMatch(/opacity:\s*0\.45/);
+    expect(RULES.map(([s]) => s)).toContain('.hoops-map-zoom-btn:hover:not([aria-disabled="true"])');
   });
 
   it('Druck: statt der Karte nur die Liste; die Sprungmarke entfällt, die stille Liste wird sichtbar', () => {
     const printAt = map.indexOf('@media print');
     expect(printAt).toBeGreaterThan(0);
     const print = map.slice(printAt);
-    expect(print).toMatch(/\.dss-map-frame, \.dss-map-skip \{ display: none; \}/);
-    expect(print).toMatch(/\.dss-map-text\.is-quiet \{ position: static;/);
+    expect(print).toMatch(/\.hoops-map-frame, \.hoops-map-skip \{ display: none; \}/);
+    expect(print).toMatch(/\.hoops-map-text\.is-quiet \{ position: static;/);
   });
 
   it('Bewegung: bei reduzierter Bewegung (Medienabfrage und data-motion) keine Übergänge der Karte', () => {
-    expect(map).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.dss-map-zoom-btn \{ transition: none !important; animation: none !important; \}/);
-    expect(map).toMatch(/:root\[data-motion="reduce"\] \.dss-map-zoom-btn \{ transition: none !important/);
-    expect(map).toMatch(/:root\[data-motion="reduce"\] \.dss-map \.leaflet-zoom-anim/);
+    expect(map).toMatch(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\.hoops-map-zoom-btn \{ transition: none !important; animation: none !important; \}/);
+    expect(map).toMatch(/:root\[data-motion="reduce"\] \.hoops-map-zoom-btn \{ transition: none !important/);
+    expect(map).toMatch(/:root\[data-motion="reduce"\] \.hoops-map \.leaflet-zoom-anim/);
   });
 
   it('Dunkelmodus: der Filter wirkt nur auf die Kachelebene (nie auf Marker, Steuerung oder Rahmen), per Media-Query und data-theme', () => {
     const filters = RULES.filter(([, b]) => /filter:\s*brightness/.test(b)).map(([s]) => s);
     expect(filters).toHaveLength(2);
-    for (const selector of filters) expect(selector).toMatch(/\.dss-map\[data-dim="true"\] \.dss-map-tiles$/);
+    for (const selector of filters) expect(selector).toMatch(/\.hoops-map\[data-dim="true"\] \.hoops-map-tiles$/);
     expect(filters.some((s) => s.startsWith(':root[data-theme="dark"]'))).toBe(true);
     expect(filters.some((s) => s.startsWith(':root:not([data-theme="light"])'))).toBe(true);
     // das einzige andere `filter` ist der Schatten am Pin
-    expect(RULES.filter(([, b]) => /(^|[;\s])filter:/.test(b) && !/brightness/.test(b)).map(([s]) => s)).toEqual(['.dss-map-pin']);
+    expect(RULES.filter(([, b]) => /(^|[;\s])filter:/.test(b) && !/brightness/.test(b)).map(([s]) => s)).toEqual(['.hoops-map-pin']);
   });
 
   it('Quellenangabe: immer eingeblendet (kein display:none, keine Deckkraft unter 1), 28 px hoch, über den Leaflet-Ebenen', () => {
-    const attr = body('.dss-map-attr');
+    const attr = body('.hoops-map-attr');
     expect(attr).not.toMatch(/display:\s*none|opacity|visibility/);
     expect(attr).toMatch(/z-index:\s*1001/);
-    expect(body('.dss-map-attr a')).toMatch(/min-height:\s*28px/);
-    expect(body('.dss-map-attr')).toMatch(/background:\s*var\(--hoops-surface\)/);
+    expect(body('.hoops-map-attr a')).toMatch(/min-height:\s*28px/);
+    expect(body('.hoops-map-attr')).toMatch(/background:\s*var\(--hoops-surface\)/);
   });
 
   it('Platzhalter und Status liegen über den Leaflet-Ebenen (z-index ab 900)', () => {
-    expect(body('.dss-map-ph')).toMatch(/z-index:\s*900/);
-    expect(body('.dss-map-status:not(:empty)')).toMatch(/z-index:\s*1002/);
-    expect(body('.dss-map-stage')).toMatch(/isolation:\s*isolate/);
+    expect(body('.hoops-map-ph')).toMatch(/z-index:\s*900/);
+    expect(body('.hoops-map-status:not(:empty)')).toMatch(/z-index:\s*1002/);
+    expect(body('.hoops-map-stage')).toMatch(/isolation:\s*isolate/);
   });
 
   it('keine nackten --ok/err/warn/info-text oder -soft (haben keinen Dunkelmodus), kein festes Hex, keine Elementselektoren für Überschriften', () => {
@@ -97,9 +97,9 @@ describe('Map: CSS-Abschnitt', () => {
   });
 
   it('Pin-Farben laufen über Tokens mit Rückfall (Marken und Themes ändern sie nicht)', () => {
-    expect(body('.dss-map-pin-body')).toMatch(/fill:\s*var\(--hoops-map-pin-bg, var\(--hoops-base-1000\)\)/);
-    expect(body('.dss-map-pin-body')).toMatch(/stroke:\s*var\(--hoops-map-pin-ring, var\(--hoops-n-0\)\)/);
-    expect(body('.dss-map-marker.is-own .dss-map-pin-body')).toMatch(/var\(--hoops-cta-bg\)/);
+    expect(body('.hoops-map-pin-body')).toMatch(/fill:\s*var\(--hoops-map-pin-bg, var\(--hoops-base-1000\)\)/);
+    expect(body('.hoops-map-pin-body')).toMatch(/stroke:\s*var\(--hoops-map-pin-ring, var\(--hoops-n-0\)\)/);
+    expect(body('.hoops-map-marker.is-own .hoops-map-pin-body')).toMatch(/var\(--hoops-cta-bg\)/);
   });
 });
 
@@ -121,8 +121,8 @@ describe('Map: Quelltext', () => {
     expect(source).toMatch(/dimInDark = true/);
     expect(source).toContain('role="region"');
     expect(source).toContain('role="status"');
-    expect(source).toContain('dss-map-skip');
-    expect(source).toContain('dss-map-attr');
+    expect(source).toContain('hoops-map-skip');
+    expect(source).toContain('hoops-map-attr');
     expect(source).toContain('aria-controls');
     expect(source).toContain('mapText.zoomIn');
     expect(source).toContain('mapText.zoomOut');

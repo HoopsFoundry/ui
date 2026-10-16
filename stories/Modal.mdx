@@ -22,13 +22,13 @@ Jedes Modal hat denselben Aufbau. Verändert werden nur Größe, Symbol-Tönung 
   label="Bestandteile eines Modals"
   head={['Teil', 'Klasse', 'Beschreibung']}
   rows={[
-    ['Hintergrund', 'dss-backdrop', <>Halbtransparente Fläche (<code>--hoops-backdrop</code>) mit 4 px Unschärfe über der ganzen Seite.</>],
-    ['Fläche', 'dss-modal', <>Radius <code>--hoops-radius-xl</code>, Schatten <code>--hoops-shadow-xl</code>, höchstens die Fensterhöhe minus 48 px, nie breiter als das Fenster.</>],
-    ['Symbol', 'dss-m-head-icon', <>Optional, getönt nach Schweregrad (<code>danger</code>, <code>warn</code>, <code>ok</code>, <code>info</code>). Bei <code>default</code> entfällt es.</>],
-    ['Titel und Untertitel', 'dss-m-title, dss-m-subtitle', <>Titel in <code>--hoops-font-display</code>, 700, <code>--hoops-fs-h3</code> (20 px). Der Untertitel ist eine Mono-Zeile in Großbuchstaben mit <code>--hoops-mute</code>.</>],
-    ['Schließen', 'dss-m-close', 'Runder 32-px-Button oben rechts, nur mit closable.'],
-    ['Inhalt', 'dss-m-body', <>Text in <code>--hoops-fs-body</code> (15 px). Bei viel Inhalt scrollt nur dieser Bereich, Kopf und Fuß bleiben stehen.</>],
-    ['Fuß', 'dss-m-footer', <>Aktionen rechtsbündig mit 8 px Abstand auf <code>--hoops-surface-2</code>, die Hauptaktion steht rechts außen. Entfällt, wenn kein Fuß übergeben wird.</>],
+    ['Hintergrund', 'hoops-backdrop', <>Halbtransparente Fläche (<code>--hoops-backdrop</code>) mit 4 px Unschärfe über der ganzen Seite.</>],
+    ['Fläche', 'hoops-modal', <>Radius <code>--hoops-radius-xl</code>, Schatten <code>--hoops-shadow-xl</code>, höchstens die Fensterhöhe minus 48 px, nie breiter als das Fenster.</>],
+    ['Symbol', 'hoops-m-head-icon', <>Optional, getönt nach Schweregrad (<code>danger</code>, <code>warn</code>, <code>ok</code>, <code>info</code>). Bei <code>default</code> entfällt es.</>],
+    ['Titel und Untertitel', 'hoops-m-title, hoops-m-subtitle', <>Titel in <code>--hoops-font-display</code>, 700, <code>--hoops-fs-h3</code> (20 px). Der Untertitel ist eine Mono-Zeile in Großbuchstaben mit <code>--hoops-mute</code>.</>],
+    ['Schließen', 'hoops-m-close', 'Runder 32-px-Button oben rechts, nur mit closable.'],
+    ['Inhalt', 'hoops-m-body', <>Text in <code>--hoops-fs-body</code> (15 px). Bei viel Inhalt scrollt nur dieser Bereich, Kopf und Fuß bleiben stehen.</>],
+    ['Fuß', 'hoops-m-footer', <>Aktionen rechtsbündig mit 8 px Abstand auf <code>--hoops-surface-2</code>, die Hauptaktion steht rechts außen. Entfällt, wenn kein Fuß übergeben wird.</>],
   ]}
 />
 
@@ -69,7 +69,7 @@ Wie viel Fokusverhalten das Modal selbst übernimmt, hängt von der Fassung ab. 
   rows={[
     ['Escape schließt', 'Ja, nur mit closable', 'Ja, nur mit closable', 'Ja, außer closable: false'],
     ['Klick auf den Hintergrund schließt', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit dismissOnBackdrop ja, nicht bei Mausdruck im Modal und Loslassen außen'],
-    ['Fokus beim Öffnen', 'Nein: der Fokus bleibt auf dem Auslöser hinter dem Modal', 'Ja, in das Modal', 'Ja: data-dss-modal-focus, sonst die Fläche'],
+    ['Fokus beim Öffnen', 'Nein: der Fokus bleibt auf dem Auslöser hinter dem Modal', 'Ja, in das Modal', 'Ja: data-hoops-modal-focus, sonst die Fläche'],
     ['Tab bleibt im Modal', 'Nein: Tab erreicht auch die Seite dahinter', 'Ja (Fokusfalle)', 'Ja (Fokusfalle, auch Umschalt+Tab; Tab läuft in jedem Browser über das Modal)'],
     ['Fokus beim Schließen', 'Nein: du setzt ihn selbst zurück', 'Nein: die Komponente hat keinen Radix-Trigger, der Fokus fällt auf body, du setzt ihn selbst zurück', 'Ja, an den Auslöser (oder das zuvor fokussierte Element)'],
     ['Seite dahinter', 'Bleibt bedienbar und lesbar', 'Wird abgeschaltet (Radix)', 'Abgeschaltet: natives dialog oder inert'],
@@ -89,10 +89,10 @@ Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeuglei
 
 ## Ohne Framework: initModal
 
-Für statische Seiten gibt es das Modal als Funktion: `initModal(element, options)` macht ein vorhandenes `dss-modal` bedienbar, `initAll` startet jedes Element mit `data-dss="modal"`, `openModal(element)` und `closeModal(element)` öffnen und schließen es aus dem Code. Es gibt zwei Wege im Markup, beide mit denselben Klassen wie die Komponenten:
+Für statische Seiten gibt es das Modal als Funktion: `initModal(element, options)` macht ein vorhandenes `hoops-modal` bedienbar, `initAll` startet jedes Element mit `data-hoops="modal"`, `openModal(element)` und `closeModal(element)` öffnen und schließen es aus dem Code. Es gibt zwei Wege im Markup, beide mit denselben Klassen wie die Komponenten:
 
-- **Natives `<dialog class="dss-modal-dialog">`** (empfohlen): `showModal()` stellt es in die oberste Ebene, schaltet die Seite dahinter ab und zeichnet den Hintergrund (`::backdrop`, Abdunklung und Unschärfe wie `dss-backdrop`). Die Fläche füllt das Fenster wie `dss-modal-wrap`; ein Klick daneben trifft das Dialog selbst.
-- **Markup ohne `<dialog>`**: ein Element mit `hidden`, das `dss-backdrop` und `dss-modal-wrap` enthält. Das Skript ergänzt `role="dialog"` und `aria-modal="true"` (falls sie fehlen), macht die Geschwister des Modals `inert` und schaltet `hidden` um. Dasselbe gilt für ein `<dialog>` in einem Browser ohne `showModal`.
+- **Natives `<dialog class="hoops-modal-dialog">`** (empfohlen): `showModal()` stellt es in die oberste Ebene, schaltet die Seite dahinter ab und zeichnet den Hintergrund (`::backdrop`, Abdunklung und Unschärfe wie `hoops-backdrop`). Die Fläche füllt das Fenster wie `hoops-modal-wrap`; ein Klick daneben trifft das Dialog selbst.
+- **Markup ohne `<dialog>`**: ein Element mit `hidden`, das `hoops-backdrop` und `hoops-modal-wrap` enthält. Das Skript ergänzt `role="dialog"` und `aria-modal="true"` (falls sie fehlen), macht die Geschwister des Modals `inert` und schaltet `hidden` um. Dasselbe gilt für ein `<dialog>` in einem Browser ohne `showModal`.
 
 Probiere beide aus. Das Dialog öffnet sich über die ganze Seite, das zweite innerhalb des Rahmens:
 
@@ -104,37 +104,37 @@ Probiere beide aus. Das Dialog öffnet sich über die ganze Seite, das zweite in
   label="Auslöser, Optionen und Ereignisse"
   head={['Teil', 'Wirkung']}
   rows={[
-    [<code>data-dss-modal-open="id"</code>, 'An jedem Element der Seite: öffnet das Modal mit dieser id; der Fokus kehrt zu diesem Element zurück. Ein Auslöser mit unbekannter id tut nichts.'],
-    [<code>data-dss-modal-close</code>, <>Im Modal: schließt es, auch bei <code>closable: false</code>. Der Knopf <code>.dss-m-close</code> tut dasselbe.</>],
-    [<code>data-dss-modal-focus</code>, 'Anfangsfokus (sonst autofocus, sonst die Fläche .dss-modal mit tabindex="-1"). Bei zerstörerischen Aktionen auf die sichere Wahl setzen.'],
+    [<code>data-hoops-modal-open="id"</code>, 'An jedem Element der Seite: öffnet das Modal mit dieser id; der Fokus kehrt zu diesem Element zurück. Ein Auslöser mit unbekannter id tut nichts.'],
+    [<code>data-hoops-modal-close</code>, <>Im Modal: schließt es, auch bei <code>closable: false</code>. Der Knopf <code>.hoops-m-close</code> tut dasselbe.</>],
+    [<code>data-hoops-modal-focus</code>, 'Anfangsfokus (sonst autofocus, sonst die Fläche .hoops-modal mit tabindex="-1"). Bei zerstörerischen Aktionen auf die sichere Wahl setzen.'],
     ['dismissOnBackdrop', <>Standard <code>false</code>. Mit <code>true</code> schließt ein Klick auf den Hintergrund; gedrückt im Modal und losgelassen außen schließt nicht (Textmarkierung).</>],
-    ['closable', <>Standard <code>true</code>. <code>false</code>: Escape und Hintergrund schließen nicht, nur <code>data-dss-modal-close</code>.</>],
+    ['closable', <>Standard <code>true</code>. <code>false</code>: Escape und Hintergrund schließen nicht, nur <code>data-hoops-modal-close</code>.</>],
     ['initialFocus, returnFocus', 'CSS-Auswahl im Modal bzw. Element (oder false) für den Fokus beim Schließen.'],
     ['lockScroll', <>Standard <code>true</code>: <code>overflow: hidden</code> auf <code>&lt;html&gt;</code> samt Ausgleich der Bildlaufleiste; mehrere offene Modals sperren einmal, beim Schließen kommt alles zurück.</>],
-    [<><code>dss:modalopen</code>, <code>dss:modalclose</code></>, <>Blubbern bis zum Dokument; <code>detail.trigger</code> ist der Auslöser, <code>detail.reason</code> der Grund (<code>escape</code>, <code>backdrop</code>, <code>close-button</code>, <code>native</code>, <code>api</code>). <code>onOpen</code>/<code>onClose</code> sind dieselben Meldungen als Optionen.</>],
+    [<><code>hoops:modalopen</code>, <code>hoops:modalclose</code></>, <>Blubbern bis zum Dokument; <code>detail.trigger</code> ist der Auslöser, <code>detail.reason</code> der Grund (<code>escape</code>, <code>backdrop</code>, <code>close-button</code>, <code>native</code>, <code>api</code>). <code>onOpen</code>/<code>onClose</code> sind dieselben Meldungen als Optionen.</>],
   ]}
 />
 
-Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das oberste auf Escape, Tab und Fokus. Das gilt auch ohne `<dialog>`: das zweite Modal bekommt den Fokus, das darunter wird inert und mit dem Schließen des obersten wieder frei; nach dem Schließen geht der Fokus an den Auslöser im darunter liegenden Modal. Ist der Auslöser entfernt oder verborgen, bekommt die Fläche des darunter offenen Modals den Fokus, sonst `main` (sonst bleibt er unberührt), nie `body`. Ein Modal ohne zugänglichen Namen (kein `aria-labelledby`, kein `aria-label`, kein `.dss-m-title`) warnt in der Konsole. Im Druck gilt die Scroll-Sperre nicht (`@media print`). Die Rückgabe `{ destroy(), open(auslöser), close(grund), isOpen() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dasselbe Element ersetzt den ersten, `destroy()` schließt ein offenes Modal still, baut Fokus, Sperre und `inert` zurück und stellt das Markup wieder her.
+Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das oberste auf Escape, Tab und Fokus. Das gilt auch ohne `<dialog>`: das zweite Modal bekommt den Fokus, das darunter wird inert und mit dem Schließen des obersten wieder frei; nach dem Schließen geht der Fokus an den Auslöser im darunter liegenden Modal. Ist der Auslöser entfernt oder verborgen, bekommt die Fläche des darunter offenen Modals den Fokus, sonst `main` (sonst bleibt er unberührt), nie `body`. Ein Modal ohne zugänglichen Namen (kein `aria-labelledby`, kein `aria-label`, kein `.hoops-m-title`) warnt in der Konsole. Im Druck gilt die Scroll-Sperre nicht (`@media print`). Die Rückgabe `{ destroy(), open(auslöser), close(grund), isOpen() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dasselbe Element ersetzt den ersten, `destroy()` schließt ein offenes Modal still, baut Fokus, Sperre und `inert` zurück und stellt das Markup wieder her.
 
 ### Überschriftenebene im Markup
 
-Es gibt in Vanilla keinen `HeadingLevel`-Kontext: Die Ebene steht im Markup. Der Titel ist das Element mit `class="dss-m-title"` (oder `data-dss-modal-title`); sein Tag wählst du, `h2` ist der Standard wie bei `titleAs` in Svelte und React, erlaubt sind `h2` bis `h6`. Überschriften im Inhalt bekommen die nächste Ebene (Titel `h2`, darin `h3`); die Größe hängt am Token `--hoops-title-size`, nicht an der Ebene. Die Rangfolge: der Tag, den du schreibst, gilt; das Skript ändert ihn nie. Hat das Modal weder `aria-labelledby` noch `aria-label`, verbindet `initModal` den Titel mit dem Dialog (und vergibt dafür eine id, falls er keine hat). Titel und Inhalt sind Text: das Skript baut nichts mit `innerHTML`, setzt du Texte aus Daten ein, dann mit `textContent` oder `createContextualFragment` auf geprüftem Markup.
+Es gibt in Vanilla keinen `HeadingLevel`-Kontext: Die Ebene steht im Markup. Der Titel ist das Element mit `class="hoops-m-title"` (oder `data-hoops-modal-title`); sein Tag wählst du, `h2` ist der Standard wie bei `titleAs` in Svelte und React, erlaubt sind `h2` bis `h6`. Überschriften im Inhalt bekommen die nächste Ebene (Titel `h2`, darin `h3`); die Größe hängt am Token `--hoops-title-size`, nicht an der Ebene. Die Rangfolge: der Tag, den du schreibst, gilt; das Skript ändert ihn nie. Hat das Modal weder `aria-labelledby` noch `aria-label`, verbindet `initModal` den Titel mit dem Dialog (und vergibt dafür eine id, falls er keine hat). Titel und Inhalt sind Text: das Skript baut nichts mit `innerHTML`, setzt du Texte aus Daten ein, dann mit `textContent` oder `createContextualFragment` auf geprüftem Markup.
 
 ## Handy · 390 px Breite
 
 Zwei eingebettete Seiten mit fester Breite, links hell mit einer Warnung, rechts dunkel mit einer zerstörerischen Aktion (Fokus auf der sicheren Wahl). Die Fläche schrumpft auf die Fensterbreite abzüglich 24 px Rand.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Modal · Warnung · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Modal · Warnung · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal hell">
       <iframe title="Handy-Vorschau: Modal mit Warnung hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-modal--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Modal · Verwerfen · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Modal · Verwerfen · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal dunkel">
       <iframe title="Handy-Vorschau: Modal zum Verwerfen dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-modal--handy-dunkel" loading="lazy" />
     </div>
   </div>
@@ -201,7 +201,7 @@ Zusätzlich gibt es je nach Fassung:
     },
     {
       title: 'Der Fokus startet auf der sicheren Wahl',
-      doText: 'Bei einer zerstörerischen Aktion startet der Fokus (data-dss-modal-focus) auf „Behalten“: Ein versehentliches Enter richtet nichts an.',
+      doText: 'Bei einer zerstörerischen Aktion startet der Fokus (data-hoops-modal-focus) auf „Behalten“: Ein versehentliches Enter richtet nichts an.',
       dontText: 'Der Fokus startet auf „Verwerfen“: Ein einziges Enter nach dem Öffnen löscht den Bericht.',
       good: <Story of={ModalStories.DoFokus} inline />,
       bad: <Story of={ModalStories.DontFokus} inline />,

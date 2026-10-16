@@ -14,7 +14,7 @@ Jede Komponente mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamC
 
 ## Ebene ist nicht Größe
 
-Die Größe einer Komponentenüberschrift hängt an einer Klasse (`dss-frame-title`, `dss-pc-nm`, `dss-team-nm`, `dss-empty-title`, `dss-pbp-title`, `dss-m-title`), nie am Elementnamen. `h2`, `h3` und `h4` sehen deshalb gleich aus. Wer eine andere Größe will, ändert das Token (siehe unten), nicht die Ebene. Wer eine andere Ebene will, ändert die Gliederung, nicht die Größe.
+Die Größe einer Komponentenüberschrift hängt an einer Klasse (`hoops-frame-title`, `hoops-pc-nm`, `hoops-team-nm`, `hoops-empty-title`, `hoops-pbp-title`, `hoops-m-title`), nie am Elementnamen. `h2`, `h3` und `h4` sehen deshalb gleich aus. Wer eine andere Größe will, ändert das Token (siehe unten), nicht die Ebene. Wer eine andere Ebene will, ändert die Gliederung, nicht die Größe.
 
 Dieselbe Karte als `h2` mit kleiner Schrift und als `h4` mit großer:
 
@@ -65,22 +65,22 @@ Die Vorgabewerte, im Browser gemessen (BBV, Standardschrift; DBB und die DBB-Sch
   label="Vorgabewerte der Komponentenüberschriften"
   head={['Komponente', 'Klasse', 'Größe', 'Gewicht', 'Zeilenhöhe']}
   rows={[
-    ['Table, ScheduleTable, ScheduleGrid', <code>.dss-frame-title</code>, '15 px (--hoops-fs-body)', '600', 'geerbt'],
-    ['PlayByPlay', <code>.dss-pbp-title</code>, '15 px (--hoops-fs-body)', '600', 'geerbt'],
-    ['PlayerCard standard', <code>.dss-pc-nm</code>, '18 px (--hoops-fs-body-lg)', '600', 'geerbt'],
-    ['PlayerCard hero', <code>.dss-pc-hero .dss-pc-nm</code>, '32 px (--hoops-fs-hero)', '700', '1,05'],
-    ['TeamCard standard', <code>.dss-team-nm</code>, '18 px (--hoops-fs-body-lg)', '600', '1,2'],
-    ['TeamCard compact', <code>.dss-team--compact .dss-team-nm</code>, '15 px (--hoops-fs-body)', '600', '1,2'],
-    ['EmptyState', <code>.dss-empty-title</code>, '18 px (--hoops-fs-body-lg)', '700', 'geerbt'],
-    ['Modal', <code>.dss-m-title</code>, '20 px (--hoops-fs-h3)', '700', 'geerbt'],
+    ['Table, ScheduleTable, ScheduleGrid', <code>.hoops-frame-title</code>, '15 px (--hoops-fs-body)', '600', 'geerbt'],
+    ['PlayByPlay', <code>.hoops-pbp-title</code>, '15 px (--hoops-fs-body)', '600', 'geerbt'],
+    ['PlayerCard standard', <code>.hoops-pc-nm</code>, '18 px (--hoops-fs-body-lg)', '600', 'geerbt'],
+    ['PlayerCard hero', <code>.hoops-pc-hero .hoops-pc-nm</code>, '32 px (--hoops-fs-hero)', '700', '1,05'],
+    ['TeamCard standard', <code>.hoops-team-nm</code>, '18 px (--hoops-fs-body-lg)', '600', '1,2'],
+    ['TeamCard compact', <code>.hoops-team--compact .hoops-team-nm</code>, '15 px (--hoops-fs-body)', '600', '1,2'],
+    ['EmptyState', <code>.hoops-empty-title</code>, '18 px (--hoops-fs-body-lg)', '700', 'geerbt'],
+    ['Modal', <code>.hoops-m-title</code>, '20 px (--hoops-fs-h3)', '700', 'geerbt'],
   ]}
 />
 
 Ein Bereich mit kleinerer Schrift für alle Titel darin:
 
-<div className="dss-doc-code-wrap">
-  <div className="dss-doc-code" tabIndex={0} role="region" aria-label="Token in einem Bereich überschreiben, CSS">
-    <span className="dss-doc-chip">CSS</span>
+<div className="hoops-doc-code-wrap">
+  <div className="hoops-doc-code" tabIndex={0} role="region" aria-label="Token in einem Bereich überschreiben, CSS">
+    <span className="hoops-doc-chip">CSS</span>
     <pre>{tokensCss}</pre>
   </div>
 </div>
@@ -119,26 +119,26 @@ Das Modal hat ein `titleAs` (Standard `h2`) und gibt seinem Inhalt und seinem Fo
 
 ### Vanilla-HTML
 
-Ohne Svelte oder React gibt es keinen Provider: Du schreibst das Element selbst ins Markup (`h2` bis `h6`) und behältst die Klasse (`dss-frame-title`, `dss-pc-nm` …). Der Standard der Komponenten ist `h3`; das erste Beispiel oben zeigt das Vanilla-Markup. Die Größe ändert sich dadurch nie.
+Ohne Svelte oder React gibt es keinen Provider: Du schreibst das Element selbst ins Markup (`h2` bis `h6`) und behältst die Klasse (`hoops-frame-title`, `hoops-pc-nm` …). Der Standard der Komponenten ist `h3`; das erste Beispiel oben zeigt das Vanilla-Markup. Die Größe ändert sich dadurch nie.
 
 ### Eigene Überschrift in React
 
-`useHeadingLevel()` liefert die Ebene (2 bis 6) an der Stelle im Baum; ohne `HeadingLevel` darüber `3`. Mit `headingTag()` aus `@bbv/dss-design-system/heading.js` wird daraus das Element:
+`useHeadingLevel()` liefert die Ebene (2 bis 6) an der Stelle im Baum; ohne `HeadingLevel` darüber `3`. Mit `headingTag()` aus `@hoopsfoundry/ui/heading.js` wird daraus das Element:
 
-<div className="dss-doc-code-wrap">
-  <div className="dss-doc-code" tabIndex={0} role="region" aria-label="Eigene Überschrift mit useHeadingLevel, React">
-    <span className="dss-doc-chip">React</span>
+<div className="hoops-doc-code-wrap">
+  <div className="hoops-doc-code" tabIndex={0} role="region" aria-label="Eigene Überschrift mit useHeadingLevel, React">
+    <span className="hoops-doc-chip">React</span>
     <pre>{hookReact}</pre>
   </div>
 </div>
 
 ### Reine Funktionen
 
-`@bbv/dss-design-system/heading.js` ist ohne Framework nutzbar. Zahlen außerhalb von 2 bis 6 werden begrenzt, alles ohne Ganzzahl (`NaN`, `3.5`, `null`, `undefined`) ergibt den Standard 3; eine Zeichenkette aus Ziffern (`'4'`) gilt wie die Zahl, andere Zeichenketten (`'h4'`) nicht. Das hilft in Svelte-Vorlagen, wo `level="4"` eine Zeichenkette ist.
+`@hoopsfoundry/ui/heading.js` ist ohne Framework nutzbar. Zahlen außerhalb von 2 bis 6 werden begrenzt, alles ohne Ganzzahl (`NaN`, `3.5`, `null`, `undefined`) ergibt den Standard 3; eine Zeichenkette aus Ziffern (`'4'`) gilt wie die Zahl, andere Zeichenketten (`'h4'`) nicht. Das hilft in Svelte-Vorlagen, wo `level="4"` eine Zeichenkette ist.
 
-<div className="dss-doc-code-wrap">
-  <div className="dss-doc-code" tabIndex={0} role="region" aria-label="Reine Funktionen aus heading.js, JavaScript">
-    <span className="dss-doc-chip">JavaScript</span>
+<div className="hoops-doc-code-wrap">
+  <div className="hoops-doc-code" tabIndex={0} role="region" aria-label="Reine Funktionen aus heading.js, JavaScript">
+    <span className="hoops-doc-chip">JavaScript</span>
     <pre>{funktionenJs}</pre>
   </div>
 </div>

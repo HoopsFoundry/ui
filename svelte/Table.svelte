@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Table · Svelte 5
+   * HoopsFoundry UI Table · Svelte 5
    * --------------------------------------------------------------
    * Datentabelle nach der Tables-Spec. Nutzt nur die Klassen aus
    * css/components.css.
@@ -14,7 +14,7 @@
    *
    * Zellen kommen vom Aufrufer über die `rows`/`body`-Snippets. Hilfsklassen:
    *   .num · .num.lead · .num.dim · .center
-   *   .dss-tn / .dss-pos / .dss-pill-s / .dss-player (Dekoration)
+   *   .hoops-tn / .hoops-pos / .hoops-pill-s / .hoops-player (Dekoration)
    */
   import type { Snippet } from 'svelte';
   import type { HeadingTag } from '../js/heading.js';
@@ -69,22 +69,22 @@
   const heading = useHeadingTag(() => titleAs);
   // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
   $inspect(collapsible && !title).with((_type, missing) => {
-    if (missing) console.warn('[DSS] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
+    if (missing) console.warn('[HoopsFoundry UI] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   });
 </script>
 
 {#snippet frameMeta()}
-  <span class="dss-frame-meta">
+  <span class="hoops-frame-meta">
     {#if meta}<span>{meta}</span>{/if}
-    {#if live}<span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
+    {#if live}<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
   </span>
 {/snippet}
 
 {#snippet tableRegion()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
-  <div class="dss-table-scroll" role="region" tabindex="0" aria-label={caption || title || 'Tabelle'}>
-    <table class={`dss-tbl dss-tbl--${density} ${striped ? 'dss-tbl--striped' : ''}`}>
-      {#if caption}<caption class="dss-sr-only">{caption}</caption>{/if}
+  <div class="hoops-table-scroll" role="region" tabindex="0" aria-label={caption || title || 'Tabelle'}>
+    <table class={`hoops-tbl hoops-tbl--${density} ${striped ? 'hoops-tbl--striped' : ''}`}>
+      {#if caption}<caption class="hoops-sr-only">{caption}</caption>{/if}
       {#if columns}
         <thead>
           <tr>
@@ -107,17 +107,17 @@
 {/snippet}
 
 {#if collapsible && title}
-  <CollapsibleFrame rootClass={`dss-frame ${dark ? 'dss-frame--dark' : ''} ${klass}`} {id} {title} {titleAs} bind:open meta={meta || live ? frameMeta : undefined}>
+  <CollapsibleFrame rootClass={`hoops-frame ${dark ? 'hoops-frame--dark' : ''} ${klass}`} {id} {title} {titleAs} bind:open meta={meta || live ? frameMeta : undefined}>
     {@render tableRegion()}
   </CollapsibleFrame>
 {:else}
-<div class={`dss-frame ${dark ? 'dss-frame--dark' : ''} ${klass}`}>
+<div class={`hoops-frame ${dark ? 'hoops-frame--dark' : ''} ${klass}`}>
   {#if title || meta || live}
-    <div class="dss-frame-head">
-      {#if title}<svelte:element this={heading.tag} class="dss-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
-      <div class="dss-frame-meta">
+    <div class="hoops-frame-head">
+      {#if title}<svelte:element this={heading.tag} class="hoops-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
+      <div class="hoops-frame-meta">
         {#if meta}<span>{meta}</span>{/if}
-        {#if live}<span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
+        {#if live}<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
       </div>
     </div>
   {/if}

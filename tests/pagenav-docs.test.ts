@@ -27,7 +27,7 @@ describe('Code-Beispiele', () => {
     expect(html).not.toContain('undefined');
     expect(html.match(/<h2>/g)).toHaveLength(3);
     expect(html).toContain('<main');
-    expect(html).not.toContain('dss-pagenav');
+    expect(html).not.toContain('hoops-pagenav');
   });
   it('React besteht den TypeScript-Compiler', () => {
     expect(compileReact({ pagenav: code.react })).toEqual([]);
@@ -76,14 +76,14 @@ describe('Doku-Seite', () => {
     const onPage = Object.entries(blocks).filter(([name]) => !name.startsWith('handy') && !name.startsWith('dont-'));
     const names = onPage.flatMap(([, text]) => [
       ...[...text.matchAll(/label: '([^']+)'/g)].map((m) => m[1]),
-      ...[...text.matchAll(/<p class="dss-eyebrow" id="[^"]+">([^<]+)<\/p>/g)].map((m) => m[1]),
+      ...[...text.matchAll(/<p class="hoops-eyebrow" id="[^"]+">([^<]+)<\/p>/g)].map((m) => m[1]),
     ]);
-    // 'vanilla' setzt den Namen über data-dss-options
+    // 'vanilla' setzt den Namen über data-hoops-options
     names.push(...[...pieces[0].matchAll(/label: '([^']+)'/g)].map((m) => m[1]));
     expect(names.length).toBeGreaterThan(8);
     expect(new Set(names).size, JSON.stringify(names)).toBe(names.length);
     // Das Don't doppelt den Namen absichtlich
-    const dont = [...blocks['dont-namen'].matchAll(/<p class="dss-eyebrow" id="[^"]+">([^<]+)<\/p>/g)].map((m) => m[1]);
+    const dont = [...blocks['dont-namen'].matchAll(/<p class="hoops-eyebrow" id="[^"]+">([^<]+)<\/p>/g)].map((m) => m[1]);
     expect(dont[0]).toBe(dont[1]);
   });
   it('die Dokumentation nennt landmark-unique und den Namen als Parameter', () => {
@@ -99,9 +99,9 @@ describe('Doku-Seite', () => {
   });
   it('keine globalen Regeln: die Doku nennt Token und Opt-in-Klasse', () => {
     expect(mdx).toMatch(/--hoops-scroll-offset/);
-    expect(mdx).toMatch(/dss-scroll-pad/);
+    expect(mdx).toMatch(/hoops-scroll-pad/);
     expect(mdx).toMatch(/keine globalen Regeln/);
-    expect(mdx).toMatch(/`dss-pagenav-target`, deren `scroll-margin-top` `--hoops-scroll-offset` plus `1rem` ist/);
+    expect(mdx).toMatch(/`hoops-pagenav-target`, deren `scroll-margin-top` `--hoops-scroll-offset` plus `1rem` ist/);
   });
   it('die Doku nennt Animation, Beobachtung, Routing, verschachtelte Gruppen, RTL und createContextualFragment', () => {
     for (const part of ['`transitionend`', 'Höchstwartezeit', '`history.replaceState`', 'Hash-Routing', 'jede Accordion-Gruppe, auch eine verschachtelte', 'keine Wurzel, nur Optionen', '`inset-inline-end`', '`createContextualFragment`']) expect(mdx, part).toContain(part);

@@ -24,10 +24,10 @@
   {/each}
 </main>
 {#if bnav}
-  <nav class="dss-bnav bar" aria-label="Hauptnavigation des Beispiels">
-    <a class="dss-bnav-item" href="#start"><span class="dss-bnav-lbl">Start</span></a>
-    <a class="dss-bnav-item" href="#spiele"><span class="dss-bnav-lbl">Spiele</span></a>
-    <a class="dss-bnav-item" href="#tabelle"><span class="dss-bnav-lbl">Tabelle</span></a>
+  <nav class="hoops-bnav bar" aria-label="Hauptnavigation des Beispiels">
+    <a class="hoops-bnav-item" href="#start"><span class="hoops-bnav-lbl">Start</span></a>
+    <a class="hoops-bnav-item" href="#spiele"><span class="hoops-bnav-lbl">Spiele</span></a>
+    <a class="hoops-bnav-item" href="#tabelle"><span class="hoops-bnav-lbl">Tabelle</span></a>
   </nav>
 {/if}
 

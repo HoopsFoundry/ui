@@ -21,15 +21,15 @@ export interface BreadcrumbsProps {
 
 /** Pfadanzeige: plain (Seitenkopf), tagged (mit Kontext-Kürzeln) oder chip (mobil). Das letzte Element ist die aktuelle Seite. */
 export function Breadcrumbs({ items, variant = 'plain', ariaLabel = 'Breadcrumb', className }: BreadcrumbsProps) {
-  const base = variant === 'chip' ? 'dss-crumbs-chip' : 'dss-crumbs-item';
+  const base = variant === 'chip' ? 'hoops-crumbs-chip' : 'hoops-crumbs-item';
 
   return (
-    <nav aria-label={ariaLabel} className={cn('dss-crumbs', `dss-crumbs--${variant}`, className)}>
+    <nav aria-label={ariaLabel} className={cn('hoops-crumbs', `hoops-crumbs--${variant}`, className)}>
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         const content = (
           <>
-            {variant === 'tagged' && item.tag ? <span className="dss-crumbs-tag">{item.tag}</span> : null}
+            {variant === 'tagged' && item.tag ? <span className="hoops-crumbs-tag">{item.tag}</span> : null}
             {item.label}
           </>
         );
@@ -46,7 +46,7 @@ export function Breadcrumbs({ items, variant = 'plain', ariaLabel = 'Breadcrumb'
             ) : (
               <span className={base}>{content}</span>
             )}
-            {isLast ? null : <Icon name="chevron-r" size={14} className="dss-crumbs-sep" />}
+            {isLast ? null : <Icon name="chevron-r" size={14} className="hoops-crumbs-sep" />}
           </Fragment>
         );
       })}

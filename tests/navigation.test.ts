@@ -20,27 +20,27 @@ const hasRing = (selector: string) => new RegExp(selector.replace(/[.[\]()]/g, '
 
 describe('Navigation: jede bedienbare Komponente hat einen gestrichelten Fokus-Ring', () => {
   it.each([
-    ['Tabs', '.dss-tab:focus-visible'],
-    ['Stepper-Punkt', 'button.dss-step-dot:focus-visible'],
-    ['AppNav-Link', '.dss-appnav-link:focus-visible'],
-    ['AppNav-Gruppe', '.dss-appnav-group-btn:focus-visible'],
-    ['AppNav-Umschalter', '.dss-appnav-toggle:focus-visible'],
-    ['BottomNav-Eintrag', '.dss-bnav-item:focus-visible'],
-    ['BottomNav-FAB', '.dss-bnav-fab:focus-visible'],
-    ['Breadcrumb-Link', 'a.dss-crumbs-item:focus-visible'],
-    ['Breadcrumb-Chip', 'a.dss-crumbs-chip:focus-visible'],
+    ['Tabs', '.hoops-tab:focus-visible'],
+    ['Stepper-Punkt', 'button.hoops-step-dot:focus-visible'],
+    ['AppNav-Link', '.hoops-appnav-link:focus-visible'],
+    ['AppNav-Gruppe', '.hoops-appnav-group-btn:focus-visible'],
+    ['AppNav-Umschalter', '.hoops-appnav-toggle:focus-visible'],
+    ['BottomNav-Eintrag', '.hoops-bnav-item:focus-visible'],
+    ['BottomNav-FAB', '.hoops-bnav-fab:focus-visible'],
+    ['Breadcrumb-Link', 'a.hoops-crumbs-item:focus-visible'],
+    ['Breadcrumb-Chip', 'a.hoops-crumbs-chip:focus-visible'],
   ])('%s: %s', (_name, selector) => {
     expect(hasRing(selector)).toBe(true);
   });
 
   it('BottomNav-Eintrag und AppNav zeichnen den Ring innen (−3 px), sonst schneidet der Rand ihn ab', () => {
-    expect(css).toMatch(/\.dss-bnav-item:focus-visible\s*\{[^}]*outline-offset:\s*-3px/);
-    expect(css).toMatch(/\.dss-appnav-link:focus-visible[^{]*\{[^}]*outline-offset:\s*-3px/);
+    expect(css).toMatch(/\.hoops-bnav-item:focus-visible\s*\{[^}]*outline-offset:\s*-3px/);
+    expect(css).toMatch(/\.hoops-appnav-link:focus-visible[^{]*\{[^}]*outline-offset:\s*-3px/);
   });
 
   it('dunkle Flächen (AppNav dunkel, TopBar) nehmen den dezenten Ring-Ton', () => {
-    expect(css).toMatch(/\.dss-appnav--dark \.dss-appnav-toggle:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
-    expect(css).toMatch(/\.dss-topbar--dark :focus-visible\s*\{\s*outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
+    expect(css).toMatch(/\.hoops-appnav--dark \.hoops-appnav-toggle:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
+    expect(css).toMatch(/\.hoops-topbar--dark :focus-visible\s*\{\s*outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
   });
 });
 
@@ -58,7 +58,7 @@ describe('Navigation: Farben mit Dunkelmodus', () => {
   });
 
   it('Live-Marker der TopBar: grüne Live-Sprache (Text --hoops-live-fg-on-dark), kein Rot', () => {
-    const live = css.match(/\.dss-topbar-live\s*\{[^}]*\}/)?.[0] ?? '';
+    const live = css.match(/\.hoops-topbar-live\s*\{[^}]*\}/)?.[0] ?? '';
     expect(live).toMatch(/color:\s*var\(--hoops-live-fg-on-dark\)/);
     expect(live).not.toMatch(/--hoops-err-fill|oklch\(0\.80 0\.19 27\)/);
   });

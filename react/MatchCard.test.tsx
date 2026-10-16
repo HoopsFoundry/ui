@@ -11,15 +11,15 @@ describe('MatchCard', () => {
     const { container } = render(
       <MatchCard league="BBL" matchday="17. Spieltag" date="Sa 12.10." time="18:00" venue="Halle Nord" heim={{ ...HEIM, score: 0 }} gast={GAST} />,
     );
-    expect(container.firstElementChild).toHaveClass('dss-match', 'dss-match--scheduled');
+    expect(container.firstElementChild).toHaveClass('hoops-match', 'hoops-match--scheduled');
     expect(screen.getByText('Sa 12.10. · 18:00')).toBeInTheDocument();
     expect(screen.getByText('Halle Nord')).toBeInTheDocument();
-    expect(container.querySelector('.dss-match-score')).toBeNull();
+    expect(container.querySelector('.hoops-match-score')).toBeNull();
   });
 
   it('zeigt in „live“ Spielstand, Viertel und Uhr', () => {
     const { container } = render(<MatchCard state="live" quarter="Q4" clock="02:14" heim={{ ...HEIM, score: 87 }} gast={{ ...GAST, score: 64 }} />);
-    expect(container.firstElementChild).toHaveClass('dss-match--live');
+    expect(container.firstElementChild).toHaveClass('hoops-match--live');
     expect(screen.getByText(/Live · Q4 02:14/)).toBeInTheDocument();
     expect(screen.getByText('87')).toBeInTheDocument();
     expect(screen.getByText('64')).toBeInTheDocument();
@@ -28,7 +28,7 @@ describe('MatchCard', () => {
   it('markiert in „finished“ den Verlierer', () => {
     const { container } = render(<MatchCard state="finished" heim={{ ...HEIM, score: 80 }} gast={{ ...GAST, score: 70 }} />);
     expect(screen.getByText('Endstand')).toBeInTheDocument();
-    const teams = container.querySelectorAll('.dss-match-team');
+    const teams = container.querySelectorAll('.hoops-match-team');
     expect(teams[0]).not.toHaveClass('is-loser');
     expect(teams[1]).toHaveClass('is-loser');
   });
@@ -59,7 +59,7 @@ describe('MatchCard', () => {
 
   describe('Spielabschnitt (period, periods, quarter)', () => {
     const live = (props: Record<string, unknown>) =>
-      render(<MatchCard state="live" clock="02:14" heim={{ ...HEIM, score: 87 }} gast={{ ...GAST, score: 64 }} {...props} />).container.querySelector('.dss-match-live')!;
+      render(<MatchCard state="live" clock="02:14" heim={{ ...HEIM, score: 87 }} gast={{ ...GAST, score: 64 }} {...props} />).container.querySelector('.hoops-match-live')!;
 
     it.each([
       [{ period: 3 }, 'Live · 3. Viertel 02:14'],

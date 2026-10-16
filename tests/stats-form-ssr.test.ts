@@ -38,14 +38,14 @@ describe('FormChips', () => {
   it('Standard: Punkte, versteckter Text, höchstens fünf Einträge', async () => {
     const { svelte: s, react: r } = await both('FormChips', { form: ['S', 'N', 'S', 'S', 'U', 'N', 'S'] });
     expect(s).toBe(r);
-    expect(s).toContain('<span class="dss-form"><span class="dss-form-list" aria-hidden="true">');
-    expect((s.match(/dss-form-item /g) ?? []).length).toBe(5);
+    expect(s).toContain('<span class="hoops-form"><span class="hoops-form-list" aria-hidden="true">');
+    expect((s.match(/hoops-form-item /g) ?? []).length).toBe(5);
     expect(s).toContain('Form: Sieg, Sieg, Unentschieden, Niederlage, Sieg');
   });
   it('letters und eigene Klasse', async () => {
     const { svelte: s, react: r } = await both('FormChips', { form: ['S'], variant: 'letters', className: 'mein' });
     expect(s).toBe(r);
-    expect(s).toContain('dss-form dss-form--letters mein');
+    expect(s).toContain('hoops-form hoops-form--letters mein');
   });
   it.each([[[]], [undefined], [['x', 1, null]], ['SSS']])('ungültige Form %j: nichts', async (form) => {
     const { svelte: s, react: r } = await both('FormChips', { form });
@@ -54,8 +54,8 @@ describe('FormChips', () => {
   });
   it('Reihenfolge der Zeichen: neueste zuletzt', async () => {
     const { svelte: s } = await both('FormChips', { form: ['S', 'N', 'U'] });
-    expect(s.indexOf('dss-form-item--s')).toBeLessThan(s.indexOf('dss-form-item--n'));
-    expect(s.indexOf('dss-form-item--n')).toBeLessThan(s.indexOf('dss-form-item--u'));
+    expect(s.indexOf('hoops-form-item--s')).toBeLessThan(s.indexOf('hoops-form-item--n'));
+    expect(s.indexOf('hoops-form-item--n')).toBeLessThan(s.indexOf('hoops-form-item--u'));
   });
 });
 
@@ -63,19 +63,19 @@ describe('StatGrid', () => {
   it('Gitter: Beschreibungsliste, Beschriftung zuerst', async () => {
     const { svelte: s, react: r } = await both('StatGrid', { items: [{ label: 'Siege', value: 12 }, { label: 'Punkte pro Spiel', value: 82.4 }] });
     expect(s).toBe(r);
-    expect(s).toContain('<dl class="dss-stats">');
-    expect(s).toContain('<dt class="dss-stat-label">Siege</dt><dd class="dss-stat-value">12</dd>');
+    expect(s).toContain('<dl class="hoops-stats">');
+    expect(s).toContain('<dt class="hoops-stat-label">Siege</dt><dd class="hoops-stat-value">12</dd>');
     expect(s).toContain('82,4');
   });
   it('compact', async () => {
     const { svelte: s, react: r } = await both('StatGrid', { items: [{ label: 'A', value: 1 }], compact: true });
     expect(s).toBe(r);
-    expect(s).toContain('dss-stats dss-stats--compact');
+    expect(s).toContain('hoops-stats hoops-stats--compact');
   });
   it('fehlender Wert: Gedankenstrich sichtbar, Text versteckt', async () => {
     const { svelte: s, react: r } = await both('StatGrid', { items: [{ label: 'Rebounds', value: null }] });
     expect(s).toBe(r);
-    expect(s).toContain('<span aria-hidden="true">–</span><span class="dss-sr-only">keine Angabe</span>');
+    expect(s).toContain('<span aria-hidden="true">–</span><span class="hoops-sr-only">keine Angabe</span>');
   });
   it('bösartige Texte werden maskiert', async () => {
     const { svelte: s, react: r } = await both('StatGrid', { items: [{ label: '"><img src=x onerror=alert(1)>', value: '<script>alert(1)</script>' }] });

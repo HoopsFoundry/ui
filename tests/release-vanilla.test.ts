@@ -25,20 +25,20 @@ beforeAll(() => rm(tmpRoot, { recursive: true, force: true }));
 afterAll(() => rm(tmpRoot, { recursive: true, force: true }));
 
 describe('Version-Abgleich', () => {
-  it('package.json, alle sechs Bündeldateien und dss.css tragen dieselbe Version', async () => {
+  it('package.json, alle sechs Bündeldateien und hoops.css tragen dieselbe Version', async () => {
     const { version, found } = await checkVersions({ bundleDir });
     expect(version).toBe(pkg.version);
-    expect(Object.keys(found).sort()).toEqual(['dss.css', 'package.json', ...BUNDLE_FILES].sort());
+    expect(Object.keys(found).sort()).toEqual(['hoops.css', 'package.json', ...BUNDLE_FILES].sort());
     expect(Object.values(found).every((v) => v === pkg.version)).toBe(true);
   });
   it('eine abweichende CSS-Version bricht ab und nennt die Datei', async () => {
     const dir = await copyBundle('css');
-    await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`--hoops-version: "${pkg.version}"`, '--hoops-version: "0.0.1"'));
+    await writeFile(`${dir}/hoops.css`, (await readFile(`${dir}/hoops.css`, 'utf8')).replace(`--hoops-version: "${pkg.version}"`, '--hoops-version: "0.0.1"'));
     await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/dss\.css 0\.0\.1/);
   });
   it('eine fehlende CSS-Version gilt als Abweichung', async () => {
     const dir = await copyBundle('css-fehlt');
-    await writeFile(`${dir}/dss.css`, ':root{}');
+    await writeFile(`${dir}/hoops.css`, ':root{}');
     await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/dss\.css null/);
   });
   it.each(BUNDLE_FILES)('eine abweichende VERSION in %s bricht ab', async (file: string) => {
@@ -67,10 +67,10 @@ describe('Ablauf', () => {
     expect(again.steps).toEqual(STEPS);
     expect(built).toEqual(['b']);
   });
-  it('schreibt tgz, beide sha256-Dateien, manifest.json, dss-sync.mjs mit Prüfsumme und die Marker-Datei, sonst nichts', async () => {
+  it('schreibt tgz, beide sha256-Dateien, manifest.json, hoops-sync.mjs mit Prüfsumme und die Marker-Datei, sonst nichts', async () => {
     const out = `${tmpRoot}/ausgabe`;
     await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
-    expect((await readdir(out)).sort()).toEqual(['.dss-release', 'dss-sync.mjs', 'dss-sync.mjs.sha256', `dss-vanilla-${pkg.version}.sha256`, `dss-vanilla-${pkg.version}.tgz`, `dss-vanilla-${pkg.version}.tgz.sha256`, 'manifest.json']);
+    expect((await readdir(out)).sort()).toEqual(['.hoops-release', 'hoops-sync.mjs', 'hoops-sync.mjs.sha256', `hoops-ui-${pkg.version}.sha256`, `hoops-ui-${pkg.version}.tgz`, `hoops-ui-${pkg.version}.tgz.sha256`, 'manifest.json']);
     expect((await readdir(tmpRoot)).filter((n) => n.includes('.tmp-'))).toEqual([]);
   });
   it('ein schmutziger Arbeitsbaum bricht ab, --allow-dirty erlaubt ihn; es wird nichts geschrieben', async () => {
@@ -86,13 +86,13 @@ describe('Ablauf', () => {
     expect(result.steps).toContain('verify');
     expect(existsSync(out)).toBe(false);
     const bad = await copyBundle('trocken-falsch');
-    await writeFile(`${bad}/dss.css`, ':root { --hoops-version: "0.0.1"; }');
+    await writeFile(`${bad}/hoops.css`, ':root { --hoops-version: "0.0.1"; }');
     await expect(releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true, dryRun: true })).rejects.toThrow(/Versionen/);
   });
   it('scheitert ein Schritt, bleibt nichts zurück (kein Ausgabeordner, kein temporärer Ordner)', async () => {
     const out = `${tmpRoot}/fehler/release`;
     const bad = await copyBundle('fehler');
-    await rm(`${bad}/dss.css`);
+    await rm(`${bad}/hoops.css`);
     await expect(releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true })).rejects.toThrow();
     expect(existsSync(out)).toBe(false);
     await mkdir(`${tmpRoot}/fehler`, { recursive: true });
@@ -104,9 +104,9 @@ describe('Ablauf', () => {
     const out = `${tmpRoot}/ersetzen`;
     await mkdir(out, { recursive: true });
     await writeFile(`${out}/alt.txt`, 'alt');
-    await writeFile(`${out}/.dss-release`, '');
+    await writeFile(`${out}/.hoops-release`, '');
     const bad = await copyBundle('ersetzen-falsch');
-    await rm(`${bad}/dss.css`);
+    await rm(`${bad}/hoops.css`);
     await expect(releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true })).rejects.toThrow();
     expect(existsSync(`${out}/alt.txt`)).toBe(true);
     await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
@@ -122,36 +122,36 @@ describe('Tarball, Prüfsummen, Manifest', () => {
   beforeAll(async () => {
     out = `${tmpRoot}/inhalt`;
     await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
-    tgz = await readFile(`${out}/dss-vanilla-${pkg.version}.tgz`);
-    sums = await readFile(`${out}/dss-vanilla-${pkg.version}.sha256`, 'utf8');
+    tgz = await readFile(`${out}/hoops-ui-${pkg.version}.tgz`);
+    sums = await readFile(`${out}/hoops-ui-${pkg.version}.sha256`, 'utf8');
     manifest = JSON.parse(await readFile(`${out}/manifest.json`, 'utf8'));
   });
-  it('enthält dist/vanilla, fonts und version.json unter einem Ordner dss-vanilla-<version>', () => {
-    const files = readTgz(tgz, { expectedTop: `dss-vanilla-${pkg.version}` }) as { path: string; data: Buffer }[];
+  it('enthält dist/vanilla, fonts und version.json unter einem Ordner hoops-ui-<version>', () => {
+    const files = readTgz(tgz, { expectedTop: `hoops-ui-${pkg.version}` }) as { path: string; data: Buffer }[];
     const names = files.map((f) => f.path);
-    for (const n of [...BUNDLE_FILES, 'dss.css', 'dss.d.ts', 'dss-render.d.ts', 'dss-map.d.ts', 'dss.min.js.map', 'courtlines/court.svg', 'fonts/fonts.css', 'version.json']) expect(names, n).toContain(n);
-    expect(JSON.parse(files.find((f) => f.path === 'version.json')!.data.toString())).toEqual({ name: '@bbv/dss-design-system', version: pkg.version });
+    for (const n of [...BUNDLE_FILES, 'hoops.css', 'hoops.d.ts', 'hoops-render.d.ts', 'hoops-map.d.ts', 'hoops.min.js.map', 'courtlines/court.svg', 'fonts/fonts.css', 'version.json']) expect(names, n).toContain(n);
+    expect(JSON.parse(files.find((f) => f.path === 'version.json')!.data.toString())).toEqual({ name: '@hoopsfoundry/ui', version: pkg.version });
     // Inhalt gleich dem Bündel
-    expect(files.find((f) => f.path === 'dss.min.js')!.data.equals(Buffer.from(require('node:fs').readFileSync(`${bundleDir}dss.min.js`)))).toBe(true);
+    expect(files.find((f) => f.path === 'hoops.min.js')!.data.equals(Buffer.from(require('node:fs').readFileSync(`${bundleDir}hoops.min.js`)))).toBe(true);
   });
   it('das System-tar versteht den Tarball (ustar mit gültigen Köpfen)', async () => {
     const { execFileSync } = await import('node:child_process');
-    const list = execFileSync('tar', ['-tzf', `${out}/dss-vanilla-${pkg.version}.tgz`], { encoding: 'utf8' }).split('\n').filter(Boolean);
-    expect(list).toContain(`dss-vanilla-${pkg.version}/dss.js`);
+    const list = execFileSync('tar', ['-tzf', `${out}/hoops-ui-${pkg.version}.tgz`], { encoding: 'utf8' }).split('\n').filter(Boolean);
+    expect(list).toContain(`hoops-ui-${pkg.version}/hoops.js`);
     expect(list.length).toBeGreaterThan(30);
   });
   it('.sha256 im sha256sum-Format: Tarball zuerst, danach jede Datei; alle Werte stimmen', () => {
     const lines = sums.trim().split('\n');
-    expect(lines[0]).toBe(`${sha(tgz)}  dss-vanilla-${pkg.version}.tgz`);
+    expect(lines[0]).toBe(`${sha(tgz)}  hoops-ui-${pkg.version}.tgz`);
     const files = readTgz(tgz) as { path: string; data: Buffer }[];
     expect(lines.length).toBe(files.length + 1);
     const map = new Map(lines.slice(1).map((l) => [l.slice(66), l.slice(0, 64)]));
-    for (const f of files) expect(map.get(`dss-vanilla-${pkg.version}/${f.path}`), f.path).toBe(sha(f.data));
+    for (const f of files) expect(map.get(`hoops-ui-${pkg.version}/${f.path}`), f.path).toBe(sha(f.data));
   });
   it('manifest.json nennt Name, Version, Tarball, Dateien, Größen in KiB, Budgets, Abhängigkeiten und den Leaflet-Hinweis', () => {
-    expect(manifest.name).toBe('@bbv/dss-design-system');
+    expect(manifest.name).toBe('@hoopsfoundry/ui');
     expect(manifest.version).toBe(pkg.version);
-    expect(manifest.tarball).toMatchObject({ name: `dss-vanilla-${pkg.version}.tgz`, bytes: tgz.length, sha256: sha(tgz), sha256File: `dss-vanilla-${pkg.version}.sha256` });
+    expect(manifest.tarball).toMatchObject({ name: `hoops-ui-${pkg.version}.tgz`, bytes: tgz.length, sha256: sha(tgz), sha256File: `hoops-ui-${pkg.version}.sha256` });
     expect(manifest.files.length).toBe((readTgz(tgz) as unknown[]).length);
     for (const [id, b] of Object.entries(BUDGETS) as [string, { file: string; minBytes: number; gzipBytes: number }][]) {
       const bundle = manifest.bundles[id];
@@ -164,11 +164,11 @@ describe('Tarball, Prüfsummen, Manifest', () => {
       expect(bundle.budget.gzipBytes).toBe(b.gzipBytes);
       expect(bundle.minBytes).toBeLessThanOrEqual(b.minBytes);
       expect(bundle.gzipBytes).toBeLessThanOrEqual(b.gzipBytes);
-      expect(bundle.css).toBe('dss.css');
+      expect(bundle.css).toBe('hoops.css');
     }
-    expect(manifest.bundles.dss.requires).toEqual([]);
-    expect(manifest.bundles['dss-render'].requires).toEqual(['dss']);
-    expect(manifest.bundles['dss-map'].requires).toEqual([]);
+    expect(manifest.bundles.hoops.requires).toEqual([]);
+    expect(manifest.bundles['hoops-render'].requires).toEqual(['dss']);
+    expect(manifest.bundles['hoops-map'].requires).toEqual([]);
     expect(manifest.leaflet).toMatchObject({ required: false, range: pkg.peerDependencies.leaflet });
     expect(manifest.leaflet.note).toMatch(/Klick/);
     expect(manifest.pairing).toMatch(/dss\.css/);
@@ -181,7 +181,7 @@ describe('Tarball, Prüfsummen, Manifest', () => {
   it('--no-sourcemaps lässt die Quellkarten weg', async () => {
     const result = await releaseVanilla({ bundleDir, outDir: `${tmpRoot}/ohne-karten`, build: false, allowDirty: true, sourcemaps: false });
     expect(result.files.some((f: string) => f.endsWith('.map'))).toBe(false);
-    expect(result.files.some((f: string) => f.endsWith('dss.min.js'))).toBe(true);
+    expect(result.files.some((f: string) => f.endsWith('hoops.min.js'))).toBe(true);
   });
   it('createTar: Namen über 100 Zeichen werden abgelehnt, Inhalt wird in 512-Byte-Blöcke gefüllt', () => {
     expect(() => createTar([{ path: 'a'.repeat(101), data: Buffer.from('x') }])).toThrow(/zu lang/);
@@ -242,10 +242,10 @@ describe('Kopf des gzip-Stroms und Tar-Aufbau (plattformunabhängig)', () => {
 describe('Budgets, Ausgabeordner, Hilfsskript', () => {
   it('ein Bündel über dem Budget bricht ab, nichts wird geschrieben', async () => {
     const dir = await copyBundle('budget');
-    await writeFile(`${dir}/dss.min.js`, `${await readFile(`${dir}/dss.min.js`, 'utf8')}\n//${'x'.repeat(5000)}`);
+    await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'x'.repeat(5000)}`);
     const out = `${tmpRoot}/budget-out`;
-    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von dss.min.js liegt bei 40 KiB
-    await writeFile(`${dir}/dss.min.js`, `${await readFile(`${dir}/dss.min.js`, 'utf8')}\n//${'y'.repeat(BUDGETS.dss.minBytes)}`);
+    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von hoops.min.js liegt bei 40 KiB
+    await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'y'.repeat(BUDGETS.hoops.minBytes)}`);
     await expect(releaseVanilla({ bundleDir: dir, outDir: out, build: false, allowDirty: true })).rejects.toThrow(/Größenbudget überschritten: dss\.min\.js/);
     expect(existsSync(out)).toBe(false);
   });
@@ -254,11 +254,11 @@ describe('Budgets, Ausgabeordner, Hilfsskript', () => {
     expect(() => assertBudgets({ a: b })).toThrow(/\(min\).*\(gzip\)/);
     expect(() => assertBudgets({ a: { ...b, minBytes: 10, gzipBytes: 4 } })).not.toThrow();
   });
-  it('--out löscht einen vorhandenen Ordner nur mit Marker .dss-release oder wenn er leer ist', async () => {
+  it('--out löscht einen vorhandenen Ordner nur mit Marker .hoops-release oder wenn er leer ist', async () => {
     const fremd = `${tmpRoot}/fremd`;
     await mkdir(fremd, { recursive: true });
     await writeFile(`${fremd}/wichtig.txt`, 'x');
-    await expect(releaseVanilla({ bundleDir, outDir: fremd, build: false, allowDirty: true })).rejects.toThrow(/Marker-Datei \.dss-release/);
+    await expect(releaseVanilla({ bundleDir, outDir: fremd, build: false, allowDirty: true })).rejects.toThrow(/Marker-Datei \.hoops-release/);
     expect(existsSync(`${fremd}/wichtig.txt`)).toBe(true);
     const leer = `${tmpRoot}/leer`;
     await mkdir(leer, { recursive: true });
@@ -279,21 +279,21 @@ describe('Budgets, Ausgabeordner, Hilfsskript', () => {
   it('die Tarball-only-Datei .tgz.sha256 passt zum Tarball und ist sha256sum-lesbar', async () => {
     const out = `${tmpRoot}/tgzsum`;
     const r = await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
-    const line = await readFile(`${out}/dss-vanilla-${pkg.version}.tgz.sha256`, 'utf8');
-    expect(line).toBe(`${sha(r.tgz)}  dss-vanilla-${pkg.version}.tgz\n`);
+    const line = await readFile(`${out}/hoops-ui-${pkg.version}.tgz.sha256`, 'utf8');
+    expect(line).toBe(`${sha(r.tgz)}  hoops-ui-${pkg.version}.tgz\n`);
     expect(r.sums.startsWith(line)).toBe(true);
-    expect(r.manifest.tarball.sha256TarballOnly).toBe(`dss-vanilla-${pkg.version}.tgz.sha256`);
+    expect(r.manifest.tarball.sha256TarballOnly).toBe(`hoops-ui-${pkg.version}.tgz.sha256`);
   });
-  it('dss-sync.mjs ist eine Datei ohne relative Importe, trägt die Startzeile, hat eine Prüfsumme und läuft allein', async () => {
+  it('hoops-sync.mjs ist eine Datei ohne relative Importe, trägt die Startzeile, hat eine Prüfsumme und läuft allein', async () => {
     const out = `${tmpRoot}/sync`;
     const r = await releaseVanilla({ bundleDir, outDir: out, build: false, allowDirty: true });
-    const code = await readFile(`${out}/dss-sync.mjs`, 'utf8');
+    const code = await readFile(`${out}/hoops-sync.mjs`, 'utf8');
     expect(code.startsWith('#!/usr/bin/env node')).toBe(true);
     expect(code.match(/(?:from|import)\s*\(?\s*["']\.{1,2}\//)).toBeNull();
-    expect(await readFile(`${out}/dss-sync.mjs.sha256`, 'utf8')).toBe(`${sha(code)}  dss-sync.mjs\n`);
-    expect(r.manifest.sync).toMatchObject({ name: 'dss-sync.mjs', bytes: Buffer.byteLength(code), sha256: sha(code), sha256File: 'dss-sync.mjs.sha256', node: '>=18' });
+    expect(await readFile(`${out}/hoops-sync.mjs.sha256`, 'utf8')).toBe(`${sha(code)}  hoops-sync.mjs\n`);
+    expect(r.manifest.sync).toMatchObject({ name: 'hoops-sync.mjs', bytes: Buffer.byteLength(code), sha256: sha(code), sha256File: 'hoops-sync.mjs.sha256', node: '>=18' });
     // läuft aus einem fremden Ordner ohne das Repository: bekannte deutsche Meldung statt Stack
-    const run = spawnSync(process.execPath, [`${out}/dss-sync.mjs`, '--from-dir', `${tmpRoot}/gibt-es-nicht`], { cwd: tmpRoot, encoding: 'utf8' });
+    const run = spawnSync(process.execPath, [`${out}/hoops-sync.mjs`, '--from-dir', `${tmpRoot}/gibt-es-nicht`], { cwd: tmpRoot, encoding: 'utf8' });
     expect(run.status).toBe(1);
     expect(run.stderr).toMatch(/Quellordner .* existiert nicht/);
     expect(run.stderr).not.toMatch(/\bat \w+.*\(/);
@@ -321,7 +321,7 @@ describe('Programm: deutsche Fehler, Paketinhalt', () => {
     const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: process.cwd(), encoding: 'utf8' });
     expect(pack.status).toBe(0);
     const files: string[] = JSON.parse(pack.stdout)[0].files.map((f: { path: string }) => f.path);
-    for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/dss.js']) expect(files, f).toContain(f);
+    for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/hoops.js']) expect(files, f).toContain(f);
     expect(files.filter((f) => f.startsWith('scripts/')).every((f) => ['scripts/portal-sync.mjs', 'scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs'].includes(f) || f.startsWith('scripts/lib/'))).toBe(true);
     // Migrationsskript der Umbenennung: Befehl hoops-migrate, mit Tabelle und Ersetzungslogik
     for (const f of ['scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs', 'scripts/lib/token-rename.mjs']) expect(files, f).toContain(f);

@@ -23,22 +23,22 @@ describe('Breadcrumbs', () => {
 
   it('setzt die Variantenklasse und blendet Tags nur in tagged ein', () => {
     const { container, rerender } = render(<Breadcrumbs items={ITEMS} />);
-    expect(container.firstElementChild).toHaveClass('dss-crumbs', 'dss-crumbs--plain');
-    expect(container.querySelector('.dss-crumbs-tag')).toBeNull();
+    expect(container.firstElementChild).toHaveClass('hoops-crumbs', 'hoops-crumbs--plain');
+    expect(container.querySelector('.hoops-crumbs-tag')).toBeNull();
     rerender(<Breadcrumbs items={ITEMS} variant="tagged" />);
-    expect(container.firstElementChild).toHaveClass('dss-crumbs--tagged');
-    expect(container.querySelector('.dss-crumbs-tag')).toHaveTextContent('Admin');
+    expect(container.firstElementChild).toHaveClass('hoops-crumbs--tagged');
+    expect(container.querySelector('.hoops-crumbs-tag')).toHaveTextContent('Admin');
   });
 
   it('rendert die Chip-Variante mit Chip-Klassen', () => {
     const { container } = render(<Breadcrumbs items={ITEMS} variant="chip" />);
-    expect(container.querySelectorAll('.dss-crumbs-chip')).toHaveLength(3);
-    expect(container.querySelector('.dss-crumbs-chip.is-current')).toHaveTextContent('Teams');
+    expect(container.querySelectorAll('.hoops-crumbs-chip')).toHaveLength(3);
+    expect(container.querySelector('.hoops-crumbs-chip.is-current')).toHaveTextContent('Teams');
   });
 
   it('versteckt die Trennzeichen vor Screenreadern', () => {
     const { container } = render(<Breadcrumbs items={ITEMS} />);
-    const seps = container.querySelectorAll('.dss-crumbs-sep');
+    const seps = container.querySelectorAll('.hoops-crumbs-sep');
     expect(seps).toHaveLength(2);
     seps.forEach((sep) => expect(sep).toHaveAttribute('aria-hidden', 'true'));
   });

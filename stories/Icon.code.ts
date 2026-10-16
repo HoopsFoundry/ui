@@ -11,20 +11,20 @@ export const vanilla = `<link rel="stylesheet" href="css/components.css" />
 
 <!-- Dekorativ: der Text daneben trägt die Bedeutung -->
 <span style="color: var(--hoops-fg)">
-  <svg class="dss-icon" width="24" height="24" viewBox="0 0 24 24"
+  <svg class="hoops-icon" width="24" height="24" viewBox="0 0 24 24"
        role="presentation" aria-hidden="true" focusable="false"><use href="#i-whistle"></use></svg>
   Schiedsrichter
 </span>
 
 <!-- Beschriftet: das Icon steht allein -->
-<svg class="dss-icon" width="24" height="24" viewBox="0 0 24 24"
+<svg class="hoops-icon" width="24" height="24" viewBox="0 0 24 24"
      role="img" aria-label="Löschen" focusable="false">
   <title>Löschen</title>
   <use href="#i-trash"></use>
 </svg>`;
 
 export const svelte = `<script>
-  import Icon from '@bbv/dss-design-system/svelte/Icon';
+  import Icon from '@hoopsfoundry/ui/svelte/Icon';
 </script>
 
 <!-- Der Sprite wird beim ersten Gebrauch automatisch ins Dokument eingefügt -->
@@ -38,7 +38,7 @@ export const svelte = `<script>
 <!-- Allein stehendes Icon braucht title -->
 <Icon name="trash" title="Löschen" />`;
 
-export const react = `import { Icon } from '@bbv/dss-design-system/react';
+export const react = `import { Icon } from '@hoopsfoundry/ui/react';
 
 {/* Der Sprite wird beim ersten Gebrauch automatisch ins Dokument eingefügt */}
 <Icon name="whistle" />

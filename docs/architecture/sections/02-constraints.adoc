@@ -3,7 +3,7 @@
 
 === Beobachteter Repository-Stand
 
-* Das Paket heißt `@bbv/dss-design-system`; die gelesene Paketversion ist `0.9.0`.
+* Das Paket heißt `@hoopsfoundry/ui`; die gelesene Paketversion ist `0.9.0`.
 * JavaScript-Module verwenden ESM.
 * Komponentenimplementierungen liegen in `react/` und `svelte/`.
 * Storybook verwendet `@storybook/svelte-vite`.

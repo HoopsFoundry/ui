@@ -86,7 +86,7 @@ describe('initTheme: Zustand und Beschriftung', () => {
     expect(b.getAttribute('data-theme-state')).toBe('light');
     expect(b.getAttribute('data-theme-mode')).toBe('system');
     expect(b.hidden).toBe(false);
-    expect(b.classList.contains('dss-theme-toggle')).toBe(true);
+    expect(b.classList.contains('hoops-theme-toggle')).toBe(true);
     expect(handle.getMode()).toBe('system');
   });
   it('System dunkel: aria-pressed true, aber kein Attribut (das CSS folgt prefers-color-scheme)', () => {
@@ -97,7 +97,7 @@ describe('initTheme: Zustand und Beschriftung', () => {
     expect(html.hasAttribute('data-theme')).toBe(false);
   });
   it('gemerkte Wahl wird gesetzt', () => {
-    localStorage.setItem('dss-theme', 'dark');
+    localStorage.setItem('hoops-theme', 'dark');
     const b = button();
     handle = initTheme(b);
     expect(html.getAttribute('data-theme')).toBe('dark');
@@ -105,16 +105,16 @@ describe('initTheme: Zustand und Beschriftung', () => {
     expect(handle.getMode()).toBe('dark');
   });
   it('ein ungültiger gemerkter Wert gilt als system', () => {
-    localStorage.setItem('dss-theme', 'lila');
+    localStorage.setItem('hoops-theme', 'lila');
     handle = initTheme(button());
     expect(handle.getMode()).toBe('system');
     expect(html.hasAttribute('data-theme')).toBe(false);
   });
   it('option mode gewinnt, wird aber nicht gemerkt', () => {
-    localStorage.setItem('dss-theme', 'light');
+    localStorage.setItem('hoops-theme', 'light');
     handle = initTheme(button(), { mode: 'dark' });
     expect(html.getAttribute('data-theme')).toBe('dark');
-    expect(localStorage.getItem('dss-theme')).toBe('light');
+    expect(localStorage.getItem('hoops-theme')).toBe('light');
   });
   it('die Beschriftung bleibt beim Umschalten gleich; ein Button mit Text behält seinen Namen', () => {
     const b = button();
@@ -139,10 +139,10 @@ describe('initTheme: Zustand und Beschriftung', () => {
     const b = button();
     handle = initTheme(b);
     const icons = [...b.querySelectorAll('svg')];
-    expect(icons.map((i) => i.getAttribute('class'))).toEqual(['dss-theme-icon dss-theme-icon--sun', 'dss-theme-icon dss-theme-icon--moon']);
+    expect(icons.map((i) => i.getAttribute('class'))).toEqual(['hoops-theme-icon hoops-theme-icon--sun', 'hoops-theme-icon hoops-theme-icon--moon']);
     for (const i of icons) expect(i.getAttribute('aria-hidden')).toBe('true');
     handle.destroy();
-    const own = button('', '<span class="dss-theme-icon">x</span>');
+    const own = button('', '<span class="hoops-theme-icon">x</span>');
     handle = initTheme(own);
     expect(own.querySelectorAll('svg')).toHaveLength(0);
   });
@@ -156,11 +156,11 @@ describe('initTheme: Umschalten und Merken', () => {
     expect(html.getAttribute('data-theme')).toBe('dark');
     expect(b.getAttribute('aria-pressed')).toBe('true');
     expect(b.getAttribute('data-theme-state')).toBe('dark');
-    expect(localStorage.getItem('dss-theme')).toBe('dark');
+    expect(localStorage.getItem('hoops-theme')).toBe('dark');
     b.click();
     expect(html.getAttribute('data-theme')).toBe('light');
     expect(b.getAttribute('aria-pressed')).toBe('false');
-    expect(localStorage.getItem('dss-theme')).toBe('light');
+    expect(localStorage.getItem('hoops-theme')).toBe('light');
   });
   it('aus system (dunkel) schaltet der erste Klick auf hell', () => {
     stubMedia(true);
@@ -177,7 +177,7 @@ describe('initTheme: Umschalten und Merken', () => {
     expect(handle.getMode()).toBe('dark');
     handle.setMode('system');
     expect(html.hasAttribute('data-theme')).toBe(false);
-    expect(localStorage.getItem('dss-theme')).toBeNull();
+    expect(localStorage.getItem('hoops-theme')).toBeNull();
     expect(b.getAttribute('data-theme-mode')).toBe('system');
   });
   it('storageKey, storage und attribute sind konfigurierbar; storage null merkt nichts', () => {
@@ -187,7 +187,7 @@ describe('initTheme: Umschalten und Merken', () => {
     b.click();
     expect(m.data['mein-theme']).toBe('dark');
     expect(html.getAttribute('data-x')).toBe('dark');
-    expect(localStorage.getItem('dss-theme')).toBeNull();
+    expect(localStorage.getItem('hoops-theme')).toBeNull();
     handle.destroy();
     handle = initTheme(button(), { storage: null });
     document.getElementById('b')!.click();
@@ -255,8 +255,8 @@ describe('initTheme: Systemeinstellung und andere Tabs', () => {
   it('ein storage-Ereignis eines anderen Tabs übernimmt die Wahl', () => {
     const b = button();
     handle = initTheme(b);
-    localStorage.setItem('dss-theme', 'dark');
-    window.dispatchEvent(new StorageEvent('storage', { key: 'dss-theme', newValue: 'dark' }));
+    localStorage.setItem('hoops-theme', 'dark');
+    window.dispatchEvent(new StorageEvent('storage', { key: 'hoops-theme', newValue: 'dark' }));
     expect(html.getAttribute('data-theme')).toBe('dark');
     localStorage.setItem('anderer', 'x');
     window.dispatchEvent(new StorageEvent('storage', { key: 'anderer' }));
@@ -284,7 +284,7 @@ describe('initTheme: Systemeinstellung und andere Tabs', () => {
 
 describe('initTheme: Aufräumen und Idempotenz', () => {
   it('destroy entfernt Listener, Symbole und gesetzte Attribute; das Theme bleibt wie gewählt', () => {
-    const b = button('class="dss-btn"');
+    const b = button('class="hoops-btn"');
     const before = b.outerHTML;
     handle = initTheme(b);
     b.click();
@@ -329,7 +329,7 @@ describe('defaultMode: Boot-Skript und Umschalter stimmen überein', () => {
     remove.mockRestore();
   });
   it('die gemerkte Wahl gewinnt gegen defaultMode, defaultMode gegen system', () => {
-    localStorage.setItem('dss-theme', 'light');
+    localStorage.setItem('hoops-theme', 'light');
     handle = initTheme(button(), { defaultMode: 'dark' });
     expect(handle.getMode()).toBe('light');
     handle.destroy();
@@ -343,7 +343,7 @@ describe('defaultMode: Boot-Skript und Umschalter stimmen überein', () => {
   it('die Wahl „System“ wird bei defaultMode dark gemerkt und beim nächsten Besuch behalten', () => {
     handle = initTheme(button(), { defaultMode: 'dark' });
     handle.setMode('system');
-    expect(localStorage.getItem('dss-theme')).toBe('system');
+    expect(localStorage.getItem('hoops-theme')).toBe('system');
     expect(html.hasAttribute('data-theme')).toBe(false);
     handle.destroy();
     handle = initTheme(button(), { defaultMode: 'dark' });
@@ -354,7 +354,7 @@ describe('defaultMode: Boot-Skript und Umschalter stimmen überein', () => {
     handle = initTheme(button());
     handle.setMode('dark');
     handle.setMode('system');
-    expect(localStorage.getItem('dss-theme')).toBeNull();
+    expect(localStorage.getItem('hoops-theme')).toBeNull();
   });
   it('das Boot-Skript lässt eine gemerkte Wahl „system“ ohne Attribut, auch bei defaultMode dark', () => {
     const s = themeBootScript({ defaultMode: 'dark' });
@@ -364,7 +364,7 @@ describe('defaultMode: Boot-Skript und Umschalter stimmen überein', () => {
     expect(html.hasAttribute('data-theme')).toBe(false);
   });
   it('ein anderer Tab, der den Eintrag löscht, ergibt defaultMode', () => {
-    localStorage.setItem('dss-theme', 'light');
+    localStorage.setItem('hoops-theme', 'light');
     handle = initTheme(button(), { defaultMode: 'dark' });
     localStorage.clear();
     window.dispatchEvent(new StorageEvent('storage', { key: null }));

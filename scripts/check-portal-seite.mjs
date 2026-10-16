@@ -7,7 +7,7 @@
  *   node scripts/check-portal-seite.mjs --only=csp,keyboard
  *
  * Die Prüfung geht den echten Auslieferungsweg: baut dist/vanilla in einen temporären Ordner, erzeugt daraus das Release (scripts/release-vanilla.mjs),
- * legt es auf einen lokalen Server, holt es mit dem Release-Anhang dss-sync.mjs (--from-release, Prüfsumme) in ein leeres Projekt und liefert die Seite von dort aus,
+ * legt es auf einen lokalen Server, holt es mit dem Release-Anhang hoops-sync.mjs (--from-release, Prüfsumme) in ein leeres Projekt und liefert die Seite von dort aus,
  * mit strenger Content-Security-Policy (default-src 'self'; script-src 'self' 'sha256-<Boot-Skript>'; style-src 'self'; img-src 'self' <Kachel-Host>).
  * Der Kachel-Host ist ein zweiter lokaler Server (localhost, anderer Port). Geprüft wird: keine Konsolenfehler, keine fremden Anfragen vor dem Klick,
  * keine CSP-Verletzung, Karte nach dem Klick, Tastatur (Tab-Reihenfolge, sichtbarer Fokusring, Dialog, Accordion, Tabs), kein seitliches Scrollen bei
@@ -54,13 +54,13 @@ async function waitFor(fn, label, ms = 10000) {
 // ── Aufbau: bauen, Release erzeugen, vom lokalen Server holen, Seite ausliefern ──
 
 async function setup() {
-  const dir = await mkdtemp(join(tmpdir(), 'dss-portal-'));
+  const dir = await mkdtemp(join(tmpdir(), 'hoops-portal-'));
   const dist = join(dir, 'dist');
   await buildVanilla({ outDir: dist });
   const release = await releaseVanilla({ bundleDir: dist, outDir: join(dir, 'release'), build: false, allowDirty: true });
   const files = new Map();
   for (const name of ['tgz', 'sha256']) {
-    const file = `dss-vanilla-${release.version}.${name}`;
+    const file = `hoops-ui-${release.version}.${name}`;
     files.set(`/v${release.version}/${file}`, await readFile(join(dir, 'release', file)));
   }
   const releaseServer = createServer((req, res) => {
@@ -72,9 +72,9 @@ async function setup() {
   const project = join(dir, 'projekt');
   await mkdir(join(project, 'node_modules'), { recursive: true });
   await symlink(join(ROOT, 'node_modules/leaflet'), join(project, 'node_modules/leaflet'));
-  // der Release-Anhang dss-sync.mjs (eine Datei) läuft in einem fremden Ordner, ohne Zugriff auf dieses Repository
-  const syncFile = join(dir, 'release', 'dss-sync.mjs');
-  // asynchron: der Release-Server läuft in diesem Prozess und muss antworten können, während dss-sync.mjs lädt
+  // der Release-Anhang hoops-sync.mjs (eine Datei) läuft in einem fremden Ordner, ohne Zugriff auf dieses Repository
+  const syncFile = join(dir, 'release', 'hoops-sync.mjs');
+  // asynchron: der Release-Server läuft in diesem Prozess und muss antworten können, während hoops-sync.mjs lädt
   const run = await new Promise((done) => {
     const child = spawn(process.execPath, [syncFile, '--from-release', release.version, '--base-url', `http://127.0.0.1:${releaseServer.address().port}`, '--leaflet', '--no-fonts'], { cwd: project });
     let stdout = '';
@@ -84,7 +84,7 @@ async function setup() {
     child.on('close', (status) => done({ status, stdout, stderr }));
   });
   await new Promise((r) => releaseServer.close(r));
-  if (run.status !== 0) throw new Error(`dss-sync.mjs ist fehlgeschlagen: ${run.stderr}`);
+  if (run.status !== 0) throw new Error(`hoops-sync.mjs ist fehlgeschlagen: ${run.stderr}`);
   const synced = { version: run.stdout.match(/ (\d+\.\d+\.\d+\S*) nach /)?.[1], leaflet: /Leaflet nach/.test(run.stdout) };
   const site = join(project, '_site');
   await cp(join(ROOT, 'stories/examples/portal-seite'), site, { recursive: true });
@@ -183,16 +183,16 @@ async function checkLoad(ctx, srv, name, context) {
     const urls = seen.requests.map((u) => new URL(u).pathname);
     const csp = await page.evaluate(() => window.__csp);
     const info = await page.evaluate(() => ({
-      versions: document.documentElement.getAttribute('data-dss-versions'),
+      versions: document.documentElement.getAttribute('data-hoops-versions'),
       ready: document.documentElement.getAttribute('data-portal'),
-      cards: document.querySelectorAll('.dss-lc, .dss-tc, .dss-st, .dss-venue, [class*="dss-venue"]').length,
+      cards: document.querySelectorAll('.hoops-lc, .hoops-tc, .hoops-st, .hoops-venue, [class*="hoops-venue"]').length,
       h1: document.querySelectorAll('h1').length,
-      navLinks: document.querySelectorAll('.dss-pagenav a').length,
+      navLinks: document.querySelectorAll('.hoops-pagenav a').length,
       markerCount: document.querySelectorAll('.leaflet-marker-icon').length,
       cookie: document.cookie, local: localStorage.length, session: sessionStorage.length,
     }));
     record(`${name} · ${label}: Seite fertig, 0 Konsolenfehler, keine Seitenfehler, keine fehlgeschlagenen Anfragen`, info.ready === 'ready' && seen.console.length === 0 && seen.errors.length === 0 && seen.failed.length === 0, { info, console: seen.console, errors: seen.errors, failed: seen.failed });
-    record(`${name} · ${label}: Versionsabgleich JS↔CSS (Kern, Render, Karte, dss.css) = ${context.version}`, info.versions === context.version, info.versions);
+    record(`${name} · ${label}: Versionsabgleich JS↔CSS (Kern, Render, Karte, hoops.css) = ${context.version}`, info.versions === context.version, info.versions);
     record(`${name} · ${label}: vor dem Klick nur der eigene Host, kein Leaflet, keine Kachel, kein Cookie, kein Speicher`,
       hosts.size === 1 && hosts.has(srv.origin) && !urls.some((u) => u.includes('/vendor/leaflet/') && u.endsWith('.js')) && !urls.some((u) => u.startsWith('/tiles/')) && info.cookie === '' && info.local === 0 && info.session === 0 && srv.log.tiles.length === 0,
       { hosts: [...hosts], tiles: srv.log.tiles.length });
@@ -208,8 +208,8 @@ async function checkMap(ctx, srv, name) {
     const { page, seen } = await openPage(ctx, srv.origin, path);
     const before = srv.log.tiles.length;
     const requestsBefore = seen.requests.length;
-    await page.click('.dss-venue .dss-map-load, .dss-map-load');
-    await waitFor(() => page.evaluate(() => document.querySelector('.dss-map')?.getAttribute('data-state') === 'ready'), 'Karte bereit');
+    await page.click('.hoops-venue .hoops-map-load, .hoops-map-load');
+    await waitFor(() => page.evaluate(() => document.querySelector('.hoops-map')?.getAttribute('data-state') === 'ready'), 'Karte bereit');
     await sleep(500);
     const after = seen.requests.slice(requestsBefore).map((u) => new URL(u));
     const hosts = new Set(after.map((u) => u.origin));
@@ -250,7 +250,7 @@ async function checkKeyboard(ctx, srv, name) {
   // Dialog
   {
     const { page } = await openPage(ctx, srv.origin, 'index.html');
-    await page.focus('[data-dss-modal-open="fehler-melden"]');
+    await page.focus('[data-hoops-modal-open="fehler-melden"]');
     await page.keyboard.press('Enter');
     await waitFor(() => page.evaluate(() => document.getElementById('fehler-melden')?.open), 'Dialog offen');
     const first = await describeFocus(page);
@@ -285,8 +285,8 @@ async function checkKeyboard(ctx, srv, name) {
     await page.keyboard.press('Home');
     const afterHome = await page.evaluate(() => document.querySelector('[role=tab][aria-selected=true]')?.id);
     record(`${name} · Tabs Alle/Heim/Auswärts: Pfeil rechts, Ende, Pos1 wechseln Tab und Panel`, afterRight.sel === 'ort-heim' && afterRight.focus === 'ort-heim' && afterRight.heimShown && afterRight.alleHidden && afterEnd === 'ort-auswaerts' && afterHome === 'ort-alle', { afterRight, afterEnd, afterHome });
-    const counts = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => p.querySelectorAll('tbody tr, .dss-sched-row, tr').length));
-    const trigger = '.dss-acc-trigger';
+    const counts = await page.evaluate(() => [...document.querySelectorAll('[role=tabpanel]')].map((p) => p.querySelectorAll('tbody tr, .hoops-sched-row, tr').length));
+    const trigger = '.hoops-acc-trigger';
     await page.focus(trigger);
     await page.keyboard.press('Enter');
     const open = await page.evaluate((s) => document.querySelector(s).getAttribute('aria-expanded'), trigger);
@@ -302,8 +302,8 @@ async function checkLayout(browser, srv, name) {
     for (const width of [420, 360, 320]) {
       const ctx = await browser.newContext({ viewport: { width, height: 900 } });
       const { page } = await openPage(ctx, srv.origin, path);
-      await page.click('.dss-map-load');
-      await waitFor(() => page.evaluate(() => document.querySelector('.dss-map')?.getAttribute('data-state') === 'ready'), 'Karte');
+      await page.click('.hoops-map-load');
+      await waitFor(() => page.evaluate(() => document.querySelector('.hoops-map')?.getAttribute('data-state') === 'ready'), 'Karte');
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       record(`${name} · ${label} bei ${width} px: kein seitliches Scrollen der Seite`, overflow <= 0, { overflow });
       await ctx.close();
@@ -320,7 +320,7 @@ async function checkSubpath(ctx, srv, name) {
   for (const path of ['projekt/index.html', 'projekt/team.html']) {
     await page.goto(`${srv.origin}/${path}`, { waitUntil: 'networkidle' });
     await waitFor(() => page.evaluate(() => document.documentElement.getAttribute('data-portal')), `Unterpfad ${path}`);
-    const info = await page.evaluate(() => ({ ready: document.documentElement.getAttribute('data-portal'), versions: document.documentElement.getAttribute('data-dss-versions'), cards: document.querySelectorAll('.dss-league, .dss-team, [class*="dss-venue"]').length }));
+    const info = await page.evaluate(() => ({ ready: document.documentElement.getAttribute('data-portal'), versions: document.documentElement.getAttribute('data-hoops-versions'), cards: document.querySelectorAll('.hoops-league, .hoops-team, [class*="hoops-venue"]').length }));
     record(`${name} · Unterpfad /${path}: Seite fertig (relative Pfade tragen), 0 Konsolenfehler, keine fehlgeschlagene Anfrage`, info.ready === 'ready' && seen.console.length === 0 && seen.errors.length === 0 && seen.failed.length === 0, { info, ...seen });
   }
   await page.close();
@@ -334,7 +334,7 @@ async function checkNoJs(browser, srv, name) {
     const info = await page.evaluate(() => null).catch(() => null);
     void info;
     const visible = await page.locator('.portal-noscript').isVisible();
-    const report = await page.locator('[data-dss-modal-open]').isVisible();
+    const report = await page.locator('[data-hoops-modal-open]').isVisible();
     const h1 = await page.locator('h1').count();
     record(`${name} · ${label} ohne JavaScript: Hinweis sichtbar, Knopf „Fehler melden“ verborgen (er wäre wirkungslos), Überschrift vorhanden`, visible && !report && h1 === 1, { visible, report, h1 });
     await page.close();
@@ -345,21 +345,21 @@ async function checkNoJs(browser, srv, name) {
 async function checkBehavior(ctx, srv, name) {
   const { page } = await openPage(ctx, srv.origin, 'team.html');
   const before = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-  await page.click('[data-dss="theme"]');
+  await page.click('[data-hoops="theme"]');
   const changed = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   await page.reload({ waitUntil: 'networkidle' });
   await waitFor(() => page.evaluate(() => document.documentElement.getAttribute('data-portal')), 'neu geladen');
   const kept = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   record(`${name} · Theme-Umschalter: wechselt und bleibt nach dem Neuladen (kein Flackern durch das Boot-Skript)`, changed !== before && kept === changed, { before, changed, kept });
   await page.evaluate(() => window.scrollTo(0, 2000));
-  await waitFor(() => page.evaluate(() => document.querySelector('.dss-backtop, [class*="backtop"]') && !document.querySelector('.dss-backtop, [class*="backtop"]').hidden), 'Nach-oben sichtbar', 4000).catch(() => null);
-  const visible = await page.evaluate(() => { const b = document.querySelector('.dss-backtop, [class*="backtop"]'); return Boolean(b) && getComputedStyle(b).visibility !== 'hidden' && b.getClientRects().length > 0; });
-  await page.click('.dss-backtop, [class*="backtop"]');
+  await waitFor(() => page.evaluate(() => document.querySelector('.hoops-backtop, [class*="backtop"]') && !document.querySelector('.hoops-backtop, [class*="backtop"]').hidden), 'Nach-oben sichtbar', 4000).catch(() => null);
+  const visible = await page.evaluate(() => { const b = document.querySelector('.hoops-backtop, [class*="backtop"]'); return Boolean(b) && getComputedStyle(b).visibility !== 'hidden' && b.getClientRects().length > 0; });
+  await page.click('.hoops-backtop, [class*="backtop"]');
   await sleep(600);
   const top = await page.evaluate(() => window.scrollY);
   record(`${name} · Nach oben: erscheint nach dem Scrollen, bringt an den Anfang`, visible && top === 0, { visible, top });
-  const link = await page.evaluate(() => document.querySelector('.dss-pagenav a')?.getAttribute('href'));
-  record(`${name} · Seitennavigation: Einträge verweisen auf vorhandene Abschnitte`, await page.evaluate(() => [...document.querySelectorAll('.dss-pagenav a')].every((a) => document.getElementById(new URL(a.href).hash.slice(1)))), { link });
+  const link = await page.evaluate(() => document.querySelector('.hoops-pagenav a')?.getAttribute('href'));
+  record(`${name} · Seitennavigation: Einträge verweisen auf vorhandene Abschnitte`, await page.evaluate(() => [...document.querySelectorAll('.hoops-pagenav a')].every((a) => document.getElementById(new URL(a.href).hash.slice(1)))), { link });
   await page.close();
 }
 
@@ -375,11 +375,11 @@ async function checkAxe(browser, srv, name, full) {
       const { page } = await openPage(ctx, srv.origin, path);
       await applyTheme(page, combo);
       const idle = await axeRun(page);
-      await page.click('.dss-map-load');
-      await waitFor(() => page.evaluate(() => document.querySelector('.dss-map')?.getAttribute('data-state') === 'ready'), 'Karte');
+      await page.click('.hoops-map-load');
+      await waitFor(() => page.evaluate(() => document.querySelector('.hoops-map')?.getAttribute('data-state') === 'ready'), 'Karte');
       await sleep(300);
       // einklappbare Bereiche geöffnet prüfen
-      await page.evaluate(() => document.querySelectorAll('.dss-acc-trigger[aria-expanded="false"]').forEach((b) => b.click()));
+      await page.evaluate(() => document.querySelectorAll('.hoops-acc-trigger[aria-expanded="false"]').forEach((b) => b.click()));
       await sleep(300);
       const ready = await axeRun(page);
       record(`${name} · axe ${label} ${combo.brand}/${combo.theme}/${combo.width}: vor und nach dem Klick (Karte, geöffnete Tabellen) ohne Verstöße`, idle.length === 0 && ready.length === 0, { idle, ready });
@@ -407,7 +407,7 @@ const context = await setup();
 context.site = context.site;
 const srv = await startServers(context.site);
 srv.site = context.site;
-record(`Auslieferung: Release ${context.version} erzeugt, mit dem Anhang dss-sync.mjs (--from-release, Prüfsumme) geholt, Leaflet kopiert`, context.synced.version === context.version && context.synced.leaflet === true, { version: context.synced.version, tgzBytes: context.releaseBytes });
+record(`Auslieferung: Release ${context.version} erzeugt, mit dem Anhang hoops-sync.mjs (--from-release, Prüfsumme) geholt, Leaflet kopiert`, context.synced.version === context.version && context.synced.leaflet === true, { version: context.synced.version, tgzBytes: context.releaseBytes });
 await checkContentChecks(null, srv, 'Inhalt');
 
 const versionsOfBrowsers = {};

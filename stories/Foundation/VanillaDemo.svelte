@@ -66,13 +66,13 @@
 {:else if example === 'dont-text'}
   <pre class="code">{code("name.innerHTML = '<b>' + spiel.gegner + '</b>';")}</pre>
 {:else if example === 'do-boot'}
-  <pre class="code">{code('<head>\n  <link rel="stylesheet" href="/dss/dss.css">\n  <script>/* themeBootScript() */</script>\n</head>')}</pre>
+  <pre class="code">{code('<head>\n  <link rel="stylesheet" href="/hoops/hoops.css">\n  <script>/* themeBootScript() */</script>\n</head>')}</pre>
 {:else if example === 'dont-boot'}
   <pre class="code">{code('<body>\n  …\n  <script type="module">\n    initTheme(knopf);   // erst nach dem ersten Zeichnen: Flackern\n  </script>\n</body>')}</pre>
 {:else if example === 'do-kopie'}
-  <pre class="code">{code('node portal-sync.mjs\n<script type="module" src="/dss/dss.min.js">')}</pre>
+  <pre class="code">{code('node portal-sync.mjs\n<script type="module" src="/hoops/hoops.min.js">')}</pre>
 {:else if example === 'dont-kopie'}
-  <pre class="code">{code('<script type="module"\n  src="https://unpkg.com/@bbv/dss-design-system/…">')}</pre>
+  <pre class="code">{code('<script type="module"\n  src="https://unpkg.com/@hoopsfoundry/ui/…">')}</pre>
 {/if}
 
 <style>
@@ -82,6 +82,6 @@
   .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: 12px; }
   .page :global([role='tabpanel']) { margin: 12px 0; font-size: var(--hoops-fs-body-sm); }
   .page :global([role='tabpanel'] p) { margin: 0; }
-  .page :global(.dss-tabs) { margin-top: 10px; }
+  .page :global(.hoops-tabs) { margin-top: 10px; }
   .code { margin: 0; padding: 12px 14px; overflow-wrap: anywhere; font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); line-height: 1.5; background: var(--hoops-surface-2); border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-md); color: var(--hoops-fg); white-space: pre-wrap; }
 </style>

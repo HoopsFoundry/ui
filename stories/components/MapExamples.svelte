@@ -40,10 +40,10 @@
 {:else if example === 'sitz-pins'}
   <div class="surface">
     <div class="states">
-      <div class="cell"><div class="colhead">Sitz · helle Kachel</div><div class="swatch swatch--light"><div class="dss-map-marker is-seat" use:pin={{ number: null, kind: 'seat' }}></div></div></div>
-      <div class="cell"><div class="colhead">Sitz · dunkle Kachel</div><div class="swatch swatch--dark"><div class="dss-map-marker is-seat" use:pin={{ number: null, kind: 'seat' }}></div></div></div>
-      <div class="cell"><div class="colhead">Sitz, eigener Ort · helle Kachel</div><div class="swatch swatch--light"><div class="dss-map-marker is-seat is-own" use:pin={{ number: null, kind: 'seat', own: true }}></div></div></div>
-      <div class="cell"><div class="colhead">Ort mit Nummer · dunkle Kachel</div><div class="swatch swatch--dark"><div class="dss-map-marker" use:pin={{ number: 1 }}></div></div></div>
+      <div class="cell"><div class="colhead">Sitz · helle Kachel</div><div class="swatch swatch--light"><div class="hoops-map-marker is-seat" use:pin={{ number: null, kind: 'seat' }}></div></div></div>
+      <div class="cell"><div class="colhead">Sitz · dunkle Kachel</div><div class="swatch swatch--dark"><div class="hoops-map-marker is-seat" use:pin={{ number: null, kind: 'seat' }}></div></div></div>
+      <div class="cell"><div class="colhead">Sitz, eigener Ort · helle Kachel</div><div class="swatch swatch--light"><div class="hoops-map-marker is-seat is-own" use:pin={{ number: null, kind: 'seat', own: true }}></div></div></div>
+      <div class="cell"><div class="colhead">Ort mit Nummer · dunkle Kachel</div><div class="swatch swatch--dark"><div class="hoops-map-marker" use:pin={{ number: 1 }}></div></div></div>
     </div>
   </div>
 {:else if example === 'dunkle-kacheln'}
@@ -95,7 +95,7 @@
           {#each stateName as name, i (name)}
             <div class="cell">
               <div class="colhead">{name}</div>
-              <button type="button" class={`dss-map-zoom-btn ${stateClass[i]}`} aria-label={`Vergrößern (${name})`} aria-disabled={i === 3 ? 'true' : undefined}>
+              <button type="button" class={`hoops-map-zoom-btn ${stateClass[i]}`} aria-label={`Vergrößern (${name})`} aria-disabled={i === 3 ? 'true' : undefined}>
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M10 4v12M4 10h12" /></svg>
               </button>
             </div>
@@ -107,19 +107,19 @@
         <div class="states">
           <div class="cell">
             <div class="colhead">Standard · helle Kachel</div>
-            <div class="swatch swatch--light"><div class="dss-map-marker" use:pin={{ number: 1 }}></div></div>
+            <div class="swatch swatch--light"><div class="hoops-map-marker" use:pin={{ number: 1 }}></div></div>
           </div>
           <div class="cell">
             <div class="colhead">Fokus · helle Kachel</div>
-            <div class="swatch swatch--light"><div class="dss-map-marker pseudo-focus-visible" tabindex="-1" use:pin={{ number: 2 }}></div></div>
+            <div class="swatch swatch--light"><div class="hoops-map-marker pseudo-focus-visible" tabindex="-1" use:pin={{ number: 2 }}></div></div>
           </div>
           <div class="cell">
             <div class="colhead">Eigener Ort · dunkle Kachel</div>
-            <div class="swatch swatch--dark"><div class="dss-map-marker" use:pin={{ number: null, own: true }}></div></div>
+            <div class="swatch swatch--dark"><div class="hoops-map-marker" use:pin={{ number: null, own: true }}></div></div>
           </div>
           <div class="cell">
             <div class="colhead">Standard · dunkle Kachel</div>
-            <div class="swatch swatch--dark"><div class="dss-map-marker" use:pin={{ number: 3 }}></div></div>
+            <div class="swatch swatch--dark"><div class="hoops-map-marker" use:pin={{ number: 3 }}></div></div>
           </div>
         </div>
       </div>
@@ -129,12 +129,12 @@
           {#each ['', 'pseudo-hover', 'pseudo-focus-visible'] as cls, i (i)}
             <div class="cell">
               <div class="colhead">{stateName[i]}</div>
-              <button type="button" class={`dss-btn dss-btn--primary dss-btn--md dss-map-load ${cls}`}>Karte laden</button>
+              <button type="button" class={`hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load ${cls}`}>Karte laden</button>
             </div>
           {/each}
           <div class="cell">
             <div class="colhead">Quellenangabe · Fokus</div>
-            <p class="dss-map-attr attr-static"><a class="pseudo-focus-visible" href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
+            <p class="hoops-map-attr attr-static"><a class="pseudo-focus-visible" href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
           </div>
         </div>
       </div>
@@ -200,8 +200,8 @@
   .gap { height: 12px; }
   .cap, .colhead { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 10px; }
-  .no-text :global(.dss-map-text) { display: none; }
-  .no-attr :global(.dss-map-attr) { display: none; }
+  .no-text :global(.hoops-map-text) { display: none; }
+  .no-attr :global(.hoops-map-attr) { display: none; }
   .matrix { display: flex; flex-direction: column; gap: 20px; }
   /* position: relative: die versteckten Texte (position: absolute) liegen sonst außerhalb des Scrollbereichs und weiten die Seite */
   .surface { position: relative; background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }

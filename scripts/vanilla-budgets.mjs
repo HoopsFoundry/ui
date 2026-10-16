@@ -4,7 +4,7 @@
 const KiB = 1024;
 
 export const BUDGETS = {
-  dss: { file: 'dss.min.js', minBytes: 40 * KiB, gzipBytes: 15 * KiB },
-  'dss-render': { file: 'dss-render.min.js', minBytes: 52 * KiB, gzipBytes: 18 * KiB },
-  'dss-map': { file: 'dss-map.min.js', minBytes: 24 * KiB, gzipBytes: 10 * KiB },
+  dss: { file: 'hoops.min.js', minBytes: 40 * KiB, gzipBytes: 15 * KiB },
+  'hoops-render': { file: 'hoops-render.min.js', minBytes: 52 * KiB, gzipBytes: 18 * KiB },
+  'hoops-map': { file: 'hoops-map.min.js', minBytes: 24 * KiB, gzipBytes: 10 * KiB },
 };

@@ -32,10 +32,10 @@ describe('VenueCard: CSS-Abschnitt', () => {
   });
 
   it('jede Klasse im Markup beider Fassungen steht im CSS-Abschnitt (oder in Karte, Namen/Logos, Chip, Link)', () => {
-    const known = new Set([...css.matchAll(/\.(dss-[\w-]+)/g)].map((m) => m[1]));
+    const known = new Set([...css.matchAll(/\.(hoops-[\w-]+)/g)].map((m) => m[1]));
     for (const path of ['svelte/VenueCard.svelte', 'react/VenueCard.tsx']) {
       const source = read(path);
-      const used = new Set([...source.matchAll(/class(?:Name)?="([^"]*dss-[^"]*)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('dss-') && !c.includes('$')));
+      const used = new Set([...source.matchAll(/class(?:Name)?="([^"]*hoops-[^"]*)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('hoops-') && !c.includes('$')));
       for (const cls of used) expect(known.has(cls), `${path}: ${cls}`).toBe(true);
     }
   });
@@ -45,15 +45,15 @@ describe('VenueCard: CSS-Abschnitt', () => {
   });
 
   it('Breakpoint 640: genau eine Container-Abfrage mit 640 px, keine Medienabfrage mit anderer Breite', () => {
-    expect(venue.match(/@container dss-venue \(max-width: (\d+)px\)/g)).toEqual(['@container dss-venue (max-width: 640px)']);
+    expect(venue.match(/@container hoops-venue \(max-width: (\d+)px\)/g)).toEqual(['@container hoops-venue (max-width: 640px)']);
     expect(venue).not.toMatch(/@media \(max-width/);
   });
 
   it('schmal: Karte oben vor den Daten (Reihenfolge im Markup: Karte, dann Daten)', () => {
     for (const path of ['svelte/VenueCard.svelte', 'react/VenueCard.tsx']) {
       const source = read(path);
-      expect(source.indexOf('dss-venue-map'), path).toBeGreaterThan(-1);
-      expect(source.indexOf('dss-venue-map'), path).toBeLessThan(source.indexOf('dss-venue-body'));
+      expect(source.indexOf('hoops-venue-map'), path).toBeGreaterThan(-1);
+      expect(source.indexOf('hoops-venue-map'), path).toBeLessThan(source.indexOf('hoops-venue-body'));
     }
   });
 });

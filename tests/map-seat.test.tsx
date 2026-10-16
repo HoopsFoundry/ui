@@ -77,24 +77,24 @@ describe('pinElement', () => {
     const svg = pinElement({ number: null, kind: 'seat' });
     expect(svg.getAttribute('viewBox')).toBe('0 0 36 46');
     expect(svg.getAttribute('aria-hidden')).toBe('true');
-    expect(svg.querySelector('.dss-map-pin-edge')).not.toBeNull();
-    expect(svg.querySelector('.dss-map-pin-body')).not.toBeNull();
-    expect(svg.querySelector('.dss-map-pin-house')).not.toBeNull();
-    expect(svg.querySelector('.dss-map-pin-dot, .dss-map-pin-num')).toBeNull();
+    expect(svg.querySelector('.hoops-map-pin-edge')).not.toBeNull();
+    expect(svg.querySelector('.hoops-map-pin-body')).not.toBeNull();
+    expect(svg.querySelector('.hoops-map-pin-house')).not.toBeNull();
+    expect(svg.querySelector('.hoops-map-pin-dot, .hoops-map-pin-num')).toBeNull();
     expect(svg.querySelector('text, circle')).toBeNull();
   });
   it('Sitz mit Nummer zeigt trotzdem nur das Haus', () => {
     const svg = pinElement({ number: 7, kind: 'seat' });
-    expect(svg.querySelector('.dss-map-pin-num')).toBeNull();
-    expect(svg.querySelector('.dss-map-pin-house')).not.toBeNull();
+    expect(svg.querySelector('.hoops-map-pin-num')).toBeNull();
+    expect(svg.querySelector('.hoops-map-pin-house')).not.toBeNull();
   });
   it('Orte bleiben unverändert (Nummer oder Punkt)', () => {
-    expect(pinElement({ number: 3 }).querySelector('.dss-map-pin-num')!.textContent).toBe('3');
-    expect(pinElement({ number: null }).querySelector('.dss-map-pin-dot')).not.toBeNull();
-    expect(pinElement({ number: 3, kind: 'place' }).querySelector('.dss-map-pin-house')).toBeNull();
+    expect(pinElement({ number: 3 }).querySelector('.hoops-map-pin-num')!.textContent).toBe('3');
+    expect(pinElement({ number: null }).querySelector('.hoops-map-pin-dot')).not.toBeNull();
+    expect(pinElement({ number: 3, kind: 'place' }).querySelector('.hoops-map-pin-house')).toBeNull();
   });
   it('das Haus liegt innerhalb des Pins (Mitte bei 18/16,5)', () => {
-    const d = pinElement({ number: null, kind: 'seat' }).querySelector('.dss-map-pin-house')!.getAttribute('d')!;
+    const d = pinElement({ number: null, kind: 'seat' }).querySelector('.hoops-map-pin-house')!.getAttribute('d')!;
     const nums = [...d.matchAll(/-?\d+(?:\.\d+)?/g)].map((m) => Number(m[0]));
     expect(nums.length).toBeGreaterThan(6);
     expect(d.startsWith('M18 9.5')).toBe(true);
@@ -115,20 +115,20 @@ describe('Controller: Sitzmarker', () => {
     expect(s.options).toMatchObject({ title: 'Geschäftsstelle, Vereinssitz', alt: 'Geschäftsstelle, Vereinssitz', keyboard: true });
     expect(s.el!.getAttribute('aria-label')).toBe('Geschäftsstelle, Vereinssitz');
     expect(s.el!.classList.contains('is-seat')).toBe(true);
-    expect(s.el!.querySelector('.dss-map-pin-house')).not.toBeNull();
+    expect(s.el!.querySelector('.hoops-map-pin-house')).not.toBeNull();
     expect(pa.options.title).toBe('1, Halle A');
     expect(pa.el!.getAttribute('aria-label')).toBe('1, Halle A');
-    expect(pa.el!.querySelector('.dss-map-pin-num')!.textContent).toBe('1');
-    expect(pb.el!.querySelector('.dss-map-pin-num')!.textContent).toBe('2');
+    expect(pa.el!.querySelector('.hoops-map-pin-num')!.textContent).toBe('1');
+    expect(pb.el!.querySelector('.hoops-map-pin-num')!.textContent).toBe('2');
     expect(el.querySelectorAll('.leaflet-marker-icon')).toHaveLength(3);
     ctrl.destroy();
   });
   it('ändert sich die Art, wird der Marker neu gebaut', async () => {
     const { ctrl } = await start([{ ...a }]);
-    expect(mock.state.markers[0].el!.querySelector('.dss-map-pin-house')).toBeNull();
+    expect(mock.state.markers[0].el!.querySelector('.hoops-map-pin-house')).toBeNull();
     ctrl.update({ markers: [{ ...a, kind: 'seat' }] as never, appLinks: [] });
     const last = mock.state.markers[mock.state.markers.length - 1];
-    expect(last.el!.querySelector('.dss-map-pin-house')).not.toBeNull();
+    expect(last.el!.querySelector('.hoops-map-pin-house')).not.toBeNull();
     expect(mock.state.markers[0].isRemoved).toBe(true);
     ctrl.destroy();
   });
@@ -149,7 +149,7 @@ describe('seatLabel: eigener Text für den Sitz', () => {
   });
   it('React: Chip und Marker-Name nutzen seatLabel', async () => {
     const { container } = render(<MapView label="Karte" markers={[seat, a]} seatLabel="Geschäftsstelle" load="auto" />);
-    expect(container.querySelector('.dss-map-item .dss-chip')!.textContent).toBe('Geschäftsstelle');
+    expect(container.querySelector('.hoops-map-item .hoops-chip')!.textContent).toBe('Geschäftsstelle');
     await new Promise((r) => setTimeout(r, 30));
     const m = mock.state.markers[0];
     expect(m.options.title).toBe('Geschäftsstelle, Geschäftsstelle');
@@ -170,23 +170,23 @@ describe('Komponente (React)', () => {
   const props = { label: 'Karte', markers: [seat, a, b] };
   it('Liste: Haus-Badge ohne Zahl, Chip „Vereinssitz“, Orte nummeriert', () => {
     const { container } = render(<MapView {...props} />);
-    const items = [...container.querySelectorAll('.dss-map-item')];
-    expect(items[0].querySelector('.dss-map-num')!.className).toContain('is-seat');
-    expect(items[0].querySelector('.dss-map-num')!.textContent).toBe('');
-    expect(items[0].querySelector('.dss-chip')!.textContent).toBe('Vereinssitz');
-    expect(items[1].querySelector('.dss-map-num')!.textContent).toBe('1');
-    expect(items[2].querySelector('.dss-map-num')!.textContent).toBe('2');
+    const items = [...container.querySelectorAll('.hoops-map-item')];
+    expect(items[0].querySelector('.hoops-map-num')!.className).toContain('is-seat');
+    expect(items[0].querySelector('.hoops-map-num')!.textContent).toBe('');
+    expect(items[0].querySelector('.hoops-chip')!.textContent).toBe('Vereinssitz');
+    expect(items[1].querySelector('.hoops-map-num')!.textContent).toBe('1');
+    expect(items[2].querySelector('.hoops-map-num')!.textContent).toBe('2');
   });
   it('Platzhalter: Sitz als Haus-Pin ohne Zahl', () => {
     const { container } = render(<MapView {...props} />);
-    const pins = [...container.querySelectorAll('.dss-map-ph-pin')];
+    const pins = [...container.querySelectorAll('.hoops-map-ph-pin')];
     expect(pins[0].classList.contains('is-seat')).toBe(true);
     expect(pins[0].textContent).toBe('');
     expect(pins[1].textContent).toBe('1');
   });
   it('darkTiles: Standard dim, invert wird übernommen, Unsinn fällt auf dim', () => {
     const { container, rerender } = render(<MapView {...props} />);
-    const root = () => container.querySelector('.dss-map')!;
+    const root = () => container.querySelector('.hoops-map')!;
     expect(root().getAttribute('data-tiles')).toBe('dim');
     rerender(<MapView {...props} darkTiles="invert" />);
     expect(root().getAttribute('data-tiles')).toBe('invert');

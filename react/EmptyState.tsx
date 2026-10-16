@@ -78,21 +78,21 @@ export function EmptyState({
 }: EmptyStateProps) {
   const Heading = useHeadingTag(titleAs);
   return (
-    <div className={cn('dss-empty', `dss-empty--${tone}`, className)}>
-      <div className="dss-empty-icon">{icon ? <Icon name={icon} size={28} /> : <ToneIcon tone={tone} />}</div>
-      <Heading className="dss-empty-title">{title}</Heading>
-      {body ? <p className="dss-empty-body">{body}</p> : null}
+    <div className={cn('hoops-empty', `hoops-empty--${tone}`, className)}>
+      <div className="hoops-empty-icon">{icon ? <Icon name={icon} size={28} /> : <ToneIcon tone={tone} />}</div>
+      <Heading className="hoops-empty-title">{title}</Heading>
+      {body ? <p className="hoops-empty-body">{body}</p> : null}
       {cta || actions ? (
-        <div className="dss-empty-actions">
+        <div className="hoops-empty-actions">
           {cta ? (
-            <button type="button" className={cn('dss-btn', 'dss-btn--md', `dss-btn--${CTA_VARIANT[tone]}`)} onClick={onCta}>
+            <button type="button" className={cn('hoops-btn', 'hoops-btn--md', `hoops-btn--${CTA_VARIANT[tone]}`)} onClick={onCta}>
               {cta}
             </button>
           ) : null}
           {actions}
         </div>
       ) : null}
-      {children ? <div className="dss-empty-extra">{children}</div> : null}
+      {children ? <div className="hoops-empty-extra">{children}</div> : null}
     </div>
   );
 }

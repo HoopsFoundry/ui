@@ -26,9 +26,9 @@ function NameText({ team, names }: { team: ScheduleTeam; names: ScheduleNames })
   const short = shortName(team);
   if (!short) return <>{team.name}</>;
   return (
-    <span className={cn('dss-team-name', names === 'short' && 'dss-team-name--short')}>
-      <span className="dss-name-full">{team.name}</span>
-      <span className="dss-name-short" aria-hidden="true" title={team.name}>
+    <span className={cn('hoops-team-name', names === 'short' && 'hoops-team-name--short')}>
+      <span className="hoops-name-full">{team.name}</span>
+      <span className="hoops-name-short" aria-hidden="true" title={team.name}>
         {short}
       </span>
     </span>
@@ -39,20 +39,20 @@ function NameText({ team, names }: { team: ScheduleTeam; names: ScheduleNames })
 export function TeamName({ team, loser = false, renderLink, names = 'full', logo = false }: TeamNameProps) {
   const current = team ?? { name: '?' };
   const text = <NameText team={current} names={names} />;
-  const label = current.placeholder ? <span className="dss-sch-ph">{text}</span> : text;
+  const label = current.placeholder ? <span className="hoops-sch-ph">{text}</span> : text;
   let node: ReactNode = label;
   if (current.href && !current.placeholder) {
     node = renderLink ? (
-      renderLink({ href: current.href, className: 'dss-link', children: label })
+      renderLink({ href: current.href, className: 'hoops-link', children: label })
     ) : (
-      <a className="dss-link" href={current.href}>
+      <a className="hoops-link" href={current.href}>
         {label}
       </a>
     );
   }
   const withLogo = logo && team !== undefined && !current.placeholder;
   return (
-    <span className={cn('dss-sch-team', loser && 'is-loser', withLogo && 'dss-sch-team--logo')}>
+    <span className={cn('hoops-sch-team', loser && 'is-loser', withLogo && 'hoops-sch-team--logo')}>
       {withLogo ? <TeamLogo name={current.name} logo={current.logo} /> : null}
       {node}
     </span>
@@ -62,7 +62,7 @@ export function TeamName({ team, loser = false, renderLink, names = 'full', logo
 /** Dekoratives Logo (Name steht daneben): Bild mit leerem Alternativtext, sonst Initialen im Kreis. */
 export function TeamLogo({ name, logo }: { name: string; logo?: string }) {
   return (
-    <span className={cn('dss-team-logo', !logo && 'dss-team-logo--initials')} aria-hidden="true">
+    <span className={cn('hoops-team-logo', !logo && 'hoops-team-logo--initials')} aria-hidden="true">
       {logo ? <img src={logo} alt="" loading="lazy" /> : initials(name, 2)}
     </span>
   );
@@ -71,8 +71,8 @@ export function TeamLogo({ name, logo }: { name: string; logo?: string }) {
 /** Grüner Live-Hinweis (wie MatchCard), steht hinter der Uhrzeit. */
 export function LiveTag() {
   return (
-    <span className="dss-match-live dss-sch-live">
-      <span className="dss-match-pulse" aria-hidden="true" /> Live
+    <span className="hoops-match-live hoops-sch-live">
+      <span className="hoops-match-pulse" aria-hidden="true" /> Live
     </span>
   );
 }
@@ -88,14 +88,14 @@ interface ResultTextProps {
 /** Sichtbares Ergebnis (für Screenreader versteckt) plus gesprochener Text; "vorläufig" steht klein unter der Zahl. */
 export function ResultText({ visible, spoken, provisional = false, chip = null }: ResultTextProps) {
   return (
-    <span className="dss-sch-resbox">
+    <span className="hoops-sch-resbox">
       {chip}
-      <span className="dss-sch-score" aria-hidden="true">
+      <span className="hoops-sch-score" aria-hidden="true">
         {visible}
       </span>
-      <span className="dss-sr-only">{spoken}</span>
+      <span className="hoops-sr-only">{spoken}</span>
       {provisional ? (
-        <small className="dss-sch-prov" aria-hidden="true">
+        <small className="hoops-sch-prov" aria-hidden="true">
           vorläufig
         </small>
       ) : null}

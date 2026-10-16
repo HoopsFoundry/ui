@@ -25,31 +25,31 @@ describe('LeagueCard: CSS-Abschnitt', () => {
 
   it('Handy (bis 640 px): die optionalen Spalten (Kopf und Zellen) entfallen, Standardspalten bleiben', () => {
     const media = league.slice(league.indexOf('@media (max-width: 640px)'));
-    expect(media).toMatch(/\.dss-league-opt \{ display: none; \}/);
+    expect(media).toMatch(/\.hoops-league-opt \{ display: none; \}/);
     // Standardspalten tragen die Klasse nicht
     for (const path of ['svelte/LeagueCard.svelte', 'react/LeagueCard.tsx']) {
       const source = read(path);
       const lines = source.split('\n');
-      for (const needle of ['Mannschaft</th>', 'dss-league-rank', 'dss-league-pts']) {
-        for (const line of lines.filter((l) => l.includes(needle))) expect(line, `${path}: ${needle}`).not.toContain('dss-league-opt');
+      for (const needle of ['Mannschaft</th>', 'hoops-league-rank', 'hoops-league-pts']) {
+        for (const line of lines.filter((l) => l.includes(needle))) expect(line, `${path}: ${needle}`).not.toContain('hoops-league-opt');
       }
     }
   });
 
   it('Zonen: Streifen links in der ersten Zelle, eigene Zeile mit Balken; beide zusammen nebeneinander', () => {
-    expect(body('.dss-league-tbl tr.is-own td:first-child')).toMatch(/inset 4px 0 0 var\(--hoops-accent-text\)/);
-    expect(body('.dss-league-tbl tr.dss-league-zone td:first-child')).toMatch(/inset 4px 0 0 var\(--hoops-league-zone\)/);
-    expect(body('.dss-league-tbl tr.is-own.dss-league-zone td:first-child')).toMatch(/inset 4px 0 0 var\(--hoops-league-zone\), inset 8px 0 0 var\(--hoops-accent-text\)/);
-    expect(body('.dss-league-zone--up')).toMatch(/--hoops-chip-ok-fg/);
-    expect(body('.dss-league-zone--playoff')).toMatch(/--hoops-chip-info-fg/);
-    expect(body('.dss-league-zone--down')).toMatch(/--hoops-chip-err-fg/);
+    expect(body('.hoops-league-tbl tr.is-own td:first-child')).toMatch(/inset 4px 0 0 var\(--hoops-accent-text\)/);
+    expect(body('.hoops-league-tbl tr.hoops-league-zone td:first-child')).toMatch(/inset 4px 0 0 var\(--hoops-league-zone\)/);
+    expect(body('.hoops-league-tbl tr.is-own.hoops-league-zone td:first-child')).toMatch(/inset 4px 0 0 var\(--hoops-league-zone\), inset 8px 0 0 var\(--hoops-accent-text\)/);
+    expect(body('.hoops-league-zone--up')).toMatch(/--hoops-chip-ok-fg/);
+    expect(body('.hoops-league-zone--playoff')).toMatch(/--hoops-chip-info-fg/);
+    expect(body('.hoops-league-zone--down')).toMatch(/--hoops-chip-err-fg/);
   });
 
-  it('Live-Tag: Chip-Token, Puls nur am Punkt (.dss-live-dot, dort aus bei reduzierter Bewegung)', () => {
-    expect(body('.dss-league-live')).toMatch(/background:\s*var\(--hoops-chip-ok-bg\)/);
+  it('Live-Tag: Chip-Token, Puls nur am Punkt (.hoops-live-dot, dort aus bei reduzierter Bewegung)', () => {
+    expect(body('.hoops-league-live')).toMatch(/background:\s*var\(--hoops-chip-ok-bg\)/);
     expect(league).not.toMatch(/animation:/);
-    expect(css).toMatch(/\.dss-live-dot,[\s\S]*?animation:\s*none/);
-    expect(css).toMatch(/:root\[data-motion="reduce"\] \.dss-live-dot/);
+    expect(css).toMatch(/\.hoops-live-dot,[\s\S]*?animation:\s*none/);
+    expect(css).toMatch(/:root\[data-motion="reduce"\] \.hoops-live-dot/);
   });
 
   it('keine nackten --ok/err/warn/info-text oder -soft (haben keinen Dunkelmodus), kein festes Hex, keine Elementselektoren für Überschriften', () => {
@@ -59,30 +59,30 @@ describe('LeagueCard: CSS-Abschnitt', () => {
   });
 
   it('Titel: Größe aus den Überschriften-Tokens mit Rückfall (standard fs-h3, compact fs-body-lg)', () => {
-    expect(body('.dss-league-title')).toMatch(/font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-h3\)\)\)/);
-    expect(body('.dss-league--compact .dss-league-title')).toMatch(/font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-body-lg\)\)\)/);
+    expect(body('.hoops-league-title')).toMatch(/font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-h3\)\)\)/);
+    expect(body('.hoops-league--compact .hoops-league-title')).toMatch(/font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-body-lg\)\)\)/);
   });
 
   it('Karte wie die anderen Karten: Rand, Radius 16 px, Fläche --hoops-surface', () => {
-    const card = body('.dss-league');
+    const card = body('.hoops-league');
     expect(card).toMatch(/border:\s*1px solid var\(--hoops-line\)/);
     expect(card).toMatch(/border-radius:\s*16px/);
     expect(card).toMatch(/background:\s*var\(--hoops-surface\)/);
   });
 
-  it('Links: die Namenslinks erben die Textfarbe, der Fuß-Link nutzt .dss-link (gestrichelter Fokus-Ring)', () => {
-    expect(body('.dss-tbl .dss-league-link')).toMatch(/color:\s*inherit/);
-    expect(body('.dss-tbl .dss-league-link')).toMatch(/min-height:\s*24px/);
-    expect(body('.dss-league-more')).toMatch(/min-height:\s*48px/);
-    expect(css).toMatch(/\.dss-link:focus-visible[^{]*\{\s*outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
-    for (const path of ['svelte/LeagueCard.svelte', 'react/LeagueCard.tsx']) expect(read(path)).toMatch(/dss-link dss-league-more/);
+  it('Links: die Namenslinks erben die Textfarbe, der Fuß-Link nutzt .hoops-link (gestrichelter Fokus-Ring)', () => {
+    expect(body('.hoops-tbl .hoops-league-link')).toMatch(/color:\s*inherit/);
+    expect(body('.hoops-tbl .hoops-league-link')).toMatch(/min-height:\s*24px/);
+    expect(body('.hoops-league-more')).toMatch(/min-height:\s*48px/);
+    expect(css).toMatch(/\.hoops-link:focus-visible[^{]*\{\s*outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
+    for (const path of ['svelte/LeagueCard.svelte', 'react/LeagueCard.tsx']) expect(read(path)).toMatch(/hoops-link hoops-league-more/);
   });
 
-  it('Form: die Spalte nutzt den gemeinsamen Baustein `dss-form` (FormChips), keine eigenen Punkte-Klassen mehr', () => {
-    expect(css).not.toMatch(/\.dss-league-dot/);
+  it('Form: die Spalte nutzt den gemeinsamen Baustein `hoops-form` (FormChips), keine eigenen Punkte-Klassen mehr', () => {
+    expect(css).not.toMatch(/\.hoops-league-dot/);
     for (const path of ['svelte/LeagueCard.svelte', 'react/LeagueCard.tsx']) {
       expect(read(path)).toMatch(/FormChips/);
-      expect(read(path)).not.toMatch(/dss-league-dot/);
+      expect(read(path)).not.toMatch(/hoops-league-dot/);
     }
   });
 });
@@ -100,7 +100,7 @@ describe('LeagueCard: Quelltext', () => {
     expect(source).toMatch(/limit = 3/);
     expect(source).toMatch(/size = 'standard'/);
     expect(source).not.toMatch(/<h[1-6][\s>]|<\/h[1-6]>/);
-    expect(source).toContain('dss-league-title');
+    expect(source).toContain('hoops-league-title');
   });
   it.each(sources)('%s: Titelebene über useHeadingTag, versteckte Texte für eigene Zeile, Zone und Form', (path) => {
     const source = read(path);

@@ -9,11 +9,11 @@ beforeEach(() => {
   window.scrollTo = vi.fn() as never;
   const body = pageMarkup;
   document.body.replaceChildren(document.createRange().createContextualFragment(body));
-  document.body.setAttribute('data-dss', 'backtop');
+  document.body.setAttribute('data-hoops', 'backtop');
 });
 afterEach(() => {
   handle?.destroy();
-  document.body.removeAttribute('data-dss');
+  document.body.removeAttribute('data-hoops');
   document.body.replaceChildren();
 });
 
@@ -21,16 +21,16 @@ describe('Vanilla-Beispiel der PageNav-Doku', () => {
   it('initAll baut die Navigation und den Knopf', () => {
     handle = initAll(document);
     expect(handle.count).toBe(2);
-    const links = [...document.querySelectorAll('.dss-pagenav-link')].map((a) => a.textContent);
+    const links = [...document.querySelectorAll('.hoops-pagenav-link')].map((a) => a.textContent);
     expect(links).toEqual(['Tabelle', 'Spielplan', 'Kader', 'Kalender-Abo']);
-    expect(document.querySelector('.dss-eyebrow')!.textContent).toBe('Auf dieser Seite');
-    expect(document.querySelector('button.dss-backtop')).not.toBeNull();
+    expect(document.querySelector('.hoops-eyebrow')!.textContent).toBe('Auf dieser Seite');
+    expect(document.querySelector('button.hoops-backtop')).not.toBeNull();
   });
   it('data-pagenav-skip: das Impressum fehlt, die Überschrift bekommt keine id', () => {
     handle = initAll(document);
     const skipped = [...document.querySelectorAll('h2')].find((h) => h.textContent === 'Impressum')!;
     expect(skipped.id).toBe('');
-    expect([...document.querySelectorAll('.dss-pagenav-link')].some((a) => a.textContent === 'Impressum')).toBe(false);
+    expect([...document.querySelectorAll('.hoops-pagenav-link')].some((a) => a.textContent === 'Impressum')).toBe(false);
   });
   it('destroy stellt das Markup wieder her', () => {
     const before = document.body.innerHTML;
@@ -40,8 +40,8 @@ describe('Vanilla-Beispiel der PageNav-Doku', () => {
   });
   it('das Code-Beispiel enthält das Markup und beide Wege (initAll, einzeln)', () => {
     expect(vanilla).toContain(pageMarkup);
-    expect(vanilla).toContain("import { initAll } from '@bbv/dss-design-system/vanilla-core.js'");
-    expect(vanilla).toContain("import { initPageNav } from '@bbv/dss-design-system/pagenav.js'");
-    expect(vanilla).toContain("import { initBackToTop } from '@bbv/dss-design-system/backtop.js'");
+    expect(vanilla).toContain("import { initAll } from '@hoopsfoundry/ui/vanilla-core.js'");
+    expect(vanilla).toContain("import { initPageNav } from '@hoopsfoundry/ui/pagenav.js'");
+    expect(vanilla).toContain("import { initBackToTop } from '@hoopsfoundry/ui/backtop.js'");
   });
 });

@@ -1,10 +1,10 @@
 // Markup für die Tabs-Tests: Leiste mit Panels (Register-Beispiel: Alle/Heim/Auswärts) im Aufbau, den die Doku zeigt.
 export const tabsMarkup = (extra = '', ids = 'r') => `
-<div class="dss-tabs dss-tabs--segmented dss-tabs--md" role="tablist" aria-label="Spiele filtern" data-dss="tabs" id="${ids}-bar" ${extra}>
-  <button type="button" class="dss-tab is-active" role="tab" id="${ids}-alle" aria-selected="true" aria-controls="${ids}-p-alle" tabindex="0"><span class="dss-tab-label">Alle</span></button>
-  <button type="button" class="dss-tab" role="tab" id="${ids}-heim" aria-selected="false" aria-controls="${ids}-p-heim" tabindex="-1"><span class="dss-tab-label">Heim</span></button>
-  <button type="button" class="dss-tab" role="tab" id="${ids}-aus" aria-selected="false" aria-controls="${ids}-p-aus" tabindex="-1" disabled><span class="dss-tab-label">Gesperrt</span></button>
-  <button type="button" class="dss-tab" role="tab" id="${ids}-ausw" aria-selected="false" aria-controls="${ids}-p-ausw" tabindex="-1"><span class="dss-tab-label">Auswärts</span></button>
+<div class="hoops-tabs hoops-tabs--segmented hoops-tabs--md" role="tablist" aria-label="Spiele filtern" data-hoops="tabs" id="${ids}-bar" ${extra}>
+  <button type="button" class="hoops-tab is-active" role="tab" id="${ids}-alle" aria-selected="true" aria-controls="${ids}-p-alle" tabindex="0"><span class="hoops-tab-label">Alle</span></button>
+  <button type="button" class="hoops-tab" role="tab" id="${ids}-heim" aria-selected="false" aria-controls="${ids}-p-heim" tabindex="-1"><span class="hoops-tab-label">Heim</span></button>
+  <button type="button" class="hoops-tab" role="tab" id="${ids}-aus" aria-selected="false" aria-controls="${ids}-p-aus" tabindex="-1" disabled><span class="hoops-tab-label">Gesperrt</span></button>
+  <button type="button" class="hoops-tab" role="tab" id="${ids}-ausw" aria-selected="false" aria-controls="${ids}-p-ausw" tabindex="-1"><span class="hoops-tab-label">Auswärts</span></button>
 </div>
 <div id="${ids}-p-alle" role="tabpanel" aria-labelledby="${ids}-alle"><p>Alle 12 Spiele</p></div>
 <div id="${ids}-p-heim" role="tabpanel" aria-labelledby="${ids}-heim" hidden inert><p id="${ids}-in-heim">6 Heimspiele</p></div>

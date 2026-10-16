@@ -6,7 +6,7 @@ import { levelOfTag, nextLevel, resolveHeading } from '../../js/heading.js';
 import { createCollapsible } from '../../js/accordion.js';
 
 export interface CollapsibleFrameProps {
-  /** `frame`: Rahmen der Tabellen (`dss-frame`); `league`: Karte der Liga (`dss-league`). */
+  /** `frame`: Rahmen der Tabellen (`hoops-frame`); `league`: Karte der Liga (`hoops-league`). */
   kind?: 'frame' | 'league';
   /** Alle Klassen des äußeren Elements (ohne `is-collapsible`/`is-open`). */
   rootClass: string;
@@ -54,7 +54,7 @@ export function CollapsibleFrame({
   const contentLevel = nextLevel(levelOfTag(Tag));
 
   const uid = useId();
-  const key = id ?? `dss-cf-${uid}`;
+  const key = id ?? `hoops-cf-${uid}`;
   const controlled = openProp !== undefined;
   const [inner, setInner] = useState(defaultOpen);
   const open = controlled ? openProp : inner;
@@ -109,7 +109,7 @@ export function CollapsibleFrame({
   }, [hasId, syncHash, key, checkHash]);
 
   const itemApi = useMemo(() => ({ reveal, group: outer }), [reveal, outer]);
-  const base = kind === 'league' ? 'dss-league' : 'dss-frame';
+  const base = kind === 'league' ? 'hoops-league' : 'hoops-frame';
   const triggerId = `${key}-trigger`;
   const panelId = `${key}-panel`;
   // React 18 kennt `inert` nicht als Prop; als Attribut mit leerem Wert wird es gesetzt
@@ -122,36 +122,36 @@ export function CollapsibleFrame({
           <button
             ref={trigger}
             type="button"
-            className="dss-acc-trigger"
+            className="hoops-acc-trigger"
             id={triggerId}
             aria-expanded={open}
             aria-controls={panelId}
             onClick={() => setOpen(!open, true)}
             onKeyDown={(event) => group?.onKey(event)}
           >
-            <span className="dss-acc-label">
+            <span className="hoops-acc-label">
               {title}
               {sub ? (
                 <>
-                  <span className="dss-acc-sep">,</span>
-                  <span className="dss-acc-sub">
+                  <span className="hoops-acc-sep">,</span>
+                  <span className="hoops-acc-sub">
                     {sub}
-                    {meta ? <span className="dss-acc-sep">,</span> : null}
+                    {meta ? <span className="hoops-acc-sep">,</span> : null}
                   </span>
                 </>
               ) : meta ? (
-                <span className="dss-acc-sep">,</span>
+                <span className="hoops-acc-sep">,</span>
               ) : null}
             </span>
             {meta}
-            <svg className="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+            <svg className="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
               <path d="M5 7.5l5 5 5-5" />
             </svg>
           </button>
         </Tag>
       </div>
-      <div ref={panel} className="dss-acc-panel" id={panelId} hidden={!open} {...inert}>
-        <div className="dss-acc-panel-inner">
+      <div ref={panel} className="hoops-acc-panel" id={panelId} hidden={!open} {...inert}>
+        <div className="hoops-acc-panel-inner">
           <ItemContext.Provider value={itemApi}>
             <HeadingLevelContext.Provider value={contentLevel}>{children}</HeadingLevelContext.Provider>
           </ItemContext.Provider>

@@ -40,7 +40,7 @@ describe('LeagueCard: renderLeagueCard gegen Svelte und React', () => {
     else expect(await p.svelte('LeagueCard', props)).toBe(r);
   });
   it('Fensterregel: limit begrenzt, eigene Mannschaft mit Nachbarn', () => {
-    const ranks = (html: string) => [...html.matchAll(/<td class="dss-league-rank">(\d*)<\/td>/g)].map((m) => m[1]);
+    const ranks = (html: string) => [...html.matchAll(/<td class="hoops-league-rank">(\d*)<\/td>/g)].map((m) => m[1]);
     const many = Array.from({ length: 12 }, (_v, i) => ({ rank: i + 1, name: `Team ${i + 1}`, own: i === 6 }));
     expect(ranks(renderLeagueCard({ title: 'T', teams: many }))).toEqual(['5', '6', '7', '8']);
     expect(ranks(renderLeagueCard({ title: 'T', teams: many.map((t) => ({ ...t, own: false })), limit: 2 }))).toEqual(['1', '2']);

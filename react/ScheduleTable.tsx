@@ -64,7 +64,7 @@ export interface ScheduleTableProps {
   renderNotice?: (game: ScheduleGame) => ReactNode;
 }
 
-const OUTCOME_CHIP = { S: 'dss-chip--ok', N: 'dss-chip--err', U: '' } as const;
+const OUTCOME_CHIP = { S: 'hoops-chip--ok', N: 'hoops-chip--err', U: '' } as const;
 
 /** Spielplan als Tabelle: Gegenüberstellung, Perspektive einer Mannschaft oder Turnier-Spalten. */
 export function ScheduleTable({
@@ -96,12 +96,12 @@ export function ScheduleTable({
 
   const league = (game: ScheduleGame) =>
     game.league ? (
-      <span className="dss-sch-sub">
+      <span className="hoops-sch-sub">
         {game.league.href ? (
           renderLink ? (
-            renderLink({ href: game.league.href, className: 'dss-link', children: game.league.name })
+            renderLink({ href: game.league.href, className: 'hoops-link', children: game.league.name })
           ) : (
-            <a className="dss-link" href={game.league.href}>
+            <a className="hoops-link" href={game.league.href}>
               {game.league.name}
             </a>
           )
@@ -111,42 +111,42 @@ export function ScheduleTable({
       </span>
     ) : null;
 
-  const note = (game: ScheduleGame) => (game.note ? <span className="dss-sch-note">{game.note}</span> : null);
+  const note = (game: ScheduleGame) => (game.note ? <span className="hoops-sch-note">{game.note}</span> : null);
 
   const cell = (key: string, game: ScheduleGame): ReactNode => {
     const winner = winnerSide(game);
     switch (key) {
       case 'nr':
         return (
-          <td key={key} role="cell" className="dss-sch-nr">
+          <td key={key} role="cell" className="hoops-sch-nr">
             {game.nr}
           </td>
         );
       case 'when':
         return (
-          <td key={key} role="cell" className="dss-sch-when">
-            {game.date ? <span className="dss-sch-date">{game.date}</span> : null}
-            {renderTime || game.time ? <span className="dss-sch-time">{renderTime ? renderTime(game) : game.time}</span> : null}
-            {stateLabel(game.state) ? <span className="dss-sr-only">{` ${stateLabel(game.state)}`}</span> : null}
+          <td key={key} role="cell" className="hoops-sch-when">
+            {game.date ? <span className="hoops-sch-date">{game.date}</span> : null}
+            {renderTime || game.time ? <span className="hoops-sch-time">{renderTime ? renderTime(game) : game.time}</span> : null}
+            {stateLabel(game.state) ? <span className="hoops-sr-only">{` ${stateLabel(game.state)}`}</span> : null}
             {game.state === 'live' ? <LiveTag /> : null}
-            {mode !== 'columns' && game.venue ? <span className="dss-sch-venue">{game.venue}</span> : null}
+            {mode !== 'columns' && game.venue ? <span className="hoops-sch-venue">{game.venue}</span> : null}
           </td>
         );
       case 'ha':
         return (
-          <td key={key} role="cell" className="dss-sch-ha">
-            <span className={cn('dss-chip dss-chip--mono', game.at === 'gast' ? 'dss-chip--amber' : 'dss-chip--sky')}>
+          <td key={key} role="cell" className="hoops-sch-ha">
+            <span className={cn('hoops-chip hoops-chip--mono', game.at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky')}>
               {game.at === 'gast' ? '@' : 'vs.'}
             </span>
           </td>
         );
       case 'match':
         return (
-          <td key={key} role="cell" className="dss-sch-match">
+          <td key={key} role="cell" className="hoops-sch-match">
             {mode === 'opponent' && game.opponent ? (
-              <span className="dss-sch-opp">
+              <span className="hoops-sch-opp">
                 {logos !== false ? (
-                  <span className="dss-sch-logo" aria-hidden="true">
+                  <span className="hoops-sch-logo" aria-hidden="true">
                     {game.opponent.logo ? <img src={game.opponent.logo} alt="" loading="lazy" /> : initials(game.opponent.name)}
                   </span>
                 ) : null}
@@ -155,10 +155,10 @@ export function ScheduleTable({
             ) : (
               <>
                 <TeamName team={game.heim} loser={winner === 'gast'} renderLink={renderLink} names={names} logo={logos === true} />
-                <span className="dss-sch-sep" aria-hidden="true">
+                <span className="hoops-sch-sep" aria-hidden="true">
                   {' – '}
                 </span>
-                <span className="dss-sr-only"> gegen </span>
+                <span className="hoops-sr-only"> gegen </span>
                 <TeamName team={game.gast} loser={winner === 'heim'} renderLink={renderLink} names={names} logo={logos === true} />
               </>
             )}
@@ -168,22 +168,22 @@ export function ScheduleTable({
         );
       case 'heim':
         return (
-          <td key={key} role="cell" className="dss-sch-heim">
+          <td key={key} role="cell" className="hoops-sch-heim">
             <TeamName team={game.heim} loser={winner === 'gast'} renderLink={renderLink} names={names} logo={logos === true} />
           </td>
         );
       case 'gast':
         return (
-          <td key={key} role="cell" className="dss-sch-gast">
+          <td key={key} role="cell" className="hoops-sch-gast">
             <TeamName team={game.gast} loser={winner === 'heim'} renderLink={renderLink} names={names} logo={logos === true} />
             {note(game)}
           </td>
         );
       case 'field':
         return (
-          <td key={key} role="cell" className="dss-sch-field-cell">
+          <td key={key} role="cell" className="hoops-sch-field-cell">
             {game.field ? (
-              <span className="dss-chip dss-chip--mono dss-sch-field" title={game.field}>
+              <span className="hoops-chip hoops-chip--mono hoops-sch-field" title={game.field}>
                 {game.field}
               </span>
             ) : null}
@@ -191,7 +191,7 @@ export function ScheduleTable({
         );
       case 'venue':
         return (
-          <td key={key} role="cell" className="dss-sch-venue-cell">
+          <td key={key} role="cell" className="hoops-sch-venue-cell">
             {game.venue}
           </td>
         );
@@ -199,8 +199,8 @@ export function ScheduleTable({
         const scored = (game.state === 'finished' || game.state === 'live') && hasScore(game, mode);
         if (!scored) {
           return (
-            <td key={key} role="cell" className="dss-sch-res">
-              <span className="dss-sch-none">–</span>
+            <td key={key} role="cell" className="hoops-sch-res">
+              <span className="hoops-sch-none">–</span>
             </td>
           );
         }
@@ -210,14 +210,14 @@ export function ScheduleTable({
             ? `${game.ownScore} : ${game.opponent.score}`
             : `${game.heim?.score} : ${game.gast?.score}`;
         return (
-          <td key={key} role="cell" className="dss-sch-res">
+          <td key={key} role="cell" className="hoops-sch-res">
             <ResultText
               visible={visible}
               spoken={ariaForResult(game, mode)}
               provisional={game.provisional}
               chip={
                 result ? (
-                  <span className={cn('dss-chip dss-chip--mono', OUTCOME_CHIP[result])} aria-hidden="true">
+                  <span className={cn('hoops-chip hoops-chip--mono', OUTCOME_CHIP[result])} aria-hidden="true">
                     {result}
                   </span>
                 ) : null
@@ -228,7 +228,7 @@ export function ScheduleTable({
       }
       case 'notice':
         return (
-          <td key={key} role="cell" className="dss-sch-notice">
+          <td key={key} role="cell" className="hoops-sch-notice">
             {renderNotice ? renderNotice(game) : null}
           </td>
         );
@@ -240,7 +240,7 @@ export function ScheduleTable({
   const row = (game: ScheduleGame): ReactNode => {
     const own = game.heim?.own || game.gast?.own;
     const classes = cn(
-      'dss-sch-row',
+      'hoops-sch-row',
       own && mode !== 'opponent' && 'is-own',
       game.state === 'live' && 'is-live',
       game.state === 'cancelled' && 'is-cancelled',
@@ -250,8 +250,8 @@ export function ScheduleTable({
     if (game.state === 'bye') {
       return (
         <tr key={game.id} role="row" className={classes}>
-          <td role="cell" className="dss-sch-bye" colSpan={cols.length}>
-            {game.time ? <span className="dss-sch-time">{game.time} · </span> : null}
+          <td role="cell" className="hoops-sch-bye" colSpan={cols.length}>
+            {game.time ? <span className="hoops-sch-time">{game.time} · </span> : null}
             {game.heim ? (
               <>
                 <TeamName team={game.heim} renderLink={renderLink} names={names} logo={logos === true} /> hat Freilos
@@ -270,13 +270,13 @@ export function ScheduleTable({
     );
   };
 
-  const rootClass = cn('dss-frame', className);
+  const rootClass = cn('hoops-frame', className);
   // Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1)
   const region = (
-    <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Spielplan'}>
-      <table role="table" className={cn('dss-tbl dss-tbl--schedule', `dss-tbl--${dens}`, `dss-sch--${mode}`)}>
-        {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
-        <thead role="rowgroup" className={mode === 'columns' ? undefined : 'dss-sr-only'}>
+    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Spielplan'}>
+      <table role="table" className={cn('hoops-tbl hoops-tbl--schedule', `hoops-tbl--${dens}`, `hoops-sch--${mode}`)}>
+        {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
+        <thead role="rowgroup" className={mode === 'columns' ? undefined : 'hoops-sr-only'}>
           <tr role="row">
             {cols.map((col) => (
               <th key={col.key} scope="col" role="columnheader">
@@ -289,7 +289,7 @@ export function ScheduleTable({
           {groups.map((group, index) => (
             <Fragment key={`${group.section ?? 'ohne'}-${index}`}>
               {group.section ? (
-                <tr role="row" className="dss-sch-group">
+                <tr role="row" className="hoops-sch-group">
                   <th scope="colgroup" colSpan={cols.length}>
                     {group.section}
                   </th>
@@ -313,20 +313,20 @@ export function ScheduleTable({
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
-        meta={meta ? <span className="dss-frame-meta"><span>{meta}</span></span> : undefined}
+        meta={meta ? <span className="hoops-frame-meta"><span>{meta}</span></span> : undefined}
       >
         {region}
       </CollapsibleFrame>
     );
   }
-  if (collapsible) devWarn('[DSS] ScheduleTable: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
+  if (collapsible) devWarn('[HoopsFoundry UI] ScheduleTable: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
     <div className={rootClass}>
       {hasHead ? (
-        <div className="dss-frame-head">
+        <div className="hoops-frame-head">
           {/* Platzhalter, damit die Meta-Angaben rechts stehen */}
-          {title ? <Heading className="dss-frame-title">{title}</Heading> : <span />}
-          <div className="dss-frame-meta">{meta ? <span>{meta}</span> : null}</div>
+          {title ? <Heading className="hoops-frame-title">{title}</Heading> : <span />}
+          <div className="hoops-frame-meta">{meta ? <span>{meta}</span> : null}</div>
         </div>
       ) : null}
       {region}

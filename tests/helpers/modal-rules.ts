@@ -36,7 +36,7 @@ export function modalLogicRules(mod: Modal): Rules {
       removeDialogPolyfill();
     }
   };
-  const modalEl = () => el('verwerfen').querySelector('.dss-modal') as HTMLElement;
+  const modalEl = () => el('verwerfen').querySelector('.hoops-modal') as HTMLElement;
 
   rule('Modal: Öffnen holt den Fokus auf die Fläche und gibt ihn beim Schließen an den Auslöser zurück', () => {
     el('verwerfen-auf').focus();
@@ -45,10 +45,10 @@ export function modalLogicRules(mod: Modal): Rules {
     key(document.activeElement!, 'Escape');
     return inside && document.activeElement === el('verwerfen-auf');
   });
-  rule('Modal: data-dss-modal-focus bekommt den Fokus', () => {
+  rule('Modal: data-hoops-modal-focus bekommt den Fokus', () => {
     click(el('verwerfen-auf'));
     return document.activeElement === el('verwerfen-ok');
-  }, divMarkup().replace('id="verwerfen-ok"', 'id="verwerfen-ok" data-dss-modal-focus'));
+  }, divMarkup().replace('id="verwerfen-ok"', 'id="verwerfen-ok" data-hoops-modal-focus'));
   rule('Modal: Escape schließt', () => {
     click(el('verwerfen-auf'));
     key(document.activeElement!, 'Escape');
@@ -58,31 +58,31 @@ export function modalLogicRules(mod: Modal): Rules {
     click(el('verwerfen-auf'));
     key(document.activeElement!, 'Escape');
     const open = !el('verwerfen').hidden;
-    click(el('verwerfen').querySelector('.dss-m-close')!);
+    click(el('verwerfen').querySelector('.hoops-m-close')!);
     return open && el('verwerfen').hidden;
   }, divMarkup(), { closable: false });
   rule('Modal: ein Klick auf den Hintergrund schließt standardmäßig nicht', () => {
     click(el('verwerfen-auf'));
-    const b = el('verwerfen').querySelector('.dss-backdrop')!;
+    const b = el('verwerfen').querySelector('.hoops-backdrop')!;
     down(b);
     click(b);
     return !el('verwerfen').hidden;
   });
   rule('Modal: mit dismissOnBackdrop schließt der Hintergrund, ein Klick im Modal nicht', () => {
     click(el('verwerfen-auf'));
-    const body = el('verwerfen').querySelector('.dss-m-body')!;
+    const body = el('verwerfen').querySelector('.hoops-m-body')!;
     down(body);
     click(body);
     const stay = !el('verwerfen').hidden;
-    const b = el('verwerfen').querySelector('.dss-backdrop')!;
+    const b = el('verwerfen').querySelector('.hoops-backdrop')!;
     down(b);
     click(b);
     return stay && el('verwerfen').hidden;
   }, divMarkup(), { dismissOnBackdrop: true });
   rule('Modal: gedrückt im Modal, losgelassen auf dem Hintergrund schließt nicht', () => {
     click(el('verwerfen-auf'));
-    down(el('verwerfen').querySelector('.dss-m-body')!);
-    click(el('verwerfen').querySelector('.dss-backdrop')!);
+    down(el('verwerfen').querySelector('.hoops-m-body')!);
+    click(el('verwerfen').querySelector('.hoops-backdrop')!);
     return !el('verwerfen').hidden;
   }, divMarkup(), { dismissOnBackdrop: true });
   rule('Modal: Tab von der letzten zur ersten Schaltfläche, Umschalt+Tab zurück', () => {
@@ -121,7 +121,7 @@ export function modalLogicRules(mod: Modal): Rules {
   });
   rule('Modal: role dialog, aria-modal und aria-labelledby aus dem Titel', () => {
     const d = modalEl();
-    const title = el('verwerfen').querySelector('.dss-m-title')!;
+    const title = el('verwerfen').querySelector('.hoops-m-title')!;
     return d.getAttribute('role') === 'dialog' && d.getAttribute('aria-modal') === 'true' && title.id !== '' && d.getAttribute('aria-labelledby') === title.id;
   });
   rule('Modal: startet geschlossen', () => el('verwerfen').hidden, divMarkup().replace(' hidden', ''));
@@ -159,11 +159,11 @@ export function modalLogicRules(mod: Modal): Rules {
   rule('Modal: ein Auslöser öffnet nur das Modal mit seiner id', () => {
     click(el('x'));
     return el('verwerfen').hidden;
-  }, divMarkup() + '<button id="x" data-dss-modal-open="gibt-es-nicht">x</button>');
+  }, divMarkup() + '<button id="x" data-hoops-modal-open="gibt-es-nicht">x</button>');
   rule('Modal: Ereignisse mit Grund', () => {
     const log: string[] = [];
-    el('verwerfen').addEventListener('dss:modalopen', () => log.push('open'));
-    el('verwerfen').addEventListener('dss:modalclose', (e) => log.push((e as CustomEvent).detail.reason));
+    el('verwerfen').addEventListener('hoops:modalopen', () => log.push('open'));
+    el('verwerfen').addEventListener('hoops:modalclose', (e) => log.push((e as CustomEvent).detail.reason));
     click(el('verwerfen-auf'));
     key(document.activeElement!, 'Escape');
     click(el('verwerfen-auf'));
@@ -176,13 +176,13 @@ export function modalLogicRules(mod: Modal): Rules {
     h.destroy();
     const d = modalEl();
     return !d.hasAttribute('role') && !d.hasAttribute('aria-modal') && !d.hasAttribute('tabindex') && !d.hasAttribute('aria-labelledby') && el('verwerfen').hidden
-      && !el('verwerfen-seite').hasAttribute('inert') && !el('verwerfen').querySelector('.dss-m-title')!.hasAttribute('id') && !document.documentElement.hasAttribute('style') && document.activeElement === el('verwerfen-auf');
+      && !el('verwerfen-seite').hasAttribute('inert') && !el('verwerfen').querySelector('.hoops-m-title')!.hasAttribute('id') && !document.documentElement.hasAttribute('style') && document.activeElement === el('verwerfen-auf');
   });
   rule('Modal: ein zweiter Aufruf ersetzt den ersten', () => {
     const second = mod.initModal(el('verwerfen'));
     try {
       let n = 0;
-      el('verwerfen').addEventListener('dss:modalopen', () => n++);
+      el('verwerfen').addEventListener('hoops:modalopen', () => n++);
       click(el('verwerfen-auf'));
       return n === 1;
     } finally {

@@ -3,18 +3,18 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { initAccordion, initAccordions } from '../js/accordion.js';
 
 const item = (id: string, { open = false, locked = false, title = id.toUpperCase(), inner = '' } = {}) => `
-  <div class="dss-acc-item${open ? ' is-open' : ''}" id="${id}">
-    <h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="${id}-t" aria-expanded="${open}" aria-controls="${id}-p"${locked ? ' aria-disabled="true"' : ''}><span class="dss-acc-label">${title}</span></button></h3>
-    <div class="dss-acc-panel" id="${id}-p"${open ? '' : ' hidden inert'}><div class="dss-acc-panel-inner"><div class="dss-acc-body">Inhalt ${id}${inner}</div></div></div>
+  <div class="hoops-acc-item${open ? ' is-open' : ''}" id="${id}">
+    <h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="${id}-t" aria-expanded="${open}" aria-controls="${id}-p"${locked ? ' aria-disabled="true"' : ''}><span class="hoops-acc-label">${title}</span></button></h3>
+    <div class="hoops-acc-panel" id="${id}-p"${open ? '' : ' hidden inert'}><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">Inhalt ${id}${inner}</div></div></div>
   </div>`;
 const detailsItem = (id: string, open = false, locked = false) => `
-  <details class="dss-acc-item" id="${id}"${open ? ' open' : ''}><summary class="dss-acc-trigger"${locked ? ' aria-disabled="true"' : ''}><span class="dss-acc-label">${id.toUpperCase()}</span></summary><div class="dss-acc-panel">Inhalt ${id}</div></details>`;
+  <details class="hoops-acc-item" id="${id}"${open ? ' open' : ''}><summary class="hoops-acc-trigger"${locked ? ' aria-disabled="true"' : ''}><span class="hoops-acc-label">${id.toUpperCase()}</span></summary><div class="hoops-acc-panel">Inhalt ${id}</div></details>`;
 
 function mount(html: string) {
   document.body.replaceChildren(document.createRange().createContextualFragment(html));
-  return document.querySelector<HTMLElement>('.dss-acc')!;
+  return document.querySelector<HTMLElement>('.hoops-acc')!;
 }
-const group = (items: string, attrs = '') => `<div class="dss-acc dss-acc--card" data-dss-acc${attrs}>${items}</div>`;
+const group = (items: string, attrs = '') => `<div class="hoops-acc hoops-acc--card" data-hoops-acc${attrs}>${items}</div>`;
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
 const expanded = (id: string) => $(`#${id}-t`).getAttribute('aria-expanded');
 const click = (el: Element) => (el as HTMLElement).click();
@@ -73,7 +73,7 @@ describe('Button-Weg', () => {
     const inner = group(item('c'), '');
     const root = mount(group(item('a', { open: true, inner }) + item('b')));
     destroy = initAccordion(root, { syncHash: false });
-    const nested = initAccordion($('#a-p .dss-acc'), { syncHash: false });
+    const nested = initAccordion($('#a-p .hoops-acc'), { syncHash: false });
     click($('#c-t'));
     expect(expanded('c')).toBe('true');
     expect(expanded('a')).toBe('true');
@@ -86,9 +86,9 @@ describe('Button-Weg', () => {
   it('sticky setzt die Klasse und destroy nimmt sie zurück', () => {
     const root = mount(group(item('a')));
     const off = initAccordion(root, { sticky: true, syncHash: false });
-    expect(root.classList.contains('dss-acc--sticky')).toBe(true);
+    expect(root.classList.contains('hoops-acc--sticky')).toBe(true);
     off();
-    expect(root.classList.contains('dss-acc--sticky')).toBe(false);
+    expect(root.classList.contains('hoops-acc--sticky')).toBe(false);
   });
 });
 
@@ -137,37 +137,37 @@ describe('Tastatur', () => {
 describe('Alle öffnen / schließen', () => {
   it('legt zwei Buttons und eine höfliche Ansage an', () => {
     destroy = initAccordion(mount(group(item('a') + item('b'))), { expandAll: true, syncHash: false });
-    const buttons = [...document.querySelectorAll<HTMLButtonElement>('.dss-acc-bar button')];
+    const buttons = [...document.querySelectorAll<HTMLButtonElement>('.hoops-acc-bar button')];
     expect(buttons.map((b) => b.textContent)).toEqual(['Alle öffnen', 'Alle schließen']);
     expect(buttons[0].getAttribute('aria-controls')).toBe('a-p b-p');
-    const live = $('.dss-acc-bar [aria-live]');
+    const live = $('.hoops-acc-bar [aria-live]');
     expect(live.getAttribute('aria-live')).toBe('polite');
     expect(live.textContent).toBe('');
   });
   it('öffnet alle, schließt alle und sagt es an; gesperrte bleiben', () => {
     destroy = initAccordion(mount(group(item('a') + item('b', { locked: true }) + item('c'))), { expandAll: true, syncHash: false });
-    const [open, close] = [...document.querySelectorAll<HTMLButtonElement>('.dss-acc-bar button')];
+    const [open, close] = [...document.querySelectorAll<HTMLButtonElement>('.hoops-acc-bar button')];
     click(open);
     expect([expanded('a'), expanded('b'), expanded('c')]).toEqual(['true', 'false', 'true']);
-    expect($('.dss-acc-bar [aria-live]').textContent).toBe('2 von 3 Bereichen geöffnet');
+    expect($('.hoops-acc-bar [aria-live]').textContent).toBe('2 von 3 Bereichen geöffnet');
     click(close);
     expect([expanded('a'), expanded('b'), expanded('c')]).toEqual(['false', 'false', 'false']);
-    expect($('.dss-acc-bar [aria-live]').textContent).toBe('Alle Bereiche geschlossen');
+    expect($('.hoops-acc-bar [aria-live]').textContent).toBe('Alle Bereiche geschlossen');
   });
   it('sagt „Alle Bereiche geöffnet“ an', () => {
     destroy = initAccordion(mount(group(item('a') + item('b'))), { expandAll: true, syncHash: false });
-    click(document.querySelector('.dss-acc-bar button')!);
-    expect($('.dss-acc-bar [aria-live]').textContent).toBe('Alle Bereiche geöffnet');
+    click(document.querySelector('.hoops-acc-bar button')!);
+    expect($('.hoops-acc-bar [aria-live]').textContent).toBe('Alle Bereiche geöffnet');
   });
   it('bei exclusive wird die Leiste nicht angeboten', () => {
     destroy = initAccordion(mount(group(item('a') + item('b'))), { expandAll: true, exclusive: true, syncHash: false });
-    expect(document.querySelector('.dss-acc-bar')).toBeNull();
+    expect(document.querySelector('.hoops-acc-bar')).toBeNull();
   });
   it('destroy entfernt die Leiste und die Wirkung', () => {
     const root = mount(group(item('a')));
     const off = initAccordion(root, { expandAll: true, nav: true, syncHash: false });
     off();
-    expect(document.querySelector('.dss-acc-tools')).toBeNull();
+    expect(document.querySelector('.hoops-acc-tools')).toBeNull();
     click($('#a-t'));
     expect(expanded('a')).toBe('false');
   });
@@ -184,7 +184,7 @@ describe('Deep-Link', () => {
     const inner = group(item('c'));
     const root = mount(group(item('a', { inner }) + item('b')));
     const outer = initAccordion(root);
-    const nested = initAccordion($('#a-p .dss-acc'));
+    const nested = initAccordion($('#a-p .hoops-acc'));
     expect(expanded('c')).toBe('true');
     expect(expanded('a')).toBe('true');
     expect(expanded('b')).toBe('false');
@@ -232,7 +232,7 @@ describe('Deep-Link', () => {
 describe('Sprungleiste', () => {
   it('legt nav „Bereiche“ mit Links auf die ids an', () => {
     destroy = initAccordion(mount(group(item('a', { title: 'Tabelle' }) + item('b', { title: 'Kader' }))), { nav: true, syncHash: false });
-    const nav = $('nav.dss-acc-nav');
+    const nav = $('nav.hoops-acc-nav');
     expect(nav.getAttribute('aria-label')).toBe('Bereiche');
     const links = [...nav.querySelectorAll('a')];
     expect(links.map((a) => [a.textContent, a.getAttribute('href')])).toEqual([['Tabelle', '#a'], ['Kader', '#b']]);
@@ -245,8 +245,8 @@ describe('Sprungleiste', () => {
   });
   it('navLabel setzt aria-label und Schaltertext', () => {
     destroy = initAccordion(mount(group(item('a'))), { nav: true, navLabel: 'Bereiche Kader', syncHash: false });
-    expect($('nav.dss-acc-nav').getAttribute('aria-label')).toBe('Bereiche Kader');
-    expect($('.dss-acc-nav-toggle').textContent).toBe('Bereiche Kader');
+    expect($('nav.hoops-acc-nav').getAttribute('aria-label')).toBe('Bereiche Kader');
+    expect($('.hoops-acc-nav-toggle').textContent).toBe('Bereiche Kader');
   });
   it('Klick auf einen Link öffnet den Bereich, setzt den Fokus auf den Kopf und markiert ihn aktuell', () => {
     destroy = initAccordion(mount(group(item('a') + item('b'))), { nav: true });
@@ -280,7 +280,7 @@ describe('natives details', () => {
     expect(names[0]).toBe(names[1]);
   });
   it('ein vorhandenes name bleibt', () => {
-    const root = mount(group('<details class="dss-acc-item" id="a" name="mein"><summary class="dss-acc-trigger">A</summary><div class="dss-acc-panel">x</div></details>'));
+    const root = mount(group('<details class="hoops-acc-item" id="a" name="mein"><summary class="hoops-acc-trigger">A</summary><div class="hoops-acc-panel">x</div></details>'));
     destroy = initAccordion(root, { exclusive: true, syncHash: false });
     expect($('details').getAttribute('name')).toBe('mein');
   });
@@ -294,10 +294,10 @@ describe('natives details', () => {
   });
   it('Deep-Link öffnet das details samt Eltern', () => {
     window.history.replaceState(null, '', '/#c');
-    const inner = `<div class="dss-acc" data-dss-acc>${detailsItem('c')}</div>`;
-    const root = mount(group(`<details class="dss-acc-item" id="a"><summary class="dss-acc-trigger">A</summary><div class="dss-acc-panel">${inner}</div></details>` + detailsItem('b')));
+    const inner = `<div class="hoops-acc" data-hoops-acc>${detailsItem('c')}</div>`;
+    const root = mount(group(`<details class="hoops-acc-item" id="a"><summary class="hoops-acc-trigger">A</summary><div class="hoops-acc-panel">${inner}</div></details>` + detailsItem('b')));
     const outer = initAccordion(root);
-    const nested = initAccordion($('#a .dss-acc'));
+    const nested = initAccordion($('#a .hoops-acc'));
     expect($<HTMLDetailsElement>('#c').open).toBe(true);
     expect($<HTMLDetailsElement>('#a').open).toBe(true);
     expect($<HTMLDetailsElement>('#b').open).toBe(false);
@@ -318,7 +318,7 @@ describe('natives details', () => {
   });
   it('vom Skript ausgelöstes Öffnen (Alle öffnen) schreibt keinen Anker', async () => {
     destroy = initAccordion(mount(group(detailsItem('a') + detailsItem('b'))), { expandAll: true });
-    click(document.querySelector('.dss-acc-bar button')!);
+    click(document.querySelector('.hoops-acc-bar button')!);
     await tick();
     await tick();
     expect(window.location.hash).toBe('');
@@ -340,9 +340,9 @@ describe('natives details', () => {
   });
   it('Alle öffnen wirkt auf details', () => {
     destroy = initAccordion(mount(group(detailsItem('a') + detailsItem('b'))), { expandAll: true, syncHash: false });
-    click(document.querySelector('.dss-acc-bar button')!);
+    click(document.querySelector('.hoops-acc-bar button')!);
     expect([...document.querySelectorAll('details')].map((d) => d.open)).toEqual([true, true]);
-    expect($('.dss-acc-bar [aria-live]').textContent).toBe('Alle Bereiche geöffnet');
+    expect($('.hoops-acc-bar [aria-live]').textContent).toBe('Alle Bereiche geöffnet');
   });
 });
 
@@ -354,11 +354,11 @@ describe('Lebenszyklus', () => {
     const root = mount(group(item('a')));
     initAccordion(root, { expandAll: true, syncHash: false });
     destroy = initAccordion(root, { expandAll: true, syncHash: false });
-    expect(document.querySelectorAll('.dss-acc-bar').length).toBe(1);
+    expect(document.querySelectorAll('.hoops-acc-bar').length).toBe(1);
     click($('#a-t'));
     expect(expanded('a')).toBe('true');
   });
-  it('initAccordions startet alle [data-dss-acc]', () => {
+  it('initAccordions startet alle [data-hoops-acc]', () => {
     mount(group(item('a')) + group(item('b')));
     const off = initAccordions(document, { syncHash: false });
     click($('#a-t'));

@@ -1,5 +1,5 @@
 /**
- * DSS Render · MatchCard (Spielkarte)
+ * HoopsFoundry UI Render · MatchCard (Spielkarte)
  * --------------------------------------------------------------
  * `renderMatchCard(props, options?)`/`mountMatchCard(el, props, options?)`: dasselbe Markup wie die Komponente MatchCard (Svelte, React).
  * Props: `state` (`scheduled`, `live`, `finished`), `league`, `matchday`, `date`, `time`, `venue`, `heim`, `gast` (`{ name, short, logo, score }`),
@@ -14,9 +14,9 @@ import { mount } from './mount.js';
 
 /** Eine Mannschaft der Karte: Logo bzw. Initialen, Name mit Kurzform. */
 function teamBlock(team, names, logos) {
-  const name = nameText(team, names, 'dss-match-name');
-  // ohne Kurzform steht der Name in einem eigenen span (`dss-match-name`), mit Kurzform trägt der Wrapper die Klasse
-  const inner = name.startsWith('<span') ? name : `<span class="dss-match-name">${name}</span>`;
+  const name = nameText(team, names, 'hoops-match-name');
+  // ohne Kurzform steht der Name in einem eigenen span (`hoops-match-name`), mit Kurzform trägt der Wrapper die Klasse
+  const inner = name.startsWith('<span') ? name : `<span class="hoops-match-name">${name}</span>`;
   return `${logos ? logoBadge(team) : ''}${inner}`;
 }
 
@@ -37,20 +37,20 @@ export function renderMatchCard(props, options) {
   const liveText = [label, clock].filter(Boolean).join(' ');
 
   let status = '';
-  if (state === 'live') status = `<span class="dss-match-live"><span class="dss-match-pulse" aria-hidden="true"></span> Live · ${esc(liveText)}</span>`;
-  else if (state === 'finished') status = '<span class="dss-match-final">Endstand</span>';
-  else if (date) status = `<span class="dss-match-when">${esc(date)}${time ? ` · ${esc(time)}` : ''}</span>`;
+  if (state === 'live') status = `<span class="hoops-match-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live · ${esc(liveText)}</span>`;
+  else if (state === 'finished') status = '<span class="hoops-match-final">Endstand</span>';
+  else if (date) status = `<span class="hoops-match-when">${esc(date)}${time ? ` · ${esc(time)}` : ''}</span>`;
 
   const side = (team, loser, gastSide) =>
-    `<span class="${klass('dss-match-team', gastSide && 'dss-match-team--gast', loser && 'is-loser')}"><span class="dss-match-dot" aria-hidden="true"></span>` +
-    `${teamBlock(team, names, logos)}${showScore && team.score !== undefined ? `<span class="dss-match-score">${esc(team.score)}</span>` : ''}</span>`;
+    `<span class="${klass('hoops-match-team', gastSide && 'hoops-match-team--gast', loser && 'is-loser')}"><span class="hoops-match-dot" aria-hidden="true"></span>` +
+    `${teamBlock(team, names, logos)}${showScore && team.score !== undefined ? `<span class="hoops-match-score">${esc(team.score)}</span>` : ''}</span>`;
 
   const body =
-    `<span class="dss-match-head"><span class="dss-match-league">${league ? `<span>${esc(league)}</span>` : ''}${matchday ? `<span class="dss-match-muted">· ${esc(matchday)}</span>` : ''}</span>${status}</span>` +
-    `<span class="dss-match-body">${side(heim, gastWin, false)}${side(gast, heimWin, true)}</span>` +
-    (venue ? `<span class="dss-match-foot"><span>${esc(venue)}</span></span>` : '');
+    `<span class="hoops-match-head"><span class="hoops-match-league">${league ? `<span>${esc(league)}</span>` : ''}${matchday ? `<span class="hoops-match-muted">· ${esc(matchday)}</span>` : ''}</span>${status}</span>` +
+    `<span class="hoops-match-body">${side(heim, gastWin, false)}${side(gast, heimWin, true)}</span>` +
+    (venue ? `<span class="hoops-match-foot"><span>${esc(venue)}</span></span>` : '');
 
-  const cls = klass('dss-match', `dss-match--${state}`, logos && 'dss-match--logos', str(p.className));
+  const cls = klass('hoops-match', `hoops-match--${state}`, logos && 'hoops-match--logos', str(p.className));
   if (href) return `<a class="${cls}" href="${attr(href)}">${body}</a>`;
   if (obj(options).button === true) return `<button type="button" class="${cls}">${body}</button>`;
   return `<div class="${cls}">${body}</div>`;
@@ -60,6 +60,6 @@ export function renderMatchCard(props, options) {
 export function mountMatchCard(el, props, options = {}) {
   const { onClick, ...rest } = obj(options);
   const handler = typeof onClick === 'function';
-  const on = handler ? [{ type: 'click', selector: '.dss-match', handler: (event) => onClick(event) }] : [];
+  const on = handler ? [{ type: 'click', selector: '.hoops-match', handler: (event) => onClick(event) }] : [];
   return mount(el, renderMatchCard, props, { ...rest, button: handler, on: [...(Array.isArray(rest.on) ? rest.on : []), ...on] });
 }

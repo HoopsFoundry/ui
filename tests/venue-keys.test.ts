@@ -17,8 +17,8 @@ describe('VenueCard (Svelte, dev): Listenschlüssel', () => {
     const target = document.body.appendChild(document.createElement('div'));
     instance = mount(VenueCard, { target, props: { name: 'H', limit: 5, games: [game('x'), game('x'), game(''), game(undefined), game(7)] } as never });
     flushSync();
-    expect(target.querySelectorAll('.dss-venue-game')).toHaveLength(5);
-    expect(target.querySelector('.dss-venue-title')?.textContent).toBe('H');
+    expect(target.querySelectorAll('.hoops-venue-game')).toHaveLength(5);
+    expect(target.querySelector('.hoops-venue-title')?.textContent).toBe('H');
     expect(error).not.toHaveBeenCalled();
     error.mockRestore();
   });
@@ -26,7 +26,7 @@ describe('VenueCard (Svelte, dev): Listenschlüssel', () => {
     const target = document.body.appendChild(document.createElement('div'));
     instance = mount(VenueCard, { target, props: { name: ' ', href: '/h' } as never });
     flushSync();
-    expect(target.querySelector('.dss-venue-title')).toBeNull();
-    expect(target.querySelector('.dss-venue-more')).not.toBeNull();
+    expect(target.querySelector('.hoops-venue-title')).toBeNull();
+    expect(target.querySelector('.hoops-venue-more')).not.toBeNull();
   });
 });

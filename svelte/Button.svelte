@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Button · Svelte 5 example
+   * HoopsFoundry UI Button · Svelte 5 example
    * --------------------------------------------------------------
    * Wraps the design-system button variants in a single component.
    * Nutzt ausschließlich die Klassen aus css/components.css (kein eigener Scoped-Style);
@@ -37,7 +37,7 @@
 <button
   {type}
   {disabled}
-  class="dss-btn dss-btn--{variant} dss-btn--{size}"
+  class="hoops-btn hoops-btn--{variant} hoops-btn--{size}"
   class:is-touch={touch}
   {onclick}
 >

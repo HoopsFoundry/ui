@@ -1,8 +1,8 @@
 <script lang="ts">
   /**
-   * DSS Select · Svelte 5
+   * HoopsFoundry UI Select · Svelte 5
    * --------------------------------------------------------------
-   * Natives <select> im DSS-Look. Nutzt ausschließlich die Klassen aus
+   * Natives <select> im HoopsFoundry-UI-Look. Nutzt ausschließlich die Klassen aus
    * css/components.css (kein eigener Scoped-Style) — tokens.css und
    * components.css müssen im App-Root importiert sein.
    */
@@ -37,13 +37,13 @@
   } = $props();
 
   const uid = $props.id();
-  const selectId = $derived(id ?? `dss-select-${uid}`);
+  const selectId = $derived(id ?? `hoops-select-${uid}`);
   const helpId = $derived(`${selectId}-help`);
 </script>
 
-<div class="dss-field" class:is-error={state === 'error'} class:is-ok={state === 'ok'} class:is-warn={state === 'warn'}>
+<div class="hoops-field" class:is-error={state === 'error'} class:is-ok={state === 'ok'} class:is-warn={state === 'warn'}>
   {#if label}
-    <label class="dss-field-label" for={selectId}>
+    <label class="hoops-field-label" for={selectId}>
       {label}
       {#if required}<span class="req" aria-hidden="true">*</span>{/if}
     </label>
@@ -54,8 +54,8 @@
     {name}
     {disabled}
     {required}
-    class="dss-select"
-    class:dss-select--compact={density === 'compact'}
+    class="hoops-select"
+    class:hoops-select--compact={density === 'compact'}
     aria-invalid={state === 'error' ? 'true' : undefined}
     aria-describedby={help ? helpId : undefined}
     bind:value
@@ -69,10 +69,10 @@
   {#if help}
     <div
       id={helpId}
-      class="dss-field-help"
-      class:dss-field-help--err={state === 'error'}
-      class:dss-field-help--ok={state === 'ok'}
-      class:dss-field-help--warn={state === 'warn'}
+      class="hoops-field-help"
+      class:hoops-field-help--err={state === 'error'}
+      class:hoops-field-help--ok={state === 'ok'}
+      class:hoops-field-help--warn={state === 'warn'}
     >
       {help}
     </div>

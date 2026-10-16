@@ -48,7 +48,7 @@ export type VersionRun = { status: number | null; output: string };
 
 /** Führt das Versions-Skript mit den Umgebungswerten aus; liefert Exit-Code und den Inhalt von GITHUB_OUTPUT. */
 export function runVersionScript(yaml: string, env: Record<string, string>): VersionRun {
-  const dir = mkdtempSync(join(tmpdir(), 'dss-wf-'));
+  const dir = mkdtempSync(join(tmpdir(), 'hoops-wf-'));
   const out = join(dir, 'output');
   try {
     const run = spawnSync('bash', ['-c', versionScript(yaml)], { env: { PATH: process.env.PATH ?? '', GITHUB_OUTPUT: out, ...env }, encoding: 'utf8' });
@@ -100,8 +100,8 @@ export function workflowRules(yaml: string): Rules {
     'Aktionen: checkout@v7 und setup-node mit Node 22': yaml.includes('actions/checkout@v7') && /node-version: '22'/.test(yaml),
     'Release nur bei Tag-Push oder manuell ohne dry_run auf einem Tag': /if: github\.event_name == 'push' \|\| \(github\.event_name == 'workflow_dispatch' && inputs\.dry_run == false && github\.ref_type == 'tag'\)/.test(release),
     'Release-Job hängt an build und lädt das Artefakt': release.includes('needs: build') && release.includes('actions/download-artifact@'),
-    'Anhänge: Tarball, beide Prüfsummen, Manifest und dss-sync.mjs mit Prüfsumme (fail_on_unmatched_files)':
-      ['.tgz\n', '.tgz.sha256', '.sha256\n', 'release/manifest.json', 'release/dss-sync.mjs\n', 'release/dss-sync.mjs.sha256'].every((p) => release.includes(p)) && release.includes('fail_on_unmatched_files: true'),
+    'Anhänge: Tarball, beide Prüfsummen, Manifest und hoops-sync.mjs mit Prüfsumme (fail_on_unmatched_files)':
+      ['.tgz\n', '.tgz.sha256', '.sha256\n', 'release/manifest.json', 'release/hoops-sync.mjs\n', 'release/hoops-sync.mjs.sha256'].every((p) => release.includes(p)) && release.includes('fail_on_unmatched_files: true'),
     'Bau-Job legt das Artefakt an, ohne Release': build.includes('actions/upload-artifact@') && !build.includes('action-gh-release'),
     'Version: strikte Prüfung mit Regex, kein case-Glob': versionScript(yaml).includes('=~ ^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$') && !versionScript(yaml).includes('case '),
     'Version: gültige Werte werden ausgegeben': good,

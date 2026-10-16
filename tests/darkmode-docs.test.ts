@@ -26,7 +26,7 @@ describe('Code-Beispiele', () => {
   it('Svelte rendert (SSR): ein verborgener Button', async () => {
     const html = await renderSvelteSource(vite, render, tmpDir, 'svelte', code.svelte);
     expect(html).not.toContain('undefined');
-    expect(html).toMatch(/<button[^>]*type="button"[^>]*class="dss-btn dss-btn--secondary dss-btn--icon"[^>]*hidden/);
+    expect(html).toMatch(/<button[^>]*type="button"[^>]*class="hoops-btn hoops-btn--secondary hoops-btn--icon"[^>]*hidden/);
   });
   it('React besteht den TypeScript-Compiler', () => {
     expect(compileReact({ theme: code.react })).toEqual([]);
@@ -37,7 +37,7 @@ describe('Code-Beispiele', () => {
     expect(code.bootScript.length).toBeLessThan(300);
   });
   it('das Vanilla-Beispiel zeigt initAll, initTheme, setMode, getMode, destroy und onChange', () => {
-    for (const part of ['initAll(document)', "initTheme(document.querySelector('[data-dss=\"theme\"]')", 'theme.setMode(', 'theme.getMode()', 'theme.destroy()', 'onChange']) expect(code.vanilla).toContain(part);
+    for (const part of ['initAll(document)', "initTheme(document.querySelector('[data-hoops=\"theme\"]')", 'theme.setMode(', 'theme.getMode()', 'theme.destroy()', 'onChange']) expect(code.vanilla).toContain(part);
   });
   it('die CSP-Hinweise nennen Hash und nonce', () => {
     expect(code.cspHeader).toMatch(/sha256/);
@@ -75,7 +75,7 @@ describe('Doku-Seite', () => {
     expect(examples).toContain('Lindenberg Hawks');
   });
   it('die Seite nennt Modi, Speicherschlüssel, aria-pressed, Boot-Skript und die CSP', () => {
-    for (const part of ['hell', 'dunkel', 'System', 'dss-theme', 'aria-pressed', 'themeBootScript', 'Content-Security-Policy', '`nonce`', 'Hash', 'Dunkelmodus']) expect(mdx, part).toContain(part);
+    for (const part of ['hell', 'dunkel', 'System', 'hoops-theme', 'aria-pressed', 'themeBootScript', 'Content-Security-Policy', '`nonce`', 'Hash', 'Dunkelmodus']) expect(mdx, part).toContain(part);
   });
   it('die Seite nennt defaultMode an beiden Stellen und die geteilten Umschalter; die Vorschau ist hoch genug', () => {
     expect(mdx).toContain("`defaultMode` an beiden Stellen gleich setzen");

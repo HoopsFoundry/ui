@@ -8,13 +8,13 @@
 flowchart TB
   subgraph Grundlage
     T["tokens/<br/>tokens.css, tokens.json, Tailwind-Preset"]
-    C["css/components.css<br/>einzige CSS-Quelle (dss-*)"]
+    C["css/components.css<br/>einzige CSS-Quelle (hoops-*)"]
     F["fonts/, icons/"]
   end
   J["js/<br/>reine Logik + Vanilla initX"]
   JR["js/render/<br/>renderX / mountX (Markup aus Daten)"]
-  B["dist/vanilla/<br/>dss.js (Kern) + dss-render.js + dss-map.js"]
-  SY["scripts/portal-sync.mjs + lib/<br/>dss-sync (Verbraucher der Auslieferung)"]
+  B["dist/vanilla/<br/>hoops.js (Kern) + hoops-render.js + hoops-map.js"]
+  SY["scripts/portal-sync.mjs + lib/<br/>hoops-sync (Verbraucher der Auslieferung)"]
   RL["scripts/release-vanilla.mjs<br/>Release: Tarball, Prüfsummen, Manifest"]
   S["svelte/*.svelte"]
   R["react/*.tsx → dist/react"]
@@ -46,15 +46,15 @@ flowchart TB
 |`fonts/`, `icons/` |Gestaltungsassets
 |`js/` |Gemeinsame Logik und Vanilla-Verhalten
 |`js/render/` |Vanilla-Render-Funktionen `renderX(props, options?) → string` und `mountX(el, props, options?) → { update, destroy }` für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips; `escape.js` (`esc`, `attr`), `core.js` (Teamname, Logo, Form, einklappbarer Rahmen), `mount.js` (`createContextualFragment`, Fokus, Accordion), `map-view.js` (Karten-Markup und Teilstücke, intern), `dom.js` (Einsetzen per `createContextualFragment`, Styles über das CSSOM, ids; ohne Abhängigkeit vom Accordion); die Logik kommt aus `js/*.js`
-|`js/map-vanilla.js` |Die Karte ohne Framework: `renderMap(props, options?)`, `initMap(el, options)`, `mountMap(el, props, options?)`, `initMapBlock` (Anbindung für `initAll`); nutzt `createMapController` (`js/map-leaflet.js`), `mapItems` (das seinerseits `mapLinks` und `safeHref` aufruft), `validTileUrl` und das Markup aus `js/render/map-view.js`; Leaflet über `import('leaflet')` oder die Option `loadLeaflet`; Einstieg des Bündels `dss-map.js` ist `js/map-bundle.js`
+|`js/map-vanilla.js` |Die Karte ohne Framework: `renderMap(props, options?)`, `initMap(el, options)`, `mountMap(el, props, options?)`, `initMapBlock` (Anbindung für `initAll`); nutzt `createMapController` (`js/map-leaflet.js`), `mapItems` (das seinerseits `mapLinks` und `safeHref` aufruft), `validTileUrl` und das Markup aus `js/render/map-view.js`; Leaflet über `import('leaflet')` oder die Option `loadLeaflet`; Einstieg des Bündels `hoops-map.js` ist `js/map-bundle.js`
 |`react/` |React-Komponenten und Typen
 |`svelte/` |Svelte-Komponenten
 |`stories/` |Stories, MDX und Framework-Codebeispiele
 |`.storybook/` |Storybook-Konfiguration (`main.ts`, `preview.ts` mit `storySort` und Toolbar-Globals, Zustands-Umschalter, `storybook.css`)
 |`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
-|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (`dss.js` als Kern, `dss-render.js` als Render-Bündel und `dss-map.js` als Karten-Bündel, je mit eigenem Budget, siehe ADR-007; ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
+|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (`hoops.js` als Kern, `hoops-render.js` als Render-Bündel und `hoops-map.js` als Karten-Bündel, je mit eigenem Budget, siehe ADR-007; ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
 |`tests/` |Automatisierte Prüfungen
-|`scripts/` |Entwicklungs- und Prüfwerkzeuge sowie die ausgelieferten Werkzeuge: `portal-sync.mjs` (Befehl `dss-sync`, mit den Hilfen unter `scripts/lib/`: Tarball und Prüfsummen, Download, Dateihilfen und Sperre, Fehlertexte, Node-Prüfung) ist im npm-Paket und als gebündelter Release-Anhang `dss-sync.mjs` enthalten; `release-vanilla.mjs` erzeugt das Release (Tarball, Prüfsummen, Manifest, `dss-sync.mjs`) und `vanilla-budgets.mjs` hält die Größenbudgets der Bündel
+|`scripts/` |Entwicklungs- und Prüfwerkzeuge sowie die ausgelieferten Werkzeuge: `portal-sync.mjs` (Befehl `hoops-sync`, mit den Hilfen unter `scripts/lib/`: Tarball und Prüfsummen, Download, Dateihilfen und Sperre, Fehlertexte, Node-Prüfung) ist im npm-Paket und als gebündelter Release-Anhang `hoops-sync.mjs` enthalten; `release-vanilla.mjs` erzeugt das Release (Tarball, Prüfsummen, Manifest, `hoops-sync.mjs`) und `vanilla-budgets.mjs` hält die Größenbudgets der Bündel
 |`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
 |`package.json` |Öffentliche Exports, Build-Kommandos und Abhängigkeiten
 |===

@@ -50,7 +50,7 @@ const PAGENAV: Mutation[] = [
 ];
 const BACKTOP: Mutation[] = [
   { name: 'schon bei einer Fensterhöhe', rule: 'BackToTop: sichtbar erst bei hoher Seite und genug Scrolltiefe', from: 'scrollHeight > innerHeight * 2', to: 'scrollHeight > innerHeight' },
-  { name: 'kein Icon-Button', rule: 'BackToTop: 44-px-Icon-Button mit Namen, anfangs verborgen', from: 'dss-btn dss-btn--secondary dss-btn--icon dss-backtop', to: 'dss-btn dss-btn--secondary dss-backtop' },
+  { name: 'kein Icon-Button', rule: 'BackToTop: 44-px-Icon-Button mit Namen, anfangs verborgen', from: 'hoops-btn hoops-btn--secondary hoops-btn--icon hoops-backtop', to: 'hoops-btn hoops-btn--secondary hoops-backtop' },
   { name: 'Symbol nicht verborgen', rule: 'BackToTop: Symbol ist ein aria-hidden-SVG', from: "'aria-hidden': 'true', ", to: '' },
   { name: 'Knopf bleibt verborgen', rule: 'BackToTop: erscheint beim Scrollen', from: 'button.hidden = !visible;', to: 'button.hidden = true;' },
   { name: 'Klick scrollt sofort', rule: 'BackToTop: Klick scrollt nach oben, sanft', from: "behavior: reducedMotion() ? 'auto' : 'smooth'", to: "behavior: 'auto'" },
@@ -68,16 +68,16 @@ const CSS: Mutation[] = [
   { name: 'unten ohne Sicherheitsabstand', rule: 'CSS: Abstand von unten über Token und Sicherheitsabstand', from: ' + env(safe-area-inset-bottom, 0px))', to: ')' },
   { name: 'rechts ohne Token', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'inset-inline-end: calc(var(--hoops-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom:', to: 'right: 16px; bottom:' },
   { name: 'rechts-nach-links ohne linken Sicherheitsabstand', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'env(safe-area-inset-left, 0px)); } /* von rechts', to: 'env(safe-area-inset-right, 0px)); } /* von rechts' },
-  { name: 'im Druck sichtbar', rule: 'CSS: im Druck ausgeblendet', from: '@media print { .dss-pagenav, .dss-backtop { display: none; } }', to: '@media print { .dss-pagenav { display: none; } }' },
-  { name: 'verborgener Knopf bleibt sichtbar', rule: 'CSS: Knopf fest positioniert und verborgen mit [hidden]', from: '.dss-backtop[hidden] { display: none; }', to: '' },
+  { name: 'im Druck sichtbar', rule: 'CSS: im Druck ausgeblendet', from: '@media print { .hoops-pagenav, .hoops-backtop { display: none; } }', to: '@media print { .hoops-pagenav { display: none; } }' },
+  { name: 'verborgener Knopf bleibt sichtbar', rule: 'CSS: Knopf fest positioniert und verborgen mit [hidden]', from: '.hoops-backtop[hidden] { display: none; }', to: '' },
   { name: 'Links 40 px', rule: 'CSS: Links mindestens 44 px', from: 'min-height: var(--hoops-touch-sm); max-width: 100%;', to: 'min-height: 40px; max-width: 100%;' },
   { name: 'feste Schrift', rule: 'CSS: Schrift nur aus Tokens', from: 'font-size: var(--hoops-fs-body-sm); font-weight: 600; text-decoration: none; overflow-wrap: anywhere;', to: 'font-size: 13px; font-weight: 600; text-decoration: none; overflow-wrap: anywhere;' },
-  { name: 'globales scroll-padding', rule: 'CSS: keine globalen Selektoren für Scrollen', from: '.dss-pagenav { margin: 1rem 0 1.5rem; }', to: 'html { scroll-padding-bottom: 4.5rem; }\n.dss-pagenav { margin: 1rem 0 1.5rem; }' },
-  { name: 'globaler h2[id]-Abstand', rule: 'CSS: keine globalen Selektoren für Scrollen', from: '.dss-pagenav .dss-eyebrow { margin: 0 0 0.5rem; }', to: 'h2[id] { scroll-margin-top: 1rem; }\n.dss-pagenav .dss-eyebrow { margin: 0 0 0.5rem; }' },
+  { name: 'globales scroll-padding', rule: 'CSS: keine globalen Selektoren für Scrollen', from: '.hoops-pagenav { margin: 1rem 0 1.5rem; }', to: 'html { scroll-padding-bottom: 4.5rem; }\n.hoops-pagenav { margin: 1rem 0 1.5rem; }' },
+  { name: 'globaler h2[id]-Abstand', rule: 'CSS: keine globalen Selektoren für Scrollen', from: '.hoops-pagenav .hoops-eyebrow { margin: 0 0 0.5rem; }', to: 'h2[id] { scroll-margin-top: 1rem; }\n.hoops-pagenav .hoops-eyebrow { margin: 0 0 0.5rem; }' },
   { name: 'Scroll-Abstand ohne Accordion-Token', rule: 'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion', from: 'var(--hoops-scroll-offset, var(--hoops-acc-sticky-top, 0px))', to: 'var(--hoops-scroll-offset, 0px)' },
   { name: 'scroll-pad ohne unteren Abstand', rule: 'CSS: Opt-in-Klasse für scroll-padding', from: ' scroll-padding-bottom: var(--hoops-scroll-offset-bottom, 4.5rem);', to: '' },
-  { name: 'Links ohne Fokus-Ring', rule: 'CSS: Fokus-Ring der Links', from: '.dss-pagenav-link:focus-visible { outline: var(--hoops-ring-w) var(--hoops-ring-style) var(--hoops-ring-color); outline-offset: 2px; }', to: '.dss-pagenav-link:focus-visible { outline-offset: 2px; }' },
-  { name: 'Liste ohne Umbruch', rule: 'CSS: Liste bricht um', from: 'display: flex; flex-wrap: wrap; gap: var(--hoops-space-2); }\n.dss-pagenav-link', to: 'display: flex; gap: var(--hoops-space-2); }\n.dss-pagenav-link' },
+  { name: 'Links ohne Fokus-Ring', rule: 'CSS: Fokus-Ring der Links', from: '.hoops-pagenav-link:focus-visible { outline: var(--hoops-ring-w) var(--hoops-ring-style) var(--hoops-ring-color); outline-offset: 2px; }', to: '.hoops-pagenav-link:focus-visible { outline-offset: 2px; }' },
+  { name: 'Liste ohne Umbruch', rule: 'CSS: Liste bricht um', from: 'display: flex; flex-wrap: wrap; gap: var(--hoops-space-2); }\n.hoops-pagenav-link', to: 'display: flex; gap: var(--hoops-space-2); }\n.hoops-pagenav-link' },
   { name: 'festes Hex', rule: 'kein festes Hex', from: 'background: var(--hoops-surface); color: var(--hoops-link);', to: 'background: var(--hoops-surface); color: #0645ad;' },
 ];
 const SOURCE: { name: string; rule: string; file: 'pagenav' | 'backtop'; from: string; to: string }[] = [
@@ -96,8 +96,8 @@ const THEME: ThemeMutation[] = [
   { name: 'system bleibt immer hell', rule: 'Theme: system folgt der Systemeinstellung', from: "if (m === 'system') return prefersDark ? 'dark' : 'light';", to: "if (m === 'system') return 'light';" },
   { name: 'Klick ohne Blick auf das System', rule: 'Theme: der Klick wechselt den tatsächlichen Zustand', from: "return resolveTheme(mode, prefersDark) === 'dark' ? 'light' : 'dark';", to: "return mode === 'dark' ? 'light' : 'dark';" },
   { name: 'Speicherfehler beim Lesen werden geworfen', rule: 'Theme: blockierter Speicher bleibt ohne Fehler', from: '} catch {\n    return null;\n  }', to: '} catch (e) {\n    throw e;\n  }' },
-  { name: 'system schreibt statt zu löschen', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "if (mode === 'system' && !keepSystem) storage?.removeItem(key);", to: "if (mode === 'system' && !keepSystem) storage?.setItem(key, mode);" },
-  { name: 'anderer Standardschlüssel', rule: 'Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', from: "export const THEME_KEY = 'dss-theme';", to: "export const THEME_KEY = 'theme';" },
+  { name: 'system schreibt statt zu löschen', rule: 'Theme: Speicher kennt den Schlüssel hoops-theme und system löscht ihn', from: "if (mode === 'system' && !keepSystem) storage?.removeItem(key);", to: "if (mode === 'system' && !keepSystem) storage?.setItem(key, mode);" },
+  { name: 'anderer Standardschlüssel', rule: 'Theme: Speicher kennt den Schlüssel hoops-theme und system löscht ihn', from: "export const THEME_KEY = 'hoops-theme';", to: "export const THEME_KEY = 'theme';" },
   { name: 'Rückfall hell statt system', rule: 'Theme: ein ungültiger gemerkter Wert gilt als system', from: "parseTheme(opts.defaultMode) ?? 'system';", to: "parseTheme(opts.defaultMode) ?? 'light';" },
   { name: 'aria-pressed bleibt falsch', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('aria-pressed', String(theme === 'dark'));", to: "button.setAttribute('aria-pressed', 'false');" },
   { name: 'kein Zustand am Button', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('data-theme-state', theme);", to: '' },
@@ -107,7 +107,7 @@ const THEME: ThemeMutation[] = [
   { name: 'Systemeinstellung wird nicht gehört', rule: 'Theme: Änderungen der Systemeinstellung werden gehört (nur im Modus system)', from: "cleanups.add(listen(query, 'change', onScheme))", to: "cleanups.add(listen(query, 'changex', onScheme))" },
   { name: 'Systemänderung auch bei gewählter Wahl', rule: 'Theme: Änderungen der Systemeinstellung werden gehört (nur im Modus system)', from: "const onScheme = () => { if (mode === 'system') {", to: 'const onScheme = () => { if (true) {' },
   { name: 'Symbole nicht verborgen', rule: 'Theme: Symbole sind aria-hidden-SVG, eigene Symbole bleiben', from: "'aria-hidden': 'true', focusable: 'false' }", to: "focusable: 'false' }" },
-  { name: 'eigene Symbole werden ergänzt', rule: 'Theme: Symbole sind aria-hidden-SVG, eigene Symbole bleiben', from: "if (!button.querySelector('.dss-theme-icon')) {", to: 'if (true) {' },
+  { name: 'eigene Symbole werden ergänzt', rule: 'Theme: Symbole sind aria-hidden-SVG, eigene Symbole bleiben', from: "if (!button.querySelector('.hoops-theme-icon')) {", to: 'if (true) {' },
   { name: 'andere Tabs werden nicht gehört', rule: 'Theme: ein anderer Tab ändert die Wahl', from: "listen(win, 'storage',", to: "listen(win, 'storagex'," },
   { name: 'Symbole bleiben nach destroy', rule: 'Theme: destroy entfernt Listener und Ergänzungen', from: 'for (const icon of created) icon.remove();', to: '' },
   { name: 'Klick-Listener bleibt nach destroy', rule: 'Theme: destroy entfernt Listener und Ergänzungen', from: 'cleanups.run();\n    for (const icon', to: 'for (const icon' },
@@ -126,8 +126,8 @@ const THEME: ThemeMutation[] = [
   { name: 'Boot wird lang', rule: 'Boot: kurz und ohne let, const, Pfeilfunktion', from: '(function(){var m;', to: `(function(){/* ${'x'.repeat(300)} */var m;` },
 ];
 const THEME_CSS: Mutation[] = [
-  { name: 'beide Symbole sichtbar', rule: 'CSS: Symbole wechseln über den Zustand (Mond im Dunkelmodus, Sonne sonst)', from: '.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: none; }', to: '.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: block; }' },
-  { name: 'Symbol 24 px', rule: 'CSS: Symbolgröße 20 px', from: 'width: 20px; height: 20px; }\n.dss-theme-toggle[data-theme-state', to: 'width: 24px; height: 24px; }\n.dss-theme-toggle[data-theme-state' },
+  { name: 'beide Symbole sichtbar', rule: 'CSS: Symbole wechseln über den Zustand (Mond im Dunkelmodus, Sonne sonst)', from: '.hoops-theme-toggle:not([data-theme-state="dark"]) .hoops-theme-icon--moon { display: none; }', to: '.hoops-theme-toggle:not([data-theme-state="dark"]) .hoops-theme-icon--moon { display: block; }' },
+  { name: 'Symbol 24 px', rule: 'CSS: Symbolgröße 20 px', from: 'width: 20px; height: 20px; }\n.hoops-theme-toggle[data-theme-state', to: 'width: 24px; height: 24px; }\n.hoops-theme-toggle[data-theme-state' },
   { name: 'gedrückt ohne Fläche', rule: 'CSS: gedrückt zeigt die Auswahlfläche', from: 'background: var(--hoops-selected-bg); }', to: 'background: transparent; }' },
   { name: 'festes Hex', rule: 'CSS: kein festes Hex', from: 'background: var(--hoops-selected-bg); }', to: 'background: #eeeeee; }' },
 ];
@@ -136,7 +136,7 @@ const THEME_SRC: Mutation[] = [
   { name: 'globaler Zustand', rule: 'Quelltext: kein globaler Zustand', from: "const registry = createRegistry('theme');", to: "const registry = createRegistry('theme');\nwindow.__theme = 1;" },
   { name: 'Speicherzugriff ohne try', rule: 'Quelltext: Speicherzugriff nur in try', from: 'try {\n      storage = opts.storage ?? win.localStorage;', to: 'if (true) {\n      storage = opts.storage ?? win.localStorage;' },
   { name: 'Lebenszyklus selbst gebaut', rule: 'Quelltext: Lebenszyklus über js/lifecycle.js', from: "from './lifecycle.js'", to: "from './own.js'" },
-  { name: 'anderer Schlüssel im Quelltext', rule: 'Quelltext: Standardschlüssel dss-theme', from: "'dss-theme'", to: "'theme'" },
+  { name: 'anderer Schlüssel im Quelltext', rule: 'Quelltext: Standardschlüssel hoops-theme', from: "'hoops-theme'", to: "'theme'" },
 ];
 
 describe('Mutationstests: Dunkelmodus-Umschalter', () => {
@@ -232,20 +232,20 @@ const LEAFLET_LOGIC: Mutation[] = [
 ];
 const MAP_CSS: Mutation[] = [
   { name: 'invert ohne Umfärben', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: 'filter: var(--hoops-map-invert-filter, invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)); }\n@media', to: 'filter: var(--hoops-map-invert-filter, invert(1) brightness(0.85) contrast(0.9)); }\n@media' },
-  { name: 'invert auch ohne dimInDark', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: ':root[data-theme="dark"] .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles', to: ':root[data-theme="dark"] .dss-map[data-tiles="invert"] .dss-map-tiles' },
-  { name: 'invert nicht bei System-Dunkel', rule: 'CSS: invert auch bei System-Dunkel ohne data-theme', from: ':root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles', to: ':root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invertx"] .dss-map-tiles' },
-  { name: 'dim abgeschafft', rule: 'CSS: dim bleibt der Standard', from: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--hoops-map-dim, 0.8)); }', to: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: none; }' },
-  { name: 'Haus in fester Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-pin-house { fill: var(--hoops-map-pin-fg, var(--hoops-n-0));', to: '.dss-map-pin-house { fill: var(--hoops-n-0);' },
-  { name: 'eigener Sitz ohne cta-Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-marker.is-own .dss-map-pin-house { fill: var(--hoops-cta-fg); stroke: var(--hoops-cta-fg); }', to: '' },
+  { name: 'invert auch ohne dimInDark', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: ':root[data-theme="dark"] .hoops-map[data-dim="true"][data-tiles="invert"] .hoops-map-tiles', to: ':root[data-theme="dark"] .hoops-map[data-tiles="invert"] .hoops-map-tiles' },
+  { name: 'invert nicht bei System-Dunkel', rule: 'CSS: invert auch bei System-Dunkel ohne data-theme', from: ':root:not([data-theme="light"]) .hoops-map[data-dim="true"][data-tiles="invert"] .hoops-map-tiles', to: ':root:not([data-theme="light"]) .hoops-map[data-dim="true"][data-tiles="invertx"] .hoops-map-tiles' },
+  { name: 'dim abgeschafft', rule: 'CSS: dim bleibt der Standard', from: ':root[data-theme="dark"] .hoops-map[data-dim="true"] .hoops-map-tiles { filter: brightness(var(--hoops-map-dim, 0.8)); }', to: ':root[data-theme="dark"] .hoops-map[data-dim="true"] .hoops-map-tiles { filter: none; }' },
+  { name: 'Haus in fester Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.hoops-map-pin-house { fill: var(--hoops-map-pin-fg, var(--hoops-n-0));', to: '.hoops-map-pin-house { fill: var(--hoops-n-0);' },
+  { name: 'eigener Sitz ohne cta-Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.hoops-map-marker.is-own .hoops-map-pin-house { fill: var(--hoops-cta-fg); stroke: var(--hoops-cta-fg); }', to: '' },
   { name: 'Haus-Maske entfällt', rule: 'CSS: Haus im Platzhalter und in der Liste als Maske in currentColor', from: 'content: \'\'; display: block; width: 16px; height: 16px; background: currentColor;', to: 'content: \'\'; display: block; width: 16px; height: 16px; background: red;' },
   { name: 'Haus 12 px', rule: 'CSS: Haus-Symbol im Platzhalter 16 px', from: 'content: \'\'; display: block; width: 16px; height: 16px;', to: 'content: \'\'; display: block; width: 12px; height: 12px;' },
-  { name: 'festes Hex beim Haus', rule: 'CSS: kein festes Hex im Abschnitt des Sitzes', from: '.dss-map-pin-house { fill: var(--hoops-map-pin-fg, var(--hoops-n-0)); stroke: var(--hoops-map-pin-fg, var(--hoops-n-0));', to: '.dss-map-pin-house { fill: #ffffff; stroke: var(--hoops-map-pin-fg, var(--hoops-n-0));' },
+  { name: 'festes Hex beim Haus', rule: 'CSS: kein festes Hex im Abschnitt des Sitzes', from: '.hoops-map-pin-house { fill: var(--hoops-map-pin-fg, var(--hoops-n-0)); stroke: var(--hoops-map-pin-fg, var(--hoops-n-0));', to: '.hoops-map-pin-house { fill: #ffffff; stroke: var(--hoops-map-pin-fg, var(--hoops-n-0));' },
 ];
 const MAP_SRC: { name: string; rule: string; file: 'svelte' | 'react' | 'leaflet'; from: string; to: string }[] = [
   { name: 'data-tiles fehlt (Svelte)', rule: 'Quelle: data-tiles aus tilesMode', file: 'svelte', from: 'data-tiles={tilesMode(darkTiles)}', to: '' },
   { name: 'data-tiles fehlt (React)', rule: 'Quelle: data-tiles aus tilesMode', file: 'react', from: 'data-tiles={tilesMode(darkTiles)}', to: '' },
   { name: 'darkTiles Standard invert (React)', rule: 'Quelle: darkTiles hat den Standard dim', file: 'react', from: "darkTiles = 'dim'", to: "darkTiles = 'invert'" },
-  { name: 'Haus-Badge fehlt (Svelte)', rule: 'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl', file: 'svelte', from: 'dss-map-num is-seat', to: 'dss-map-num' },
+  { name: 'Haus-Badge fehlt (Svelte)', rule: 'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl', file: 'svelte', from: 'hoops-map-num is-seat', to: 'hoops-map-num' },
   { name: 'Chip fehlt (React)', rule: 'Quelle: Chip Vereinssitz in der Liste', file: 'react', from: '{item.seatText}', to: '' },
   { name: 'Platzhalter-Pin ohne is-seat (Svelte)', rule: 'Quelle: Platzhalter-Pin trägt is-seat', file: 'svelte', from: "pin.kind === 'seat' ? ' is-seat'", to: "false ? ' is-seat'" },
   { name: 'Marker ohne markerName', rule: 'Quelle: Marker nutzt markerName für Titel, Alt und aria-label', file: 'leaflet', from: "title: markerName(item), alt: markerName(item)", to: 'title: item.label, alt: item.label' },
@@ -287,9 +287,9 @@ describe('Mutationstests: initAll (vanilla-core.js)', () => {
   const coreJs = read('js/vanilla-core.js');
   const CORE: Mutation[] = [
     { name: 'nur das erste Element je Baustein', rule: 'initAll: jedes Element eines Bausteins wird gestartet', from: 'for (const el of found) {\n      // `start` der Karte', to: 'for (const el of [...found].slice(0, 1)) {\n      // `start` der Karte' },
-    { name: 'Optionen nur vom ersten Element', rule: 'initAll: jedes Element bekommt seine eigenen Optionen', from: "parseOptions(el.getAttribute('data-dss-options'))", to: "parseOptions(found.values().next().value.getAttribute('data-dss-options'))" },
+    { name: 'Optionen nur vom ersten Element', rule: 'initAll: jedes Element bekommt seine eigenen Optionen', from: "parseOptions(el.getAttribute('data-hoops-options'))", to: "parseOptions(found.values().next().value.getAttribute('data-hoops-options'))" },
     { name: 'destroy nur des ersten', rule: 'initAll: destroy baut alle Elemente ab', from: 'for (const h of handles.splice(0).reverse()) h.destroy();', to: 'handles.splice(0).slice(0, 1).forEach((h) => h.destroy());' },
-    { name: 'ohne data-dss wird etwas gestartet', rule: 'initAll: ohne data-dss nichts', from: "accordion: { selector: '[data-dss=\"accordion\"], [data-dss-acc]'", to: "accordion: { selector: 'div, [data-dss-acc]'" },
+    { name: 'ohne data-hoops wird etwas gestartet', rule: 'initAll: ohne data-hoops nichts', from: "accordion: { selector: '[data-hoops=\"accordion\"], [data-hoops-acc]'", to: "accordion: { selector: 'div, [data-hoops-acc]'" },
   ];
   it('Ausgangslage', async () => {
     const mod = await loadModule(coreJs);

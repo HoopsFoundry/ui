@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Hallen im Kreis Nordhain</title>
   <!-- Ohne Build: alle Dateien liegen lokal im Projekt (kein unpkg, kein CDN). Die Ordner stammen aus dem Paket:
-       /dss/        ← dist/vanilla (dss.css, dss-map.min.js, dss-render.min.js)
+       /hoops/        ← dist/vanilla (hoops.css, hoops-map.min.js, hoops-render.min.js)
        /vendor/leaflet/  ← node_modules/leaflet/dist (leaflet.css, leaflet-src.esm.js) -->
-  <link rel="stylesheet" href="/dss/dss.css" />
+  <link rel="stylesheet" href="/hoops/hoops.css" />
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
   <style>
     body { margin: 0; padding: 1rem; background: var(--hoops-page-bg); color: var(--hoops-page-fg); font-family: system-ui, sans-serif; }
@@ -29,9 +29,9 @@
   </main>
 
   <script type="module">
-    import { mountMap } from '/dss/dss-map.min.js';
-    import { mountVenueCard } from '/dss/dss-render.min.js';
-    import { initMap } from '/dss/dss-map.min.js';
+    import { mountMap } from '/hoops/hoops-map.min.js';
+    import { mountVenueCard } from '/hoops/hoops-render.min.js';
+    import { initMap } from '/hoops/hoops-map.min.js';
 
     // Leaflet kommt aus einer lokalen Datei und wird erst nach dem Klick auf „Karte laden“ geladen (vorher kein Netzverkehr).
     const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');

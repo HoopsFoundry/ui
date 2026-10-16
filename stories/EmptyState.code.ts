@@ -3,24 +3,24 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="css/components.css" />
 <!-- optional: <link rel="stylesheet" href="fonts/fonts.css" /> -->
 
-<!-- Tonalität: dss-empty--neutral | --action | --error.
-     Button passend dazu: dss-btn--primary | --amber | --danger. Die Überschrift passt zur Gliederung (h2 bis h6; Rangfolge: titleAs, dann HeadingLevel, dann h3). -->
-<div class="dss-empty dss-empty--neutral">
-  <div class="dss-empty-icon">
+<!-- Tonalität: hoops-empty--neutral | --action | --error.
+     Button passend dazu: hoops-btn--primary | --amber | --danger. Die Überschrift passt zur Gliederung (h2 bis h6; Rangfolge: titleAs, dann HeadingLevel, dann h3). -->
+<div class="hoops-empty hoops-empty--neutral">
+  <div class="hoops-empty-icon">
     <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
       <rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16"/>
     </svg>
   </div>
-  <h3 class="dss-empty-title">Noch keine Spiele angesetzt</h3>
-  <p class="dss-empty-body">Sobald Spiele für den aktuellen Spieltag eingetragen sind, erscheinen sie hier.</p>
-  <div class="dss-empty-actions">
-    <button type="button" class="dss-btn dss-btn--md dss-btn--primary">Spielplan öffnen</button>
+  <h3 class="hoops-empty-title">Noch keine Spiele angesetzt</h3>
+  <p class="hoops-empty-body">Sobald Spiele für den aktuellen Spieltag eingetragen sind, erscheinen sie hier.</p>
+  <div class="hoops-empty-actions">
+    <button type="button" class="hoops-btn hoops-btn--md hoops-btn--primary">Spielplan öffnen</button>
   </div>
 </div>`;
 
 export const svelte = `<script>
-  import EmptyState from '@bbv/dss-design-system/svelte/EmptyState';
-  import Button from '@bbv/dss-design-system/svelte/Button';
+  import EmptyState from '@hoopsfoundry/ui/svelte/EmptyState';
+  import Button from '@hoopsfoundry/ui/svelte/Button';
 </script>
 
 <EmptyState
@@ -44,7 +44,7 @@ export const svelte = `<script>
   Fragen? Die Hilfe erklärt den Ablauf.
 </EmptyState>`;
 
-export const react = `import { Button, EmptyState } from '@bbv/dss-design-system/react';
+export const react = `import { Button, EmptyState } from '@hoopsfoundry/ui/react';
 
 <EmptyState
   tone="neutral"

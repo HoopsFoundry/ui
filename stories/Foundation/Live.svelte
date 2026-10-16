@@ -55,25 +55,25 @@
       <div class="cap">TopBar · immer dunkel</div>
       <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen -->
       <div class="scroll" role="region" tabindex="0" aria-label="TopBar mit Live-Kontext, seitlich scrollbar">
-        <div class="scroll-in"><TopBar brand="DSS" mark="D" context="live" matchLabel="BBL · 17. Spieltag" score="87 : 64" clock="4. Viertel · 02:14" /></div>
+        <div class="scroll-in"><TopBar brand="HoopsFoundry UI" mark="D" context="live" matchLabel="BBL · 17. Spieltag" score="87 : 64" clock="4. Viertel · 02:14" /></div>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Brotkrumen-Punkt · Tabellenkopf</div>
-      <div class="dss-frame">
-        <div class="dss-frame-head">
-          <h3 class="dss-frame-title">Tabelle</h3>
-          <div class="dss-frame-meta"><span>Spieltag 17</span><span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span></div>
+      <div class="hoops-frame">
+        <div class="hoops-frame-head">
+          <h3 class="hoops-frame-title">Tabelle</h3>
+          <div class="hoops-frame-meta"><span>Spieltag 17</span><span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span></div>
         </div>
       </div>
     </div>
 
     <div class="cell">
-      <div class="cap">Bausteine · .dss-live und .dss-live-dot</div>
+      <div class="cap">Bausteine · .hoops-live und .hoops-live-dot</div>
       <div class="tags">
-        <span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span> Live</span>
-        <span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span> Läuft</span>
+        <span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span> Live</span>
+        <span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span> Läuft</span>
       </div>
     </div>
   </div>

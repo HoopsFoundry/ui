@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS TextInput · Svelte 5 example
+   * HoopsFoundry UI TextInput · Svelte 5 example
    * --------------------------------------------------------------
    * Standard form input with label, help text, and validation states.
    * Supports density (touch/default/compact), prefix/suffix addons,
@@ -52,27 +52,27 @@
   } = $props();
 
   const uid = $props.id();
-  const inputId = $derived(id ?? `dss-input-${uid}`);
+  const inputId = $derived(id ?? `hoops-input-${uid}`);
   const helpId = $derived(`${inputId}-help`);
 </script>
 
-<div class="dss-field" class:is-error={state === 'error'} class:is-ok={state === 'ok'} class:is-warn={state === 'warn'}>
+<div class="hoops-field" class:is-error={state === 'error'} class:is-ok={state === 'ok'} class:is-warn={state === 'warn'}>
   {#if label}
-    <label class="dss-field-label" for={inputId}>
+    <label class="hoops-field-label" for={inputId}>
       {label}
       {#if required}<span class="req" aria-hidden="true">*</span>{/if}
       {#if optional}<span class="opt">{optional}</span>{/if}
     </label>
   {/if}
 
-  <div class="dss-input-group">
-    {#if prefix}<span class="dss-addon">{@render prefix()}</span>{/if}
+  <div class="hoops-input-group">
+    {#if prefix}<span class="hoops-addon">{@render prefix()}</span>{/if}
     <input
       id={inputId}
       {name}
-      class="dss-input"
-      class:dss-input--default={density === 'default'}
-      class:dss-input--compact={density === 'compact'}
+      class="hoops-input"
+      class:hoops-input--default={density === 'default'}
+      class:hoops-input--compact={density === 'compact'}
       bind:value
       {type}
       {placeholder}
@@ -84,16 +84,16 @@
       aria-invalid={state === 'error' ? 'true' : undefined}
       aria-describedby={help ? helpId : undefined}
     />
-    {#if suffix}<span class="dss-addon dss-addon--right">{@render suffix()}</span>{/if}
+    {#if suffix}<span class="hoops-addon hoops-addon--right">{@render suffix()}</span>{/if}
   </div>
 
   {#if help}
     <div
       id={helpId}
-      class="dss-field-help"
-      class:dss-field-help--err={state === 'error'}
-      class:dss-field-help--ok={state === 'ok'}
-      class:dss-field-help--warn={state === 'warn'}
+      class="hoops-field-help"
+      class:hoops-field-help--err={state === 'error'}
+      class:hoops-field-help--ok={state === 'ok'}
+      class:hoops-field-help--warn={state === 'warn'}
     >
       {help}
     </div>

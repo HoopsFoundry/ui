@@ -32,8 +32,8 @@ const normalize = (html: string) =>
   html
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/ (hidden|inert)=""/g, ' $1')
-    .replace(/ data-dss-acc(="")?/g, '')
-    .replace(/<div class="dss-acc-tools dss-acc-tools--pending"[^>]*><\/div>/g, '') // Platzhalter der Leiste (nur im Server-Markup der Komponenten)
+    .replace(/ data-hoops-acc(="")?/g, '')
+    .replace(/<div class="hoops-acc-tools hoops-acc-tools--pending"[^>]*><\/div>/g, '') // Platzhalter der Leiste (nur im Server-Markup der Komponenten)
     .replace(/\s+/g, ' ')
     .replace(/ ?> ?/g, '>')
     .replace(/ ?</g, '<')
@@ -43,14 +43,14 @@ const tags = (html: string) => [...html.matchAll(/<(h[1-6])[\s>]/g)].map((m) => 
 
 const renderSvelte = async (name: string, source: string) => {
   const file = `${tmpDir}${name}.svelte`;
-  writeFileSync(file, source.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+  writeFileSync(file, source.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
   const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
   return render(component, { props: {} }).body;
 };
 
 /** Beispielcode → Modul mit einer Demo-Komponente (Importe auf die Quellen im Repo umgelegt). */
 function reactModule(source: string, target: 'check' | 'run', name: string): string {
-  const map = (line: string) => line.replace('@bbv/dss-design-system/react', target === 'check' ? './index' : `${rootDir}react/index.ts`);
+  const map = (line: string) => line.replace('@hoopsfoundry/ui/react', target === 'check' ? './index' : `${rootDir}react/index.ts`);
   const imports = source.match(/^import [^;]+;$/gm) ?? [];
   const rest = source.replace(/^import [^;]+;$/gm, '').trim();
   if (/^export function/m.test(rest)) return [...imports.map(map), rest].join('\n');
@@ -94,7 +94,7 @@ describe('React-Beispiele bestehen den TypeScript-Compiler und rendern wie Svelt
     expect(compile(files)).toEqual([]);
   }, 60000);
   it('Typfehler würden auffallen (titleAs h1 und fehlende id)', () => {
-    const bad = `import { AccordionItem } from '@bbv/dss-design-system/react';\n\nexport const A = () => <><AccordionItem id="a" title="x" titleAs="h1" /><AccordionItem title="y" /></>;`;
+    const bad = `import { AccordionItem } from '@hoopsfoundry/ui/react';\n\nexport const A = () => <><AccordionItem id="a" title="x" titleAs="h1" /><AccordionItem title="y" /></>;`;
     const file = `${rootDir}react/__code_bad.tsx`;
     const messages = compile({ [file]: reactModule(bad, 'check', 'bad') });
     expect(messages.join('\n')).toContain('"h1"');
@@ -112,7 +112,7 @@ describe('React-Beispiele bestehen den TypeScript-Compiler und rendern wie Svelt
     expect(normalize(react)).toBe(normalize(svelteHtml));
     const { JSDOM } = await import('jsdom');
     const dom = new JSDOM('');
-    const root = dom.window.document.createRange().createContextualFragment(code.vanilla.replace(/<!--[\s\S]*?-->/g, '')).querySelector('.dss-acc')!;
+    const root = dom.window.document.createRange().createContextualFragment(code.vanilla.replace(/<!--[\s\S]*?-->/g, '')).querySelector('.hoops-acc')!;
     expect(normalize(root.outerHTML)).toBe(normalize(svelteHtml));
     expect(normalize(code.buttonMarkup)).toBe(normalize(svelteHtml));
   });
@@ -128,14 +128,14 @@ describe('Vanilla: natives details', () => {
     const { JSDOM } = await import('jsdom');
     const dom = new JSDOM('');
     const root = dom.window.document.createRange().createContextualFragment(code.detailsMarkup);
-    const items = [...root.querySelectorAll('details.dss-acc-item')];
+    const items = [...root.querySelectorAll('details.hoops-acc-item')];
     expect(items).toHaveLength(3);
     expect(new Set(items.map((d) => d.getAttribute('name'))).size).toBe(1);
-    expect(items.every((d) => d.querySelector(':scope > summary.dss-acc-trigger > .dss-acc-label'))).toBe(true);
+    expect(items.every((d) => d.querySelector(':scope > summary.hoops-acc-trigger > .hoops-acc-label'))).toBe(true);
     expect(items.filter((d) => d.hasAttribute('open'))).toHaveLength(1);
     expect(new Set(items.map((d) => d.id)).size).toBe(3);
     const css = readFileSync(`${rootDir}css/components.css`, 'utf8');
-    for (const cls of new Set(code.detailsMarkup.match(/dss-[\w-]+/g))) expect(css, cls).toContain(`.${cls}`);
+    for (const cls of new Set(code.detailsMarkup.match(/hoops-[\w-]+/g))) expect(css, cls).toContain(`.${cls}`);
   });
   it('das Skript im Beispiel (exclusive) hält auch ohne native Gruppe nur einen offen', async () => {
     const { JSDOM } = await import('jsdom');
@@ -145,7 +145,7 @@ describe('Vanilla: natives details', () => {
     Object.assign(g, { window: dom.window, document: dom.window.document, Element: dom.window.Element, Node: dom.window.Node });
     try {
       const { initAccordion } = await import('../js/accordion.js');
-      const destroy = initAccordion(dom.window.document.querySelector('.dss-acc')!, { exclusive: true, syncHash: false });
+      const destroy = initAccordion(dom.window.document.querySelector('.hoops-acc')!, { exclusive: true, syncHash: false });
       const second = dom.window.document.querySelector<HTMLDetailsElement>('#d-spielplan')!;
       second.open = true;
       await new Promise((r) => setTimeout(r, 10));
@@ -163,9 +163,9 @@ describe('Beispiele der Seite sind stimmig', () => {
     expect(pkg.exports['./accordion.js']).toBeTruthy();
     expect(pkg.exports['./svelte/Accordion']).toBeTruthy();
     expect(pkg.exports['./svelte/AccordionItem']).toBeTruthy();
-    expect(code.vanilla).toContain('@bbv/dss-design-system/accordion.js');
-    expect(code.svelte).toContain('@bbv/dss-design-system/svelte/Accordion');
-    expect(code.svelte).toContain('@bbv/dss-design-system/svelte/AccordionItem');
+    expect(code.vanilla).toContain('@hoopsfoundry/ui/accordion.js');
+    expect(code.svelte).toContain('@hoopsfoundry/ui/svelte/Accordion');
+    expect(code.svelte).toContain('@hoopsfoundry/ui/svelte/AccordionItem');
   });
   it('funktionenJs: jede kommentierte Zeile wird ausgeführt und mit dem Kommentar verglichen', async () => {
     const mod = await import('../js/accordion.js');

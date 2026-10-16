@@ -1,5 +1,5 @@
 /**
- * DSS Render · LeagueCard (Ligencard)
+ * HoopsFoundry UI Render · LeagueCard (Ligencard)
  * --------------------------------------------------------------
  * `renderLeagueCard(props, options?)`/`mountLeagueCard(el, props, options?)`: dasselbe Markup wie die Komponente LeagueCard (Svelte, React).
  * Props: `title`, `teams`, `teamCount`, `played`, `total`, `columns` (`won`, `lost`, `diff`, `form`), `limit` (Standard 3), `href`, `linkLabel`,
@@ -28,7 +28,7 @@ function rowOf(raw) {
 }
 
 const liveMeta = (tag) =>
-  `<span class="dss-league-live"><span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>${tag.text ? `<span class="dss-league-live-n">${esc(tag.text)}</span>` : ''}</span>`;
+  `<span class="hoops-league-live"><span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span>Live</span>${tag.text ? `<span class="hoops-league-live-n">${esc(tag.text)}</span>` : ''}</span>`;
 
 /** Ligencard: Mini-Tabelle mit Ausschnitt um die eigene Mannschaft (sonst die ersten Plätze) und Link zur kompletten Tabelle. */
 export function renderLeagueCard(props, options) {
@@ -51,17 +51,17 @@ export function renderLeagueCard(props, options) {
   const linkLabel = typeof p.linkLabel === 'string' ? p.linkLabel : 'Komplette Tabelle und Spielplan';
   const id = str(p.id);
 
-  const head = (shown, hidden, extra) => `<th scope="col"${extra ? ` class="${extra}"` : ''}><span aria-hidden="true">${shown}</span><span class="dss-sr-only">${hidden}</span></th>`;
+  const head = (shown, hidden, extra) => `<th scope="col"${extra ? ` class="${extra}"` : ''}><span aria-hidden="true">${shown}</span><span class="hoops-sr-only">${hidden}</span></th>`;
   const header =
     '<thead><tr>' +
-    '<th scope="col" class="dss-league-rank"><span aria-hidden="true">#</span><span class="dss-sr-only">Platz</span></th>' +
+    '<th scope="col" class="hoops-league-rank"><span aria-hidden="true">#</span><span class="hoops-sr-only">Platz</span></th>' +
     '<th scope="col">Mannschaft</th>' +
     head('SP', 'Spiele', 'num') +
-    (wantsWon ? head('S', 'Siege', 'num dss-league-opt') : '') +
-    (wantsLost ? head('N', 'Niederlagen', 'num dss-league-opt') : '') +
-    (wantsDiff ? head('Diff', 'Korbdifferenz', 'num dss-league-opt') : '') +
-    head('PKT', 'Punkte', 'num dss-league-pts') +
-    (wantsForm ? '<th scope="col" class="dss-league-opt">Form</th>' : '') +
+    (wantsWon ? head('S', 'Siege', 'num hoops-league-opt') : '') +
+    (wantsLost ? head('N', 'Niederlagen', 'num hoops-league-opt') : '') +
+    (wantsDiff ? head('Diff', 'Korbdifferenz', 'num hoops-league-opt') : '') +
+    head('PKT', 'Punkte', 'num hoops-league-pts') +
+    (wantsForm ? '<th scope="col" class="hoops-league-opt">Form</th>' : '') +
     '</tr></thead>';
 
   const body = rows
@@ -71,36 +71,36 @@ export function renderLeagueCard(props, options) {
       const name = nameText(t, names);
       const who =
         (logos ? logoBadge(t) : '') +
-        (t.href ? `<a class="dss-link dss-league-link" href="${attr(t.href)}">${name}</a>` : name) +
-        (t.own ? '<span class="dss-sr-only">, eigene Mannschaft</span>' : '') +
-        (zone ? `<span class="dss-sr-only">, ${esc(zone.row)}</span>` : '');
-      const rowClass = cls(t.own && 'is-own', zone && 'dss-league-zone', zone && `dss-league-zone--${zone.zone}`);
+        (t.href ? `<a class="hoops-link hoops-league-link" href="${attr(t.href)}">${name}</a>` : name) +
+        (t.own ? '<span class="hoops-sr-only">, eigene Mannschaft</span>' : '') +
+        (zone ? `<span class="hoops-sr-only">, ${esc(zone.row)}</span>` : '');
+      const rowClass = cls(t.own && 'is-own', zone && 'hoops-league-zone', zone && `hoops-league-zone--${zone.zone}`);
       return (
         `<tr${rowClass ? ` class="${klass(rowClass)}"` : ''}>` +
-        `<td class="dss-league-rank">${esc(rankText(t.rank))}</td>` +
-        `<td class="dss-league-team"><span class="dss-league-who">${who}</span></td>` +
+        `<td class="hoops-league-rank">${esc(rankText(t.rank))}</td>` +
+        `<td class="hoops-league-team"><span class="hoops-league-who">${who}</span></td>` +
         `<td class="num">${esc(cellNumber(t.played))}</td>` +
-        (wantsWon ? `<td class="num dss-league-opt">${esc(cellNumber(t.won))}</td>` : '') +
-        (wantsLost ? `<td class="num dss-league-opt">${esc(cellNumber(t.lost))}</td>` : '') +
-        (wantsDiff ? `<td class="${klass('num', 'dss-league-opt', sign)}">${esc(diffText(t.diff))}</td>` : '') +
-        `<td class="num lead dss-league-pts">${esc(cellNumber(t.points))}</td>` +
-        (wantsForm ? `<td class="dss-league-opt">${formChips(t.form)}</td>` : '') +
+        (wantsWon ? `<td class="num hoops-league-opt">${esc(cellNumber(t.won))}</td>` : '') +
+        (wantsLost ? `<td class="num hoops-league-opt">${esc(cellNumber(t.lost))}</td>` : '') +
+        (wantsDiff ? `<td class="${klass('num', 'hoops-league-opt', sign)}">${esc(diffText(t.diff))}</td>` : '') +
+        `<td class="num lead hoops-league-pts">${esc(cellNumber(t.points))}</td>` +
+        (wantsForm ? `<td class="hoops-league-opt">${formChips(t.form)}</td>` : '') +
         '</tr>'
       );
     })
     .join('');
 
   const panel =
-    `<div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label="${attr(title ? `Tabelle: ${title}` : 'Tabelle')}">` +
-    `<table class="${klass('dss-tbl', `dss-tbl--${size === 'compact' ? 'compact' : 'touch'}`, 'dss-league-tbl')}">` +
-    (caption ? `<caption class="dss-sr-only">${esc(caption)}</caption>` : '') +
+    `<div class="hoops-table-scroll hoops-league-scroll" role="region" tabindex="0" aria-label="${attr(title ? `Tabelle: ${title}` : 'Tabelle')}">` +
+    `<table class="${klass('hoops-tbl', `hoops-tbl--${size === 'compact' ? 'compact' : 'touch'}`, 'hoops-league-tbl')}">` +
+    (caption ? `<caption class="hoops-sr-only">${esc(caption)}</caption>` : '') +
     `${header}<tbody>${body}</tbody></table></div>` +
     (legend.length
-      ? `<ul class="dss-league-legend" aria-label="Legende">${legend.map((z) => `<li><span class="dss-league-key dss-league-key--${z.zone}" aria-hidden="true"></span>${esc(z.legend)}</li>`).join('')}</ul>`
+      ? `<ul class="hoops-league-legend" aria-label="Legende">${legend.map((z) => `<li><span class="hoops-league-key hoops-league-key--${z.zone}" aria-hidden="true"></span>${esc(z.legend)}</li>`).join('')}</ul>`
       : '') +
-    (target ? `<div class="dss-league-foot"><a class="dss-link dss-league-more" href="${attr(target)}">${esc(linkLabel)}<span class="dss-sr-only">, ${esc(title)}</span></a></div>` : '');
+    (target ? `<div class="hoops-league-foot"><a class="hoops-link hoops-league-more" href="${attr(target)}">${esc(linkLabel)}<span class="hoops-sr-only">, ${esc(title)}</span></a></div>` : '');
 
-  const rootClass = cls('dss-league', size === 'compact' && 'dss-league--compact', str(p.className));
+  const rootClass = cls('hoops-league', size === 'compact' && 'hoops-league--compact', str(p.className));
   if (p.collapsible === true && title) {
     return collapsibleFrame({
       kind: 'league', rootClass, id, title, sub: summary, titleAs: p.titleAs, open: p.open === true,
@@ -109,8 +109,8 @@ export function renderLeagueCard(props, options) {
   }
   const tag = headingOf(p.titleAs);
   return (
-    `<div class="${klass(rootClass)}"><div class="dss-league-head"><div class="dss-league-heading"><${tag} class="dss-league-title">${esc(title)}</${tag}>` +
-    `${summary ? `<p class="dss-league-sub">${esc(summary)}</p>` : ''}</div>${liveTag ? liveMeta(liveTag) : ''}</div>${panel}</div>`
+    `<div class="${klass(rootClass)}"><div class="hoops-league-head"><div class="hoops-league-heading"><${tag} class="hoops-league-title">${esc(title)}</${tag}>` +
+    `${summary ? `<p class="hoops-league-sub">${esc(summary)}</p>` : ''}</div>${liveTag ? liveMeta(liveTag) : ''}</div>${panel}</div>`
   );
 }
 

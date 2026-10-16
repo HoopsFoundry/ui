@@ -50,18 +50,18 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
       state={state}
       className={fieldClassName}
     >
-      <div className="dss-input-group">
-        {prefix ? <span className="dss-addon">{prefix}</span> : null}
+      <div className="hoops-input-group">
+        {prefix ? <span className="hoops-addon">{prefix}</span> : null}
         <input
           ref={ref}
           id={inputId}
-          className={cn('dss-input', density !== 'touch' && `dss-input--${density}`, className)}
+          className={cn('hoops-input', density !== 'touch' && `hoops-input--${density}`, className)}
           required={required}
           aria-invalid={state === 'error' ? true : undefined}
           aria-describedby={describedBy}
           {...rest}
         />
-        {suffix ? <span className="dss-addon dss-addon--right">{suffix}</span> : null}
+        {suffix ? <span className="hoops-addon hoops-addon--right">{suffix}</span> : null}
       </div>
     </Field>
   );

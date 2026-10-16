@@ -20,19 +20,19 @@ describe('CSS einklappbarer Rahmen', () => {
     expect(START).toBeGreaterThan(css.indexOf('/* ── LeagueCard'));
     expect(START).toBeGreaterThan(css.indexOf('/* ── Accordion'));
   });
-  it.each(['is-collapsible', 'is-open', 'dss-frame-head--acc', 'dss-league-head--acc', 'dss-acc-sub', 'dss-acc-trigger'])('verwendet .%s', (cls) => {
+  it.each(['is-collapsible', 'is-open', 'hoops-frame-head--acc', 'hoops-league-head--acc', 'hoops-acc-sub', 'hoops-acc-trigger'])('verwendet .%s', (cls) => {
     expect(frames).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
   });
   it('die Titelgröße bleibt an den Rahmen-Tokens: der Button erbt die Schrift vom Titel, keine Accordion-Tokens im Abschnitt', () => {
-    const inherit = rule('.dss-frame-title > .dss-acc-trigger, .dss-league-title > .dss-acc-trigger');
+    const inherit = rule('.hoops-frame-title > .hoops-acc-trigger, .hoops-league-title > .hoops-acc-trigger');
     expect(inherit).toMatch(/font:\s*inherit/);
     expect(inherit).toMatch(/letter-spacing:\s*inherit/);
     expect(inherit).toMatch(/color:\s*inherit/);
     expect(noComments).not.toMatch(/--hoops-acc-title-size|--hoops-acc-pad|--hoops-acc-nested-title-size/);
     expect(inherit).not.toMatch(/font-size/);
     // die Titelgrößen selbst bleiben unverändert an den Rahmen- bzw. Karten-Tokens
-    expect(css).toMatch(/\.dss-frame-title\s*\{[^}]*font-size:\s*var\(--hoops-frame-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-body\)\)\)/);
-    expect(css).toMatch(/\.dss-league-title\s*\{[^}]*font-size:\s*var\(--hoops-card-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-h3\)\)\)/);
+    expect(css).toMatch(/\.hoops-frame-title\s*\{[^}]*font-size:\s*var\(--hoops-frame-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-body\)\)\)/);
+    expect(css).toMatch(/\.hoops-league-title\s*\{[^}]*font-size:\s*var\(--hoops-card-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-h3\)\)\)/);
   });
   it('kein Selektor auf h1 bis h6 im Abschnitt', () => {
     expect(noComments).not.toMatch(/(^|[\s,>+~])h[1-6]\b/m);
@@ -40,55 +40,55 @@ describe('CSS einklappbarer Rahmen', () => {
   it('keine nackten --*-text-Variablen (nur mit Token-Namen --hoops-…)', () => {
     expect(noComments).not.toMatch(/var\(--hoops-(ok|err|warn|info|signal|cool|base)-(text|soft)\b/);
   });
-  it('Rahmenkopf: ohne Innenabstand, der Button trägt ihn (≥ 44 px Zielhöhe über .dss-acc-trigger)', () => {
-    expect(rule('.dss-frame-head--acc, .dss-league-head--acc')).toMatch(/padding:\s*0/);
-    expect(rule('.dss-frame-title > .dss-acc-trigger')).toMatch(/padding:\s*16px 22px/);
-    expect(css).toMatch(/\.dss-acc-trigger\s*\{[^}]*min-height:\s*44px/);
+  it('Rahmenkopf: ohne Innenabstand, der Button trägt ihn (≥ 44 px Zielhöhe über .hoops-acc-trigger)', () => {
+    expect(rule('.hoops-frame-head--acc, .hoops-league-head--acc')).toMatch(/padding:\s*0/);
+    expect(rule('.hoops-frame-title > .hoops-acc-trigger')).toMatch(/padding:\s*16px 22px/);
+    expect(css).toMatch(/\.hoops-acc-trigger\s*\{[^}]*min-height:\s*44px/);
   });
   it('geschlossen: kein doppelter Strich (Rand des Kopfes durchsichtig), Radius rundum', () => {
-    const closed = rule('.dss-frame.is-collapsible:not(.is-open) > .dss-frame-head--acc');
+    const closed = rule('.hoops-frame.is-collapsible:not(.is-open) > .hoops-frame-head--acc');
     expect(closed).toMatch(/border-bottom-color:\s*transparent/);
     expect(closed).toMatch(/border-radius:\s*13px/);
-    expect(rule('.dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc')).toMatch(/border-radius:\s*15px/);
+    expect(rule('.hoops-league.is-collapsible:not(.is-open) > .hoops-league-head--acc')).toMatch(/border-radius:\s*15px/);
   });
-  it('Fokus: der gestrichelte Ring kommt von .dss-acc-trigger (innen), auf dunklem Rahmen in der dezenten Farbe', () => {
-    expect(css).toMatch(/\.dss-acc-trigger:focus-visible\s*\{[^}]*outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\);\s*outline-offset:\s*-3px/);
-    expect(rule('.dss-frame--dark .dss-acc-trigger:focus-visible')).toMatch(/outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
+  it('Fokus: der gestrichelte Ring kommt von .hoops-acc-trigger (innen), auf dunklem Rahmen in der dezenten Farbe', () => {
+    expect(css).toMatch(/\.hoops-acc-trigger:focus-visible\s*\{[^}]*outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\);\s*outline-offset:\s*-3px/);
+    expect(rule('.hoops-frame--dark .hoops-acc-trigger:focus-visible')).toMatch(/outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
   });
   it('Hover und Aktiv nutzen vorhandene Tokens (kein Zustand nur über Farbe: der Pfeil dreht sich)', () => {
-    expect(frames).toMatch(/\.dss-frame-head--acc \.dss-acc-trigger:hover/);
-    expect(css).toMatch(/\.dss-acc-trigger\[aria-expanded="true"\] \.dss-acc-chevron[^{]*\{\s*transform:\s*rotate\(180deg\)/);
+    expect(frames).toMatch(/\.hoops-frame-head--acc \.hoops-acc-trigger:hover/);
+    expect(css).toMatch(/\.hoops-acc-trigger\[aria-expanded="true"\] \.hoops-acc-chevron[^{]*\{\s*transform:\s*rotate\(180deg\)/);
   });
   it('Sticky: der Rahmen schneidet mit overflow: clip (kein Scrollcontainer), der Kopf klebt', () => {
-    expect(frames).toMatch(/\.dss-acc--sticky:not\(\.dss-acc--nested\) > \.dss-frame\.is-collapsible[^{]*\{\s*overflow:\s*clip/);
-    expect(frames).toMatch(/\.dss-frame\.is-open > \.dss-frame-head--acc[^{]*\{[^}]*position:\s*sticky/);
+    expect(frames).toMatch(/\.hoops-acc--sticky:not\(\.hoops-acc--nested\) > \.hoops-frame\.is-collapsible[^{]*\{\s*overflow:\s*clip/);
+    expect(frames).toMatch(/\.hoops-frame\.is-open > \.hoops-frame-head--acc[^{]*\{[^}]*position:\s*sticky/);
   });
   it('Druck: Kopf nicht klebend, Strich unter dem Kopf auch bei zugeklappt', () => {
     const at = frames.indexOf('@media print');
     expect(at).toBeGreaterThan(0);
     const print = frames.slice(at);
     // so spezifisch wie die Regel für „zugeklappt“, sonst bliebe der Strich im Druck durchsichtig
-    expect(print).toMatch(/\.dss-frame\.is-collapsible:not\(\.is-open\) > \.dss-frame-head--acc\s*\{[^}]*border-bottom-color:\s*var\(--hoops-line\)/);
+    expect(print).toMatch(/\.hoops-frame\.is-collapsible:not\(\.is-open\) > \.hoops-frame-head--acc\s*\{[^}]*border-bottom-color:\s*var\(--hoops-line\)/);
     expect(print).toMatch(/position:\s*static/);
   });
   it('Animation und Druck der Bereiche kommen aus dem Accordion (gleiche Klassen), nicht aus einer Kopie', () => {
     expect(frames).not.toMatch(/grid-template-rows/);
     expect(frames).not.toMatch(/prefers-reduced-motion/);
     const acc = css.slice(css.indexOf('/* ── Accordion'), START);
-    expect(acc).toMatch(/\.dss-acc-panel\[hidden\]/);
-    expect(acc).toMatch(/:root\[data-motion="reduce"\] \.dss-acc-panel/);
+    expect(acc).toMatch(/\.hoops-acc-panel\[hidden\]/);
+    expect(acc).toMatch(/:root\[data-motion="reduce"\] \.hoops-acc-panel/);
   });
   it('ohne collapsible ändert sich nichts: alle Regeln hängen an .is-collapsible, --acc oder dem Button im Titel', () => {
     for (const m of noComments.matchAll(/(^|\})\s*([^{}@]+)\{/g)) {
       for (const sel of m[2].replace(/:is\([^)]*\)/g, '').split(',').map((x) => x.trim()).filter(Boolean)) {
-        expect(sel, sel).toMatch(/is-collapsible|--acc|\.dss-acc-trigger|\.dss-acc-sub|\.dss-acc-chevron|\.dss-league-live/);
+        expect(sel, sel).toMatch(/is-collapsible|--acc|\.hoops-acc-trigger|\.hoops-acc-sub|\.hoops-acc-chevron|\.hoops-league-live/);
       }
     }
   });
 });
 
 describe('Zielgröße der Links im Spielplan (WCAG 2.5.8)', () => {
-  const sub = css.match(/\.dss-sch-sub \.dss-link, \.dss-sch-team \.dss-link \{([^}]*)\}/);
+  const sub = css.match(/\.hoops-sch-sub \.hoops-link, \.hoops-sch-team \.hoops-link \{([^}]*)\}/);
   it('Links in Unterzeile und am Teamnamen: 3 px Fläche oben und unten, negativer Rand hält die Zeilenhöhe', () => {
     expect(sub).not.toBeNull();
     expect(sub![1]).toMatch(/padding-block:\s*3px/);

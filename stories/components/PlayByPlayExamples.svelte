@@ -42,8 +42,8 @@
   const cols = ['Standard', 'Hover', 'Fokus'] as const;
   const colForce: Record<(typeof cols)[number], { sel: string; cls: string } | null> = {
     Standard: null,
-    Hover: { sel: '.dss-pbp-event', cls: 'pseudo-hover' },
-    Fokus: { sel: '.dss-pbp-feed', cls: 'pseudo-focus-visible' },
+    Hover: { sel: '.hoops-pbp-event', cls: 'pseudo-hover' },
+    Fokus: { sel: '.hoops-pbp-feed', cls: 'pseudo-focus-visible' },
   };
 </script>
 

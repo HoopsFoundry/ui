@@ -89,7 +89,7 @@ describe('HeadingLevel', () => {
         <EmptyState title="C" />
       </HeadingLevel>,
     );
-    expect([...container.querySelectorAll('.dss-empty-title')].map((e) => e.tagName.toLowerCase())).toEqual(['h2', 'h3', 'h2']);
+    expect([...container.querySelectorAll('.hoops-empty-title')].map((e) => e.tagName.toLowerCase())).toEqual(['h2', 'h3', 'h2']);
   });
   it('Gliederung der App: Abschnitt h2, Karten darunter h3 (Beispiel der Doku)', () => {
     const { container } = render(
@@ -114,8 +114,8 @@ describe('Modal und die Ebenen im Inhalt', () => {
   it('der Titel bleibt der Name des Dialogs', () => {
     render(<Modal open onOpenChange={() => {}} title="Kader" titleAs="h4">x</Modal>);
     const dialog = document.querySelector('[role="dialog"]')!;
-    expect(dialog.getAttribute('aria-labelledby')).toBe(document.querySelector('.dss-m-title')!.id);
-    expect(document.querySelector('.dss-m-title')!.id).not.toBe('');
+    expect(dialog.getAttribute('aria-labelledby')).toBe(document.querySelector('.hoops-m-title')!.id);
+    expect(document.querySelector('.hoops-m-title')!.id).not.toBe('');
   });
   it.each([['h2', 'h3'], ['h3', 'h4'], ['h4', 'h5'], ['h5', 'h6'], ['h6', 'h6']] as const)('titleAs=%s: Inhalt bekommt %s', (titleAs, child) => {
     render(<Modal open onOpenChange={() => {}} title="Kader" titleAs={titleAs}>{table}</Modal>);

@@ -49,15 +49,15 @@ describe('Karte: ids', () => {
   it('ohne uid stabil (gleiche Eingaben, gleiche ids), mit uid die Basis', () => {
     expect(renderMap(BASE as never)).toBe(renderMap({ ...BASE } as never));
     const a = renderMap(BASE as never, { uid: 'a1' });
-    expect(a).toContain('id="dss-map-text-a1"');
-    expect(a).toContain('href="#dss-map-text-a1"');
+    expect(a).toContain('id="hoops-map-text-a1"');
+    expect(a).toContain('href="#hoops-map-text-a1"');
   });
   it('uid wird auf Buchstaben, Ziffern, _ und - gekürzt', () => {
-    expect(renderMap(BASE as never, { uid: 'a"><img onerror=x>' })).toContain('id="dss-map-text-aimgonerrorx"');
+    expect(renderMap(BASE as never, { uid: 'a"><img onerror=x>' })).toContain('id="hoops-map-text-aimgonerrorx"');
   });
   it('die Schaltfläche „Karte laden“ ist bedienbar (nicht gesperrt)', () => {
     const html = renderMap(BASE as never);
-    expect(html).toContain('dss-map-load">Karte laden');
+    expect(html).toContain('hoops-map-load">Karte laden');
     expect(html).not.toContain('disabled');
   });
 });

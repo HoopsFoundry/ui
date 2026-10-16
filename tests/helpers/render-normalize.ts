@@ -14,9 +14,9 @@ export const normalize = (html: string) => {
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/ onerror="this\.__e=event"/g, '')
     .replace(/ (hidden|inert)=""/g, ' $1')
-    // erzeugte ids angleichen: Rahmenkopf (dss-cf-<id>-trigger|panel) und Karte (dss-map-canvas-<id>, dss-map-text-<id>)
-    .replace(/dss-cf-([^"#]+?)-(trigger|panel)(?=")/g, (_m, id: string, part: string) => `${key('dss-cf-', id)}-${part}`)
-    .replace(/(dss-map-(?:canvas|text)-)([^"#]+)/g, (_m, prefix: string, id: string) => key(prefix, id));
+    // erzeugte ids angleichen: Rahmenkopf (hoops-cf-<id>-trigger|panel) und Karte (hoops-map-canvas-<id>, hoops-map-text-<id>)
+    .replace(/hoops-cf-([^"#]+?)-(trigger|panel)(?=")/g, (_m, id: string, part: string) => `${key('hoops-cf-', id)}-${part}`)
+    .replace(/(hoops-map-(?:canvas|text)-)([^"#]+)/g, (_m, prefix: string, id: string) => key(prefix, id));
   // Attribute je Tag nach Name sortieren (Reihenfolge ist in HTML bedeutungslos), Klassen sortieren, Stil glätten
   text = text.replace(TAG, (_m, name: string, attrs: string) => {
     const list: [string, string | undefined][] = [];

@@ -22,7 +22,7 @@
 
   // Erzwingt einen Zustand auf den Links (Hover und Fokus wirken über die Pseudo-Klassen des Storybook-Addons)
   function mark(node: HTMLElement, cls: string) {
-    const targets = node.querySelectorAll<HTMLElement>('.dss-venue-more, .dss-venue-contact .dss-link, .dss-venue-maplinks .dss-link');
+    const targets = node.querySelectorAll<HTMLElement>('.hoops-venue-more, .hoops-venue-contact .hoops-link, .hoops-venue-maplinks .hoops-link');
     if (cls) for (const target of targets) target.classList.add(...cls.split(' '));
   }
   const cols = ['Standard', 'Hover', 'Fokus'] as const;

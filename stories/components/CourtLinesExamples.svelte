@@ -38,7 +38,7 @@
   .outer { position: relative; transform: translateZ(0); overflow: hidden; width: 100%; box-sizing: border-box; padding: 16px; border: 1px dashed var(--hoops-page-line); border-radius: 12px; }
   .frame.plain { position: static; transform: none; }
   /* Nur für die Vorschau: Maske verkleinert, damit in der kleinen Bühne mehrere Linien sichtbar sind (Standard: bis 1500 px breit) */
-  .frame :global(.dss-courtlines), .outer :global(.dss-courtlines) {
+  .frame :global(.hoops-courtlines), .outer :global(.hoops-courtlines) {
     -webkit-mask-size: 560px auto; mask-size: 560px auto;
     -webkit-mask-position: center 30%; mask-position: center 30%;
   }

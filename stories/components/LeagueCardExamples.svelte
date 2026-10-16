@@ -11,7 +11,7 @@
 
   // Erzwingt einen Zustand auf dem Link (Hover und Fokus wirken über die Pseudo-Klassen des Storybook-Addons)
   function mark(node: HTMLElement, cls: string) {
-    const targets = node.querySelectorAll<HTMLElement>('.dss-league-link, .dss-league-more');
+    const targets = node.querySelectorAll<HTMLElement>('.hoops-league-link, .hoops-league-more');
     if (cls) for (const target of targets) target.classList.add(...cls.split(' '));
   }
   const cols = ['Standard', 'Hover', 'Fokus'] as const;
@@ -19,8 +19,8 @@
 
   // Nachgestellte Fehler (Don'ts): entfernt den versteckten Text der Form-Zellen, so wie ein reines Punkte-Markup ihn nicht hätte
   function stripFormText(node: HTMLElement) {
-    for (const cell of node.querySelectorAll('td .dss-form-list')) {
-      for (const hidden of cell.closest('td')?.querySelectorAll('.dss-sr-only') ?? []) hidden.remove();
+    for (const cell of node.querySelectorAll('td .hoops-form-list')) {
+      for (const hidden of cell.closest('td')?.querySelectorAll('.hoops-sr-only') ?? []) hidden.remove();
     }
   }
 </script>
@@ -173,7 +173,7 @@
   </div>
 {:else if example === 'einklappbar-id'}
   <div class="grid1">
-    <p class="links">Direkt springen: <a class="dss-link" href="#lc-west">Liga West (Deep-Link)</a></p>
+    <p class="links">Direkt springen: <a class="hoops-link" href="#lc-west">Liga West (Deep-Link)</a></p>
     <div class="grid2">
       <LeagueCard {...COMMON} collapsible id="lc-ost" title={LIGEN[34]} teams={mid} />
       <LeagueCard {...COMMON} collapsible id="lc-west" title={LIGEN[35]} teams={mid} />
@@ -220,7 +220,7 @@
   .gap { height: 12px; }
   .cap, .colhead { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 10px; }
-  .no-legend :global(.dss-league-legend) { display: none; }
+  .no-legend :global(.hoops-league-legend) { display: none; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
   /* position: relative: die versteckten Texte (position: absolute) liegen sonst außerhalb des Scrollbereichs und weiten die Seite (Standalone-Story bei 420 px) */
   .surface { position: relative; background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }

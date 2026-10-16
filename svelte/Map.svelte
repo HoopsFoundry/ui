@@ -1,12 +1,12 @@
 <script lang="ts">
   /**
-   * DSS Map (Karte) · Svelte 5
+   * HoopsFoundry UI Map (Karte) · Svelte 5
    * --------------------------------------------------------------
    * Interaktive Karte mit Leaflet und OpenStreetMap-Kacheln. Leaflet ist eine optionale Peer-Abhängigkeit und wird erst beim Laden der
    * Karte nachgeladen (`import('leaflet')`); die App lädt zusätzlich `leaflet/dist/leaflet.css`. Standard ist die Zwei-Klick-Lösung:
    * zuerst ein Platzhalter mit Hinweis (kein Netzverkehr), die Kacheln erst nach „Karte laden“ (`load="auto"` lädt sofort).
    * Die Textalternative (nummerierte Liste mit Koordinaten und Links) ist immer da. Zoom-Schaltflächen, Quellenangabe, Platzhalter und
-   * Fehlerhinweis sind eigenes Markup; die Quellenangabe lässt sich nicht ausblenden. Nutzt nur Klassen aus css/components.css (`dss-map*`).
+   * Fehlerhinweis sind eigenes Markup; die Quellenangabe lässt sich nicht ausblenden. Nutzt nur Klassen aus css/components.css (`hoops-map*`).
    * Der Dateiname ist `Map.svelte`; beim Import `MapView` nennen, damit das JS-Global `Map` nicht überdeckt wird.
    */
   import { tick, untrack } from 'svelte';
@@ -76,8 +76,8 @@
   } = $props();
 
   const uid = $props.id();
-  const canvasId = `dss-map-canvas-${uid}`;
-  const textId = `dss-map-text-${uid}`;
+  const canvasId = `hoops-map-canvas-${uid}`;
+  const textId = `hoops-map-text-${uid}`;
 
   let phase = $state<Phase>(untrack(() => (load === 'auto' ? 'loading' : 'idle')));
   let failure = $state<string | null>(null);
@@ -95,7 +95,7 @@
   const source = $derived(attribution && attribution.trim() ? attribution : mapText.attribution);
 
   $effect(() => {
-    if (!urlOk) devWarn(`[dss-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
+    if (!urlOk) devWarn(`[hoops-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
   });
 
   // Neue Kachel-Adresse: ein früherer Fehler gilt nicht mehr, die Karte versucht es erneut
@@ -149,61 +149,61 @@
 </script>
 
 <div
-  class={`dss-map${klass ? ` ${klass}` : ''}`}
+  class={`hoops-map${klass ? ` ${klass}` : ''}`}
   data-state={state}
   data-dim={dimInDark ? 'true' : 'false'}
   data-tiles={tilesMode(darkTiles)}
   style={`--hoops-map-h:${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px`}
 >
-  <a class="dss-map-skip" href={`#${textId}`}>{mapText.skip}</a>
-  <div class="dss-map-frame" role="region" aria-label={label}>
-    <div class="dss-map-stage">
+  <a class="hoops-map-skip" href={`#${textId}`}>{mapText.skip}</a>
+  <div class="hoops-map-frame" role="region" aria-label={label}>
+    <div class="hoops-map-stage">
       {#if running}
-        <div class="dss-map-canvas" id={canvasId} role="group" aria-label={mapText.canvasHint} inert={state === 'loading'} bind:this={canvas}></div>
+        <div class="hoops-map-canvas" id={canvasId} role="group" aria-label={mapText.canvasHint} inert={state === 'loading'} bind:this={canvas}></div>
       {/if}
       {#if state !== 'ready'}
-        <div class="dss-map-ph">
+        <div class="hoops-map-ph">
           {#each state === 'error' ? [] : pins as pin (pin.id)}
-            <span class={`dss-map-ph-pin${pin.own ? ' is-own' : ''}${pin.kind === 'seat' ? ' is-seat' : ''}`} style={`left:${pin.x}%;top:${pin.y}%`} aria-hidden="true">{pin.number ?? ''}</span>
+            <span class={`hoops-map-ph-pin${pin.own ? ' is-own' : ''}${pin.kind === 'seat' ? ' is-seat' : ''}`} style={`left:${pin.x}%;top:${pin.y}%`} aria-hidden="true">{pin.number ?? ''}</span>
           {/each}
           {#if state === 'idle'}
-            <div class="dss-map-ph-card">
-              <p class="dss-map-note">{privacyNote}</p>
-              <button type="button" class="dss-btn dss-btn--primary dss-btn--md dss-map-load" onclick={start}>{mapText.load}</button>
+            <div class="hoops-map-ph-card">
+              <p class="hoops-map-note">{privacyNote}</p>
+              <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load" onclick={start}>{mapText.load}</button>
             </div>
           {/if}
         </div>
       {/if}
       {#if state === 'ready'}
-        <div class="dss-map-zoom" role="group" aria-label={mapText.zoomGroup}>
-          <button type="button" class="dss-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onclick={() => canIn && controller?.zoomIn()}>
+        <div class="hoops-map-zoom" role="group" aria-label={mapText.zoomGroup}>
+          <button type="button" class="hoops-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onclick={() => canIn && controller?.zoomIn()}>
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M10 4v12M4 10h12" /></svg>
           </button>
-          <button type="button" class="dss-map-zoom-btn" aria-label={mapText.zoomOut} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onclick={() => canOut && controller?.zoomOut()}>
+          <button type="button" class="hoops-map-zoom-btn" aria-label={mapText.zoomOut} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onclick={() => canOut && controller?.zoomOut()}>
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 10h12" /></svg>
           </button>
         </div>
       {/if}
-      <div class="dss-map-status" role="status">{status}</div>
-      <p class="dss-map-attr"><a href={mapText.attributionHref}>{source}</a></p>
+      <div class="hoops-map-status" role="status">{status}</div>
+      <p class="hoops-map-attr"><a href={mapText.attributionHref}>{source}</a></p>
     </div>
   </div>
-  <div class={`dss-map-text${showList ? '' : ' is-quiet'}`} id={textId} tabindex="-1">
-    <ol class="dss-map-list" aria-label={mapText.listLabel}>
+  <div class={`hoops-map-text${showList ? '' : ' is-quiet'}`} id={textId} tabindex="-1">
+    <ol class="hoops-map-list" aria-label={mapText.listLabel}>
       {#each items as item (item.id)}
-        <li class="dss-map-item" value={item.number ?? undefined}>
-          {#if item.kind === 'seat'}<span class={`dss-map-num is-seat${item.own ? ' is-own' : ''}`} aria-hidden="true"></span>{:else if item.number !== null}<span class={`dss-map-num${item.own ? ' is-own' : ''}`} aria-hidden="true">{item.number}</span>{/if}
-          <div class="dss-map-item-body">
-            <p class="dss-map-name">
-              {#if item.href}<a class="dss-link" href={item.href}>{item.label}</a>{:else}<span>{item.label}</span>{/if}
-              {#if item.kind === 'seat'}<span class="dss-chip">{item.seatText}</span>{/if}
-              {#if item.own}<span class="dss-chip dss-chip--amber">{mapText.own}</span>{/if}
+        <li class="hoops-map-item" value={item.number ?? undefined}>
+          {#if item.kind === 'seat'}<span class={`hoops-map-num is-seat${item.own ? ' is-own' : ''}`} aria-hidden="true"></span>{:else if item.number !== null}<span class={`hoops-map-num${item.own ? ' is-own' : ''}`} aria-hidden="true">{item.number}</span>{/if}
+          <div class="hoops-map-item-body">
+            <p class="hoops-map-name">
+              {#if item.href}<a class="hoops-link" href={item.href}>{item.label}</a>{:else}<span>{item.label}</span>{/if}
+              {#if item.kind === 'seat'}<span class="hoops-chip">{item.seatText}</span>{/if}
+              {#if item.own}<span class="hoops-chip hoops-chip--amber">{mapText.own}</span>{/if}
             </p>
-            <p class="dss-map-coords">{item.coords}</p>
+            <p class="hoops-map-coords">{item.coords}</p>
             {#if showList && item.links.length}
-              <div class="dss-map-links">
+              <div class="hoops-map-links">
                 {#each item.links as link (link.kind)}
-                  <a class="dss-link" href={link.href}>{link.text}<span class="dss-sr-only">, {item.label}</span></a>
+                  <a class="hoops-link" href={link.href}>{link.text}<span class="hoops-sr-only">, {item.label}</span></a>
                 {/each}
               </div>
             {/if}

@@ -1,5 +1,5 @@
 /**
- * DSS Periods · Spielabschnitte (Viertel, Achtel, Verlängerung)
+ * HoopsFoundry UI Periods · Spielabschnitte (Viertel, Achtel, Verlängerung)
  * --------------------------------------------------------------
  * Reine Funktionen ohne DOM. MatchCard und PlayByPlay (Svelte und React) nutzen dieselbe Logik.
  * Typen: js/periods.d.ts.

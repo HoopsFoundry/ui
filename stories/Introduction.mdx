@@ -4,7 +4,7 @@ import './docs/blocks/blocks.css';
 
 <Meta of={IntroductionStories} />
 
-# DSS Design System
+# HoopsFoundry UI
 
 Komponenten-Bibliothek für den **Digitalen Spielbericht** des Bayerischen Basketball Verbands und Schwester-Apps (Scoreboard, Vereinsregister, Live-Scoring). Dieses Storybook ist die Referenz: Jede Komponente hat eine Seite mit Beispielen, Zuständen, Props, Code und Dos und Don'ts.
 
@@ -13,9 +13,9 @@ Komponenten-Bibliothek für den **Digitalen Spielbericht** des Bayerischen Baske
 ## Was ist drin
 
 - **Tokens:** `tokens.css` (CSS-Variablen), `tokens.json` (Design Tokens Community Group) und `tailwind.preset.js`.
-- **CSS:** `components.css` mit den Vanilla-Klassen (`dss-btn`, `dss-card`, `dss-tabs`, …), die einzige CSS-Quelle für Svelte, React und Seiten ohne Build-Schritt.
-- **Svelte:** Komponenten unter `svelte/`, einzeln importierbar (`@bbv/dss-design-system/svelte/Button`).
-- **React:** dieselben Komponenten aus `@bbv/dss-design-system/react`.
+- **CSS:** `components.css` mit den Vanilla-Klassen (`hoops-btn`, `hoops-card`, `hoops-tabs`, …), die einzige CSS-Quelle für Svelte, React und Seiten ohne Build-Schritt.
+- **Svelte:** Komponenten unter `svelte/`, einzeln importierbar (`@hoopsfoundry/ui/svelte/Button`).
+- **React:** dieselben Komponenten aus `@hoopsfoundry/ui/react`.
 - **Storybook:** diese Seiten, mit Hell/Dunkel, A11y-Prüfung und den Code-Beispielen in drei Fassungen.
 
 ## Marken, Schrift, Hell und Dunkel
@@ -48,16 +48,16 @@ Marke, Schrift, Theme und Zustand wirken auf Vorschauen, die direkt auf der Seit
 Für React installierst du das Paket mit seinen Peer-Abhängigkeiten und importierst Stile und Komponenten:
 
 ```bash
-npm install github:OliEder/dss-design-system#v0.9.0 react react-dom @radix-ui/react-dialog
+npm install github:HoopsFoundry/ui#v0.9.0 react react-dom @radix-ui/react-dialog
 ```
 
 ```tsx
-import '@bbv/dss-design-system/tokens.css';
-import '@bbv/dss-design-system/components.css';
-import { Button } from '@bbv/dss-design-system/react';
+import '@hoopsfoundry/ui/tokens.css';
+import '@hoopsfoundry/ui/components.css';
+import { Button } from '@hoopsfoundry/ui/react';
 ```
 
-Svelte-Komponenten importierst du einzeln über den Path-Export, etwa aus `@bbv/dss-design-system/svelte/Button`. Tailwind-Nutzer laden `components.css` nach `@tailwind base`. Die ausführliche Anleitung steht in der `README.md`.
+Svelte-Komponenten importierst du einzeln über den Path-Export, etwa aus `@hoopsfoundry/ui/svelte/Button`. Tailwind-Nutzer laden `components.css` nach `@tailwind base`. Die ausführliche Anleitung steht in der `README.md`.
 
 ## Inhaltsverzeichnis
 
@@ -69,13 +69,13 @@ Svelte-Komponenten importierst du einzeln über den Path-Export, etwa aus `@bbv/
 - [Focus & Hover](?path=/docs/foundation-focus-hover--docs): Fokus-Ring und Hover-Zustände
 - [Live](?path=/docs/foundation-live--docs): grüne Live-Sprache, Puls, Token
 - [Dark Mode](?path=/docs/foundation-dark-mode--docs): Hell, Dunkel oder System, Umschalter ohne Flackern (`initTheme`, `themeBootScript`)
-- [Vanilla](?path=/docs/foundation-vanilla--docs): das Paket ohne Framework und Build: `dist/vanilla`, `data-dss`, `initAll`, Markup aus Daten (`renderX`, `mountX`), die Karte ohne Framework (`mountMap`, `initMap`, Leaflet lokal), Sicherheit, CSP, Größen, Kopieren ins Projekt, Einbinden aus dem Release, Aktualisieren und Rollback, Kompatibilität (Browsermatrix), Wechsel auf npm ab 1.0, Versionsabgleich
+- [Vanilla](?path=/docs/foundation-vanilla--docs): das Paket ohne Framework und Build: `dist/vanilla`, `data-hoops`, `initAll`, Markup aus Daten (`renderX`, `mountX`), die Karte ohne Framework (`mountMap`, `initMap`, Leaflet lokal), Sicherheit, CSP, Größen, Kopieren ins Projekt, Einbinden aus dem Release, Aktualisieren und Rollback, Kompatibilität (Browsermatrix), Wechsel auf npm ab 1.0, Versionsabgleich
 
 ### Eingabe und Aktion
 
 - [Button](?path=/docs/components-button--docs): Varianten, Größen, Touch
 - [TextInput](?path=/docs/components-textinput--docs): Eingabefeld mit Label, Hilfetext und Validierung
-- [Select](?path=/docs/components-select--docs): Auswahlfeld im DSS-Look
+- [Select](?path=/docs/components-select--docs): Auswahlfeld im HoopsFoundry-UI-Look
 - [Checkbox](?path=/docs/components-checkbox--docs): Kontrollkästchen
 
 ### Hinweise und Overlays
@@ -89,7 +89,7 @@ Svelte-Komponenten importierst du einzeln über den Path-Export, etwa aus `@bbv/
 - [Card Library](?path=/docs/components-card-library--docs): Spielkarte, Spielerkarte (mit Foto), Ladezustand
 - [TeamCard](?path=/docs/components-teamcard--docs): Mannschaftskarte mit Bilanz, Spielen und Kader
 - [LeagueCard](?path=/docs/components-leaguecard--docs): Ligencard, Mini-Tabelle einer Liga mit Ausschnitt um die eigene Mannschaft
-- [Kennzahlen und Form](?path=/docs/components-kennzahlen--docs): Kennzahlen-Gitter (`dss-stats`) und die Form der letzten Spiele (`dss-form`), dieselbe Darstellung wie in der LeagueCard
+- [Kennzahlen und Form](?path=/docs/components-kennzahlen--docs): Kennzahlen-Gitter (`hoops-stats`) und die Form der letzten Spiele (`hoops-form`), dieselbe Darstellung wie in der LeagueCard
 - [Map](?path=/docs/components-map--docs): Karte mit Leaflet und OpenStreetMap, Zwei-Klick-Platzhalter, Textalternative, Vereinssitz-Marker, Dunkelmodus der Kacheln, Kachel-Proxy-Rezepten und die Karte ohne Build (`mountMap`, Leaflet lokal)
 - [VenueCard](?path=/docs/components-venuecard--docs): Hallenkarte, kleine Karte links, Adresse, Kontakt und die nächsten Spiele in der Halle rechts
 - [EmptyState](?path=/docs/components-emptystate--docs): Leerzustand und Fehler

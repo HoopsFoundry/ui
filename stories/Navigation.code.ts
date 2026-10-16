@@ -6,34 +6,34 @@ const setup = `<!-- Einmal im App-Root einbinden -->
 
 // ── TopBar ──
 export const topBarVanilla = `${setup}
-<!-- dss-topbar--dark ist Pflicht (ohne den Modifier ist es die helle Leiste des Vereinsregisters) -->
-<div class="dss-topbar dss-topbar--dark">
-  <div class="dss-topbar-brand">
-    <span class="dss-topbar-mark" aria-hidden="true">D</span>
-    DSS
+<!-- hoops-topbar--dark ist Pflicht (ohne den Modifier ist es die helle Leiste des Vereinsregisters) -->
+<div class="hoops-topbar hoops-topbar--dark">
+  <div class="hoops-topbar-brand">
+    <span class="hoops-topbar-mark" aria-hidden="true">D</span>
+    HoopsFoundry UI
   </div>
   <!-- Kontext: Live (Puls, Spielstand, Uhr) oder Admin (nur Text) -->
-  <div class="dss-topbar-ctx">
-    <span class="dss-topbar-live">Live</span>
+  <div class="hoops-topbar-ctx">
+    <span class="hoops-topbar-live">Live</span>
     <span>BBL · 17. Spieltag</span>
-    <span class="dss-topbar-score">87 : 64</span>
-    <span class="dss-topbar-clock">Q4 · 02:14</span>
+    <span class="hoops-topbar-score">87 : 64</span>
+    <span class="hoops-topbar-clock">Q4 · 02:14</span>
   </div>
-  <span class="dss-topbar-spacer"></span>
-  <div class="dss-topbar-user">
-    <span class="dss-topbar-av">SR</span>
+  <span class="hoops-topbar-spacer"></span>
+  <div class="hoops-topbar-user">
+    <span class="hoops-topbar-av">SR</span>
     Sven R.
   </div>
 </div>`;
 
 export const topBarSvelte = `<script>
-  import TopBar from '@bbv/dss-design-system/svelte/TopBar';
-  import Button from '@bbv/dss-design-system/svelte/Button';
+  import TopBar from '@hoopsfoundry/ui/svelte/TopBar';
+  import Button from '@hoopsfoundry/ui/svelte/Button';
 </script>
 
 <!-- context: 'default' | 'live' | 'admin' -->
 <TopBar
-  brand="DSS"
+  brand="HoopsFoundry UI"
   mark="D"
   context="live"
   matchLabel="BBL · 17. Spieltag"
@@ -44,13 +44,13 @@ export const topBarSvelte = `<script>
 />
 
 <!-- Eigene Inhalte über Snippets: leading, center, actions -->
-<TopBar brand="DSS" mark="D" contained>
+<TopBar brand="HoopsFoundry UI" mark="D" contained>
   {#snippet actions()}
     <Button variant="secondary" size="sm">Hilfe</Button>
   {/snippet}
 </TopBar>`;
 
-export const topBarReact = `import { Button, TopBar } from '@bbv/dss-design-system/react';
+export const topBarReact = `import { Button, TopBar } from '@hoopsfoundry/ui/react';
 
 export function Kopf() {
   return (
@@ -58,7 +58,7 @@ export function Kopf() {
       {/* context: 'default' | 'live' | 'admin'; as="header" macht die Leiste zur banner-Landmark */}
       <TopBar
         as="header"
-        brand="DSS"
+        brand="HoopsFoundry UI"
         mark="D"
         context="live"
         matchLabel="BBL · 17. Spieltag"
@@ -69,7 +69,7 @@ export function Kopf() {
       />
 
       {/* Eigene Inhalte über leading, center, actions */}
-      <TopBar brand="DSS" mark="D" contained actions={<Button variant="secondary" size="sm">Hilfe</Button>} />
+      <TopBar brand="HoopsFoundry UI" mark="D" contained actions={<Button variant="secondary" size="sm">Hilfe</Button>} />
     </>
   );
 }`;
@@ -78,28 +78,28 @@ export function Kopf() {
 export const bottomNavVanilla = `${setup}
 <!-- Symbole: <use href="#i-…"> braucht das Icon-Sprite auf der Seite.
      Aktuelle Seite: is-active und aria-current="page". Auswahl wechseln musst du selbst ergänzen. -->
-<nav class="dss-bnav" aria-label="Hauptnavigation">
-  <button type="button" class="dss-bnav-item is-active" aria-current="page">
-    <svg class="dss-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-home"></use></svg>
-    <span class="dss-bnav-lbl">Übersicht</span>
+<nav class="hoops-bnav" aria-label="Hauptnavigation">
+  <button type="button" class="hoops-bnav-item is-active" aria-current="page">
+    <svg class="hoops-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-home"></use></svg>
+    <span class="hoops-bnav-lbl">Übersicht</span>
   </button>
-  <button type="button" class="dss-bnav-item">
-    <svg class="dss-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-roster"></use></svg>
-    <span class="dss-bnav-lbl">Roster</span>
+  <button type="button" class="hoops-bnav-item">
+    <svg class="hoops-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-roster"></use></svg>
+    <span class="hoops-bnav-lbl">Roster</span>
   </button>
   <!-- Mittelaktion: das Label steht als aria-label, es wird nicht angezeigt -->
-  <button type="button" class="dss-bnav-fab" aria-label="Erfassen">
+  <button type="button" class="hoops-bnav-fab" aria-label="Erfassen">
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
   </button>
-  <button type="button" class="dss-bnav-item">
-    <svg class="dss-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-foul-p"></use></svg>
-    <span class="dss-bnav-lbl">Fouls</span>
-    <span class="dss-bnav-badge">3</span>
+  <button type="button" class="hoops-bnav-item">
+    <svg class="hoops-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href="#i-foul-p"></use></svg>
+    <span class="hoops-bnav-lbl">Fouls</span>
+    <span class="hoops-bnav-badge">3</span>
   </button>
 </nav>`;
 
 export const bottomNavSvelte = `<script>
-  import BottomNav from '@bbv/dss-design-system/svelte/BottomNav';
+  import BottomNav from '@hoopsfoundry/ui/svelte/BottomNav';
 
   const items = [
     { id: 'overview', label: 'Übersicht', icon: 'i-home' },
@@ -115,7 +115,7 @@ export const bottomNavSvelte = `<script>
 <BottomNav {items} bind:value onaction={(id) => console.log('Aktion', id)} />`;
 
 export const bottomNavReact = `import { useState } from 'react';
-import { BottomNav, type BottomNavItem } from '@bbv/dss-design-system/react';
+import { BottomNav, type BottomNavItem } from '@hoopsfoundry/ui/react';
 
 const items: BottomNavItem[] = [
   { id: 'overview', label: 'Übersicht', icon: 'home' },
@@ -133,18 +133,18 @@ export function Fuss() {
 
 // ── Breadcrumbs ──
 export const breadcrumbsVanilla = `${setup}
-<!-- Varianten: dss-crumbs--plain | --tagged | --chip. Bei chip heißen die Einträge dss-crumbs-chip statt dss-crumbs-item.
+<!-- Varianten: hoops-crumbs--plain | --tagged | --chip. Bei chip heißen die Einträge hoops-crumbs-chip statt hoops-crumbs-item.
      Der letzte Eintrag ist die aktuelle Seite: kein Link, aria-current="page". -->
-<nav class="dss-crumbs dss-crumbs--plain" aria-label="Breadcrumb">
-  <a class="dss-crumbs-item" href="/verband">Verband</a>
-  <svg class="dss-crumbs-sep" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>
-  <a class="dss-crumbs-item" href="/bayernliga">Bayernliga</a>
-  <svg class="dss-crumbs-sep" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>
-  <span class="dss-crumbs-item is-current" aria-current="page">Roster</span>
+<nav class="hoops-crumbs hoops-crumbs--plain" aria-label="Breadcrumb">
+  <a class="hoops-crumbs-item" href="/verband">Verband</a>
+  <svg class="hoops-crumbs-sep" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>
+  <a class="hoops-crumbs-item" href="/bayernliga">Bayernliga</a>
+  <svg class="hoops-crumbs-sep" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>
+  <span class="hoops-crumbs-item is-current" aria-current="page">Roster</span>
 </nav>`;
 
 export const breadcrumbsSvelte = `<script>
-  import Breadcrumbs from '@bbv/dss-design-system/svelte/Breadcrumbs';
+  import Breadcrumbs from '@hoopsfoundry/ui/svelte/Breadcrumbs';
 </script>
 
 <!-- variant: 'plain' | 'tagged' | 'chip'. Das letzte Element ist die aktuelle Seite (kein Link). -->
@@ -166,7 +166,7 @@ export const breadcrumbsSvelte = `<script>
   ]}
 />`;
 
-export const breadcrumbsReact = `import { Breadcrumbs } from '@bbv/dss-design-system/react';
+export const breadcrumbsReact = `import { Breadcrumbs } from '@hoopsfoundry/ui/react';
 
 export function Pfad() {
   return (
@@ -194,29 +194,29 @@ export function Pfad() {
 
 // ── Stepper ──
 export const stepperVanilla = `${setup}
-<!-- Layouts: dss-step--h (horizontal), dss-step--c (kompakt), dss-step--v (vertikal).
+<!-- Layouts: hoops-step--h (horizontal), hoops-step--c (kompakt), hoops-step--v (vertikal).
      Zustand je Schritt: is-done | is-current | is-pending. Der Zustand steht zusätzlich als unsichtbarer Text im Label. -->
-<ol class="dss-step dss-step--h" aria-label="Fortschritt">
-  <li class="dss-step-item is-done">
-    <span class="dss-step-dot" aria-hidden="true">
+<ol class="hoops-step hoops-step--h" aria-label="Fortschritt">
+  <li class="hoops-step-item is-done">
+    <span class="hoops-step-dot" aria-hidden="true">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
     </span>
-    <div class="dss-step-label">Spiel-Daten<span class="dss-sr-only"> (erledigt)</span></div>
-    <span class="dss-step-line" aria-hidden="true"></span>
+    <div class="hoops-step-label">Spiel-Daten<span class="hoops-sr-only"> (erledigt)</span></div>
+    <span class="hoops-step-line" aria-hidden="true"></span>
   </li>
-  <li class="dss-step-item is-current" aria-current="step">
-    <span class="dss-step-dot" aria-hidden="true"><span>2</span></span>
-    <div class="dss-step-label">Aufstellungen<span class="dss-sr-only"> (aktuell)</span></div>
-    <span class="dss-step-line" aria-hidden="true"></span>
+  <li class="hoops-step-item is-current" aria-current="step">
+    <span class="hoops-step-dot" aria-hidden="true"><span>2</span></span>
+    <div class="hoops-step-label">Aufstellungen<span class="hoops-sr-only"> (aktuell)</span></div>
+    <span class="hoops-step-line" aria-hidden="true"></span>
   </li>
-  <li class="dss-step-item is-pending">
-    <span class="dss-step-dot" aria-hidden="true"><span>3</span></span>
-    <div class="dss-step-label">Freigabe<span class="dss-sr-only"> (ausstehend)</span></div>
+  <li class="hoops-step-item is-pending">
+    <span class="hoops-step-dot" aria-hidden="true"><span>3</span></span>
+    <div class="hoops-step-label">Freigabe<span class="hoops-sr-only"> (ausstehend)</span></div>
   </li>
 </ol>`;
 
 export const stepperSvelte = `<script>
-  import Stepper from '@bbv/dss-design-system/svelte/Stepper';
+  import Stepper from '@hoopsfoundry/ui/svelte/Stepper';
 
   let aktuell = $state(1);
   const namen = [
@@ -233,7 +233,7 @@ export const stepperSvelte = `<script>
 <Stepper {steps} variant="vertical" onstep={(id) => (aktuell = namen.findIndex((s) => s.id === id))} />`;
 
 export const stepperReact = `import { useState } from 'react';
-import { Stepper, type StepItem } from '@bbv/dss-design-system/react';
+import { Stepper, type StepItem } from '@hoopsfoundry/ui/react';
 
 const namen = [
   { id: 's1', label: 'Spiel-Daten', description: 'Datum, Halle, Liga' },

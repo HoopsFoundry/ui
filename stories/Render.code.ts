@@ -1,7 +1,7 @@
 // Vanilla-Beispiele „Markup aus Daten erzeugen“ (renderX / mountX), gezeigt auf den Seiten der Komponenten. Die Tests
 // (tests/render-docs-code.test.ts) führen jedes Beispiel in jsdom aus und vergleichen das Ergebnis mit der Ausgabe der Svelte- und der
 // React-Komponente zu denselben Daten (`DOCS` am Ende nennt Variablen, Behälter und Komponente). Alle Daten sind erfunden.
-const IMPORT = (names: string) => `import { ${names} } from '@bbv/dss-design-system/render.js';`;
+const IMPORT = (names: string) => `import { ${names} } from '@hoopsfoundry/ui/render.js';`;
 
 /** Ligencard: mountLeagueCard in ein Element, renderLeagueCard als Zeichenkette (Crawler). */
 export const ligaRender = `<div id="liga"></div>
@@ -105,8 +105,8 @@ export const hallenRender = `<div id="halle"></div>
 export const hallenKarteLebendig = `<div id="halle"></div>
 
 <script type="module">
-  import { mountVenueCard } from '/dss/dss-render.min.js';
-  import { initMap } from '/dss/dss-map.min.js';
+  import { mountVenueCard } from '/hoops/hoops-render.min.js';
+  import { initMap } from '/hoops/hoops-map.min.js';
 
   const halle = {
     name: 'Sporthalle Nordhain',
@@ -137,14 +137,14 @@ export const hallenKarteLebendig = `<div id="halle"></div>
 </script>`;
 
 /** Hallenkarte vom Server: das Markup entsteht in Node, initAll macht die Karte im Browser lebendig. */
-export const hallenKarteServer = `// In Node (Seitengenerierung, Crawler): die Karte trägt data-dss="map" und ihre Optionen als JSON
-import { renderVenueCard } from '@bbv/dss-design-system/vanilla/dss-render.js';
+export const hallenKarteServer = `// In Node (Seitengenerierung, Crawler): die Karte trägt data-hoops="map" und ihre Optionen als JSON
+import { renderVenueCard } from '@hoopsfoundry/ui/vanilla/hoops-render.js';
 
 const html = renderVenueCard(halle, { init: true });   // „Karte laden“ ist ohne Skript gesperrt, Adresse und Links stehen als Text da
 
 // Im Browser, nach dem Laden der Seite:
-import { initAll } from '/dss/dss.min.js';
-import { initMapBlock } from '/dss/dss-map.min.js';
+import { initAll } from '/hoops/hoops.min.js';
+import { initMapBlock } from '/hoops/hoops-map.min.js';
 
 initAll(document, { map: { start: initMapBlock, loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js') } });`;
 

@@ -78,25 +78,25 @@ export function ScheduleGrid({
       <div
         key={game.id}
         className={cn(
-          'dss-sg-game',
+          'hoops-sg-game',
           own && 'is-own',
           game.state === 'live' && 'is-live',
           game.state === 'cancelled' && 'is-cancelled',
           game.state === 'postponed' && 'is-postponed',
         )}
       >
-        <div className="dss-sg-teams">
-          {stateLabel(game.state) ? <span className="dss-sr-only">{`${stateLabel(game.state)} `}</span> : null}
+        <div className="hoops-sg-teams">
+          {stateLabel(game.state) ? <span className="hoops-sr-only">{`${stateLabel(game.state)} `}</span> : null}
           <TeamName team={game.heim} loser={winner === 'gast'} renderLink={renderLink} names={names} logo={logos} />
-          <span className="dss-sch-sep" aria-hidden="true">
+          <span className="hoops-sch-sep" aria-hidden="true">
             {' – '}
           </span>
-          <span className="dss-sr-only"> gegen </span>
+          <span className="hoops-sr-only"> gegen </span>
           <TeamName team={game.gast} loser={winner === 'heim'} renderLink={renderLink} names={names} logo={logos} />
           {game.state === 'live' && !hasScore(game, 'versus') ? <LiveTag /> : null}
         </div>
         {(game.state === 'finished' || game.state === 'live') && hasScore(game, 'versus') ? (
-          <div className="dss-sg-result">
+          <div className="hoops-sg-result">
             <ResultText
               visible={`${game.heim?.score} : ${game.gast?.score}`}
               spoken={ariaForResult(game, 'versus')}
@@ -105,22 +105,22 @@ export function ScheduleGrid({
             {game.state === 'live' ? <LiveTag /> : null}
           </div>
         ) : null}
-        {metaText ? <div className="dss-sg-meta">{metaText}</div> : null}
-        {game.note ? <div className="dss-sch-note">{game.note}</div> : null}
+        {metaText ? <div className="hoops-sg-meta">{metaText}</div> : null}
+        {game.note ? <div className="hoops-sch-note">{game.note}</div> : null}
         {renderNotice ? renderNotice(game) : null}
       </div>
     );
   };
 
-  const rootClass = cn('dss-frame', className);
+  const rootClass = cn('hoops-frame', className);
   // Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1)
   const region = (
-    <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Zeitraster'}>
-      <table role="table" className={cn('dss-tbl dss-sgrid', `dss-tbl--${density}`)}>
-        {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
+    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Zeitraster'}>
+      <table role="table" className={cn('hoops-tbl hoops-sgrid', `hoops-tbl--${density}`)}>
+        {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
         <thead role="rowgroup">
           <tr role="row">
-            <th scope="col" role="columnheader" className="dss-sg-time">
+            <th scope="col" role="columnheader" className="hoops-sg-time">
               Zeit
             </th>
             {columns.map((column) => (
@@ -135,8 +135,8 @@ export function ScheduleGrid({
           {rows.map((row, index) => {
             if (row.kind === 'break') {
               return (
-                <tr key={`b-${index}`} role="row" className="dss-sg-break">
-                  <th scope="row" role="rowheader" className="dss-sg-time">
+                <tr key={`b-${index}`} role="row" className="hoops-sg-break">
+                  <th scope="row" role="rowheader" className="hoops-sg-time">
                     {row.time}
                   </th>
                   <td role="cell" colSpan={columns.length}>
@@ -147,9 +147,9 @@ export function ScheduleGrid({
             }
             if (row.kind === 'bye') {
               return (
-                <tr key={`y-${index}`} role="row" className="dss-sg-bye">
-                  <th scope="row" role="rowheader" className="dss-sg-time">
-                    {row.time ? row.time : <span className="dss-sr-only">Zeit offen</span>}
+                <tr key={`y-${index}`} role="row" className="hoops-sg-bye">
+                  <th scope="row" role="rowheader" className="hoops-sg-time">
+                    {row.time ? row.time : <span className="hoops-sr-only">Zeit offen</span>}
                   </th>
                   <td role="cell" colSpan={columns.length}>
                     {row.game.heim ? (
@@ -165,17 +165,17 @@ export function ScheduleGrid({
             }
             return (
               <tr key={`s-${row.time}-${index}`} role="row">
-                <th scope="row" role="rowheader" className="dss-sg-time">
+                <th scope="row" role="rowheader" className="hoops-sg-time">
                   {row.time}
                 </th>
                 {row.cells.map((cell, columnIndex) => (
                   <td
                     key={columns[columnIndex].id}
                     role="cell"
-                    className={cn('dss-sg-cell', cell.length === 0 && 'is-empty')}
+                    className={cn('hoops-sg-cell', cell.length === 0 && 'is-empty')}
                     data-label={columns[columnIndex].label}
                   >
-                    {cell.length === 0 ? <span className="dss-sg-empty">{emptyLabel}</span> : cell.map(gameBlock)}
+                    {cell.length === 0 ? <span className="hoops-sg-empty">{emptyLabel}</span> : cell.map(gameBlock)}
                   </td>
                 ))}
               </tr>
@@ -196,19 +196,19 @@ export function ScheduleGrid({
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
-        meta={meta ? <span className="dss-frame-meta"><span>{meta}</span></span> : undefined}
+        meta={meta ? <span className="hoops-frame-meta"><span>{meta}</span></span> : undefined}
       >
         {region}
       </CollapsibleFrame>
     );
   }
-  if (collapsible) devWarn('[DSS] ScheduleGrid: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
+  if (collapsible) devWarn('[HoopsFoundry UI] ScheduleGrid: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
     <div className={rootClass}>
       {hasHead ? (
-        <div className="dss-frame-head">
-          {title ? <Heading className="dss-frame-title">{title}</Heading> : <span />}
-          <div className="dss-frame-meta">{meta ? <span>{meta}</span> : null}</div>
+        <div className="hoops-frame-head">
+          {title ? <Heading className="hoops-frame-title">{title}</Heading> : <span />}
+          <div className="hoops-frame-meta">{meta ? <span>{meta}</span> : null}</div>
         </div>
       ) : null}
       {region}

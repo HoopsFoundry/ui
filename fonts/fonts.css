@@ -1,5 +1,5 @@
 /* ──────────────────────────────────────────────────────────────
-   DSS Design System · Schriften (selbst gehostet, optional)
+   HoopsFoundry UI · Schriften (selbst gehostet, optional)
    ──────────────────────────────────────────────────────────────
    Sora · Manrope · JetBrains Mono · Rubik   variable Schriften (wght)
    Barlow Condensed 600/700                   Fallback für Sucrose (DBB)
@@ -7,7 +7,7 @@
    (Lizenztexte in fonts/licenses/). Subsets: latin und latin-ext.
 
    Einbinden (eine Zeile, keine Anfrage an Google):
-       @import "@bbv/dss-design-system/fonts.css";
+       @import "@hoopsfoundry/ui/fonts.css";
 
    Sucrose (DBB-Display-Schrift) ist lizenzpflichtig und nicht enthalten.
    ─────────────────────────────────────────────────────────── */

@@ -1,106 +1,106 @@
 // Ligencard. Das Vanilla-Markup entspricht der Svelte-/React-Ausgabe (tests/league-code.test.ts); die Beispiele rendern bzw. kompilieren dort.
-export const vanilla = `<!-- Ligencard: dss-league (compact: dss-league--compact). Die Tabelle ist eine echte table mit caption (versteckt, nennt den Ausschnitt).
-     Eigene Zeile: class="is-own" plus versteckter Text. Zone: class="dss-league-zone dss-league-zone--up|playoff|down" plus versteckter Text und Legende.
-     S, N, Diff und Form tragen dss-league-opt (bis 640 px ausgeblendet). Diff: Vorzeichen als Text, Klasse plus bzw. minus. -->
-<div class="dss-league">
-  <div class="dss-league-head">
-    <div class="dss-league-heading">
-      <h3 class="dss-league-title">Oberliga Nordhain Männer</h3>
-      <p class="dss-league-sub">12 Teams · 66 von 132 Spielen gespielt</p>
+export const vanilla = `<!-- Ligencard: hoops-league (compact: hoops-league--compact). Die Tabelle ist eine echte table mit caption (versteckt, nennt den Ausschnitt).
+     Eigene Zeile: class="is-own" plus versteckter Text. Zone: class="hoops-league-zone hoops-league-zone--up|playoff|down" plus versteckter Text und Legende.
+     S, N, Diff und Form tragen hoops-league-opt (bis 640 px ausgeblendet). Diff: Vorzeichen als Text, Klasse plus bzw. minus. -->
+<div class="hoops-league">
+  <div class="hoops-league-head">
+    <div class="hoops-league-heading">
+      <h3 class="hoops-league-title">Oberliga Nordhain Männer</h3>
+      <p class="hoops-league-sub">12 Teams · 66 von 132 Spielen gespielt</p>
     </div>
-    <span class="dss-league-live">
-      <span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>
-      <span class="dss-league-live-n">2 Spiele laufen</span>
+    <span class="hoops-league-live">
+      <span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span>Live</span>
+      <span class="hoops-league-live-n">2 Spiele laufen</span>
     </span>
   </div>
-  <div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
-    <table class="dss-tbl dss-tbl--touch dss-league-tbl">
-      <caption class="dss-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 4 von 12</caption>
+  <div class="hoops-table-scroll hoops-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
+    <table class="hoops-tbl hoops-tbl--touch hoops-league-tbl">
+      <caption class="hoops-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 4 von 12</caption>
       <thead>
         <tr>
-          <th scope="col" class="dss-league-rank"><span aria-hidden="true">#</span><span class="dss-sr-only">Platz</span></th>
+          <th scope="col" class="hoops-league-rank"><span aria-hidden="true">#</span><span class="hoops-sr-only">Platz</span></th>
           <th scope="col">Mannschaft</th>
-          <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="dss-sr-only">Spiele</span></th>
-          <th scope="col" class="num dss-league-opt"><span aria-hidden="true">Diff</span><span class="dss-sr-only">Korbdifferenz</span></th>
-          <th scope="col" class="num dss-league-pts"><span aria-hidden="true">PKT</span><span class="dss-sr-only">Punkte</span></th>
+          <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="hoops-sr-only">Spiele</span></th>
+          <th scope="col" class="num hoops-league-opt"><span aria-hidden="true">Diff</span><span class="hoops-sr-only">Korbdifferenz</span></th>
+          <th scope="col" class="num hoops-league-pts"><span aria-hidden="true">PKT</span><span class="hoops-sr-only">Punkte</span></th>
         </tr>
       </thead>
       <tbody>
-        <tr class="dss-league-zone dss-league-zone--up">
-          <td class="dss-league-rank">1</td>
-          <td class="dss-league-team"><span class="dss-league-who">Lindenberg Hawks<span class="dss-sr-only">, Aufstiegsplatz</span></span></td>
+        <tr class="hoops-league-zone hoops-league-zone--up">
+          <td class="hoops-league-rank">1</td>
+          <td class="hoops-league-team"><span class="hoops-league-who">Lindenberg Hawks<span class="hoops-sr-only">, Aufstiegsplatz</span></span></td>
           <td class="num">11</td>
-          <td class="num dss-league-opt plus">+31</td>
-          <td class="num lead dss-league-pts">20</td>
+          <td class="num hoops-league-opt plus">+31</td>
+          <td class="num lead hoops-league-pts">20</td>
         </tr>
         <tr>
-          <td class="dss-league-rank">2</td>
-          <td class="dss-league-team"><span class="dss-league-who">BG Seeberg</span></td>
+          <td class="hoops-league-rank">2</td>
+          <td class="hoops-league-team"><span class="hoops-league-who">BG Seeberg</span></td>
           <td class="num">11</td>
-          <td class="num dss-league-opt plus">+24</td>
-          <td class="num lead dss-league-pts">18</td>
+          <td class="num hoops-league-opt plus">+24</td>
+          <td class="num lead hoops-league-pts">18</td>
         </tr>
         <tr class="is-own">
-          <td class="dss-league-rank">3</td>
-          <td class="dss-league-team"><span class="dss-league-who"><a class="dss-link dss-league-link" href="/teams/nordhain">TSV Nordhain 1920</a><span class="dss-sr-only">, eigene Mannschaft</span></span></td>
+          <td class="hoops-league-rank">3</td>
+          <td class="hoops-league-team"><span class="hoops-league-who"><a class="hoops-link hoops-league-link" href="/teams/nordhain">TSV Nordhain 1920</a><span class="hoops-sr-only">, eigene Mannschaft</span></span></td>
           <td class="num">11</td>
-          <td class="num dss-league-opt plus">+17</td>
-          <td class="num lead dss-league-pts">16</td>
+          <td class="num hoops-league-opt plus">+17</td>
+          <td class="num lead hoops-league-pts">16</td>
         </tr>
         <tr>
-          <td class="dss-league-rank">4</td>
-          <td class="dss-league-team"><span class="dss-league-who">TSV Elbach</span></td>
+          <td class="hoops-league-rank">4</td>
+          <td class="hoops-league-team"><span class="hoops-league-who">TSV Elbach</span></td>
           <td class="num">11</td>
-          <td class="num dss-league-opt minus">−3</td>
-          <td class="num lead dss-league-pts">14</td>
+          <td class="num hoops-league-opt minus">−3</td>
+          <td class="num lead hoops-league-pts">14</td>
         </tr>
       </tbody>
     </table>
   </div>
-  <ul class="dss-league-legend" aria-label="Legende">
-    <li><span class="dss-league-key dss-league-key--up" aria-hidden="true"></span>Aufstieg</li>
+  <ul class="hoops-league-legend" aria-label="Legende">
+    <li><span class="hoops-league-key hoops-league-key--up" aria-hidden="true"></span>Aufstieg</li>
   </ul>
-  <div class="dss-league-foot">
-    <a class="dss-link dss-league-more" href="/liga/tabelle">Komplette Tabelle und Spielplan<span class="dss-sr-only">, Oberliga Nordhain Männer</span></a>
+  <div class="hoops-league-foot">
+    <a class="hoops-link hoops-league-more" href="/liga/tabelle">Komplette Tabelle und Spielplan<span class="hoops-sr-only">, Oberliga Nordhain Männer</span></a>
   </div>
 </div>
 
-<!-- Seitenleiste: dss-league--compact (Dichte compact, kein Untertitel) -->
-<div class="dss-league dss-league--compact">
-  <div class="dss-league-head">
-    <div class="dss-league-heading">
-      <h3 class="dss-league-title">Oberliga Nordhain Männer</h3>
+<!-- Seitenleiste: hoops-league--compact (Dichte compact, kein Untertitel) -->
+<div class="hoops-league hoops-league--compact">
+  <div class="hoops-league-head">
+    <div class="hoops-league-heading">
+      <h3 class="hoops-league-title">Oberliga Nordhain Männer</h3>
     </div>
   </div>
-  <div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
-    <table class="dss-tbl dss-tbl--compact dss-league-tbl">
-      <caption class="dss-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 3 von 6</caption>
+  <div class="hoops-table-scroll hoops-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
+    <table class="hoops-tbl hoops-tbl--compact hoops-league-tbl">
+      <caption class="hoops-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 3 von 6</caption>
       <thead>
         <tr>
-          <th scope="col" class="dss-league-rank"><span aria-hidden="true">#</span><span class="dss-sr-only">Platz</span></th>
+          <th scope="col" class="hoops-league-rank"><span aria-hidden="true">#</span><span class="hoops-sr-only">Platz</span></th>
           <th scope="col">Mannschaft</th>
-          <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="dss-sr-only">Spiele</span></th>
-          <th scope="col" class="num dss-league-pts"><span aria-hidden="true">PKT</span><span class="dss-sr-only">Punkte</span></th>
+          <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="hoops-sr-only">Spiele</span></th>
+          <th scope="col" class="num hoops-league-pts"><span aria-hidden="true">PKT</span><span class="hoops-sr-only">Punkte</span></th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="dss-league-rank">1</td>
-          <td class="dss-league-team"><span class="dss-league-who">Lindenberg Hawks</span></td>
+          <td class="hoops-league-rank">1</td>
+          <td class="hoops-league-team"><span class="hoops-league-who">Lindenberg Hawks</span></td>
           <td class="num">11</td>
-          <td class="num lead dss-league-pts">20</td>
+          <td class="num lead hoops-league-pts">20</td>
         </tr>
         <tr>
-          <td class="dss-league-rank">2</td>
-          <td class="dss-league-team"><span class="dss-league-who">BG Seeberg</span></td>
+          <td class="hoops-league-rank">2</td>
+          <td class="hoops-league-team"><span class="hoops-league-who">BG Seeberg</span></td>
           <td class="num">11</td>
-          <td class="num lead dss-league-pts">18</td>
+          <td class="num lead hoops-league-pts">18</td>
         </tr>
         <tr>
-          <td class="dss-league-rank">3</td>
-          <td class="dss-league-team"><span class="dss-league-who">TSV Nordhain 1920</span></td>
+          <td class="hoops-league-rank">3</td>
+          <td class="hoops-league-team"><span class="hoops-league-who">TSV Nordhain 1920</span></td>
           <td class="num">11</td>
-          <td class="num lead dss-league-pts">16</td>
+          <td class="num lead hoops-league-pts">16</td>
         </tr>
       </tbody>
     </table>
@@ -115,7 +115,7 @@ const teamsJs = `{ rank: 1, name: 'Lindenberg Hawks', played: 11, points: 20, di
     { rank: 6, name: 'TuS Waldmark', played: 11, points: 12, diff: -12 },`;
 
 export const svelte = `<script>
-  import LeagueCard from '@bbv/dss-design-system/svelte/LeagueCard';
+  import LeagueCard from '@hoopsfoundry/ui/svelte/LeagueCard';
 
   // Die ganze Tabelle (oder ein Teil); die Karte wählt den Ausschnitt selbst: mit eigener Mannschaft
   // (own: true) zwei davor, die eigene und eine dahinter, sonst die ersten limit (Standard 3).
@@ -142,7 +142,7 @@ export const svelte = `<script>
 <!-- Ohne eigene Mannschaft (own): die ersten limit Plätze -->
 <LeagueCard title="Oberliga Nordhain Männer" teams={teams.map(({ own, ...team }) => team)} limit={5} />`;
 
-export const react = `import { LeagueCard, type LeagueTeam } from '@bbv/dss-design-system/react';
+export const react = `import { LeagueCard, type LeagueTeam } from '@hoopsfoundry/ui/react';
 
 // Die ganze Tabelle (oder ein Teil); die Karte wählt den Ausschnitt selbst: mit eigener Mannschaft
 // (own: true) zwei davor, die eigene und eine dahinter, sonst die ersten limit (Standard 3).
@@ -169,8 +169,8 @@ const teams: LeagueTeam[] = [
 <LeagueCard title="Oberliga Nordhain Männer" teams={teams.map(({ own, ...team }) => team)} limit={5} />`;
 
 export const ebeneSvelte = `<script>
-  import HeadingLevel from '@bbv/dss-design-system/svelte/HeadingLevel';
-  import LeagueCard from '@bbv/dss-design-system/svelte/LeagueCard';
+  import HeadingLevel from '@hoopsfoundry/ui/svelte/HeadingLevel';
+  import LeagueCard from '@hoopsfoundry/ui/svelte/LeagueCard';
 
   const teams = [{ rank: 1, name: 'Lindenberg Hawks', played: 11, points: 20 }];
 </script>
@@ -182,7 +182,7 @@ export const ebeneSvelte = `<script>
   <LeagueCard title="Kreisliga Süd" {teams} titleAs="h5" />
 </HeadingLevel>`;
 
-export const ebeneReact = `import { HeadingLevel, LeagueCard, type LeagueTeam } from '@bbv/dss-design-system/react';
+export const ebeneReact = `import { HeadingLevel, LeagueCard, type LeagueTeam } from '@hoopsfoundry/ui/react';
 
 const teams: LeagueTeam[] = [{ rank: 1, name: 'Lindenberg Hawks', played: 11, points: 20 }];
 
@@ -193,7 +193,7 @@ const teams: LeagueTeam[] = [{ rank: 1, name: 'Lindenberg Hawks', played: 11, po
   <LeagueCard title="Kreisliga Süd" teams={teams} titleAs="h5" />
 </HeadingLevel>`;
 
-export const funktionenJs = `import { leagueWindow, leagueSummary, formLabel, windowLabel } from '@bbv/dss-design-system/league.js';
+export const funktionenJs = `import { leagueWindow, leagueSummary, formLabel, windowLabel } from '@hoopsfoundry/ui/league.js';
 
 const teams = [
   { rank: 1, name: 'Lindenberg Hawks', played: 11, points: 20 },
@@ -216,50 +216,50 @@ formLabel(['S', 'S', 'N']); // 'Form: Sieg, Sieg, Niederlage'`;
 // ── Tabellen einklappen (LeagueCard.mdx, Abschnitt „Ligencard einklappen“). Die Tests (tests/collapsible-code.test.ts) übersetzen das
 // React-Beispiel mit dem TypeScript-Compiler, rendern das Svelte-Beispiel und vergleichen das Vanilla-Markup mit der Ausgabe der Komponente.
 
-const CHEVRON = `<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
+const CHEVRON = `<svg class="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
 
 /** Markup einer einklappbaren Ligencard (geöffnet, mit Untertitel); die Doku zeigt es und prüft es gegen die Komponente. */
-export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
-  <div class="dss-league is-collapsible is-open" id="oberliga">
-    <div class="dss-league-head dss-league-head--acc">
-      <h3 class="dss-league-title">
-        <button type="button" class="dss-acc-trigger" id="oberliga-trigger" aria-expanded="true" aria-controls="oberliga-panel">
-          <span class="dss-acc-label">Oberliga Nordhain Männer<span class="dss-acc-sep">,</span><span class="dss-acc-sub">12 Teams · 66 von 132 Spielen gespielt</span></span>
+export const collapsibleMarkup = `<div class="hoops-acc" data-hoops-acc>
+  <div class="hoops-league is-collapsible is-open" id="oberliga">
+    <div class="hoops-league-head hoops-league-head--acc">
+      <h3 class="hoops-league-title">
+        <button type="button" class="hoops-acc-trigger" id="oberliga-trigger" aria-expanded="true" aria-controls="oberliga-panel">
+          <span class="hoops-acc-label">Oberliga Nordhain Männer<span class="hoops-acc-sep">,</span><span class="hoops-acc-sub">12 Teams · 66 von 132 Spielen gespielt</span></span>
           ${CHEVRON}
         </button>
       </h3>
     </div>
-    <div class="dss-acc-panel" id="oberliga-panel">
-      <div class="dss-acc-panel-inner">
-        <div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
-          <table class="dss-tbl dss-tbl--touch dss-league-tbl">
-            <caption class="dss-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 3 von 12</caption>
+    <div class="hoops-acc-panel" id="oberliga-panel">
+      <div class="hoops-acc-panel-inner">
+        <div class="hoops-table-scroll hoops-league-scroll" role="region" tabindex="0" aria-label="Tabelle: Oberliga Nordhain Männer">
+          <table class="hoops-tbl hoops-tbl--touch hoops-league-tbl">
+            <caption class="hoops-sr-only">Oberliga Nordhain Männer, Plätze 1 bis 3 von 12</caption>
             <thead>
               <tr>
-                <th scope="col" class="dss-league-rank"><span aria-hidden="true">#</span><span class="dss-sr-only">Platz</span></th>
+                <th scope="col" class="hoops-league-rank"><span aria-hidden="true">#</span><span class="hoops-sr-only">Platz</span></th>
                 <th scope="col">Mannschaft</th>
-                <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="dss-sr-only">Spiele</span></th>
-                <th scope="col" class="num dss-league-pts"><span aria-hidden="true">PKT</span><span class="dss-sr-only">Punkte</span></th>
+                <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="hoops-sr-only">Spiele</span></th>
+                <th scope="col" class="num hoops-league-pts"><span aria-hidden="true">PKT</span><span class="hoops-sr-only">Punkte</span></th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td class="dss-league-rank">1</td>
-                <td class="dss-league-team"><span class="dss-league-who">Lindenberg Hawks</span></td>
+                <td class="hoops-league-rank">1</td>
+                <td class="hoops-league-team"><span class="hoops-league-who">Lindenberg Hawks</span></td>
                 <td class="num">11</td>
-                <td class="num lead dss-league-pts">20</td>
+                <td class="num lead hoops-league-pts">20</td>
               </tr>
               <tr>
-                <td class="dss-league-rank">2</td>
-                <td class="dss-league-team"><span class="dss-league-who">BG Seeberg</span></td>
+                <td class="hoops-league-rank">2</td>
+                <td class="hoops-league-team"><span class="hoops-league-who">BG Seeberg</span></td>
                 <td class="num">11</td>
-                <td class="num lead dss-league-pts">18</td>
+                <td class="num lead hoops-league-pts">18</td>
               </tr>
               <tr>
-                <td class="dss-league-rank">3</td>
-                <td class="dss-league-team"><span class="dss-league-who">TSV Nordhain 1920</span></td>
+                <td class="hoops-league-rank">3</td>
+                <td class="hoops-league-team"><span class="hoops-league-who">TSV Nordhain 1920</span></td>
                 <td class="num">11</td>
-                <td class="num lead dss-league-pts">16</td>
+                <td class="num lead hoops-league-pts">16</td>
               </tr>
             </tbody>
           </table>
@@ -270,14 +270,14 @@ export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
 </div>`;
 
 export const collapsibleVanilla = `<!-- Wie die normale Ligencard (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Untertitel steht im Button
-     (dss-acc-sub), ein Live-Tag käme als dss-league-live dahinter. Die Karte trägt is-collapsible (und is-open, wenn sie offen ist);
-     Tabelle, Legende und Link stehen im Bereich (dss-acc-panel). Geschlossen: aria-expanded="false", Bereich mit hidden und inert.
-     Steht der Rahmen im Panel eines Bereichs (dss-acc-item), braucht er einen eigenen Container (div.dss-acc mit data-dss-acc) und einen eigenen
-     initAccordion-Aufruf; initAccordions startet jeden data-dss-acc-Container einzeln. -->
+     (hoops-acc-sub), ein Live-Tag käme als hoops-league-live dahinter. Die Karte trägt is-collapsible (und is-open, wenn sie offen ist);
+     Tabelle, Legende und Link stehen im Bereich (hoops-acc-panel). Geschlossen: aria-expanded="false", Bereich mit hidden und inert.
+     Steht der Rahmen im Panel eines Bereichs (hoops-acc-item), braucht er einen eigenen Container (div.hoops-acc mit data-hoops-acc) und einen eigenen
+     initAccordion-Aufruf; initAccordions startet jeden data-hoops-acc-Container einzeln. -->
 ${collapsibleMarkup}
 
 <script type="module">
-  import { initAccordions } from '@bbv/dss-design-system/accordion.js';
+  import { initAccordions } from '@hoopsfoundry/ui/accordion.js';
 
   initAccordions(document, { nav: true });
 </script>`;
@@ -289,8 +289,8 @@ const collapsibleTeams = `const teams = [
 ];`;
 
 export const collapsibleSvelte = `<script>
-  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
-  import LeagueCard from '@bbv/dss-design-system/svelte/LeagueCard';
+  import Accordion from '@hoopsfoundry/ui/svelte/Accordion';
+  import LeagueCard from '@hoopsfoundry/ui/svelte/LeagueCard';
 
   ${collapsibleTeams.replaceAll('\n', '\n  ')}
   let open = $state(true);
@@ -306,7 +306,7 @@ export const collapsibleSvelte = `<script>
 </Accordion>`;
 
 export const collapsibleReact = `import { useState } from 'react';
-import { Accordion, LeagueCard, type LeagueTeam } from '@bbv/dss-design-system/react';
+import { Accordion, LeagueCard, type LeagueTeam } from '@hoopsfoundry/ui/react';
 
 ${collapsibleTeams.replace('const teams = [', 'const teams: LeagueTeam[] = [')}
 

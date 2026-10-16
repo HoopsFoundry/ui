@@ -1,6 +1,6 @@
-/** DSS Design System · Tailwind v3 / v4 preset
- *  Usage: import dssPreset from '@bbv/dss/tailwind.preset.js';
- *         export default { presets: [dssPreset], ... }
+/** HoopsFoundry UI · Tailwind v3 / v4 preset
+ *  Usage: import hoopsPreset from '@bbv/hoops/tailwind.preset.js';
+ *         export default { presets: [hoopsPreset], ... }
  */
 
 export default {
@@ -203,10 +203,10 @@ export default {
         'xl':  '18px',
       },
       boxShadow: {
-        'dss-sm': '0 1px 2px rgba(15,20,38,0.08)',
-        'dss-md': '0 4px 12px rgba(15,20,38,0.08), 0 1px 3px rgba(15,20,38,0.04)',
-        'dss-lg': '0 18px 48px rgba(15,20,38,0.16), 0 4px 12px rgba(15,20,38,0.08)',
-        'dss-xl': '0 30px 80px -10px rgba(15,20,38,0.30), 0 12px 30px -8px rgba(15,20,38,0.18)',
+        'hoops-sm': '0 1px 2px rgba(15,20,38,0.08)',
+        'hoops-md': '0 4px 12px rgba(15,20,38,0.08), 0 1px 3px rgba(15,20,38,0.04)',
+        'hoops-lg': '0 18px 48px rgba(15,20,38,0.16), 0 4px 12px rgba(15,20,38,0.08)',
+        'hoops-xl': '0 30px 80px -10px rgba(15,20,38,0.30), 0 12px 30px -8px rgba(15,20,38,0.18)',
       },
       screens: {
         'tablet':  '1024px',  // iPad landscape — Kampfgericht

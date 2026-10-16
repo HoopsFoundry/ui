@@ -75,10 +75,10 @@ describe('EmptyState: renderEmptyState gegen Svelte und React', () => {
   it('actions als Links und extra als Text', async () => {
     const html = renderEmptyState({ title: 'T', cta: 'Los', actions: [{ label: 'Hilfe', href: '/hilfe' }, { label: 'Böse', href: 'javascript:alert(1)' }], extra: 'Fragen?' });
     const reactHtml = await p.react('EmptyState', { title: 'T', cta: 'Los' }, 'Fragen?');
-    expect(html).toContain('<a class="dss-btn dss-btn--ghost dss-btn--md" href="/hilfe">Hilfe</a>');
+    expect(html).toContain('<a class="hoops-btn hoops-btn--ghost hoops-btn--md" href="/hilfe">Hilfe</a>');
     expect(html).not.toContain('javascript');
-    expect(normalize(html)).toContain('<div class="dss-empty-extra">Fragen?</div>');
-    expect(reactHtml).toContain('dss-empty-extra');
+    expect(normalize(html)).toContain('<div class="hoops-empty-extra">Fragen?</div>');
+    expect(reactHtml).toContain('hoops-empty-extra');
   });
   it('mit icon wie Svelte (Sprite-ID mit i-)', async () => {
     const props = { title: 'X', icon: 'i-calendar' };

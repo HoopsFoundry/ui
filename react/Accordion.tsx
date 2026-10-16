@@ -94,7 +94,7 @@ export function Accordion({
   children,
 }: AccordionProps) {
   const uid = useId();
-  const listId = `dss-acc-nav-${uid}`;
+  const listId = `hoops-acc-nav-${uid}`;
   const nested = useContext(ItemContext) !== undefined;
   const root = useRef<HTMLDivElement>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -159,35 +159,35 @@ export function Accordion({
 
   return (
     <GroupContext.Provider value={api}>
-      <div ref={root} className={cn('dss-acc', `dss-acc--${variant}`, sticky && 'dss-acc--sticky', nested && 'dss-acc--nested', className)}>
+      <div ref={root} className={cn('hoops-acc', `hoops-acc--${variant}`, sticky && 'hoops-acc--sticky', nested && 'hoops-acc--nested', className)}>
         {entries.length === 0 && (showAll || nav) ? (
           // Platz für Leiste und Sprungleiste schon im Server-Markup: kein Sprung nach dem Hydrieren
-          <div className="dss-acc-tools dss-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true" />
+          <div className="hoops-acc-tools hoops-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true" />
         ) : entries.length > 0 && (showAll || nav) ? (
-          <div className="dss-acc-tools">
+          <div className="hoops-acc-tools">
             {showAll ? (
-              <div className="dss-acc-bar">
-                <button type="button" className="dss-btn dss-btn--secondary dss-btn--sm" aria-controls={panelIds} onClick={() => setAll(true)}>
+              <div className="hoops-acc-bar">
+                <button type="button" className="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={panelIds} onClick={() => setAll(true)}>
                   Alle öffnen
                 </button>
-                <button type="button" className="dss-btn dss-btn--secondary dss-btn--sm" aria-controls={panelIds} onClick={() => setAll(false)}>
+                <button type="button" className="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={panelIds} onClick={() => setAll(false)}>
                   Alle schließen
                 </button>
-                <span className="dss-sr-only" aria-live="polite" aria-atomic="true">
+                <span className="hoops-sr-only" aria-live="polite" aria-atomic="true">
                   {announcement}
                 </span>
               </div>
             ) : null}
             {nav ? (
-              <nav className={cn('dss-acc-nav', navOpen && 'is-open')} aria-label={navLabel}>
-                <button type="button" className="dss-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onClick={() => setNavOpen((v) => !v)}>
+              <nav className={cn('hoops-acc-nav', navOpen && 'is-open')} aria-label={navLabel}>
+                <button type="button" className="hoops-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onClick={() => setNavOpen((v) => !v)}>
                   {navLabel}
                 </button>
-                <ul className="dss-acc-nav-list" id={listId}>
+                <ul className="hoops-acc-nav-list" id={listId}>
                   {entries.filter((e) => e.anchor !== false && e.title).map((entry) => (
-                    <li key={entry.id} className="dss-acc-nav-item">
+                    <li key={entry.id} className="hoops-acc-nav-item">
                       <a
-                        className="dss-acc-nav-link"
+                        className="hoops-acc-nav-link"
                         href={`#${encodeURIComponent(entry.id)}`}
                         aria-current={current === entry.id ? 'true' : undefined}
                         onClick={(event) => jump(event, entry)}
@@ -300,12 +300,12 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
   const inert = open ? {} : ({ inert: '' } as Record<string, string>);
 
   return (
-    <div ref={el} className={cn('dss-acc-item', open && 'is-open', disabled && 'is-disabled')} id={id}>
-      <TitleTag className="dss-acc-title">
+    <div ref={el} className={cn('hoops-acc-item', open && 'is-open', disabled && 'is-disabled')} id={id}>
+      <TitleTag className="hoops-acc-title">
         <button
           ref={trigger}
           type="button"
-          className="dss-acc-trigger"
+          className="hoops-acc-trigger"
           id={triggerId}
           aria-expanded={open}
           aria-controls={panelId}
@@ -313,19 +313,19 @@ export function AccordionItem({ id, title, open: openProp, defaultOpen = false, 
           onClick={() => setOpen(!open, true)}
           onKeyDown={(event) => group?.onKey(event)}
         >
-          <span className="dss-acc-label">
+          <span className="hoops-acc-label">
             {title}
-            {meta ? <span className="dss-acc-sep">,</span> : null}
+            {meta ? <span className="hoops-acc-sep">,</span> : null}
           </span>
-          {meta ? <span className="dss-acc-meta">{meta}</span> : null}
-          <svg className="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+          {meta ? <span className="hoops-acc-meta">{meta}</span> : null}
+          <svg className="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
             <path d="M5 7.5l5 5 5-5" />
           </svg>
         </button>
       </TitleTag>
-      <div ref={panel} className="dss-acc-panel" id={panelId} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} {...inert}>
-        <div className="dss-acc-panel-inner">
-          <div className="dss-acc-body">
+      <div ref={panel} className="hoops-acc-panel" id={panelId} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} {...inert}>
+        <div className="hoops-acc-panel-inner">
+          <div className="hoops-acc-body">
             <ItemContext.Provider value={itemApi}>
               <HeadingLevelContext.Provider value={contentLevel}>{children}</HeadingLevelContext.Provider>
             </ItemContext.Provider>

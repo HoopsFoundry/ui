@@ -7,19 +7,19 @@ describe('Card', () => {
   it('rendert default/md mit Body', () => {
     const { container } = render(<Card>Inhalt</Card>);
     const card = container.firstElementChild!;
-    expect(card).toHaveClass('dss-card', 'dss-card--default', 'dss-card--pad-md');
-    expect(card.querySelector('.dss-card-body')).toHaveTextContent('Inhalt');
+    expect(card).toHaveClass('hoops-card', 'hoops-card--default', 'hoops-card--pad-md');
+    expect(card.querySelector('.hoops-card-body')).toHaveTextContent('Inhalt');
   });
 
   it('setzt variant und padding', () => {
     const { container } = render(<Card variant="elevated" padding="lg">X</Card>);
-    expect(container.firstElementChild).toHaveClass('dss-card--elevated', 'dss-card--pad-lg');
+    expect(container.firstElementChild).toHaveClass('hoops-card--elevated', 'hoops-card--pad-lg');
   });
 
   it('rendert header und footer in ihren Bereichen', () => {
     const { container } = render(<Card header="Titel" footer="Fuß">Body</Card>);
-    expect(container.querySelector('.dss-card-head')).toHaveTextContent('Titel');
-    expect(container.querySelector('.dss-card-foot')).toHaveTextContent('Fuß');
+    expect(container.querySelector('.hoops-card-head')).toHaveTextContent('Titel');
+    expect(container.querySelector('.hoops-card-foot')).toHaveTextContent('Fuß');
   });
 
   it('wird mit href zum Link', () => {

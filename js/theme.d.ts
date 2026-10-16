@@ -1,4 +1,4 @@
-import type { DssHandle } from './lifecycle.js';
+import type { HoopsHandle } from './lifecycle.js';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 export type ThemeState = 'light' | 'dark';
@@ -12,7 +12,7 @@ export interface ThemeStorage {
 export interface ThemeOptions {
   /** Modus ohne gemerkte Wahl (Standard `system`); derselbe Wert wie bei `themeBootScript`: gemerkte Wahl vor `defaultMode` vor `system`. */
   defaultMode?: ThemeMode;
-  /** Schlüssel im Speicher (Standard `dss-theme`). */
+  /** Schlüssel im Speicher (Standard `hoops-theme`). */
   storageKey?: string;
   /** Speicher (Standard `localStorage`); `null` schaltet das Merken ab. */
   storage?: ThemeStorage | null;
@@ -28,7 +28,7 @@ export interface ThemeOptions {
   onChange?: (mode: ThemeMode, theme: ThemeState) => void;
 }
 
-export interface ThemeHandle extends DssHandle {
+export interface ThemeHandle extends HoopsHandle {
   getMode(): ThemeMode;
   setMode(mode: ThemeMode): void;
 }

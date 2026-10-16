@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Stepper · Svelte 5
+   * HoopsFoundry UI Stepper · Svelte 5
    * --------------------------------------------------------------
    * Schrittanzeige für Setup-Wizards, Spiel-Vorbereitung, Onboarding.
    * Drei Layouts mit demselben Datenmodell. Nutzt nur Klassen aus
@@ -41,7 +41,7 @@
 
 {#snippet dot(s: Step, i: number)}
   {#if onstep && s.state !== 'pending'}
-    <button type="button" class="dss-step-dot" aria-label="{i + 1}. {s.label}" onclick={() => onstep?.(s.id)}>
+    <button type="button" class="hoops-step-dot" aria-label="{i + 1}. {s.label}" onclick={() => onstep?.(s.id)}>
       {#if s.state === 'done'}
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
       {:else}
@@ -49,7 +49,7 @@
       {/if}
     </button>
   {:else}
-    <span class="dss-step-dot" aria-hidden="true">
+    <span class="hoops-step-dot" aria-hidden="true">
       {#if s.state === 'done'}
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
       {:else}
@@ -60,38 +60,38 @@
 {/snippet}
 
 {#if variant === 'horizontal'}
-  <ol class="dss-step dss-step--h" aria-label={ariaLabel}>
+  <ol class="hoops-step hoops-step--h" aria-label={ariaLabel}>
     {#each steps as s, i (s.id)}
-      <li class={`dss-step-item is-${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
+      <li class={`hoops-step-item is-${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
         {@render dot(s, i)}
-        <div class="dss-step-label">{s.label}<span class="dss-sr-only"> ({stateText[s.state]})</span></div>
-        {#if i < steps.length - 1}<span class="dss-step-line" aria-hidden="true"></span>{/if}
+        <div class="hoops-step-label">{s.label}<span class="hoops-sr-only"> ({stateText[s.state]})</span></div>
+        {#if i < steps.length - 1}<span class="hoops-step-line" aria-hidden="true"></span>{/if}
       </li>
     {/each}
   </ol>
 
 {:else if variant === 'compact'}
-  <div class="dss-step dss-step--c" role="group" aria-label={ariaLabel}>
-    <div class="dss-step-track" aria-hidden="true">
-      <div class="dss-step-fill" style={`width: ${steps.length ? (doneCount / steps.length) * 100 : 0}%;`}></div>
+  <div class="hoops-step hoops-step--c" role="group" aria-label={ariaLabel}>
+    <div class="hoops-step-track" aria-hidden="true">
+      <div class="hoops-step-fill" style={`width: ${steps.length ? (doneCount / steps.length) * 100 : 0}%;`}></div>
     </div>
-    <div class="dss-step-info">
-      <span class="dss-step-num">{currentIdx + 1} / {steps.length}</span>
-      <span class="dss-step-cur">{steps[currentIdx]?.label ?? '—'}</span>
+    <div class="hoops-step-info">
+      <span class="hoops-step-num">{currentIdx + 1} / {steps.length}</span>
+      <span class="hoops-step-cur">{steps[currentIdx]?.label ?? '—'}</span>
     </div>
   </div>
 
 {:else}
-  <ol class="dss-step dss-step--v" aria-label={ariaLabel}>
+  <ol class="hoops-step hoops-step--v" aria-label={ariaLabel}>
     {#each steps as s, i (s.id)}
-      <li class={`dss-step-item is-${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
-        <div class="dss-step-rail">
+      <li class={`hoops-step-item is-${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
+        <div class="hoops-step-rail">
           {@render dot(s, i)}
-          {#if i < steps.length - 1}<span class="dss-step-vline" aria-hidden="true"></span>{/if}
+          {#if i < steps.length - 1}<span class="hoops-step-vline" aria-hidden="true"></span>{/if}
         </div>
-        <div class="dss-step-body">
-          <div class="dss-step-label">{s.label}<span class="dss-sr-only"> ({stateText[s.state]})</span></div>
-          {#if s.description}<div class="dss-step-desc">{s.description}</div>{/if}
+        <div class="hoops-step-body">
+          <div class="hoops-step-label">{s.label}<span class="hoops-sr-only"> ({stateText[s.state]})</span></div>
+          {#if s.description}<div class="hoops-step-desc">{s.description}</div>{/if}
         </div>
       </li>
     {/each}

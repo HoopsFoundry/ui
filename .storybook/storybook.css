@@ -16,7 +16,7 @@
 .sb-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 16px; }
 .sb-label  { font-family: var(--hoops-font-mono); font-size: 11px; color: var(--hoops-page-mute); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
 
-/* MDX-Doku-Seiten: DSS-Schrift und -Farben im Standard-Container */
+/* MDX-Doku-Seiten: HoopsFoundry-UI-Schrift und -Farben im Standard-Container */
 .sbdocs.sbdocs-wrapper { background: var(--hoops-page-bg); }
 .sbdocs-content { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
 .sbdocs-content :is(h1, h2, h3):not(.docs-story *) { font-family: var(--hoops-font-display); color: var(--hoops-page-fg); }
@@ -49,4 +49,4 @@
 .sbdocs .docblock-argstable.docblock-argstable td:not(:first-child) div div > span { font-family: var(--hoops-font-mono); background: var(--hoops-page-surface-0); }
 
 /* Doku-Seiten: Vorschauen mit position:fixed (Modal) bleiben im Rahmen. transform macht den Rahmen zum Bezugsrahmen. */
-.docs-story:has(.dss-modal-wrap) { transform: translateZ(0); overflow: hidden; }
+.docs-story:has(.hoops-modal-wrap) { transform: translateZ(0); overflow: hidden; }

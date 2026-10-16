@@ -1,6 +1,6 @@
 <script lang="ts" module>
   /**
-   * DSS Icon · Svelte 5 example
+   * HoopsFoundry UI Icon · Svelte 5 example
    * --------------------------------------------------------------
    * Central icon renderer for the v0.6 Icons spec — 67 glyphs in 8 groups
    * (gallery: Components/Icon in Storybook).
@@ -54,7 +54,7 @@
   width={size}
   height={size}
   viewBox="0 0 24 24"
-  class={`dss-icon ${klass}`}
+  class={`hoops-icon ${klass}`}
   role={title ? 'img' : 'presentation'}
   aria-label={title}
   aria-hidden={title ? undefined : true}

@@ -12,33 +12,33 @@ ${dialogMarkup}
 
 ${accordionMarkup}`;
 
-/** Eine vollständige Seite ohne Build: Stylesheet, Boot-Skript gegen Flackern, Markup mit `data-dss`, ein Aufruf. */
+/** Eine vollständige Seite ohne Build: Stylesheet, Boot-Skript gegen Flackern, Markup mit `data-hoops`, ein Aufruf. */
 export const vanilla = `<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vereinsregister</title>
-  <!-- Aus node_modules nach _site/dss kopiert (siehe unten): dss.css = tokens.css + components.css -->
-  <link rel="stylesheet" href="/dss/dss.css" />
-  <!-- optional: <link rel="stylesheet" href="/dss/fonts/fonts.css" /> -->
+  <!-- Aus node_modules nach _site/dss kopiert (siehe unten): hoops.css = tokens.css + components.css -->
+  <link rel="stylesheet" href="/hoops/hoops.css" />
+  <!-- optional: <link rel="stylesheet" href="/hoops/fonts/fonts.css" /> -->
 
   <!-- Gegen Flackern im Dunkelmodus: das Ergebnis von themeBootScript() (siehe Dark Mode, CSP unten) -->
   <script>${themeBootScript()}</script>
 </head>
 <body>
-  <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" hidden></button>
+  <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" data-hoops="theme" hidden></button>
 
   <main>
     <h1>TSV Nordhain 1920</h1>
-    <!-- Jedes Element mit data-dss startet beim Aufruf von initAll: Tabs, Dialog, Accordion … -->
+    <!-- Jedes Element mit data-hoops startet beim Aufruf von initAll: Tabs, Dialog, Accordion … -->
 ${pageMarkup.split('\n').map((line) => (line ? `    ${line}` : line)).join('\n')}
   </main>
 
   <script type="module">
-    import { initAll, VERSION, checkVersion } from '/dss/dss.min.js';
+    import { initAll, VERSION, checkVersion } from '/hoops/hoops.min.js';
 
-    const dss = initAll(document);           // startet alles mit data-dss; dss.count, dss.destroy()
+    const dss = initAll(document);           // startet alles mit data-hoops; dss.count, dss.destroy()
     console.log(VERSION, checkVersion());   // { js: '0.9.0', css: '0.9.0', match: true }
   </script>
 </body>
@@ -46,16 +46,16 @@ ${pageMarkup.split('\n').map((line) => (line ? `    ${line}` : line)).join('\n')
 
 /** Optionen und Einzelaufrufe */
 export const options = `<!-- Optionen je Element als JSON (ungültiges JSON, Listen und Schlüssel wie __proto__ fallen weg) -->
-<div class="dss-tabs dss-tabs--segmented" role="tablist" aria-label="Spielort" data-dss="tabs" data-dss-options='{"activation":"manual","hash":true}'>…</div>
+<div class="hoops-tabs hoops-tabs--segmented" role="tablist" aria-label="Spielort" data-hoops="tabs" data-hoops-options='{"activation":"manual","hash":true}'>…</div>
 
 <script type="module">
-  import { initAll, initTabs, initModal, openModal, closeModal } from '/dss/dss.min.js';
+  import { initAll, initTabs, initModal, openModal, closeModal } from '/hoops/hoops.min.js';
 
   // Optionen für alle Elemente eines Bausteins; das JSON am Element gewinnt gegen options
   const dss = initAll(document, { tabs: { hash: true }, modal: { dismissOnBackdrop: false }, only: ['tabs', 'modal'] });
 
   // Oder einzeln, auf einem Element, das du selbst wählst (auch nachträglich eingefügt)
-  const leiste = initTabs(document.querySelector('.dss-tabs'), { onChange: ({ id }) => console.log(id) });
+  const leiste = initTabs(document.querySelector('.hoops-tabs'), { onChange: ({ id }) => console.log(id) });
 
   // Ein zweiter Aufruf für dasselbe Element ersetzt den ersten (kein doppelter Listener)
   // destroy() ist mehrfach aufrufbar und stellt das Markup wieder her
@@ -65,7 +65,7 @@ export const options = `<!-- Optionen je Element als JSON (ungültiges JSON, Lis
 
 /** Lebenszyklus bei dynamisch eingefügtem Inhalt */
 export const dynamic = `<script type="module">
-  import { initAll } from '/dss/dss.min.js';
+  import { initAll } from '/hoops/hoops.min.js';
 
   const bereich = document.querySelector('#inhalt');
   let dss = null;
@@ -85,7 +85,7 @@ export const cspHeader = `# Das Bündel braucht nur script-src 'self' (eine Date
 Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<Hash des Boot-Skripts>'; style-src 'self'
 
 # Hash des Boot-Skripts (der Text zwischen <script> und </script>, ohne Änderung):
-printf '%s' "$(node -e "import('@bbv/dss-design-system/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
+printf '%s' "$(node -e "import('@hoopsfoundry/ui/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
   | openssl dgst -sha256 -binary | openssl base64
 
 # Alternative mit nonce: der Server erzeugt je Antwort einen Wert und setzt ihn in Header und Tag
@@ -101,8 +101,8 @@ export const renderPage = `<main>
 </main>
 
 <script type="module">
-  import { initAll } from '/dss/dss.min.js';
-  import { mountLeagueCard, mountScheduleTable, mountVenueCard } from '/dss/dss-render.min.js';
+  import { initAll } from '/hoops/hoops.min.js';
+  import { mountLeagueCard, mountScheduleTable, mountVenueCard } from '/hoops/hoops-render.min.js';
 
   // Daten aus deiner Quelle (hier erfunden); die Eigenschaften sind die der Komponenten.
   // titleAs gibt die Ebene der Überschrift vor (h2 bis h6, Standard h3): hier folgt sie der h1 der Seite
@@ -130,20 +130,20 @@ export const renderPage = `<main>
   const spielplan = mountScheduleTable(document.querySelector('#spielplan'), verein.plan);
   const halle = mountVenueCard(document.querySelector('#halle'), verein.halle);
 
-  // Danach das Verhalten der Bausteine mit data-dss (Tabs, Accordion …) wie gewohnt
+  // Danach das Verhalten der Bausteine mit data-hoops (Tabs, Accordion …) wie gewohnt
   initAll(document);
 </script>`;
 
 /** Dasselbe in Node: Markup als Zeichenkette, zum Beispiel im Crawler für statische Seiten. */
 export const renderNode = `// seite.mjs: läuft in Node ohne DOM (kein window, kein document)
-import { esc, renderLeagueCard, renderTeamCard } from '@bbv/dss-design-system/vanilla/dss-render.js';
+import { esc, renderLeagueCard, renderTeamCard } from '@hoopsfoundry/ui/vanilla/hoops-render.js';
 
 const verein = { name: 'TSV Nordhain <1920>', liga: { title: 'Oberliga', teams: [{ rank: 1, name: 'Lindenberg Hawks', points: 20 }] }, team: { name: 'TSV Nordhain 1920', rank: 3 } };
 
 // esc für jeden Text, der nicht von einer Render-Funktion kommt (hier der Seitentitel)
 const seite = \`<!doctype html>
 <html lang="de">
-<head><meta charset="utf-8"><title>\${esc(verein.name)}</title><link rel="stylesheet" href="/dss/dss.css"></head>
+<head><meta charset="utf-8"><title>\${esc(verein.name)}</title><link rel="stylesheet" href="/hoops/hoops.css"></head>
 <body>
   \${renderLeagueCard(verein.liga)}
   \${renderTeamCard(verein.team, { uid: 'team' })}
@@ -151,8 +151,8 @@ const seite = \`<!doctype html>
 </html>\`;`;
 
 /** Escaping: was durch esc, attr und safeHref läuft. */
-export const renderEscape = `import { esc, attr, renderEmptyState } from '@bbv/dss-design-system/vanilla/dss-render.js';
-import { safeHref } from '@bbv/dss-design-system/vanilla';
+export const renderEscape = `import { esc, attr, renderEmptyState } from '@hoopsfoundry/ui/vanilla/hoops-render.js';
+import { safeHref } from '@hoopsfoundry/ui/vanilla';
 
 esc('<img src=x onerror=alert(1)>');   // → '&lt;img src=x onerror=alert(1)&gt;'
 esc(null);                              // → ''   (nur Text und endliche Zahlen)
@@ -167,66 +167,66 @@ renderEmptyState({ title: '<script>alert(1)</script>', actions: [{ label: 'Los',
 export const bundleSizes = { js: 65891, min: 37164, gzip: 13241, css: 179156 };
 /** Budgets in KiB (1 KiB = 1024 Byte); die Namen behalten das alte Kürzel. */
 export const budget = { minKB: 40, gzipKB: 15 };
-/** Das Render-Bündel (dss-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
+/** Das Render-Bündel (hoops-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
 export const renderSizes = { js: 81145, min: 51395, gzip: 17474 };
 export const renderBudget = { minKB: 52, gzipKB: 18 };
-/** Das Karten-Bündel (dss-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
+/** Das Karten-Bündel (hoops-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
 export const mapSizes = { js: 38745, min: 22173, gzip: 9104 };
 export const mapBudget = { minKB: 24, gzipKB: 10 };
 
-/** Das Hilfsskript holen und prüfen: Release-Anhang `dss-sync.mjs` mit eigener Prüfsumme. */
+/** Das Hilfsskript holen und prüfen: Release-Anhang `hoops-sync.mjs` mit eigener Prüfsumme. */
 export const getSync = `# Im Projekt des Portals (neben der package.json): das Skript und seine Prüfsumme aus demselben Release laden und prüfen
-curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-sync.mjs
-curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-sync.mjs.sha256
-shasum -a 256 -c dss-sync.mjs.sha256        # muss "dss-sync.mjs: OK" melden (Linux: sha256sum -c)
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-sync.mjs
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-sync.mjs.sha256
+shasum -a 256 -c hoops-sync.mjs.sha256        # muss "hoops-sync.mjs: OK" melden (Linux: sha256sum -c)
 node --version                              # Node 18 oder neuer
 
-# Alternative aus dem npm-Paket (ab 1.0 der Regelweg): derselbe Code, Befehl dss-sync
-npm install --save-dev @bbv/dss-design-system
-npx dss-sync --from-package`;
+# Alternative aus dem npm-Paket (ab 1.0 der Regelweg): derselbe Code, Befehl hoops-sync
+npm install --save-dev @hoopsfoundry/ui
+npx hoops-sync --from-package`;
 
 /** Auslieferung bis Version 1.0: Release-Anhänge auf GitHub. Der Befehl holt, prüft und ersetzt `_site/dss` in einem Schritt. */
-export const releaseSync = `# Im Projekt (nicht im Paket): dss-sync.mjs liegt neben der package.json des Portals
-node dss-sync.mjs --from-release 0.9.0
-# → lädt dss-vanilla-0.9.0.tgz und dss-vanilla-0.9.0.sha256 von
-#   https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/
+export const releaseSync = `# Im Projekt (nicht im Paket): hoops-sync.mjs liegt neben der package.json des Portals
+node hoops-sync.mjs --from-release 0.9.0
+# → lädt hoops-ui-0.9.0.tgz und hoops-ui-0.9.0.sha256 von
+#   https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/
 # → prüft die SHA-256 des Tarballs und jeder Datei darin, die Version in version.json und den Ordnernamen
 # → ersetzt erst danach _site/dss (bei einer Abweichung bleibt das alte Ziel unverändert, Exit-Code 1)
 
 # Weitere Quellen (derselbe Aufbau von dist/vanilla):
-node dss-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard)
-node dss-sync.mjs --from-dir ./dss-vanilla-0.9.0 # entpackter Release-Ordner, offline
-node dss-sync.mjs --from-release 0.9.0 --base-url https://intern.example/dss   # eigener Spiegel (https; Weiterleitungen nur auf denselben Host)
-node dss-sync.mjs --from-release 0.9.0 --base-url http://spiegel.lan/dss --allow-insecure-http   # unverschlüsselt nur mit ausdrücklicher Freigabe
-node dss-sync.mjs --from-release 0.9.0 --debug   # bei einem Fehler zusätzlich der Stack`;
+node hoops-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard)
+node hoops-sync.mjs --from-dir ./hoops-ui-0.9.0 # entpackter Release-Ordner, offline
+node hoops-sync.mjs --from-release 0.9.0 --base-url https://intern.example/dss   # eigener Spiegel (https; Weiterleitungen nur auf denselben Host)
+node hoops-sync.mjs --from-release 0.9.0 --base-url http://spiegel.lan/dss --allow-insecure-http   # unverschlüsselt nur mit ausdrücklicher Freigabe
+node hoops-sync.mjs --from-release 0.9.0 --debug   # bei einem Fehler zusätzlich der Stack`;
 
 /** Prüfsumme von Hand, ohne das Skript. */
 export const manualCheck = `# Beide Dateien eines Releases in einen leeren Ordner laden, den Tarball daneben entpacken, dann prüfen
-mkdir dss-0.9.0 && cd dss-0.9.0
-curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.tgz
-curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.sha256
-curl -LO https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/dss-vanilla-0.9.0.tgz.sha256
-shasum -a 256 -c dss-vanilla-0.9.0.tgz.sha256   # nur der Tarball (Linux: sha256sum -c)
-tar xzf dss-vanilla-0.9.0.tgz
-shasum -a 256 -c dss-vanilla-0.9.0.sha256      # Tarball und jede Datei darin; jede Zeile muss "OK" sein`;
+mkdir hoops-0.9.0 && cd hoops-0.9.0
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-ui-0.9.0.tgz
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-ui-0.9.0.sha256
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-ui-0.9.0.tgz.sha256
+shasum -a 256 -c hoops-ui-0.9.0.tgz.sha256   # nur der Tarball (Linux: sha256sum -c)
+tar xzf hoops-ui-0.9.0.tgz
+shasum -a 256 -c hoops-ui-0.9.0.sha256      # Tarball und jede Datei darin; jede Zeile muss "OK" sein`;
 
 /** Aktualisieren und Zurückrollen im Portal. */
 export const updateFlow = `# 1. Neue Version holen und prüfen
-node dss-sync.mjs --from-release 0.10.0
+node hoops-sync.mjs --from-release 0.10.0
 
-# 2. Versionen im Browser abgleichen (data-dss-versions am html-Element der Beispielseite, oder checkVersion() im Start-Skript)
+# 2. Versionen im Browser abgleichen (data-hoops-versions am html-Element der Beispielseite, oder checkVersion() im Start-Skript)
 # 3. Portal veröffentlichen
 
 # Rollback: dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt
-node dss-sync.mjs --from-release 0.9.0`;
+node hoops-sync.mjs --from-release 0.9.0`;
 
 /** Wechsel auf npm ab 1.0: nur die Quelle ändert sich. */
 export const npmSwitch = `# bis 1.0 (Release-Anhang)
-node dss-sync.mjs --from-release 0.9.0
+node hoops-sync.mjs --from-release 0.9.0
 
 # ab 1.0 (npm, Paketname und Aufbau von dist/vanilla bleiben)
-npm install @bbv/dss-design-system@1.0.0
-npx dss-sync --from-package`;
+npm install @hoopsfoundry/ui@1.0.0
+npx hoops-sync --from-package`;
 
 /** Das Ergebnis der Browser-Prüfung der Beispiel-Portalseite (scripts/check-portal-seite.mjs); Stand der Messung. */
 export const compat = {
@@ -238,5 +238,5 @@ export const compat = {
   ],
 };
 
-/** Node-Versionen, mit denen das Release-Skript und dss-sync.mjs (--from-dir und --from-release gegen einen lokalen Server) gelaufen sind. */
+/** Node-Versionen, mit denen das Release-Skript und hoops-sync.mjs (--from-dir und --from-release gegen einen lokalen Server) gelaufen sind. */
 export const nodeVersions = ['18.20.8', '20.20.2', '22.21.0'];

@@ -23,7 +23,7 @@ const normalize = (html: string) => {
   };
   return html
     .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/(dss-map-(?:canvas|text)-)([^"#]+)/g, (_m, prefix: string, id: string) => `${prefix}${key(id)}`)
+    .replace(/(hoops-map-(?:canvas|text)-)([^"#]+)/g, (_m, prefix: string, id: string) => `${prefix}${key(id)}`)
     .replace(/ (hidden|inert)=""/g, ' $1')
     .replace(/&quot;/g, '"') // Svelte schreibt " und > im Text unmaskiert, React maskiert sie
     .replace(/&gt;/g, '>')
@@ -103,8 +103,8 @@ describe('Map: Svelte und React erzeugen dasselbe Markup (Platzhalter)', () => {
     expect(one).toContain('49,4875° N, 8,4660° O');
     expect(one).toContain('Karte überspringen');
     expect(one).toContain('© OpenStreetMap-Mitwirkende');
-    expect(one).not.toContain('dss-map-canvas');
-    expect(one).not.toContain('dss-map-num');
+    expect(one).not.toContain('hoops-map-canvas');
+    expect(one).not.toContain('hoops-map-num');
     const three = await same(cases['drei Marker mit Sonderzeichen und eigener Nummer']);
     expect(three).toContain('>12<');
     expect(three).toContain('&lt;Ost>');
@@ -112,7 +112,7 @@ describe('Map: Svelte und React erzeugen dasselbe Markup (Platzhalter)', () => {
     expect(await same(cases['ungültige tileUrl'])).toContain('Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.');
     const auto = await same(cases['load auto']);
     expect(auto).toContain('data-state="loading"');
-    expect(auto).toContain('dss-map-canvas');
+    expect(auto).toContain('hoops-map-canvas');
     expect(auto).not.toContain('Karte laden');
     expect(await same(cases['showList false'])).toContain('is-quiet');
     expect(await same(cases['ungültige Marker'])).not.toContain('Kaputt');

@@ -19,5 +19,5 @@ export type { TeamCardProps, TeamCardRenderOptions, TeamCardMountOptions } from 
 export { renderVenueCard, mountVenueCard } from './venue-card.js';
 export type { VenueCardProps, VenueCardRenderOptions, VenueCardMountOptions } from './venue-card.js';
 
-/** Version des Pakets, aus dem dieses Bündel gebaut wurde; sie muss zu `VERSION` von dss.js und zu dss.css passen. */
+/** Version des Pakets, aus dem dieses Bündel gebaut wurde; sie muss zu `VERSION` von hoops.js und zu hoops.css passen. */
 export const VERSION: string;

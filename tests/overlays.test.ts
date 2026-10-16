@@ -15,7 +15,7 @@ function block(start: RegExp, end: RegExp): string {
 describe('Banner und Modal: Farben mit Dunkelmodus', () => {
   const area = block(/\/\* ── Banner/, /\/\* ── Tabs/);
   it('Regeln im Banner- und Modal-Block nutzen nicht die nackten --*-text-Tokens (ohne Dunkelmodus)', () => {
-    expect(area).toContain('.dss-banner--danger');
+    expect(area).toContain('.hoops-banner--danger');
     expect(area).not.toMatch(/var\(--hoops-(err|ok|warn|info)-text\)/);
   });
 });
@@ -23,26 +23,26 @@ describe('Banner und Modal: Farben mit Dunkelmodus', () => {
 describe('Svelte-Modal: eindeutige Titel-id', () => {
   it('leitet die id aus $props.id() ab statt einer festen id', () => {
     expect(modal).toContain('$props.id()');
-    expect(modal).not.toMatch(/id="dss-modal-title"/);
+    expect(modal).not.toMatch(/id="hoops-modal-title"/);
     expect(modal).toMatch(/aria-labelledby=\{titleId\}/);
   });
 
   it('Titel ist standardmäßig eine h2 wie in der React-Fassung (h4 sprang in der Gliederung); titleAs wählt h2 bis h6', () => {
     expect(modal).toMatch(/resolveHeading\(titleAs, 2\)/);
-    expect(modal).toMatch(/<svelte:element this=\{titleTag\} class="dss-m-title" id=\{titleId\}/);
+    expect(modal).toMatch(/<svelte:element this=\{titleTag\} class="hoops-m-title" id=\{titleId\}/);
   });
 });
 
 describe('Banner-Link im Dunkelmodus', () => {
   it('Fokus-Ring nimmt die Textfarbe (der dezente Dunkel-Ring hat auf dem Banner unter 3:1)', () => {
-    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-banner a:focus-visible\s*\{\s*outline-color:\s*currentColor/);
-    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.dss-banner a:focus-visible\s*\{\s*outline-color:\s*currentColor/);
+    expect(css).toMatch(/:root\[data-theme="dark"\] \.hoops-banner a:focus-visible\s*\{\s*outline-color:\s*currentColor/);
+    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.hoops-banner a:focus-visible\s*\{\s*outline-color:\s*currentColor/);
   });
 });
 
 describe('Modal-Fuß', () => {
   it('bricht um, statt auf schmalen Bildschirmen abgeschnitten zu werden', () => {
-    const block = css.match(/\.dss-m-footer\s*\{[^}]*\}/)?.[0] ?? '';
+    const block = css.match(/\.hoops-m-footer\s*\{[^}]*\}/)?.[0] ?? '';
     expect(block).toContain('flex-wrap: wrap');
   });
 });
@@ -50,6 +50,6 @@ describe('Modal-Fuß', () => {
 describe('Modal: Klick auf den Hintergrund', () => {
   it('Svelte: schließt nur mit dismissOnBackdrop (Standard false)', () => {
     expect(modal).toMatch(/dismissOnBackdrop\s*=\s*false/);
-    expect(modal).toMatch(/class="dss-backdrop"[^>]*onclick=\{closable && dismissOnBackdrop \? handleClose : null\}/);
+    expect(modal).toMatch(/class="hoops-backdrop"[^>]*onclick=\{closable && dismissOnBackdrop \? handleClose : null\}/);
   });
 });

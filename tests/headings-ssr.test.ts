@@ -113,7 +113,7 @@ describe('Modal: Titel h2 (oder titleAs), Kinder bekommen die nächste Ebene (Sv
   it('der Titel trägt die Klasse und die id des Dialogs', async () => {
     const Svelte = await load(table.svelte);
     const html = render(ModalWith, { props: { Comp: Svelte, props: table.svelteProps(snip), titleAs: 'h4' } }).body;
-    expect(html).toMatch(/<h4 class="dss-m-title" id="(dss-modal-title-[^"]+)"/);
-    expect(html).toMatch(/aria-labelledby="dss-modal-title-/);
+    expect(html).toMatch(/<h4 class="hoops-m-title" id="(hoops-modal-title-[^"]+)"/);
+    expect(html).toMatch(/aria-labelledby="hoops-modal-title-/);
   });
 });

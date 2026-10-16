@@ -48,12 +48,12 @@ Der Punkt hat mindestens 3:1 gegen jede Seitenfläche (Hell, Dunkel, flache Flä
 
 Es gibt zwei Animationen, beide nur über die Deckkraft, beide 1,6 Sekunden, `ease-in-out`:
 
-- `dss-live-pulse` für Punkte und Flächen: Deckkraft 1 → 0,35 → 1.
-- `dss-live-pulse-text` für Text: Deckkraft 1 → 0,8 → 1. Bei 0,75 läge der Kontrast im Tal auf hellen Flächen nur bei 4,3:1, deshalb die Untergrenze 0,8.
+- `hoops-live-pulse` für Punkte und Flächen: Deckkraft 1 → 0,35 → 1.
+- `hoops-live-pulse-text` für Text: Deckkraft 1 → 0,8 → 1. Bei 0,75 läge der Kontrast im Tal auf hellen Flächen nur bei 4,3:1, deshalb die Untergrenze 0,8.
 
 Es ändert sich nur die Deckkraft: keine Bewegung, kein Farbwechsel, kein Flackern. Eine Periode dauert 1,6 Sekunden, das ist weniger als ein Wechsel pro Sekunde (WCAG 2.3.1). Mit `prefers-reduced-motion: reduce` oder `data-motion="reduce"` auf `<html>` steht jede Live-Stelle still und bleibt voll deckend.
 
-Die Punkt-Animation hängt an `.dss-live-dot`, `.dss-match-pulse`, `.dss-pbp-dot`, `.dss-crumb-dot` und dem Punkt der TopBar; die Text-Animation an den Ergebniszahlen laufender Spiele (Spielplan, Zeitraster, Spielkarte). Für eigene Punkte gibt es die Hilfsklasse `.dss-live-pulse`.
+Die Punkt-Animation hängt an `.hoops-live-dot`, `.hoops-match-pulse`, `.hoops-pbp-dot`, `.hoops-crumb-dot` und dem Punkt der TopBar; die Text-Animation an den Ergebniszahlen laufender Spiele (Spielplan, Zeitraster, Spielkarte). Für eigene Punkte gibt es die Hilfsklasse `.hoops-live-pulse`.
 
 ## Pause-Schalter
 
@@ -74,13 +74,13 @@ Rot gehört nicht zu Live. Es bleibt für Fehler, Fouls (Play-by-Play) und „ab
 
 ## Bausteine
 
-`.dss-live` ist ein Wort-Tag in Live-Farbe, `.dss-live-dot` der pulsierende Punkt davor:
+`.hoops-live` ist ein Wort-Tag in Live-Farbe, `.hoops-live-dot` der pulsierende Punkt davor:
 
 ```html
-<span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span> Live</span>
+<span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span> Live</span>
 ```
 
-Die Komponenten bringen ihre Live-Stelle selbst mit (`dss-match-live`, `dss-pbp-live`, `dss-topbar-live`, `dss-crumb-dot`), nutzen aber dieselben Token. Auf immer dunklen Flächen außerhalb der TopBar setzt du `color: var(--hoops-live-fg-on-dark)`.
+Die Komponenten bringen ihre Live-Stelle selbst mit (`hoops-match-live`, `hoops-pbp-live`, `hoops-topbar-live`, `hoops-crumb-dot`), nutzen aber dieselben Token. Auf immer dunklen Flächen außerhalb der TopBar setzt du `color: var(--hoops-live-fg-on-dark)`.
 
 ## Auf den Komponentenseiten
 

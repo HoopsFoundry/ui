@@ -37,7 +37,7 @@ describe('MatchCard: renderMatchCard gegen Svelte und React', () => {
     const html = renderMatchCard({ state: 'finished', heim: { name: 'A', score: Number.NaN }, gast: { name: 'B', score: Infinity } } as never);
     expect(html).not.toContain('NaN');
     expect(html).not.toContain('Infinity');
-    expect(html).not.toContain('dss-match-score');
+    expect(html).not.toContain('hoops-match-score');
   });
   it('Button wie bei onClick', async () => {
     const v = normalize(renderMatchCard({ heim: HEIM, gast: GAST } as never, { button: true }));

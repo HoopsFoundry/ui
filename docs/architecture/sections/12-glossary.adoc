@@ -4,7 +4,7 @@
 [cols="1,3",options="header"]
 |===
 |Begriff |Bedeutung in dieser Dokumentation
-|DSS |Kurzform des Systems. Arbeitsname, Entscheidung offen: „HoopsFoundry DSS" (DSS = Digital Sports System) oder „HoopsFoundry UI". Ursprünglich aus dem Kontext „Digitaler Spielbericht"
+|HoopsFoundry UI |Kurzform des Systems. Arbeitsname, Entscheidung offen: „HoopsFoundry HoopsFoundry UI" (HoopsFoundry UI = HoopsFoundry UI) oder „HoopsFoundry UI". Ursprünglich aus dem Kontext „Digitaler Spielbericht"
 |HoopsFoundry |Arbeitsname der Produktfamilie, Entscheidung offen; Paket- und Repository-Name bleiben bis dahin unverändert
 |Vereinsregister-Portal |Statisches Portal (Vanilla-JS, GitHub Pages) im Repository `basketball-vereinsregister-deutschland`; Hauptnutzer und Auslöser des Vanilla-Pakets
 |Turnier-Manager |Anwendung im Repository `basketball-turnier-manager` (Name laut Auftraggeber); rendert PDFs und nutzt u. a. die Spielplan-Bausteine
@@ -16,7 +16,7 @@
 |Lifecycle |Initialisierung, Aktualisierung und Aufräumen einer Instanz
 |Renderfunktion |Erzeugt Ausgabe aus Eingaben; in Vanilla `renderX` (Zeichenkette) und `mountX` (Einsetzen mit `update`/`destroy`), siehe ADR-005
 |Mount |Bindet Ausgabe und gegebenenfalls Verhalten an ein DOM-Element
-|Karten-Bündel |`dist/vanilla/dss-map.js`: `renderMap`, `initMap`, `mountMap`, `initMapBlock` ohne Leaflet; Leaflet liefert die Seite über die Option `loadLeaflet` (ADR-003, ADR-007)
+|Karten-Bündel |`dist/vanilla/hoops-map.js`: `renderMap`, `initMap`, `mountMap`, `initMapBlock` ohne Leaflet; Leaflet liefert die Seite über die Option `loadLeaflet` (ADR-003, ADR-007)
 |ADR |Architecture Decision Record mit Kontext, Entscheidung, Status und Konsequenzen
 |MCP |Model Context Protocol; Zugriffsschicht für Agent-Werkzeuge und Kontext
 |Baseline |Erste prüfbare Architekturfassung, kein vollständiger Implementierungsnachweis

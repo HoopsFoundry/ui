@@ -1,5 +1,5 @@
 /**
- * DSS Team · Hilfsfunktionen für die TeamCard
+ * HoopsFoundry UI Team · Hilfsfunktionen für die TeamCard
  * --------------------------------------------------------------
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte und React nutzen dieselbe Logik.
  * Typen: js/team.d.ts. Ergebnis-Logik (S/N/U, Screenreader-Text) kommt aus js/schedule.js.

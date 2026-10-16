@@ -69,18 +69,18 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
     rule('Theme: system folgt der Systemeinstellung', () => mod.resolveTheme('system', true) === 'dark' && mod.resolveTheme('system', false) === 'light' && mod.resolveTheme('light', true) === 'light' && mod.resolveTheme('dark', false) === 'dark' && mod.resolveTheme('x', true) === 'dark');
     rule('Theme: der Klick wechselt den tatsächlichen Zustand', () => mod.nextTheme('light', false) === 'dark' && mod.nextTheme('dark', true) === 'light' && mod.nextTheme('system', true) === 'light' && mod.nextTheme('system', false) === 'dark');
     rule('Theme: blockierter Speicher bleibt ohne Fehler', () => mod.readTheme(broken) === null && mod.writeTheme(broken, 'dark') === false && mod.writeTheme(broken, 'system') === false && mod.readTheme(null) === null);
-    rule('Theme: Speicher kennt den Schlüssel dss-theme und system löscht ihn', () => {
+    rule('Theme: Speicher kennt den Schlüssel hoops-theme und system löscht ihn', () => {
       const b = mk();
       const h = mod.initTheme(b);
       b.click();
-      const set = localStorage.getItem('dss-theme') === 'dark';
+      const set = localStorage.getItem('hoops-theme') === 'dark';
       h.setMode('system');
-      const cleared = localStorage.getItem('dss-theme') === null;
+      const cleared = localStorage.getItem('hoops-theme') === null;
       h.destroy();
       return set && cleared;
     });
     rule('Theme: ein ungültiger gemerkter Wert gilt als system', () => {
-      localStorage.setItem('dss-theme', 'lila');
+      localStorage.setItem('hoops-theme', 'lila');
       const h = mod.initTheme(mk());
       const ok = h.getMode() === 'system' && !html.hasAttribute('data-theme');
       h.destroy();
@@ -143,10 +143,10 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
       const b = mk();
       const h = mod.initTheme(b);
       const icons = [...b.querySelectorAll('svg')];
-      const ok = icons.length === 2 && icons.every((i) => i.namespaceURI === 'http://www.w3.org/2000/svg' && i.getAttribute('aria-hidden') === 'true') && icons[0].classList.contains('dss-theme-icon--sun') && icons[1].classList.contains('dss-theme-icon--moon');
+      const ok = icons.length === 2 && icons.every((i) => i.namespaceURI === 'http://www.w3.org/2000/svg' && i.getAttribute('aria-hidden') === 'true') && icons[0].classList.contains('hoops-theme-icon--sun') && icons[1].classList.contains('hoops-theme-icon--moon');
       h.destroy();
       const own = mk();
-      own.append(Object.assign(document.createElement('span'), { className: 'dss-theme-icon' }));
+      own.append(Object.assign(document.createElement('span'), { className: 'hoops-theme-icon' }));
       const h2 = mod.initTheme(own);
       const kept = own.querySelectorAll('svg').length === 0;
       h2.destroy();
@@ -154,14 +154,14 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
     });
     rule('Theme: ein anderer Tab ändert die Wahl', () => {
       const h = mod.initTheme(mk());
-      localStorage.setItem('dss-theme', 'dark');
-      window.dispatchEvent(new StorageEvent('storage', { key: 'dss-theme' }));
+      localStorage.setItem('hoops-theme', 'dark');
+      window.dispatchEvent(new StorageEvent('storage', { key: 'hoops-theme' }));
       const ok = html.getAttribute('data-theme') === 'dark';
       h.destroy();
       return ok;
     });
     rule('Theme: destroy entfernt Listener und Ergänzungen', () => {
-      const b = mk('class="dss-btn"');
+      const b = mk('class="hoops-btn"');
       const before = b.outerHTML;
       const h = mod.initTheme(b);
       h.destroy();
@@ -191,7 +191,7 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
       return ok;
     });
     rule('Theme: die gemerkte Wahl gewinnt gegen defaultMode', () => {
-      localStorage.setItem('dss-theme', 'light');
+      localStorage.setItem('hoops-theme', 'light');
       const h = mod.initTheme(mk(), { defaultMode: 'dark' });
       const ok = h.getMode() === 'light';
       h.destroy();
@@ -200,7 +200,7 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
     rule('Theme: die Wahl „System“ wird bei defaultMode dark gemerkt', () => {
       const h = mod.initTheme(mk(), { defaultMode: 'dark' });
       h.setMode('system');
-      const kept = localStorage.getItem('dss-theme') === 'system';
+      const kept = localStorage.getItem('hoops-theme') === 'system';
       h.destroy();
       const h2 = mod.initTheme(mk(), { defaultMode: 'dark' });
       const ok = kept && h2.getMode() === 'system' && !html.hasAttribute('data-theme');
@@ -244,12 +244,12 @@ export async function themeLogicRules(mod: ThemeMod): Promise<Rules> {
 export function themeCssRules(css: string): Rules {
   const text = cssSection(css, 'Dunkelmodus-Umschalter');
   const rules = rulesOf(text);
-  const sun = bodyOf(rules, '.dss-theme-toggle[data-theme-state="dark"] .dss-theme-icon--sun, .dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon');
+  const sun = bodyOf(rules, '.hoops-theme-toggle[data-theme-state="dark"] .hoops-theme-icon--sun, .hoops-theme-toggle:not([data-theme-state="dark"]) .hoops-theme-icon--moon');
   return {
     'Abschnitt vorhanden': text.length > 200,
     'CSS: Symbole wechseln über den Zustand (Mond im Dunkelmodus, Sonne sonst)': /display:\s*none/.test(sun),
-    'CSS: Symbolgröße 20 px': /width:\s*20px/.test(bodyOf(rules, '.dss-theme-toggle .dss-theme-icon')) && /height:\s*20px/.test(bodyOf(rules, '.dss-theme-toggle .dss-theme-icon')),
-    'CSS: gedrückt zeigt die Auswahlfläche': /background:\s*var\(--hoops-selected-bg\)/.test(bodyOf(rules, '.dss-theme-toggle[aria-pressed="true"]')),
+    'CSS: Symbolgröße 20 px': /width:\s*20px/.test(bodyOf(rules, '.hoops-theme-toggle .hoops-theme-icon')) && /height:\s*20px/.test(bodyOf(rules, '.hoops-theme-toggle .hoops-theme-icon')),
+    'CSS: gedrückt zeigt die Auswahlfläche': /background:\s*var\(--hoops-selected-bg\)/.test(bodyOf(rules, '.hoops-theme-toggle[aria-pressed="true"]')),
     'CSS: kein festes Hex': !/#[0-9a-fA-F]{3,8}\b/.test(text),
   };
 }
@@ -261,6 +261,6 @@ export function themeSourceRules(src: string): Rules {
     'Quelltext: kein globaler Zustand': !/\bwindow\.\w+\s*=/.test(code) && !/\bglobalThis\.\w+\s*=/.test(code),
     'Quelltext: Speicherzugriff nur in try': /try \{\s*storage = opts\.storage \?\? win\.localStorage;/.test(code) && /try \{\s*return parseTheme\(storage\?\.getItem\(key\)\);/.test(code),
     'Quelltext: Lebenszyklus über js/lifecycle.js': code.includes("from './lifecycle.js'"),
-    'Quelltext: Standardschlüssel dss-theme': code.includes("export const THEME_KEY = 'dss-theme';"),
+    'Quelltext: Standardschlüssel hoops-theme': code.includes("export const THEME_KEY = 'hoops-theme';"),
   };
 }

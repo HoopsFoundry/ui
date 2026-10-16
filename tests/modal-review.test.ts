@@ -59,7 +59,7 @@ describe('gestapelte Modals ohne dialog', () => {
     el('a-auf').focus();
     click(el('a-auf'));
     const opener = el('a-ok');
-    opener.setAttribute('data-dss-modal-open', 'b');
+    opener.setAttribute('data-hoops-modal-open', 'b');
     opener.focus();
     click(opener);
     expect(el('b').hasAttribute('inert')).toBe(false);
@@ -111,18 +111,18 @@ describe('Fokus-Rückgabe ohne Auslöser', () => {
     handles.push(initModal(el('a')), initModal(el('b')));
     click(el('a-auf'));
     const opener = el('a-ok');
-    opener.setAttribute('data-dss-modal-open', 'b');
+    opener.setAttribute('data-hoops-modal-open', 'b');
     click(opener);
     opener.remove();
     keydown(document.activeElement!, 'Escape');
-    expect(document.activeElement).toBe(el('a').querySelector('.dss-modal'));
+    expect(document.activeElement).toBe(el('a').querySelector('.hoops-modal'));
   });
 });
 
 describe('Hinweise', () => {
   it('ein Modal ohne zugänglichen Namen warnt in der Konsole, eines mit Titel nicht', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    mountHtml(divMarkup('a').replace('<h2 class="dss-m-title">', '<h2>'));
+    mountHtml(divMarkup('a').replace('<h2 class="hoops-m-title">', '<h2>'));
     handles.push(initModal(el('a')));
     expect(warn).toHaveBeenCalledTimes(1);
     expect(String(warn.mock.calls[0][0])).toContain('zugänglichen Namen');

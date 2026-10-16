@@ -6,7 +6,7 @@ import { expectNoA11yViolations } from './test-utils';
 
 const tick = () => new Promise((resolve) => setTimeout(resolve, 0));
 const clickBackdrop = () => {
-  const backdrop = document.querySelector('.dss-backdrop')!;
+  const backdrop = document.querySelector('.hoops-backdrop')!;
   fireEvent.pointerDown(backdrop, { button: 0, pointerType: 'mouse' });
   fireEvent.pointerUp(backdrop, { button: 0, pointerType: 'mouse' });
   fireEvent.click(backdrop);
@@ -25,23 +25,23 @@ describe('Modal', () => {
       </Modal>,
     );
     expect(screen.getByRole('dialog', { name: 'Spielbericht freigeben' })).toBeInTheDocument();
-    expect(screen.getByText('17. Spieltag')).toHaveClass('dss-m-subtitle');
+    expect(screen.getByText('17. Spieltag')).toHaveClass('hoops-m-subtitle');
     expect(screen.getByText('Inhalt')).toBeInTheDocument();
-    expect(document.querySelector('.dss-m-footer')).toContainElement(screen.getByRole('button', { name: 'OK' }));
+    expect(document.querySelector('.hoops-m-footer')).toContainElement(screen.getByRole('button', { name: 'OK' }));
   });
 
   it('setzt Größen-Modifier außer für md', () => {
     const { rerender } = render(<Modal open onOpenChange={() => {}} title="T" size="wide">x</Modal>);
-    expect(screen.getByRole('dialog')).toHaveClass('dss-modal', 'dss-modal--wide');
+    expect(screen.getByRole('dialog')).toHaveClass('hoops-modal', 'hoops-modal--wide');
     rerender(<Modal open onOpenChange={() => {}} title="T" size="md">x</Modal>);
-    expect(screen.getByRole('dialog')).not.toHaveClass('dss-modal--md');
+    expect(screen.getByRole('dialog')).not.toHaveClass('hoops-modal--md');
   });
 
   it('zeigt bei severity ein Header-Icon, bei default keins', () => {
     const { rerender } = render(<Modal open onOpenChange={() => {}} title="T" severity="danger">x</Modal>);
-    expect(document.querySelector('.dss-m-head-icon--danger svg')).toBeInTheDocument();
+    expect(document.querySelector('.hoops-m-head-icon--danger svg')).toBeInTheDocument();
     rerender(<Modal open onOpenChange={() => {}} title="T">x</Modal>);
-    expect(document.querySelector('.dss-m-head-icon')).toBeNull();
+    expect(document.querySelector('.hoops-m-head-icon')).toBeNull();
   });
 
   it('schließt über den Schließen-Button', () => {

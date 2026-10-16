@@ -52,7 +52,7 @@ export type AccordionHandle = (() => void) & { destroy(): void };
 
 /** Macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und natives `details`); gibt eine Aufräum-Funktion mit `.destroy()` zurück. */
 export function initAccordion(root: Element, options?: AccordionOptions): AccordionHandle;
-/** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument). */
+/** Startet alle `[data-hoops-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument). */
 export function initAccordions(scope?: ParentNode, options?: AccordionOptions): AccordionHandle;
 
 /** Ein angemeldeter Bereich (Werte als Getter, damit sie aktuell bleiben). `anchor: false`: kein öffentlicher Anker (keine Sprungleiste, kein Hash). */

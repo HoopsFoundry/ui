@@ -8,8 +8,8 @@ import SvelteTabs from '../svelte/Tabs.svelte';
 import { initTabs } from '../js/tabs.js';
 
 const items = [{ id: 'a', label: 'A' }, { id: 'b', label: 'B' }, { id: 'c', label: 'C', disabled: true }, { id: 'd', label: 'D' }];
-const markup = (variant: string) => `<div class="dss-tabs dss-tabs--${variant}" role="tablist" aria-label="x" id="v">${items.map((i, n) =>
-  `<button type="button" class="dss-tab${n === 0 ? ' is-active' : ''}" role="tab" id="v-${i.id}" aria-selected="${n === 0}" tabindex="${n === 0 ? 0 : -1}"${i.disabled ? ' disabled' : ''}>${i.label}</button>`).join('')}</div>`;
+const markup = (variant: string) => `<div class="hoops-tabs hoops-tabs--${variant}" role="tablist" aria-label="x" id="v">${items.map((i, n) =>
+  `<button type="button" class="hoops-tab${n === 0 ? ' is-active' : ''}" role="tab" id="v-${i.id}" aria-selected="${n === 0}" tabindex="${n === 0 ? 0 : -1}"${i.disabled ? ' disabled' : ''}>${i.label}</button>`).join('')}</div>`;
 
 type Trace = { selected: string; focus: string; tabindex: string };
 const snapshot = (root: Element): Trace => {

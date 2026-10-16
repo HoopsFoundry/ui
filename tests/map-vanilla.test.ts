@@ -56,34 +56,34 @@ describe('Zwei-Klick-Platzhalter', () => {
     await tick();
     expect(load).not.toHaveBeenCalled();
     expect(state.maps).toHaveLength(0);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('idle');
-    click(host.querySelector('.dss-map-load'));
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('loading');
-    expect(host.querySelector('.dss-map-load')).toBeNull();
-    expect(host.querySelector('.dss-map-canvas')!.hasAttribute('inert')).toBe(true);
-    expect(host.querySelector('.dss-map-status')!.textContent).toBe('Karte wird geladen …');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('idle');
+    click(host.querySelector('.hoops-map-load'));
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('loading');
+    expect(host.querySelector('.hoops-map-load')).toBeNull();
+    expect(host.querySelector('.hoops-map-canvas')!.hasAttribute('inert')).toBe(true);
+    expect(host.querySelector('.hoops-map-status')!.textContent).toBe('Karte wird geladen …');
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
     expect(load).toHaveBeenCalledTimes(1);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
-    expect(host.querySelector('.dss-map-canvas')!.hasAttribute('inert')).toBe(false);
-    expect(host.querySelector('.dss-map-ph')).toBeNull();
-    expect(host.querySelectorAll('.dss-map-zoom-btn')).toHaveLength(2);
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
+    expect(host.querySelector('.hoops-map-canvas')!.hasAttribute('inert')).toBe(false);
+    expect(host.querySelector('.hoops-map-ph')).toBeNull();
+    expect(host.querySelectorAll('.hoops-map-zoom-btn')).toHaveLength(2);
     // Fokus auf der Kartenfläche (nur nach dem Klick des Nutzers)
-    expect(document.activeElement).toBe(host.querySelector('.dss-map-canvas'));
+    expect(document.activeElement).toBe(host.querySelector('.hoops-map-canvas'));
   });
   it('load auto startet ohne Klick, ohne Fokus-Sprung', async () => {
     mountMap(host, { ...BASE, load: 'auto', tileUrl: '/t/{z}/{x}/{y}.png' } as never);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('loading');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('loading');
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
-    expect(document.activeElement).not.toBe(host.querySelector('.dss-map-canvas'));
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
+    expect(document.activeElement).not.toBe(host.querySelector('.hoops-map-canvas'));
     expect(lastLayer().url).toBe('/t/{z}/{x}/{y}.png');
   });
   it('die Schaltfläche tut bei ungültiger Kachel-Adresse nichts (Fehlerzustand ohne Schaltfläche)', async () => {
     mountMap(host, { ...BASE, tileUrl: 'http://tiles.example.org/{z}/{x}/{y}.png' } as never);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
-    expect(host.querySelector('.dss-map-load')).toBeNull();
-    expect(host.querySelector('.dss-map-status')!.textContent).toContain('konnte nicht geladen werden');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('error');
+    expect(host.querySelector('.hoops-map-load')).toBeNull();
+    expect(host.querySelector('.hoops-map-status')!.textContent).toContain('konnte nicht geladen werden');
     await tick();
     expect(state.maps).toHaveLength(0);
   });
@@ -94,7 +94,7 @@ describe('Leaflet laden: loadLeaflet', () => {
     const mock = await import('./helpers/leaflet-mock');
     mountMap(host, { ...BASE, load: 'auto' } as never, { loadLeaflet: () => Promise.resolve(mock.L) });
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
   });
   it('ohne Lader gilt import("leaflet") (der Standard)', async () => {
     mountMap(host, { ...BASE, load: 'auto' } as never);
@@ -107,9 +107,9 @@ describe('Leaflet laden: loadLeaflet', () => {
       document.body.append(el);
       mountMap(el, { ...BASE, load: 'auto' } as never, { loadLeaflet: loader as never, onError: (r) => reasons.push(r) });
       await vi.waitFor(() => expect(reasons).toEqual(['import']));
-      expect(el.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
-      expect(el.querySelector('.dss-map-canvas')).toBeNull();
-      expect(el.querySelector('.dss-map-status')!.textContent).toContain('konnte nicht geladen werden');
+      expect(el.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('error');
+      expect(el.querySelector('.hoops-map-canvas')).toBeNull();
+      expect(el.querySelector('.hoops-map-status')!.textContent).toContain('konnte nicht geladen werden');
       expect(state.maps).toHaveLength(0);
     }
   });
@@ -126,11 +126,11 @@ describe('Fehlerfälle', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     mountMap(host, { ...BASE, load: 'auto', markers: [A, B] } as never, { onError: (r) => reasons.push(r) });
     await vi.waitFor(() => expect(reasons).toEqual(['init']));
-    const root = host.querySelector('.dss-map')!;
+    const root = host.querySelector('.hoops-map')!;
     expect(root.getAttribute('data-state')).toBe('error');
-    expect(root.querySelectorAll('.dss-map-ph-pin')).toHaveLength(0);
-    expect(root.querySelector('.dss-map-status')!.textContent).toContain('konnte nicht geladen werden');
-    expect(root.querySelectorAll('.dss-map-item')).toHaveLength(2);
+    expect(root.querySelectorAll('.hoops-map-ph-pin')).toHaveLength(0);
+    expect(root.querySelector('.hoops-map-status')!.textContent).toContain('konnte nicht geladen werden');
+    expect(root.querySelectorAll('.hoops-map-item')).toHaveLength(2);
   });
   it('alle ersten Kacheln schlagen fehl: tiles; die Karte wird abgebaut', async () => {
     const reasons: string[] = [];
@@ -140,16 +140,16 @@ describe('Fehlerfälle', () => {
     const map = lastMap();
     finishTiles(lastLayer(), 'fail');
     expect(reasons).toEqual(['tiles']);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('error');
     expect(map.isRemoved).toBe(true);
-    expect(host.querySelector('.dss-map-canvas')).toBeNull();
+    expect(host.querySelector('.hoops-map-canvas')).toBeNull();
   });
   it('eine Karte, die schon Kacheln zeigte, kippt bei späteren Kachelfehlern nicht', async () => {
     mountMap(host, { ...BASE, load: 'auto' } as never);
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
     finishTiles(lastLayer(), 'ok');
     finishTiles(lastLayer(), 'fail');
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
   });
   it('update wirft: Grund update, Fehlerzustand', async () => {
     const reasons: string[] = [];
@@ -159,22 +159,22 @@ describe('Fehlerfälle', () => {
     state.throwOnView = true;
     handle.update({ ...BASE, markers: [B, C], center: [50, 9] } as never);
     expect(reasons).toEqual(['update']);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('error');
   });
   it('eine neue Kachel-Adresse versucht es erneut; die erste ungültige zeigt den Fehler', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     const handle = mountMap(host, { ...BASE, tileUrl: 'http://x.example/{z}/{x}/{y}.png' } as never);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('error');
     handle.update({ ...BASE, tileUrl: '/tiles/{z}/{x}/{y}.png' } as never);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('idle');
-    expect(host.querySelector('.dss-map-load')).not.toBeNull();
-    expect(host.querySelectorAll('.dss-map-ph-pin')).toHaveLength(1);
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('idle');
+    expect(host.querySelector('.hoops-map-load')).not.toBeNull();
+    expect(host.querySelectorAll('.hoops-map-ph-pin')).toHaveLength(1);
   });
   it('ein Handler, der wirft, kippt die Karte nicht', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
     mountMap(host, { ...BASE, load: 'auto' } as never, { onLoad: () => { throw new Error('Handler'); } });
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
   });
 });
 
@@ -182,7 +182,7 @@ describe('Zoom-Schaltflächen', () => {
   it('Klick ruft zoomIn und zoomOut; aria-disabled an den Grenzen, nie disabled', async () => {
     mountMap(host, { ...BASE, load: 'auto' } as never);
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
-    const [plus, minus] = [...host.querySelectorAll<HTMLElement>('.dss-map-zoom-btn')];
+    const [plus, minus] = [...host.querySelectorAll<HTMLElement>('.hoops-map-zoom-btn')];
     const map = lastMap();
     const before = map.getZoom();
     click(plus);
@@ -199,7 +199,7 @@ describe('Zoom-Schaltflächen', () => {
     map.fire('zoomend');
     expect(minus.getAttribute('aria-disabled')).toBe('true');
     expect(plus.hasAttribute('aria-disabled')).toBe(false);
-    expect(plus.getAttribute('aria-controls')).toBe(host.querySelector('.dss-map-canvas')!.id);
+    expect(plus.getAttribute('aria-controls')).toBe(host.querySelector('.hoops-map-canvas')!.id);
   });
 });
 
@@ -235,7 +235,7 @@ describe('update', () => {
     expect(mA.latlngs).toEqual([[49.4875, 8.466], [49.49, 8.466]]);
     expect(mB.isRemoved).toBe(true);
     expect(state.markers).toHaveLength(3);
-    expect(host.querySelectorAll('.dss-map-item')).toHaveLength(2);
+    expect(host.querySelectorAll('.hoops-map-item')).toHaveLength(2);
     expect(lastMap().isRemoved).toBe(false);
     expect(state.maps).toHaveLength(1);
   });
@@ -251,18 +251,18 @@ describe('update', () => {
   });
   it('der Fokus in der Liste bleibt bei einer Aktualisierung (derselbe Link an derselben Stelle)', () => {
     const handle = mountMap(host, { ...BASE, markers: [B, C] } as never);
-    const link = host.querySelector<HTMLElement>('.dss-map-item a.dss-link')!;
+    const link = host.querySelector<HTMLElement>('.hoops-map-item a.hoops-link')!;
     link.focus();
     expect(document.activeElement).toBe(link);
     handle.update({ ...BASE, markers: [B, C, A] } as never);
     expect(document.activeElement?.tagName).toBe('A');
-    expect(host.querySelector('.dss-map-item a.dss-link')).toBe(document.activeElement);
+    expect(host.querySelector('.hoops-map-item a.hoops-link')).toBe(document.activeElement);
   });
   it('gleiche Liste: kein Ersetzen (der Link bleibt dasselbe Element)', () => {
     const handle = mountMap(host, { ...BASE, markers: [B, C] } as never);
-    const link = host.querySelector('.dss-map-item a.dss-link');
+    const link = host.querySelector('.hoops-map-item a.hoops-link');
     handle.update({ ...BASE, markers: [B, C] } as never);
-    expect(host.querySelector('.dss-map-item a.dss-link')).toBe(link);
+    expect(host.querySelector('.hoops-map-item a.hoops-link')).toBe(link);
   });
 });
 
@@ -319,7 +319,7 @@ describe('destroy und Aufräumen', () => {
     const resolvers: ((value: unknown) => void)[] = [];
     const loader = () => new Promise((resolve) => resolvers.push(resolve));
     const first = mountMap(host, BASE as never, { loadLeaflet: loader });
-    click(host.querySelector('.dss-map-load'));
+    click(host.querySelector('.hoops-map-load'));
     first.destroy();
     const second = mountMap(host, { ...BASE, load: 'auto' } as never, { loadLeaflet: loader });
     const L = (await import('./helpers/leaflet-mock')).default;
@@ -338,7 +338,7 @@ describe('Mehrfach-init (idempotent)', () => {
     const second = mountMap(host, { ...BASE, load: 'auto', label: 'Neu' } as never);
     expect(state.maps[0].isRemoved).toBe(true);
     await vi.waitFor(() => expect(state.maps).toHaveLength(2));
-    expect(host.querySelectorAll('.dss-map')).toHaveLength(1);
+    expect(host.querySelectorAll('.hoops-map')).toHaveLength(1);
     expect(host.querySelector('[role="region"]')!.getAttribute('aria-label')).toBe('Neu');
     first.destroy();
     expect(state.maps[1].isRemoved).toBe(false);
@@ -351,7 +351,7 @@ describe('Mehrfach-init (idempotent)', () => {
     const first = initMap(host, BASE as never);
     const second = initMap(host, BASE as never);
     expect(l.open().filter(([k]) => k.includes('click'))).toEqual([['element click', 1]]);
-    click(host.querySelector('.dss-map-load'));
+    click(host.querySelector('.hoops-map-load'));
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
     first.destroy();
     expect(state.maps[0].isRemoved).toBe(false);
@@ -364,11 +364,11 @@ describe('Mehrfach-init (idempotent)', () => {
 describe('initMap auf vorhandenem Markup', () => {
   it('Server-Markup: Schaltfläche der Hallenkarte wird bedienbar, destroy stellt Markup und Sperre wieder her', async () => {
     host.append(document.createRange().createContextualFragment(renderVenueCard({ name: 'Halle', lat: 49.3, lng: 7.9 } as never, { uid: 'v1' })));
-    const button = host.querySelector<HTMLButtonElement>('.dss-map-load')!;
+    const button = host.querySelector<HTMLButtonElement>('.hoops-map-load')!;
     expect(button.disabled).toBe(true);
     const before = host.innerHTML;
-    const handle = initMap(host.querySelector('.dss-venue-map')!, { markers: [{ id: 'halle', lat: 49.3, lng: 7.9, label: 'Halle' }], interactive: false, showList: false, appLinks: [] } as never);
-    const live = host.querySelector<HTMLButtonElement>('.dss-map-load')!;
+    const handle = initMap(host.querySelector('.hoops-venue-map')!, { markers: [{ id: 'halle', lat: 49.3, lng: 7.9, label: 'Halle' }], interactive: false, showList: false, appLinks: [] } as never);
+    const live = host.querySelector<HTMLButtonElement>('.hoops-map-load')!;
     expect(live.disabled).toBe(false);
     expect(live.hasAttribute('aria-disabled')).toBe(false);
     click(live);
@@ -376,7 +376,7 @@ describe('initMap auf vorhandenem Markup', () => {
     expect(lastMap().dragging.enabled).toBe(false);
     handle.destroy();
     expect(host.innerHTML).toBe(before);
-    expect(host.querySelector<HTMLButtonElement>('.dss-map-load')!.disabled).toBe(true);
+    expect(host.querySelector<HTMLButtonElement>('.hoops-map-load')!.disabled).toBe(true);
   });
   it('ohne Karten-Markup: kein Fehler, nichts passiert', () => {
     host.append('nichts');
@@ -411,20 +411,20 @@ describe('Styles über das CSSOM (CSP style-src ohne unsafe-inline)', () => {
     expect(fragments.length).toBeGreaterThan(0);
     for (const html of fragments) expect(html).not.toMatch(/\sstyle="/);
     expect(styleWrites).toEqual([]);
-    const root = host.querySelector<HTMLElement>('.dss-map')!;
+    const root = host.querySelector<HTMLElement>('.hoops-map')!;
     expect(root.style.getPropertyValue('--hoops-map-h')).toBe('300px');
-    const pins = [...host.querySelectorAll<HTMLElement>('.dss-map-ph-pin')];
+    const pins = [...host.querySelectorAll<HTMLElement>('.hoops-map-ph-pin')];
     expect(pins).toHaveLength(2);
     for (const pin of pins) {
       expect(pin.style.left).toMatch(/%$/);
       expect(pin.style.top).toMatch(/%$/);
-      expect(pin.hasAttribute('data-dss-style')).toBe(false);
+      expect(pin.hasAttribute('data-hoops-style')).toBe(false);
     }
   });
   it('update schreibt die Höhe über das CSSOM', () => {
     const handle = mountMap(host, BASE as never);
     handle.update({ ...BASE, height: 480 } as never);
-    expect(host.querySelector<HTMLElement>('.dss-map')!.style.getPropertyValue('--hoops-map-h')).toBe('480px');
+    expect(host.querySelector<HTMLElement>('.hoops-map')!.style.getPropertyValue('--hoops-map-h')).toBe('480px');
   });
 });
 
@@ -449,11 +449,11 @@ describe('Parität im DOM: Vanilla gegen React (normalisiert)', () => {
     const el = document.createElement('div');
     document.body.append(el);
     mountMap(el, props as never);
-    click(el.querySelector('.dss-map-load'));
+    click(el.querySelector('.hoops-map-load'));
     await vi.waitFor(() => expect(state.maps).toHaveLength(1));
     const r = reactRender(createElement(MapView, props as never));
-    await act(async () => { click(r.container.querySelector('.dss-map-load')); await tick(); await tick(); });
-    await vi.waitFor(() => expect(r.container.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready'));
+    await act(async () => { click(r.container.querySelector('.hoops-map-load')); await tick(); await tick(); });
+    await vi.waitFor(() => expect(r.container.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready'));
     // Marker-DOM der gespielten Karte hängt in der Kartenfläche (gleich in beiden); die Struktur drumherum muss gleich sein
     expect(norm(el)).toBe(norm(r.container));
   });
@@ -490,12 +490,12 @@ describe('Zweimal init auf demselben Server-Markup (die Karte lebt im sichtbaren
     host.append(document.createRange().createContextualFragment(renderMap(BASE as never)));
     initMap(host, BASE as never);
     initMap(host, BASE as never);
-    click(host.querySelector('.dss-map-load'));
-    await vi.waitFor(() => expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready'));
+    click(host.querySelector('.hoops-map-load'));
+    await vi.waitFor(() => expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready'));
     expect(host.querySelectorAll('.leaflet-container')).toHaveLength(1);
-    expect(host.querySelector('.dss-map-canvas')!.classList.contains('leaflet-container')).toBe(true);
+    expect(host.querySelector('.hoops-map-canvas')!.classList.contains('leaflet-container')).toBe(true);
     expect(state.detached).toBe(0);
-    expect(host.querySelectorAll('.dss-map-zoom-btn')).toHaveLength(2);
+    expect(host.querySelectorAll('.hoops-map-zoom-btn')).toHaveLength(2);
   });
   it('renderVenueCard(init) + initAll zweimal: die Schaltfläche ist bedienbar und die Karte entsteht im Dokument', async () => {
     const { initAll } = await import('../js/vanilla-core.js');
@@ -504,13 +504,13 @@ describe('Zweimal init auf demselben Server-Markup (die Karte lebt im sichtbaren
     const options = { map: { start: initMapBlock } };
     initAll(document, options);
     const second = initAll(document, options);
-    const button = host.querySelector<HTMLButtonElement>('.dss-map-load')!;
+    const button = host.querySelector<HTMLButtonElement>('.hoops-map-load')!;
     expect(button.disabled).toBe(false);
     click(button);
     await vi.waitFor(() => expect(host.querySelectorAll('.leaflet-container')).toHaveLength(1));
     expect(state.detached).toBe(0);
     second.destroy();
-    expect(host.querySelector<HTMLButtonElement>('.dss-map-load')!.disabled).toBe(true);
+    expect(host.querySelector<HTMLButtonElement>('.hoops-map-load')!.disabled).toBe(true);
   });
   it('mountMap zweimal und mountVenueCard zweimal mit initMap: je eine lebendige Karte im Dokument', async () => {
     mountMap(host, { ...BASE, load: 'auto' } as never);
@@ -535,9 +535,9 @@ describe('update mit Teilen (kein stiller Rückfall auf den Standardserver)', ()
     expect(state.layers[0].urls).toEqual(['/proxy/{z}/{x}/{y}.png']);
     expect(state.layers.every((l) => l.urls.every((u) => !u.includes('openstreetmap')))).toBe(true);
     expect(state.markers.filter((m) => !m.isRemoved)).toHaveLength(2);
-    expect(host.querySelectorAll('.dss-map-item')).toHaveLength(2);
-    expect(host.querySelector('.dss-map-links a')!.getAttribute('href')).toMatch(/^geo:/);
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
+    expect(host.querySelectorAll('.hoops-map-item')).toHaveLength(2);
+    expect(host.querySelector('.hoops-map-links a')!.getAttribute('href')).toMatch(/^geo:/);
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
     expect(lastMap().view.at(-1)).toMatchObject({ center: [50, 9], zoom: 12 });
   });
   it('undefined wird ignoriert, null nimmt zurück (Standard), die Adresse wird erst dann der Standard', async () => {
@@ -559,31 +559,31 @@ describe('Verhalten (nicht nur Quelltextmuster)', () => {
     const errors: string[] = [];
     const handle = mountMap(host, { ...BASE, load: 'auto', tileUrl: '/a/{z}/{x}/{y}.png' } as never, { loadLeaflet: loader, onError: (r) => errors.push(r) });
     await vi.waitFor(() => expect(errors).toEqual(['import']));
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('error');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('error');
     // gleiche Adresse: bleibt im Fehler, der Lader wird nicht erneut gerufen
     handle.update({ label: 'Name' });
     expect(calls).toBe(1);
     handle.update({ tileUrl: '/b/{z}/{x}/{y}.png' });
-    await vi.waitFor(() => expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready'));
+    await vi.waitFor(() => expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready'));
     expect(calls).toBe(2);
     expect(lastLayer().url).toBe('/b/{z}/{x}/{y}.png');
-    expect(host.querySelector('.dss-map-status')!.textContent).toBe('');
+    expect(host.querySelector('.hoops-map-status')!.textContent).toBe('');
   });
   it('hängender Lader: die Karte bleibt im Zustand „Laden“, ohne Fehler und ohne Karte', async () => {
     const errors: string[] = [];
     mountMap(host, { ...BASE, load: 'auto' } as never, { loadLeaflet: () => new Promise(() => {}), onError: (r) => errors.push(r) });
     await tick();
     await tick();
-    expect(host.querySelector('.dss-map')!.getAttribute('data-state')).toBe('loading');
-    expect(host.querySelector('.dss-map-status')!.textContent).toBe('Karte wird geladen …');
+    expect(host.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('loading');
+    expect(host.querySelector('.hoops-map-status')!.textContent).toBe('Karte wird geladen …');
     expect(errors).toEqual([]);
     expect(state.maps).toHaveLength(0);
   });
   it('Vereinssitz zählt nicht mit: Liste, Pins im Platzhalter und Marker der Karte nummerieren die Orte von 1 an', async () => {
     const handle = mountMap(host, { label: 'K', markers: [{ ...C, kind: 'seat' }, A, B], load: 'auto' } as never);
-    expect([...host.querySelectorAll('.dss-map-ph-pin')].map((p) => p.textContent)).toEqual(['', '1', '2']);
+    expect([...host.querySelectorAll('.hoops-map-ph-pin')].map((p) => p.textContent)).toEqual(['', '1', '2']);
     await vi.waitFor(() => expect(state.markers).toHaveLength(3));
-    expect([...host.querySelectorAll('.dss-map-item')].map((li) => li.querySelector('.dss-map-num')?.textContent)).toEqual(['', '1', '2']);
+    expect([...host.querySelectorAll('.hoops-map-item')].map((li) => li.querySelector('.hoops-map-num')?.textContent)).toEqual(['', '1', '2']);
     expect(state.markers.map((m) => m.options.title)).toEqual(['Gymnasium Lindenberg, Vereinssitz', '1, Sporthalle Nordhain', '2, Halle Süd & West']);
     handle.destroy();
   });

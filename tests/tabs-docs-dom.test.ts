@@ -41,11 +41,11 @@ describe('Vanilla-Beispiele der Tabs-Doku', () => {
     expect(visible('ort-auswaerts-panel')).toBe(true);
     expect(el('wb-pokal').getAttribute('tabindex')).toBe('0');
   });
-  it('Filter: Klick schaltet um, dss:tabchange meldet alle gedrückten', () => {
+  it('Filter: Klick schaltet um, hoops:tabchange meldet alle gedrückten', () => {
     mountHtml(filterMarkup);
     handle = initAll(document);
     const seen: string[][] = [];
-    document.addEventListener('dss:tabchange', (e) => seen.push((e as CustomEvent).detail.ids));
+    document.addEventListener('hoops:tabchange', (e) => seen.push((e as CustomEvent).detail.ids));
     el('f-b').click();
     el('f-a').click();
     expect(seen).toEqual([['f-a', 'f-b', 'f-c'], ['f-b', 'f-c']]);

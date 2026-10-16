@@ -57,9 +57,9 @@ describe.each(CASES)('exclusive + defaultOpen + Anker: %s', (_name, open, hash, 
   });
   it('Vanilla', async () => {
     setHash(hash);
-    const item = (i: number) => `<div class="dss-acc-item${open.includes(i) ? ' is-open' : ''}" id="i${i}"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="i${i}-trigger" aria-expanded="${open.includes(i)}" aria-controls="i${i}-panel"><span class="dss-acc-label">${titles[i]}</span></button></h3><div class="dss-acc-panel" id="i${i}-panel"${open.includes(i) ? '' : ' hidden inert'}><div class="dss-acc-panel-inner"><div class="dss-acc-body">x</div></div></div></div>`;
-    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="dss-acc dss-acc--card">${[0, 1, 2, 3].map(item).join('')}</div>`));
-    const destroy = initAccordion(document.querySelector('.dss-acc')!, { exclusive: true });
+    const item = (i: number) => `<div class="hoops-acc-item${open.includes(i) ? ' is-open' : ''}" id="i${i}"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="i${i}-trigger" aria-expanded="${open.includes(i)}" aria-controls="i${i}-panel"><span class="hoops-acc-label">${titles[i]}</span></button></h3><div class="hoops-acc-panel" id="i${i}-panel"${open.includes(i) ? '' : ' hidden inert'}><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">x</div></div></div></div>`;
+    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="hoops-acc hoops-acc--card">${[0, 1, 2, 3].map(item).join('')}</div>`));
+    const destroy = initAccordion(document.querySelector('.hoops-acc')!, { exclusive: true });
     await wait(20);
     expect(states(document.body)).toEqual(expected);
     destroy();
@@ -107,9 +107,9 @@ describe('Fokus geht auf den Kopf, wenn sein Bereich inert wird', () => {
     void unmount(app);
   });
   it('Vanilla: Anker öffnet einen anderen Bereich (exclusive)', async () => {
-    const item = (id: string, open: boolean, inner = '') => `<div class="dss-acc-item${open ? ' is-open' : ''}" id="${id}"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="${id}-t" aria-expanded="${open}" aria-controls="${id}-p"><span class="dss-acc-label">${id}</span></button></h3><div class="dss-acc-panel" id="${id}-p"${open ? '' : ' hidden inert'}><div class="dss-acc-panel-inner"><div class="dss-acc-body">${inner}</div></div></div></div>`;
-    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="dss-acc dss-acc--card">${item('a', true, '<button id="inner">i</button>')}${item('b', false)}</div>`));
-    const destroy = initAccordion(document.querySelector('.dss-acc')!, { exclusive: true });
+    const item = (id: string, open: boolean, inner = '') => `<div class="hoops-acc-item${open ? ' is-open' : ''}" id="${id}"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="${id}-t" aria-expanded="${open}" aria-controls="${id}-p"><span class="hoops-acc-label">${id}</span></button></h3><div class="hoops-acc-panel" id="${id}-p"${open ? '' : ' hidden inert'}><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">${inner}</div></div></div></div>`;
+    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="hoops-acc hoops-acc--card">${item('a', true, '<button id="inner">i</button>')}${item('b', false)}</div>`));
+    const destroy = initAccordion(document.querySelector('.hoops-acc')!, { exclusive: true });
     document.getElementById('inner')!.focus();
     window.location.hash = '#b';
     await wait(30);
@@ -121,11 +121,11 @@ describe('Fokus geht auf den Kopf, wenn sein Bereich inert wird', () => {
 
 // ── B: Name der Sprungleiste ohne das unsichtbare Komma ───────────────
 describe('Vanilla-Sprungleiste: Linktext ist der Titel', () => {
-  it('auch bei einem Kopf mit Zusatzinfo (unsichtbares Komma im Label, .dss-acc-sep)', () => {
-    const item = (id: string, title: string, meta: boolean) => `<div class="dss-acc-item" id="${id}"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="${id}-t" aria-expanded="false" aria-controls="${id}-p"><span class="dss-acc-label">${title}${meta ? '<span class="dss-acc-sep">,</span>' : ''}</span>${meta ? '<span class="dss-acc-meta">14 Spieler</span>' : ''}</button></h3><div class="dss-acc-panel" id="${id}-p" hidden inert><div class="dss-acc-panel-inner"><div class="dss-acc-body">x</div></div></div></div>`;
-    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="dss-acc dss-acc--card">${item('a', 'Bereich 0', true)}${item('b', 'Spielplan', false)}</div>`));
-    const destroy = initAccordion(document.querySelector('.dss-acc')!, { nav: true, syncHash: false });
-    expect([...document.querySelectorAll('.dss-acc-nav-link')].map((l) => l.textContent)).toEqual(['Bereich 0', 'Spielplan']);
+  it('auch bei einem Kopf mit Zusatzinfo (unsichtbares Komma im Label, .hoops-acc-sep)', () => {
+    const item = (id: string, title: string, meta: boolean) => `<div class="hoops-acc-item" id="${id}"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="${id}-t" aria-expanded="false" aria-controls="${id}-p"><span class="hoops-acc-label">${title}${meta ? '<span class="hoops-acc-sep">,</span>' : ''}</span>${meta ? '<span class="hoops-acc-meta">14 Spieler</span>' : ''}</button></h3><div class="hoops-acc-panel" id="${id}-p" hidden inert><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">x</div></div></div></div>`;
+    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="hoops-acc hoops-acc--card">${item('a', 'Bereich 0', true)}${item('b', 'Spielplan', false)}</div>`));
+    const destroy = initAccordion(document.querySelector('.hoops-acc')!, { nav: true, syncHash: false });
+    expect([...document.querySelectorAll('.hoops-acc-nav-link')].map((l) => l.textContent)).toEqual(['Bereich 0', 'Spielplan']);
     destroy();
   });
 });
@@ -135,13 +135,13 @@ describe('Scroll-Abstand bei verschachtelten Zielen unter klebendem Kopf', () =>
   const tree = (sticky: boolean) => {
     document.body.replaceChildren(
       document.createRange().createContextualFragment(
-        `<div class="dss-acc ${sticky ? 'dss-acc--sticky' : ''}"><div class="dss-acc-item is-open" id="o"><h3 class="dss-acc-title"><button class="dss-acc-trigger">O</button></h3><div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">` +
-          `<div class="dss-acc dss-acc--nested"><div class="dss-acc-item is-open" id="m"><h3 class="dss-acc-title"><button class="dss-acc-trigger">M</button></h3><div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">` +
-          `<div class="dss-acc dss-acc--nested"><div class="dss-acc-item" id="t"><h3 class="dss-acc-title"><button class="dss-acc-trigger">T</button></h3></div></div>` +
+        `<div class="hoops-acc ${sticky ? 'hoops-acc--sticky' : ''}"><div class="hoops-acc-item is-open" id="o"><h3 class="hoops-acc-title"><button class="hoops-acc-trigger">O</button></h3><div class="hoops-acc-panel"><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">` +
+          `<div class="hoops-acc hoops-acc--nested"><div class="hoops-acc-item is-open" id="m"><h3 class="hoops-acc-title"><button class="hoops-acc-trigger">M</button></h3><div class="hoops-acc-panel"><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">` +
+          `<div class="hoops-acc hoops-acc--nested"><div class="hoops-acc-item" id="t"><h3 class="hoops-acc-title"><button class="hoops-acc-trigger">T</button></h3></div></div>` +
           `</div></div></div></div></div></div></div></div></div>`,
       ),
     );
-    const head = document.querySelector('#o > .dss-acc-title') as HTMLElement;
+    const head = document.querySelector('#o > .hoops-acc-title') as HTMLElement;
     head.getBoundingClientRect = () => ({ height: 46.4, top: 0, bottom: 46.4, left: 0, right: 0, width: 0, x: 0, y: 0, toJSON() {} });
   };
   it('stickyOffset: Höhe des klebenden Kopfes der obersten Ebene; 0 für den Bereich selbst und ohne sticky', () => {

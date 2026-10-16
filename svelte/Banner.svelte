@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Banner · Svelte 5
+   * HoopsFoundry UI Banner · Svelte 5
    * --------------------------------------------------------------
    * Inline-Hinweis (info · ok · warn · danger). Nutzt nur die Klassen aus
    * css/components.css. `role` ist standardmäßig "alert" für warn/danger
@@ -27,9 +27,9 @@
   const resolvedRole = $derived(role ?? (severity === 'warn' || severity === 'danger' ? 'alert' : 'status'));
 </script>
 
-<div class="dss-banner dss-banner--{severity}" role={resolvedRole}>
+<div class="hoops-banner hoops-banner--{severity}" role={resolvedRole}>
   {#if icon}
-    <svg class="dss-banner-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+    <svg class="hoops-banner-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
       {#if severity === 'danger'}
         <g stroke-width="1.8"><circle cx="8" cy="8" r="6.5" /><path d="M5.2 10.8l5.6-5.6" /></g>
       {:else if severity === 'warn'}
@@ -41,8 +41,8 @@
       {/if}
     </svg>
   {/if}
-  <div class="dss-banner-body">
-    {#if title}<p class="dss-banner-title">{title}</p>{/if}
+  <div class="hoops-banner-body">
+    {#if title}<p class="hoops-banner-title">{title}</p>{/if}
     {@render children()}
   </div>
 </div>

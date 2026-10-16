@@ -1,4 +1,4 @@
-# DSS Design System
+# HoopsFoundry UI
 
 **Digitaler Spielbericht · Komponenten-Library für Basketball-Apps**
 Version 0.9 · WCAG 2.1 AAA · Framework-agnostisch · *Pre-release*
@@ -20,7 +20,7 @@ svelte/
   Tabs.svelte           ← v0.6
   Accordion.svelte      ← Bereiche auf und zu klappen (mit AccordionItem.svelte, CSS in css/components.css); Table, ScheduleTable, ScheduleGrid und LeagueCard klappen mit `collapsible` ein (interner Baustein internal/CollapsibleFrame.svelte)
   Icon.svelte           ← v0.6 (67 Glyphen)
-  Select.svelte         ← v0.7 · natives <select> im DSS-Look
+  Select.svelte         ← v0.7 · natives <select> im HoopsFoundry-UI-Look
   Banner.svelte         ← v0.7 · Inline-Hinweis
   Table.svelte          ← Tabelle mit Rahmenkopf (CSS jetzt in css/components.css)
   TopBar.svelte         ← App-Leiste (CSS jetzt in css/components.css)
@@ -54,10 +54,10 @@ js/
   theme.js              ← Dunkelmodus: `initTheme`, `themeBootScript` (`./theme.js`)
   tabs.js               ← Tabs: `initTabs`, `nextTab` (`./tabs.js`)
   modal.js              ← Modal: `initModal`, `openModal`, `closeModal` (`./modal.js`)
-  vanilla-core.js       ← `initAll(scope)` über `data-dss="accordion|pagenav|backtop|theme|tabs|modal|map"` (`./vanilla-core.js`)
+  vanilla-core.js       ← `initAll(scope)` über `data-hoops="accordion|pagenav|backtop|theme|tabs|modal|map"` (`./vanilla-core.js`)
   vanilla.js            ← Einstieg des gebündelten Pakets `dist/vanilla` (`./vanilla`)
-  render/               ← `renderX`/`mountX` (Markup aus Daten, `./render.js`, `./render/*.js`); gebündelt `dss-render.js` (`./vanilla-render`)
-  map-vanilla.js        ← `renderMap`/`initMap`/`mountMap`: die Karte ohne Framework (`./map-vanilla.js`); gebündelt `dss-map.js` (`./vanilla-map`)
+  render/               ← `renderX`/`mountX` (Markup aus Daten, `./render.js`, `./render/*.js`); gebündelt `hoops-render.js` (`./vanilla-render`)
+  map-vanilla.js        ← `renderMap`/`initMap`/`mountMap`: die Karte ohne Framework (`./map-vanilla.js`); gebündelt `hoops-map.js` (`./vanilla-map`)
   motion.js, url.js, lifecycle.js ← gemeinsame Grundlagen: `reducedMotion`, `safeHref`, das Muster `initX(root, options) → { destroy() }`
 icons/
   sprite.ts             ← v0.7 · gemeinsamer Icon-Sprite für Svelte und React
@@ -67,13 +67,13 @@ css/
 .storybook/             ← v0.6 · Storybook config
 stories/                ← v0.6 · Stories für alle Komponenten + Foundation
 docs/
-  DSS Design System - Identity Overview v0.3.html
-  DSS Design System - Tables.html
-  DSS Design System - Forms.html
-  DSS Design System - Modals.html
-  DSS Design System - Navigation.html       ← v0.6
-  DSS Design System - Cards & Lists.html    ← v0.6
-  DSS Design System - Icons.html            ← v0.6
+  HoopsFoundry UI - Identity Overview v0.3.html
+  HoopsFoundry UI - Tables.html
+  HoopsFoundry UI - Forms.html
+  HoopsFoundry UI - Modals.html
+  HoopsFoundry UI - Navigation.html       ← v0.6
+  HoopsFoundry UI - Cards & Lists.html    ← v0.6
+  HoopsFoundry UI - Icons.html            ← v0.6
 ```
 
 ---
@@ -103,10 +103,10 @@ Dann tokens benutzen:
 
 ```js
 // tailwind.config.js
-import dssPreset from './tokens/tailwind.preset.js';
+import hoopsPreset from './tokens/tailwind.preset.js';
 
 export default {
-  presets: [dssPreset],
+  presets: [hoopsPreset],
   content: ['./src/**/*.{html,svelte,ts,tsx}'],
 };
 ```
@@ -128,15 +128,15 @@ npx style-dictionary build --tokens tokens/tokens.json
 ## Vanilla CSS (ohne Svelte)
 
 Für Seiten ohne Build-Schritt gibt es `css/components.css` mit denselben Klassennamen wie die
-Svelte-Komponenten (`dss-btn`, `dss-card`, `dss-tabs`, `dss-tbl`, `dss-chip`, …):
+Svelte-Komponenten (`hoops-btn`, `hoops-card`, `hoops-tabs`, `hoops-tbl`, `hoops-chip`, …):
 
 ```html
 <html data-theme="light">
 <link rel="stylesheet" href="tokens/tokens.css" />
 <link rel="stylesheet" href="css/components.css" />
 
-<button class="dss-btn dss-btn--amber dss-btn--lg">Suchen</button>
-<span class="dss-chip dss-chip--sky">Männlich</span>
+<button class="hoops-btn hoops-btn--amber hoops-btn--lg">Suchen</button>
+<span class="hoops-chip hoops-chip--sky">Männlich</span>
 ```
 
 Farben laufen über die semantischen Variablen `--hoops-*`; Dark schaltet `data-theme="dark"` oder die
@@ -152,13 +152,13 @@ der Standard und schreibt nichts, `--write` schreibt (vorher Git-Stand sichern).
 ## React
 
 ```bash
-npm install github:OliEder/dss-design-system#v0.9.0 react react-dom @radix-ui/react-dialog
+npm install github:HoopsFoundry/ui#v0.9.0 react react-dom @radix-ui/react-dialog
 ```
 
 ```tsx
-import '@bbv/dss-design-system/tokens.css';
-import '@bbv/dss-design-system/components.css';
-import { Button, TextInput, Select, Modal, Banner, AppNav, Checkbox, Table, BottomNav, Breadcrumbs, MatchCard, PlayerCard, TeamCard, LeagueCard, CourtLines } from '@bbv/dss-design-system/react';
+import '@hoopsfoundry/ui/tokens.css';
+import '@hoopsfoundry/ui/components.css';
+import { Button, TextInput, Select, Modal, Banner, AppNav, Checkbox, Table, BottomNav, Breadcrumbs, MatchCard, PlayerCard, TeamCard, LeagueCard, CourtLines } from '@hoopsfoundry/ui/react';
 
 <Button variant="amber">Speichern</Button>
 <TextInput label="Name" required />
@@ -169,21 +169,21 @@ Tailwind-Nutzer: `components.css` **nach** `@tailwind base` laden (Preflight set
 
 ## AppNav ohne Framework
 
-`css/components.css` + `js/appnav.js` genügen. Das Skript initialisiert alle `[data-dss-appnav]`.
+`css/components.css` + `js/appnav.js` genügen. Das Skript initialisiert alle `[data-hoops-appnav]`.
 
 ```html
 <link rel="stylesheet" href="…/tokens/tokens.css" />
 <link rel="stylesheet" href="…/css/components.css" />
 
-<nav class="dss-appnav dss-appnav--light" data-dss-appnav aria-label="Hauptnavigation">
-  <div class="dss-appnav-bar">
-    <button type="button" class="dss-appnav-toggle" data-appnav-toggle aria-expanded="false" aria-controls="nav-list">Menü</button>
-    <ul class="dss-appnav-list" id="nav-list">
-      <li class="dss-appnav-item"><a class="dss-appnav-link is-active" aria-current="page" href="/">Start</a></li>
-      <li class="dss-appnav-item">
-        <button type="button" class="dss-appnav-group-btn" data-appnav-group aria-expanded="false" aria-controls="nav-g1">Gruppe</button>
-        <ul class="dss-appnav-panel" id="nav-g1" hidden>
-          <li><a class="dss-appnav-link" href="/a">Seite A</a></li>
+<nav class="hoops-appnav hoops-appnav--light" data-hoops-appnav aria-label="Hauptnavigation">
+  <div class="hoops-appnav-bar">
+    <button type="button" class="hoops-appnav-toggle" data-appnav-toggle aria-expanded="false" aria-controls="nav-list">Menü</button>
+    <ul class="hoops-appnav-list" id="nav-list">
+      <li class="hoops-appnav-item"><a class="hoops-appnav-link is-active" aria-current="page" href="/">Start</a></li>
+      <li class="hoops-appnav-item">
+        <button type="button" class="hoops-appnav-group-btn" data-appnav-group aria-expanded="false" aria-controls="nav-g1">Gruppe</button>
+        <ul class="hoops-appnav-panel" id="nav-g1" hidden>
+          <li><a class="hoops-appnav-link" href="/a">Seite A</a></li>
         </ul>
       </li>
     </ul>
@@ -193,16 +193,16 @@ Tailwind-Nutzer: `components.css` **nach** `@tailwind base` laden (Preflight set
 <script type="module" src="…/js/appnav.js"></script>
 ```
 
-Gesperrte Einträge: `<span role="link" aria-disabled="true" class="dss-appnav-link is-disabled" title="Hinweis">Label</span>`.
+Gesperrte Einträge: `<span role="link" aria-disabled="true" class="hoops-appnav-link is-disabled" title="Hinweis">Label</span>`.
 
 ## Bausteine ohne Framework (Vanilla)
 
-Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein folgt demselben Muster: `initX(root, options) → { destroy() }`, idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten), nur `root` und seine Nachfahren, beim Import wird nichts ausgeführt. `initAll(scope)` aus `vanilla-core.js` findet alle Elemente mit `data-dss="accordion|pagenav|backtop|theme|tabs|modal|map"` (die Karte startet über `options.map.start`, siehe unten); Optionen stehen in `initAll(document, { pagenav: { … } })` oder am Element als JSON in `data-dss-options`.
+Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein folgt demselben Muster: `initX(root, options) → { destroy() }`, idempotent (ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten), nur `root` und seine Nachfahren, beim Import wird nichts ausgeführt. `initAll(scope)` aus `vanilla-core.js` findet alle Elemente mit `data-hoops="accordion|pagenav|backtop|theme|tabs|modal|map"` (die Karte startet über `options.map.start`, siehe unten); Optionen stehen in `initAll(document, { pagenav: { … } })` oder am Element als JSON in `data-hoops-options`.
 
 ```html
-<body data-dss="backtop">
-  <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" aria-label="Dunkelmodus" hidden></button>
-  <main data-dss="pagenav" data-dss-options='{"label":"Auf dieser Seite"}'>
+<body data-hoops="backtop">
+  <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" data-hoops="theme" aria-label="Dunkelmodus" hidden></button>
+  <main data-hoops="pagenav" data-hoops-options='{"label":"Auf dieser Seite"}'>
     <h1>Verein Nordhain</h1>
     <h2>Tabelle</h2> … <h2>Spielplan</h2> … <h2>Kader</h2> …
   </main>
@@ -214,36 +214,36 @@ Verhalten für vorhandenes HTML liegt als ES-Module unter `js/`. Jeder Baustein 
 ```
 
 - **`initPageNav`** (`pagenav.js`): Seitennavigation „Auf dieser Seite“ aus den Überschriften; ein Sprung öffnet Accordion-Bereiche und `details`, setzt den Fokus auf das Ziel, beobachtet nachgeladene Überschriften. Optionen `selector`, `container`, `label`, `minHeadings`, `skipAttribute`, `observe`, `syncHash`.
-- **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `dss-bnav`, mit `--hoops-backtop-offset`, Sicherheitsabständen und Druckregel.
-- **`initTheme`** und **`themeBootScript`** (`theme.js`): Umschalter hell/dunkel/System mit `aria-pressed`, Speicherschlüssel `dss-theme`; das Boot-Skript gehört in den `<head>` und verhindert das Flackern.
-- **`initTabs`** (`tabs.js`): Tab-Leiste mit Pfeiltasten, Pos1/Ende (roving `tabindex`, `aria-selected`), Panels über `aria-controls` (`hidden` und `inert`), `role="group"` mit `aria-pressed` als Mehrfachauswahl, optionaler Deep-Link (`hash`), manuelle Aktivierung, Ereignis `dss:tabchange`. Dieselben Regeln wie die Svelte- und React-Tabs.
-- **`initModal`**, **`openModal`**, **`closeModal`** (`modal.js`): natives `<dialog class="dss-modal-dialog">` (`showModal`) oder Markup mit `hidden` (Rolle, `aria-modal`, inerte Seite); Fokus holen und an den Auslöser zurückgeben, Escape, Fokusfalle, `dismissOnBackdrop` (Standard aus), Scroll-Sperre mit Rückbau, Auslöser `data-dss-modal-open="<id>"` und `data-dss-modal-close`, Ereignisse `dss:modalopen` und `dss:modalclose`.
+- **`initBackToTop`** (`backtop.js`): Nach-oben-Knopf (44 px), über einer festen `hoops-bnav`, mit `--hoops-backtop-offset`, Sicherheitsabständen und Druckregel.
+- **`initTheme`** und **`themeBootScript`** (`theme.js`): Umschalter hell/dunkel/System mit `aria-pressed`, Speicherschlüssel `hoops-theme`; das Boot-Skript gehört in den `<head>` und verhindert das Flackern.
+- **`initTabs`** (`tabs.js`): Tab-Leiste mit Pfeiltasten, Pos1/Ende (roving `tabindex`, `aria-selected`), Panels über `aria-controls` (`hidden` und `inert`), `role="group"` mit `aria-pressed` als Mehrfachauswahl, optionaler Deep-Link (`hash`), manuelle Aktivierung, Ereignis `hoops:tabchange`. Dieselben Regeln wie die Svelte- und React-Tabs.
+- **`initModal`**, **`openModal`**, **`closeModal`** (`modal.js`): natives `<dialog class="hoops-modal-dialog">` (`showModal`) oder Markup mit `hidden` (Rolle, `aria-modal`, inerte Seite); Fokus holen und an den Auslöser zurückgeben, Escape, Fokusfalle, `dismissOnBackdrop` (Standard aus), Scroll-Sperre mit Rückbau, Auslöser `data-hoops-modal-open="<id>"` und `data-hoops-modal-close`, Ereignisse `hoops:modalopen` und `hoops:modalclose`.
 
-Scrollabstände laufen über `--hoops-scroll-offset` und die Opt-in-Klasse `dss-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
+Scrollabstände laufen über `--hoops-scroll-offset` und die Opt-in-Klasse `hoops-scroll-pad`, nie über globale Regeln. Ausführlich in Storybook: `Components/PageNav`, `Components/Tabs`, `Components/Modal` und `Foundation/Dark Mode`.
 
 ### Markup aus Daten (`renderX`, `mountX`)
 
-Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips erzeugen `renderLeagueCard(props)` & Co. dasselbe Markup wie die Svelte- und React-Komponenten als Zeichenkette (läuft in Node, etwa im Crawler); `mountLeagueCard(el, props, options)` setzt es per `createContextualFragment` ein und gibt `{ update(props), destroy() }` zurück. Alle Eingaben sind unvertraut: Texte durch `esc`, Ziele durch `safeHref`, kein Rohmarkup von außen. Die Hallenkarte liefert die Karte als Platzhalter (ohne Leaflet; „Karte laden“ ist gesperrt, bis `mountVenueCard(el, props, { initMap })` die Karte startet). `mountX` setzt die wenigen `style`-Attribute über das CSSOM (CSP `style-src 'self'`); das Ergebnis von `renderX` braucht dafür `style-src-attr 'unsafe-inline'`. Import `@bbv/dss-design-system/render.js` (Einzelmodule `…/render/league-card.js` usw.) oder gebündelt `@bbv/dss-design-system/vanilla-render` (`dist/vanilla/dss-render.js`, importiert den Kern `dss.js` aus demselben Ordner; rund 50,2 KiB min, gzip 17,1 KiB, eigenes Budget 52 KiB und 18 KiB; `VERSION` muss zu `dss.js` und `dss.css` passen). Doku: Storybook `Foundation/Vanilla`, Abschnitt „Markup erzeugen“, und der Vanilla-Code-Tab auf jeder Komponentenseite.
+Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips erzeugen `renderLeagueCard(props)` & Co. dasselbe Markup wie die Svelte- und React-Komponenten als Zeichenkette (läuft in Node, etwa im Crawler); `mountLeagueCard(el, props, options)` setzt es per `createContextualFragment` ein und gibt `{ update(props), destroy() }` zurück. Alle Eingaben sind unvertraut: Texte durch `esc`, Ziele durch `safeHref`, kein Rohmarkup von außen. Die Hallenkarte liefert die Karte als Platzhalter (ohne Leaflet; „Karte laden“ ist gesperrt, bis `mountVenueCard(el, props, { initMap })` die Karte startet). `mountX` setzt die wenigen `style`-Attribute über das CSSOM (CSP `style-src 'self'`); das Ergebnis von `renderX` braucht dafür `style-src-attr 'unsafe-inline'`. Import `@hoopsfoundry/ui/render.js` (Einzelmodule `…/render/league-card.js` usw.) oder gebündelt `@hoopsfoundry/ui/vanilla-render` (`dist/vanilla/hoops-render.js`, importiert den Kern `hoops.js` aus demselben Ordner; rund 50,2 KiB min, gzip 17,1 KiB, eigenes Budget 52 KiB und 18 KiB; `VERSION` muss zu `hoops.js` und `hoops.css` passen). Doku: Storybook `Foundation/Vanilla`, Abschnitt „Markup erzeugen“, und der Vanilla-Code-Tab auf jeder Komponentenseite.
 
 ### Gebündelt, ohne Build (`dist/vanilla`)
 
-`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` (zusammengeführt), `dss.css` (`tokens.css` plus `components.css`, setzt `--hoops-version`) und `courtlines/`. Export `@bbv/dss-design-system/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `dss.min.js` ist rund 36 KiB groß (gzip 12,9 KiB, Budget 40 KiB und 15 KiB als Test, Polster gut 3,5 KiB).
+`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `hoops.js` (ES-Modul), `hoops.min.js`, Quellkarten, `hoops.d.ts` (zusammengeführt), `hoops.css` (`tokens.css` plus `components.css`, setzt `--hoops-version`) und `courtlines/`. Export `@hoopsfoundry/ui/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `hoops.min.js` ist rund 36 KiB groß (gzip 12,9 KiB, Budget 40 KiB und 15 KiB als Test, Polster gut 3,5 KiB).
 
-#### Karte ohne Framework (`dss-map.js`)
+#### Karte ohne Framework (`hoops-map.js`)
 
-`renderMap(props)` liefert das Markup der Karte als Zeichenkette (dasselbe wie `MapView`, läuft in Node), `mountMap(el, props, options)` setzt es ein und startet das Verhalten, `initMap(el, props)` macht vorhandenes Markup lebendig; alle drei geben `{ update(props), destroy() }` zurück (idempotent, `destroy` räumt Karte, Listener und `ResizeObserver` ab). Zwei-Klick-Platzhalter (vor dem Klick kein Netzverkehr), `load: 'auto'`, `tileUrl`, `privacyNote`, Fehlerfälle (`tile-url`, `import`, `init`, `update`, `tiles`) mit Statuszeile, Vereinssitz, `darkTiles`. Das Bündel `dist/vanilla/dss-map.js` (Export `@bbv/dss-design-system/vanilla-map`, Einzelmodul `…/map-vanilla.js`; rund 21,7 KiB min, gzip 8,9 KiB, eigenes Budget 24 KiB und 10 KiB) enthält **kein Leaflet**: die Option `loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js')` (oder eine importmap für `leaflet`, oder `window.L`) liefert es aus dem eigenen Projekt, erst nach dem Klick. `mountVenueCard(el, props, { initMap })` startet die eingebettete Karte der Hallenkarte; `initAll(document, { map: { start: initMapBlock } })` startet `data-dss="map"` mit Optionen als JSON. Ohne Build einbinden, Kachel-Proxy, CSP: Storybook `Components/Map`, Abschnitt „Ohne Build einbinden“. Beim Import passiert nichts, es lädt auch in Node.
+`renderMap(props)` liefert das Markup der Karte als Zeichenkette (dasselbe wie `MapView`, läuft in Node), `mountMap(el, props, options)` setzt es ein und startet das Verhalten, `initMap(el, props)` macht vorhandenes Markup lebendig; alle drei geben `{ update(props), destroy() }` zurück (idempotent, `destroy` räumt Karte, Listener und `ResizeObserver` ab). Zwei-Klick-Platzhalter (vor dem Klick kein Netzverkehr), `load: 'auto'`, `tileUrl`, `privacyNote`, Fehlerfälle (`tile-url`, `import`, `init`, `update`, `tiles`) mit Statuszeile, Vereinssitz, `darkTiles`. Das Bündel `dist/vanilla/hoops-map.js` (Export `@hoopsfoundry/ui/vanilla-map`, Einzelmodul `…/map-vanilla.js`; rund 21,7 KiB min, gzip 8,9 KiB, eigenes Budget 24 KiB und 10 KiB) enthält **kein Leaflet**: die Option `loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js')` (oder eine importmap für `leaflet`, oder `window.L`) liefert es aus dem eigenen Projekt, erst nach dem Klick. `mountVenueCard(el, props, { initMap })` startet die eingebettete Karte der Hallenkarte; `initAll(document, { map: { start: initMapBlock } })` startet `data-hoops="map"` mit Optionen als JSON. Ohne Build einbinden, Kachel-Proxy, CSP: Storybook `Components/Map`, Abschnitt „Ohne Build einbinden“. Beim Import passiert nichts, es lädt auch in Node.
 
 ```html
-<link rel="stylesheet" href="/dss/dss.css" />
+<link rel="stylesheet" href="/hoops/hoops.css" />
 <script type="module">
-  import { initAll } from '/dss/dss.min.js';
+  import { initAll } from '/hoops/hoops.min.js';
   initAll(document);
 </script>
 ```
 
-`scripts/portal-sync.mjs` (Befehl `dss-sync`) zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet, falls installiert) aus `node_modules` nach `_site/dss` kopiert; das Ziel gehört dem Skript (Marker `.dss-sync`, Ersetzen über einen temporären Ordner). Die Peer-Abhängigkeiten sind optional, React `^18 || ^19`; `npm install` im leeren Projekt braucht kein `--legacy-peer-deps`. ES-Module brauchen `http(s)`, nicht `file://`. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
+`scripts/portal-sync.mjs` (Befehl `hoops-sync`) zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet, falls installiert) aus `node_modules` nach `_site/dss` kopiert; das Ziel gehört dem Skript (Marker `.hoops-sync`, Ersetzen über einen temporären Ordner). Die Peer-Abhängigkeiten sind optional, React `^18 || ^19`; `npm install` im leeren Projekt braucht kein `--legacy-peer-deps`. ES-Module brauchen `http(s)`, nicht `file://`. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
 
-**Auslieferung bis Version 1.0: GitHub-Release.** `npm run build` und `node scripts/release-vanilla.mjs` erzeugen in `release/` (nicht im Git) `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/`, `version.json` unter `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (Format von `sha256sum`), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Dateien, Größen in KiB, Budgets, Abhängigkeiten, Leaflet-Hinweis) sowie `dss-sync.mjs` mit `dss-sync.mjs.sha256`; vorher prüft das Skript, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `dss.css` übereinstimmen und jedes Bündel sein Größenbudget einhält (`--dry-run`, `--allow-dirty`, `--no-build`, `--no-sourcemaps`, `--expect-version=`, `--debug`). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (gzip-Kopf normiert); maßgeblich ist die veröffentlichte `.sha256`. Der Workflow `.github/workflows/release-vanilla.yml` macht dasselbe bei einem Tag `v*` und legt das Release an (bis zum ersten Tag ungetestet; `workflow_dispatch` mit `dry_run` lädt nur ein Artefakt hoch). Das Portal holt und prüft das Release mit `node dss-sync.mjs --from-release 0.9.0` (Anhang `dss-sync.mjs`, eine Datei, Node 18 oder neuer; im npm-Paket als Befehl `dss-sync`; Alternativen `--from-package`, `--from-dir`); ab 1.0 ist `--from-package` mit dem npm-Paket die Quelle, der Aufbau von `dist/vanilla` bleibt. Eine komplette Beispielseite ohne Build (Vereins- und Teamseite aus einem JSON-Datensatz, relative Pfade): `stories/examples/portal-seite/`, geprüft mit `node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox` (Chromium und WebKit bestanden; Firefox ist in der Entwicklungsumgebung nicht gelaufen, Ursache ungeklärt). Einbinden, Aktualisieren, Rollback und Kompatibilität: Storybook `Foundation/Vanilla`.
+**Auslieferung bis Version 1.0: GitHub-Release.** `npm run build` und `node scripts/release-vanilla.mjs` erzeugen in `release/` (nicht im Git) `hoops-ui-<version>.tgz` (`dist/vanilla`, `fonts/`, `version.json` unter `hoops-ui-<version>/`), `hoops-ui-<version>.sha256` (Format von `sha256sum`), `hoops-ui-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Dateien, Größen in KiB, Budgets, Abhängigkeiten, Leaflet-Hinweis) sowie `hoops-sync.mjs` mit `hoops-sync.mjs.sha256`; vorher prüft das Skript, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `hoops.css` übereinstimmen und jedes Bündel sein Größenbudget einhält (`--dry-run`, `--allow-dirty`, `--no-build`, `--no-sourcemaps`, `--expect-version=`, `--debug`). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (gzip-Kopf normiert); maßgeblich ist die veröffentlichte `.sha256`. Der Workflow `.github/workflows/release-vanilla.yml` macht dasselbe bei einem Tag `v*` und legt das Release an (bis zum ersten Tag ungetestet; `workflow_dispatch` mit `dry_run` lädt nur ein Artefakt hoch). Das Portal holt und prüft das Release mit `node hoops-sync.mjs --from-release 0.9.0` (Anhang `hoops-sync.mjs`, eine Datei, Node 18 oder neuer; im npm-Paket als Befehl `hoops-sync`; Alternativen `--from-package`, `--from-dir`); ab 1.0 ist `--from-package` mit dem npm-Paket die Quelle, der Aufbau von `dist/vanilla` bleibt. Eine komplette Beispielseite ohne Build (Vereins- und Teamseite aus einem JSON-Datensatz, relative Pfade): `stories/examples/portal-seite/`, geprüft mit `node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox` (Chromium und WebKit bestanden; Firefox ist in der Entwicklungsumgebung nicht gelaufen, Ursache ungeklärt). Einbinden, Aktualisieren, Rollback und Kompatibilität: Storybook `Foundation/Vanilla`.
 
 ## Leisten mit begrenzter Inhaltsbreite
 
@@ -256,7 +256,7 @@ Inhaltscontainer:
 <AppNav items={items} contained />
 ```
 
-Vanilla: Klassen `dss-topbar dss-topbar--dark dss-topbar--contained` bzw. `dss-appnav dss-appnav--contained`.
+Vanilla: Klassen `hoops-topbar hoops-topbar--dark hoops-topbar--contained` bzw. `hoops-appnav hoops-appnav--contained`.
 Die Breite lässt sich über `--hoops-shell-max` ändern.
 
 ## CourtLines
@@ -273,7 +273,7 @@ unter `css/courtlines/`.
 Vanilla:
 
 ```html
-<div class="dss-courtbg" aria-hidden="true"><div class="dss-courtlines"></div></div>
+<div class="hoops-courtbg" aria-hidden="true"><div class="hoops-courtlines"></div></div>
 ```
 
 Der Seiteninhalt braucht `position: relative; z-index: 1`, damit er über dem Hintergrund liegt.
@@ -336,12 +336,12 @@ Ohne diese Datei greift der freie Fallback Barlow Condensed (OFL).
 
 **Schriftdateien (selbst gehostet):** `fonts/fonts.css` bindet Sora, Manrope, JetBrains Mono, Rubik und Barlow Condensed
 aus dem Paket ein (variable Schriften, Subsets latin und latin-ext, rund 290 KB, Lizenztexte in `fonts/licenses/`). Es
-geht keine Anfrage an Google. Einbinden mit `@import "@bbv/dss-design-system/fonts.css";` bzw. `import '@bbv/dss-design-system/fonts.css'`.
+geht keine Anfrage an Google. Einbinden mit `@import "@hoopsfoundry/ui/fonts.css";` bzw. `import '@hoopsfoundry/ui/fonts.css'`.
 Die Datei ist optional; wer eigene Schriften ausliefert, lässt sie weg. Im Storybook ist sie eingebunden.
 
 ### Type scale
 
-13 Stufen, als CSS-Variablen (`--hoops-fs-*`, `--hoops-lh-*`, `--hoops-ls-*`, `--hoops-fw-*`) und als Klassen (`.dss-t-*`):
+13 Stufen, als CSS-Variablen (`--hoops-fs-*`, `--hoops-lh-*`, `--hoops-ls-*`, `--hoops-fw-*`) und als Klassen (`.hoops-t-*`):
 
 | Stufe | Größe / Zeilenhöhe | Verwendung |
 |---|---|---|
@@ -355,9 +355,9 @@ Die Datei ist optional; wer eigene Schriften ausliefert, lässt sie weg. Im Stor
 | `label` | 12 · 600 · Versalien | Feld-Beschriftung, Tabellenkopf |
 | `caption` | 11 · 600 · Mono · Versalien | Chips, Meta |
 
-Auf dem Handy (≤ 640 px) nutzen die Klassen `.dss-t-display`, `-clock`, `-h1` und `-h2` die kleineren Größen `--hoops-fs-display-sm` (56), `--hoops-fs-clock-sm` (48), `--hoops-fs-h1-sm` (32) und `--hoops-fs-h2-sm` (24). Komponenten mit fester Kachelgröße bleiben bei `--hoops-fs-*`. Alle Komponenten in `css/components.css` und `svelte/` setzen `font-size` ausschließlich über `--hoops-fs-*`. Zahlen in Spalten (Spielstand, Uhr,
-Statistik) setzen `font-variant-numeric: tabular-nums` (`.dss-tnum`, bei `display` und `clock` eingebaut). Fließtext begrenzt
-`--hoops-measure` (65ch, `.dss-measure`). Die DBB-Schrift setzt Display, H1 und H2 in Versalien und ohne negatives Tracking.
+Auf dem Handy (≤ 640 px) nutzen die Klassen `.hoops-t-display`, `-clock`, `-h1` und `-h2` die kleineren Größen `--hoops-fs-display-sm` (56), `--hoops-fs-clock-sm` (48), `--hoops-fs-h1-sm` (32) und `--hoops-fs-h2-sm` (24). Komponenten mit fester Kachelgröße bleiben bei `--hoops-fs-*`. Alle Komponenten in `css/components.css` und `svelte/` setzen `font-size` ausschließlich über `--hoops-fs-*`. Zahlen in Spalten (Spielstand, Uhr,
+Statistik) setzen `font-variant-numeric: tabular-nums` (`.hoops-tnum`, bei `display` und `clock` eingebaut). Fließtext begrenzt
+`--hoops-measure` (65ch, `.hoops-measure`). Die DBB-Schrift setzt Display, H1 und H2 in Versalien und ohne negatives Tracking.
 Das Storybook (`Foundation/Typography`) zeigt Skala, Familien, Zahlen und einen Seiten-Ausschnitt; der Reiter *Audit* zählt die
 Schriftgrößen in den Komponenten gegen die Skala.
 
@@ -389,7 +389,7 @@ Kontraste messen (Text ≥ 7:1, UI-Elemente ≥ 3:1) und im Storybook alle Stori
 ## Spielplan
 
 Zwei Bausteine für Spielpläne (Vanilla-Klassen, Svelte, React), gemeinsames Datenmodell `ScheduleGame`
-(Typen in `js/schedule.d.ts`, Hilfsfunktionen in `js/schedule.js`, Export `@bbv/dss-design-system/schedule.js`).
+(Typen in `js/schedule.d.ts`, Hilfsfunktionen in `js/schedule.js`, Export `@hoopsfoundry/ui/schedule.js`).
 
 - **`ScheduleTable`:** Tabelle, eine Zeile pro Spiel, nach `section` gruppiert. Layouts: `versus` (Heim – Gast, Liga,
   Halle), `opponent` (Perspektive einer Mannschaft mit Chip vs./@, Logo, S/N-Chip, Ergebnis *eigene : Gegner*),
@@ -408,7 +408,7 @@ Zwei Bausteine für Spielpläne (Vanilla-Klassen, Svelte, React), gemeinsames Da
   den Text „abgesagt“ bzw. „verschoben“ (nicht nur über Farbe oder Durchstreichung erkennbar).
 - Unter 640 px werden Zeilen zu Karten (Tabelle) bzw. Anwurfzeiten zu Blöcken (Raster).
 - Kurznamen und Logos (auch an `MatchCard`): `ScheduleTeam.short` und `logo`; Prop `names="full" | "short"` (Standard `full`; bis 640 px Breite erscheint der Kurzname automatisch, per CSS) und `logos` (Standard aus; Logo-Bild mit leerem Alternativtext oder Initialen; im Layout `opponent` an, solange nicht `false`). Der volle Name bleibt für Screenreader lesbar.
-- Kein dunkler Rahmen (`dss-frame--dark`); der seitenweite Dark Mode wirkt über die `--hoops-*`-Variablen.
+- Kein dunkler Rahmen (`hoops-frame--dark`); der seitenweite Dark Mode wirkt über die `--hoops-*`-Variablen.
 
 ```tsx
 <ScheduleTable
@@ -430,8 +430,8 @@ Zuordnung Turnier-Manager: `Game` wird zu `ScheduleGame` mit `nr: '#' + gameNumb
 - **`TeamCard`**: Mannschaft mit Logo, Liga, Bilanz, Tabellenplatz, nächstem und letztem Spiel, Kader und optionaler Saison-Statistik (`stats`: nur übergebene Felder). Alles außer `name` ist optional; `size="compact"` ist die Listenzeile; mit `href` oder `onclick` ist die Karte klickbar.
 - **`LeagueCard`** (Ligencard): Mini-Tabelle einer Liga in einer Karte mit Titel, Untertitel („12 Teams · 66 von 132 Spielen gespielt“), `#`, `Mannschaft`, `SP`, `PKT` und einem Link zur kompletten Tabelle. Sie zeigt nur einen **Ausschnitt**: mit einer eigenen Mannschaft (`own: true`) zwei Teams davor, die eigene und eins dahinter, sonst die ersten `limit` (Standard 3). `columns` schaltet `won`, `lost`, `diff` (Korbdifferenz) und `form` zu (bis 640 px aus); `zone` (`up`, `playoff`, `down`) markiert Auf- und Abstieg mit Streifen, Text und Legende; `live` zeigt „Live“ (mit Zahl „2 Spiele laufen“); `logos` und `names="short"` wie im Spielplan; `size="compact"` für Seitenleisten; `titleAs` wählt die Überschriftenebene. Die Regeln liegen als reine Funktionen in `league.js`.
 
-- **`StatGrid`** und **`FormChips`** (Kennzahlen und Form): Kennzahlen-Gitter (`dss-stats`, `compact` ohne Kacheln) als Beschreibungsliste und die Form der letzten Spiele (`dss-form`: Punkte oder Buchstaben, höchstens fünf, mit Screenreader-Text „Form: Sieg, …“). Dieselbe Form zeigt die Spalte „Form“ der `LeagueCard`. Import: `svelte/StatGrid`, `svelte/FormChips` bzw. aus `/react`; reine Funktion `statItems` in `@bbv/dss-design-system/stats.js`.
-- **`VenueCard`** (Hallenkarte): links eine kleine Karte (die Map, nicht interaktiv, Zwei-Klick-Platzhalter), rechts `name`, `address` (`<address>`), `info`, `contact` (`tel:`/`mailto:`-Links nur bei gültiger Form), die nächsten Spiele in der Halle (`games`, höchstens `limit`, Standard 2) und der Link zur Hallenseite (`href`, `linkLabel`). Ohne `lat`/`lng` keine Karte; `size="compact"` ohne Spiele; schmal (Karte bis 640 px breit) steht die Karte oben (16:9). Funktionen in `@bbv/dss-design-system/venue.js`. Import: `svelte/VenueCard` bzw. `VenueCard` aus `/react`.
+- **`StatGrid`** und **`FormChips`** (Kennzahlen und Form): Kennzahlen-Gitter (`hoops-stats`, `compact` ohne Kacheln) als Beschreibungsliste und die Form der letzten Spiele (`hoops-form`: Punkte oder Buchstaben, höchstens fünf, mit Screenreader-Text „Form: Sieg, …“). Dieselbe Form zeigt die Spalte „Form“ der `LeagueCard`. Import: `svelte/StatGrid`, `svelte/FormChips` bzw. aus `/react`; reine Funktion `statItems` in `@hoopsfoundry/ui/stats.js`.
+- **`VenueCard`** (Hallenkarte): links eine kleine Karte (die Map, nicht interaktiv, Zwei-Klick-Platzhalter), rechts `name`, `address` (`<address>`), `info`, `contact` (`tel:`/`mailto:`-Links nur bei gültiger Form), die nächsten Spiele in der Halle (`games`, höchstens `limit`, Standard 2) und der Link zur Hallenseite (`href`, `linkLabel`). Ohne `lat`/`lng` keine Karte; `size="compact"` ohne Spiele; schmal (Karte bis 640 px breit) steht die Karte oben (16:9). Funktionen in `@hoopsfoundry/ui/venue.js`. Import: `svelte/VenueCard` bzw. `VenueCard` aus `/react`.
 
 - **`MapView`** (Svelte: `svelte/Map`): **Karte** mit [Leaflet](https://leafletjs.com) und OpenStreetMap-Kacheln für einen oder mehrere Orte (`markers`: `id`, `lat`, `lng`, `label`, `href?`, `number?`, `own?`). Standard ist die **Zwei-Klick-Lösung**: erst ein Platzhalter mit Hinweis und „Karte laden“ (kein Netzverkehr, Leaflet wird nicht geladen), `load="auto"` lädt sofort. `tileUrl` setzt einen **eigenen Kachel-Proxy** (`/tiles/{z}/{x}/{y}.png`); der Standard `tile.openstreetmap.org` ist für Demo und Entwicklung. Die **Textalternative** (nummerierte Liste mit Koordinaten, Links „In OpenStreetMap öffnen“, „In Karten-App öffnen“ (`geo:`), „Route planen“) ist immer da; die **Quellenangabe** „© OpenStreetMap-Mitwirkende“ lässt sich nicht ausblenden. Zoom-Schaltflächen, Tastatur, Fehlerfall, Dunkelmodus (Kacheln abgedunkelt), Druck (nur die Liste) und „Bewegung reduzieren“ sind eingebaut. **Leaflet ist eine optionale Peer-Abhängigkeit** (BSD-2-Clause): `npm install leaflet` und `leaflet/dist/leaflet.css` in der App laden; die Komponente lädt Leaflet erst bei Bedarf per `import('leaflet')`. Die reinen Funktionen liegen in `map.js`; die Doku enthält Rezepte für einen Kachel-Proxy (nginx, SvelteKit-Endpunkt) und die Pflichten der OSM Tile Usage Policy. Es gibt keinen Serverteil im Paket.
 
@@ -443,7 +443,7 @@ Zuordnung Turnier-Manager: `Game` wird zu `ScheduleGame` mit `nr: '#' + gameNumb
 
 ## Überschriften
 
-Komponenten mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamCard, LeagueCard, EmptyState, PlayByPlay, Modal) geben nie eine `h1` aus; die gehört der App. Die **Ebene** (`h2` bis `h6`) wählst du mit `titleAs` an der Komponente oder für einen ganzen Abschnitt mit `HeadingLevel` (React: `@bbv/dss-design-system/react`, Svelte: `@bbv/dss-design-system/svelte/HeadingLevel`). Rangfolge: `titleAs` vor `HeadingLevel` vor dem Standard `h3`. Das Modal hat `titleAs` (Standard `h2`) und gibt seinem Inhalt die nächste Ebene weiter. In Vanilla-HTML schreibst du das Element selbst. Die **Größe** hängt nie an der Ebene, sondern an Tokens: `--hoops-title-size`, `--hoops-title-weight`, `--hoops-title-leading`, `--hoops-frame-title-size` (Tabellen, Spielplan, PlayByPlay) und `--hoops-card-title-size` (Karten, EmptyState); ohne Wert gelten die bisherigen Größen.
+Komponenten mit Titel (Table, ScheduleTable, ScheduleGrid, PlayerCard, TeamCard, LeagueCard, EmptyState, PlayByPlay, Modal) geben nie eine `h1` aus; die gehört der App. Die **Ebene** (`h2` bis `h6`) wählst du mit `titleAs` an der Komponente oder für einen ganzen Abschnitt mit `HeadingLevel` (React: `@hoopsfoundry/ui/react`, Svelte: `@hoopsfoundry/ui/svelte/HeadingLevel`). Rangfolge: `titleAs` vor `HeadingLevel` vor dem Standard `h3`. Das Modal hat `titleAs` (Standard `h2`) und gibt seinem Inhalt die nächste Ebene weiter. In Vanilla-HTML schreibst du das Element selbst. Die **Größe** hängt nie an der Ebene, sondern an Tokens: `--hoops-title-size`, `--hoops-title-weight`, `--hoops-title-leading`, `--hoops-frame-title-size` (Tabellen, Spielplan, PlayByPlay) und `--hoops-card-title-size` (Karten, EmptyState); ohne Wert gelten die bisherigen Größen.
 
 ```tsx
 <h1>Mannschaft</h1>
@@ -484,7 +484,7 @@ Einen Umschalter (hell, dunkel, System) liefert `initTheme` aus `theme.js`; `the
 
 ```html
 <script>/* Ergebnis von themeBootScript(), mit CSP als nonce oder Hash */</script>
-<button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" hidden></button>
+<button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" data-hoops="theme" hidden></button>
 <script type="module">import { initAll } from '…/js/vanilla-core.js'; initAll(document);</script>
 ```
 
@@ -563,15 +563,15 @@ Stories liegen unter `stories/`, geschrieben in [Svelte CSF](https://github.com/
 
 ### Variante A · Einfach (privates Repo)
 
-1. **Auf github.com:** Neues Repo erstellen, z. B. `dss-design-system` — privat oder public
+1. **Auf github.com:** Neues Repo erstellen, z. B. `hoops-design-system` — privat oder public
 2. **Lokal:** Projekt herunterladen (alle Dateien aus diesem Workspace)
 3. Terminal im Projekt-Ordner:
    ```bash
    git init
    git add .
-   git commit -m "DSS Design System v1.0"
+   git commit -m "HoopsFoundry UI v1.0"
    git branch -M main
-   git remote add origin https://github.com/<dein-user>/dss-design-system.git
+   git remote add origin https://github.com/<dein-user>/hoops-design-system.git
    git push -u origin main
    ```
 
@@ -582,9 +582,9 @@ Damit eure App-Repos das System via `npm install` einbinden können:
 1. `package.json` im Repo-Root anlegen:
    ```json
    {
-     "name": "@bbv/dss-design-system",
+     "name": "@hoopsfoundry/ui",
      "version": "1.0.0",
-     "description": "DSS Design System for Basketball Apps",
+     "description": "HoopsFoundry UI for Basketball Apps",
      "main": "tokens/tokens.css",
      "exports": {
        "./tokens.css":    "./tokens/tokens.css",
@@ -614,7 +614,7 @@ Die HTML-Dokumente werden automatisch öffentlich anschaubar:
 2. Source: `main` Branch, Ordner `/` (root) oder `/docs`
 3. Save → nach ~2 Minuten ist die Library erreichbar unter:
    ```
-   https://<user>.github.io/<repo>/DSS%20Design%20System%20-%20Identity%20Overview%20v0.3.html
+   https://<user>.github.io/<repo>/HoopsFoundry UI%20Design%20System%20-%20Identity%20Overview%20v0.3.html
    ```
 
 ### GitHub-Setup-Checkliste

@@ -27,7 +27,7 @@ describe('Vanilla-Beispiel der Dark-Mode-Doku', () => {
     b.click();
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     expect(b.getAttribute('aria-pressed')).toBe('true');
-    expect(localStorage.getItem('dss-theme')).toBe('dark');
+    expect(localStorage.getItem('hoops-theme')).toBe('dark');
   });
   it('destroy stellt das Markup wieder her', () => {
     const before = document.body.innerHTML;

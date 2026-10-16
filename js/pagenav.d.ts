@@ -1,4 +1,4 @@
-import type { DssHandle } from './lifecycle.js';
+import type { HoopsHandle } from './lifecycle.js';
 
 export interface PageNavOptions {
   /** CSS-Auswahl der Ziele in `root` (Standard `'h2, [data-pagenav]'`). Eine ungültige Auswahl fällt auf den Standard zurück. */
@@ -34,4 +34,4 @@ export function labelOf(el: Element): string;
 export function entries(targets: Iterable<Element>, taken?: Set<string>, onNewId?: (el: Element) => void): PageNavEntry[];
 export function signature(list: readonly { id: string; text: string }[]): string;
 /** Baut die Seitennavigation für `root`; `destroy()` entfernt alles, was der Baustein angelegt hat. Ein zweiter Aufruf für dieselbe Wurzel ersetzt den ersten. */
-export function initPageNav(root: Element, options?: PageNavOptions): DssHandle;
+export function initPageNav(root: Element, options?: PageNavOptions): HoopsHandle;

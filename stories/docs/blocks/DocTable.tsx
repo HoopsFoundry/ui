@@ -3,8 +3,8 @@ import type { ReactNode } from 'react';
 /** Datentabelle für die Doku (Felder, Props). Der Scrollbereich ist fokussierbar. Nur Storybook-Doku. */
 export function DocTable({ label, head, rows }: { label: string; head: string[]; rows: ReactNode[][] }) {
   return (
-    <div className="dss-doc-table-wrap" tabIndex={0} role="region" aria-label={`${label}, seitlich scrollbar`}>
-      <table className="dss-doc-table" aria-label={label}>
+    <div className="hoops-doc-table-wrap" tabIndex={0} role="region" aria-label={`${label}, seitlich scrollbar`}>
+      <table className="hoops-doc-table" aria-label={label}>
         <thead>
           <tr>
             {head.map((h) => (
@@ -17,9 +17,9 @@ export function DocTable({ label, head, rows }: { label: string; head: string[];
             <tr key={i}>
               {cells.map((c, j) =>
                 j === 0 ? (
-                  <th key={j} scope="row" className="dss-doc-k">{c}</th>
+                  <th key={j} scope="row" className="hoops-doc-k">{c}</th>
                 ) : (
-                  <td key={j} className={j === 1 ? 'dss-doc-v' : undefined}>{c}</td>
+                  <td key={j} className={j === 1 ? 'hoops-doc-v' : undefined}>{c}</td>
                 ),
               )}
             </tr>

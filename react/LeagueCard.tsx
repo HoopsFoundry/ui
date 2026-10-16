@@ -68,9 +68,9 @@ function NameText({ team, names }: { team: LeagueTeam; names: LeagueCardNames })
   const short = shortName(team);
   if (!short) return <>{team.name}</>;
   return (
-    <span className={cn('dss-team-name', names === 'short' && 'dss-team-name--short')}>
-      <span className="dss-name-full">{team.name}</span>
-      <span className="dss-name-short" aria-hidden="true" title={team.name}>
+    <span className={cn('hoops-team-name', names === 'short' && 'hoops-team-name--short')}>
+      <span className="hoops-name-full">{team.name}</span>
+      <span className="hoops-name-short" aria-hidden="true" title={team.name}>
         {short}
       </span>
     </span>
@@ -112,47 +112,47 @@ export function LeagueCard({
   const wantsDiff = columns.includes('diff');
   const wantsForm = columns.includes('form');
 
-  const rootClass = cn('dss-league', size === 'compact' && 'dss-league--compact', className);
+  const rootClass = cn('hoops-league', size === 'compact' && 'hoops-league--compact', className);
   const panel = (
     <>
-      <div className="dss-table-scroll dss-league-scroll" role="region" tabIndex={0} aria-label={title ? `Tabelle: ${title}` : 'Tabelle'}>
-        <table className={cn('dss-tbl', `dss-tbl--${size === 'compact' ? 'compact' : 'touch'}`, 'dss-league-tbl')}>
-          {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
+      <div className="hoops-table-scroll hoops-league-scroll" role="region" tabIndex={0} aria-label={title ? `Tabelle: ${title}` : 'Tabelle'}>
+        <table className={cn('hoops-tbl', `hoops-tbl--${size === 'compact' ? 'compact' : 'touch'}`, 'hoops-league-tbl')}>
+          {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
           <thead>
             <tr>
-              <th scope="col" className="dss-league-rank">
+              <th scope="col" className="hoops-league-rank">
                 <span aria-hidden="true">#</span>
-                <span className="dss-sr-only">Platz</span>
+                <span className="hoops-sr-only">Platz</span>
               </th>
               <th scope="col">Mannschaft</th>
               <th scope="col" className="num">
                 <span aria-hidden="true">SP</span>
-                <span className="dss-sr-only">Spiele</span>
+                <span className="hoops-sr-only">Spiele</span>
               </th>
               {wantsWon ? (
-                <th scope="col" className="num dss-league-opt">
+                <th scope="col" className="num hoops-league-opt">
                   <span aria-hidden="true">S</span>
-                  <span className="dss-sr-only">Siege</span>
+                  <span className="hoops-sr-only">Siege</span>
                 </th>
               ) : null}
               {wantsLost ? (
-                <th scope="col" className="num dss-league-opt">
+                <th scope="col" className="num hoops-league-opt">
                   <span aria-hidden="true">N</span>
-                  <span className="dss-sr-only">Niederlagen</span>
+                  <span className="hoops-sr-only">Niederlagen</span>
                 </th>
               ) : null}
               {wantsDiff ? (
-                <th scope="col" className="num dss-league-opt">
+                <th scope="col" className="num hoops-league-opt">
                   <span aria-hidden="true">Diff</span>
-                  <span className="dss-sr-only">Korbdifferenz</span>
+                  <span className="hoops-sr-only">Korbdifferenz</span>
                 </th>
               ) : null}
-              <th scope="col" className="num dss-league-pts">
+              <th scope="col" className="num hoops-league-pts">
                 <span aria-hidden="true">PKT</span>
-                <span className="dss-sr-only">Punkte</span>
+                <span className="hoops-sr-only">Punkte</span>
               </th>
               {wantsForm ? (
-                <th scope="col" className="dss-league-opt">
+                <th scope="col" className="hoops-league-opt">
                   Form
                 </th>
               ) : null}
@@ -163,33 +163,33 @@ export function LeagueCard({
               const zone = zoneInfo(t.zone);
               const sign = diffSign(t.diff);
               return (
-                <tr key={i} className={cn(t.own && 'is-own', zone && 'dss-league-zone', zone && `dss-league-zone--${zone.zone}`) || undefined}>
-                  <td className="dss-league-rank">{rankText(t.rank)}</td>
-                  <td className="dss-league-team">
-                    <span className="dss-league-who">
+                <tr key={i} className={cn(t.own && 'is-own', zone && 'hoops-league-zone', zone && `hoops-league-zone--${zone.zone}`) || undefined}>
+                  <td className="hoops-league-rank">{rankText(t.rank)}</td>
+                  <td className="hoops-league-team">
+                    <span className="hoops-league-who">
                       {logos ? (
-                        <span className={cn('dss-team-logo', !t.logo && 'dss-team-logo--initials')} aria-hidden="true">
+                        <span className={cn('hoops-team-logo', !t.logo && 'hoops-team-logo--initials')} aria-hidden="true">
                           {t.logo ? <img src={t.logo} alt="" loading="lazy" /> : initials(t.name, 2)}
                         </span>
                       ) : null}
                       {t.href ? (
-                        <a className="dss-link dss-league-link" href={t.href}>
+                        <a className="hoops-link hoops-league-link" href={t.href}>
                           <NameText team={t} names={names} />
                         </a>
                       ) : (
                         <NameText team={t} names={names} />
                       )}
-                      {t.own ? <span className="dss-sr-only">, eigene Mannschaft</span> : null}
-                      {zone ? <span className="dss-sr-only">, {zone.row}</span> : null}
+                      {t.own ? <span className="hoops-sr-only">, eigene Mannschaft</span> : null}
+                      {zone ? <span className="hoops-sr-only">, {zone.row}</span> : null}
                     </span>
                   </td>
                   <td className="num">{cellNumber(t.played)}</td>
-                  {wantsWon ? <td className="num dss-league-opt">{cellNumber(t.won)}</td> : null}
-                  {wantsLost ? <td className="num dss-league-opt">{cellNumber(t.lost)}</td> : null}
-                  {wantsDiff ? <td className={cn('num', 'dss-league-opt', sign)}>{diffText(t.diff)}</td> : null}
-                  <td className="num lead dss-league-pts">{cellNumber(t.points)}</td>
+                  {wantsWon ? <td className="num hoops-league-opt">{cellNumber(t.won)}</td> : null}
+                  {wantsLost ? <td className="num hoops-league-opt">{cellNumber(t.lost)}</td> : null}
+                  {wantsDiff ? <td className={cn('num', 'hoops-league-opt', sign)}>{diffText(t.diff)}</td> : null}
+                  <td className="num lead hoops-league-pts">{cellNumber(t.points)}</td>
                   {wantsForm ? (
-                    <td className="dss-league-opt">
+                    <td className="hoops-league-opt">
                       <FormChips form={t.form ?? []} />
                     </td>
                   ) : null}
@@ -201,10 +201,10 @@ export function LeagueCard({
       </div>
 
       {legend.length > 0 ? (
-        <ul className="dss-league-legend" aria-label="Legende">
+        <ul className="hoops-league-legend" aria-label="Legende">
           {legend.map((z) => (
             <li key={z.zone}>
-              <span className={`dss-league-key dss-league-key--${z.zone}`} aria-hidden="true" />
+              <span className={`hoops-league-key hoops-league-key--${z.zone}`} aria-hidden="true" />
               {z.legend}
             </li>
           ))}
@@ -212,10 +212,10 @@ export function LeagueCard({
       ) : null}
 
       {href ? (
-        <div className="dss-league-foot">
-          <a className="dss-link dss-league-more" href={href}>
+        <div className="hoops-league-foot">
+          <a className="hoops-link hoops-league-more" href={href}>
             {linkLabel}
-            <span className="dss-sr-only">, {title}</span>
+            <span className="hoops-sr-only">, {title}</span>
           </a>
         </div>
       ) : null}
@@ -236,12 +236,12 @@ export function LeagueCard({
         onOpenChange={onOpenChange}
         meta={
           liveTag ? (
-            <span className="dss-league-live">
-              <span className="dss-live">
-                <span className="dss-live-dot" aria-hidden="true" />
+            <span className="hoops-league-live">
+              <span className="hoops-live">
+                <span className="hoops-live-dot" aria-hidden="true" />
                 Live
               </span>
-              {liveTag.text ? <span className="dss-league-live-n">{liveTag.text}</span> : null}
+              {liveTag.text ? <span className="hoops-league-live-n">{liveTag.text}</span> : null}
             </span>
           ) : undefined
         }
@@ -250,21 +250,21 @@ export function LeagueCard({
       </CollapsibleFrame>
     );
   }
-  if (collapsible) devWarn('[DSS] LeagueCard: `collapsible` braucht einen `title`, sonst bleibt die Karte unverändert.');
+  if (collapsible) devWarn('[HoopsFoundry UI] LeagueCard: `collapsible` braucht einen `title`, sonst bleibt die Karte unverändert.');
   return (
     <div className={rootClass}>
-      <div className="dss-league-head">
-        <div className="dss-league-heading">
-          <Heading className="dss-league-title">{title}</Heading>
-          {summary ? <p className="dss-league-sub">{summary}</p> : null}
+      <div className="hoops-league-head">
+        <div className="hoops-league-heading">
+          <Heading className="hoops-league-title">{title}</Heading>
+          {summary ? <p className="hoops-league-sub">{summary}</p> : null}
         </div>
         {liveTag ? (
-          <span className="dss-league-live">
-            <span className="dss-live">
-              <span className="dss-live-dot" aria-hidden="true" />
+          <span className="hoops-league-live">
+            <span className="hoops-live">
+              <span className="hoops-live-dot" aria-hidden="true" />
               Live
             </span>
-            {liveTag.text ? <span className="dss-league-live-n">{liveTag.text}</span> : null}
+            {liveTag.text ? <span className="hoops-league-live-n">{liveTag.text}</span> : null}
           </span>
         ) : null}
       </div>

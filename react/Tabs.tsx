@@ -85,7 +85,7 @@ export function Tabs({
 
   return (
     <div
-      className={cn('dss-tabs', `dss-tabs--${variant}`, `dss-tabs--${size}`, className)}
+      className={cn('hoops-tabs', `hoops-tabs--${variant}`, `hoops-tabs--${size}`, className)}
       role={multi ? 'group' : 'tablist'}
       aria-label={ariaLabel}
       aria-orientation={!multi && variant === 'vertical' ? 'vertical' : undefined}
@@ -99,7 +99,7 @@ export function Tabs({
               buttons.current[index] = el;
             }}
             type="button"
-            className={cn('dss-tab', active && 'is-active', item.disabled && 'is-disabled')}
+            className={cn('hoops-tab', active && 'is-active', item.disabled && 'is-disabled')}
             role={multi ? undefined : 'tab'}
             aria-selected={multi ? undefined : active}
             aria-pressed={multi ? active : undefined}
@@ -108,9 +108,9 @@ export function Tabs({
             onClick={() => select(item)}
             onKeyDown={(event) => onKeyDown(event, index)}
           >
-            {item.icon ? <Icon name={item.icon} size={16} className="dss-tab-ic" /> : null}
-            <span className="dss-tab-label">{item.label}</span>
-            {item.count !== undefined ? <span className="dss-tab-count">{item.count}</span> : null}
+            {item.icon ? <Icon name={item.icon} size={16} className="hoops-tab-ic" /> : null}
+            <span className="hoops-tab-label">{item.label}</span>
+            {item.count !== undefined ? <span className="hoops-tab-count">{item.count}</span> : null}
           </button>
         );
       })}

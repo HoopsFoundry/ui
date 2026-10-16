@@ -31,27 +31,27 @@ afterAll(async () => {
   rmSync(tmpDir, { recursive: true, force: true });
 });
 
-const titles = (html: string) => [...html.matchAll(/<h[2-6] class="dss-venue-title">([^<]*)</g)].map((m) => m[1]);
+const titles = (html: string) => [...html.matchAll(/<h[2-6] class="hoops-venue-title">([^<]*)</g)].map((m) => m[1]);
 
 describe('Svelte-Code-Beispiele rendern (SSR)', () => {
   it.each(Object.entries({ svelte: venue.svelte, ebeneSvelte: venue.ebeneSvelte }))('%s', async (name, source) => {
     const file = `${tmpDir}${name}.svelte`;
-    writeFileSync(file, source.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+    writeFileSync(file, source.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
     const html = render(component, { props: {} }).body;
     expect(html).not.toContain('undefined');
-    expect(html).toContain('dss-venue');
+    expect(html).toContain('hoops-venue');
     if (name === 'svelte') {
       expect(titles(html)).toEqual(['Sporthalle Nordhain', 'Mehrzweckhalle Seeberg', 'Gymnasium Kiefernau']);
       expect(html).toContain('tel:03023125100');
       expect(html).toContain('mailto:hallenwart@example.org');
-      expect(html.match(/<li class="dss-venue-game"/g)).toHaveLength(2);
-      expect(html).toMatch(/<h2 class="dss-venue-title">Mehrzweckhalle Seeberg/);
+      expect(html.match(/<li class="hoops-venue-game"/g)).toHaveLength(2);
+      expect(html).toMatch(/<h2 class="hoops-venue-title">Mehrzweckhalle Seeberg/);
       expect(html).toContain('data-state="loading"');
     } else {
       expect(html).toMatch(/<h2[^>]*>Hallen<\/h2>/);
-      expect(html).toMatch(/<h4 class="dss-venue-title">Sporthalle Nordhain/);
-      expect(html).toMatch(/<h5 class="dss-venue-title">Mehrzweckhalle Seeberg/);
+      expect(html).toMatch(/<h4 class="hoops-venue-title">Sporthalle Nordhain/);
+      expect(html).toMatch(/<h5 class="hoops-venue-title">Mehrzweckhalle Seeberg/);
     }
   });
 });
@@ -66,7 +66,7 @@ describe('React-Code-Beispiele bestehen den TypeScript-Compiler', () => {
       const head = split < 0 ? '' : rest.slice(0, split);
       const body = split < 0 ? rest : rest.slice(split);
       files[`${rootDir}react/__code_venue_${name}.tsx`] = [
-        ...imports.map((line) => line.replace('@bbv/dss-design-system/react', './index')),
+        ...imports.map((line) => line.replace('@hoopsfoundry/ui/react', './index')),
         head,
         `export const Demo_${name} = () => (\n<>${body}</>\n);`,
       ].join('\n');
@@ -100,7 +100,7 @@ describe('Vanilla-Markup entspricht der Ausgabe der Komponenten', () => {
     const Svelte = ((await vite.ssrLoadModule(`${rootDir}svelte/VenueCard.svelte`)) as { default: unknown }).default;
     const React = ((await vite.ssrLoadModule(`${rootDir}react/VenueCard.tsx`)) as { VenueCard: unknown }).VenueCard;
     // Der Pin im Platzhalter hat im Vanilla-Beispiel keine Ziffer; das Muster aus beiden Fassungen ist identisch
-    const fix = (html: string) => normalize(html).replace(/id="dss-map-text-i1"/g, 'id="halle-karte-text"').replace(/href="#dss-map-text-i1"/g, 'href="#halle-karte-text"');
+    const fix = (html: string) => normalize(html).replace(/id="hoops-map-text-i1"/g, 'id="halle-karte-text"').replace(/href="#hoops-map-text-i1"/g, 'href="#halle-karte-text"');
     const expected = fix(render(Svelte, { props }).body);
     expect(fix(renderToStaticMarkup(createElement(React as never, props)))).toBe(expected);
     expect(fix(venue.vanilla.replace(/<!--[\s\S]*?-->\s*/, ''))).toBe(expected);
@@ -140,7 +140,7 @@ describe('Doku', () => {
     const seen = new Map<string, string>();
     for (const name of names.filter((n) => !iframes.includes(n))) {
       const html = render(Examples, { props: { example: name } }).body;
-      expect(html, name).toContain('dss-venue');
+      expect(html, name).toContain('hoops-venue');
       expect(html, name).not.toContain('undefined');
       for (const label of html.match(/aria-label="Karte: [^"]*"/g) ?? []) {
         expect(seen.get(label), `${label} in ${name} und ${seen.get(label)}`).toBeUndefined();

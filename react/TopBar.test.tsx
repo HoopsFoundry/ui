@@ -6,14 +6,14 @@ import { expectNoA11yViolations } from './test-utils';
 describe('TopBar', () => {
   it('rendert Marke und Namen, die Marke ist dekorativ', () => {
     const { container } = render(<TopBar brand="Turnier-Manager" mark="T" />);
-    expect(container.firstElementChild).toHaveClass('dss-topbar', 'dss-topbar--dark');
+    expect(container.firstElementChild).toHaveClass('hoops-topbar', 'hoops-topbar--dark');
     expect(screen.getByText('Turnier-Manager')).toBeInTheDocument();
-    expect(container.querySelector('.dss-topbar-mark')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('.hoops-topbar-mark')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('zeigt im Live-Kontext Spielstand und Uhr', () => {
     const { container } = render(<TopBar context="live" matchLabel="17. Spieltag" score="87 : 64" clock="Q4 · 02:14" />);
-    expect(container.querySelector('.dss-topbar-live')).toHaveTextContent('Live');
+    expect(container.querySelector('.hoops-topbar-live')).toHaveTextContent('Live');
     expect(screen.getByText('87 : 64')).toBeInTheDocument();
     expect(screen.getByText('Q4 · 02:14')).toBeInTheDocument();
   });
@@ -38,7 +38,7 @@ describe('TopBar', () => {
     expect(screen.getByText('Mitte')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Aktion' })).toBeInTheDocument();
     expect(screen.getByText('Sven R.')).toBeInTheDocument();
-    expect(screen.getByText('SR')).toHaveClass('dss-topbar-av');
+    expect(screen.getByText('SR')).toHaveClass('hoops-topbar-av');
   });
 
   it('kann als header-Element gerendert werden (banner-Landmark)', () => {
@@ -53,6 +53,6 @@ describe('TopBar', () => {
 
   it('setzt die Klasse für die begrenzte Inhaltsbreite mit contained', () => {
     const { container } = render(<TopBar contained />);
-    expect(container.firstElementChild).toHaveClass('dss-topbar--contained');
+    expect(container.firstElementChild).toHaveClass('hoops-topbar--contained');
   });
 });

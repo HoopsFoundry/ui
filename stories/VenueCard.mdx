@@ -90,16 +90,16 @@ Gemessen im Browser (Chromium, BBV); die Kartenbreite steht in der jeweiligen Ze
 
 Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (zwei verschiedene Hallen, damit die Karten auf der Seite unterscheidbar bleiben). Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben. Genau gilt: ist die Containerbreite ohne den 1 px breiten Rand der Karte höchstens 640 px (die Karte also höchstens 642 px breit), steht die Karte oben; ab 643 px steht sie links. Die Kurznamen der Mannschaften (`names`) folgen dagegen der **Fensterbreite** (bis 640 px), nicht der Karte: in einer schmalen Spalte am großen Bildschirm bleibt es bei `names="full"`, wenn du `short` nicht selbst setzt.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">VenueCard · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">VenueCard · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard hell">
       <iframe title="Handy-Vorschau: Hallenkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-venuecard--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">VenueCard · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">VenueCard · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard dunkel">
       <iframe title="Handy-Vorschau: Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--handy-dunkel" loading="lazy" />
     </div>
   </div>
@@ -127,7 +127,7 @@ Die Hallenkarte gibt nie eine `h1` aus. Ohne weitere Angabe ist der Name eine `h
 
 ## Verwendung: Import und Props
 
-Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; die Funktionen kommen aus `@bbv/dss-design-system/venue.js`. Die App lädt zusätzlich `leaflet/dist/leaflet.css` (siehe Map). **Vanilla:** Eine Karte ohne Framework gibt es nicht; das Beispiel zeigt das Markup mit dem Platzhalter der Karte, Leaflet lädst du selbst nach.
+Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; die Funktionen kommen aus `@hoopsfoundry/ui/venue.js`. Die App lädt zusätzlich `leaflet/dist/leaflet.css` (siehe Map). **Vanilla:** Eine Karte ohne Framework gibt es nicht; das Beispiel zeigt das Markup mit dem Platzhalter der Karte, Leaflet lädst du selbst nach.
 
 <FrameworkCode label="VenueCard" vanilla={vanilla} svelte={svelte} react={react} />
 
@@ -160,13 +160,13 @@ Die Spielwiese zeigt die echte Komponente mit der erfundenen Sporthalle Nordhain
 
 ### Mit lebendiger Karte: `initMap`
 
-`mountVenueCard(el, props, { initMap })` startet die eingebettete Karte über `initMap` aus dem Karten-Bündel (`dss-map.min.js`): nicht interaktiv und ohne Liste wie die Komponente, „Karte laden“ ist bedienbar, Kacheln und Leaflet kommen erst nach dem Klick (oder bei `load: 'auto'`). Leaflet liefert `loadLeaflet` aus dem eigenen Projekt (Abschnitt „Ohne Build einbinden“ auf der Seite [Map](?path=/docs/components-map--docs)). `update(props)` lässt die laufende Karte stehen, solange Koordinaten und Name gleich bleiben; `destroy()` räumt Karte und Markup ab. Die Beispiele laufen mit dem lokalen Gitterbild als Kachel:
+`mountVenueCard(el, props, { initMap })` startet die eingebettete Karte über `initMap` aus dem Karten-Bündel (`hoops-map.min.js`): nicht interaktiv und ohne Liste wie die Komponente, „Karte laden“ ist bedienbar, Kacheln und Leaflet kommen erst nach dem Klick (oder bei `load: 'auto'`). Leaflet liefert `loadLeaflet` aus dem eigenen Projekt (Abschnitt „Ohne Build einbinden“ auf der Seite [Map](?path=/docs/components-map--docs)). `update(props)` lässt die laufende Karte stehen, solange Koordinaten und Name gleich bleiben; `destroy()` räumt Karte und Markup ab. Die Beispiele laufen mit dem lokalen Gitterbild als Kachel:
 
 <Canvas of={VenueCardStories.VanillaKarte} />
 
 <FrameworkCode label="Hallenkarte mit lebendiger Karte (Vanilla)" vanilla={hallenKarteLebendig} />
 
-Entsteht das Markup auf dem Server (Seitengenerierung, Crawler), markiert `renderVenueCard(props, { init: true })` die Karte mit `data-dss="map"` und ihren Optionen als JSON; im Browser genügt `initAll`:
+Entsteht das Markup auf dem Server (Seitengenerierung, Crawler), markiert `renderVenueCard(props, { init: true })` die Karte mit `data-hoops="map"` und ihren Optionen als JSON; im Browser genügt `initAll`:
 
 <FrameworkCode label="Hallenkarte vom Server (Vanilla)" vanilla={hallenKarteServer} />
 
@@ -174,16 +174,16 @@ Entsteht das Markup auf dem Server (Seitengenerierung, Crawler), markiert `rende
 
 Die Vorschauen zeigen die Hallenkarte aus `mountVenueCard` mit anderen Hallen als die Svelte-Vorschauen oben: links die Ahornhalle mit Spielen, rechts die Erlenhalle kompakt mit sofort geladener Karte.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">VenueCard Vanilla · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">VenueCard Vanilla · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte hell">
       <iframe title="Handy-Vorschau: Vanilla-Hallenkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-venuecard--vanilla-handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">VenueCard Vanilla · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">VenueCard Vanilla · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte dunkel">
       <iframe title="Handy-Vorschau: Vanilla-Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--vanilla-handy-dunkel" loading="lazy" />
     </div>
   </div>

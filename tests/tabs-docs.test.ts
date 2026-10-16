@@ -23,14 +23,14 @@ const mdx = read('stories/Tabs.mdx');
 const stories = read('stories/Tabs.stories.ts');
 const examples = read('stories/components/TabsExamples.svelte');
 
-/** Nur die Leisten (ohne Panels, ohne Kommentare) und ohne das, was nur das Skript braucht: ids, aria-controls, data-dss, Zustandsklassen der Vanilla-Seite. */
+/** Nur die Leisten (ohne Panels, ohne Kommentare) und ohne das, was nur das Skript braucht: ids, aria-controls, data-hoops, Zustandsklassen der Vanilla-Seite. */
 const bars = (markup: string) =>
-  [...markup.matchAll(/<div class="dss-tabs[\s\S]*?\n<\/div>/g)].map((m) => m[0])
-    .map((bar) => bar.replace(/ id="[^"]*"/g, '').replace(/ aria-controls="[^"]*"/g, '').replace(/ data-dss(-options)?(='[^']*'|="[^"]*")?/g, ''));
+  [...markup.matchAll(/<div class="hoops-tabs[\s\S]*?\n<\/div>/g)].map((m) => m[0])
+    .map((bar) => bar.replace(/ id="[^"]*"/g, '').replace(/ aria-controls="[^"]*"/g, '').replace(/ data-hoops(-options)?(='[^']*'|="[^"]*")?/g, ''));
 // disabled steht in den Komponenten vor tabindex, im Markup dahinter: ohne das Attribut vergleichen, die Zahl getrennt prüfen
 const clean = (html: string) => normalize(html.replace(/ aria-orientation="horizontal"/g, '').replace(/ type="button"/g, '').replace(/ disabled(="")?/g, ''));
 const disabledCount = (html: string) => (html.match(/ disabled(=""|>| )/g) ?? []).length;
-const sv = (name: string, body: string, imports = "import Tabs from '@bbv/dss-design-system/svelte/Tabs';") =>
+const sv = (name: string, body: string, imports = "import Tabs from '@hoopsfoundry/ui/svelte/Tabs';") =>
   renderSvelteSource(vite, render, tmpDir, name, `<script>\n${imports}\n</script>\n${body}`);
 const reactMod = async () => (await vite.ssrLoadModule(`${rootDir}react/Tabs.tsx`)) as { Tabs: never };
 
@@ -68,9 +68,9 @@ describe('Code-Beispiel', () => {
   it('enthält die Markup-Konstanten, beide Wege (initAll, einzeln) und das Ereignis', () => {
     expect(code.vanilla).toContain(code.barMarkup);
     expect(code.vanilla).toContain(code.filterMarkup);
-    expect(code.vanilla).toContain("import { initAll } from '@bbv/dss-design-system/vanilla-core.js'");
-    expect(code.vanilla).toContain("import { initTabs } from '@bbv/dss-design-system/tabs.js'");
-    expect(code.vanilla).toContain('dss:tabchange');
+    expect(code.vanilla).toContain("import { initAll } from '@hoopsfoundry/ui/vanilla-core.js'");
+    expect(code.vanilla).toContain("import { initTabs } from '@hoopsfoundry/ui/tabs.js'");
+    expect(code.vanilla).toContain('hoops:tabchange');
   });
   it('die Importpfade gibt es als Exporte', () => {
     const pkg = JSON.parse(read('package.json'));
@@ -118,7 +118,7 @@ describe('Doku-Seite', () => {
     expect(mdx).toContain('TabsStories.DontPanels');
   });
   it('die Doku nennt Optionen, Ereignis, Home/End-Abweichung und die Garantie ohne innerHTML', () => {
-    for (const part of ['activation', 'dss:tabchange', 'Pos1 / Ende', 'Nicht belegt in Svelte und React', 'destroy()', 'innerHTML', 'initTabs']) expect(mdx, part).toContain(part);
+    for (const part of ['activation', 'hoops:tabchange', 'Pos1 / Ende', 'Nicht belegt in Svelte und React', 'destroy()', 'innerHTML', 'initTabs']) expect(mdx, part).toContain(part);
   });
   it('die Beispielseite im Code verwendet kein innerHTML', () => {
     const script = examples.slice(0, examples.indexOf('{#if example'));

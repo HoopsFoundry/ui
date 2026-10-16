@@ -1,31 +1,31 @@
 // Code-Beispiele der Seite „Accordion“. Die Tests (tests/accordion-code.test.ts) übersetzen das React-Beispiel mit dem
 // TypeScript-Compiler, rendern das Svelte-Beispiel und vergleichen das Vanilla-Markup mit der Ausgabe der Komponenten.
 
-const CHEVRON = `<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
+const CHEVRON = `<svg class="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
 
 /** Markup des Button-Wegs (zwei Bereiche, der erste offen); die Doku zeigt es und rendert es auch. */
-export const buttonMarkup = `<div class="dss-acc dss-acc--card" data-dss-acc>
-  <div class="dss-acc-item is-open" id="tabelle">
-    <h3 class="dss-acc-title">
-      <button type="button" class="dss-acc-trigger" id="tabelle-trigger" aria-expanded="true" aria-controls="tabelle-panel">
-        <span class="dss-acc-label">Tabelle</span>
+export const buttonMarkup = `<div class="hoops-acc hoops-acc--card" data-hoops-acc>
+  <div class="hoops-acc-item is-open" id="tabelle">
+    <h3 class="hoops-acc-title">
+      <button type="button" class="hoops-acc-trigger" id="tabelle-trigger" aria-expanded="true" aria-controls="tabelle-panel">
+        <span class="hoops-acc-label">Tabelle</span>
         ${CHEVRON}
       </button>
     </h3>
-    <div class="dss-acc-panel" id="tabelle-panel">
-      <div class="dss-acc-panel-inner"><div class="dss-acc-body">Platz 3 von 12 in der Bayernliga Süd.</div></div>
+    <div class="hoops-acc-panel" id="tabelle-panel">
+      <div class="hoops-acc-panel-inner"><div class="hoops-acc-body">Platz 3 von 12 in der Bayernliga Süd.</div></div>
     </div>
   </div>
-  <div class="dss-acc-item" id="spielplan">
-    <h3 class="dss-acc-title">
-      <button type="button" class="dss-acc-trigger" id="spielplan-trigger" aria-expanded="false" aria-controls="spielplan-panel">
-        <span class="dss-acc-label">Spielplan<span class="dss-acc-sep">,</span></span>
-        <span class="dss-acc-meta">12 Spiele</span>
+  <div class="hoops-acc-item" id="spielplan">
+    <h3 class="hoops-acc-title">
+      <button type="button" class="hoops-acc-trigger" id="spielplan-trigger" aria-expanded="false" aria-controls="spielplan-panel">
+        <span class="hoops-acc-label">Spielplan<span class="hoops-acc-sep">,</span></span>
+        <span class="hoops-acc-meta">12 Spiele</span>
         ${CHEVRON}
       </button>
     </h3>
-    <div class="dss-acc-panel" id="spielplan-panel" hidden inert>
-      <div class="dss-acc-panel-inner"><div class="dss-acc-body">Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle.</div></div>
+    <div class="hoops-acc-panel" id="spielplan-panel" hidden inert>
+      <div class="hoops-acc-panel-inner"><div class="hoops-acc-body">Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle.</div></div>
     </div>
   </div>
 </div>`;
@@ -39,26 +39,26 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 ${buttonMarkup}
 
 <script type="module">
-  import { initAccordions } from '@bbv/dss-design-system/accordion.js';
+  import { initAccordions } from '@hoopsfoundry/ui/accordion.js';
 
-  // Alle [data-dss-acc] auf der Seite; Optionen: exclusive, syncHash (Standard true), expandAll, nav, sticky
+  // Alle [data-hoops-acc] auf der Seite; Optionen: exclusive, syncHash (Standard true), expandAll, nav, sticky
   initAccordions(document, { expandAll: true, nav: true });
 </script>`;
 
 /** Markup des nativen details-Wegs (drei Bereiche, „nur einer offen“ über das gemeinsame name). */
-export const detailsMarkup = `<div class="dss-acc dss-acc--card">
-  <details class="dss-acc-item" name="liga" id="d-tabelle" open>
-    <summary class="dss-acc-trigger"><span class="dss-acc-label">Tabelle</span></summary>
-    <div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">Platz 3 von 12 in der Bayernliga Süd.</div></div></div>
+export const detailsMarkup = `<div class="hoops-acc hoops-acc--card">
+  <details class="hoops-acc-item" name="liga" id="d-tabelle" open>
+    <summary class="hoops-acc-trigger"><span class="hoops-acc-label">Tabelle</span></summary>
+    <div class="hoops-acc-panel"><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">Platz 3 von 12 in der Bayernliga Süd.</div></div></div>
   </details>
-  <details class="dss-acc-item" name="liga" id="d-spielplan">
-    <summary class="dss-acc-trigger"><span class="dss-acc-label">Spielplan<span class="dss-acc-sep">,</span></span>
-        <span class="dss-acc-meta">12 Spiele</span></summary>
-    <div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle.</div></div></div>
+  <details class="hoops-acc-item" name="liga" id="d-spielplan">
+    <summary class="hoops-acc-trigger"><span class="hoops-acc-label">Spielplan<span class="hoops-acc-sep">,</span></span>
+        <span class="hoops-acc-meta">12 Spiele</span></summary>
+    <div class="hoops-acc-panel"><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle.</div></div></div>
   </details>
-  <details class="dss-acc-item" name="liga" id="d-kader">
-    <summary class="dss-acc-trigger"><span class="dss-acc-label">Kader<span class="dss-acc-sep">,</span></span><span class="dss-acc-meta">14 Spieler</span></summary>
-    <div class="dss-acc-panel"><div class="dss-acc-panel-inner"><div class="dss-acc-body">Zehn Spieler, vier Trainer und Betreuer.</div></div></div>
+  <details class="hoops-acc-item" name="liga" id="d-kader">
+    <summary class="hoops-acc-trigger"><span class="hoops-acc-label">Kader<span class="hoops-acc-sep">,</span></span><span class="hoops-acc-meta">14 Spieler</span></summary>
+    <div class="hoops-acc-panel"><div class="hoops-acc-panel-inner"><div class="hoops-acc-body">Zehn Spieler, vier Trainer und Betreuer.</div></div></div>
   </details>
 </div>`;
 
@@ -69,14 +69,14 @@ ${detailsMarkup}
 
 <!-- Optional, wenn Deep-Link (#id), Sprungleiste oder Alle öffnen/schließen gebraucht werden -->
 <script type="module">
-  import { initAccordion } from '@bbv/dss-design-system/accordion.js';
+  import { initAccordion } from '@hoopsfoundry/ui/accordion.js';
 
-  initAccordion(document.querySelector('.dss-acc'), { exclusive: true });
+  initAccordion(document.querySelector('.hoops-acc'), { exclusive: true });
 </script>`;
 
 export const svelte = `<script>
-  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
-  import AccordionItem from '@bbv/dss-design-system/svelte/AccordionItem';
+  import Accordion from '@hoopsfoundry/ui/svelte/Accordion';
+  import AccordionItem from '@hoopsfoundry/ui/svelte/AccordionItem';
 
   let tabelleOffen = $state(true);
 </script>
@@ -94,7 +94,7 @@ export const svelte = `<script>
 </Accordion>`;
 
 export const react = `import { useState } from 'react';
-import { Accordion, AccordionItem } from '@bbv/dss-design-system/react';
+import { Accordion, AccordionItem } from '@hoopsfoundry/ui/react';
 
 export function LigaSeite() {
   const [tabelleOffen, setTabelleOffen] = useState(true);
@@ -114,9 +114,9 @@ export function LigaSeite() {
 }`;
 
 export const ebenenSvelte = `<script>
-  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
-  import AccordionItem from '@bbv/dss-design-system/svelte/AccordionItem';
-  import HeadingLevel from '@bbv/dss-design-system/svelte/HeadingLevel';
+  import Accordion from '@hoopsfoundry/ui/svelte/Accordion';
+  import AccordionItem from '@hoopsfoundry/ui/svelte/AccordionItem';
+  import HeadingLevel from '@hoopsfoundry/ui/svelte/HeadingLevel';
 </script>
 
 <h1>Verein</h1>
@@ -137,7 +137,7 @@ export const ebenenSvelte = `<script>
   </Accordion>
 </HeadingLevel>`;
 
-export const ebenenReact = `import { Accordion, AccordionItem, HeadingLevel } from '@bbv/dss-design-system/react';
+export const ebenenReact = `import { Accordion, AccordionItem, HeadingLevel } from '@hoopsfoundry/ui/react';
 
 export function Mannschaft() {
   return (
@@ -172,7 +172,7 @@ export const tokensCss = `/* Alle Werte sind Rückfälle: ohne Angabe gilt der h
   --hoops-acc-sticky-top: 56px;       /* Abstand zu einer festen Kopfzeile (Top-Bar) */
 }`;
 
-export const funktionenJs = `import { nextHeader, hashTarget, ancestorsOf, labelWithMeta, summaryText } from '@bbv/dss-design-system/accordion.js';
+export const funktionenJs = `import { nextHeader, hashTarget, ancestorsOf, labelWithMeta, summaryText } from '@hoopsfoundry/ui/accordion.js';
 
 const koepfe = [{ disabled: false }, { disabled: true }, { disabled: false }];
 nextHeader(0, 'ArrowDown', koepfe);  // 2 (der gesperrte Kopf wird übersprungen)

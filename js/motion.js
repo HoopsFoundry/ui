@@ -1,5 +1,5 @@
 /**
- * DSS Motion · eine Frage, eine Antwort: Soll Bewegung entfallen?
+ * HoopsFoundry UI Motion · eine Frage, eine Antwort: Soll Bewegung entfallen?
  * --------------------------------------------------------------
  * Gemeinsam für Karte, Seitennavigation, Nach-oben-Knopf und weitere Bausteine. Ohne Abhängigkeiten, SSR-sicher (beim Import wird
  * weder `window` noch `document` gelesen). Typen: js/motion.d.ts.

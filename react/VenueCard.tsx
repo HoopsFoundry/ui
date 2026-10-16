@@ -68,19 +68,19 @@ export interface VenueCardProps {
 function TeamLine({ team, side, names, logos }: { team: ScheduleTeam; side: 'heim' | 'gast'; names: VenueCardNames; logos: boolean }) {
   const short = shortName(team);
   return (
-    <div className="dss-venue-team">
-      <span className={`dss-venue-dot dss-venue-dot--${side}`} aria-hidden="true" />
+    <div className="hoops-venue-team">
+      <span className={`hoops-venue-dot hoops-venue-dot--${side}`} aria-hidden="true" />
       {logos ? (
-        <span className={cn('dss-team-logo', 'dss-team-logo--sm', !team.logo && 'dss-team-logo--initials')} aria-hidden="true">
+        <span className={cn('hoops-team-logo', 'hoops-team-logo--sm', !team.logo && 'hoops-team-logo--initials')} aria-hidden="true">
           {team.logo ? <img src={team.logo} alt="" loading="lazy" /> : initials(team.name, 2)}
         </span>
       ) : null}
-      <span className="dss-sr-only">{side === 'heim' ? venueText.home : venueText.away}:</span>
-      <span className="dss-venue-team-name">
+      <span className="hoops-sr-only">{side === 'heim' ? venueText.home : venueText.away}:</span>
+      <span className="hoops-venue-team-name">
         {short ? (
-          <span className={cn('dss-team-name', names === 'short' && 'dss-team-name--short')}>
-            <span className="dss-name-full">{team.name}</span>
-            <span className="dss-name-short" aria-hidden="true" title={team.name}>
+          <span className={cn('hoops-team-name', names === 'short' && 'hoops-team-name--short')}>
+            <span className="hoops-name-full">{team.name}</span>
+            <span className="hoops-name-short" aria-hidden="true" title={team.name}>
               {short}
             </span>
           </span>
@@ -127,10 +127,10 @@ export function VenueCard({
   const keys = gameKeys(rows);
 
   return (
-    <div className={cn('dss-venue', `dss-venue--${size}`, hasMap && 'dss-venue--map', className)}>
-      <div className="dss-venue-in">
+    <div className={cn('hoops-venue', `hoops-venue--${size}`, hasMap && 'hoops-venue--map', className)}>
+      <div className="hoops-venue-in">
       {hasMap ? (
-        <div className="dss-venue-map">
+        <div className="hoops-venue-map">
           <MapView
             label={venueMapLabel(title)}
             markers={[{ id: 'halle', lat: lat as number, lng: lng as number, label: title }]}
@@ -142,34 +142,34 @@ export function VenueCard({
             privacyNote={privacyNote}
             appLinks={[]}
           />
-          <div className="dss-venue-maplinks">
+          <div className="hoops-venue-maplinks">
             {mapLinks.map((link) => (
-              <a key={link.kind} className="dss-link" href={link.href}>
+              <a key={link.kind} className="hoops-link" href={link.href}>
                 {link.text}
-                {title ? <span className="dss-sr-only">, {title}</span> : null}
+                {title ? <span className="hoops-sr-only">, {title}</span> : null}
               </a>
             ))}
           </div>
         </div>
       ) : null}
 
-      <div className="dss-venue-body">
-        {title ? <Heading className="dss-venue-title">{title}</Heading> : null}
+      <div className="hoops-venue-body">
+        {title ? <Heading className="hoops-venue-title">{title}</Heading> : null}
 
         {lines.length > 0 ? (
-          <address className="dss-venue-address">
+          <address className="hoops-venue-address">
             {lines.map((line, i) => (
-              <span key={i} className="dss-venue-line">
+              <span key={i} className="hoops-venue-line">
                 {line}
               </span>
             ))}
           </address>
         ) : null}
 
-        {info && info.trim() ? <p className="dss-venue-info">{info.trim()}</p> : null}
+        {info && info.trim() ? <p className="hoops-venue-info">{info.trim()}</p> : null}
 
         {person ? (
-          <dl className="dss-venue-contact">
+          <dl className="hoops-venue-contact">
             {person.name ? (
               <div>
                 <dt>{venueText.contact}</dt>
@@ -181,7 +181,7 @@ export function VenueCard({
                 <dt>{venueText.phone}</dt>
                 <dd>
                   {person.phone.href ? (
-                    <a className="dss-link" href={person.phone.href}>
+                    <a className="hoops-link" href={person.phone.href}>
                       {person.phone.text}
                     </a>
                   ) : (
@@ -195,7 +195,7 @@ export function VenueCard({
                 <dt>{venueText.email}</dt>
                 <dd>
                   {person.email.href ? (
-                    <a className="dss-link" href={person.email.href}>
+                    <a className="hoops-link" href={person.email.href}>
                       {person.email.text}
                     </a>
                   ) : (
@@ -208,25 +208,25 @@ export function VenueCard({
         ) : null}
 
         {rows.length > 0 ? (
-          <div className="dss-venue-games">
-            <div className="dss-venue-sec" aria-hidden="true">
+          <div className="hoops-venue-games">
+            <div className="hoops-venue-sec" aria-hidden="true">
               {gamesLabel}
             </div>
-            <ul className="dss-venue-game-list" aria-label={gamesLabel}>
+            <ul className="hoops-venue-game-list" aria-label={gamesLabel}>
               {rows.map((game, index) => {
                 const when = gameWhen(game);
                 const meta = gameMeta(game);
                 const state = gameState(game);
                 return (
-                  <li key={keys[index]} className="dss-venue-game">
+                  <li key={keys[index]} className="hoops-venue-game">
                     {when || state ? (
-                      <div className="dss-venue-game-head">
-                        {when ? <span className="dss-venue-when">{when}</span> : null}
-                        {state ? <span className={`dss-chip dss-chip--${state.tone}`}>{state.text}</span> : null}
+                      <div className="hoops-venue-game-head">
+                        {when ? <span className="hoops-venue-when">{when}</span> : null}
+                        {state ? <span className={`hoops-chip hoops-chip--${state.tone}`}>{state.text}</span> : null}
                       </div>
                     ) : null}
-                    {meta ? <div className="dss-venue-game-meta">{meta}</div> : null}
-                    <div className="dss-venue-teams">
+                    {meta ? <div className="hoops-venue-game-meta">{meta}</div> : null}
+                    <div className="hoops-venue-teams">
                       {game.heim?.name ? <TeamLine team={game.heim} side="heim" names={names} logos={logos} /> : null}
                       {game.gast?.name ? <TeamLine team={game.gast} side="gast" names={names} logos={logos} /> : null}
                     </div>
@@ -238,10 +238,10 @@ export function VenueCard({
         ) : null}
 
         {target ? (
-          <div className="dss-venue-foot">
-            <a className="dss-link dss-venue-more" href={target}>
+          <div className="hoops-venue-foot">
+            <a className="hoops-link hoops-venue-more" href={target}>
               {linkLabel}
-              {title ? <span className="dss-sr-only">, {title}</span> : null}
+              {title ? <span className="hoops-sr-only">, {title}</span> : null}
             </a>
           </div>
         ) : null}

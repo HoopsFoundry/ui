@@ -110,7 +110,7 @@ const preview: Preview = {
       },
     },
     a11y: {
-      // DSS targets WCAG 2.1 AAA on text pairs
+      // HoopsFoundry UI targets WCAG 2.1 AAA on text pairs
       config: { rules: [{ id: 'color-contrast', enabled: true }] },
     },
   },

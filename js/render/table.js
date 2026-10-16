@@ -1,5 +1,5 @@
 /**
- * DSS Render · Table
+ * HoopsFoundry UI Render · Table
  * --------------------------------------------------------------
  * `renderTable(props)`/`mountTable(el, props)`: dasselbe Markup wie die Komponente Table (Svelte, React). Die Zellen kommen nicht als Markup,
  * sondern als Daten: `rows` (und `head`, `foot`) sind Listen von Zeilen; eine Zeile ist eine Liste von Zellen oder `{ cells, className }`,
@@ -21,7 +21,7 @@ const WIDTH = /^\d{1,4}(\.\d{1,3})?(px|%|rem|em|ch|vw)$/;
 const cell = (raw, tag = 'td') => {
   const c = typeof raw === 'string' || typeof raw === 'number' ? { text: raw } : obj(raw);
   const href = url(c.href);
-  const inner = href ? `<a class="dss-link" href="${attr(href)}">${esc(c.text)}</a>` : esc(c.text);
+  const inner = href ? `<a class="hoops-link" href="${attr(href)}">${esc(c.text)}</a>` : esc(c.text);
   const name = c.header === true ? 'th' : tag;
   // Kopfzellen gelten für Spalten; eine Kopfzelle im Rumpf (`header: true`) für die Zeile
   const scope = name === 'th' ? ` scope="${tag === 'th' ? 'col' : 'row'}"` : '';
@@ -39,7 +39,7 @@ const rowsOf = (value, tag) =>
     })
     .join('');
 
-/** Datentabelle im DSS-Rahmen (Titelzeile optional). */
+/** Datentabelle im HoopsFoundry-UI-Rahmen (Titelzeile optional). */
 export function renderTable(props, options) {
   const p = obj(props);
   const title = str(p.title);
@@ -63,25 +63,25 @@ export function renderTable(props, options) {
     : list(p.head).length ? `<thead>${rowsOf(p.head, 'th')}</thead>` : '';
   const foot = list(p.foot).length ? `<tfoot>${rowsOf(p.foot, 'td')}</tfoot>` : '';
   const region =
-    `<div class="dss-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || 'Tabelle')}">` +
-    `<table class="${klass('dss-tbl', `dss-tbl--${density}`, p.striped === true && 'dss-tbl--striped')}">` +
-    (caption ? `<caption class="dss-sr-only">${esc(caption)}</caption>` : '') +
+    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || 'Tabelle')}">` +
+    `<table class="${klass('hoops-tbl', `hoops-tbl--${density}`, p.striped === true && 'hoops-tbl--striped')}">` +
+    (caption ? `<caption class="hoops-sr-only">${esc(caption)}</caption>` : '') +
     `${head}<tbody>${rowsOf(p.rows, 'td')}</tbody>${foot}</table></div>`;
 
-  const rootClass = cls('dss-frame', p.dark === true && 'dss-frame--dark', str(p.className));
-  const metaInner = `${meta ? `<span>${esc(meta)}</span>` : ''}${live ? '<span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>' : ''}`;
+  const rootClass = cls('hoops-frame', p.dark === true && 'hoops-frame--dark', str(p.className));
+  const metaInner = `${meta ? `<span>${esc(meta)}</span>` : ''}${live ? '<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>' : ''}`;
 
   if (p.collapsible === true && title) {
     return collapsibleFrame({
       kind: 'frame', rootClass, id, title, titleAs: p.titleAs, open,
-      meta: meta || live ? `<span class="dss-frame-meta">${metaInner}</span>` : undefined,
+      meta: meta || live ? `<span class="hoops-frame-meta">${metaInner}</span>` : undefined,
       content: region, uid: uidFor(p, options),
     });
   }
   const tag = headingOf(p.titleAs);
   const header =
     title || meta || live
-      ? `<div class="dss-frame-head">${title ? `<${tag} class="dss-frame-title">${esc(title)}</${tag}>` : '<span></span>'}<div class="dss-frame-meta">${metaInner}</div></div>`
+      ? `<div class="hoops-frame-head">${title ? `<${tag} class="hoops-frame-title">${esc(title)}</${tag}>` : '<span></span>'}<div class="hoops-frame-meta">${metaInner}</div></div>`
       : '';
   return `<div class="${klass(rootClass)}">${header}${region}</div>`;
 }

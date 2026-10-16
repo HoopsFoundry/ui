@@ -1,5 +1,5 @@
 /**
- * DSS Render · TeamCard (Mannschaftskarte)
+ * HoopsFoundry UI Render · TeamCard (Mannschaftskarte)
  * --------------------------------------------------------------
  * `renderTeamCard(props, options?)`/`mountTeamCard(el, props, options?)`: dasselbe Markup wie die Komponente TeamCard (Svelte, React).
  * Props: `name`, `short`, `logo`, `names`, `logos`, `league`, `leagueHref`, `season`, `record`, `rank`, `rankOf`, `points`, `next`, `last`, `squad`,
@@ -13,16 +13,16 @@ import { headingOf, klass, logoBadge, nameText, num, obj, pick, str, teamOf, url
 import { mount } from './mount.js';
 
 const OUTCOMES = ['S', 'N', 'U'];
-const OUTCOME_CHIP = { S: 'dss-chip--ok', N: 'dss-chip--err', U: '' };
+const OUTCOME_CHIP = { S: 'hoops-chip--ok', N: 'hoops-chip--err', U: '' };
 
 const tile = (value, label, aria) =>
-  `<div><div class="dss-pc-v" aria-hidden="true">${esc(value)}</div><div class="dss-pc-l" aria-hidden="true">${esc(label)}</div><span class="dss-sr-only">${esc(aria)}</span></div>`;
+  `<div><div class="hoops-pc-v" aria-hidden="true">${esc(value)}</div><div class="hoops-pc-l" aria-hidden="true">${esc(label)}</div><span class="hoops-sr-only">${esc(aria)}</span></div>`;
 
 /** Ein Gegner in einer Spielzeile; `team` aus unvertrauten Daten (fehlt es, bleibt der Name leer). */
 function opponent(raw, at, names, logos) {
   const o = teamOf(raw);
-  const badge = at ? `<span class="dss-chip dss-chip--mono ${at === 'gast' ? 'dss-chip--amber' : 'dss-chip--sky'}" aria-hidden="true">${at === 'gast' ? '@' : 'vs.'}</span>` : '';
-  return `${badge}<span class="dss-team-game-opp">${logos ? logoBadge(o, 'dss-team-logo--sm') : ''}<span><span class="dss-sr-only">${esc(opponentPrefix(at))}</span>${nameText(o, names)}</span></span>`;
+  const badge = at ? `<span class="hoops-chip hoops-chip--mono ${at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}" aria-hidden="true">${at === 'gast' ? '@' : 'vs.'}</span>` : '';
+  return `${badge}<span class="hoops-team-game-opp">${logos ? logoBadge(o, 'hoops-team-logo--sm') : ''}<span><span class="hoops-sr-only">${esc(opponentPrefix(at))}</span>${nameText(o, names)}</span></span>`;
 }
 
 /** Mannschaftskarte: Kopf, Bilanz und Tabellenplatz, nächstes und letztes Spiel, Kader, optionale Saison-Statistik; compact als Listenzeile. */
@@ -54,22 +54,22 @@ export function renderTeamCard(props, options) {
 
   const name = nameText(own, names);
   const nameBlock = href
-    ? `<a class="dss-team-link" href="${attr(href)}">${name}</a>`
+    ? `<a class="hoops-team-link" href="${attr(href)}">${name}</a>`
     : asButton
-      ? `<button class="dss-team-link" type="button">${name}</button>`
+      ? `<button class="hoops-team-link" type="button">${name}</button>`
       : name;
   const leagueLine =
     league || season
-      ? `<div class="dss-team-sub">${league ? (leagueHref && !clickable ? `<a class="dss-link" href="${attr(leagueHref)}">${esc(league)}</a>` : `<span>${esc(league)}</span>`) : ''}${season ? `<span>${esc(season)}</span>` : ''}</div>`
+      ? `<div class="hoops-team-sub">${league ? (leagueHref && !clickable ? `<a class="hoops-link" href="${attr(leagueHref)}">${esc(league)}</a>` : `<span>${esc(league)}</span>`) : ''}${season ? `<span>${esc(season)}</span>` : ''}</div>`
       : '';
 
   if (size === 'compact') {
     return (
-      `<div class="${klass('dss-team', 'dss-team--compact', clickable && 'dss-team--link', str(p.className))}">` +
-      `${logoBadge(own)}<div class="dss-team-who"><span class="dss-team-nm">${nameBlock}</span>${leagueLine}</div>` +
-      '<span class="dss-team-end">' +
-      (rec ? `<span class="dss-team-rec" aria-hidden="true">${esc(rec.text)}</span><span class="dss-sr-only">${esc(rec.aria)}</span>` : '') +
-      (pos ? `<span class="dss-team-rank" aria-hidden="true">Platz ${esc(pos.text)}</span><span class="dss-sr-only">${esc(pos.aria)}</span>` : '') +
+      `<div class="${klass('hoops-team', 'hoops-team--compact', clickable && 'hoops-team--link', str(p.className))}">` +
+      `${logoBadge(own)}<div class="hoops-team-who"><span class="hoops-team-nm">${nameBlock}</span>${leagueLine}</div>` +
+      '<span class="hoops-team-end">' +
+      (rec ? `<span class="hoops-team-rec" aria-hidden="true">${esc(rec.text)}</span><span class="hoops-sr-only">${esc(rec.aria)}</span>` : '') +
+      (pos ? `<span class="hoops-team-rank" aria-hidden="true">Platz ${esc(pos.text)}</span><span class="hoops-sr-only">${esc(pos.aria)}</span>` : '') +
       '</span></div>'
     );
   }
@@ -77,33 +77,33 @@ export function renderTeamCard(props, options) {
   const tag = headingOf(p.titleAs);
   const vitals =
     rec || pos || points !== undefined
-      ? `<div class="dss-team-vitals">${rec ? tile(rec.text, rec.label, rec.aria) : ''}${pos ? tile(pos.text, pos.label, pos.aria) : ''}${points !== undefined ? tile(String(points), 'Punkte', `Punkte: ${points}`) : ''}</div>`
+      ? `<div class="hoops-team-vitals">${rec ? tile(rec.text, rec.label, rec.aria) : ''}${pos ? tile(pos.text, pos.label, pos.aria) : ''}${points !== undefined ? tile(String(points), 'Punkte', `Punkte: ${points}`) : ''}</div>`
       : '';
   let games = '';
   if (next || last) {
     const when = next ? [str(next.date), str(next.time)].filter(Boolean).join(' · ') : '';
     const lastDate = last ? str(last.date) : '';
     games =
-      '<div class="dss-team-games">' +
+      '<div class="hoops-team-games">' +
       (next
-        ? `<div class="dss-team-game"><div class="dss-team-game-l">Nächstes Spiel</div><div class="dss-team-game-row">${opponent(next.opponent, at(next.at), names, logos)}${when ? `<span class="dss-team-game-end">${esc(when)}</span>` : ''}</div>${str(next.venue) ? `<div class="dss-team-game-venue">${esc(next.venue)}</div>` : ''}</div>`
+        ? `<div class="hoops-team-game"><div class="hoops-team-game-l">Nächstes Spiel</div><div class="hoops-team-game-row">${opponent(next.opponent, at(next.at), names, logos)}${when ? `<span class="hoops-team-game-end">${esc(when)}</span>` : ''}</div>${str(next.venue) ? `<div class="hoops-team-game-venue">${esc(next.venue)}</div>` : ''}</div>`
         : '') +
       (last
-        ? `<div class="dss-team-game"><div class="dss-team-game-l">${lastDate ? `Letztes Spiel · ${esc(lastDate)}` : 'Letztes Spiel'}</div><div class="dss-team-game-row">${opponent(last.opponent, at(last.at), names, logos)}` +
+        ? `<div class="hoops-team-game"><div class="hoops-team-game-l">${lastDate ? `Letztes Spiel · ${esc(lastDate)}` : 'Letztes Spiel'}</div><div class="hoops-team-game-row">${opponent(last.opponent, at(last.at), names, logos)}` +
           (res
-            ? `<span class="dss-team-game-end">${OUTCOMES.includes(res.outcome) ? `<span class="dss-chip dss-chip--mono${OUTCOME_CHIP[res.outcome] ? ` ${OUTCOME_CHIP[res.outcome]}` : ''}" aria-hidden="true">${esc(res.outcome)}</span>` : ''}<span class="dss-team-game-score" aria-hidden="true">${esc(res.score)}</span><span class="dss-sr-only">${esc(res.aria)}</span></span>`
+            ? `<span class="hoops-team-game-end">${OUTCOMES.includes(res.outcome) ? `<span class="hoops-chip hoops-chip--mono${OUTCOME_CHIP[res.outcome] ? ` ${OUTCOME_CHIP[res.outcome]}` : ''}" aria-hidden="true">${esc(res.outcome)}</span>` : ''}<span class="hoops-team-game-score" aria-hidden="true">${esc(res.score)}</span><span class="hoops-sr-only">${esc(res.aria)}</span></span>`
             : '') +
           '</div></div>'
         : '') +
       '</div>';
   }
   const stats = statList.length
-    ? `<div class="dss-team-stats" role="group" aria-label="Saison-Statistik"><div class="dss-team-sec" aria-hidden="true">Saison-Statistik</div><div class="dss-team-vitals">${statList.map((s) => `<div><div class="dss-pc-v">${esc(s.value)}</div><div class="dss-pc-l">${esc(s.label)}</div></div>`).join('')}</div></div>`
+    ? `<div class="hoops-team-stats" role="group" aria-label="Saison-Statistik"><div class="hoops-team-sec" aria-hidden="true">Saison-Statistik</div><div class="hoops-team-vitals">${statList.map((s) => `<div><div class="hoops-pc-v">${esc(s.value)}</div><div class="hoops-pc-l">${esc(s.label)}</div></div>`).join('')}</div></div>`
     : '';
   return (
-    `<div class="${klass('dss-team', 'dss-team--standard', clickable && 'dss-team--link', str(p.className))}">` +
-    `<div class="dss-team-head">${logoBadge(own, 'dss-team-logo--lg')}<div class="dss-team-who"><${tag} class="dss-team-nm">${nameBlock}</${tag}>${leagueLine}</div></div>` +
-    `${vitals}${games}${squadLine ? `<div class="dss-team-squad">${esc(squadLine)}</div>` : ''}${stats}</div>`
+    `<div class="${klass('hoops-team', 'hoops-team--standard', clickable && 'hoops-team--link', str(p.className))}">` +
+    `<div class="hoops-team-head">${logoBadge(own, 'hoops-team-logo--lg')}<div class="hoops-team-who"><${tag} class="hoops-team-nm">${nameBlock}</${tag}>${leagueLine}</div></div>` +
+    `${vitals}${games}${squadLine ? `<div class="hoops-team-squad">${esc(squadLine)}</div>` : ''}${stats}</div>`
   );
 }
 
@@ -111,6 +111,6 @@ export function renderTeamCard(props, options) {
 export function mountTeamCard(el, props, options = {}) {
   const { onClick, ...rest } = obj(options);
   const handler = typeof onClick === 'function';
-  const on = handler ? [{ type: 'click', selector: '.dss-team-link', handler: (event) => onClick(event) }] : [];
+  const on = handler ? [{ type: 'click', selector: '.hoops-team-link', handler: (event) => onClick(event) }] : [];
   return mount(el, renderTeamCard, props, { ...rest, button: handler, on: [...(Array.isArray(rest.on) ? rest.on : []), ...on] });
 }

@@ -1,7 +1,7 @@
 // Zentrale Übersetzung von Systemfehlern in deutsche Meldungen für die Skripte portal-sync.mjs und release-vanilla.mjs.
 // Eigene Fehler der Skripte (Meldung beginnt mit dem Skriptnamen und einem Doppelpunkt) bleiben unverändert.
 
-const OWN = /^(portal-sync|release-vanilla|dss-sync): /;
+const OWN = /^(portal-sync|release-vanilla|hoops-sync): /;
 
 const TEXT = {
   ENOENT: (p) => `Datei oder Ordner nicht gefunden${p}.`,

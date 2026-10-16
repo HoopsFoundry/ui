@@ -172,7 +172,7 @@ describe('Aufzählungen: nur bekannte Werte erreichen das Markup', () => {
   it('titleAs: nur h2 bis h6; h1 und alles andere wird h3', () => {
     for (const [titleAs, tag] of [['h2', 'h2'], ['h6', 'h6'], ['h1', 'h3'], ['h7', 'h3'], ['div', 'h3'], [3, 'h3'], [undefined, 'h3']] as const) {
       const html = fn('renderEmptyState')({ title: 'x', titleAs });
-      expect(html).toContain(`<${tag} class="dss-empty-title">`);
+      expect(html).toContain(`<${tag} class="hoops-empty-title">`);
     }
   });
 });

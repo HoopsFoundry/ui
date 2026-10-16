@@ -1,10 +1,10 @@
 <script lang="ts">
   /**
-   * DSS Accordion · Svelte 5 (Gruppe)
+   * HoopsFoundry UI Accordion · Svelte 5 (Gruppe)
    * --------------------------------------------------------------
    * Fasst `AccordionItem`-Bereiche zusammen: nur ein Bereich offen (`exclusive`), „Alle öffnen/schließen“ (`expandAll`),
    * Sprungleiste (`nav`), Deep-Link per URL-Anker (`syncHash`), klebender Kopf (`sticky`) und Pfeiltasten zwischen den Köpfen.
-   * Eine Gruppe in einem Bereich ist verschachtelt (`dss-acc--nested`, kleiner) und zählt die Überschriftenebene hoch.
+   * Eine Gruppe in einem Bereich ist verschachtelt (`hoops-acc--nested`, kleiner) und zählt die Überschriftenebene hoch.
    * Sprungleiste und „Alle öffnen/schließen“ entstehen im Browser (sie kennen die Bereiche erst nach dem Anmelden).
    * Nutzt ausschließlich die Klassen aus css/components.css (kein eigener Scoped-Style).
    */
@@ -46,7 +46,7 @@
   } = $props();
 
   const uid = $props.id();
-  const listId = `dss-acc-nav-${uid}`;
+  const listId = `hoops-acc-nav-${uid}`;
   const nested = useParentItem() !== undefined;
 
   let root = $state<HTMLElement>();
@@ -108,29 +108,29 @@
     entry.trigger?.focus({ preventScroll: true });
   }
 
-  const classes = $derived(['dss-acc', `dss-acc--${variant}`, sticky && 'dss-acc--sticky', nested && 'dss-acc--nested', klass].filter(Boolean).join(' '));
+  const classes = $derived(['hoops-acc', `hoops-acc--${variant}`, sticky && 'hoops-acc--sticky', nested && 'hoops-acc--nested', klass].filter(Boolean).join(' '));
 </script>
 
 <div class={classes} bind:this={root}>
   {#if entries.length === 0 && (showAll || nav)}
     <!-- Platz für Leiste und Sprungleiste schon im Server-Markup: kein Sprung nach dem Hydrieren -->
-    <div class="dss-acc-tools dss-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true"></div>
+    <div class="hoops-acc-tools hoops-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true"></div>
   {:else if entries.length > 0 && (showAll || nav)}
-    <div class="dss-acc-tools">
+    <div class="hoops-acc-tools">
       {#if showAll}
-        <div class="dss-acc-bar">
-          <button type="button" class="dss-btn dss-btn--secondary dss-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(true)}>Alle öffnen</button>
-          <button type="button" class="dss-btn dss-btn--secondary dss-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(false)}>Alle schließen</button>
-          <span class="dss-sr-only" aria-live="polite" aria-atomic="true">{announcement}</span>
+        <div class="hoops-acc-bar">
+          <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(true)}>Alle öffnen</button>
+          <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(false)}>Alle schließen</button>
+          <span class="hoops-sr-only" aria-live="polite" aria-atomic="true">{announcement}</span>
         </div>
       {/if}
       {#if nav}
-        <nav class="dss-acc-nav{navOpen ? ' is-open' : ''}" aria-label={navLabel}>
-          <button type="button" class="dss-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>{navLabel}</button>
-          <ul class="dss-acc-nav-list" id={listId}>
+        <nav class="hoops-acc-nav{navOpen ? ' is-open' : ''}" aria-label={navLabel}>
+          <button type="button" class="hoops-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>{navLabel}</button>
+          <ul class="hoops-acc-nav-list" id={listId}>
             {#each entries.filter((e) => e.anchor !== false && e.title) as entry (entry.id)}
-              <li class="dss-acc-nav-item">
-                <a class="dss-acc-nav-link" href={`#${encodeURIComponent(entry.id)}`} aria-current={current === entry.id ? 'true' : undefined} onclick={(event) => jump(event, entry)}>{entry.title}</a>
+              <li class="hoops-acc-nav-item">
+                <a class="hoops-acc-nav-link" href={`#${encodeURIComponent(entry.id)}`} aria-current={current === entry.id ? 'true' : undefined} onclick={(event) => jump(event, entry)}>{entry.title}</a>
               </li>
             {/each}
           </ul>

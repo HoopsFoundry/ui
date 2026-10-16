@@ -27,12 +27,12 @@ describe('Code-Beispiele', () => {
   it('Svelte rendert (SSR) mit Kennzahlen und Form', async () => {
     const html = await renderSvelteSource(vite, render, tmpDir, 'svelte', code.svelte);
     expect(html).not.toContain('undefined');
-    expect(html.match(/<dl class="dss-stats/g)).toHaveLength(2);
-    expect(html).toContain('dss-stats--compact');
+    expect(html.match(/<dl class="hoops-stats/g)).toHaveLength(2);
+    expect(html).toContain('hoops-stats--compact');
     expect(html).toContain('82,4');
     expect(html).toContain('keine Angabe');
     expect(html).toContain('Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden');
-    expect(html).toContain('dss-form--letters');
+    expect(html).toContain('hoops-form--letters');
   });
   it('React besteht den TypeScript-Compiler', () => {
     expect(compileReact({ stats: code.react })).toEqual([]);
@@ -55,7 +55,7 @@ describe('Code-Beispiele', () => {
     }
   });
   it('das Vanilla-Beispiel enthält alle Bausteine und die reinen Funktionen', () => {
-    for (const part of [code.statsMarkup, code.statsCompactMarkup, code.formMarkup, code.formLettersMarkup, "from '@bbv/dss-design-system/stats.js'", "from '@bbv/dss-design-system/league.js'"]) expect(code.vanilla).toContain(part);
+    for (const part of [code.statsMarkup, code.statsCompactMarkup, code.formMarkup, code.formLettersMarkup, "from '@hoopsfoundry/ui/stats.js'", "from '@hoopsfoundry/ui/league.js'"]) expect(code.vanilla).toContain(part);
   });
   it('die Funktionen im Vanilla-Beispiel liefern die genannten Ergebnisse', async () => {
     const { formEntries, formLabel } = await import('../js/league.js');

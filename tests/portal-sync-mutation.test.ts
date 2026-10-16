@@ -17,7 +17,7 @@ const FILE: Record<Target, string> = { sync: 'portal-sync.mjs', tar: 'lib/tar.mj
 /** Lädt portal-sync.mjs, wobei die Datei `target` durch `text` ersetzt ist. */
 const loadWith = (target: Target, text: string) => (target === 'sync' ? loadScript(text, 'portal-sync.mjs') : loadScript(SOURCE, 'portal-sync.mjs', { [FILE[target]]: text }));
 const V = '0.9.0';
-const FILES = { 'dss.js': 'a', 'dss.css': 'b', 'fonts/fonts.css': 'f', 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: V }) + '\n' };
+const FILES = { 'hoops.js': 'a', 'hoops.css': 'b', 'fonts/fonts.css': 'f', 'version.json': JSON.stringify({ name: '@hoopsfoundry/ui', version: V }) + '\n' };
 const sha = (d: Buffer | string) => createHash('sha256').update(d).digest('hex');
 const root = `${tmpRoot}-syncmut`;
 const project = `${root}/p`;
@@ -37,26 +37,26 @@ beforeEach(async () => {
   routes.clear();
   await rm(project, { recursive: true, force: true });
   await mkdir(`${project}/_site/dss`, { recursive: true });
-  await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-  await writeFile(`${project}/_site/dss/.dss-sync`, '');
+  await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+  await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
 });
 
 const serveFake = async (name: string, files: Record<string, string> = FILES, options: { top?: string; version?: string } = {}) => {
   const version = options.version ?? V;
   const fake = await writeFakeRelease(`${root}/rel-${name}`, version, files, { top: options.top });
-  routes.set(`/v${version}/dss-vanilla-${version}.tgz`, { body: fake.tgz });
-  routes.set(`/v${version}/dss-vanilla-${version}.sha256`, { body: fake.sums });
+  routes.set(`/v${version}/hoops-ui-${version}.tgz`, { body: fake.tgz });
+  routes.set(`/v${version}/hoops-ui-${version}.sha256`, { body: fake.sums });
   return fake;
 };
 const run = (mod: any, extra: Record<string, unknown> = {}, version = V) =>
-  mod.syncDss({ root: project, source: { type: 'release', version, baseUrl: server.baseUrl }, ...extra });
+  mod.syncHoops({ root: project, source: { type: 'release', version, baseUrl: server.baseUrl }, ...extra });
 /** Wahr, wenn der Lauf mit einer passenden Meldung scheitert und das Ziel unverändert ist. */
 const rejected = async (fn: () => Promise<unknown>, pattern: RegExp) => {
   try {
     await fn();
     return false;
   } catch (error) {
-    const unchanged = (await readFile(`${project}/_site/dss/alt.js`, 'utf8').catch(() => '')) === 'alt';
+    const unchanged = (await readFile(`${project}/_site/hoops/alt.js`, 'utf8').catch(() => '')) === 'alt';
     return pattern.test(String((error as Error).message)) && unchanged;
   }
 };
@@ -77,25 +77,25 @@ let counter = 0;
 const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   'Tarball-Prüfsumme wird geprüft': async (mod) => {
     const fake = await serveFake('tgz');
-    routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: Buffer.concat([fake.tgz.subarray(0, -1), Buffer.from([fake.tgz.at(-1)! ^ 1])]) });
+    routes.set(`/v${V}/hoops-ui-${V}.tgz`, { body: Buffer.concat([fake.tgz.subarray(0, -1), Buffer.from([fake.tgz.at(-1)! ^ 1])]) });
     const first = await rejected(() => run(mod), /Prüfsumme|kein gültiges|beschädigt/);
     return first && (await rejected(() => run(mod), /Prüfsumme von/));
   },
   'Prüfsumme jeder Datei wird geprüft': async (mod) => {
     const fake = await serveFake('datei');
-    routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: fake.sums.replace(sha('a'), sha('x')) });
+    routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: fake.sums.replace(sha('a'), sha('x')) });
     return rejected(() => run(mod), /Datei dss\.js stimmt nicht/);
   },
   'Prüfsummen-Datei und Archiv nennen dieselben Dateien': async (mod) => {
     const fake = await serveFake('liste');
-    routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: `${fake.sums}${sha('x')}  dss-vanilla-${V}/extra.js\n` });
+    routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: `${fake.sums}${sha('x')}  hoops-ui-${V}/extra.js\n` });
     return rejected(() => run(mod), /nicht dieselben Dateien/);
   },
   'Version in version.json muss zur verlangten passen': async (mod) => {
-    await serveFake('version', { ...FILES, 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: '0.1.0' }) });
+    await serveFake('version', { ...FILES, 'version.json': JSON.stringify({ name: '@hoopsfoundry/ui', version: '0.1.0' }) });
     return rejected(() => run(mod), /version\.json im Archiv nennt/);
   },
-  'oberster Ordner muss dss-vanilla-<version> heißen': async (mod) => {
+  'oberster Ordner muss hoops-ui-<version> heißen': async (mod) => {
     await serveFake('top', FILES, { top: 'anderer-ordner' });
     return rejected(() => run(mod), /oberster Ordner/);
   },
@@ -118,18 +118,18 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     for (let i = 0; i < 512; i++) sum += tar[i];
     tar.write(`${sum.toString(8).padStart(6, '0')}\0 `, 148, 'latin1');
     const tgz = gzipSync(tar);
-    routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: tgz });
-    routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: fake.sums.replace(sha(fake.tgz), sha(tgz)) });
+    routes.set(`/v${V}/hoops-ui-${V}.tgz`, { body: tgz });
+    routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: fake.sums.replace(sha(fake.tgz), sha(tgz)) });
     const first = await rejected(() => run(mod), /Eintragstyp|Prüfsumme/);
     return first && (await rejected(() => run(mod), /Eintragstyp/));
   },
   'doppelte Einträge sind verboten': async (mod) => {
     const { createTar } = await import(/* @vite-ignore */ '../scripts/release-vanilla.mjs');
     const { gzipSync } = await import('node:zlib');
-    const entries = [{ path: `dss-vanilla-${V}/dss.js`, data: Buffer.from('a') }, { path: `dss-vanilla-${V}/dss.js`, data: Buffer.from('b') }];
+    const entries = [{ path: `hoops-ui-${V}/hoops.js`, data: Buffer.from('a') }, { path: `hoops-ui-${V}/hoops.js`, data: Buffer.from('b') }];
     const tgz = gzipSync(createTar(entries));
-    routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: tgz });
-    routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: `${sha(tgz)}  dss-vanilla-${V}.tgz\n${sha('a')}  dss-vanilla-${V}/dss.js\n` });
+    routes.set(`/v${V}/hoops-ui-${V}.tgz`, { body: tgz });
+    routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: `${sha(tgz)}  hoops-ui-${V}.tgz\n${sha('a')}  hoops-ui-${V}/hoops.js\n` });
     return rejected(() => run(mod), /doppelter Eintrag/);
   },
   'ein Ziel ohne Marker wird nie gelöscht': async (mod) => {
@@ -149,8 +149,8 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     return ok && server.requests.length === 0;
   },
   'übergroße Downloads werden abgelehnt': async (mod) => {
-    routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: 'x', declared: 40 * 1024 * 1024, abort: true });
-    routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: '' });
+    routes.set(`/v${V}/hoops-ui-${V}.tgz`, { body: 'x', declared: 40 * 1024 * 1024, abort: true });
+    routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: '' });
     return rejected(() => run(mod), /größer als/);
   },
   'Stream: Übergröße ohne Content-Length bricht ab': async (mod) => {
@@ -213,10 +213,10 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   },
   'Rollback: scheitert das Einsetzen, kommt das alte Ziel zurück': async (mod) => {
     await mkdir(`${project}/_site/dss`, { recursive: true });
-    await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-    await writeFile(`${project}/_site/dss/.dss-sync`, '');
+    await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+    await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
     await mod.replaceDir(`${project}/_site/dss`, project, async (tmp: string) => writeFile(`${tmp}/neu.js`, 'n'), { beforeInstall: (tmp: string) => rm(tmp, { recursive: true, force: true }) }).catch(() => {});
-    return readFile(`${project}/_site/dss/alt.js`, 'utf8').then((t) => t === 'alt', () => false);
+    return readFile(`${project}/_site/hoops/alt.js`, 'utf8').then((t) => t === 'alt', () => false);
   },
   'Startprüfung: zu altes Node wird abgelehnt': async (mod) => {
     const rt = await loadSibling(mod, 'lib/runtime.mjs');
@@ -229,7 +229,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   'fonts kommen nur auf Verlangen mit': async (mod) => {
     await serveFake('fonts');
     await run(mod);
-    return !existsSync(`${project}/_site/dss/fonts`) && existsSync(`${project}/_site/dss/dss.js`);
+    return !existsSync(`${project}/_site/hoops/fonts`) && existsSync(`${project}/_site/hoops/hoops.js`);
   },
 };
 
@@ -240,7 +240,7 @@ const MUTATIONS: Mutation[] = [
   { name: 'Dateiliste nicht verglichen', rule: 'Prüfsummen-Datei und Archiv nennen dieselben Dateien', from: 'if (listed.length !== files.length) throw', to: 'if (false) throw' },
   { name: 'Version nicht verglichen', rule: 'Version in version.json muss zur verlangten passen', from: 'if (!parsed || parsed.version !== version || parsed.name !== PACKAGE) {', to: 'if (!parsed) {' },
   { name: 'Name nicht verglichen', rule: 'Version in version.json muss zur verlangten passen', from: 'parsed.version !== version || parsed.name !== PACKAGE', to: 'parsed.version === version + "x"' },
-  { name: 'Ordnername nicht verglichen', rule: 'oberster Ordner muss dss-vanilla-<version> heißen', from: 'if (expectedTop !== undefined && top !== expectedTop) throw', to: 'if (false) throw' },
+  { name: 'Ordnername nicht verglichen', rule: 'oberster Ordner muss hoops-ui-<version> heißen', from: 'if (expectedTop !== undefined && top !== expectedTop) throw', to: 'if (false) throw' },
   { name: '.. erlaubt', rule: 'Pfade mit .. sind verboten', from: "s === '..' || ", to: '' },
   { name: 'Rückwärtsstrich erlaubt', rule: 'Pfade mit Rückwärtsstrich (Windows) sind verboten', from: "name.includes('\\\\') || ", to: '' },
   { name: 'Verknüpfungen erlaubt', rule: 'Verknüpfungen und Geräte sind verboten', from: "if (type !== '0') throw", to: 'if (false) throw' },
@@ -270,8 +270,8 @@ describe('portal-sync --from-release: Mutationen', () => {
     const mod = await loadScript(SOURCE, 'portal-sync.mjs');
     for (const [name, rule] of Object.entries(RULES)) {
       await mkdir(`${project}/_site/dss`, { recursive: true });
-      await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-      await writeFile(`${project}/_site/dss/.dss-sync`, '');
+      await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+      await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
       routes.clear();
       expect(await rule(mod), name).toBe(true);
     }

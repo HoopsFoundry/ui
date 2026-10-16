@@ -85,7 +85,7 @@ describe('Accordion: Öffnen und Schließen', () => {
     fireEvent.click(trigger('solo'));
     expect(isOpen('solo')).toBe(true);
     expect(screen.getByRole('region', { name: 'Allein' })).toBeInTheDocument();
-    expect(document.querySelector('.dss-acc-tools')).toBeNull();
+    expect(document.querySelector('.hoops-acc-tools')).toBeNull();
   });
 
   it('ein gesperrter Bereich öffnet nicht, trägt aria-disabled und bleibt fokussierbar', () => {
@@ -103,7 +103,7 @@ describe('Accordion: Öffnen und Schließen', () => {
   it('die Kopfklasse: Überschrift enthält den Button', () => {
     render(<Basic />);
     const heading = screen.getByRole('heading', { name: 'Tabelle', level: 3 });
-    expect(heading).toHaveClass('dss-acc-title');
+    expect(heading).toHaveClass('hoops-acc-title');
     expect(within(heading).getByRole('button')).toBe(trigger('a'));
   });
 });
@@ -185,7 +185,7 @@ describe('Accordion: Name der Sprungleiste (navLabel)', () => {
     rerender(<Basic nav navLabel="Bereiche der Liga-Seite" />);
     await tick();
     expect(screen.getByRole('navigation', { name: 'Bereiche der Liga-Seite' })).toBeInTheDocument();
-    expect(document.querySelector('.dss-acc-nav-toggle')).toHaveTextContent('Bereiche der Liga-Seite');
+    expect(document.querySelector('.hoops-acc-nav-toggle')).toHaveTextContent('Bereiche der Liga-Seite');
   });
   it('zwei Sprungleisten mit verschiedenen Namen bestehen axe (landmark-unique)', async () => {
     render(
@@ -234,7 +234,7 @@ describe('Accordion: Alle öffnen / schließen', () => {
   it('ohne expandAll gibt es keine Leiste', async () => {
     render(<Basic />);
     await tick();
-    expect(document.querySelector('.dss-acc-tools')).toBeNull();
+    expect(document.querySelector('.hoops-acc-tools')).toBeNull();
   });
 });
 
@@ -399,12 +399,12 @@ describe('Accordion: Sprungleiste', () => {
   it('der Schalter „Bereiche“ klappt die Liste (Handy) mit aria-expanded', async () => {
     render(<Basic nav />);
     await tick();
-    const toggle = document.querySelector('.dss-acc-nav-toggle') as HTMLButtonElement;
+    const toggle = document.querySelector('.hoops-acc-nav-toggle') as HTMLButtonElement;
     expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    expect(toggle.getAttribute('aria-controls')).toBe(document.querySelector('.dss-acc-nav-list')!.id);
+    expect(toggle.getAttribute('aria-controls')).toBe(document.querySelector('.hoops-acc-nav-list')!.id);
     fireEvent.click(toggle);
     expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    expect(document.querySelector('.dss-acc-nav')).toHaveClass('is-open');
+    expect(document.querySelector('.hoops-acc-nav')).toHaveClass('is-open');
   });
 });
 
@@ -418,19 +418,19 @@ describe('Accordion: Zusatzinfo und Name', () => {
     const button = screen.getByRole('button', { name: /Kader/ });
     expect(button).toHaveAccessibleName(/^Kader,\s?14 Spieler$/); // Leerraum zwischen Spans: je nach Layout
     expect(button.textContent?.match(/14 Spieler/g)).toHaveLength(1);
-    expect(button.querySelector('.dss-acc-meta')).toHaveTextContent('14 Spieler');
+    expect(button.querySelector('.hoops-acc-meta')).toHaveTextContent('14 Spieler');
   });
   it('Chip und Live-Tag als Zusatzinfo', () => {
     render(
       <Accordion syncHash={false}>
-        <AccordionItem id="l" title="Spielplan" meta={<span className="dss-live"><span className="dss-live-dot" aria-hidden="true" />Live</span>}>x</AccordionItem>
+        <AccordionItem id="l" title="Spielplan" meta={<span className="hoops-live"><span className="hoops-live-dot" aria-hidden="true" />Live</span>}>x</AccordionItem>
       </Accordion>,
     );
     expect(screen.getByRole('button')).toHaveAccessibleName(/^Spielplan,\s?Live$/);
   });
   it('ohne meta gibt es kein Zusatzelement', () => {
     render(<Basic />);
-    expect(document.querySelector('.dss-acc-meta')).toBeNull();
+    expect(document.querySelector('.hoops-acc-meta')).toBeNull();
   });
   it('der Pfeil ist für Screenreader verborgen', () => {
     render(<Basic />);
@@ -472,7 +472,7 @@ describe('Accordion: Region nur bis 6 Bereiche', () => {
 });
 
 describe('Accordion: Überschriftenebene', () => {
-  const level = (id: string) => document.getElementById(id)!.querySelector('.dss-acc-title')!.tagName.toLowerCase();
+  const level = (id: string) => document.getElementById(id)!.querySelector('.hoops-acc-title')!.tagName.toLowerCase();
   it('Standard h3; titleAs am Bereich > titleAs der Gruppe > HeadingLevel', () => {
     render(
       <>
@@ -508,8 +508,8 @@ describe('Accordion: Überschriftenebene', () => {
       </Accordion>,
     );
     expect(['o', 'm', 'i'].map(level)).toEqual(['h3', 'h4', 'h5']);
-    expect(document.querySelectorAll('.dss-acc--nested')).toHaveLength(2);
-    expect(document.querySelector('.dss-acc')).not.toHaveClass('dss-acc--nested');
+    expect(document.querySelectorAll('.hoops-acc--nested')).toHaveLength(2);
+    expect(document.querySelector('.hoops-acc')).not.toHaveClass('hoops-acc--nested');
   });
   it('bei h6 bleibt es h6', () => {
     render(
@@ -536,10 +536,10 @@ describe('Accordion: Überschriftenebene', () => {
 describe('Accordion: Varianten, sticky, Klassen', () => {
   it('Karte ist Standard, flach und sticky setzen Klassen, class kommt dazu', () => {
     const { container, rerender } = render(<Accordion syncHash={false}><AccordionItem id="a" title="A">x</AccordionItem></Accordion>);
-    expect(container.firstElementChild).toHaveClass('dss-acc', 'dss-acc--card');
+    expect(container.firstElementChild).toHaveClass('hoops-acc', 'hoops-acc--card');
     rerender(<Accordion syncHash={false} variant="flat" sticky className="extra"><AccordionItem id="a" title="A">x</AccordionItem></Accordion>);
-    expect(container.firstElementChild).toHaveClass('dss-acc', 'dss-acc--flat', 'dss-acc--sticky', 'extra');
-    expect(container.firstElementChild).not.toHaveClass('dss-acc--card');
+    expect(container.firstElementChild).toHaveClass('hoops-acc', 'hoops-acc--flat', 'hoops-acc--sticky', 'extra');
+    expect(container.firstElementChild).not.toHaveClass('hoops-acc--card');
   });
 });
 
@@ -552,7 +552,7 @@ describe('Accordion: Server-Rendering', () => {
       </Accordion>,
     );
     expect(html).toContain('aria-expanded="true"');
-    expect(html).toContain('dss-acc-tools--pending');
+    expect(html).toContain('hoops-acc-tools--pending');
     expect(html).not.toContain('<nav');
     expect(html).not.toContain('role="region"');
   });

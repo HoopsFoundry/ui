@@ -13,15 +13,15 @@
 </script>
 
 {#snippet cell(row, col, ri, ci)}
-  <label class="dss-check {row.compact ? 'dss-check--compact' : ''} {col === 'Gesperrt' ? 'is-disabled' : ''}" for={uid(ri, ci)}>
+  <label class="hoops-check {row.compact ? 'hoops-check--compact' : ''} {col === 'Gesperrt' ? 'is-disabled' : ''}" for={uid(ri, ci)}>
     <input
       id={uid(ri, ci)}
       type="checkbox"
-      class="dss-check-input {col === 'Fokus' ? 'pseudo-focus-visible' : ''}"
+      class="hoops-check-input {col === 'Fokus' ? 'pseudo-focus-visible' : ''}"
       checked={row.checked}
       disabled={col === 'Gesperrt'}
     />
-    <span class="dss-check-text"><span class="dss-check-label">Mit Rückspiel</span></span>
+    <span class="hoops-check-text"><span class="hoops-check-label">Mit Rückspiel</span></span>
   </label>
 {/snippet}
 
@@ -62,7 +62,7 @@
 {:else if example === 'dont-label'}
   <!-- Text neben der Box, aber nicht mit ihr verknüpft: nur die 22-px-Box ist klickbar -->
   <div class="loose">
-    <input type="checkbox" class="dss-check-input" aria-label="Mit Rückspiel" />
+    <input type="checkbox" class="hoops-check-input" aria-label="Mit Rückspiel" />
     <span>Mit Rückspiel</span>
   </div>
 {:else if example === 'do-hint'}

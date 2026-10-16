@@ -46,16 +46,16 @@ export interface TeamCardProps {
   className?: string;
 }
 
-const OUTCOME_CHIP = { S: 'dss-chip--ok', N: 'dss-chip--err', U: '' } as const;
+const OUTCOME_CHIP = { S: 'hoops-chip--ok', N: 'hoops-chip--err', U: '' } as const;
 
 /** Name mit Kurzform: beide Texte im Markup, der Kurzname ist für Hilfstechnik versteckt (der volle Name gilt). */
 function NameText({ team, names }: { team: TeamRef; names: TeamCardNames }) {
   const short = shortName(team);
   if (!short) return <>{team.name}</>;
   return (
-    <span className={cn('dss-team-name', names === 'short' && 'dss-team-name--short')}>
-      <span className="dss-name-full">{team.name}</span>
-      <span className="dss-name-short" aria-hidden="true" title={team.name}>
+    <span className={cn('hoops-team-name', names === 'short' && 'hoops-team-name--short')}>
+      <span className="hoops-name-full">{team.name}</span>
+      <span className="hoops-name-short" aria-hidden="true" title={team.name}>
         {short}
       </span>
     </span>
@@ -64,7 +64,7 @@ function NameText({ team, names }: { team: TeamRef; names: TeamCardNames }) {
 
 function LogoBadge({ team, size }: { team: TeamRef; size?: string }) {
   return (
-    <span className={cn('dss-team-logo', size, !team.logo && 'dss-team-logo--initials')} aria-hidden="true">
+    <span className={cn('hoops-team-logo', size, !team.logo && 'hoops-team-logo--initials')} aria-hidden="true">
       {team.logo ? <img src={team.logo} alt="" loading="lazy" /> : initials(team.name, 2)}
     </span>
   );
@@ -73,13 +73,13 @@ function LogoBadge({ team, size }: { team: TeamRef; size?: string }) {
 function Tile({ value, label, aria }: { value: string; label: string; aria: string }) {
   return (
     <div>
-      <div className="dss-pc-v" aria-hidden="true">
+      <div className="hoops-pc-v" aria-hidden="true">
         {value}
       </div>
-      <div className="dss-pc-l" aria-hidden="true">
+      <div className="hoops-pc-l" aria-hidden="true">
         {label}
       </div>
-      <span className="dss-sr-only">{aria}</span>
+      <span className="hoops-sr-only">{aria}</span>
     </div>
   );
 }
@@ -119,11 +119,11 @@ export function TeamCard({
   const own: TeamRef = { name, short, logo };
 
   const nameBlock: ReactNode = href ? (
-    <a className="dss-team-link" href={href} onClick={onClick}>
+    <a className="hoops-team-link" href={href} onClick={onClick}>
       <NameText team={own} names={names} />
     </a>
   ) : onClick ? (
-    <button className="dss-team-link" type="button" onClick={onClick}>
+    <button className="hoops-team-link" type="button" onClick={onClick}>
       <NameText team={own} names={names} />
     </button>
   ) : (
@@ -132,10 +132,10 @@ export function TeamCard({
 
   const leagueLine =
     league || season ? (
-      <div className="dss-team-sub">
+      <div className="hoops-team-sub">
         {league ? (
           leagueHref && !clickable ? (
-            <a className="dss-link" href={leagueHref}>
+            <a className="hoops-link" href={leagueHref}>
               {league}
             </a>
           ) : (
@@ -149,14 +149,14 @@ export function TeamCard({
   const opponent = (o: TeamRef, at: 'heim' | 'gast' | undefined) => (
     <>
       {at ? (
-        <span className={cn('dss-chip', 'dss-chip--mono', at === 'gast' ? 'dss-chip--amber' : 'dss-chip--sky')} aria-hidden="true">
+        <span className={cn('hoops-chip', 'hoops-chip--mono', at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky')} aria-hidden="true">
           {at === 'gast' ? '@' : 'vs.'}
         </span>
       ) : null}
-      <span className="dss-team-game-opp">
-        {logos ? <LogoBadge team={o} size="dss-team-logo--sm" /> : null}
+      <span className="hoops-team-game-opp">
+        {logos ? <LogoBadge team={o} size="hoops-team-logo--sm" /> : null}
         <span>
-          <span className="dss-sr-only">{opponentPrefix(at)}</span>
+          <span className="hoops-sr-only">{opponentPrefix(at)}</span>
           <NameText team={o} names={names} />
         </span>
       </span>
@@ -165,27 +165,27 @@ export function TeamCard({
 
   if (size === 'compact') {
     return (
-      <div className={cn('dss-team', 'dss-team--compact', clickable && 'dss-team--link', className)}>
+      <div className={cn('hoops-team', 'hoops-team--compact', clickable && 'hoops-team--link', className)}>
         <LogoBadge team={own} />
-        <div className="dss-team-who">
-          <span className="dss-team-nm">{nameBlock}</span>
+        <div className="hoops-team-who">
+          <span className="hoops-team-nm">{nameBlock}</span>
           {leagueLine}
         </div>
-        <span className="dss-team-end">
+        <span className="hoops-team-end">
           {rec ? (
             <>
-              <span className="dss-team-rec" aria-hidden="true">
+              <span className="hoops-team-rec" aria-hidden="true">
                 {rec.text}
               </span>
-              <span className="dss-sr-only">{rec.aria}</span>
+              <span className="hoops-sr-only">{rec.aria}</span>
             </>
           ) : null}
           {pos ? (
             <>
-              <span className="dss-team-rank" aria-hidden="true">
+              <span className="hoops-team-rank" aria-hidden="true">
                 Platz {pos.text}
               </span>
-              <span className="dss-sr-only">{pos.aria}</span>
+              <span className="hoops-sr-only">{pos.aria}</span>
             </>
           ) : null}
         </span>
@@ -194,17 +194,17 @@ export function TeamCard({
   }
 
   return (
-    <div className={cn('dss-team', 'dss-team--standard', clickable && 'dss-team--link', className)}>
-      <div className="dss-team-head">
-        <LogoBadge team={own} size="dss-team-logo--lg" />
-        <div className="dss-team-who">
-          <Heading className="dss-team-nm">{nameBlock}</Heading>
+    <div className={cn('hoops-team', 'hoops-team--standard', clickable && 'hoops-team--link', className)}>
+      <div className="hoops-team-head">
+        <LogoBadge team={own} size="hoops-team-logo--lg" />
+        <div className="hoops-team-who">
+          <Heading className="hoops-team-nm">{nameBlock}</Heading>
           {leagueLine}
         </div>
       </div>
 
       {rec || pos || hasPoints ? (
-        <div className="dss-team-vitals">
+        <div className="hoops-team-vitals">
           {rec ? <Tile value={rec.text} label={rec.label} aria={rec.aria} /> : null}
           {pos ? <Tile value={pos.text} label={pos.label} aria={pos.aria} /> : null}
           {hasPoints ? <Tile value={String(points)} label="Punkte" aria={`Punkte: ${points}`} /> : null}
@@ -212,33 +212,33 @@ export function TeamCard({
       ) : null}
 
       {next || last ? (
-        <div className="dss-team-games">
+        <div className="hoops-team-games">
           {next ? (
-            <div className="dss-team-game">
-              <div className="dss-team-game-l">Nächstes Spiel</div>
-              <div className="dss-team-game-row">
+            <div className="hoops-team-game">
+              <div className="hoops-team-game-l">Nächstes Spiel</div>
+              <div className="hoops-team-game-row">
                 {opponent(next.opponent, next.at)}
-                {next.date || next.time ? <span className="dss-team-game-end">{[next.date, next.time].filter(Boolean).join(' · ')}</span> : null}
+                {next.date || next.time ? <span className="hoops-team-game-end">{[next.date, next.time].filter(Boolean).join(' · ')}</span> : null}
               </div>
-              {next.venue ? <div className="dss-team-game-venue">{next.venue}</div> : null}
+              {next.venue ? <div className="hoops-team-game-venue">{next.venue}</div> : null}
             </div>
           ) : null}
           {last ? (
-            <div className="dss-team-game">
-              <div className="dss-team-game-l">{last.date ? `Letztes Spiel · ${last.date}` : 'Letztes Spiel'}</div>
-              <div className="dss-team-game-row">
+            <div className="hoops-team-game">
+              <div className="hoops-team-game-l">{last.date ? `Letztes Spiel · ${last.date}` : 'Letztes Spiel'}</div>
+              <div className="hoops-team-game-row">
                 {opponent(last.opponent, last.at)}
                 {res ? (
-                  <span className="dss-team-game-end">
+                  <span className="hoops-team-game-end">
                     {res.outcome ? (
-                      <span className={cn('dss-chip', 'dss-chip--mono', OUTCOME_CHIP[res.outcome])} aria-hidden="true">
+                      <span className={cn('hoops-chip', 'hoops-chip--mono', OUTCOME_CHIP[res.outcome])} aria-hidden="true">
                         {res.outcome}
                       </span>
                     ) : null}
-                    <span className="dss-team-game-score" aria-hidden="true">
+                    <span className="hoops-team-game-score" aria-hidden="true">
                       {res.score}
                     </span>
-                    <span className="dss-sr-only">{res.aria}</span>
+                    <span className="hoops-sr-only">{res.aria}</span>
                   </span>
                 ) : null}
               </div>
@@ -247,18 +247,18 @@ export function TeamCard({
         </div>
       ) : null}
 
-      {squadLine ? <div className="dss-team-squad">{squadLine}</div> : null}
+      {squadLine ? <div className="hoops-team-squad">{squadLine}</div> : null}
 
       {statList.length > 0 ? (
-        <div className="dss-team-stats" role="group" aria-label="Saison-Statistik">
-          <div className="dss-team-sec" aria-hidden="true">
+        <div className="hoops-team-stats" role="group" aria-label="Saison-Statistik">
+          <div className="hoops-team-sec" aria-hidden="true">
             Saison-Statistik
           </div>
-          <div className="dss-team-vitals">
+          <div className="hoops-team-vitals">
             {statList.map((stat) => (
               <div key={stat.key}>
-                <div className="dss-pc-v">{stat.value}</div>
-                <div className="dss-pc-l">{stat.label}</div>
+                <div className="hoops-pc-v">{stat.value}</div>
+                <div className="hoops-pc-l">{stat.label}</div>
               </div>
             ))}
           </div>

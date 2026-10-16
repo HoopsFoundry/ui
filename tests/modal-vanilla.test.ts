@@ -26,7 +26,7 @@ afterEach(() => {
 });
 
 describe('natives <dialog>', () => {
-  it('der Auslöser öffnet per showModal, der Fokus geht auf data-dss-modal-focus', () => {
+  it('der Auslöser öffnet per showModal, der Fokus geht auf data-hoops-modal-focus', () => {
     start(dialogMarkup(), 'freigabe');
     const spy = vi.spyOn(HTMLDialogElement.prototype as never, 'showModal');
     el('freigabe-auf').focus();
@@ -35,10 +35,10 @@ describe('natives <dialog>', () => {
     expect(el('freigabe').hasAttribute('open')).toBe(true);
     expect(document.activeElement).toBe(el('freigabe-ok'));
   });
-  it('ohne Fokusziel bekommt die Fläche (.dss-modal, tabindex -1) den Fokus, nicht eine Schaltfläche', () => {
-    start(dialogMarkup().replace(' data-dss-modal-focus', ''), 'freigabe');
+  it('ohne Fokusziel bekommt die Fläche (.hoops-modal, tabindex -1) den Fokus, nicht eine Schaltfläche', () => {
+    start(dialogMarkup().replace(' data-hoops-modal-focus', ''), 'freigabe');
     click(el('freigabe-auf'));
-    expect(document.activeElement).toBe(el('freigabe').querySelector('.dss-modal'));
+    expect(document.activeElement).toBe(el('freigabe').querySelector('.hoops-modal'));
     expect(document.activeElement!.getAttribute('tabindex')).toBe('-1');
   });
   it('option initialFocus wählt das Ziel; eine ungültige Auswahl fällt zurück', () => {
@@ -75,13 +75,13 @@ describe('natives <dialog>', () => {
     expect(keydown(document.activeElement!, 'Escape').defaultPrevented).toBe(true);
     el('freigabe').dispatchEvent(new Event('cancel', { cancelable: true }));
     expect(el('freigabe').hasAttribute('open')).toBe(true);
-    click(el('freigabe').querySelector('.dss-m-close')!);
+    click(el('freigabe').querySelector('.hoops-m-close')!);
     expect(el('freigabe').hasAttribute('open')).toBe(false);
   });
-  it('.dss-m-close und data-dss-modal-close schließen', () => {
+  it('.hoops-m-close und data-hoops-modal-close schließen', () => {
     start(dialogMarkup(), 'freigabe');
     click(el('freigabe-auf'));
-    click(el('freigabe').querySelector('.dss-m-close')!);
+    click(el('freigabe').querySelector('.hoops-m-close')!);
     expect(el('freigabe').hasAttribute('open')).toBe(false);
     click(el('freigabe-auf'));
     click(el('freigabe-abbr'));
@@ -97,7 +97,7 @@ describe('natives <dialog>', () => {
   it('mit dismissOnBackdrop schließt er, ein Klick im Modal nicht', () => {
     start(dialogMarkup(), 'freigabe', { dismissOnBackdrop: true });
     click(el('freigabe-auf'));
-    const surface = el('freigabe').querySelector('.dss-m-body')!;
+    const surface = el('freigabe').querySelector('.hoops-m-body')!;
     down(surface);
     click(surface);
     expect(el('freigabe').hasAttribute('open')).toBe(true);
@@ -108,7 +108,7 @@ describe('natives <dialog>', () => {
   it('dismissOnBackdrop: Maustaste im Modal gedrückt, außerhalb losgelassen (Textmarkierung) schließt nicht', () => {
     start(dialogMarkup(), 'freigabe', { dismissOnBackdrop: true });
     click(el('freigabe-auf'));
-    down(el('freigabe').querySelector('.dss-m-body')!);
+    down(el('freigabe').querySelector('.hoops-m-body')!);
     click(el('freigabe'));
     expect(el('freigabe').hasAttribute('open')).toBe(true);
   });
@@ -159,22 +159,22 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
   it('startet geschlossen (hidden wird ergänzt), setzt role, aria-modal und aria-labelledby aus dem Titel', () => {
     start(divMarkup().replace(' hidden', ''), 'verwerfen');
     expect(el('verwerfen').hidden).toBe(true);
-    const dialog = el('verwerfen').querySelector('.dss-modal')!;
+    const dialog = el('verwerfen').querySelector('.hoops-modal')!;
     expect(dialog.getAttribute('role')).toBe('dialog');
     expect(dialog.getAttribute('aria-modal')).toBe('true');
-    const title = el('verwerfen').querySelector('.dss-m-title')!;
-    expect(title.id).toMatch(/^dss-modal-title-\d+$/);
+    const title = el('verwerfen').querySelector('.hoops-m-title')!;
+    expect(title.id).toMatch(/^hoops-modal-title-\d+$/);
     expect(dialog.getAttribute('aria-labelledby')).toBe(title.id);
   });
   it('vorhandene Beschriftung bleibt (aria-labelledby, aria-label)', () => {
-    start(divMarkup().replace('class="dss-modal dss-modal--sm"', 'class="dss-modal" role="dialog" aria-label="Eigener Name"'), 'verwerfen');
-    const dialog = el('verwerfen').querySelector('.dss-modal')!;
+    start(divMarkup().replace('class="hoops-modal hoops-modal--sm"', 'class="hoops-modal" role="dialog" aria-label="Eigener Name"'), 'verwerfen');
+    const dialog = el('verwerfen').querySelector('.hoops-modal')!;
     expect(dialog.hasAttribute('aria-labelledby')).toBe(false);
     expect(dialog.getAttribute('aria-label')).toBe('Eigener Name');
   });
   it('role=alertdialog bleibt erhalten', () => {
-    start(divMarkup().replace('class="dss-modal dss-modal--sm"', 'class="dss-modal" role="alertdialog"'), 'verwerfen');
-    expect(el('verwerfen').querySelector('.dss-modal')!.getAttribute('role')).toBe('alertdialog');
+    start(divMarkup().replace('class="hoops-modal hoops-modal--sm"', 'class="hoops-modal" role="alertdialog"'), 'verwerfen');
+    expect(el('verwerfen').querySelector('.hoops-modal')!.getAttribute('role')).toBe('alertdialog');
   });
   it('Öffnen: hidden weg, Hintergrund der Seite inert, Fokus auf die Fläche', () => {
     start(divMarkup(), 'verwerfen');
@@ -183,7 +183,7 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
     expect(el('verwerfen').hidden).toBe(false);
     expect(el('verwerfen-seite').hasAttribute('inert')).toBe(true);
     expect(el('verwerfen').hasAttribute('inert')).toBe(false);
-    expect(document.activeElement).toBe(el('verwerfen').querySelector('.dss-modal'));
+    expect(document.activeElement).toBe(el('verwerfen').querySelector('.hoops-modal'));
   });
   it('Schließen: wieder hidden, inert zurückgebaut (auch ein vorher gesetztes inert bleibt), Fokus zurück', () => {
     start(divMarkup('verwerfen') + '<aside id="schon" inert>x</aside>', 'verwerfen');
@@ -199,14 +199,14 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
   it('Klick auf den Hintergrund: nur mit dismissOnBackdrop', () => {
     start(divMarkup(), 'verwerfen');
     click(el('verwerfen-auf'));
-    const backdrop = el('verwerfen').querySelector('.dss-backdrop')!;
+    const backdrop = el('verwerfen').querySelector('.hoops-backdrop')!;
     down(backdrop);
     click(backdrop);
     expect(el('verwerfen').hidden).toBe(false);
     handles.pop()!.destroy();
     start(divMarkup(), 'verwerfen', { dismissOnBackdrop: true });
     click(el('verwerfen-auf'));
-    const b2 = el('verwerfen').querySelector('.dss-backdrop')!;
+    const b2 = el('verwerfen').querySelector('.hoops-backdrop')!;
     down(b2);
     click(b2);
     expect(el('verwerfen').hidden).toBe(true);
@@ -215,13 +215,13 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
     start(divMarkup(), 'verwerfen');
     click(el('verwerfen-auf'));
     const list = focusables(el('verwerfen'));
-    expect(list.map((e) => e.className || e.id)).toEqual(['dss-m-close', 'dss-btn', 'dss-btn']);
+    expect(list.map((e) => e.className || e.id)).toEqual(['hoops-m-close', 'hoops-btn', 'hoops-btn']);
     list[2].focus();
     expect(keydown(list[2], 'Tab').defaultPrevented).toBe(true);
     expect(document.activeElement).toBe(list[0]);
     expect(keydown(list[0], 'Tab', { shiftKey: true }).defaultPrevented).toBe(true);
     expect(document.activeElement).toBe(list[2]);
-    (el('verwerfen').querySelector('.dss-modal') as HTMLElement).focus();
+    (el('verwerfen').querySelector('.hoops-modal') as HTMLElement).focus();
     keydown(document.activeElement!, 'Tab', { shiftKey: true });
     expect(document.activeElement).toBe(list[2]);
   });
@@ -239,7 +239,7 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
     start(divMarkup(), 'verwerfen');
     click(el('verwerfen-auf'));
     const list = focusables(el('verwerfen'));
-    const surface = el('verwerfen').querySelector('.dss-modal') as HTMLElement;
+    const surface = el('verwerfen').querySelector('.hoops-modal') as HTMLElement;
     surface.focus();
     keydown(surface, 'Tab');
     expect(document.activeElement).toBe(list[0]);
@@ -255,9 +255,9 @@ describe('Markup mit role=dialog (ohne <dialog>)', () => {
     expect(el('verwerfen').contains(document.activeElement)).toBe(true);
     for (const b of el('verwerfen').querySelectorAll('button')) b.setAttribute('disabled', '');
     expect(focusables(el('verwerfen'))).toHaveLength(0);
-    (el('verwerfen').querySelector('.dss-modal') as HTMLElement).focus();
+    (el('verwerfen').querySelector('.hoops-modal') as HTMLElement).focus();
     expect(keydown(document.activeElement!, 'Tab').defaultPrevented).toBe(true);
-    expect(document.activeElement).toBe(el('verwerfen').querySelector('.dss-modal'));
+    expect(document.activeElement).toBe(el('verwerfen').querySelector('.hoops-modal'));
   });
   it('Fokus, der herausfällt, kommt zurück', () => {
     start(divMarkup(), 'verwerfen');
@@ -315,18 +315,18 @@ describe('Scroll-Sperre', () => {
 });
 
 describe('Ereignisse und Rückgabe', () => {
-  it('dss:modalopen und dss:modalclose mit Grund und Auslöser; onOpen/onClose', () => {
+  it('hoops:modalopen und hoops:modalclose mit Grund und Auslöser; onOpen/onClose', () => {
     const onOpen = vi.fn();
     const onClose = vi.fn();
     mountHtml(divMarkup());
     handles.push(initModal(el('verwerfen'), { onOpen, onClose }));
     const log: string[] = [];
-    document.body.addEventListener('dss:modalopen', (e) => log.push('open:' + ((e as CustomEvent).detail.trigger?.id ?? '-')));
-    document.body.addEventListener('dss:modalclose', (e) => log.push('close:' + (e as CustomEvent).detail.reason));
+    document.body.addEventListener('hoops:modalopen', (e) => log.push('open:' + ((e as CustomEvent).detail.trigger?.id ?? '-')));
+    document.body.addEventListener('hoops:modalclose', (e) => log.push('close:' + (e as CustomEvent).detail.reason));
     click(el('verwerfen-auf'));
     keydown(document.activeElement!, 'Escape');
     click(el('verwerfen-auf'));
-    click(el('verwerfen').querySelector('.dss-m-close')!);
+    click(el('verwerfen').querySelector('.hoops-m-close')!);
     click(el('verwerfen-auf'));
     click(el('verwerfen-abbr'));
     handles[0].open();
@@ -338,7 +338,7 @@ describe('Ereignisse und Rückgabe', () => {
   it('open/close sind idempotent; isOpen folgt', () => {
     const h = start(divMarkup(), 'verwerfen');
     const spy = vi.fn();
-    el('verwerfen').addEventListener('dss:modalopen', spy);
+    el('verwerfen').addEventListener('hoops:modalopen', spy);
     expect(h.isOpen()).toBe(false);
     h.close();
     h.open();
@@ -406,7 +406,7 @@ describe('mehrere Modals und gestapelte', () => {
     handles.push(initModal(el('a')), initModal(el('b')));
     click(el('a-auf'));
     const opener = el('a-ok');
-    opener.setAttribute('data-dss-modal-open', 'b');
+    opener.setAttribute('data-hoops-modal-open', 'b');
     opener.focus();
     click(opener);
     expect(el('b').hidden).toBe(false);
@@ -419,7 +419,7 @@ describe('mehrere Modals und gestapelte', () => {
   });
   it('ein Auslöser mit fremder oder fehlender id öffnet nichts', () => {
     start(divMarkup(), 'verwerfen');
-    mountHtml(divMarkup() + '<button id="x" data-dss-modal-open="gibt-es-nicht">x</button><button id="y" data-dss-modal-open="">y</button><button id="z" data-dss-modal-open=\'"><img src=x onerror=alert(1)>\'>z</button>');
+    mountHtml(divMarkup() + '<button id="x" data-hoops-modal-open="gibt-es-nicht">x</button><button id="y" data-hoops-modal-open="">y</button><button id="z" data-hoops-modal-open=\'"><img src=x onerror=alert(1)>\'>z</button>');
     handles.push(initModal(el('verwerfen')));
     for (const id of ['x', 'y', 'z']) click(el(id));
     expect(el('verwerfen').hidden).toBe(true);
@@ -438,7 +438,7 @@ describe('init mehrfach, destroy', () => {
     mountHtml(divMarkup());
     handles.push(initModal(el('verwerfen')), initModal(el('verwerfen')));
     const spy = vi.fn();
-    el('verwerfen').addEventListener('dss:modalopen', spy);
+    el('verwerfen').addEventListener('hoops:modalopen', spy);
     click(el('verwerfen-auf'));
     expect(spy).toHaveBeenCalledTimes(1);
   });
@@ -454,12 +454,12 @@ describe('init mehrfach, destroy', () => {
     expect(document.activeElement).toBe(el('verwerfen-auf'));
     expect(document.body.innerHTML).toBe(before);
   });
-  it('destroy meldet kein dss:modalclose; danach reagieren Auslöser und Escape nicht mehr', () => {
+  it('destroy meldet kein hoops:modalclose; danach reagieren Auslöser und Escape nicht mehr', () => {
     mountHtml(divMarkup());
     const h = initModal(el('verwerfen'));
     click(el('verwerfen-auf'));
     const spy = vi.fn();
-    el('verwerfen').addEventListener('dss:modalclose', spy);
+    el('verwerfen').addEventListener('hoops:modalclose', spy);
     h.destroy();
     expect(spy).not.toHaveBeenCalled();
     click(el('verwerfen-auf'));

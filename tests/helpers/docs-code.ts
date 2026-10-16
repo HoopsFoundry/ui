@@ -23,7 +23,7 @@ export async function startServer(): Promise<{ vite: ViteDevServer; render: Rend
 export async function renderSvelteSource(vite: ViteDevServer, render: Render, tmpDir: string, name: string, source: string, props: Record<string, unknown> = {}) {
   mkdirSync(tmpDir, { recursive: true });
   const file = `${tmpDir}${name}.svelte`;
-  writeFileSync(file, source.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`).replace(/@bbv\/dss-design-system\/([\w-]+)\.js/g, (_m, mod: string) => `${rootDir}js/${mod}.js`));
+  writeFileSync(file, source.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`).replace(/@bbv\/hoops-design-system\/([\w-]+)\.js/g, (_m, mod: string) => `${rootDir}js/${mod}.js`));
   const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
   return render(component, { props }).body;
 }
@@ -40,8 +40,8 @@ export function compileReact(sources: Record<string, string>): string[] {
     const body = split < 0 ? rest : rest.slice(split);
     const isComponent = /export (default )?function/.test(rest);
     files[`${rootDir}react/__code_${name}.tsx`] = (isComponent
-      ? [...imports.map((l) => l.replace('@bbv/dss-design-system/react', './index').replace(/@bbv\/dss-design-system\/([\w-]+)\.js/, '../js/$1.js')), rest.replace(/^import [^;]+;$/gm, '')]
-      : [...imports.map((l) => l.replace('@bbv/dss-design-system/react', './index')), head, `export const Demo_${name} = () => (\n<>${body}</>\n);`]).join('\n');
+      ? [...imports.map((l) => l.replace('@hoopsfoundry/ui/react', './index').replace(/@bbv\/hoops-design-system\/([\w-]+)\.js/, '../js/$1.js')), rest.replace(/^import [^;]+;$/gm, '')]
+      : [...imports.map((l) => l.replace('@hoopsfoundry/ui/react', './index')), head, `export const Demo_${name} = () => (\n<>${body}</>\n);`]).join('\n');
   }
   const options: ts.CompilerOptions = {
     target: ts.ScriptTarget.ES2020, lib: ['lib.es2020.d.ts', 'lib.dom.d.ts', 'lib.dom.iterable.d.ts'], module: ts.ModuleKind.ESNext,

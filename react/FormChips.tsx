@@ -18,13 +18,13 @@ export function FormChips({ form, variant = 'dots', className }: FormChipsProps)
   const entries = formEntries(form);
   if (!entries.length) return null;
   return (
-    <span className={cn('dss-form', variant === 'letters' && 'dss-form--letters', className)}>
-      <span className="dss-form-list" aria-hidden="true">
+    <span className={cn('hoops-form', variant === 'letters' && 'hoops-form--letters', className)}>
+      <span className="hoops-form-list" aria-hidden="true">
         {entries.map((e, k) => (
-          <span key={k} className={`dss-form-item dss-form-item--${e.toLowerCase()}`} />
+          <span key={k} className={`hoops-form-item hoops-form-item--${e.toLowerCase()}`} />
         ))}
       </span>
-      <span className="dss-sr-only">{formLabel(form)}</span>
+      <span className="hoops-sr-only">{formLabel(form)}</span>
     </span>
   );
 }

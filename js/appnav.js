@@ -1,35 +1,35 @@
 /**
- * DSS AppNav · Vanilla-Verhalten
+ * HoopsFoundry UI AppNav · Vanilla-Verhalten
  * --------------------------------------------------------------
  * Ergänzt das Markup der AppNav (css/components.css) um Verhalten, ohne Framework:
  * Hamburger-Menü, Gruppen-Dropdowns (Disclosure), Esc, Klick außerhalb, Fokusverlust.
  *
  * Markup-Vertrag (Klassen siehe components.css):
- *   <nav class="dss-appnav dss-appnav--light" data-dss-appnav aria-label="Hauptnavigation">
- *     <div class="dss-appnav-bar">
- *       <button type="button" class="dss-appnav-toggle" data-appnav-toggle
+ *   <nav class="hoops-appnav hoops-appnav--light" data-hoops-appnav aria-label="Hauptnavigation">
+ *     <div class="hoops-appnav-bar">
+ *       <button type="button" class="hoops-appnav-toggle" data-appnav-toggle
  *               aria-expanded="false" aria-controls="nav-list">Menü</button>
- *       <ul class="dss-appnav-list" id="nav-list">
- *         <li class="dss-appnav-item"><a class="dss-appnav-link is-active" aria-current="page" href="/">Start</a></li>
- *         <li class="dss-appnav-item">
- *           <button type="button" class="dss-appnav-group-btn" data-appnav-group
+ *       <ul class="hoops-appnav-list" id="nav-list">
+ *         <li class="hoops-appnav-item"><a class="hoops-appnav-link is-active" aria-current="page" href="/">Start</a></li>
+ *         <li class="hoops-appnav-item">
+ *           <button type="button" class="hoops-appnav-group-btn" data-appnav-group
  *                   aria-expanded="false" aria-controls="nav-g1">Gruppe</button>
- *           <ul class="dss-appnav-panel" id="nav-g1" hidden>
- *             <li><a class="dss-appnav-link" href="/a">Seite A</a></li>
+ *           <ul class="hoops-appnav-panel" id="nav-g1" hidden>
+ *             <li><a class="hoops-appnav-link" href="/a">Seite A</a></li>
  *           </ul>
  *         </li>
  *       </ul>
  *     </div>
  *   </nav>
  *
- * <script type="module" src="…/js/appnav.js"></script> initialisiert alle [data-dss-appnav] automatisch.
+ * <script type="module" src="…/js/appnav.js"></script> initialisiert alle [data-hoops-appnav] automatisch.
  */
 const OPEN = 'is-open';
 
 /** Initialisiert eine AppNav; gibt eine Funktion zurück, die alle Listener entfernt und erneutes Initialisieren erlaubt. */
 export function initAppNav(root) {
-  if (root.dataset.dssAppnavReady) return () => {};
-  root.dataset.dssAppnavReady = 'true';
+  if (root.dataset.hoopsAppnavReady) return () => {};
+  root.dataset.hoopsAppnavReady = 'true';
   const controller = new AbortController();
   const { signal } = controller;
 
@@ -91,13 +91,13 @@ export function initAppNav(root) {
   document.addEventListener('mousedown', onOutside, { signal });
   return () => {
     controller.abort();
-    delete root.dataset.dssAppnavReady;
+    delete root.dataset.hoopsAppnavReady;
   };
 }
 
 /** Initialisiert alle AppNavs im Bereich (Standard: ganzes Dokument). */
 export function initAppNavs(scope = document) {
-  return Array.from(scope.querySelectorAll('[data-dss-appnav]')).map(initAppNav);
+  return Array.from(scope.querySelectorAll('[data-hoops-appnav]')).map(initAppNav);
 }
 
 if (typeof document !== 'undefined') {

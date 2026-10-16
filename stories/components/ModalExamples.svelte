@@ -40,26 +40,26 @@
 
 <!-- Statisches Modal (nicht gestartet) für Handy-Vorschauen und Do/Don't; focusDanger/focusSafe setzt den Fokus-Ring fest -->
 {#snippet staticModal(p: { id: string; severity?: string; title: string; subtitle: string; body: string; safe: string; danger?: string; ok?: string; ring?: string })}
-  <div class="dss-backdrop"></div>
-  <div class="dss-modal-wrap">
-    <div class="dss-modal dss-modal--sm" role="dialog" aria-modal="true" aria-labelledby="{p.id}-titel">
-      <div class="dss-m-head">
+  <div class="hoops-backdrop"></div>
+  <div class="hoops-modal-wrap">
+    <div class="hoops-modal hoops-modal--sm" role="dialog" aria-modal="true" aria-labelledby="{p.id}-titel">
+      <div class="hoops-m-head">
         {#if p.severity}
-          <div class="dss-m-head-icon dss-m-head-icon--{p.severity}">
+          <div class="hoops-m-head-icon hoops-m-head-icon--{p.severity}">
             <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4M8 4.5v.05"/></svg>
           </div>
         {/if}
-        <div class="dss-m-head-text">
-          <h2 class="dss-m-title" id="{p.id}-titel">{p.title}</h2>
-          <div class="dss-m-subtitle">{p.subtitle}</div>
+        <div class="hoops-m-head-text">
+          <h2 class="hoops-m-title" id="{p.id}-titel">{p.title}</h2>
+          <div class="hoops-m-subtitle">{p.subtitle}</div>
         </div>
-        <button type="button" class="dss-m-close" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+        <button type="button" class="hoops-m-close" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
       </div>
-      <div class="dss-m-body">{p.body}</div>
-      <div class="dss-m-footer">
-        <button type="button" class="dss-btn dss-btn--secondary dss-btn--md {p.ring === 'safe' ? 'pseudo-focus-visible' : ''}">{p.safe}</button>
-        {#if p.danger}<button type="button" class="dss-btn dss-btn--danger dss-btn--md {p.ring === 'danger' ? 'pseudo-focus-visible' : ''}">{p.danger}</button>{/if}
-        {#if p.ok}<button type="button" class="dss-btn dss-btn--primary dss-btn--md">{p.ok}</button>{/if}
+      <div class="hoops-m-body">{p.body}</div>
+      <div class="hoops-m-footer">
+        <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--md {p.ring === 'safe' ? 'pseudo-focus-visible' : ''}">{p.safe}</button>
+        {#if p.danger}<button type="button" class="hoops-btn hoops-btn--danger hoops-btn--md {p.ring === 'danger' ? 'pseudo-focus-visible' : ''}">{p.danger}</button>{/if}
+        {#if p.ok}<button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md">{p.ok}</button>{/if}
       </div>
     </div>
   </div>
@@ -128,7 +128,7 @@
             {#if c === 'Gesperrt'}
               <span class="none">nicht vorgesehen</span>
             {:else}
-              <button type="button" class="dss-m-close {stateClass[c]}" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg></button>
+              <button type="button" class="hoops-m-close {stateClass[c]}" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg></button>
             {/if}
           </div>
         {/each}
@@ -136,7 +136,7 @@
           <div class="rowlabel">{b.name}</div>
           {#each cols as c}
             <div class="cell cell-foot">
-              <button type="button" class="dss-btn dss-btn--{b.variant} dss-btn--md {stateClass[c]}" disabled={c === 'Gesperrt'}>{b.label}</button>
+              <button type="button" class="hoops-btn hoops-btn--{b.variant} hoops-btn--md {stateClass[c]}" disabled={c === 'Gesperrt'}>{b.label}</button>
             </div>
           {/each}
         {/each}

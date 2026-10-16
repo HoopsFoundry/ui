@@ -41,11 +41,11 @@ export interface PlayerCardProps {
 function Vitals({ vitals }: { vitals: PlayerVital[] }) {
   if (vitals.length === 0) return null;
   return (
-    <div className="dss-pc-vitals">
+    <div className="hoops-pc-vitals">
       {vitals.map((vital) => (
         <div key={vital.label}>
-          <div className={cn('dss-pc-v', vital.accent && 'dss-pc-v--amber')}>{vital.value}</div>
-          <div className="dss-pc-l">{vital.label}</div>
+          <div className={cn('hoops-pc-v', vital.accent && 'hoops-pc-v--amber')}>{vital.value}</div>
+          <div className="hoops-pc-l">{vital.label}</div>
         </div>
       ))}
     </div>
@@ -79,7 +79,7 @@ export function PlayerCard({
   const imgSize = size === 'compact' ? 32 : size === 'standard' ? 64 : 200;
   const img = (
     <img
-      className="dss-pc-img"
+      className="hoops-pc-img"
       src={photo}
       alt={photoAlt}
       width={imgSize}
@@ -90,11 +90,11 @@ export function PlayerCard({
     />
   );
 
-  const posClass = position ? `dss-pos ${position.toLowerCase()}` : '';
+  const posClass = position ? `hoops-pos ${position.toLowerCase()}` : '';
   const role = (
-    <div className="dss-pc-role">
+    <div className="hoops-pc-role">
       {position ? <span className={posClass}>{position}</span> : null}
-      {captain ? <span className="dss-pc-cap">Kapitän</span> : null}
+      {captain ? <span className="hoops-pc-cap">Kapitän</span> : null}
       {age ? <span>{age}</span> : null}
       {heightCm ? <span>{heightCm} cm</span> : null}
     </div>
@@ -104,20 +104,20 @@ export function PlayerCard({
     const body = (
       <>
         {showPhoto ? (
-          <span className="dss-pc-av">
+          <span className="hoops-pc-av">
             {img}
-            <span className={cn('dss-tn', 'dss-tn--badge', team, captain && 'captain')}>{jersey}</span>
+            <span className={cn('hoops-tn', 'hoops-tn--badge', team, captain && 'captain')}>{jersey}</span>
           </span>
         ) : (
-          <span className={cn('dss-tn', team, 'small', captain && 'captain')}>{jersey}</span>
+          <span className={cn('hoops-tn', team, 'small', captain && 'captain')}>{jersey}</span>
         )}
-        <span className="dss-pc-who">
-          <span className="dss-pc-name">
+        <span className="hoops-pc-who">
+          <span className="hoops-pc-name">
             {name}
             {captain ? ' (C)' : ''}
           </span>
           {position || playerRole ? (
-            <span className="dss-pc-meta">
+            <span className="hoops-pc-meta">
               {position}
               {playerRole ? ` · ${playerRole}` : ''}
             </span>
@@ -126,9 +126,9 @@ export function PlayerCard({
         {/* Pill nur visuell: die Position steht schon in der Meta-Zeile. Leeres <span /> = Platzhalter für die Grid-Spalte. */}
         {position ? <span className={posClass} aria-hidden="true">{position}</span> : <span />}
         {stat !== null ? (
-          <span className="dss-pc-stat">
+          <span className="hoops-pc-stat">
             {stat}
-            {statLabel ? <span className="dss-pc-stat-l">{statLabel}</span> : null}
+            {statLabel ? <span className="hoops-pc-stat-l">{statLabel}</span> : null}
           </span>
         ) : (
           // Platzhalter für die Grid-Spalte der Statistik
@@ -137,28 +137,28 @@ export function PlayerCard({
       </>
     );
     return onClick ? (
-      <button type="button" className={cn('dss-pc-row', className)} onClick={onClick}>
+      <button type="button" className={cn('hoops-pc-row', className)} onClick={onClick}>
         {body}
       </button>
     ) : (
-      <div className={cn('dss-pc-row', className)}>{body}</div>
+      <div className={cn('hoops-pc-row', className)}>{body}</div>
     );
   }
 
   if (size === 'standard') {
     return (
-      <div className={cn('dss-pc-card', className)}>
-        <div className="dss-pc-head">
+      <div className={cn('hoops-pc-card', className)}>
+        <div className="hoops-pc-head">
           {showPhoto ? (
-            <span className="dss-pc-av dss-pc-av--lg">
+            <span className="hoops-pc-av hoops-pc-av--lg">
               {img}
-              <span className={cn('dss-tn', 'dss-tn--badge', 'dss-tn--badge-lg', team, captain && 'captain')}>{jersey}</span>
+              <span className={cn('hoops-tn', 'hoops-tn--badge', 'hoops-tn--badge-lg', team, captain && 'captain')}>{jersey}</span>
             </span>
           ) : (
-            <span className={cn('dss-tn', team, 'large', captain && 'captain')}>{jersey}</span>
+            <span className={cn('hoops-tn', team, 'large', captain && 'captain')}>{jersey}</span>
           )}
-          <div className="dss-pc-who">
-            <Heading className="dss-pc-nm">{name}</Heading>
+          <div className="hoops-pc-who">
+            <Heading className="hoops-pc-nm">{name}</Heading>
             {role}
           </div>
         </div>
@@ -168,19 +168,19 @@ export function PlayerCard({
   }
 
   return (
-    <div className={cn('dss-pc-hero', showPhoto && 'dss-pc-hero--photo', className)}>
-      <div className="dss-pc-hero-left">
+    <div className={cn('hoops-pc-hero', showPhoto && 'hoops-pc-hero--photo', className)}>
+      <div className="hoops-pc-hero-left">
         {showPhoto ? (
           <>
             {img}
-            <span className={cn('dss-tn', 'dss-tn--badge', 'dss-tn--badge-lg', team, captain && 'captain')}>{jersey}</span>
+            <span className={cn('hoops-tn', 'hoops-tn--badge', 'hoops-tn--badge-lg', team, captain && 'captain')}>{jersey}</span>
           </>
         ) : (
-          <span className={cn('dss-tn', 'hero', team, captain && 'captain')}>{jersey}</span>
+          <span className={cn('hoops-tn', 'hero', team, captain && 'captain')}>{jersey}</span>
         )}
       </div>
-      <div className="dss-pc-hero-right">
-        <Heading className="dss-pc-nm">{name}</Heading>
+      <div className="hoops-pc-hero-right">
+        <Heading className="hoops-pc-nm">{name}</Heading>
         {role}
         <Vitals vitals={vitals} />
       </div>

@@ -52,11 +52,11 @@ export function Modal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
-        <Dialog.Overlay className="dss-backdrop" />
-        <div className="dss-modal-wrap">
+        <Dialog.Overlay className="hoops-backdrop" />
+        <div className="hoops-modal-wrap">
           <Dialog.Content
             aria-describedby={undefined}
-            className={cn('dss-modal', size !== 'md' && `dss-modal--${size}`, className)}
+            className={cn('hoops-modal', size !== 'md' && `hoops-modal--${size}`, className)}
             onInteractOutside={(event) => {
               if (blockOutsideDismiss) event.preventDefault();
             }}
@@ -64,20 +64,20 @@ export function Modal({
               if (!closable) event.preventDefault();
             }}
           >
-            <div className="dss-m-head">
+            <div className="hoops-m-head">
               {severity !== 'default' ? (
-                <div className={`dss-m-head-icon dss-m-head-icon--${severity}`}>
+                <div className={`hoops-m-head-icon hoops-m-head-icon--${severity}`}>
                   <SeverityIcon severity={severity} />
                 </div>
               ) : null}
-              <div className="dss-m-head-text">
+              <div className="hoops-m-head-text">
                 <Dialog.Title asChild>
-                  <TitleTag className="dss-m-title">{title}</TitleTag>
+                  <TitleTag className="hoops-m-title">{title}</TitleTag>
                 </Dialog.Title>
-                {subtitle ? <div className="dss-m-subtitle">{subtitle}</div> : null}
+                {subtitle ? <div className="hoops-m-subtitle">{subtitle}</div> : null}
               </div>
               {closable ? (
-                <Dialog.Close className="dss-m-close" aria-label={closeLabel}>
+                <Dialog.Close className="hoops-m-close" aria-label={closeLabel}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" focusable="false">
                     <path d="M4 4l8 8M12 4l-8 8" />
                   </svg>
@@ -85,8 +85,8 @@ export function Modal({
               ) : null}
             </div>
             <HeadingLevelContext.Provider value={contentLevel}>
-              <div className="dss-m-body">{children}</div>
-              {footer ? <div className="dss-m-footer">{footer}</div> : null}
+              <div className="hoops-m-body">{children}</div>
+              {footer ? <div className="hoops-m-footer">{footer}</div> : null}
             </HeadingLevelContext.Provider>
           </Dialog.Content>
         </div>

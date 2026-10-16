@@ -62,7 +62,7 @@
         {:else}{game.time}{/if}
       {/snippet}
       {#snippet notice(game)}
-        {#if game.id === 't6'}<span class="dss-chip dss-chip--warn">Sperrzeit</span>{/if}
+        {#if game.id === 't6'}<span class="hoops-chip hoops-chip--warn">Sperrzeit</span>{/if}
       {/snippet}
     </ScheduleTable>
   {:else}

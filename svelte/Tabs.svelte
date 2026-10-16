@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Tabs · Svelte 5 example
+   * HoopsFoundry UI Tabs · Svelte 5 example
    * --------------------------------------------------------------
    * Matches the v0.6 Navigation spec — four variants:
    *
@@ -89,14 +89,14 @@
       }
       select(items[n]);
       // refocus
-      const btns = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('button.dss-tab');
+      const btns = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('button.hoops-tab');
       btns?.[n]?.focus();
     }
   }
 </script>
 
 <div
-  class="dss-tabs dss-tabs--{variant} dss-tabs--{size}"
+  class="hoops-tabs hoops-tabs--{variant} hoops-tabs--{size}"
   role={multi ? 'group' : 'tablist'}
   aria-label={ariaLabel}
   aria-orientation={multi ? undefined : variant === 'vertical' ? 'vertical' : 'horizontal'}
@@ -104,7 +104,7 @@
   {#each items as item, i (item.id)}
     <button
       type="button"
-      class="dss-tab"
+      class="hoops-tab"
       class:is-active={isActive(item.id)}
       class:is-disabled={item.disabled}
       role={multi ? undefined : 'tab'}
@@ -116,13 +116,13 @@
       onkeydown={(e) => onKey(e, i)}
     >
       {#if item.icon}
-        <svg class="dss-tab-ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="hoops-tab-ic" width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
           <use href={`#${item.icon}`}></use>
         </svg>
       {/if}
-      <span class="dss-tab-label">{item.label}</span>
+      <span class="hoops-tab-label">{item.label}</span>
       {#if item.count !== undefined}
-        <span class="dss-tab-count">{item.count}</span>
+        <span class="hoops-tab-count">{item.count}</span>
       {/if}
     </button>
   {/each}

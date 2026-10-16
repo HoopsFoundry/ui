@@ -29,7 +29,7 @@ describe('Seite „Vanilla“ mit initAll', () => {
     expect(document.getElementById('ort-heim-panel')!.hidden).toBe(false);
     document.getElementById('wb-pokal')!.click();
     expect(document.getElementById('wb-pokal-panel')!.hidden).toBe(false);
-    document.querySelector<HTMLElement>('[data-dss-modal-open="freigabe"]')!.click();
+    document.querySelector<HTMLElement>('[data-hoops-modal-open="freigabe"]')!.click();
     expect(document.getElementById('freigabe')!.hasAttribute('open')).toBe(true);
     keydown(document.activeElement!, 'Escape');
     expect(document.getElementById('freigabe')!.hasAttribute('open')).toBe(false);

@@ -19,7 +19,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     <button
       ref={ref}
       type={type}
-      className={cn('dss-btn', `dss-btn--${variant}`, `dss-btn--${size}`, touch && 'is-touch', className)}
+      className={cn('hoops-btn', `hoops-btn--${variant}`, `hoops-btn--${size}`, touch && 'is-touch', className)}
       {...rest}
     />
   );

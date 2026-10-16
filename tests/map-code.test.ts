@@ -32,7 +32,7 @@ const read = (p: string) => readFileSync(`${rootDir}${p}`, 'utf8');
 describe('Svelte-Code-Beispiel rendert (SSR)', () => {
   it('svelte: zwei Karten mit eigenem Namen, Platzhalter des Auto-Ladens, Liste mit Links', async () => {
     const file = `${tmpDir}svelte.svelte`;
-    writeFileSync(file, map.svelte.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+    writeFileSync(file, map.svelte.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
     const html = render(component, { props: {} }).body;
     expect(html).not.toContain('undefined');
@@ -55,7 +55,7 @@ describe('React-Code-Beispiel besteht den TypeScript-Compiler', () => {
     const head = split < 0 ? '' : rest.slice(0, split);
     const body = split < 0 ? rest : rest.slice(split);
     files[`${rootDir}react/__code_map.tsx`] = [
-      ...imports.map((line) => line.replace('@bbv/dss-design-system/react', './index')),
+      ...imports.map((line) => line.replace('@hoopsfoundry/ui/react', './index')),
       head,
       `export const Demo_map = () => (\n<>${body}</>\n);`,
     ].join('\n');
@@ -99,7 +99,7 @@ describe('Funktionen aus map.js: die Aufrufe im Beispiel werden ausgewertet und 
       expect(line, expr).toContain(`// ${literal(expected)}`.replace(/^\/\/ (\{.*)$/, '// $1'));
     }
     const file = `${tmpDir}funktionen.mjs`;
-    writeFileSync(file, `${map.funktionenJs.replace("'@bbv/dss-design-system/map.js'", `'${rootDir}js/map.js'`)}\nexport const results = [${CALLS.map(([expr]) => expr).join(',\n')}];\n`);
+    writeFileSync(file, `${map.funktionenJs.replace("'@hoopsfoundry/ui/map.js'", `'${rootDir}js/map.js'`)}\nexport const results = [${CALLS.map(([expr]) => expr).join(',\n')}];\n`);
     const mod = (await vite.ssrLoadModule(file)) as { results: unknown[] };
     expect(mod.results).toEqual(CALLS.map(([, expected]) => expected));
   });
@@ -108,16 +108,16 @@ describe('Funktionen aus map.js: die Aufrufe im Beispiel werden ausgewertet und 
 describe('Beispiel „Leaflet direkt“ (leafletDirekt)', () => {
   const script = map.leafletDirekt.match(/<script type="module">([\s\S]*?)<\/script>/)![1];
   it('der Skriptteil importiert nur vorhandene Exporte aus map.js', () => {
-    const named = script.match(/import \{([^}]+)\} from '@bbv\/dss-design-system\/map\.js'/)![1].split(',').map((s) => s.trim());
+    const named = script.match(/import \{([^}]+)\} from '@bbv\/hoops-design-system\/map\.js'/)![1].split(',').map((s) => s.trim());
     for (const name of named) expect(mapjs, name).toHaveProperty(name);
   });
   it('der Pin im Beispiel hat dieselbe Form wie der Pin der Komponente', () => {
     const path = read('js/map-leaflet.js').match(/const PIN_PATH = '([^']+)'/)![1];
     expect(map.leafletDirekt.split(path)).toHaveLength(3);
   });
-  it('alle dss-map-Klassen im Markup gibt es im CSS', () => {
+  it('alle hoops-map-Klassen im Markup gibt es im CSS', () => {
     const css = read('css/components.css');
-    const classes = new Set([...map.leafletDirekt.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('dss-map')));
+    const classes = new Set([...map.leafletDirekt.matchAll(/class="([^"]+)"/g)].flatMap((m) => m[1].split(/\s+/)).filter((c) => c.startsWith('hoops-map')));
     expect(classes.size).toBeGreaterThan(8);
     for (const cls of classes) expect(css, cls).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
   });
@@ -127,7 +127,7 @@ describe('Beispiel „Leaflet direkt“ (leafletDirekt)', () => {
     const mock = await import('./helpers/leaflet-mock');
     mock.reset();
     // Das Skript ist ein ES-Modul: Import-Zeilen durch die lokalen Module ersetzen und im DOM von jsdom ausführen
-    const body = script.replace(/import L from 'leaflet';/, '').replace(/import \{([^}]+)\} from '@bbv\/dss-design-system\/map\.js';/, '');
+    const body = script.replace(/import L from 'leaflet';/, '').replace(/import \{([^}]+)\} from '@bbv\/hoops-design-system\/map\.js';/, '');
     const { formatCoords, mapLinks, validTileUrl } = mapjs;
     const L = mock.L;
     const run = new dom.window.Function('L', 'formatCoords', 'mapLinks', 'validTileUrl', 'document', body);
@@ -143,7 +143,7 @@ describe('Beispiel „Leaflet direkt“ (leafletDirekt)', () => {
     expect(m.options).toMatchObject({ zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 19 });
     expect(m.view[0]).toMatchObject({ center: [49.3, 7.9], zoom: 15 });
     expect(mock.lastLayer().url).toBe('/tiles/{z}/{x}/{y}.png');
-    expect(mock.lastLayer().options.className).toBe('dss-map-tiles');
+    expect(mock.lastLayer().options.className).toBe('hoops-map-tiles');
     expect(mock.state.markers[0].options).toMatchObject({ title: 'Sporthalle Nordhain', keyboard: true });
     expect(dom.window.document.getElementById('karte-koordinaten')!.textContent).toBe('49,3000° N, 7,9000° O');
     expect(dom.window.document.getElementById('karte-route')!.getAttribute('href')).toBe('https://www.openstreetmap.org/directions?route=%3B49.3%2C7.9');
@@ -355,7 +355,7 @@ describe('Beispiele der Doku-Seite', () => {
       const html = await renderExample(example);
       expect(html, example).not.toContain('undefined');
       // Vanilla-Beispiele entstehen erst im Browser (mountMap in einer Svelte-Aktion), die Code-Beispiele sind Text
-      if (!['zustaende', 'sitz-pins'].includes(example) && !/^(vanilla|do-lokal|dont-lokal)/.test(example)) expect(html, example).toContain('dss-map-frame');
+      if (!['zustaende', 'sitz-pins'].includes(example) && !/^(vanilla|do-lokal|dont-lokal)/.test(example)) expect(html, example).toContain('hoops-map-frame');
     }
   });
   it('Namen der Karten sind eindeutig: je Beispiel und über alle Beispiele einer Docs-Seite (axe landmark-unique)', async () => {
@@ -404,8 +404,8 @@ describe('Beispiele der Doku-Seite', () => {
     }
   });
   it('Don\'ts stellen den Fehler nach: Liste, Quellenangabe ausgeblendet (lokales CSS), sofort geladen', async () => {
-    expect(examplesSrc).toMatch(/\.no-text :global\(\.dss-map-text\) \{ display: none; \}/);
-    expect(examplesSrc).toMatch(/\.no-attr :global\(\.dss-map-attr\) \{ display: none; \}/);
+    expect(examplesSrc).toMatch(/\.no-text :global\(\.hoops-map-text\) \{ display: none; \}/);
+    expect(examplesSrc).toMatch(/\.no-attr :global\(\.hoops-map-attr\) \{ display: none; \}/);
     expect(await renderExample('dont-datenschutz')).toContain('data-state="loading"');
     expect(await renderExample('do-datenschutz')).toContain('Karte laden');
   });

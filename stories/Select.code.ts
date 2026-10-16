@@ -3,9 +3,9 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="css/components.css" />
 <!-- optional: <link rel="stylesheet" href="fonts/fonts.css" /> -->
 
-<div class="dss-field">
-  <label class="dss-field-label" for="modus">Turniermodus</label>
-  <select id="modus" class="dss-select">
+<div class="hoops-field">
+  <label class="hoops-field-label" for="modus">Turniermodus</label>
+  <select id="modus" class="hoops-select">
     <option value="round-robin">Jeder gegen Jeden</option>
     <option value="round-robin+finals">Gruppenphase + Endrunde</option>
     <option value="swiss">Einstufungsturnier (Schweizer System)</option>
@@ -13,25 +13,25 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 </div>
 
 <!-- Fehler: is-error am Feld, aria-invalid am Select, Hilfetext mit --err -->
-<div class="dss-field is-error">
-  <label class="dss-field-label" for="modus-err">Turniermodus <span class="req" aria-hidden="true">*</span></label>
-  <select id="modus-err" class="dss-select" required aria-invalid="true" aria-describedby="modus-err-help">
+<div class="hoops-field is-error">
+  <label class="hoops-field-label" for="modus-err">Turniermodus <span class="req" aria-hidden="true">*</span></label>
+  <select id="modus-err" class="hoops-select" required aria-invalid="true" aria-describedby="modus-err-help">
     <option value="">Bitte wählen</option>
     <option value="round-robin">Jeder gegen Jeden</option>
   </select>
-  <div id="modus-err-help" class="dss-field-help dss-field-help--err">Bitte einen Modus wählen.</div>
+  <div id="modus-err-help" class="hoops-field-help hoops-field-help--err">Bitte einen Modus wählen.</div>
 </div>
 
 <!-- Kompakt und gesperrt -->
-<div class="dss-field">
-  <label class="dss-field-label" for="modus-kompakt">Turniermodus</label>
-  <select id="modus-kompakt" class="dss-select dss-select--compact" disabled>
+<div class="hoops-field">
+  <label class="hoops-field-label" for="modus-kompakt">Turniermodus</label>
+  <select id="modus-kompakt" class="hoops-select hoops-select--compact" disabled>
     <option>Jeder gegen Jeden</option>
   </select>
 </div>`;
 
 export const svelte = `<script>
-  import Select from '@bbv/dss-design-system/svelte/Select';
+  import Select from '@hoopsfoundry/ui/svelte/Select';
 
   const options = [
     { value: 'round-robin', label: 'Jeder gegen Jeden' },
@@ -45,7 +45,7 @@ export const svelte = `<script>
 <Select label="Turniermodus" {options} bind:value={modus} required state="error" help="Bitte einen Modus wählen." />
 <Select label="Turniermodus" {options} bind:value={modus} density="compact" disabled />`;
 
-export const react = `import { Select } from '@bbv/dss-design-system/react';
+export const react = `import { Select } from '@hoopsfoundry/ui/react';
 
 const options = [
   { value: 'round-robin', label: 'Jeder gegen Jeden' },

@@ -1,5 +1,5 @@
 /**
- * DSS Stats · Hilfsfunktionen für das Kennzahlen-Gitter (StatGrid, `dss-stats`)
+ * HoopsFoundry UI Stats · Hilfsfunktionen für das Kennzahlen-Gitter (StatGrid, `hoops-stats`)
  * --------------------------------------------------------------
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte, React und die Vanilla-Beispiele nutzen dieselbe Logik.
  * Typen: js/stats.d.ts.

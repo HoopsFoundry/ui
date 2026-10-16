@@ -1,7 +1,7 @@
 {
-  "name": "@bbv/dss-design-system",
+  "name": "@hoopsfoundry/ui",
   "version": "0.9.0",
-  "description": "DSS Design System — Komponenten-Library für Basketball-Apps (Digitaler Spielbericht, Scoreboard, Vereinsregister)",
+  "description": "HoopsFoundry UI — Komponenten-Library für Basketball-Apps (Digitaler Spielbericht, Scoreboard, Vereinsregister)",
   "type": "module",
   "main": "tokens/tokens.css",
   "exports": {
@@ -173,16 +173,16 @@
       "import": "./js/render/venue-card.js"
     },
     "./vanilla": {
-      "types": "./dist/vanilla/dss.d.ts",
-      "import": "./dist/vanilla/dss.js"
+      "types": "./dist/vanilla/hoops.d.ts",
+      "import": "./dist/vanilla/hoops.js"
     },
     "./vanilla-render": {
-      "types": "./dist/vanilla/dss-render.d.ts",
-      "import": "./dist/vanilla/dss-render.js"
+      "types": "./dist/vanilla/hoops-render.d.ts",
+      "import": "./dist/vanilla/hoops-render.js"
     },
     "./vanilla-map": {
-      "types": "./dist/vanilla/dss-map.d.ts",
-      "import": "./dist/vanilla/dss-map.js"
+      "types": "./dist/vanilla/hoops-map.d.ts",
+      "import": "./dist/vanilla/hoops-map.js"
     },
     "./vanilla/*": "./dist/vanilla/*",
     "./portal-sync.mjs": "./scripts/portal-sync.mjs"
@@ -233,7 +233,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/OliEder/dss-design-system.git"
+    "url": "git+https://github.com/HoopsFoundry/ui.git"
   },
   "peerDependencies": {
     "@radix-ui/react-dialog": "^1.1.0",
@@ -298,7 +298,7 @@
     "vite": "^7.0.0"
   },
   "bin": {
-    "dss-sync": "scripts/portal-sync.mjs",
+    "hoops-sync": "scripts/portal-sync.mjs",
     "hoops-migrate": "scripts/migrate-from-dss.mjs"
   }
 }

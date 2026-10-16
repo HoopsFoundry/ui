@@ -41,11 +41,11 @@ export function tabsModalCoreRules(mod: Core): Rules {
     const first = !(document.getElementById('m1') as HTMLElement).hidden;
     return third && first && (document.getElementById('m2') as HTMLElement).hasAttribute('open') === false;
   });
-  run('initAll: Optionen je Leiste aus data-dss-options', () => {
+  run('initAll: Optionen je Leiste aus data-hoops-options', () => {
     key('x-alle', 'ArrowRight');
     key('y-alle', 'ArrowRight');
     return document.getElementById('x-heim')!.getAttribute('aria-selected') === 'false' && document.getElementById('y-heim')!.getAttribute('aria-selected') === 'true';
-  }, {}, tabsMarkup(`data-dss-options='{"activation":"manual"}'`, 'x') + tabsMarkup('', 'y'));
+  }, {}, tabsMarkup(`data-hoops-options='{"activation":"manual"}'`, 'x') + tabsMarkup('', 'y'));
   run('initAll: tabs-Optionen aus options.tabs gelten für alle Leisten', () => {
     key('a-alle', 'ArrowRight');
     key('b-alle', 'ArrowRight');
@@ -53,7 +53,7 @@ export function tabsModalCoreRules(mod: Core): Rules {
   }, { tabs: { activation: 'manual' } });
   run('initAll: modal-Optionen aus options.modal (dismissOnBackdrop)', () => {
     click('m1-auf');
-    const backdrop = document.querySelector('#m1 .dss-backdrop')!;
+    const backdrop = document.querySelector('#m1 .hoops-backdrop')!;
     backdrop.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }));
     backdrop.dispatchEvent(new MouseEvent('click', { bubbles: true }));
     return (document.getElementById('m1') as HTMLElement).hidden === true;
@@ -75,11 +75,11 @@ export function tabsModalCoreRules(mod: Core): Rules {
     document.body.replaceChildren(document.createRange().createContextualFragment(PAGE_V1B));
     let n = 0;
     const count = () => n++;
-    document.addEventListener('dss:tabchange', count);
+    document.addEventListener('hoops:tabchange', count);
     const first = mod.initAll(document);
     const second = mod.initAll(document);
     key('a-alle', 'ArrowRight');
-    document.removeEventListener('dss:tabchange', count);
+    document.removeEventListener('hoops:tabchange', count);
     const ok = n === 1;
     first.destroy();
     second.destroy();

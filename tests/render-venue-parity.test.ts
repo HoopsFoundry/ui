@@ -51,13 +51,13 @@ describe('VenueCard: renderVenueCard gegen Svelte und React', () => {
   it('ohne mapActive ist „Karte laden“ gesperrt, sonst unverändert', () => {
     const off = renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 } as never);
     const on = renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 } as never, { mapActive: true });
-    expect(off).toContain('dss-map-load" disabled aria-disabled="true">Karte laden');
-    expect(on).toContain('dss-map-load">Karte laden');
+    expect(off).toContain('hoops-map-load" disabled aria-disabled="true">Karte laden');
+    expect(on).toContain('hoops-map-load">Karte laden');
     expect(off.replace(' disabled aria-disabled="true"', '')).toBe(on);
   });
   it('limit: höchstens 5, ohne beendete und Spielfrei', () => {
     const many = Array.from({ length: 9 }, (_v, i) => ({ id: `s${i}`, state: i === 0 ? 'finished' : i === 1 ? 'bye' : 'scheduled', heim: { name: `Heim ${i}` }, gast: { name: `Gast ${i}` } }));
-    const count = (html: string) => (html.match(/class="dss-venue-game"/g) ?? []).length;
+    const count = (html: string) => (html.match(/class="hoops-venue-game"/g) ?? []).length;
     expect(count(renderVenueCard({ name: 'H', games: many } as never))).toBe(2);
     expect(count(renderVenueCard({ name: 'H', games: many, limit: 99 } as never))).toBe(5);
     expect(renderVenueCard({ name: 'H', games: many, limit: 5 } as never)).not.toContain('Heim 0');

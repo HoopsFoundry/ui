@@ -1,13 +1,13 @@
 // Beispiel-Portalseite ohne Build: Vereinsseite (index.html) und Teamseite (team.html) aus einem JSON-Datensatz.
 // Das Seitenlayout steht im HTML, alle Bausteine kommen aus den Funktionen des Pakets (mountX, initAll). Tabs und Dialog haben keine
 // Render-Funktion im Paket; die kleinen Hilfen dafür unten setzen ihre Texte über esc/attr aus den Daten zusammen.
-import { initAll, checkVersion, VERSION as CORE_VERSION } from './dss/dss.min.js';
-import { esc, attr, mountLeagueCard, mountTeamCard, mountScheduleTable, mountTable, mountVenueCard, VERSION as RENDER_VERSION } from './dss/dss-render.min.js';
-import { initMap, VERSION as MAP_VERSION } from './dss/dss-map.min.js';
+import { initAll, checkVersion, VERSION as CORE_VERSION } from './hoops/hoops.min.js';
+import { esc, attr, mountLeagueCard, mountTeamCard, mountScheduleTable, mountTable, mountVenueCard, VERSION as RENDER_VERSION } from './hoops/hoops-render.min.js';
+import { initMap, VERSION as MAP_VERSION } from './hoops/hoops-map.min.js';
 
 const meta = (name) => document.querySelector(`meta[name="${name}"]`)?.getAttribute('content') ?? '';
-const tileUrl = meta('dss-tile-url');
-const page = meta('dss-page');
+const tileUrl = meta('hoops-tile-url');
+const page = meta('hoops-page');
 // Leaflet kommt aus einer lokalen Datei und wird erst nach dem Klick auf „Karte laden“ geladen (vorher kein Netzverkehr)
 const loadLeaflet = () => import('./vendor/leaflet/leaflet-src.esm.js');
 
@@ -35,24 +35,24 @@ function block(parent, id, heading) {
 
 /** Tabs mit Panels aus Daten: `[{ id, label, count }]`; liefert die Panels nach id. */
 function tabs(parent, { id, label, items, style = 'segmented' }) {
-  const bar = items.map((item, i) => `<button type="button" class="dss-tab${i === 0 ? ' is-active' : ''}" role="tab" id="${attr(id)}-${attr(item.id)}" aria-selected="${i === 0}" aria-controls="${attr(id)}-${attr(item.id)}-panel" tabindex="${i === 0 ? 0 : -1}"><span class="dss-tab-label">${esc(item.label)}</span>${item.count === undefined ? '' : `<span class="dss-tab-count">${esc(item.count)}</span>`}</button>`).join('');
+  const bar = items.map((item, i) => `<button type="button" class="hoops-tab${i === 0 ? ' is-active' : ''}" role="tab" id="${attr(id)}-${attr(item.id)}" aria-selected="${i === 0}" aria-controls="${attr(id)}-${attr(item.id)}-panel" tabindex="${i === 0 ? 0 : -1}"><span class="hoops-tab-label">${esc(item.label)}</span>${item.count === undefined ? '' : `<span class="hoops-tab-count">${esc(item.count)}</span>`}</button>`).join('');
   const panels = items.map((item, i) => `<div id="${attr(id)}-${attr(item.id)}-panel" role="tabpanel" aria-labelledby="${attr(id)}-${attr(item.id)}" tabindex="0"${i === 0 ? '' : ' hidden inert'}></div>`).join('');
   const holder = document.createElement('div');
   holder.className = 'portal-body';
   parent.append(holder);
-  setMarkup(holder, `<div class="dss-tabs dss-tabs--${attr(style)} dss-tabs--md" role="tablist" aria-label="${attr(label)}" data-dss="tabs">${bar}</div>${panels}`);
+  setMarkup(holder, `<div class="hoops-tabs hoops-tabs--${attr(style)} hoops-tabs--md" role="tablist" aria-label="${attr(label)}" data-hoops="tabs">${bar}</div>${panels}`);
   return Object.fromEntries(items.map((item) => [item.id, holder.querySelector(`#${CSS.escape(`${id}-${item.id}-panel`)}`)]));
 }
 
-/** Dialog „Fehler melden“ (natives <dialog>); initAll startet ihn über data-dss="modal". */
+/** Dialog „Fehler melden“ (natives <dialog>); initAll startet ihn über data-hoops="modal". */
 function reportDialog(parent) {
   const holder = document.createElement('div');
   parent.append(holder);
-  setMarkup(holder, `<dialog class="dss-modal-dialog" id="fehler-melden" data-dss="modal" aria-labelledby="fehler-titel"><div class="dss-modal">
-  <div class="dss-m-head"><div class="dss-m-head-text"><h2 class="dss-m-title" id="fehler-titel">Fehler melden</h2><div class="dss-m-subtitle">Falsche Angabe auf dieser Seite?</div></div>
-  <button type="button" class="dss-m-close" aria-label="Schließen">${CLOSE_ICON}</button></div>
-  <div class="dss-m-body"><div class="portal-form"><label for="fehler-text">Was stimmt nicht?</label><textarea id="fehler-text" name="text" rows="4"></textarea></div></div>
-  <div class="dss-m-footer"><button type="button" class="dss-btn dss-btn--secondary dss-btn--md" data-dss-modal-close>Abbrechen</button><button type="button" class="dss-btn dss-btn--primary dss-btn--md" data-dss-modal-close>Senden</button></div>
+  setMarkup(holder, `<dialog class="hoops-modal-dialog" id="fehler-melden" data-hoops="modal" aria-labelledby="fehler-titel"><div class="hoops-modal">
+  <div class="hoops-m-head"><div class="hoops-m-head-text"><h2 class="hoops-m-title" id="fehler-titel">Fehler melden</h2><div class="hoops-m-subtitle">Falsche Angabe auf dieser Seite?</div></div>
+  <button type="button" class="hoops-m-close" aria-label="Schließen">${CLOSE_ICON}</button></div>
+  <div class="hoops-m-body"><div class="portal-form"><label for="fehler-text">Was stimmt nicht?</label><textarea id="fehler-text" name="text" rows="4"></textarea></div></div>
+  <div class="hoops-m-footer"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--md" data-hoops-modal-close>Abbrechen</button><button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md" data-hoops-modal-close>Senden</button></div>
 </div></dialog>`);
 }
 
@@ -111,14 +111,14 @@ async function main() {
   }
   reportDialog(document.getElementById('dialoge'));
   // der Knopf „Fehler melden“ ist ohne JavaScript verborgen und erscheint erst, wenn der Dialog da ist
-  for (const button of document.querySelectorAll('[data-dss-modal-open]')) button.hidden = false;
+  for (const button of document.querySelectorAll('[data-hoops-modal-open]')) button.hidden = false;
 
   // Danach das Verhalten: Seitennavigation, Tabs, Dialog, Theme-Umschalter, Nach oben, Accordion der einklappbaren Karten
   const dss = initAll(document);
   const versions = { core: CORE_VERSION, render: RENDER_VERSION, map: MAP_VERSION, css: checkVersion().css };
   const same = new Set(Object.values(versions)).size === 1;
-  document.documentElement.setAttribute('data-dss-versions', same ? versions.core : `abweichend: ${JSON.stringify(versions)}`);
-  if (!same) console.warn('DSS: Versionen passen nicht zusammen', versions);
+  document.documentElement.setAttribute('data-hoops-versions', same ? versions.core : `abweichend: ${JSON.stringify(versions)}`);
+  if (!same) console.warn('HoopsFoundry UI: Versionen passen nicht zusammen', versions);
   window.__portal = { dss, versions };
   document.documentElement.setAttribute('data-portal', 'ready');
 }

@@ -33,7 +33,7 @@ Eine laufende Karte zeigt im Kopf „Live · 3. Viertel 06:40“. Die Props: `pe
 
 <Canvas of={CardLibraryStories.Spielabschnitte} />
 
-**`quarter` ist veraltet.** Bestehender Code mit `quarter="Q4"` läuft weiter: Ohne `period` wird der Text unverändert angezeigt. Ist `period` gesetzt, gewinnt es. Die Berechnung steht in `@bbv/dss-design-system/periods.js` (`periodLabel`, `periodShort`, `resolvePeriod`), damit Svelte und React gleich entscheiden; auch [PlayByPlay](?path=/docs/components-playbyplay--docs) nutzt sie.
+**`quarter` ist veraltet.** Bestehender Code mit `quarter="Q4"` läuft weiter: Ohne `period` wird der Text unverändert angezeigt. Ist `period` gesetzt, gewinnt es. Die Berechnung steht in `@hoopsfoundry/ui/periods.js` (`periodLabel`, `periodShort`, `resolvePeriod`), damit Svelte und React gleich entscheiden; auch [PlayByPlay](?path=/docs/components-playbyplay--docs) nutzt sie.
 
 ## Kurznamen und Logos
 
@@ -46,16 +46,16 @@ Auf schmalen Karten brechen lange Vereinsnamen oder werden mit Auslassungspunkte
 
 <Canvas of={CardLibraryStories.KartenLogos} />
 
-Das Logo ist dekorativ (`alt=""`, `aria-hidden`), weil der Name daneben steht. Der Kurzname ist `aria-hidden`; wo er sichtbar ist, bleibt der volle Name unsichtbar im Dokument (`dss-sr-only`-Muster), sodass Screenreader den vollen Namen genau einmal lesen; auch der Name einer Karte als Link oder Button enthält den vollen Namen. Der sichtbare Kurzname zeigt den vollen Namen als Tooltip (`title`), der versteckte volle Name ist nicht markierbar, Kopieren liefert nur den sichtbaren Namen. **Label im Namen (WCAG 2.5.3):** Ein abgekürzter Kurzname wie „TSV N.“ steckt nicht im zugänglichen Namen „TSV Nordhain 1920“; Sprachsteuerung („Klick TSV N.“) greift dann nicht. Wähle Kurznamen deshalb so, dass sie Teil des vollen Namens sind („Hawks“, „Seeberg“) oder dessen Anfang bilden. Ohne `short` ändert sich nichts.
+Das Logo ist dekorativ (`alt=""`, `aria-hidden`), weil der Name daneben steht. Der Kurzname ist `aria-hidden`; wo er sichtbar ist, bleibt der volle Name unsichtbar im Dokument (`hoops-sr-only`-Muster), sodass Screenreader den vollen Namen genau einmal lesen; auch der Name einer Karte als Link oder Button enthält den vollen Namen. Der sichtbare Kurzname zeigt den vollen Namen als Tooltip (`title`), der versteckte volle Name ist nicht markierbar, Kopieren liefert nur den sichtbaren Namen. **Label im Namen (WCAG 2.5.3):** Ein abgekürzter Kurzname wie „TSV N.“ steckt nicht im zugänglichen Namen „TSV Nordhain 1920“; Sprachsteuerung („Klick TSV N.“) greift dann nicht. Wähle Kurznamen deshalb so, dass sie Teil des vollen Namens sind („Hawks“, „Seeberg“) oder dessen Anfang bilden. Ohne `short` ändert sich nichts.
 
 ### Handy · 390 px Breite
 
 Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass `names` gesetzt ist: Der Kurzname erscheint automatisch.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">MatchCard · logos</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: MatchCard mit Logos">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">MatchCard · logos</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: MatchCard mit Logos">
       <iframe title="Handy-Vorschau: Spielkarte mit Kurznamen und Logos in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-card-library--karten-namen-handy" loading="lazy" />
     </div>
   </div>
@@ -83,10 +83,10 @@ Ohne `photo`, mit leerem `photo` oder wenn das Bild nicht lädt, erscheint wiede
 
 <Canvas of={CardLibraryStories.SpielerkartenFotoFallback} />
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">PlayerCard · hero mit Foto</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PlayerCard hero mit Foto">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">PlayerCard · hero mit Foto</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PlayerCard hero mit Foto">
       <iframe title="Handy-Vorschau: Spielerkarte hero mit Foto in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-card-library--spielerkarten-foto-handy" loading="lazy" />
     </div>
   </div>
@@ -108,7 +108,7 @@ Shimmer-Platzhalter nehmen die Struktur der späteren Komponente ein, damit es b
 
 <Canvas of={CardLibraryStories.Ladezustaende} />
 
-Der Glanz läuft als Animation (`dss-skel-shimmer`, 1,4 s); bei `prefers-reduced-motion: reduce` steht sie still. Die Platzhalter sind für Screenreader verborgen (`aria-hidden`), ein einzelner Status-Text (`role="status"`, Standard „Lädt …“) meldet das Laden. Mit `label=""` entfällt er, wenn mehrere Skeletons auf einer Seite stehen.
+Der Glanz läuft als Animation (`hoops-skel-shimmer`, 1,4 s); bei `prefers-reduced-motion: reduce` steht sie still. Die Platzhalter sind für Screenreader verborgen (`aria-hidden`), ein einzelner Status-Text (`role="status"`, Standard „Lädt …“) meldet das Laden. Mit `label=""` entfällt er, wenn mehrere Skeletons auf einer Seite stehen.
 
 Die Muster haben die Struktur der Zielkomponente, aber nicht ihre genaue Höhe: `match` ist 108 px hoch, eine Spielkarte mit Halle etwa 164 px; `row` ist 70 px hoch, die kompakte Spielerzeile 60 px. Reserviere bei Listen deshalb die Höhe des Containers. Die Bausteine `line`, `block` und `circle` brauchen `width` und `height`: mit dem Standard `auto` haben sie keine Höhe und bleiben unsichtbar.
 

@@ -27,7 +27,7 @@
 
   // Erzwingt einen Zustand auf dem Wurzelelement der Karte (die Svelte-Karten haben keine class-Prop)
   function mark(node: HTMLElement, cls: string) {
-    const target = node.querySelector<HTMLElement>('.dss-match, .dss-pc-row');
+    const target = node.querySelector<HTMLElement>('.hoops-match, .hoops-pc-row');
     if (cls && target) target.classList.add(...cls.split(' '));
   }
 
@@ -266,7 +266,7 @@
   .narrow { width: 100%; max-width: 380px; }
   .read { margin: 8px 2px 0; font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }
   /* Gegenbeispiel: Das Bild zeigt nur einen Ausschnitt aus dem Hintergrund (oben links), kein Gesicht */
-  .bad-crop :global(.dss-pc-img) { object-fit: none; object-position: 0% 0%; }
+  .bad-crop :global(.hoops-pc-img) { object-fit: none; object-position: 0% 0%; }
   .gap { height: 10px; }
   .gap-s { height: 8px; }
   .cap, .colhead, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }

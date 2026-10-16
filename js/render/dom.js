@@ -1,5 +1,5 @@
 /**
- * DSS Render · DOM-Hilfen ohne Abhängigkeiten
+ * HoopsFoundry UI Render · DOM-Hilfen ohne Abhängigkeiten
  * --------------------------------------------------------------
  * Gemeinsam für `mount` (js/render/mount.js) und `mountMap`/`initMap` (js/map-vanilla.js): Markup über `Range.createContextualFragment`
  * einsetzen (nie über eine HTML-Eigenschaft), Styles nach dem Einsetzen über das CSSOM anwenden (CSP `style-src` ohne `unsafe-inline`),
@@ -8,7 +8,7 @@
  */
 
 // Zähler für erzeugte Kennungen: einer je Seite über alle Kopien des Moduls (Symbol.for), damit zwei Bündel keine gleiche id vergeben
-const COUNTER = Symbol.for('dss.render.counter');
+const COUNTER = Symbol.for('hoops.render.counter');
 export const nextUid = () => {
   const store = (globalThis[COUNTER] ??= { n: 0 });
   store.n += 1;
@@ -19,8 +19,8 @@ export const nextUid = () => {
 const STYLE_PROPS = new Set(['left', 'top', 'width', '--hoops-map-h']);
 const STYLE_ATTR = /\sstyle="([^"]*)"/g;
 
-/** Ersetzt `style="…"` im Markup durch `data-dss-style="…"`: das Attribut wird nach dem Einsetzen über das CSSOM angewendet (CSP `style-src`). */
-export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style="$1"');
+/** Ersetzt `style="…"` im Markup durch `data-hoops-style="…"`: das Attribut wird nach dem Einsetzen über das CSSOM angewendet (CSP `style-src`). */
+export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-hoops-style="$1"');
 
 /** Schreibt die Angaben aus `text` (`left:10%;top:20%`) über das CSSOM an `el`: nur bekannte Eigenschaften, nur schlichte Werte. */
 function setDeclarations(el, text) {
@@ -33,11 +33,11 @@ function setDeclarations(el, text) {
   }
 }
 
-/** Wendet `data-dss-style` über `style.setProperty` an (nur bekannte Eigenschaften) und entfernt das Attribut. */
+/** Wendet `data-hoops-style` über `style.setProperty` an (nur bekannte Eigenschaften) und entfernt das Attribut. */
 export function applyStyles(host) {
-  for (const el of host.querySelectorAll('[data-dss-style]')) {
-    setDeclarations(el, el.getAttribute('data-dss-style'));
-    el.removeAttribute('data-dss-style');
+  for (const el of host.querySelectorAll('[data-hoops-style]')) {
+    setDeclarations(el, el.getAttribute('data-hoops-style'));
+    el.removeAttribute('data-hoops-style');
   }
 }
 

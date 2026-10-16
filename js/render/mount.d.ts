@@ -1,4 +1,4 @@
-import type { DssHandle } from '../lifecycle.js';
+import type { HoopsHandle } from '../lifecycle.js';
 import type { RenderOptions } from './core.js';
 
 /** Ein delegiertes Ereignis am Container (z. B. der Klick einer Karte). */
@@ -15,7 +15,7 @@ export interface MountOptions extends RenderOptions {
 }
 
 /** Rückgabe von `mountX`. */
-export interface MountHandle<P = Record<string, unknown>> extends DssHandle {
+export interface MountHandle<P = Record<string, unknown>> extends HoopsHandle {
   /**
    * Ersetzt den Inhalt durch das Markup zu den neuen Eigenschaften; der Fokus und der Zustand eines einklappbaren Rahmens bleiben erhalten.
    * `props` sind die **vollständigen** Eigenschaften (wie ein erneutes Rendern), keine Änderungen: Fehlendes gilt als nicht angegeben.

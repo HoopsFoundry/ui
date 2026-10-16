@@ -1,11 +1,11 @@
 <script lang="ts">
   /**
-   * DSS LeagueCard (Ligencard) · Svelte 5
+   * HoopsFoundry UI LeagueCard (Ligencard) · Svelte 5
    * --------------------------------------------------------------
    * Mini-Tabelle einer Liga in einer Karte: Titel, Untertitel („12 Teams · 15 von 132 Spielen gespielt“), Tabelle mit
    * Platz, Mannschaft, SP und PKT (optional S, N, Diff, Form) und ein Link zur kompletten Tabelle. Zeigt einen Ausschnitt:
    * mit eigener Mannschaft (`own: true`) zwei davor, die eigene und eine dahinter, sonst die ersten `limit`
-   * (Regeln: js/league.js). Nutzt nur Klassen aus css/components.css (`dss-league*`, `dss-tbl`).
+   * (Regeln: js/league.js). Nutzt nur Klassen aus css/components.css (`hoops-league*`, `hoops-tbl`).
    *
    *   standard — Zeilen 60 px, mit Untertitel
    *   compact  — Zeilen 40 px, ohne Untertitel, kleinerer Titel (für Seitenleisten)
@@ -86,7 +86,7 @@
   const heading = useHeadingTag(() => titleAs);
   // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
   $inspect(collapsible && !title).with((_type, missing) => {
-    if (missing) console.warn('[DSS] LeagueCard: `collapsible` braucht einen `title`, sonst bleibt die Karte unverändert.');
+    if (missing) console.warn('[HoopsFoundry UI] LeagueCard: `collapsible` braucht einen `title`, sonst bleibt die Karte unverändert.');
   });
 
   const rows = $derived(leagueWindow(teams, { limit }));
@@ -103,51 +103,51 @@
 
 {#snippet nameText(t: LeagueTeam)}
   {@const kurz = shortName(t)}
-  {#if kurz}<span class="dss-team-name" class:dss-team-name--short={names === 'short'}><span class="dss-name-full">{t.name}</span><span class="dss-name-short" aria-hidden="true" title={t.name}>{kurz}</span></span>{:else}{t.name}{/if}
+  {#if kurz}<span class="hoops-team-name" class:hoops-team-name--short={names === 'short'}><span class="hoops-name-full">{t.name}</span><span class="hoops-name-short" aria-hidden="true" title={t.name}>{kurz}</span></span>{:else}{t.name}{/if}
 {/snippet}
 
 {#snippet liveMeta()}
-  <span class="dss-league-live"><span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag?.text}<span class="dss-league-live-n">{liveTag.text}</span>{/if}</span>
+  <span class="hoops-league-live"><span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag?.text}<span class="hoops-league-live-n">{liveTag.text}</span>{/if}</span>
 {/snippet}
 
 {#snippet panel()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
-  <div class="dss-table-scroll dss-league-scroll" role="region" tabindex="0" aria-label={title ? `Tabelle: ${title}` : 'Tabelle'}>
-    <table class={`dss-tbl dss-tbl--${size === 'compact' ? 'compact' : 'touch'} dss-league-tbl`}>
-      {#if caption}<caption class="dss-sr-only">{caption}</caption>{/if}
+  <div class="hoops-table-scroll hoops-league-scroll" role="region" tabindex="0" aria-label={title ? `Tabelle: ${title}` : 'Tabelle'}>
+    <table class={`hoops-tbl hoops-tbl--${size === 'compact' ? 'compact' : 'touch'} hoops-league-tbl`}>
+      {#if caption}<caption class="hoops-sr-only">{caption}</caption>{/if}
       <thead>
         <tr>
-          <th scope="col" class="dss-league-rank"><span aria-hidden="true">#</span><span class="dss-sr-only">Platz</span></th>
+          <th scope="col" class="hoops-league-rank"><span aria-hidden="true">#</span><span class="hoops-sr-only">Platz</span></th>
           <th scope="col">Mannschaft</th>
-          <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="dss-sr-only">Spiele</span></th>
-          {#if wantsWon}<th scope="col" class="num dss-league-opt"><span aria-hidden="true">S</span><span class="dss-sr-only">Siege</span></th>{/if}
-          {#if wantsLost}<th scope="col" class="num dss-league-opt"><span aria-hidden="true">N</span><span class="dss-sr-only">Niederlagen</span></th>{/if}
-          {#if wantsDiff}<th scope="col" class="num dss-league-opt"><span aria-hidden="true">Diff</span><span class="dss-sr-only">Korbdifferenz</span></th>{/if}
-          <th scope="col" class="num dss-league-pts"><span aria-hidden="true">PKT</span><span class="dss-sr-only">Punkte</span></th>
-          {#if wantsForm}<th scope="col" class="dss-league-opt">Form</th>{/if}
+          <th scope="col" class="num"><span aria-hidden="true">SP</span><span class="hoops-sr-only">Spiele</span></th>
+          {#if wantsWon}<th scope="col" class="num hoops-league-opt"><span aria-hidden="true">S</span><span class="hoops-sr-only">Siege</span></th>{/if}
+          {#if wantsLost}<th scope="col" class="num hoops-league-opt"><span aria-hidden="true">N</span><span class="hoops-sr-only">Niederlagen</span></th>{/if}
+          {#if wantsDiff}<th scope="col" class="num hoops-league-opt"><span aria-hidden="true">Diff</span><span class="hoops-sr-only">Korbdifferenz</span></th>{/if}
+          <th scope="col" class="num hoops-league-pts"><span aria-hidden="true">PKT</span><span class="hoops-sr-only">Punkte</span></th>
+          {#if wantsForm}<th scope="col" class="hoops-league-opt">Form</th>{/if}
         </tr>
       </thead>
       <tbody>
         {#each rows as t, i (i)}
           {@const zone = zoneInfo(t.zone)}
           {@const sign = diffSign(t.diff)}
-          <tr class={`${t.own ? 'is-own' : ''}${zone ? ` dss-league-zone dss-league-zone--${zone.zone}` : ''}`.trim() || undefined}>
-            <td class="dss-league-rank">{rankText(t.rank)}</td>
-            <td class="dss-league-team">
-              <span class="dss-league-who">
-                {#if logos}<span class="dss-team-logo" class:dss-team-logo--initials={!t.logo} aria-hidden="true">{#if t.logo}<img src={t.logo} alt="" loading="lazy" />{:else}{initials(t.name, 2)}{/if}</span>{/if}
-                {#if t.href}<a class="dss-link dss-league-link" href={t.href}>{@render nameText(t)}</a>{:else}{@render nameText(t)}{/if}
-                {#if t.own}<span class="dss-sr-only">, eigene Mannschaft</span>{/if}
-                {#if zone}<span class="dss-sr-only">, {zone.row}</span>{/if}
+          <tr class={`${t.own ? 'is-own' : ''}${zone ? ` hoops-league-zone hoops-league-zone--${zone.zone}` : ''}`.trim() || undefined}>
+            <td class="hoops-league-rank">{rankText(t.rank)}</td>
+            <td class="hoops-league-team">
+              <span class="hoops-league-who">
+                {#if logos}<span class="hoops-team-logo" class:hoops-team-logo--initials={!t.logo} aria-hidden="true">{#if t.logo}<img src={t.logo} alt="" loading="lazy" />{:else}{initials(t.name, 2)}{/if}</span>{/if}
+                {#if t.href}<a class="hoops-link hoops-league-link" href={t.href}>{@render nameText(t)}</a>{:else}{@render nameText(t)}{/if}
+                {#if t.own}<span class="hoops-sr-only">, eigene Mannschaft</span>{/if}
+                {#if zone}<span class="hoops-sr-only">, {zone.row}</span>{/if}
               </span>
             </td>
             <td class="num">{cellNumber(t.played)}</td>
-            {#if wantsWon}<td class="num dss-league-opt">{cellNumber(t.won)}</td>{/if}
-            {#if wantsLost}<td class="num dss-league-opt">{cellNumber(t.lost)}</td>{/if}
-            {#if wantsDiff}<td class={`num dss-league-opt${sign ? ` ${sign}` : ''}`}>{diffText(t.diff)}</td>{/if}
-            <td class="num lead dss-league-pts">{cellNumber(t.points)}</td>
+            {#if wantsWon}<td class="num hoops-league-opt">{cellNumber(t.won)}</td>{/if}
+            {#if wantsLost}<td class="num hoops-league-opt">{cellNumber(t.lost)}</td>{/if}
+            {#if wantsDiff}<td class={`num hoops-league-opt${sign ? ` ${sign}` : ''}`}>{diffText(t.diff)}</td>{/if}
+            <td class="num lead hoops-league-pts">{cellNumber(t.points)}</td>
             {#if wantsForm}
-              <td class="dss-league-opt">
+              <td class="hoops-league-opt">
                 <FormChips form={t.form ?? []} />
               </td>
             {/if}
@@ -158,29 +158,29 @@
   </div>
 
   {#if legend.length}
-    <ul class="dss-league-legend" aria-label="Legende">
-      {#each legend as z (z.zone)}<li><span class={`dss-league-key dss-league-key--${z.zone}`} aria-hidden="true"></span>{z.legend}</li>{/each}
+    <ul class="hoops-league-legend" aria-label="Legende">
+      {#each legend as z (z.zone)}<li><span class={`hoops-league-key hoops-league-key--${z.zone}`} aria-hidden="true"></span>{z.legend}</li>{/each}
     </ul>
   {/if}
 
   {#if href}
-    <div class="dss-league-foot"><a class="dss-link dss-league-more" {href}>{linkLabel}<span class="dss-sr-only">, {title}</span></a></div>
+    <div class="hoops-league-foot"><a class="hoops-link hoops-league-more" {href}>{linkLabel}<span class="hoops-sr-only">, {title}</span></a></div>
   {/if}
 {/snippet}
 
 {#if collapsible && title}
-  <CollapsibleFrame kind="league" rootClass={`dss-league${size === 'compact' ? ' dss-league--compact' : ''}${klass ? ` ${klass}` : ''}`} {id} {title} sub={summary} {titleAs} bind:open meta={liveTag ? liveMeta : undefined}>
+  <CollapsibleFrame kind="league" rootClass={`hoops-league${size === 'compact' ? ' hoops-league--compact' : ''}${klass ? ` ${klass}` : ''}`} {id} {title} sub={summary} {titleAs} bind:open meta={liveTag ? liveMeta : undefined}>
     {@render panel()}
   </CollapsibleFrame>
 {:else}
-<div class={`dss-league${size === 'compact' ? ' dss-league--compact' : ''}${klass ? ` ${klass}` : ''}`}>
-  <div class="dss-league-head">
-    <div class="dss-league-heading">
-      <svelte:element this={heading.tag} class="dss-league-title">{title}</svelte:element>
-      {#if summary}<p class="dss-league-sub">{summary}</p>{/if}
+<div class={`hoops-league${size === 'compact' ? ' hoops-league--compact' : ''}${klass ? ` ${klass}` : ''}`}>
+  <div class="hoops-league-head">
+    <div class="hoops-league-heading">
+      <svelte:element this={heading.tag} class="hoops-league-title">{title}</svelte:element>
+      {#if summary}<p class="hoops-league-sub">{summary}</p>{/if}
     </div>
     {#if liveTag}
-      <span class="dss-league-live"><span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag.text}<span class="dss-league-live-n">{liveTag.text}</span>{/if}</span>
+      <span class="hoops-league-live"><span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span>Live</span>{#if liveTag.text}<span class="hoops-league-live-n">{liveTag.text}</span>{/if}</span>
     {/if}
   </div>
 

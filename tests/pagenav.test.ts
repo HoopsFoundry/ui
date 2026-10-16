@@ -8,8 +8,8 @@ const mount = (html: string) => {
   return document.querySelector<HTMLElement>('main')!;
 };
 const $ = <T extends Element = HTMLElement>(sel: string) => document.querySelector<T>(sel)!;
-const nav = () => document.querySelector<HTMLElement>('nav.dss-pagenav');
-const links = () => [...document.querySelectorAll<HTMLAnchorElement>('.dss-pagenav-link')];
+const nav = () => document.querySelector<HTMLElement>('nav.hoops-pagenav');
+const links = () => [...document.querySelectorAll<HTMLAnchorElement>('.hoops-pagenav-link')];
 const PAGE = `<main><h1>Verein</h1><div id="content"><section><h2>Tabelle</h2><p>a</p></section><section><h2>Spielplan</h2></section><section><h2>Kader</h2></section></div></main>`;
 
 let scrolls: { el: Element; arg: unknown }[] = [];
@@ -90,14 +90,14 @@ describe('Aufbau', () => {
     handle = initPageNav(mount(PAGE));
     const id = nav()!.getAttribute('aria-labelledby')!;
     expect(document.getElementById(id)!.textContent).toBe('Auf dieser Seite');
-    expect(document.getElementById(id)!.classList.contains('dss-eyebrow')).toBe(true);
+    expect(document.getElementById(id)!.classList.contains('hoops-eyebrow')).toBe(true);
     expect(nav()!.hasAttribute('aria-label')).toBe(false);
   });
   it('label ändert Text und Namen; zwei Navigationen mit verschiedenen Namen bleiben eindeutig', () => {
     mount(`<main><section id="a"><h2>A1</h2><h2>A2</h2><h2>A3</h2></section><section id="b"><h2>B1</h2><h2>B2</h2><h2>B3</h2></section></main>`);
     const h1 = initPageNav($('#a'), { label: 'Im Abschnitt A' });
     const h2 = initPageNav($('#b'), { label: 'Im Abschnitt B' });
-    const names = [...document.querySelectorAll('nav.dss-pagenav')].map((n) => document.getElementById(n.getAttribute('aria-labelledby')!)!.textContent);
+    const names = [...document.querySelectorAll('nav.hoops-pagenav')].map((n) => document.getElementById(n.getAttribute('aria-labelledby')!)!.textContent);
     expect(names).toEqual(['Im Abschnitt A', 'Im Abschnitt B']);
     // gleiche ids der Beschriftungen kommen nicht vor
     const ids = [...document.querySelectorAll('[id]')].map((e) => e.id);
@@ -198,7 +198,7 @@ describe('Nachladen', () => {
     await vi.advanceTimersByTimeAsync(300);
     expect(nav()).not.toBe(first);
     expect(links()).toHaveLength(4);
-    expect(document.querySelectorAll('nav.dss-pagenav')).toHaveLength(1);
+    expect(document.querySelectorAll('nav.hoops-pagenav')).toHaveLength(1);
   });
   it('viele Änderungen hintereinander ergeben einen Aufbau', async () => {
     vi.useFakeTimers();
@@ -230,23 +230,23 @@ describe('Nachladen', () => {
 
 describe('Sprung', () => {
   const ACC = `<main><h1>Liga</h1>
-    <div class="dss-acc" data-dss-acc>
-      <div class="dss-acc-item" id="tabelle"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="tabelle-t" aria-expanded="false" aria-controls="tabelle-p"><span class="dss-acc-label">Tabelle</span></button></h3>
-        <div class="dss-acc-panel" id="tabelle-p" hidden inert><div class="dss-acc-body"><h2 id="stand">Stand</h2><p>x</p></div></div></div>
-      <div class="dss-acc-item" id="kader"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="kader-t" aria-expanded="false" aria-controls="kader-p"><span class="dss-acc-label">Kader</span></button></h3>
-        <div class="dss-acc-panel" id="kader-p" hidden inert><div class="dss-acc-body">
-          <div class="dss-acc dss-acc--nested" data-dss-acc>
-            <div class="dss-acc-item" id="guards"><h4 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="guards-t" aria-expanded="false" aria-controls="guards-p"><span class="dss-acc-label">Guards</span></button></h4>
-              <div class="dss-acc-panel" id="guards-p" hidden inert><div class="dss-acc-body"><h2>Tief drin</h2></div></div></div>
+    <div class="hoops-acc" data-hoops-acc>
+      <div class="hoops-acc-item" id="tabelle"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="tabelle-t" aria-expanded="false" aria-controls="tabelle-p"><span class="hoops-acc-label">Tabelle</span></button></h3>
+        <div class="hoops-acc-panel" id="tabelle-p" hidden inert><div class="hoops-acc-body"><h2 id="stand">Stand</h2><p>x</p></div></div></div>
+      <div class="hoops-acc-item" id="kader"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="kader-t" aria-expanded="false" aria-controls="kader-p"><span class="hoops-acc-label">Kader</span></button></h3>
+        <div class="hoops-acc-panel" id="kader-p" hidden inert><div class="hoops-acc-body">
+          <div class="hoops-acc hoops-acc--nested" data-hoops-acc>
+            <div class="hoops-acc-item" id="guards"><h4 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="guards-t" aria-expanded="false" aria-controls="guards-p"><span class="hoops-acc-label">Guards</span></button></h4>
+              <div class="hoops-acc-panel" id="guards-p" hidden inert><div class="hoops-acc-body"><h2>Tief drin</h2></div></div></div>
           </div></div></div></div>
-      <div class="dss-acc-item" id="gesperrt"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="gesperrt-t" aria-expanded="false" aria-disabled="true" aria-controls="gesperrt-p"><span class="dss-acc-label">Gesperrt</span></button></h3>
-        <div class="dss-acc-panel" id="gesperrt-p" hidden inert><div class="dss-acc-body"><h2>Unerreichbar</h2></div></div></div>
+      <div class="hoops-acc-item" id="gesperrt"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="gesperrt-t" aria-expanded="false" aria-disabled="true" aria-controls="gesperrt-p"><span class="hoops-acc-label">Gesperrt</span></button></h3>
+        <div class="hoops-acc-panel" id="gesperrt-p" hidden inert><div class="hoops-acc-body"><h2>Unerreichbar</h2></div></div></div>
     </div>
     <details id="d"><summary>Mehr</summary><h2>In details</h2></details>
     <h2>Offen sichtbar</h2></main>`;
   const setup = () => {
     mount(ACC);
-    const accs = [...document.querySelectorAll<HTMLElement>('[data-dss-acc]')].map((el) => initAccordion(el, { syncHash: false }));
+    const accs = [...document.querySelectorAll<HTMLElement>('[data-hoops-acc]')].map((el) => initAccordion(el, { syncHash: false }));
     handle = initPageNav($('main'));
     return accs;
   };
@@ -270,8 +270,8 @@ describe('Sprung', () => {
   });
   it('ein Bereich, der sich erst nach dem Klick öffnet (Svelte, React): der Fokus kommt im nächsten Frame an', () => {
     mount(`<main><h1>L</h1>
-      <div class="dss-acc-item" id="spaet"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="spaet-t" aria-expanded="false"><span class="dss-acc-label">Spät</span></button></h3>
-        <div class="dss-acc-panel" id="spaet-p" hidden inert><h2 id="drin">Drin</h2></div></div>
+      <div class="hoops-acc-item" id="spaet"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="spaet-t" aria-expanded="false"><span class="hoops-acc-label">Spät</span></button></h3>
+        <div class="hoops-acc-panel" id="spaet-p" hidden inert><h2 id="drin">Drin</h2></div></div>
       <h2>Zwei</h2><h2>Drei</h2></main>`);
     const queue: FrameRequestCallback[] = [];
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { queue.push(cb); return 0; });
@@ -337,7 +337,7 @@ describe('Sprung', () => {
   });
   it('ein Anker beim Laden auf ein Ziel in einem geschlossenen Bereich öffnet ihn; ein späterer hashchange ebenso', () => {
     mount(ACC);
-    const accs = [...document.querySelectorAll<HTMLElement>('[data-dss-acc]')].map((el) => initAccordion(el, { syncHash: false }));
+    const accs = [...document.querySelectorAll<HTMLElement>('[data-hoops-acc]')].map((el) => initAccordion(el, { syncHash: false }));
     window.history.replaceState(null, '', '/seite#stand');
     handle = initPageNav($('main'));
     expect($('#tabelle-t').getAttribute('aria-expanded')).toBe('true');
@@ -355,7 +355,7 @@ describe('Sprung', () => {
   });
   it('ein Anker auf einen Bereich selbst bleibt dem Accordion überlassen (kein doppeltes Öffnen)', () => {
     mount(ACC);
-    const accs = [...document.querySelectorAll<HTMLElement>('[data-dss-acc]')].map((el) => initAccordion(el, { syncHash: false }));
+    const accs = [...document.querySelectorAll<HTMLElement>('[data-hoops-acc]')].map((el) => initAccordion(el, { syncHash: false }));
     window.history.replaceState(null, '', '/seite#tabelle');
     handle = initPageNav($('main'));
     expect($('#tabelle-t').getAttribute('aria-expanded')).toBe('false');
@@ -371,8 +371,8 @@ describe('Sprung', () => {
 });
 
 describe('Sprung in Bereiche mit Höhenanimation', () => {
-  const ACC = `<main><h1>L</h1><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false"><span class="dss-acc-label">A</span></button></h3>
-    <div class="dss-acc-panel" id="a-p" hidden inert style="transition-duration: 200ms"><div class="dss-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>`;
+  const ACC = `<main><h1>L</h1><div class="hoops-acc-item" id="a"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="a-t" aria-expanded="false"><span class="hoops-acc-label">A</span></button></h3>
+    <div class="hoops-acc-panel" id="a-p" hidden inert style="transition-duration: 200ms"><div class="hoops-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>`;
   const open = () => $('#a-t').addEventListener('click', () => { $('#a-p').removeAttribute('hidden'); $('#a-p').removeAttribute('inert'); $('#a-t').setAttribute('aria-expanded', 'true'); });
   const go = () => links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
 
@@ -508,7 +508,7 @@ describe('Aufräumen und Idempotenz', () => {
     const main = mount(PAGE);
     initPageNav(main);
     handle = initPageNav(main, { label: 'Neu' });
-    expect(document.querySelectorAll('nav.dss-pagenav')).toHaveLength(1);
+    expect(document.querySelectorAll('nav.hoops-pagenav')).toHaveLength(1);
     expect(document.getElementById(nav()!.getAttribute('aria-labelledby')!)!.textContent).toBe('Neu');
     expect(links().map((a) => a.getAttribute('href')!.split('#')[1])).toEqual(['abschnitt-tabelle', 'abschnitt-spielplan', 'abschnitt-kader']);
   });
@@ -540,6 +540,6 @@ describe('Sicherheit', () => {
   it('label wird als Text gesetzt, nie als HTML', () => {
     handle = initPageNav(mount(PAGE), { label: '<b>x</b><img src=x onerror=alert(1)>' });
     expect(nav()!.querySelector('b, img')).toBeNull();
-    expect($('.dss-pagenav .dss-eyebrow').textContent).toBe('<b>x</b><img src=x onerror=alert(1)>');
+    expect($('.hoops-pagenav .hoops-eyebrow').textContent).toBe('<b>x</b><img src=x onerror=alert(1)>');
   });
 });

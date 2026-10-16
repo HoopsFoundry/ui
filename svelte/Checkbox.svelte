@@ -4,9 +4,9 @@
 
 <script lang="ts">
   /**
-   * DSS Checkbox · Svelte 5
+   * HoopsFoundry UI Checkbox · Svelte 5
    * --------------------------------------------------------------
-   * Natives Kontrollkästchen im DSS-Look. Die Klickfläche ist das
+   * Natives Kontrollkästchen im HoopsFoundry-UI-Look. Die Klickfläche ist das
    * gesamte Label (≥ 44 px, `density="compact"` 36 px). Nutzt nur
    * die Klassen aus css/components.css.
    */
@@ -30,28 +30,28 @@
     onchange?: (checked: boolean) => void;
   } = $props();
 
-  const autoId = `dss-check-${++seq}`;
+  const autoId = `hoops-check-${++seq}`;
   const inputId = $derived(id ?? autoId);
 </script>
 
 <label
   for={inputId}
-  class="dss-check"
-  class:dss-check--compact={density === 'compact'}
+  class="hoops-check"
+  class:hoops-check--compact={density === 'compact'}
   class:is-disabled={disabled}
 >
   <input
     id={inputId}
     {name}
     type="checkbox"
-    class="dss-check-input"
+    class="hoops-check-input"
     bind:checked
     {disabled}
     aria-describedby={hint ? `${inputId}-hint` : undefined}
     onchange={() => onchange?.(checked)}
   />
-  <span class="dss-check-text">
-    <span class="dss-check-label">{label}</span>
-    {#if hint}<span id={`${inputId}-hint`} class="dss-check-hint">{hint}</span>{/if}
+  <span class="hoops-check-text">
+    <span class="hoops-check-label">{label}</span>
+    {#if hint}<span id={`${inputId}-hint`} class="hoops-check-hint">{hint}</span>{/if}
   </span>
 </label>

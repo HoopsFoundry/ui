@@ -1,78 +1,78 @@
 // Hallenkarte. Die Beispiele sind gegen die echten Komponenten geprüft (tests/venue-code.test.ts): Svelte per Server-Rendering, React per
 // TypeScript-Compiler, das Vanilla-Markup gegen die Ausgabe der Svelte- und der React-Fassung.
-export const vanilla = `<!-- Vanilla: die Hallenkarte ist reines Markup mit den Klassen dss-venue* (css/components.css); aus Daten erzeugt sie mountVenueCard
+export const vanilla = `<!-- Vanilla: die Hallenkarte ist reines Markup mit den Klassen hoops-venue* (css/components.css); aus Daten erzeugt sie mountVenueCard
      (Abschnitt „Vanilla: Hallenkarte aus Daten erzeugen“). Hier von Hand: Die Karte links ist die Map: statt der Komponente
-     schreibst du den Platzhalter der Karte selbst (dss-map*) und lädst Leaflet nach dem Klick auf „Karte laden“ (npm install leaflet, dazu leaflet.css).
+     schreibst du den Platzhalter der Karte selbst (hoops-map*) und lädst Leaflet nach dem Klick auf „Karte laden“ (npm install leaflet, dazu leaflet.css).
      Links tel: und mailto: baust du mit telHref() und mailHref(), die Links unter der Karte mit mapLinks() (map.js, venue.js). -->
-<div class="dss-venue dss-venue--standard dss-venue--map">
-  <div class="dss-venue-in">
-    <div class="dss-venue-map">
-      <div class="dss-map" data-state="idle" data-dim="true" data-tiles="dim" style="--hoops-map-h:250px">
-        <a class="dss-map-skip" href="#halle-karte-text">Karte überspringen</a>
-        <div class="dss-map-frame" role="region" aria-label="Karte: Sporthalle Nordhain">
-          <div class="dss-map-stage">
-            <div class="dss-map-ph">
-              <span class="dss-map-ph-pin" style="left:50%;top:29%" aria-hidden="true"></span>
-              <div class="dss-map-ph-card">
-                <p class="dss-map-note">Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.</p>
-                <button type="button" class="dss-btn dss-btn--primary dss-btn--md dss-map-load">Karte laden</button>
+<div class="hoops-venue hoops-venue--standard hoops-venue--map">
+  <div class="hoops-venue-in">
+    <div class="hoops-venue-map">
+      <div class="hoops-map" data-state="idle" data-dim="true" data-tiles="dim" style="--hoops-map-h:250px">
+        <a class="hoops-map-skip" href="#halle-karte-text">Karte überspringen</a>
+        <div class="hoops-map-frame" role="region" aria-label="Karte: Sporthalle Nordhain">
+          <div class="hoops-map-stage">
+            <div class="hoops-map-ph">
+              <span class="hoops-map-ph-pin" style="left:50%;top:29%" aria-hidden="true"></span>
+              <div class="hoops-map-ph-card">
+                <p class="hoops-map-note">Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.</p>
+                <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load">Karte laden</button>
               </div>
             </div>
-            <div class="dss-map-status" role="status"></div>
-            <p class="dss-map-attr"><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
+            <div class="hoops-map-status" role="status"></div>
+            <p class="hoops-map-attr"><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
           </div>
         </div>
-        <div class="dss-map-text is-quiet" id="halle-karte-text" tabindex="-1">
-          <ol class="dss-map-list" aria-label="Orte auf der Karte">
-            <li class="dss-map-item">
-              <div class="dss-map-item-body">
-                <p class="dss-map-name"><span>Sporthalle Nordhain</span></p>
-                <p class="dss-map-coords">49,3000° N, 7,9000° O</p>
+        <div class="hoops-map-text is-quiet" id="halle-karte-text" tabindex="-1">
+          <ol class="hoops-map-list" aria-label="Orte auf der Karte">
+            <li class="hoops-map-item">
+              <div class="hoops-map-item-body">
+                <p class="hoops-map-name"><span>Sporthalle Nordhain</span></p>
+                <p class="hoops-map-coords">49,3000° N, 7,9000° O</p>
               </div>
             </li>
           </ol>
         </div>
       </div>
-      <div class="dss-venue-maplinks">
-        <a class="dss-link" href="https://www.openstreetmap.org/?mlat=49.3&amp;mlon=7.9#map=17/49.3/7.9">Größere Karte<span class="dss-sr-only">, Sporthalle Nordhain</span></a>
-        <a class="dss-link" href="https://www.openstreetmap.org/directions?route=%3B49.3%2C7.9">Route planen<span class="dss-sr-only">, Sporthalle Nordhain</span></a>
+      <div class="hoops-venue-maplinks">
+        <a class="hoops-link" href="https://www.openstreetmap.org/?mlat=49.3&amp;mlon=7.9#map=17/49.3/7.9">Größere Karte<span class="hoops-sr-only">, Sporthalle Nordhain</span></a>
+        <a class="hoops-link" href="https://www.openstreetmap.org/directions?route=%3B49.3%2C7.9">Route planen<span class="hoops-sr-only">, Sporthalle Nordhain</span></a>
       </div>
     </div>
-    <div class="dss-venue-body">
-      <h3 class="dss-venue-title">Sporthalle Nordhain</h3>
-      <address class="dss-venue-address">
-        <span class="dss-venue-line">Am Sportpark 4</span>
-        <span class="dss-venue-line">12345 Nordhain</span>
+    <div class="hoops-venue-body">
+      <h3 class="hoops-venue-title">Sporthalle Nordhain</h3>
+      <address class="hoops-venue-address">
+        <span class="hoops-venue-line">Am Sportpark 4</span>
+        <span class="hoops-venue-line">12345 Nordhain</span>
       </address>
-      <p class="dss-venue-info">Zwei Spielfelder, Zugang über den Haupteingang.</p>
-      <dl class="dss-venue-contact">
+      <p class="hoops-venue-info">Zwei Spielfelder, Zugang über den Haupteingang.</p>
+      <dl class="hoops-venue-contact">
         <div><dt>Kontakt</dt><dd>Jonas Weide</dd></div>
-        <div><dt>Telefon</dt><dd><a class="dss-link" href="tel:03023125100">030 23125 100</a></dd></div>
-        <div><dt>E-Mail</dt><dd><a class="dss-link" href="mailto:hallenwart@example.org">hallenwart@example.org</a></dd></div>
+        <div><dt>Telefon</dt><dd><a class="hoops-link" href="tel:03023125100">030 23125 100</a></dd></div>
+        <div><dt>E-Mail</dt><dd><a class="hoops-link" href="mailto:hallenwart@example.org">hallenwart@example.org</a></dd></div>
       </dl>
-      <div class="dss-venue-games">
-        <div class="dss-venue-sec" aria-hidden="true">Nächste Spiele in der Halle</div>
-        <ul class="dss-venue-game-list" aria-label="Nächste Spiele in der Halle">
-          <li class="dss-venue-game">
-            <div class="dss-venue-game-head"><span class="dss-venue-when">Sa, 17.10.2026 · 17:30</span></div>
-            <div class="dss-venue-game-meta">Oberliga Nordhain Männer</div>
-            <div class="dss-venue-teams">
-              <div class="dss-venue-team">
-                <span class="dss-venue-dot dss-venue-dot--heim" aria-hidden="true"></span>
-                <span class="dss-sr-only">Heim:</span>
-                <span class="dss-venue-team-name">TSV Nordhain 1920</span>
+      <div class="hoops-venue-games">
+        <div class="hoops-venue-sec" aria-hidden="true">Nächste Spiele in der Halle</div>
+        <ul class="hoops-venue-game-list" aria-label="Nächste Spiele in der Halle">
+          <li class="hoops-venue-game">
+            <div class="hoops-venue-game-head"><span class="hoops-venue-when">Sa, 17.10.2026 · 17:30</span></div>
+            <div class="hoops-venue-game-meta">Oberliga Nordhain Männer</div>
+            <div class="hoops-venue-teams">
+              <div class="hoops-venue-team">
+                <span class="hoops-venue-dot hoops-venue-dot--heim" aria-hidden="true"></span>
+                <span class="hoops-sr-only">Heim:</span>
+                <span class="hoops-venue-team-name">TSV Nordhain 1920</span>
               </div>
-              <div class="dss-venue-team">
-                <span class="dss-venue-dot dss-venue-dot--gast" aria-hidden="true"></span>
-                <span class="dss-sr-only">Gast:</span>
-                <span class="dss-venue-team-name">BG Seeberg</span>
+              <div class="hoops-venue-team">
+                <span class="hoops-venue-dot hoops-venue-dot--gast" aria-hidden="true"></span>
+                <span class="hoops-sr-only">Gast:</span>
+                <span class="hoops-venue-team-name">BG Seeberg</span>
               </div>
             </div>
           </li>
         </ul>
       </div>
-      <div class="dss-venue-foot">
-        <a class="dss-link dss-venue-more" href="/hallen/nordhain">Zur Hallenseite<span class="dss-sr-only">, Sporthalle Nordhain</span></a>
+      <div class="hoops-venue-foot">
+        <a class="hoops-link hoops-venue-more" href="/hallen/nordhain">Zur Hallenseite<span class="hoops-sr-only">, Sporthalle Nordhain</span></a>
       </div>
     </div>
   </div>
@@ -88,7 +88,7 @@ const gamesJs = `{
     }`;
 
 export const svelte = `<script>
-  import VenueCard from '@bbv/dss-design-system/svelte/VenueCard';
+  import VenueCard from '@hoopsfoundry/ui/svelte/VenueCard';
 
   // Die Karte lädt Kacheln erst nach „Karte laden“. tileUrl zeigt auf den eigenen Proxy (siehe Seite Map);
   // in Svelte als Konstante, weil {z} in einem Attribut ein Ausdruck wäre.
@@ -120,7 +120,7 @@ export const svelte = `<script>
 <!-- Mit Einwilligung oder eigenem Proxy: sofort laden (load="auto") und einen eigenen Hinweis -->
 <VenueCard name="Gymnasium Kiefernau" lat={49.2955} lng={7.8905} load="auto" privacyNote="Die Karte wird über unseren Server geladen." {tileUrl} />`;
 
-export const react = `import { VenueCard, type ScheduleGame, type VenueAddress, type VenueContact } from '@bbv/dss-design-system/react';
+export const react = `import { VenueCard, type ScheduleGame, type VenueAddress, type VenueContact } from '@hoopsfoundry/ui/react';
 
 // Die Karte lädt Kacheln erst nach „Karte laden“. tileUrl zeigt auf den eigenen Proxy (siehe Seite Map).
 const tileUrl = '/tiles/{z}/{x}/{y}.png';
@@ -153,8 +153,8 @@ const games: ScheduleGame[] = [
 <VenueCard name="Gymnasium Kiefernau" lat={49.2955} lng={7.8905} load="auto" privacyNote="Die Karte wird über unseren Server geladen." tileUrl={tileUrl} />`;
 
 export const ebeneSvelte = `<script>
-  import HeadingLevel from '@bbv/dss-design-system/svelte/HeadingLevel';
-  import VenueCard from '@bbv/dss-design-system/svelte/VenueCard';
+  import HeadingLevel from '@hoopsfoundry/ui/svelte/HeadingLevel';
+  import VenueCard from '@hoopsfoundry/ui/svelte/VenueCard';
 </script>
 
 <!-- Unter einer h2 der Seite: die Hallenkarte bekommt h3 (Standard) bzw. die Ebene aus HeadingLevel; titleAs gewinnt -->
@@ -164,7 +164,7 @@ export const ebeneSvelte = `<script>
   <VenueCard name="Mehrzweckhalle Seeberg" titleAs="h5" />
 </HeadingLevel>`;
 
-export const ebeneReact = `import { HeadingLevel, VenueCard } from '@bbv/dss-design-system/react';
+export const ebeneReact = `import { HeadingLevel, VenueCard } from '@hoopsfoundry/ui/react';
 
 {/* Unter einer h2 der Seite: die Hallenkarte bekommt h3 (Standard) bzw. die Ebene aus HeadingLevel; titleAs gewinnt */}
 <h2>Hallen</h2>
@@ -173,7 +173,7 @@ export const ebeneReact = `import { HeadingLevel, VenueCard } from '@bbv/dss-des
   <VenueCard name="Mehrzweckhalle Seeberg" titleAs="h5" />
 </HeadingLevel>`;
 
-export const funktionenJs = `import { addressLines, contactInfo, telHref, mailHref, venueGames, venueMapLinks } from '@bbv/dss-design-system/venue.js';
+export const funktionenJs = `import { addressLines, contactInfo, telHref, mailHref, venueGames, venueMapLinks } from '@hoopsfoundry/ui/venue.js';
 
 addressLines({ street: 'Am Sportpark 4', zip: '12345', city: 'Nordhain' }); // ['Am Sportpark 4', '12345 Nordhain']
 telHref('+49 30 23125 100'); // 'tel:+493023125100' (nur Ziffern und ein führendes Plus)

@@ -1,5 +1,5 @@
 /**
- * DSS Schedule · Hilfsfunktionen für ScheduleTable und ScheduleGrid
+ * HoopsFoundry UI Schedule · Hilfsfunktionen für ScheduleTable und ScheduleGrid
  * --------------------------------------------------------------
  * Reine Funktionen ohne DOM. Svelte und React nutzen dieselbe Logik,
  * damit beide Fassungen gleich entscheiden. Typen: js/schedule.d.ts.

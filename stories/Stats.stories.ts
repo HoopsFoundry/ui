@@ -8,7 +8,7 @@ export default {
   component: StatsPlayground,
   argTypes: {
     count: { control: { type: 'number', min: 1, max: 6, step: 1 }, description: 'Nur Demo: Anzahl der Kennzahlen (`items`).', table: t('number', '4') },
-    compact: { control: 'boolean', description: 'Ohne Kacheln, in einer Zeile (`compact` an `StatGrid`, Klasse `dss-stats--compact`).', table: t('boolean', 'false') },
+    compact: { control: 'boolean', description: 'Ohne Kacheln, in einer Zeile (`compact` an `StatGrid`, Klasse `hoops-stats--compact`).', table: t('boolean', 'false') },
     missing: { control: 'boolean', description: 'Nur Demo: der letzte Wert fehlt (`value: null`): Gedankenstrich mit versteckter Beschriftung „keine Angabe“.', table: t('boolean', 'false') },
     variant: { control: 'inline-radio', options: ['dots', 'letters'], description: 'Form: Punkte (Sieg gefüllt, Niederlage Quadrat, Unentschieden Ring) oder Marken mit S, N, U (`variant` an `FormChips`).', table: t("'dots' | 'letters'", "'dots'") },
     formLength: { control: { type: 'number', min: 0, max: 7, step: 1 }, description: 'Nur Demo: Länge der übergebenen Form. Angezeigt werden höchstens die letzten fünf; ohne gültigen Eintrag erscheint nichts.', table: t('number', '5') },

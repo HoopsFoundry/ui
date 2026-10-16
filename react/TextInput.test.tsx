@@ -32,35 +32,35 @@ describe('TextInput', () => {
     const input = screen.getByLabelText('Name');
     const help = screen.getByText('Mindestens 2 Zeichen');
     expect(input).toHaveAttribute('aria-describedby', help.id);
-    expect(help).toHaveClass('dss-field-help');
+    expect(help).toHaveClass('hoops-field-help');
   });
 
   it('error-Zustand: aria-invalid, is-error am Wrapper, Hilfetext-Modifier', () => {
     render(<TextInput label="Name" state="error" help="Pflichtfeld" />);
     expect(screen.getByLabelText('Name')).toHaveAttribute('aria-invalid', 'true');
-    expect(document.querySelector('.dss-field')).toHaveClass('is-error');
-    expect(screen.getByText('Pflichtfeld')).toHaveClass('dss-field-help--err');
+    expect(document.querySelector('.hoops-field')).toHaveClass('is-error');
+    expect(screen.getByText('Pflichtfeld')).toHaveClass('hoops-field-help--err');
   });
 
-  it('Dichte: default → dss-input--default, compact → dss-input--compact, touch → keine', () => {
+  it('Dichte: default → hoops-input--default, compact → hoops-input--compact, touch → keine', () => {
     const { rerender } = render(<TextInput label="A" />);
-    expect(screen.getByLabelText('A')).toHaveClass('dss-input', 'dss-input--default');
+    expect(screen.getByLabelText('A')).toHaveClass('hoops-input', 'hoops-input--default');
     rerender(<TextInput label="A" density="compact" />);
-    expect(screen.getByLabelText('A')).toHaveClass('dss-input--compact');
+    expect(screen.getByLabelText('A')).toHaveClass('hoops-input--compact');
     rerender(<TextInput label="A" density="touch" />);
-    expect(screen.getByLabelText('A')).not.toHaveClass('dss-input--default', 'dss-input--compact');
+    expect(screen.getByLabelText('A')).not.toHaveClass('hoops-input--default', 'hoops-input--compact');
   });
 
   it('rendert prefix und suffix als Addons', () => {
     render(<TextInput label="Betrag" prefix="€" suffix="netto" />);
-    expect(screen.getByText('€')).toHaveClass('dss-addon');
-    expect(screen.getByText('netto')).toHaveClass('dss-addon', 'dss-addon--right');
+    expect(screen.getByText('€')).toHaveClass('hoops-addon');
+    expect(screen.getByText('netto')).toHaveClass('hoops-addon', 'hoops-addon--right');
   });
 
   it('className geht an das Input, fieldClassName an den Wrapper', () => {
     render(<TextInput label="A" className="on-input" fieldClassName="on-field" />);
     expect(screen.getByLabelText('A')).toHaveClass('on-input');
-    expect(document.querySelector('.dss-field')).toHaveClass('on-field');
+    expect(document.querySelector('.hoops-field')).toHaveClass('on-field');
   });
 
   it('funktioniert kontrolliert und leitet die ref weiter', () => {

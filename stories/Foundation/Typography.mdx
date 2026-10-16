@@ -6,11 +6,11 @@ import '../docs/blocks/blocks.css';
 
 # Typography
 
-Die Schrift des DSS ist eine Skala aus 13 Stufen, vier Familien und einer festen Zahlenregel. Marke (`data-brand`) und Schrift (`data-type`) sind unabhängig und lassen sich in der Werkzeugleiste frei kombinieren. Die Werte in den Vorschauen sind live aus den CSS-Variablen gelesen und folgen Marke, Schrift und Handy-Breakpoint.
+Die Schrift des HoopsFoundry UI ist eine Skala aus 13 Stufen, vier Familien und einer festen Zahlenregel. Marke (`data-brand`) und Schrift (`data-type`) sind unabhängig und lassen sich in der Werkzeugleiste frei kombinieren. Die Werte in den Vorschauen sind live aus den CSS-Variablen gelesen und folgen Marke, Schrift und Handy-Breakpoint.
 
 ## Type scale
 
-13 Stufen als CSS-Variablen (`--hoops-fs-*`, `--hoops-lh-*`, `--hoops-ls-*`, `--hoops-fw-*`) und Klassen (`.dss-t-*`). Für die großen Stufen gibt es Handy-Größen (bis 640 px, `--hoops-fs-*-sm`), die die Klassen `.dss-t-*` dort verwenden. Komponenten mit fester Kachelgröße bleiben bei `--hoops-fs-*`.
+13 Stufen als CSS-Variablen (`--hoops-fs-*`, `--hoops-lh-*`, `--hoops-ls-*`, `--hoops-fw-*`) und Klassen (`.hoops-t-*`). Für die großen Stufen gibt es Handy-Größen (bis 640 px, `--hoops-fs-*-sm`), die die Klassen `.hoops-t-*` dort verwenden. Komponenten mit fester Kachelgröße bleiben bei `--hoops-fs-*`.
 
 <Canvas of={TypographyStories.Scale} />
 
@@ -22,13 +22,13 @@ Die Familien folgen `data-type` auf `<html>`. Gewichte, die eine Schrift nicht l
 
 ## Zahlen und Mono
 
-Spielstände, Uhren und Statistik stehen in Spalten. Dafür gilt `font-variant-numeric: tabular-nums` (`.dss-tnum`); `.dss-t-display` und `.dss-t-clock` setzen es bereits.
+Spielstände, Uhren und Statistik stehen in Spalten. Dafür gilt `font-variant-numeric: tabular-nums` (`.hoops-tnum`); `.hoops-t-display` und `.hoops-t-clock` setzen es bereits.
 
 <Canvas of={TypographyStories.NumbersAndMono} />
 
 ## Im Einsatz
 
-Die Stufen zusammen, wie sie in einer Seite stehen. Fließtext ist auf `--hoops-measure` (65ch, `.dss-measure`) begrenzt.
+Die Stufen zusammen, wie sie in einer Seite stehen. Fließtext ist auf `--hoops-measure` (65ch, `.hoops-measure`) begrenzt.
 
 <Canvas of={TypographyStories.InContext} />
 

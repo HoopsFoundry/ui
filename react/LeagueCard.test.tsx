@@ -18,7 +18,7 @@ describe('LeagueCard', () => {
     expect(rankCells()).toEqual(['1', '2', '3']);
     const heads = screen.getAllByRole('columnheader').map((th) => th.textContent);
     expect(heads).toEqual(['#Platz', 'Mannschaft', 'SPSpiele', 'PKTPunkte']);
-    expect(container.firstElementChild).toHaveClass('dss-league');
+    expect(container.firstElementChild).toHaveClass('hoops-league');
     expect(container.querySelector('a')).toBeNull();
   });
 
@@ -79,23 +79,23 @@ describe('LeagueCard', () => {
 
   it('Form ohne Spalte erscheint nicht; die Form-Punkte sind aria-hidden', () => {
     const { container, rerender } = render(<LeagueCard title="L" teams={teams()} />);
-    expect(container.querySelector('.dss-form')).toBeNull();
+    expect(container.querySelector('.hoops-form')).toBeNull();
     expect(screen.queryByText(/Form:/)).toBeNull();
     rerender(<LeagueCard title="L" teams={teams()} columns={['form']} />);
-    expect(container.querySelector('.dss-form-list')).toHaveAttribute('aria-hidden', 'true');
-    expect(container.querySelectorAll('.dss-form-item--s').length).toBeGreaterThan(0);
+    expect(container.querySelector('.hoops-form-list')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelectorAll('.hoops-form-item--s').length).toBeGreaterThan(0);
     expect(screen.getAllByText('Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden').length).toBeGreaterThan(0);
   });
 
   it('Zonen: Streifen-Klasse, versteckter Text je Zeile und Legende nur mit Zone', () => {
     const rows = teams(2).map((t) => (t.rank === 1 ? { ...t, zone: 'up' as const } : t.rank === 4 ? { ...t, zone: 'down' as const } : t));
     const { container } = render(<LeagueCard title="L" teams={rows} />);
-    expect(bodyRows()[0]).toHaveClass('dss-league-zone--up');
+    expect(bodyRows()[0]).toHaveClass('hoops-league-zone--up');
     expect(bodyRows()[0]).toHaveTextContent('TSV Nordhain 1920, Aufstiegsplatz');
     expect(bodyRows()[3]).toHaveTextContent('SV Kiefernau, Abstiegsplatz');
     const legend = screen.getByRole('list', { name: 'Legende' });
     expect(within(legend).getAllByRole('listitem').map((li) => li.textContent)).toEqual(['Aufstieg', 'Abstieg']);
-    expect(container.querySelectorAll('.dss-league-key')).toHaveLength(2);
+    expect(container.querySelectorAll('.hoops-league-key')).toHaveLength(2);
   });
 
   it('Legende nur für sichtbare Zonen; ohne Zone keine Legende', () => {
@@ -128,18 +128,18 @@ describe('LeagueCard', () => {
 
   it('Live: Zahl als Text, true nur Live, false nichts', () => {
     const { container, rerender } = render(<LeagueCard title="L" teams={teams()} live={2} />);
-    expect(container.querySelector('.dss-live')).toHaveTextContent('Live');
+    expect(container.querySelector('.hoops-live')).toHaveTextContent('Live');
     expect(screen.getByText('2 Spiele laufen')).toBeInTheDocument();
-    expect(container.querySelector('.dss-live-dot')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('.hoops-live-dot')).toHaveAttribute('aria-hidden', 'true');
     rerender(<LeagueCard title="L" teams={teams()} live={1} />);
     expect(screen.getByText('1 Spiel läuft')).toBeInTheDocument();
     rerender(<LeagueCard title="L" teams={teams()} live />);
-    expect(container.querySelector('.dss-league-live-n')).toBeNull();
-    expect(container.querySelector('.dss-live')).not.toBeNull();
+    expect(container.querySelector('.hoops-league-live-n')).toBeNull();
+    expect(container.querySelector('.hoops-live')).not.toBeNull();
     rerender(<LeagueCard title="L" teams={teams()} live={0} />);
-    expect(container.querySelector('.dss-league-live')).toBeNull();
+    expect(container.querySelector('.hoops-league-live')).toBeNull();
     rerender(<LeagueCard title="L" teams={teams()} live={false} />);
-    expect(container.querySelector('.dss-league-live')).toBeNull();
+    expect(container.querySelector('.hoops-league-live')).toBeNull();
   });
 
   it('Logos und Kurznamen: voller Name genau einmal für Hilfstechnik, Initialen als Rückfall', () => {
@@ -148,35 +148,35 @@ describe('LeagueCard', () => {
       { rank: 2, name: 'SV Kiefernau', played: 1, points: 0 },
     ];
     const { container } = render(<LeagueCard title="L" teams={rows} logos names="short" />);
-    expect(container.querySelectorAll('.dss-team-logo')).toHaveLength(2);
-    expect(container.querySelector('.dss-team-logo img')).toHaveAttribute('alt', '');
-    expect(container.querySelector('.dss-team-logo--initials')).toHaveTextContent('SK');
-    expect(container.querySelector('.dss-team-name--short')).not.toBeNull();
-    expect(container.querySelector('.dss-name-short')).toHaveAttribute('title', 'TSV Nordhain 1920');
-    expect(container.querySelector('.dss-name-short')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelectorAll('.hoops-team-logo')).toHaveLength(2);
+    expect(container.querySelector('.hoops-team-logo img')).toHaveAttribute('alt', '');
+    expect(container.querySelector('.hoops-team-logo--initials')).toHaveTextContent('SK');
+    expect(container.querySelector('.hoops-team-name--short')).not.toBeNull();
+    expect(container.querySelector('.hoops-name-short')).toHaveAttribute('title', 'TSV Nordhain 1920');
+    expect(container.querySelector('.hoops-name-short')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getAllByText('TSV Nordhain 1920')).toHaveLength(1);
   });
 
   it('ohne logos keine Logos', () => {
     const { container } = render(<LeagueCard title="L" teams={teams()} />);
-    expect(container.querySelector('.dss-team-logo')).toBeNull();
+    expect(container.querySelector('.hoops-team-logo')).toBeNull();
   });
 
   it('compact: Klasse, Dichte compact, kein Untertitel', () => {
     const { container } = render(<LeagueCard title="L" teams={teams()} size="compact" played={1} total={2} />);
-    expect(container.firstElementChild).toHaveClass('dss-league--compact');
-    expect(container.querySelector('table')).toHaveClass('dss-tbl--compact');
-    expect(container.querySelector('.dss-league-sub')).toBeNull();
+    expect(container.firstElementChild).toHaveClass('hoops-league--compact');
+    expect(container.querySelector('table')).toHaveClass('hoops-tbl--compact');
+    expect(container.querySelector('.hoops-league-sub')).toBeNull();
   });
 
   it('standard: Dichte touch (60 px)', () => {
     const { container } = render(<LeagueCard title="L" teams={teams()} />);
-    expect(container.querySelector('table')).toHaveClass('dss-tbl--touch');
+    expect(container.querySelector('table')).toHaveClass('hoops-tbl--touch');
   });
 
   it('Überschriftenebene: titleAs vor HeadingLevel vor h3', () => {
     const { unmount } = render(<LeagueCard title="L" teams={teams()} titleAs="h2" />);
-    expect(screen.getByRole('heading', { level: 2 })).toHaveClass('dss-league-title');
+    expect(screen.getByRole('heading', { level: 2 })).toHaveClass('hoops-league-title');
     unmount();
     const second = render(
       <HeadingLevel level={4}>
@@ -207,7 +207,7 @@ describe('LeagueCard', () => {
 
   it('className kommt an die Karte', () => {
     const { container } = render(<LeagueCard title="L" teams={teams()} className="extra" />);
-    expect(container.firstElementChild).toHaveClass('dss-league', 'extra');
+    expect(container.firstElementChild).toHaveClass('hoops-league', 'extra');
   });
 
   it('hat keine axe-Verstöße (alle Zusätze)', async () => {

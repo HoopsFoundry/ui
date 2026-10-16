@@ -129,14 +129,14 @@ export function writeHash(id, open) {
 
 /**
  * Höhe des klebenden Kopfes, der ein verschachteltes Ziel verdecken würde: Steht `el` in einem Bereich einer klebenden Gruppe
- * (`dss-acc--sticky`), bleibt dessen Kopf oben stehen und liegt über dem Ziel. Ist `el` selbst der Bereich der obersten Ebene, ist es 0.
+ * (`hoops-acc--sticky`), bleibt dessen Kopf oben stehen und liegt über dem Ziel. Ist `el` selbst der Bereich der obersten Ebene, ist es 0.
  */
 export function stickyOffset(el) {
   if (!el || typeof el.closest !== 'function') return 0;
   let top = null;
   for (let item = el.parentElement?.closest(ITEM); item; item = item.parentElement?.closest(ITEM)) top = item;
-  if (!top || !top.parentElement?.closest('.dss-acc')?.classList.contains('dss-acc--sticky')) return 0;
-  const head = top.querySelector(':scope > .dss-acc-title, :scope > summary, :scope > .dss-frame-head, :scope > .dss-league-head');
+  if (!top || !top.parentElement?.closest('.hoops-acc')?.classList.contains('hoops-acc--sticky')) return 0;
+  const head = top.querySelector(':scope > .hoops-acc-title, :scope > summary, :scope > .hoops-frame-head, :scope > .hoops-league-head');
   return head ? Math.ceil(head.getBoundingClientRect().height) : 0;
 }
 
@@ -195,16 +195,16 @@ export function isAccordionItem(el) {
 }
 
 /**
- * Tastatur in einer Gruppe: Pfeil ab/auf, Home, End bewegen den Fokus zwischen den Köpfen (`.dss-acc-trigger`), die direkt zu
- * `root` (`.dss-acc`) gehören; deaktivierte (`aria-disabled`) werden übersprungen. Gibt `true` zurück, wenn die Taste behandelt wurde
+ * Tastatur in einer Gruppe: Pfeil ab/auf, Home, End bewegen den Fokus zwischen den Köpfen (`.hoops-acc-trigger`), die direkt zu
+ * `root` (`.hoops-acc`) gehören; deaktivierte (`aria-disabled`) werden übersprungen. Gibt `true` zurück, wenn die Taste behandelt wurde
  * (der Aufrufer ruft dann `preventDefault` auf). Mit Strg, Alt, Meta oder Umschalt passiert nichts.
  */
 export function moveFocus(root, trigger, key, modifiers = {}) {
   if (!root || !trigger || modifiers.altKey || modifiers.ctrlKey || modifiers.metaKey || modifiers.shiftKey) return false;
   if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(key)) return false;
   // Köpfe in einem Panel (ein einzelner einklappbarer Rahmen im Inhalt eines Bereichs) gehören nicht zur Gruppe
-  const triggers = [...root.querySelectorAll('.dss-acc-trigger')].filter(
-    (el) => el.closest('.dss-acc') === root && el.closest('.dss-acc-panel')?.closest('.dss-acc') !== root,
+  const triggers = [...root.querySelectorAll('.hoops-acc-trigger')].filter(
+    (el) => el.closest('.hoops-acc') === root && el.closest('.hoops-acc-panel')?.closest('.hoops-acc') !== root,
   );
   const index = triggers.indexOf(trigger);
   if (index < 0) return false;
@@ -280,10 +280,10 @@ function handle(fn) {
   return run;
 }
 
-// Bereiche: Karten (`.dss-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
-const ITEM = '.dss-acc-item, .dss-frame.is-collapsible, .dss-league.is-collapsible';
-const DETAILS = 'details.dss-acc-item';
-// Register der Instanzen: gleicher Name, gleiches Register über alle Kopien (dss.js, dss.min.js, Einzelmodul), damit ein Wurzelelement nie doppelt geschaltet wird
+// Bereiche: Karten (`.hoops-acc-item`) und einklappbare Rahmen der Tabellen und Ligencards (`.is-collapsible`)
+const ITEM = '.hoops-acc-item, .hoops-frame.is-collapsible, .hoops-league.is-collapsible';
+const DETAILS = 'details.hoops-acc-item';
+// Register der Instanzen: gleicher Name, gleiches Register über alle Kopien (hoops.js, hoops.min.js, Einzelmodul), damit ein Wurzelelement nie doppelt geschaltet wird
 const registry = createRegistry('accordion');
 let uid = 0;
 
@@ -291,11 +291,11 @@ const TEXT = { all: 'Alle öffnen', none: 'Alle schließen', nav: 'Bereiche' };
 
 function triggerOf(item) {
   return item.querySelector(
-    ':scope > summary, :scope > .dss-acc-title > .dss-acc-trigger, :scope > .dss-frame-head > .dss-frame-title > .dss-acc-trigger, :scope > .dss-league-head > .dss-league-title > .dss-acc-trigger',
+    ':scope > summary, :scope > .hoops-acc-title > .hoops-acc-trigger, :scope > .hoops-frame-head > .hoops-frame-title > .hoops-acc-trigger, :scope > .hoops-league-head > .hoops-league-title > .hoops-acc-trigger',
   );
 }
 function panelOf(item) {
-  return item.querySelector(':scope > .dss-acc-panel');
+  return item.querySelector(':scope > .hoops-acc-panel');
 }
 const isDetails = (item) => item.tagName === 'DETAILS';
 const isOpen = (item) => (isDetails(item) ? item.open : triggerOf(item)?.getAttribute('aria-expanded') === 'true');
@@ -310,11 +310,11 @@ function keepFocus(item) {
 
 function labelOf(item) {
   const trigger = triggerOf(item);
-  const source = trigger?.querySelector('.dss-acc-label') ?? trigger;
+  const source = trigger?.querySelector('.hoops-acc-label') ?? trigger;
   if (!source) return '';
-  // Das unsichtbare Komma (.dss-acc-sep, früher .dss-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
+  // Das unsichtbare Komma (.hoops-acc-sep, früher .hoops-sr-only) gehört zum Namen des Kopfes, nicht zum Titel der Sprungleiste
   const copy = source.cloneNode(true);
-  for (const hidden of copy.querySelectorAll('.dss-sr-only, .dss-acc-sep, .dss-acc-sub')) hidden.remove();
+  for (const hidden of copy.querySelectorAll('.hoops-sr-only, .hoops-acc-sep, .hoops-acc-sub')) hidden.remove();
   return clean(copy.textContent);
 }
 
@@ -326,7 +326,7 @@ function itemsOf(root) {
 /** Gehört der Bereich direkt zu `root`? Nicht, wenn er in einer verschachtelten Gruppe oder (als einzelner Rahmen) im Panel eines Bereichs steht. */
 function inGroup(item, root) {
   const parent = item.parentElement;
-  return parent?.closest('.dss-acc') === root && parent.closest('.dss-acc-panel')?.closest('.dss-acc') !== root;
+  return parent?.closest('.hoops-acc') === root && parent.closest('.hoops-acc-panel')?.closest('.hoops-acc') !== root;
 }
 
 /** Baum aller Bereiche mit id unterhalb von `scope` (über alle Gruppen): jeder Bereich kennt den Bereich, in dem er liegt. */
@@ -345,8 +345,8 @@ function make(tag, className, attrs = {}) {
 
 /**
  * Macht ein Accordion im Vanilla-Markup bedienbar. Zwei Wege mit demselben Aussehen:
- * (1) `div.dss-acc-item` mit `h3.dss-acc-title > button.dss-acc-trigger[aria-expanded][aria-controls]` und `div.dss-acc-panel[hidden]`;
- * (2) natives `details.dss-acc-item` mit `summary.dss-acc-trigger` (zeigt auch ohne Skript; das Skript ergänzt die Funktionen).
+ * (1) `div.hoops-acc-item` mit `h3.hoops-acc-title > button.hoops-acc-trigger[aria-expanded][aria-controls]` und `div.hoops-acc-panel[hidden]`;
+ * (2) natives `details.hoops-acc-item` mit `summary.hoops-acc-trigger` (zeigt auch ohne Skript; das Skript ergänzt die Funktionen).
  * Optionen: `exclusive` (nur ein Bereich offen), `syncHash` (Deep-Link, Standard `true`), `expandAll` („Alle öffnen/schließen“ mit Ansage),
  * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt eine Funktion zum Aufräumen zurück, die auch als `.destroy()` aufrufbar ist (Muster `{ destroy() }`); mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
  */
@@ -410,8 +410,8 @@ export function initAccordion(root, options = {}) {
   };
 
   const onClick = (event) => {
-    const trigger = event.target instanceof Element ? event.target.closest('.dss-acc-trigger') : null;
-    if (!trigger || trigger.closest('.dss-acc') !== root) return;
+    const trigger = event.target instanceof Element ? event.target.closest('.hoops-acc-trigger') : null;
+    if (!trigger || trigger.closest('.hoops-acc') !== root) return;
     const item = trigger.closest(ITEM);
     if (!item || !inGroup(item, root)) return;
     if (isDetails(item)) {
@@ -435,7 +435,7 @@ export function initAccordion(root, options = {}) {
     if (!programmatic && syncHash && item.id) writeHash(item.id, item.open);
   };
   const onKeyDown = (event) => {
-    const trigger = event.target instanceof Element ? event.target.closest('.dss-acc-trigger') : null;
+    const trigger = event.target instanceof Element ? event.target.closest('.hoops-acc-trigger') : null;
     if (!trigger) return;
     if (moveFocus(root, trigger, event.key, event)) event.preventDefault();
   };
@@ -448,13 +448,13 @@ export function initAccordion(root, options = {}) {
     root.removeEventListener('toggle', onToggle, true);
   });
 
-  if (sticky && !root.classList.contains('dss-acc--sticky')) {
-    root.classList.add('dss-acc--sticky');
-    cleanups.push(() => root.classList.remove('dss-acc--sticky'));
+  if (sticky && !root.classList.contains('hoops-acc--sticky')) {
+    root.classList.add('hoops-acc--sticky');
+    cleanups.push(() => root.classList.remove('hoops-acc--sticky'));
   }
   if (exclusive) {
     // Natives Verhalten wo vorhanden: gleiches `name` an allen details dieser Gruppe
-    const name = `dss-acc-${++uid}`;
+    const name = `hoops-acc-${++uid}`;
     for (const item of items()) if (isDetails(item) && !item.getAttribute('name')) item.setAttribute('name', name);
   }
   // Ausgangszustand: Klasse und inert zum Markup passend machen; bei exklusiv höchstens ein offener Bereich (der erste)
@@ -467,17 +467,17 @@ export function initAccordion(root, options = {}) {
     if (open) current = item.id || current;
   }
 
-  const tools = make('div', 'dss-acc-tools');
+  const tools = make('div', 'hoops-acc-tools');
   root.insertBefore(tools, root.firstChild);
   created.push(tools);
 
   if (expandAll && !exclusive) {
-    const wrap = make('div', 'dss-acc-bar');
-    const open = make('button', 'dss-btn dss-btn--secondary dss-btn--sm', { type: 'button' });
-    const close = make('button', 'dss-btn dss-btn--secondary dss-btn--sm', { type: 'button' });
+    const wrap = make('div', 'hoops-acc-bar');
+    const open = make('button', 'hoops-btn hoops-btn--secondary hoops-btn--sm', { type: 'button' });
+    const close = make('button', 'hoops-btn hoops-btn--secondary hoops-btn--sm', { type: 'button' });
     open.textContent = TEXT.all;
     close.textContent = TEXT.none;
-    announce = make('span', 'dss-sr-only', { 'aria-live': 'polite', 'aria-atomic': 'true' });
+    announce = make('span', 'hoops-sr-only', { 'aria-live': 'polite', 'aria-atomic': 'true' });
     wrap.append(open, close, announce);
     tools.append(wrap);
     const controls = () => items().map((el) => panelOf(el)?.id || el.id).filter(Boolean).join(' ');
@@ -496,16 +496,16 @@ export function initAccordion(root, options = {}) {
   }
 
   if (nav) {
-    const navEl = make('nav', 'dss-acc-nav', { 'aria-label': navLabel });
-    const listId = `dss-acc-nav-${++uid}`;
-    const toggle = make('button', 'dss-acc-nav-toggle', { type: 'button', 'aria-expanded': 'false', 'aria-controls': listId });
+    const navEl = make('nav', 'hoops-acc-nav', { 'aria-label': navLabel });
+    const listId = `hoops-acc-nav-${++uid}`;
+    const toggle = make('button', 'hoops-acc-nav-toggle', { type: 'button', 'aria-expanded': 'false', 'aria-controls': listId });
     toggle.textContent = navLabel;
-    const list = make('ul', 'dss-acc-nav-list', { id: listId });
+    const list = make('ul', 'hoops-acc-nav-list', { id: listId });
     navLinks = new Map();
     for (const item of items()) {
       if (!item.id) continue;
-      const li = make('li', 'dss-acc-nav-item');
-      const link = make('a', 'dss-acc-nav-link', { href: `#${encodeURIComponent(item.id)}` });
+      const li = make('li', 'hoops-acc-nav-item');
+      const link = make('a', 'hoops-acc-nav-link', { href: `#${encodeURIComponent(item.id)}` });
       link.textContent = labelOf(item);
       li.append(link);
       list.append(li);
@@ -519,7 +519,7 @@ export function initAccordion(root, options = {}) {
       navEl.classList.toggle('is-open', next);
     });
     navEl.addEventListener('click', (event) => {
-      const link = event.target instanceof Element ? event.target.closest('a.dss-acc-nav-link') : null;
+      const link = event.target instanceof Element ? event.target.closest('a.hoops-acc-nav-link') : null;
       if (!link) return;
       const id = hashTarget(link.getAttribute('href'), [...navLinks.keys()]);
       const item = id ? document.getElementById(id) : null;
@@ -558,11 +558,11 @@ export function initAccordion(root, options = {}) {
   return handle(() => claimed.destroy());
 }
 
-/** Startet alle `[data-dss-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument) mit denselben Optionen; gibt eine Funktion zum Aufräumen aller zurück. */
+/** Startet alle `[data-hoops-acc]`-Gruppen unterhalb von `scope` (Standard: das Dokument) mit denselben Optionen; gibt eine Funktion zum Aufräumen aller zurück. */
 export function initAccordions(scope, options = {}) {
   if (typeof document === 'undefined') return handle(() => {});
   const host = scope ?? document;
-  const roots = [...host.querySelectorAll('[data-dss-acc]')];
+  const roots = [...host.querySelectorAll('[data-hoops-acc]')];
   const destroys = roots.map((root) => initAccordion(root, options));
   return handle(() => destroys.forEach((fn) => fn()));
 }

@@ -39,8 +39,8 @@ const normalize = (html: string) =>
     .replace(/<(img|br)([^>]*?)\/?>/g, '<$1$2>')
     .trim();
 
-// Titel der Karten; bei einklappbaren Karten steht er im Button (`.dss-acc-label`)
-const titles = (html: string) => [...html.matchAll(/<h[2-6] class="dss-league-title">(?:<button[^>]*><span class="dss-acc-label">)?([^<]*)</g)].map((m) => m[1]);
+// Titel der Karten; bei einklappbaren Karten steht er im Button (`.hoops-acc-label`)
+const titles = (html: string) => [...html.matchAll(/<h[2-6] class="hoops-league-title">(?:<button[^>]*><span class="hoops-acc-label">)?([^<]*)</g)].map((m) => m[1]);
 /** Zeilen im tbody je Karte */
 const rowCounts = (html: string) => html.split('<table').slice(1).map((part) => ((part.split('<tbody')[1] ?? '').split('</tbody>')[0].match(/<tr/g) ?? []).length);
 const SVELTE = { svelte: league.svelte, ebeneSvelte: league.ebeneSvelte };
@@ -49,12 +49,12 @@ const REACT = { react: league.react, ebeneReact: league.ebeneReact };
 describe('Svelte-Code-Beispiele rendern (SSR)', () => {
   it.each(Object.entries(SVELTE))('%s', async (name, source) => {
     const file = `${tmpDir}${name}.svelte`;
-    writeFileSync(file, source.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+    writeFileSync(file, source.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
     const html = render(component, { props: {} }).body;
     expect(html.length).toBeGreaterThan(100);
     expect(html).not.toContain('undefined');
-    expect(html).toContain('dss-league');
+    expect(html).toContain('hoops-league');
     if (name === 'svelte') {
       // drei Karten: eigene Mannschaft auf Platz 3 (vier Zeilen), compact (ebenfalls vier), ohne eigene Mannschaft mit limit 5
       expect(titles(html)).toEqual(['Oberliga Nordhain Männer', 'Oberliga Nordhain Männer', 'Oberliga Nordhain Männer']);
@@ -66,8 +66,8 @@ describe('Svelte-Code-Beispiele rendern (SSR)', () => {
       expect(titles(html)).toEqual(['Oberliga Nordhain Männer', 'Kreisliga Süd']);
       expect(html).toMatch(/<h2[^>]*>Tabellen<\/h2>/);
       // HeadingLevel level=4 gilt für die erste Karte, titleAs h5 gewinnt für die zweite
-      expect(html).toMatch(/<h4 class="dss-league-title">Oberliga Nordhain Männer/);
-      expect(html).toMatch(/<h5 class="dss-league-title">Kreisliga Süd/);
+      expect(html).toMatch(/<h4 class="hoops-league-title">Oberliga Nordhain Männer/);
+      expect(html).toMatch(/<h5 class="hoops-league-title">Kreisliga Süd/);
     }
   });
 });
@@ -82,7 +82,7 @@ describe('React-Code-Beispiele bestehen den TypeScript-Compiler', () => {
       const head = split < 0 ? '' : rest.slice(0, split);
       const body = split < 0 ? rest : rest.slice(split);
       files[`${rootDir}react/__code_${name}.tsx`] = [
-        ...imports.map((line) => line.replace('@bbv/dss-design-system/react', './index')),
+        ...imports.map((line) => line.replace('@hoopsfoundry/ui/react', './index')),
         head,
         `export const Demo_${name} = () => (\n<>${body}</>\n);`,
       ].join('\n');
@@ -152,7 +152,7 @@ describe('Funktionen aus league.js: die Aufrufe im Beispiel werden ausgewertet u
       expect(line, expr).toContain(comment);
     }
     const file = `${tmpDir}funktionen.mjs`;
-    const body = league.funktionenJs.replace("'@bbv/dss-design-system/league.js'", `'${rootDir}js/league.js'`);
+    const body = league.funktionenJs.replace("'@hoopsfoundry/ui/league.js'", `'${rootDir}js/league.js'`);
     writeFileSync(file, `${body}\nexport const results = [${CALLS.map(([expr]) => expr).join(',\n')}];\n`);
     const mod = (await vite.ssrLoadModule(file)) as { results: unknown[] };
     expect(mod.results).toEqual(CALLS.map(([, expected]) => expected));
@@ -170,7 +170,7 @@ describe('Beispiele der Doku-Seite', () => {
     expect(names.length).toBeGreaterThanOrEqual(18);
     for (const example of names) {
       const html = await renderExample(example);
-      expect(html, example).toContain('dss-league');
+      expect(html, example).toContain('hoops-league');
       expect(html, example).not.toContain('undefined');
     }
   });
@@ -215,7 +215,7 @@ describe('Beispiele der Doku-Seite', () => {
   });
   it('Dos und Don\'ts: Kartentitel als h4 unter den h3-Paartiteln', async () => {
     for (const example of names.filter((n) => /^(do|dont)-/.test(n))) {
-      expect(await renderExample(example), example).toMatch(/<h4 class="dss-league-title">/);
+      expect(await renderExample(example), example).toMatch(/<h4 class="hoops-league-title">/);
     }
   });
   it('alle Beispiel-Stories sind versteckt (tags !dev), nur Spielwiese sichtbar; kein autodocs', () => {

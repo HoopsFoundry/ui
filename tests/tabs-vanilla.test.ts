@@ -1,5 +1,5 @@
 // initTabs: Tastatur (Pfeile, Pos1/Ende, Umlauf, gesperrte), ARIA, roving tabindex, Panels (hidden/inert), manuelle Aktivierung, Mehrfachauswahl,
-// Deep-Link, Ereignis dss:tabchange, mehrere Leisten, mehrfaches init, destroy.
+// Deep-Link, Ereignis hoops:tabchange, mehrere Leisten, mehrfaches init, destroy.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { initTabs, initialTab, nextTab } from '../js/tabs.js';
 import { keydown, mountHtml, tabsMarkup } from './helpers/tabs-markup';
@@ -102,18 +102,18 @@ describe('Anfangszustand und ARIA', () => {
     expect(tab('heim').classList.contains('is-active')).toBe(false);
   });
   it('ergänzt fehlende Rollen, ids und Beschriftungen (Markup nur mit Klassen)', () => {
-    start(`<div class="dss-tabs" id="r-bar" aria-label="X"><button class="dss-tab">A</button><button class="dss-tab">B</button></div>`);
+    start(`<div class="hoops-tabs" id="r-bar" aria-label="X"><button class="hoops-tab">A</button><button class="hoops-tab">B</button></div>`);
     const bar = document.getElementById('r-bar')!;
     expect(bar.getAttribute('role')).toBe('tablist');
     const [a, b] = [...bar.querySelectorAll('button')];
     expect(a.getAttribute('role')).toBe('tab');
-    expect(a.id).toMatch(/^dss-tab-\d+$/);
+    expect(a.id).toMatch(/^hoops-tab-\d+$/);
     expect(a.id).not.toBe(b.id);
     expect(a.getAttribute('aria-selected')).toBe('true');
     expect(b.getAttribute('tabindex')).toBe('-1');
   });
   it('vertical: aria-orientation, Pfeil ab/auf', () => {
-    start(tabsMarkup().replace('dss-tabs--segmented', 'dss-tabs--vertical'));
+    start(tabsMarkup().replace('hoops-tabs--segmented', 'hoops-tabs--vertical'));
     expect(document.getElementById('r-bar')!.getAttribute('aria-orientation')).toBe('vertical');
     keydown(tab('alle'), 'ArrowRight');
     expect(selected()).toEqual(['alle']);
@@ -121,18 +121,18 @@ describe('Anfangszustand und ARIA', () => {
     expect(selected()).toEqual(['heim']);
   });
   it('Panels ohne eigene Rolle bekommen role=tabpanel und aria-labelledby', () => {
-    start(`<div class="dss-tabs" id="r-bar"><button class="dss-tab" id="a" aria-controls="pa">A</button><button class="dss-tab" id="b" aria-controls="pb">B</button></div><div id="pa">x</div><div id="pb">y</div>`);
+    start(`<div class="hoops-tabs" id="r-bar"><button class="hoops-tab" id="a" aria-controls="pa">A</button><button class="hoops-tab" id="b" aria-controls="pb">B</button></div><div id="pa">x</div><div id="pb">y</div>`);
     expect(document.getElementById('pa')!.getAttribute('role')).toBe('tabpanel');
     expect(document.getElementById('pa')!.getAttribute('aria-labelledby')).toBe('a');
     expect(document.getElementById('pb')!.hidden).toBe(true);
   });
   it('ohne Panels (reiner Umschalter) funktioniert es ebenso', () => {
-    start(`<div class="dss-tabs" id="r-bar"><button class="dss-tab" id="a">A</button><button class="dss-tab" id="b">B</button></div>`);
+    start(`<div class="hoops-tabs" id="r-bar"><button class="hoops-tab" id="a">A</button><button class="hoops-tab" id="b">B</button></div>`);
     keydown(document.getElementById('a')!, 'ArrowRight');
     expect(document.getElementById('b')!.getAttribute('aria-selected')).toBe('true');
   });
   it('ein Verweis auf ein fehlendes Panel stört nicht', () => {
-    expect(() => start(`<div class="dss-tabs" id="r-bar"><button class="dss-tab" aria-controls="gibt-es-nicht">A</button></div>`)).not.toThrow();
+    expect(() => start(`<div class="hoops-tabs" id="r-bar"><button class="hoops-tab" aria-controls="gibt-es-nicht">A</button></div>`)).not.toThrow();
   });
   it('option value wählt den Anfangstab (data-tab, id oder Index); ein gesperrter wird nicht genommen', () => {
     start(tabsMarkup(), { value: 'r-ausw' });
@@ -204,7 +204,7 @@ describe('Tastatur', () => {
     expect(selected()).toEqual(['alle']);
   });
   it('RTL: Pfeil links wählt den nächsten', () => {
-    start(tabsMarkup('dir="rtl"').replace('data-dss="tabs"', 'data-dss="tabs" style="direction: rtl"'));
+    start(tabsMarkup('dir="rtl"').replace('data-hoops="tabs"', 'data-hoops="tabs" style="direction: rtl"'));
     keydown(tab('alle'), 'ArrowLeft');
     expect(selected()).toEqual(['heim']);
     keydown(tab('heim'), 'ArrowRight');
@@ -219,7 +219,7 @@ describe('Tastatur', () => {
     expect(selected()).toEqual(['heim']);
   });
   it('Enter und Leertaste wählen auch ein Tab, das kein Button ist', () => {
-    start(`<div class="dss-tabs" id="r-bar"><a class="dss-tab" id="a" role="tab" href="#a">A</a><a class="dss-tab" id="b" role="tab" href="#b">B</a></div>`);
+    start(`<div class="hoops-tabs" id="r-bar"><a class="hoops-tab" id="a" role="tab" href="#a">A</a><a class="hoops-tab" id="b" role="tab" href="#b">B</a></div>`);
     const event = keydown(document.getElementById('b')!, 'Enter');
     expect(event.defaultPrevented).toBe(true);
     expect(document.getElementById('b')!.getAttribute('aria-selected')).toBe('true');
@@ -227,7 +227,7 @@ describe('Tastatur', () => {
     expect(document.getElementById('a')!.getAttribute('aria-selected')).toBe('true');
   });
   it('eine Taste an einem Element, das kein Tab ist, tut nichts', () => {
-    start(tabsMarkup().replace('<span class="dss-tab-label">Alle</span>', '<span class="dss-tab-label">Alle</span>') + '<input id="x">');
+    start(tabsMarkup().replace('<span class="hoops-tab-label">Alle</span>', '<span class="hoops-tab-label">Alle</span>') + '<input id="x">');
     keydown(document.getElementById('r-bar')!, 'ArrowRight');
     expect(selected()).toEqual(['alle']);
   });
@@ -236,7 +236,7 @@ describe('Tastatur', () => {
 describe('Klick', () => {
   it('ein Klick wählt (auch auf das innere Label), ein gesperrter Tab nicht', () => {
     start();
-    (tab('ausw').querySelector('.dss-tab-label') as HTMLElement).click();
+    (tab('ausw').querySelector('.hoops-tab-label') as HTMLElement).click();
     expect(selected()).toEqual(['ausw']);
     tab('aus').click();
     expect(selected()).toEqual(['ausw']);
@@ -251,17 +251,17 @@ describe('Klick', () => {
   it('ein Klick auf den gewählten Tab ändert nichts und meldet nichts', () => {
     start();
     const spy = vi.fn();
-    document.getElementById('r-bar')!.addEventListener('dss:tabchange', spy);
+    document.getElementById('r-bar')!.addEventListener('hoops:tabchange', spy);
     tab('alle').click();
     expect(spy).not.toHaveBeenCalled();
   });
 });
 
-describe('Ereignis dss:tabchange', () => {
+describe('Ereignis hoops:tabchange', () => {
   it('meldet den Wechsel mit Detail, blubbert, kommt nicht beim Start', () => {
     mountHtml(tabsMarkup());
     const spy = vi.fn();
-    document.body.addEventListener('dss:tabchange', spy);
+    document.body.addEventListener('hoops:tabchange', spy);
     const onChange = vi.fn();
     handles.push(initTabs(document.getElementById('r-bar')!, { onChange }));
     expect(spy).not.toHaveBeenCalled();
@@ -272,12 +272,12 @@ describe('Ereignis dss:tabchange', () => {
     expect(detail.tab).toBe(tab('heim'));
     expect(detail.panel).toBe(panel('heim'));
     expect(onChange).toHaveBeenCalledTimes(1);
-    document.body.removeEventListener('dss:tabchange', spy);
+    document.body.removeEventListener('hoops:tabchange', spy);
   });
   it('select() meldet source api, data-tab ist der Schlüssel', () => {
     const h = start(tabsMarkup().replace('id="r-heim"', 'id="r-heim" data-tab="heim"'));
     const sources: string[] = [];
-    document.getElementById('r-bar')!.addEventListener('dss:tabchange', (e) => sources.push((e as CustomEvent).detail.source + ':' + (e as CustomEvent).detail.id));
+    document.getElementById('r-bar')!.addEventListener('hoops:tabchange', (e) => sources.push((e as CustomEvent).detail.source + ':' + (e as CustomEvent).detail.id));
     h.select('heim');
     h.select(3);
     h.select(tab('alle'));
@@ -292,10 +292,10 @@ describe('Ereignis dss:tabchange', () => {
 });
 
 describe('Mehrfachauswahl (role=group, aria-pressed)', () => {
-  const group = `<div class="dss-tabs dss-tabs--pills" role="group" aria-label="Wettbewerb" id="m-bar">
-    <button type="button" class="dss-tab is-active" id="m-liga" aria-pressed="true">Liga</button>
-    <button type="button" class="dss-tab" id="m-pokal" aria-pressed="false">Pokal</button>
-    <button type="button" class="dss-tab" id="m-ref" aria-pressed="false" disabled>Test</button></div>`;
+  const group = `<div class="hoops-tabs hoops-tabs--pills" role="group" aria-label="Wettbewerb" id="m-bar">
+    <button type="button" class="hoops-tab is-active" id="m-liga" aria-pressed="true">Liga</button>
+    <button type="button" class="hoops-tab" id="m-pokal" aria-pressed="false">Pokal</button>
+    <button type="button" class="hoops-tab" id="m-ref" aria-pressed="false" disabled>Test</button></div>`;
   it('Klick schaltet um, kein Rollenwechsel, keine Pfeiltasten', () => {
     const h = start(group, {}, 'm-bar');
     const bar = document.getElementById('m-bar')!;
@@ -314,7 +314,7 @@ describe('Mehrfachauswahl (role=group, aria-pressed)', () => {
   it('das Ereignis trägt pressed und ids', () => {
     start(group, {}, 'm-bar');
     const spy = vi.fn();
-    document.getElementById('m-bar')!.addEventListener('dss:tabchange', spy);
+    document.getElementById('m-bar')!.addEventListener('hoops:tabchange', spy);
     document.getElementById('m-pokal')!.click();
     expect((spy.mock.calls[0][0] as CustomEvent).detail).toMatchObject({ pressed: true, ids: ['m-liga', 'm-pokal'], index: 1 });
   });
@@ -369,7 +369,7 @@ describe('Deep-Link (hash)', () => {
     window.dispatchEvent(new HashChangeEvent('hashchange'));
     expect(selected()).toEqual(['ausw']);
     const sources: string[] = [];
-    document.getElementById('r-bar')!.addEventListener('dss:tabchange', (e) => sources.push((e as CustomEvent).detail.source));
+    document.getElementById('r-bar')!.addEventListener('hoops:tabchange', (e) => sources.push((e as CustomEvent).detail.source));
     window.history.replaceState(null, '', '/#r-in-heim');
     window.dispatchEvent(new HashChangeEvent('hashchange'));
     expect(selected()).toEqual(['heim']);
@@ -396,7 +396,7 @@ describe('mehrere Leisten, init mehrfach, destroy', () => {
     expect(panel('heim', 'b').hidden).toBe(true);
   });
   it('eine verschachtelte Leiste im Panel gehört nicht zur äußeren', () => {
-    const inner = `<div class="dss-tabs" id="i-bar"><button class="dss-tab" id="i1">1</button><button class="dss-tab" id="i2">2</button></div>`;
+    const inner = `<div class="hoops-tabs" id="i-bar"><button class="hoops-tab" id="i1">1</button><button class="hoops-tab" id="i2">2</button></div>`;
     start(tabsMarkup().replace('<p>Alle 12 Spiele</p>', `<p>Alle 12 Spiele</p>${inner}`));
     handles.push(initTabs(document.getElementById('i-bar')!));
     keydown(document.getElementById('i1')!, 'ArrowRight');
@@ -410,7 +410,7 @@ describe('mehrere Leisten, init mehrfach, destroy', () => {
     handles.push(initTabs(bar));
     handles.push(initTabs(bar));
     const spy = vi.fn();
-    bar.addEventListener('dss:tabchange', spy);
+    bar.addEventListener('hoops:tabchange', spy);
     keydown(tab('alle'), 'ArrowRight');
     expect(spy).toHaveBeenCalledTimes(1);
     expect(selected()).toEqual(['heim']);
@@ -427,7 +427,7 @@ describe('mehrere Leisten, init mehrfach, destroy', () => {
     expect(document.body.innerHTML).toBe(before);
   });
   it('destroy entfernt ergänzte Rollen und ids wieder', () => {
-    mountHtml(`<div class="dss-tabs" id="r-bar"><button class="dss-tab">A</button><button class="dss-tab">B</button></div>`);
+    mountHtml(`<div class="hoops-tabs" id="r-bar"><button class="hoops-tab">A</button><button class="hoops-tab">B</button></div>`);
     const before = document.body.innerHTML;
     initTabs(document.getElementById('r-bar')!).destroy();
     expect(document.body.innerHTML).toBe(before);

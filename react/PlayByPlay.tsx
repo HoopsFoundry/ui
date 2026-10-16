@@ -51,44 +51,44 @@ export function PlayByPlay({
 }: PlayByPlayProps) {
   const Heading = useHeadingTag(titleAs);
   return (
-    <div className={cn('dss-pbp-frame', dark && 'dss-pbp-frame--dark', className)}>
-      <div className="dss-pbp-head">
-        <Heading className="dss-pbp-title">{title}</Heading>
-        <div className="dss-pbp-meta">
+    <div className={cn('hoops-pbp-frame', dark && 'hoops-pbp-frame--dark', className)}>
+      <div className="hoops-pbp-head">
+        <Heading className="hoops-pbp-title">{title}</Heading>
+        <div className="hoops-pbp-meta">
           {meta ? <span>{meta}</span> : null}
           {live ? (
-            <span className="dss-pbp-live">
-              <span className="dss-pbp-dot" aria-hidden="true" /> Live
+            <span className="hoops-pbp-live">
+              <span className="hoops-pbp-dot" aria-hidden="true" /> Live
             </span>
           ) : null}
         </div>
       </div>
 
-      <div className="dss-pbp-feed" role="log" aria-label={title} tabIndex={0}>
+      <div className="hoops-pbp-feed" role="log" aria-label={title} tabIndex={0}>
         {events.map((event) => {
           const team = event.team ?? 'none';
           const abschnitt = resolvePeriod({ period: event.period, periods, quarter: event.quarter });
           return (
-            <div key={event.id} className={cn('dss-pbp-event', `dss-pbp-event--${event.kind ?? 'default'}`)}>
-              <div className="dss-pbp-time">
+            <div key={event.id} className={cn('hoops-pbp-event', `hoops-pbp-event--${event.kind ?? 'default'}`)}>
+              <div className="hoops-pbp-time">
                 {event.time}
                 {abschnitt.short ? (
-                  <span className="dss-pbp-q">
+                  <span className="hoops-pbp-q">
                     {abschnitt.alias ? (
                       abschnitt.label
                     ) : (
                       <>
                         <span aria-hidden="true">{abschnitt.short}</span>
-                        <span className="dss-sr-only">{abschnitt.label}</span>
+                        <span className="hoops-sr-only">{abschnitt.label}</span>
                       </>
                     )}
                   </span>
                 ) : null}
               </div>
-              <div className={cn('dss-pbp-strip', `dss-pbp-strip--${team}`)} aria-hidden="true" />
-              <div className="dss-pbp-body">
-                <div className="dss-pbp-action">
-                  {team !== 'none' ? <span className="dss-sr-only">{TEAM_TEXT[team]} </span> : null}
+              <div className={cn('hoops-pbp-strip', `hoops-pbp-strip--${team}`)} aria-hidden="true" />
+              <div className="hoops-pbp-body">
+                <div className="hoops-pbp-action">
+                  {team !== 'none' ? <span className="hoops-sr-only">{TEAM_TEXT[team]} </span> : null}
                   {event.titleBold ? (
                     <>
                       <b>{event.titleBold}</b> ·{' '}
@@ -96,16 +96,16 @@ export function PlayByPlay({
                   ) : null}
                   {event.title}
                 </div>
-                {event.detail ? <div className="dss-pbp-detail">{event.detail}</div> : null}
+                {event.detail ? <div className="hoops-pbp-detail">{event.detail}</div> : null}
               </div>
               {event.score ? (
-                <div className="dss-pbp-score">
+                <div className="hoops-pbp-score">
                   <span aria-hidden="true">
                     {event.score.heim}
-                    <span className="dss-pbp-sep">:</span>
+                    <span className="hoops-pbp-sep">:</span>
                     {event.score.gast}
                   </span>
-                  <span className="dss-sr-only">{`Spielstand ${event.score.heim} zu ${event.score.gast}`}</span>
+                  <span className="hoops-sr-only">{`Spielstand ${event.score.heim} zu ${event.score.gast}`}</span>
                 </div>
               ) : null}
             </div>

@@ -227,20 +227,20 @@
   <p class="readout">Screenreader: <q>TSV Nordhain 1920, gegen, Lindenberg Hawks</q></p>
 {:else if example === 'dont-logo'}
   <!-- Nachgestellt: die Komponente setzt immer alt="". Hier trägt das Bild den Vereinsnamen als Alternativtext. -->
-  <div class="dss-frame">
-    <div class="dss-table-scroll">
-      <table role="table" class="dss-tbl dss-tbl--schedule dss-tbl--default dss-sch--versus">
-        <caption class="dss-sr-only">Logo mit Alternativtext</caption>
+  <div class="hoops-frame">
+    <div class="hoops-table-scroll">
+      <table role="table" class="hoops-tbl hoops-tbl--schedule hoops-tbl--default hoops-sch--versus">
+        <caption class="hoops-sr-only">Logo mit Alternativtext</caption>
         <tbody role="rowgroup">
-          <tr role="row" class="dss-sch-row">
-            <td role="cell" class="dss-sch-when"><span class="dss-sch-date">{D}</span> <span class="dss-sch-time">15:00</span></td>
-            <td role="cell" class="dss-sch-match">
-              <span class="dss-sch-team dss-sch-team--logo"><span class="dss-team-logo"><img src={nordhainLogo} alt="Logo TSV Nordhain 1920" /></span><a class="dss-link" href="#">TSV Nordhain 1920</a></span>
-              <span class="dss-sch-sep" aria-hidden="true"> – </span>
-              <span class="dss-sr-only"> gegen </span>
-              <span class="dss-sch-team dss-sch-team--logo"><span class="dss-team-logo"><img src={hawksLogo} alt="Logo Lindenberg Hawks" /></span><a class="dss-link" href="#">Lindenberg Hawks</a></span>
+          <tr role="row" class="hoops-sch-row">
+            <td role="cell" class="hoops-sch-when"><span class="hoops-sch-date">{D}</span> <span class="hoops-sch-time">15:00</span></td>
+            <td role="cell" class="hoops-sch-match">
+              <span class="hoops-sch-team hoops-sch-team--logo"><span class="hoops-team-logo"><img src={nordhainLogo} alt="Logo TSV Nordhain 1920" /></span><a class="hoops-link" href="#">TSV Nordhain 1920</a></span>
+              <span class="hoops-sch-sep" aria-hidden="true"> – </span>
+              <span class="hoops-sr-only"> gegen </span>
+              <span class="hoops-sch-team hoops-sch-team--logo"><span class="hoops-team-logo"><img src={hawksLogo} alt="Logo Lindenberg Hawks" /></span><a class="hoops-link" href="#">Lindenberg Hawks</a></span>
             </td>
-            <td role="cell" class="dss-sch-res"><span class="dss-sch-none">–</span></td>
+            <td role="cell" class="hoops-sch-res"><span class="hoops-sch-none">–</span></td>
           </tr>
         </tbody>
       </table>
@@ -273,7 +273,7 @@
   </div>
 {:else if example === 'einklappbar-id'}
   <div class="stack">
-    <p class="links">Direkt springen: <a class="dss-link" href="#sp-turnier">Turnierplan (Deep-Link)</a></p>
+    <p class="links">Direkt springen: <a class="hoops-link" href="#sp-turnier">Turnierplan (Deep-Link)</a></p>
     <ScheduleTable collapsible id="sp-mannschaft" games={mannschaft} layout="opponent" title="Spielplan der Mannschaft" meta="4 Spiele" caption="Deep-Link: Mannschaftsplan" />
     <ScheduleTable collapsible id="sp-turnier" games={turnier} layout="columns" title="Turnierplan" meta="4 Spiele" caption="Deep-Link: Turnierplan" />
   </div>
@@ -299,7 +299,7 @@
   {#if example === 'zustand-' + s.key}
     {#if s.extra === 'notice'}
       <ScheduleTable games={s.games} layout={s.layout} caption={`Zustand ${s.label}`}>
-        {#snippet notice()}<span class="dss-chip dss-chip--warn">Sperrzeit</span>{/snippet}
+        {#snippet notice()}<span class="hoops-chip hoops-chip--warn">Sperrzeit</span>{/snippet}
       </ScheduleTable>
     {:else if s.extra === 'time'}
       <ScheduleTable games={s.games} layout={s.layout} caption={`Zustand ${s.label}`}>
@@ -315,5 +315,5 @@
   .stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
   .links { margin: 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .readout { margin: 8px 0 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-fg-soft); }
-  .shout :global(.dss-tbl tbody tr:not(.dss-sch-group)) { background: var(--hoops-signal-400); }
+  .shout :global(.hoops-tbl tbody tr:not(.hoops-sch-group)) { background: var(--hoops-signal-400); }
 </style>

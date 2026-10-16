@@ -1,5 +1,5 @@
 /**
- * DSS PageNav · Seitennavigation „Auf dieser Seite“
+ * HoopsFoundry UI PageNav · Seitennavigation „Auf dieser Seite“
  * --------------------------------------------------------------
  * `initPageNav(root, options)` baut aus den Überschriften in `root` eine Navigation (echtes `nav`, `ul`, Links) und beobachtet, ob später
  * Überschriften dazukommen (Inhalt, den die Seite im Browser nachlädt). Ein Sprung öffnet alle umgebenden Bereiche des Accordions, einklappbare
@@ -135,7 +135,7 @@ export function initPageNav(root, options = {}) {
     } catch {
       found = [...root.querySelectorAll(DEFAULTS.selector)]; // ungültige Auswahl: Standard
     }
-    return found.filter((el) => !el.closest('.dss-pagenav') && !isSkipped(el, root, skipAttribute));
+    return found.filter((el) => !el.closest('.hoops-pagenav') && !isSkipped(el, root, skipAttribute));
   };
 
   const taken = () => new Set([...doc.querySelectorAll('[id]')].map((el) => el.id));
@@ -144,7 +144,7 @@ export function initPageNav(root, options = {}) {
   // nach Dauer und Verzögerung plus Puffer, wird noch einmal gescrollt und der Fokus gesetzt. Ohne Animation (reduzierte Bewegung, Vanilla) entfällt das.
   const settle = (target, focusIt) => {
     const panels = [];
-    for (let el = target.parentElement?.closest('.dss-acc-panel'); el; el = el.parentElement?.closest('.dss-acc-panel')) panels.push(el);
+    for (let el = target.parentElement?.closest('.hoops-acc-panel'); el; el = el.parentElement?.closest('.hoops-acc-panel')) panels.push(el);
     let wait = 0;
     for (const panel of panels) {
       for (const el of [panel, panel.firstElementChild].filter(Boolean)) {
@@ -188,22 +188,22 @@ export function initPageNav(root, options = {}) {
   };
 
   const build = (list) => {
-    const id = `dss-pagenav-${++uid}`;
+    const id = `hoops-pagenav-${++uid}`;
     const el = doc.createElement('nav');
-    el.className = 'dss-pagenav';
+    el.className = 'hoops-pagenav';
     el.setAttribute('aria-labelledby', `${id}-label`);
     const eyebrow = doc.createElement('p');
-    eyebrow.className = 'dss-eyebrow';
+    eyebrow.className = 'hoops-eyebrow';
     eyebrow.id = `${id}-label`;
     eyebrow.textContent = label;
     const ul = doc.createElement('ul');
-    ul.className = 'dss-pagenav-list';
+    ul.className = 'hoops-pagenav-list';
     // mit Seitenadresse: <base href> würde ein bloßes #id auf die Startseite lenken
     const page = win.location.href.split('#')[0];
     for (const entry of list) {
       const li = doc.createElement('li');
       const a = doc.createElement('a');
-      a.className = 'dss-pagenav-link';
+      a.className = 'hoops-pagenav-link';
       a.href = `${page}#${encodeURIComponent(entry.id)}`;
       a.textContent = entry.text;
       li.append(a);
@@ -211,7 +211,7 @@ export function initPageNav(root, options = {}) {
     }
     el.append(eyebrow, ul);
     el.addEventListener('click', (event) => {
-      const link = event.target instanceof Element ? event.target.closest('a.dss-pagenav-link') : null;
+      const link = event.target instanceof Element ? event.target.closest('a.hoops-pagenav-link') : null;
       if (!link || event.defaultPrevented || event.button > 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const wanted = hashTarget(link.getAttribute('href').split('#')[1] ?? '', list.map((e) => e.id));
       const target = wanted ? doc.getElementById(wanted) : null;
@@ -223,7 +223,7 @@ export function initPageNav(root, options = {}) {
   };
 
   const unmark = (el) => {
-    el.classList.remove('dss-pagenav-target');
+    el.classList.remove('hoops-pagenav-target');
     if (!el.classList.length) el.removeAttribute('class');
     marked.delete(el);
   };
@@ -246,7 +246,7 @@ export function initPageNav(root, options = {}) {
     for (const el of [...marked]) if (!list.some((e) => e.el === el)) unmark(el);
     if (!next) return;
     for (const entry of list) {
-      entry.el.classList.add('dss-pagenav-target');
+      entry.el.classList.add('hoops-pagenav-target');
       marked.add(entry.el);
     }
     nav = build(list);
@@ -278,7 +278,7 @@ export function initPageNav(root, options = {}) {
       if (own(r.target)) return false;
       if (r.type !== 'childList') return true;
       const nodes = [...r.addedNodes, ...r.removedNodes];
-      return nodes.length === 0 || !nodes.every((n) => n.nodeType === 1 && n.classList?.contains('dss-pagenav'));
+      return nodes.length === 0 || !nodes.every((n) => n.nodeType === 1 && n.classList?.contains('hoops-pagenav'));
     };
     let pendingSince = 0;
     const observer = new win.MutationObserver((records) => {
