@@ -1,6 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from 'react';
 import { Icon, type IconName } from './Icon';
 import { cn } from './cn';
+import { nextTab } from '../js/tabs.js';
 
 export interface TabItem {
   id: string;
@@ -67,18 +68,11 @@ export function Tabs({
 
   const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     if (multi) return;
-    const horizontal = variant !== 'vertical';
-    const nextKey = horizontal ? 'ArrowRight' : 'ArrowDown';
-    const prevKey = horizontal ? 'ArrowLeft' : 'ArrowUp';
-    if (event.key !== nextKey && event.key !== prevKey) return;
-
+    const axis = variant === 'vertical' ? ['ArrowUp', 'ArrowDown'] : ['ArrowLeft', 'ArrowRight'];
+    if (!['Home', 'End', ...axis].includes(event.key)) return; // Pfeile der anderen Achse bleiben unberührt
+    const next = nextTab(index, event.key, items, { vertical: variant === 'vertical' });
     event.preventDefault();
-    const direction = event.key === nextKey ? 1 : -1;
-    let next = index;
-    for (let i = 0; i < items.length; i++) {
-      next = (next + direction + items.length) % items.length;
-      if (!items[next].disabled) break;
-    }
+    if (next === index) return;
     select(items[next]);
     buttons.current[next]?.focus();
   };

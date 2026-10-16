@@ -4,11 +4,13 @@
    * --------------------------------------------------------------
    * Modal with backdrop, optional icon header, body, and footer slot.
    * Closes on Escape; a click on the backdrop closes only with dismissOnBackdrop. Nutzt ausschließlich die Klassen aus
-   * css/components.css (kein eigener Scoped-Style).
+   * css/components.css (kein eigener Scoped-Style). Das Verhalten (Fokus hinein, Fokusfalle, Fokusrückgabe, Seite inert, Scroll-Sperre)
+   * kommt wie im Vanilla-Baustein aus js/modal.js (`initModal`), das mit dem Markup gestartet wird, solange `open` gilt.
    */
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import { levelOfTag, nextLevel, resolveHeading, type HeadingTag } from '../js/heading.js';
   import { provideHeadingLevel } from './heading-context.js';
+  import { initModal } from '../js/modal.js';
 
   type Severity = 'default' | 'danger' | 'warn' | 'ok' | 'info';
   type Size = 'sm' | 'md' | 'wide' | 'xwide';
@@ -49,20 +51,29 @@
   const titleTag = $derived(resolveHeading(titleAs, 2));
   provideHeadingLevel(() => nextLevel(levelOfTag(titleTag)));
 
-  function handleClose() {
-    open = false;
-    onclose?.();
-  }
+  let root = $state<HTMLElement>();
 
-  function handleKey(e: KeyboardEvent) {
-    if (open && closable && e.key === 'Escape') handleClose();
-  }
+  // Verhalten aus js/modal.js: öffnet sofort (Fokus ins Modal, Seite inert, Scroll-Sperre), beim Schließen oder Abräumen kehrt der Fokus zurück.
+  // Escape, Schließen-Knopf und Hintergrund meldet initModal über onClose; open und onclose ziehen nach.
+  $effect(() => {
+    if (!open || !root) return;
+    // Die Optionen werden beim Öffnen gelesen; ein Wechsel von closable oder dismissOnBackdrop öffnet das Modal nicht neu
+    const handle = untrack(() => initModal(root!, {
+      closable,
+      dismissOnBackdrop,
+      onClose: () => {
+        open = false;
+        onclose?.();
+      },
+    }));
+    handle.open();
+    return () => handle.destroy();
+  });
 </script>
 
-<svelte:window onkeydown={handleKey} />
-
 {#if open}
-  <div class="hoops-backdrop" onclick={closable && dismissOnBackdrop ? handleClose : null} role="presentation"></div>
+<div bind:this={root}>
+  <div class="hoops-backdrop" role="presentation"></div>
   <div class="hoops-modal-wrap" role="dialog" aria-modal="true" aria-labelledby={titleId}>
     <div class="hoops-modal hoops-modal--{size}">
       <div class="hoops-m-head">
@@ -84,8 +95,8 @@
           {#if subtitle}<div class="hoops-m-subtitle">{subtitle}</div>{/if}
         </div>
         {#if closable}
-          <button class="hoops-m-close" aria-label="Schließen" onclick={handleClose}>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
+          <button type="button" class="hoops-m-close" aria-label="Schließen">
+            <svg width="16" height="16" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
           </button>
         {/if}
       </div>
@@ -99,4 +110,5 @@
       {/if}
     </div>
   </div>
+</div>
 {/if}

@@ -47,7 +47,7 @@
     zoom?: number;
     /** Höhe der Karte in Pixeln (Standard 320, 200 bis 2000). */
     height?: number;
-    /** `false`: kein Ziehen, Scrollzoom und Doppelklick; Tasten und Zoom-Schaltflächen bleiben. */
+    /** `false`: kein Ziehen, Scrollzoom und Doppelklick, keine Zoom-Schaltflächen (keine zusätzlichen Tab-Stopps); der Tastaturzoom auf der Kartenfläche bleibt. */
     interactive?: boolean;
     /** `click`: Platzhalter, Kacheln erst nach „Karte laden“ (Standard). `auto`: sofort laden. */
     load?: 'click' | 'auto';
@@ -140,6 +140,13 @@
     controller?.update(next);
   });
 
+  // Nach einem Ladefehler (nicht bei ungültiger tileUrl): derselbe Ablauf wie „Karte laden“, der Fokus geht danach auf die Kartenfläche
+  const canRetry = $derived(state === 'error' && urlOk && failure !== null);
+  function retry() {
+    userStarted = true;
+    failure = null;
+    phase = 'loading';
+  }
   function start() {
     userStarted = true;
     phase = 'loading';
@@ -166,6 +173,11 @@
           {#each state === 'error' ? [] : pins as pin (pin.id)}
             <span class={`hoops-map-ph-pin${pin.own ? ' is-own' : ''}${pin.kind === 'seat' ? ' is-seat' : ''}`} style={`left:${pin.x}%;top:${pin.y}%`} aria-hidden="true">{pin.number ?? ''}</span>
           {/each}
+          {#if canRetry}
+            <div class="hoops-map-ph-card">
+              <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-retry" onclick={retry}>{mapText.retry}</button>
+            </div>
+          {/if}
           {#if state === 'idle'}
             <div class="hoops-map-ph-card">
               <p class="hoops-map-note">{privacyNote}</p>
@@ -174,7 +186,7 @@
           {/if}
         </div>
       {/if}
-      {#if state === 'ready'}
+      {#if state === 'ready' && interactive !== false}
         <div class="hoops-map-zoom" role="group" aria-label={mapText.zoomGroup}>
           <button type="button" class="hoops-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onclick={() => canIn && controller?.zoomIn()}>
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M10 4v12M4 10h12" /></svg>

@@ -50,6 +50,7 @@ describe('Modal-Fuß', () => {
 describe('Modal: Klick auf den Hintergrund', () => {
   it('Svelte: schließt nur mit dismissOnBackdrop (Standard false)', () => {
     expect(modal).toMatch(/dismissOnBackdrop\s*=\s*false/);
-    expect(modal).toMatch(/class="hoops-backdrop"[^>]*onclick=\{closable && dismissOnBackdrop \? handleClose : null\}/);
+    // Der Klick läuft über initModal (Verhalten getestet in tests/modal-fassungen.test.tsx); die Option kommt aus der Prop
+    expect(modal).toMatch(/initModal\([^)]*\{\s*closable,\s*dismissOnBackdrop,/);
   });
 });

@@ -56,7 +56,7 @@ Telefon und E-Mail werden nur zu Links, wenn sie sicher sind. Die Rufnummer darf
 
 ## Nächste Spiele
 
-`games` nimmt `ScheduleGame`-Einträge mit `heim` und `gast`. Gezeigt werden die ersten **zwei** in der Reihenfolge der Eingabe (`limit` ändert die Zahl, höchstens fünf; ungültige Werte gelten als 2). **Beendete** und **spielfreie** Einträge entfallen, ebenso Einträge ohne Mannschaft; **Live**, **Abgesagt** und **Verschoben** erscheinen mit Text-Chip. Jede Zeile zeigt Datum und Uhrzeit, Liga und Feld, darunter die Mannschaften mit Trikotpunkt (der Punkt hat einen Rand, damit er auch im Dunkelmodus sichtbar bleibt; „Heim“ und „Gast“ stehen versteckt im Text). `names` und `logos` wirken wie bei Spielplan und Karten: Kurznamen bis 640 px automatisch, Logos dekorativ, Initialen ohne Logo. `gamesLabel` (Standard „Nächste Spiele in der Halle“) beschriftet Block und Liste.
+`games` nimmt `ScheduleGame`-Einträge mit `heim` und `gast`. Gezeigt werden die ersten **zwei** in der Reihenfolge der Eingabe (`limit` ändert die Zahl, höchstens fünf; ungültige Werte gelten als 2). **Beendete** und **spielfreie** Einträge entfallen, ebenso Einträge ohne Mannschaft; **Live**, **Abgesagt** und **Verschoben** erscheinen mit Text-Chip. Jede Zeile zeigt Datum und Uhrzeit, Liga und Feld, darunter die Mannschaften mit Trikotpunkt (der Punkt hat einen Rand, damit er auch im Dunkelmodus sichtbar bleibt; „Heim“ und „Gast“ stehen versteckt im Text). `names` und `logos` wirken wie bei Spielplan und Karten: Kurznamen bis 640 px Kartenbreite automatisch, Logos dekorativ, Initialen ohne Logo. `gamesLabel` (Standard „Nächste Spiele in der Halle“) beschriftet Block und Liste.
 
 <Canvas of={VenueCardStories.Spiele} />
 
@@ -88,7 +88,7 @@ Gemessen im Browser (Chromium, BBV); die Kartenbreite steht in der jeweiligen Ze
 
 ## Handy · 390 px Breite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (zwei verschiedene Hallen, damit die Karten auf der Seite unterscheidbar bleiben). Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben. Genau gilt: ist die Containerbreite ohne den 1 px breiten Rand der Karte höchstens 640 px (die Karte also höchstens 642 px breit), steht die Karte oben; ab 643 px steht sie links. Die Kurznamen der Mannschaften (`names`) folgen dagegen der **Fensterbreite** (bis 640 px), nicht der Karte: in einer schmalen Spalte am großen Bildschirm bleibt es bei `names="full"`, wenn du `short` nicht selbst setzt.
+Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (zwei verschiedene Hallen, damit die Karten auf der Seite unterscheidbar bleiben). Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben. Genau gilt: ist die Containerbreite ohne den 1 px breiten Rand der Karte höchstens 640 px (die Karte also höchstens 642 px breit), steht die Karte oben; ab 643 px steht sie links. Auch die Kurznamen der Mannschaften (`names`) folgen der **Breite der Karte** (Container-Abfrage, dieselbe Schwelle von 640 px): in einer schmalen Spalte am großen Bildschirm erscheinen die Kurznamen, in einer breiten Karte auf dem Handy-Fenster nicht; `names="short"` zeigt sie immer.
 
 <div className="hoops-phones">
   <div className="hoops-phone">
@@ -111,7 +111,7 @@ Alle Flächen und Texte laufen über die semantischen Tokens; die Karte braucht 
 
 ## Zustände: Link-Hover und Fokus
 
-Die Karte selbst ist nicht klickbar, die Links in ihr sind es: Größere Karte, Route planen, Telefon, E-Mail und der Link zur Hallenseite. Bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring um den Link. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Die Schaltflächen der Karte (Karte laden, Zoom) stehen auf der Seite Map. Hinweis: Auch mit `interactive={false}` zeigt die geladene Karte die Zoom-Schaltflächen und reagiert auf die Tasten; nur Ziehen, Scrollzoom und Doppelklick sind aus.
+Die Karte selbst ist nicht klickbar, die Links in ihr sind es: Größere Karte, Route planen, Telefon, E-Mail und der Link zur Hallenseite. Bei Tastaturfokus liegt der gestrichelte Gold/Amber-Ring um den Link. Einen Stil für Gedrückt oder Gesperrt gibt es nicht. Die Schaltflächen der Karte (Karte laden, Zoom) stehen auf der Seite Map. Hinweis: Die Karte der Hallenkarte läuft mit `interactive={false}`: Ziehen, Scrollzoom und Doppelklick sind aus und die Zoom-Schaltflächen entfallen (keine zusätzlichen Tab-Stopps in der Karte); die geladene Karte reagiert weiter auf die Tasten (Pfeile verschieben, Plus und Minus zoomen).
 
 <Canvas of={VenueCardStories.Zustaende} />
 

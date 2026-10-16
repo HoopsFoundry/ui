@@ -81,7 +81,7 @@ export interface MapPin {
 
 export const mapText: {
   load: string; loading: string; error: string; privacy: string; skip: string; zoomIn: string; zoomOut: string;
-  attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; seat: string; zoomGroup: string; canvasHint: string;
+  attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; seat: string; retry: string; zoomGroup: string; canvasHint: string;
 };
 export const DEFAULT_TILE_URL: string;
 /** Name eines Markers für Hilfstechnik; ein Sitzmarker bekommt den Zusatz „Vereinssitz“. */

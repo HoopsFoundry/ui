@@ -24,6 +24,10 @@ export const mapPinsMarkup = (pins) =>
 export const mapCardMarkup = (privacy, enabled) =>
   `<div class="hoops-map-ph-card"><p class="hoops-map-note">${esc(privacy)}</p><button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load"${enabled ? '' : ' disabled aria-disabled="true"'}>${esc(mapText.load)}</button></div>`;
 
+/** Karte mit der Schaltfläche „Erneut versuchen“ (Fehlerzustand nach einem Ladefehler; gehört zu `initMap`). */
+export const mapRetryMarkup = () =>
+  `<div class="hoops-map-ph-card"><button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-retry">${esc(mapText.retry)}</button></div>`;
+
 /** Einträge der Ortsliste (der Inhalt von `ol.hoops-map-list`). */
 export const mapListMarkup = (items, showList) =>
   items

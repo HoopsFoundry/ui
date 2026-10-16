@@ -1,5 +1,5 @@
 // Parität der Tastaturregeln: Svelte-Tabs, React-Tabs und initTabs wählen bei derselben Tastenfolge dieselben Tabs
-// (Pfeile in Richtung, Umlauf, gesperrte übersprungen, roving tabindex). Bekannte Abweichung: Pos1/Ende gibt es nur im Vanilla-Baustein.
+// (Pfeile in Richtung, Umlauf, gesperrte übersprungen, roving tabindex). Pos1/Ende springen in allen drei Fassungen an den ersten bzw. letzten nicht gesperrten Tab.
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import { flushSync, mount, unmount } from 'svelte';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -40,8 +40,8 @@ afterEach(() => {
 });
 
 const SEQUENCES: Record<string, string[]> = {
-  waagerecht: ['ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'a', 'ArrowDown', 'ArrowUp'],
-  senkrecht: ['ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'Enter'],
+  waagerecht: ['ArrowRight', 'ArrowRight', 'ArrowRight', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'ArrowLeft', 'a', 'ArrowDown', 'ArrowUp', 'End', 'End', 'Home', 'Home'],
+  senkrecht: ['ArrowDown', 'ArrowDown', 'ArrowRight', 'ArrowUp', 'ArrowUp', 'ArrowUp', 'ArrowLeft', 'Enter', 'End', 'Home', 'End'],
 };
 
 describe.each([['underline', 'waagerecht'], ['vertical', 'senkrecht']])('Tastenfolge (%s)', (variant, name) => {
@@ -76,19 +76,25 @@ describe.each([['underline', 'waagerecht'], ['vertical', 'senkrecht']])('Tastenf
   });
 });
 
-describe('Bekannte Abweichung: Pos1 und Ende', () => {
-  it('Svelte und React ignorieren sie, der Vanilla-Baustein springt an die Ränder (WAI-ARIA)', () => {
+describe('Pos1 und Ende', () => {
+  it('Svelte, React und Vanilla springen an die Ränder (WAI-ARIA), gesperrte Tabs zählen nicht', () => {
     const target = document.createElement('div');
     document.body.append(target);
     const instance = mount(SvelteTabs, { target, props: { items } });
     flushSync();
-    expect(press(target, ['End'], () => flushSync())[0].selected).toBe('A');
+    expect(press(target, ['End'], () => flushSync())[0].selected).toBe('D');
     unmount(instance);
     const { container } = render(<ReactTabs items={items} />);
-    expect(press(container, ['End'])[0].selected).toBe('A');
+    expect(press(container, ['End', 'Home'])[1].selected).toBe('A');
+    expect(press(container, ['End'])[0].selected).toBe('D');
     document.body.replaceChildren(document.createRange().createContextualFragment(markup('underline')));
     const handle = initTabs(document.getElementById('v')!);
     expect(press(document.getElementById('v')!, ['End'])[0].selected).toBe('D');
     handle.destroy();
+  });
+  it('mit multi bleiben Pos1/Ende ohne Wirkung', () => {
+    const { container } = render(<ReactTabs items={items} multi />);
+    const first = container.querySelector<HTMLElement>('button')!;
+    expect(fireEvent.keyDown(first, { key: 'End' })).toBe(true);
   });
 });

@@ -179,7 +179,7 @@ describe('Doku', () => {
     for (const phone of data.match(/030 \d{5} \d{3}/g) ?? []) expect(phone, phone).toMatch(/^030 23125 \d{3}$/);
   });
   it('Seite nennt Datenschutz mit Verweis auf die Map, Größen, Handy, Dunkelmodus, Zustände, Props, Code und Dos/Don\'ts', () => {
-    for (const needle of ['## Aufbau', '## Karte und Datenschutz', 'components-map--docs', '## Größen', '## Handy', 'Containerbreite ohne den 1 px breiten Rand', '**Fensterbreite**', 'Rand der Trikotpunkte', '258 px (30 %)', 'handy-dunkel', '## Dunkelmodus', '## Zustände', '<Controls of=', '<DocTable', '<FrameworkCode', '## Dos und Don\'ts', '**Vanilla:**']) expect(mdx, needle).toContain(needle);
+    for (const needle of ['## Aufbau', '## Karte und Datenschutz', 'components-map--docs', '## Größen', '## Handy', 'Containerbreite ohne den 1 px breiten Rand', '**Breite der Karte**', 'Rand der Trikotpunkte', '258 px (30 %)', 'handy-dunkel', '## Dunkelmodus', '## Zustände', '<Controls of=', '<DocTable', '<FrameworkCode', '## Dos und Don\'ts', '**Vanilla:**']) expect(mdx, needle).toContain(needle);
     expect((mdx.match(/title: '/g) ?? []).length).toBeGreaterThanOrEqual(3);
   });
   it('Einträge in Introduction, storySort, README und CHANGELOG', () => {

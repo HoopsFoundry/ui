@@ -10,6 +10,7 @@ import { safeHref } from './url.js';
 /** Texte der Komponente (eine Quelle für Svelte und React). */
 export const mapText = {
   load: 'Karte laden',
+  retry: 'Erneut versuchen',
   loading: 'Karte wird geladen …',
   error: 'Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.',
   privacy: 'Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.',

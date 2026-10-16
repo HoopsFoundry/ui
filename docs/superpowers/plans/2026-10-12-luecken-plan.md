@@ -5,17 +5,20 @@ Stand: 2026-10-12 · Quelle: Reviews und Berichte der Pakete Map, Accordion A/B,
 Aufwand: S = unter einem halben Tag, M = bis ein Tag, L = mehrere Tage. Jedes Paket läuft wie bisher: Worktree, Umsetzung, unabhängiger Review, Fixes, Merge, Push.
 
 ## Welle 1: Fehler und Sicherheit in vorhandenen Komponenten (zuerst)
+
+Stand 2026-10-16: erledigt (✓) sind 1.1, 1.2, 1.4, 1.5, 1.7, 1.8, 1.9 (Branch `feat/welle1`, ADR-011); offen bleiben 1.3 (Entscheidung), 1.6 und 1.10. Dazu behoben: Select-Stories „e.subscribe is not a function“ (Prop `state` überdeckte `$state`).
+
 | # | Lücke | Wo | Plan | Aufwand |
 |---|---|---|---|---|
-| 1.1 | Svelte-Modal: kein Fokus ins Modal, keine Falle, keine Fokusrückgabe, Seite nicht abgeschaltet, Scrollen nicht gesperrt, Schließen-Symbol ohne `aria-hidden` | `svelte/Modal.svelte` | Verhalten aus `js/modal.js` (V1b) als gemeinsame Logik nutzen oder nachbauen; Tests wie beim Vanilla-Modal; Parität mit React | M |
-| 1.2 | React-Modal (Radix): Fokus geht beim Schließen nicht an den Auslöser zurück | `react/Modal.tsx` | `onCloseAutoFocus` bzw. Auslöser merken; Test | S |
+| 1.1 ✓ | Svelte-Modal: kein Fokus ins Modal, keine Falle, keine Fokusrückgabe, Seite nicht abgeschaltet, Scrollen nicht gesperrt, Schließen-Symbol ohne `aria-hidden` | `svelte/Modal.svelte` | Verhalten aus `js/modal.js` (V1b) als gemeinsame Logik nutzen oder nachbauen; Tests wie beim Vanilla-Modal; Parität mit React | M |
+| 1.2 ✓ | React-Modal (Radix): Fokus geht beim Schließen nicht an den Auslöser zurück | `react/Modal.tsx` | `onCloseAutoFocus` bzw. Auslöser merken; Test | S |
 | 1.3 | `safeHref` lässt protokoll-relative Ziele (`//evil.example/x`) durch | `js/url.js` | Entscheidung: ablehnen (Standard) oder Option `allowProtocolRelative`; Tabellentest; Map, Venue, PageNav prüfen | S |
-| 1.4 | Tabs: Pos1/Ende nur in Vanilla, Svelte/React „nicht belegt" | `svelte/Tabs.svelte`, `react/Tabs.tsx` | Home/End nachrüsten (gemeinsame `nextTab`-Logik); Paritätstest erweitern; Doku-Tabelle aktualisieren | S |
-| 1.5 | MatchCard: Trikotpunkt im Dunkelmodus kaum sichtbar (`--team-heim`, 1,57:1 bis 2,66:1) | `css/components.css` (MatchCard, ggf. ScheduleGrid) | gleicher Rand in `--dss-mute` wie bei VenueCard; Kontrasttest hell/dunkel × BBV/DBB | S |
+| 1.4 ✓ | Tabs: Pos1/Ende nur in Vanilla, Svelte/React „nicht belegt" | `svelte/Tabs.svelte`, `react/Tabs.tsx` | Home/End nachrüsten (gemeinsame `nextTab`-Logik); Paritätstest erweitern; Doku-Tabelle aktualisieren | S |
+| 1.5 ✓ | MatchCard: Trikotpunkt im Dunkelmodus kaum sichtbar (`--team-heim`, 1,57:1 bis 2,66:1) | `css/components.css` (MatchCard, ggf. ScheduleGrid) | gleicher Rand in `--dss-mute` wie bei VenueCard; Kontrasttest hell/dunkel × BBV/DBB | S |
 | 1.6 | Map: Speicherzuwachs beim Ein-/Aushängen (Reviewer ja, Entwickler nein) | `js/map-leaflet.js`, Komponenten | Gegenprobe mit dem Messaufbau des Reviewers (Storybook-Seite, CDP-Metriken, 5→45 Zyklen); Ergebnis dokumentieren, ggf. Ursache beheben | M |
-| 1.7 | Map: kein „Erneut versuchen" nach Fehlern; `load` wird nur beim Start gelesen | `Map`, `js/map-leaflet.js` | Knopf „Erneut versuchen" im Fehlerhinweis (`role=status` bleibt); Prop-Wechsel `load` auswerten oder dokumentieren | S |
-| 1.8 | Map: Zoom-Schaltflächen erscheinen bei `interactive={false}` (VenueCard: viele Tab-Stopps) | `Map`, `VenueCard` | Option `controls: false` bzw. bei `interactive=false` ausblenden (Tastaturzoom bleibt); VenueCard nutzt es; Tests | S |
-| 1.9 | VenueCard: `names="short"` folgt der Fensterbreite, nicht der Container-Abfrage | CSS | Container-Abfrage für Kurznamen auch in der Hallenkarte | S |
+| 1.7 ✓ | Map: kein „Erneut versuchen" nach Fehlern; `load` wird nur beim Start gelesen | `Map`, `js/map-leaflet.js` | Knopf „Erneut versuchen" im Fehlerhinweis (`role=status` bleibt); Prop-Wechsel `load` auswerten oder dokumentieren | S |
+| 1.8 ✓ | Map: Zoom-Schaltflächen erscheinen bei `interactive={false}` (VenueCard: viele Tab-Stopps) | `Map`, `VenueCard` | Option `controls: false` bzw. bei `interactive=false` ausblenden (Tastaturzoom bleibt); VenueCard nutzt es; Tests | S |
+| 1.9 ✓ | VenueCard: `names="short"` folgt der Fensterbreite, nicht der Container-Abfrage | CSS | Container-Abfrage für Kurznamen auch in der Hallenkarte | S |
 | 1.10 | Doku/Rezepte: Node-Endpunkt ohne Rate-Limit (nur Hinweis); OSM-Routenlink gegen echte Seite nicht geprüft | `stories/examples/kachel-endpunkt.ts`, `Map.mdx` | Rate-Limit-Beispiel ergänzen; Routenlink einmal im Browser prüfen | S |
 
 ## Welle 2: Prüflücken schließen (nichts bauen, nur belegen)
