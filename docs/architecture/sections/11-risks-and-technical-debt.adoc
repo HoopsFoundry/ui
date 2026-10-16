@@ -11,9 +11,9 @@ Der neuere Vanilla-Plan konkretisiert den älteren Review. Aufgaben aus historis
 
 === Priorisierte Risiken
 
-. Fokusmanagement und Tastaturparität: Modal und Tabs laut Lückenplan.
+. Fokusmanagement und Tastaturparität: Modal und Tabs sind seit Welle 1 angeglichen (ADR-011); offen bleibt die Prüfung mit Hilfstechnik in echten Browsern.
 . Eingabesicherheit: URL-Regeln und künftige Renderer.
-. Karten-Lifecycle: in Chromium bei wiederholtem Auf- und Abbau stabil gemessen; ein eigener Wiederholen-Knopf nach einem Fehler fehlt (neue `tileUrl` löst einen neuen Versuch aus). Firefox ist im Prüflauf noch nicht abgedeckt.
+. Karten-Lifecycle: in Chromium bei wiederholtem Auf- und Abbau stabil gemessen; nach einem Ladefehler bietet der Platzhalter „Erneut versuchen“ an (ADR-011), eine neue `tileUrl` löst ebenfalls einen neuen Versuch aus. Firefox ist im Prüflauf noch nicht abgedeckt.
 . Prüflücken: Browsermatrix, CSP und vollständige Docs-Prüfungen.
 . Auslieferung: noch nicht abgeschlossener Vanilla-Releaseprozess.
 . Dokumentationsdrift: abweichende Versionen, Begriffe und Planstände.

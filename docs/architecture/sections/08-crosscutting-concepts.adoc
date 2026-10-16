@@ -9,7 +9,7 @@ Alle eigenen CSS-Custom-Properties tragen das Präfix `--hoops-` (private Hilfsv
 
 === Accessibility
 
-Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusmanagement sind Bestandteil der API-Verantwortung. Modal- und Tabs-Parität weisen laut Lückenplan noch offene Punkte auf. Aussagen zu WCAG-Konformität müssen einen benannten Prüfungsumfang haben; Kontrasttests allein beweisen keine vollständige Konformität.
+Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusmanagement sind Bestandteil der API-Verantwortung. Modal (Fokus hinein, Falle, Rückgabe, abgeschaltete Seite, Scroll-Sperre) und Tabs (Pfeile, Pos1/Ende) verhalten sich in Vanilla, Svelte und React gleich (ADR-011). Aussagen zu WCAG-Konformität müssen einen benannten Prüfungsumfang haben; Kontrasttests allein beweisen keine vollständige Konformität.
 
 === Sicherheit
 

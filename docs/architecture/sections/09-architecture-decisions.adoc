@@ -97,6 +97,14 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 * Konsequenzen: Ein Umzug ändert die Konfiguration, `package.json` (vom Test geprüft) und die Texte in README/MDX. Im Browser gibt es keine Umgebungsvariablen, die Komponenten brauchen keine Adresse. `project.config.json` gehört in `files` des Pakets, weil `hoops-sync` aus dem Paket sie liest.
 * Quellen: ADR-006, ADR-008, ADR-009.
 
+=== ADR-011: Verhaltensparität der Framework-Fassungen (Modal, Tabs, Karte)
+
+* Status: angenommen und umgesetzt (Welle 1 des Lückenplans, Punkte 1.1, 1.2, 1.4, 1.7, 1.8, 1.9).
+* Kontext: Die Svelte-Fassung des Modals holte weder den Fokus noch sperrte sie die Seite, das React-Modal (Radix) gab den Fokus nicht zurück, Pos1/Ende gab es nur in `initTabs`, die Karte hatte keinen Neuversuch und zeigte bei `interactive={false}` weiter Zoom-Schaltflächen, die Kurznamen der Hallenkarte folgten der Fensterbreite.
+* Entscheidung: Verhalten, das schon als reine Funktion oder `initX` im Vanilla-Baustein besteht, wird von den Framework-Fassungen wiederverwendet statt nachgebaut. Das Svelte-Modal startet `initModal` (`js/modal.js`) auf seinem Markup, solange `open` gilt (Wrapper-`div` um Hintergrund und Dialog; Escape, Schließen-Knopf und Hintergrund laufen über `onClose` zurück in `open`). Das React-Modal bleibt bei Radix und merkt sich das Element mit Fokus beim Öffnen für `onCloseAutoFocus` (kein `Dialog.Trigger`). Die Tabs aller Fassungen nutzen `nextTab` aus `js/tabs.js` (Pfeile, Pos1/Ende). Die Karte bekommt in allen drei Fassungen die Schaltfläche „Erneut versuchen“ (`hoops-map-retry`, nach Ladefehlern, nicht bei ungültiger `tileUrl`) und blendet bei `interactive={false}` die Zoom-Schaltflächen aus (Tastaturzoom bleibt); `load` wird weiterhin nur beim Start gelesen (dokumentiert). Die Kurznamen in `.hoops-venue` folgen der Container-Abfrage `hoops-venue` (640 px) statt der Medienabfrage; `names="short"` gilt immer.
+* Konsequenzen: Das Svelte-Modal hängt von `js/modal.js` ab (Bündelgröße der Svelte-Anwendung wächst um dieses Modul; die Vanilla-Bündel ändern sich nur durch die Karten-Schaltfläche). Die Tabelle „Verhalten je Fassung“ in der Modal-Doku und die Paritätstests (`tests/modal-fassungen.test.tsx`, `tests/tabs-parity.test.tsx`, `tests/map-component.test.tsx`) belegen die Gleichheit. Das Modal-Markup der Svelte-Fassung hat einen zusätzlichen umschließenden `div` ohne Klasse.
+* Quellen: `docs/superpowers/plans/2026-10-12-luecken-plan.md` (Welle 1), ADR-003, ADR-007.
+
 === Offene Punkte (keine ADRs)
 
 [cols="1,1,2",options="header"]
