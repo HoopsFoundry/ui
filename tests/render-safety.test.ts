@@ -9,7 +9,7 @@ const ALLOWED_TAGS = new Set([
   'div', 'span', 'a', 'p', 'ul', 'ol', 'li', 'dl', 'dt', 'dd', 'h2', 'h3', 'h4', 'h5', 'h6', 'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
   'caption', 'button', 'small', 'svg', 'path', 'rect', 'circle', 'use', 'img', 'address',
 ]);
-const STYLE = /^(--dss-map-h:\d+(\.\d+)?px|width: \d{1,4}(\.\d{1,3})?(px|%|rem|em|ch|vw);|left:[\d.]+%;top:[\d.]+%)$/;
+const STYLE = /^(--hoops-map-h:\d+(\.\d+)?px|width: \d{1,4}(\.\d{1,3})?(px|%|rem|em|ch|vw);|left:[\d.]+%;top:[\d.]+%)$/;
 
 /** Markup in ein Fragment parsen und auf Gefährliches prüfen; gibt die Verstöße zurück. */
 function violations(html: string): string[] {

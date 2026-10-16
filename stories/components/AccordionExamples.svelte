@@ -155,7 +155,7 @@
   </Accordion>
 {:else if example === 'sticky'}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den Scrollbereich erreichen -->
-  <div class="scroller" tabindex="0" role="region" aria-label="Scrollbereich: Accordion mit klebendem Kopf" style="--dss-acc-sticky-top: 0px;">
+  <div class="scroller" tabindex="0" role="region" aria-label="Scrollbereich: Accordion mit klebendem Kopf" style="--hoops-acc-sticky-top: 0px;">
     <Accordion syncHash={false} sticky>
       <AccordionItem id="st-tabelle" title="Vereinsporträt" open>
         {#each LANG as p}<p>{p}</p>{/each}
@@ -352,15 +352,15 @@
 
 <style>
   .stack { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
-  .cap, .head, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .head, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 8px; }
   .cap code { text-transform: none; letter-spacing: 0; }
-  .links { margin: 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
-  .scroller { height: 340px; overflow-y: auto; border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 12px; background: var(--page-bg); }
+  .links { margin: 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
+  .scroller { height: 340px; overflow-y: auto; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 12px; background: var(--hoops-page-bg); }
   .scroller :global(p) { margin: 0 0 12px; }
   .scroller :global(p:last-child) { margin-bottom: 0; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 70px repeat(6, minmax(170px, 1fr)); gap: 10px 12px; align-items: start; }
   .cell { min-width: 0; }
   .page { max-width: 390px; padding: 16px; box-sizing: border-box; }

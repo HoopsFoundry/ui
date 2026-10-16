@@ -238,29 +238,29 @@
   .stack { display: flex; flex-direction: column; gap: 24px; }
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 24px; }
   .phones { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; }
-  .cap, .head, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .head, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 8px; }
-  .frame { border: 1px solid var(--page-line); border-radius: var(--radius-lg); overflow: hidden; background: var(--page-bg); max-width: 100%; }
+  .frame { border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); overflow: hidden; background: var(--hoops-page-bg); max-width: 100%; }
   .frame.pad { padding: 22px; }
   .frame.wide { padding: 32px 28px; }
   @media (max-width: 640px) { .frame.wide { padding: 24px 16px; } }
   .wide100 { width: 100%; }
-  .phone { width: 380px; max-width: 100%; border: 1px solid var(--page-line); border-radius: 24px; overflow: hidden; background: var(--page-bg); }
-  .phone-top { height: 160px; background: linear-gradient(0deg, var(--surface-2), var(--page-bg)); border-bottom: 1px solid var(--page-line); }
+  .phone { width: 380px; max-width: 100%; border: 1px solid var(--hoops-page-line); border-radius: 24px; overflow: hidden; background: var(--hoops-page-bg); }
+  .phone-top { height: 160px; background: linear-gradient(0deg, var(--hoops-page-surface-2), var(--hoops-page-bg)); border-bottom: 1px solid var(--hoops-page-line); }
   /* Horizontal braucht etwa 480 px, sonst überlappen die Beschriftungen: in schmalen Rahmen scrollt der Stepper seitlich */
   .hscroll { overflow-x: auto; padding: 6px; margin: -6px; }
   .hscroll > :global(.dss-step--h) { min-width: 480px; }
   .narrow { width: 100%; max-width: 380px; }
-  .mid { font-family: var(--font-display); font-weight: 600; color: var(--n-100); }
-  .note { margin: 18px 0 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
+  .mid { font-family: var(--hoops-font-display); font-weight: 600; color: var(--hoops-n-100); }
+  .note { margin: 18px 0 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 130px repeat(6, minmax(130px, 1fr)); gap: 10px 12px; align-items: center; }
-  .cell { display: flex; align-items: center; justify-content: center; min-height: 72px; padding: 8px; border-radius: var(--radius-md); min-width: 0; }
+  .cell { display: flex; align-items: center; justify-content: center; min-height: 72px; padding: 8px; border-radius: var(--hoops-radius-md); min-width: 0; }
   .cell.fabcell { min-height: 96px; padding-top: 24px; }
   .cell :global(.dss-bnav) { width: 100%; }
   .cell.dark { padding: 0; }
-  .tb { height: auto; width: 100%; box-sizing: border-box; justify-content: center; padding: 14px 10px; border-radius: var(--radius-md); }
-  .none { font-size: var(--fs-caption); color: var(--page-mute); }
-  .none-dark { font-size: var(--fs-caption); color: var(--n-300); }
+  .tb { height: auto; width: 100%; box-sizing: border-box; justify-content: center; padding: 14px 10px; border-radius: var(--hoops-radius-md); }
+  .none { font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }
+  .none-dark { font-size: var(--hoops-fs-caption); color: var(--hoops-n-300); }
 </style>

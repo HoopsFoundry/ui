@@ -98,10 +98,10 @@ describe('Doku-Seite', () => {
     expect(mdx).toContain('id=components-pagenav--nach-oben-bnav"');
   });
   it('keine globalen Regeln: die Doku nennt Token und Opt-in-Klasse', () => {
-    expect(mdx).toMatch(/--dss-scroll-offset/);
+    expect(mdx).toMatch(/--hoops-scroll-offset/);
     expect(mdx).toMatch(/dss-scroll-pad/);
     expect(mdx).toMatch(/keine globalen Regeln/);
-    expect(mdx).toMatch(/`dss-pagenav-target`, deren `scroll-margin-top` `--dss-scroll-offset` plus `1rem` ist/);
+    expect(mdx).toMatch(/`dss-pagenav-target`, deren `scroll-margin-top` `--hoops-scroll-offset` plus `1rem` ist/);
   });
   it('die Doku nennt Animation, Beobachtung, Routing, verschachtelte Gruppen, RTL und createContextualFragment', () => {
     for (const part of ['`transitionend`', 'Höchstwartezeit', '`history.replaceState`', 'Hash-Routing', 'jede Accordion-Gruppe, auch eine verschachtelte', 'keine Wurzel, nur Optionen', '`inset-inline-end`', '`createContextualFragment`']) expect(mdx, part).toContain(part);

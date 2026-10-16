@@ -233,20 +233,20 @@
 <style>
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px; }
   .stack { display: flex; flex-direction: column; gap: 24px; }
-  .card { min-width: 0; border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 18px 20px; background: var(--page-bg); }
+  .card { min-width: 0; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 18px 20px; background: var(--hoops-page-bg); }
   .card.full { grid-column: 1 / -1; }
-  .cap, .head, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .head, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 8px; }
-  .panel { margin: 14px 0 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
+  .panel { margin: 14px 0 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .clip { width: 100%; overflow: hidden; }
   .narrow { box-sizing: border-box; max-width: 390px; padding: 14px; }
-  .vanilla :global([role='tabpanel']) { margin: 14px 0 0; padding: 0 2px; font-size: var(--fs-body-sm); color: var(--page-fg); }
+  .vanilla :global([role='tabpanel']) { margin: 14px 0 0; padding: 0 2px; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .vanilla :global(.dss-tabs + [role='tabpanel']), .vanilla :global([role='tabpanel'] + .dss-tabs) { margin-top: 14px; }
   .vanilla :global([role='tabpanel'] p) { margin: 0; }
   /* Underline und Segmented brechen nicht um: in schmalen Bereichen scrollt die Leiste hier seitlich (Innenabstand für den Fokus-Ring) */
   .scroll { overflow-x: auto; max-width: 100%; padding: 6px; margin: -6px; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 90px repeat(6, minmax(130px, 1fr)); gap: 10px 12px; align-items: center; }
   .cell { display: flex; align-items: center; justify-content: center; min-height: 64px; padding: 8px; }
   .cell :global(.dss-tabs--vertical) { min-width: 0; }

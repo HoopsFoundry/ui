@@ -85,7 +85,7 @@ function attach(root, options, { restore }) {
       }
     };
   })();
-  const heightBefore = root.style.getPropertyValue('--dss-map-h');
+  const heightBefore = root.style.getPropertyValue('--hoops-map-h');
 
   const textId = root.querySelector('.dss-map-text')?.id ?? '';
   const canvasId = root.querySelector('.dss-map-canvas')?.id || (textId.startsWith('dss-map-text-') ? `dss-map-canvas-${textId.slice(13)}` : `dss-map-canvas-${nextUid()}`);
@@ -184,7 +184,7 @@ function attach(root, options, { restore }) {
     root.setAttribute('data-state', state);
     if (has('dimInDark')) root.setAttribute('data-dim', props.dimInDark !== false ? 'true' : 'false');
     if (has('darkTiles')) root.setAttribute('data-tiles', tilesMode(props.darkTiles));
-    if (has('height')) root.style.setProperty('--dss-map-h', `${mapHeightPx(props.height)}px`);
+    if (has('height')) root.style.setProperty('--hoops-map-h', `${mapHeightPx(props.height)}px`);
     if (has('className')) applyClass(str(props.className));
     if (has('label')) root.querySelector('.dss-map-frame')?.setAttribute('aria-label', str(props.label));
     if (has('attribution')) {
@@ -338,8 +338,8 @@ function attach(root, options, { restore }) {
     if (restore) {
       root.replaceChildren(...pristine);
       restoreAttributes();
-      if (heightBefore) root.style.setProperty('--dss-map-h', heightBefore);
-      else root.style.removeProperty('--dss-map-h');
+      if (heightBefore) root.style.setProperty('--hoops-map-h', heightBefore);
+      else root.style.removeProperty('--hoops-map-h');
     }
   });
 

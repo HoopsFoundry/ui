@@ -78,8 +78,8 @@ describe('Karte: Höhe und Beschriftung in allen Fassungen gleich', () => {
     expect(await p.svelte('Map', props)).toBe(r);
   });
   it('2001 und 5000 werden 2000 px, 199 wird 200 px; ohne label kein aria-label', () => {
-    expect(renderMap({ ...BASE, height: 5000 } as never)).toContain('--dss-map-h:2000px');
-    expect(renderMap({ ...BASE, height: 199 } as never)).toContain('--dss-map-h:200px');
+    expect(renderMap({ ...BASE, height: 5000 } as never)).toContain('--hoops-map-h:2000px');
+    expect(renderMap({ ...BASE, height: 199 } as never)).toContain('--hoops-map-h:200px');
     expect(renderMap({ markers: [] } as never)).not.toContain('role="region" aria-label');
   });
 });

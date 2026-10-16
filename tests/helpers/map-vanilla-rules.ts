@@ -317,7 +317,7 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     mountMap(host, { ...BASE, markers: [A, B], height: 300 });
     spy.mockRestore();
     const pin = host.querySelector<HTMLElement>('.dss-map-ph-pin');
-    return seen.length > 0 && seen.every((html) => !/\sstyle="/.test(html)) && pin?.style.left !== '' && root()!.style.getPropertyValue('--dss-map-h') === '300px';
+    return seen.length > 0 && seen.every((html) => !/\sstyle="/.test(html)) && pin?.style.left !== '' && root()!.style.getPropertyValue('--hoops-map-h') === '300px';
   });
   await rule('Karte: nur bekannte Eigenschaften gelangen ins CSSOM', (host) => {
     const create = Range.prototype.createContextualFragment;
@@ -339,7 +339,7 @@ export async function mapRules(m: Loaded): Promise<Rules> {
     });
     initMap(host, { ...BASE, markers: [A, B] });
     spy.mockRestore();
-    return calls.includes('--dss-map-h:333px') && calls.filter((c) => c.startsWith('left:')).length >= 2;
+    return calls.includes('--hoops-map-h:333px') && calls.filter((c) => c.startsWith('left:')).length >= 2;
   });
   await rule('Karte: data-dss-options ohne Prototyp-Schlüssel', (host) => {
     host.setAttribute('data-dss', 'map');

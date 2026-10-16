@@ -14,7 +14,7 @@ export interface AccordionOptions {
   expandAll?: boolean;
   /** Sprungleiste mit Links auf die Bereiche. */
   nav?: boolean;
-  /** Kopf des offenen Bereichs klebt oben (`--dss-acc-sticky-top`). */
+  /** Kopf des offenen Bereichs klebt oben (`--hoops-acc-sticky-top`). */
   sticky?: boolean;
   /** Name der Sprungleiste (`aria-label` und Text des Handy-Schalters), Standard „Bereiche“. */
   navLabel?: string;
@@ -39,7 +39,7 @@ export function currentHash(): string;
 export function writeHash(id: string, open: boolean): void;
 /** Höhe des klebenden Kopfes eines umgebenden Bereichs, der ein verschachteltes Ziel verdecken würde (sonst 0). */
 export function stickyOffset(el: Element | null | undefined): number;
-/** Scrollt das Element nach dem nächsten Frame in Sicht; der Abstand nach oben enthält `--dss-acc-sticky-top` und den klebenden Kopf der Eltern (ohne Browser ohne Wirkung). */
+/** Scrollt das Element nach dem nächsten Frame in Sicht; der Abstand nach oben enthält `--hoops-acc-sticky-top` und den klebenden Kopf der Eltern (ohne Browser ohne Wirkung). */
 export function scrollToElement(el: Element | null | undefined, options?: { behavior?: 'auto' | 'smooth' }): void;
 /** Öffnet alle Bereiche und `<details>`, die `target` umgeben (Klick auf den Kopf, von außen nach innen); gesperrte bleiben zu. `true`, wenn etwas geöffnet wurde. */
 export function revealAround(target: Element | null | undefined): boolean;

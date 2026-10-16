@@ -46,7 +46,7 @@
       <Button size="sm" onclick={startLive} disabled={isLive}>▶ Live-Scoring starten</Button>
       <Button size="sm" variant="secondary" onclick={stopLive} disabled={!isLive}>⏸ Pause</Button>
       <Button size="sm" variant="secondary" onclick={reset}>↻ Zurücksetzen</Button>
-      <span style="margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--page-mute); text-transform: uppercase; letter-spacing: 0.08em;">
+      <span style="margin-left: auto; font-family: var(--hoops-font-mono); font-size: 11px; color: var(--hoops-page-mute); text-transform: uppercase; letter-spacing: 0.08em;">
         {isLive ? `Live · ${liveIndex}/${liveBank.length}` : `Bereit · ${liveBank.length} Events in der Pipeline`}
       </span>
     </div>

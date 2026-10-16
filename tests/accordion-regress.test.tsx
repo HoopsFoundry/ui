@@ -161,7 +161,7 @@ describe('Scroll-Abstand bei verschachtelten Zielen unter klebendem Kopf', () =>
     });
     scrollToElement(el);
     await wait(40);
-    expect(margin).toBe('calc(var(--dss-acc-sticky-top, 0px) + 8px + 47px)');
+    expect(margin).toBe('calc(var(--hoops-acc-sticky-top, 0px) + 8px + 47px)');
     expect(el.style.scrollMarginTop).toBe('');
   });
   it('für den Bereich der obersten Ebene bleibt der Abstand aus dem CSS', async () => {

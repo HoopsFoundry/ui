@@ -59,11 +59,11 @@ describe('Namen: Kurzname per CSS, ohne JavaScript', () => {
 });
 
 describe('Logos: Größen und Darstellung', () => {
-  it('28 px, in compact 20 px; Bild contain; dekorativ gedacht (Kachel --dss-surface-2)', () => {
+  it('28 px, in compact 20 px; Bild contain; dekorativ gedacht (Kachel --hoops-surface-2)', () => {
     const logo = rule('.dss-team-logo');
     expect(logo).toMatch(/width:\s*28px/);
     expect(logo).toMatch(/height:\s*28px/);
-    expect(logo).toMatch(/background:\s*var\(--dss-surface-2\)/);
+    expect(logo).toMatch(/background:\s*var\(--hoops-surface-2\)/);
     expect(rule('.dss-team-logo img')).toMatch(/object-fit:\s*contain/);
     const compact = rule('.dss-tbl--compact .dss-team-logo');
     expect(compact).toMatch(/width:\s*20px/);
@@ -78,7 +78,7 @@ describe('Logos: Größen und Darstellung', () => {
     expect(rule('.dss-match--logos .dss-match-team')).toMatch(/grid-template-columns:\s*16px 28px 1fr auto/);
   });
 
-  it('Initialen (--dss-fg auf --dss-surface-2) haben ≥ 7:1, hell und dunkel, beide Marken', () => {
+  it('Initialen (--hoops-fg auf --hoops-surface-2) haben ≥ 7:1, hell und dunkel, beide Marken', () => {
     const lightBlock = blockOf(css, ':root {');
     const darkBlock = blockOf(css, ':root[data-theme="dark"] {\n');
     const dbb = blockOf(tokens, ':root[data-brand="dbb"] {');
@@ -88,8 +88,8 @@ describe('Logos: Größen und Darstellung', () => {
         const dark = block === darkBlock;
         const defs = dark ? darkBlock : lightBlock;
         const pick = (name: string) => defs.match(new RegExp(`${name}:\\s*([^;]+);`))![1];
-        const fg = color(pick('--dss-fg'), scope);
-        const bg = color(pick('--dss-surface-2'), scope);
+        const fg = color(pick('--hoops-fg'), scope);
+        const bg = color(pick('--hoops-surface-2'), scope);
         expect(ratio(fg, bg)).toBeGreaterThanOrEqual(7);
       }
     }

@@ -19,15 +19,15 @@ Die Spielplan-Zeile, die Raster-Zelle, die Spielkarte, der Play-by-Play-Kopf, di
 
 ## Token
 
-Die Token stehen in `css/components.css` neben den `--dss-chip-*`-Token, jeweils im hellen Block und in beiden dunklen Blöcken (Media-Query und `data-theme="dark"`). Die Kontrastwerte sind für BBV und DBB aus dem CSS gerechnet (Test `tests/live.test.ts`).
+Die Token stehen in `css/components.css` neben den `--hoops-chip-*`-Token, jeweils im hellen Block und in beiden dunklen Blöcken (Media-Query und `data-theme="dark"`). Die Kontrastwerte sind für BBV und DBB aus dem CSS gerechnet (Test `tests/live.test.ts`).
 
 <DocTable
   label="Live-Token"
   head={['Token', 'Verwendung', 'Hell', 'Dunkel']}
   rows={[
-    [<code>--live-fill</code>, 'Punkt und Flächen (Rahmen und Balken der Spielkarte), aus --ok-fill abgeleitet', 'oklch(0.600 0.150 150), 3,3 bis 3,7:1 auf Seitenflächen', 'oklch(0.72 0.17 150), 6,3 bis 9,0:1'],
-    [<code>--dss-live-fg</code>, 'Text und Ergebniszahlen auf Seitenflächen', '--ok-text, 7,7 bis 8,5:1', 'oklch(0.85 0.12 150), 9,7 bis 13,7:1'],
-    [<code>--dss-live-fg-on-dark</code>, 'Text auf immer dunklen Flächen (TopBar, dunkler Rahmen), wie --ring-color-on-dark', 'oklch(0.85 0.12 150), 11,6:1 auf Anthrazit #191919, 13,9:1 auf Schwarz', 'derselbe Wert'],
+    [<code>--hoops-live-fill</code>, 'Punkt und Flächen (Rahmen und Balken der Spielkarte), aus --hoops-ok-fill abgeleitet', 'oklch(0.600 0.150 150), 3,3 bis 3,7:1 auf Seitenflächen', 'oklch(0.72 0.17 150), 6,3 bis 9,0:1'],
+    [<code>--hoops-live-fg</code>, 'Text und Ergebniszahlen auf Seitenflächen', '--hoops-ok-text, 7,7 bis 8,5:1', 'oklch(0.85 0.12 150), 9,7 bis 13,7:1'],
+    [<code>--hoops-live-fg-on-dark</code>, 'Text auf immer dunklen Flächen (TopBar, dunkler Rahmen), wie --hoops-ring-color-on-dark', 'oklch(0.85 0.12 150), 11,6:1 auf Anthrazit #191919, 13,9:1 auf Schwarz', 'derselbe Wert'],
   ]}
 />
 
@@ -37,10 +37,10 @@ Der Punkt hat mindestens 3:1 gegen jede Seitenfläche (Hell, Dunkel, flache Flä
   label="Kontrast der Ergebniszahlen im Puls-Tal"
   head={['Fläche', 'Hell (BBV und DBB)', 'Dunkel (BBV und DBB)']}
   rows={[
-    [<code>--dss-surface</code>, '5,18:1', '8,75:1'],
-    [<code>--dss-surface-2</code>, '4,84 bis 4,86:1', '8,50 bis 8,51:1'],
-    [<code>--dss-hover-bg</code>, '5,04:1', '8,50 bis 8,51:1'],
-    [<code>--dss-selected-bg</code>, '4,94 bis 4,95:1', '6,71:1'],
+    [<code>--hoops-surface</code>, '5,18:1', '8,75:1'],
+    [<code>--hoops-surface-2</code>, '4,84 bis 4,86:1', '8,50 bis 8,51:1'],
+    [<code>--hoops-hover-bg</code>, '5,04:1', '8,50 bis 8,51:1'],
+    [<code>--hoops-selected-bg</code>, '4,94 bis 4,95:1', '6,71:1'],
   ]}
 />
 
@@ -80,7 +80,7 @@ Rot gehört nicht zu Live. Es bleibt für Fehler, Fouls (Play-by-Play) und „ab
 <span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span> Live</span>
 ```
 
-Die Komponenten bringen ihre Live-Stelle selbst mit (`dss-match-live`, `dss-pbp-live`, `dss-topbar-live`, `dss-crumb-dot`), nutzen aber dieselben Token. Auf immer dunklen Flächen außerhalb der TopBar setzt du `color: var(--dss-live-fg-on-dark)`.
+Die Komponenten bringen ihre Live-Stelle selbst mit (`dss-match-live`, `dss-pbp-live`, `dss-topbar-live`, `dss-crumb-dot`), nutzen aber dieselben Token. Auf immer dunklen Flächen außerhalb der TopBar setzt du `color: var(--hoops-live-fg-on-dark)`.
 
 ## Auf den Komponentenseiten
 

@@ -160,39 +160,39 @@ describe('feste untere Leiste', () => {
   it('eine feste dss-bnav: der Knopf sitzt darüber (Höhe plus 16 px)', () => {
     bar('position:fixed;bottom:0');
     handle = initBackToTop();
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('80px');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('80px');
   });
   it('eine nicht feste Leiste ändert nichts; avoid: null schaltet ab; offset hat Vorrang', () => {
     bar('position:static');
     handle = initBackToTop();
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('');
     handle.destroy();
     bar('position:fixed');
     handle = initBackToTop({ avoid: null });
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('');
     handle.destroy();
     bar('position:fixed');
     handle = initBackToTop({ offset: '7rem' });
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('7rem');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('7rem');
   });
   it('eine ausgeblendete Leiste zählt nicht', () => {
     bar('position:fixed;display:none');
     handle = initBackToTop();
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('');
   });
   it('die Leiste kommt erst später: beim nächsten Ändern der Größe wird sie erkannt', () => {
     handle = initBackToTop();
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('');
     const later = document.createElement('nav');
     later.className = 'dss-bnav';
     later.style.position = 'fixed';
     later.getBoundingClientRect = () => ({ height: 60 }) as DOMRect;
     document.body.append(later);
     window.dispatchEvent(new Event('resize'));
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('76px');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('76px');
     later.remove();
     window.dispatchEvent(new Event('resize'));
-    expect(btn().style.getPropertyValue('--dss-backtop-offset')).toBe('');
+    expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('');
   });
 });
 

@@ -147,14 +147,14 @@
 
 <style>
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 110px repeat(6, minmax(150px, 1fr)); gap: 10px 12px; align-items: center; }
-  .head, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .head, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cell { display: flex; align-items: center; min-width: 0; }
-  .cell > :global(.dss-appnav) { width: 100%; border: 1px solid var(--page-line); border-radius: var(--radius-md); }
+  .cell > :global(.dss-appnav) { width: 100%; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-md); }
   .cell :global(.dss-appnav-bar) { padding: 4px 6px; }
   .cell :global(.dss-appnav-panel.static) { position: static; margin: 0; box-shadow: none; min-width: 0; width: 100%; box-sizing: border-box; }
-  .none { font-size: var(--fs-caption); color: var(--page-mute); }
+  .none { font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }
   .nav { width: 100%; max-width: 100%; }
   .nav.clip { overflow: hidden; }
   .open-demo { min-height: 130px; }

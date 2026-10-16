@@ -166,7 +166,7 @@ export function MapView({
       data-state={state}
       data-dim={dimInDark ? 'true' : 'false'}
       data-tiles={tilesMode(darkTiles)}
-      style={{ '--dss-map-h': `${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px` } as React.CSSProperties}
+      style={{ '--hoops-map-h': `${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px` } as React.CSSProperties}
     >
       <a className="dss-map-skip" href={`#${textId}`}>
         {mapText.skip}

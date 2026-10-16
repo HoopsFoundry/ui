@@ -15,7 +15,7 @@ function block(start: RegExp, end: RegExp): string {
   return rest.slice(0, to + 1);
 }
 
-const RING = 'outline:\\s*var\\(--ring-w\\)\\s+var\\(--ring-style\\)\\s+var\\(--ring-color\\)';
+const RING = 'outline:\\s*var\\(--hoops-ring-w\\)\\s+var\\(--hoops-ring-style\\)\\s+var\\(--hoops-ring-color\\)';
 const hasRing = (selector: string) => new RegExp(selector.replace(/[.[\]()]/g, '\\$&') + '[^{]*\\{[^}]*' + RING).test(css);
 
 describe('Navigation: jede bedienbare Komponente hat einen gestrichelten Fokus-Ring', () => {
@@ -39,8 +39,8 @@ describe('Navigation: jede bedienbare Komponente hat einen gestrichelten Fokus-R
   });
 
   it('dunkle Flächen (AppNav dunkel, TopBar) nehmen den dezenten Ring-Ton', () => {
-    expect(css).toMatch(/\.dss-appnav--dark \.dss-appnav-toggle:focus-visible\s*\{\s*outline-color:\s*var\(--ring-color-on-dark\)/);
-    expect(css).toMatch(/\.dss-topbar--dark :focus-visible\s*\{\s*outline-color:\s*var\(--ring-color-on-dark\)/);
+    expect(css).toMatch(/\.dss-appnav--dark \.dss-appnav-toggle:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
+    expect(css).toMatch(/\.dss-topbar--dark :focus-visible\s*\{\s*outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
   });
 });
 
@@ -54,13 +54,13 @@ describe('Navigation: Farben mit Dunkelmodus', () => {
   ];
   it.each(areas)('%s nutzt nicht die nackten --*-text-Tokens (ohne Dunkelmodus)', (_name, area) => {
     expect(area.length).toBeGreaterThan(200);
-    expect(area).not.toMatch(/var\(--(err|ok|warn|info)-text\)/);
+    expect(area).not.toMatch(/var\(--hoops-(err|ok|warn|info)-text\)/);
   });
 
-  it('Live-Marker der TopBar: grüne Live-Sprache (Text --dss-live-fg-on-dark), kein Rot', () => {
+  it('Live-Marker der TopBar: grüne Live-Sprache (Text --hoops-live-fg-on-dark), kein Rot', () => {
     const live = css.match(/\.dss-topbar-live\s*\{[^}]*\}/)?.[0] ?? '';
-    expect(live).toMatch(/color:\s*var\(--dss-live-fg-on-dark\)/);
-    expect(live).not.toMatch(/--err-fill|oklch\(0\.80 0\.19 27\)/);
+    expect(live).toMatch(/color:\s*var\(--hoops-live-fg-on-dark\)/);
+    expect(live).not.toMatch(/--hoops-err-fill|oklch\(0\.80 0\.19 27\)/);
   });
 });
 

@@ -178,8 +178,8 @@ nextLevel(3, 2);      // 5
 nextLevel(undefined); // 3      (ohne Vorfahr zählt die Ausgangsebene 2)`;
 
 export const tokensCss = `.seitenleiste {
-  --dss-title-size: var(--fs-body-md);   /* alle Komponentenüberschriften darin: 14 px */
+  --hoops-title-size: var(--hoops-fs-body-md);   /* alle Komponentenüberschriften darin: 14 px */
 }
 .kader {
-  --dss-card-title-size: var(--fs-h3);   /* nur Karten (PlayerCard, TeamCard, EmptyState): 20 px */
+  --hoops-card-title-size: var(--hoops-fs-h3);   /* nur Karten (PlayerCard, TeamCard, EmptyState): 20 px */
 }`;

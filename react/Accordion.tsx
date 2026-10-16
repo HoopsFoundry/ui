@@ -65,7 +65,7 @@ export interface AccordionProps {
   nav?: boolean;
   /** Deep-Link: `#id` öffnet den Bereich samt Eltern; Klick setzt den Anker (Standard true). */
   syncHash?: boolean;
-  /** Kopf des offenen Bereichs klebt oben (Abstand: `--dss-acc-sticky-top`). */
+  /** Kopf des offenen Bereichs klebt oben (Abstand: `--hoops-acc-sticky-top`). */
   sticky?: boolean;
   /** Name der Sprungleiste (`aria-label` der Navigation und Text des Handy-Schalters), Standard „Bereiche“. Mehrere Sprungleisten auf einer Seite brauchen verschiedene Namen. */
   navLabel?: string;

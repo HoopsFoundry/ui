@@ -29,7 +29,7 @@ Es gibt keinen Linter. CI (`.github/workflows/deploy-storybook.yaml`) baut nur S
 
 **Gemeinsame Logik in `js/`** (reine Funktionen, ESM, mit `.d.ts`, einzeln über `package.json`-`exports` veröffentlicht): `schedule.js`, `league.js`, `team.js`, `venue.js`, `map.js`, `heading.js`, `periods.js`, `stats.js`, `accordion.js` … Svelte und React rufen dieselben Funktionen, damit beide Fassungen dasselbe Verhalten und Markup erzeugen. Verhalten für Vanilla-Seiten sind `initX(root, options) → { destroy() }`-Funktionen (`accordion`, `tabs`, `modal`, `pagenav`, `backtop`, `theme`, `vanilla-core.js` mit `initAll` über `data-dss`); `npm run build:vanilla` bündelt sie nach `dist/vanilla` (Größenbudget als Test; `dist/` ist gitignored, Auslieferung per GitHub-Release, siehe `docs/superpowers/plans/2026-10-12-vanilla-v2-plan.md`), gemeinsame Hilfen in `lifecycle.js`, `motion.js`, `url.js` (`safeHref`).
 
-**Überschriften:** Komponenten geben nie `h1` aus. Rangfolge der Ebene: `titleAs` > `HeadingLevel`-Kontext > `h3`. Größe hängt an Klassen/Tokens (`--dss-title-size` …), nie am Elementnamen.
+**Überschriften:** Komponenten geben nie `h1` aus. Rangfolge der Ebene: `titleAs` > `HeadingLevel`-Kontext > `h3`. Größe hängt an Klassen/Tokens (`--hoops-title-size` …), nie am Elementnamen.
 
 **Karte:** Leaflet ist optionale Peer-Abhängigkeit, wird per dynamischem `import('leaflet')` erst nach Klick geladen (Datenschutz: Zwei-Klick-Platzhalter, `tileUrl` für eigenen Kachel-Proxy). Controller `js/map-leaflet.js` wird von Svelte, React und Vanilla gemeinsam genutzt; in Tests ist `leaflet` auf `tests/helpers/leaflet-mock.ts` aliasiert. Vanilla: `js/map-vanilla.js` (`renderMap`, `initMap`, `mountMap`) im eigenen Bündel `dist/vanilla/dss-map.js` ohne Leaflet; die Option `loadLeaflet` liefert Leaflet aus dem eigenen Projekt (ADR-003, ADR-007).
 
@@ -45,7 +45,7 @@ Docs sind MDX-Seiten je Komponente in `stories/` (`X.mdx`, `X.stories.ts`, `X.co
 
 ## Qualitätsregeln (WCAG 2.2 AAA als Ziel)
 
-Text mindestens 7:1 (`color-contrast-enhanced`), Zielgrößen ≥ 24 px (AA) bzw. 44 px für Hauptbedienelemente, gestrichelter Fokus-Ring über `--ring-*`-Tokens, Bewegung respektiert `prefers-reduced-motion` und `data-motion="reduce"`, nichts nur über Farbe. Neue Regeln werden mit Mutationstests abgesichert (Test muss rot werden, wenn die Regel im Quelltext verfälscht wird).
+Text mindestens 7:1 (`color-contrast-enhanced`), Zielgrößen ≥ 24 px (AA) bzw. 44 px für Hauptbedienelemente, gestrichelter Fokus-Ring über `--hoops-ring-*`-Tokens, Bewegung respektiert `prefers-reduced-motion` und `data-motion="reduce"`, nichts nur über Farbe. Neue Regeln werden mit Mutationstests abgesichert (Test muss rot werden, wenn die Regel im Quelltext verfälscht wird).
 
 ## Arbeitsweise im Projekt
 

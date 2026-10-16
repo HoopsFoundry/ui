@@ -95,9 +95,9 @@ const preview: Preview = {
     },
     backgrounds: {
       options: {
-        page: { name: 'page',     value: 'var(--page-bg)' },
-        surface: { name: 'surface',  value: 'var(--surface-0)' },
-        kampf: { name: 'kampf',    value: 'var(--n-1000)' }
+        page: { name: 'page',     value: 'var(--hoops-page-bg)' },
+        surface: { name: 'surface',  value: 'var(--hoops-page-surface-0)' },
+        kampf: { name: 'kampf',    value: 'var(--hoops-n-1000)' }
       }
     },
     options: {

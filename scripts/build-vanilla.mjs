@@ -42,7 +42,7 @@ export async function buildVanilla({ outDir = `${root}dist/vanilla` } = {}) {
   // CSS: Tokens zuerst, dann die Komponenten; die Version steht als Eigenschaft auf :root (Abgleich mit VERSION im Bündel)
   const tokens = await readFile(`${root}tokens/tokens.css`, 'utf8');
   const components = await readFile(`${root}css/components.css`, 'utf8');
-  const banner = `/* ${pkg.name} ${pkg.version} · tokens.css + components.css · Schriften (fonts/fonts.css) werden nicht mitgeliefert */\n:root { --dss-version: "${pkg.version}"; }\n`;
+  const banner = `/* ${pkg.name} ${pkg.version} · tokens.css + components.css · Schriften (fonts/fonts.css) werden nicht mitgeliefert */\n:root { --hoops-version: "${pkg.version}"; }\n`;
   await writeFile(`${outDir}/dss.css`, `${banner}${tokens}\n${components}`);
   await cp(`${root}css/courtlines`, `${outDir}/courtlines`, { recursive: true });
   return { outDir, version: pkg.version };

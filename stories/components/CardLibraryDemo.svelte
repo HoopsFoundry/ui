@@ -155,9 +155,9 @@
     max-width: 1080px;
   }
   .hdr {
-    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    font-family: var(--hoops-font-mono); font-size: 11px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--page-mute);
+    color: var(--hoops-page-mute);
     margin-bottom: 12px;
   }
 </style>

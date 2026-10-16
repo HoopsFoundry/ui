@@ -58,7 +58,7 @@
     <ScheduleTable games={turnier} layout="columns" density={dens} title="Spielplan" meta="7 Spiele · Ende ca. 12:10" caption="Turnier-Spielplan">
       {#snippet time(game)}
         {#if game.id === 't9'}
-          <input type="text" value={game.time?.slice(0, 5)} aria-label="Anwurfzeit Spiel {game.nr}" style="width: 7ch; font: inherit; padding: 2px 6px; border: 1px solid var(--dss-line); border-radius: 6px; background: var(--dss-surface); color: var(--dss-fg);" />
+          <input type="text" value={game.time?.slice(0, 5)} aria-label="Anwurfzeit Spiel {game.nr}" style="width: 7ch; font: inherit; padding: 2px 6px; border: 1px solid var(--hoops-line); border-radius: 6px; background: var(--hoops-surface); color: var(--hoops-fg);" />
         {:else}{game.time}{/if}
       {/snippet}
       {#snippet notice(game)}

@@ -45,17 +45,17 @@ Eine Titelkomponente wählt ihre Ebene in dieser Reihenfolge:
 
 ## Größe über Tokens
 
-Die Tokens sind absichtlich nicht vorbelegt. Ohne Wert gilt je Komponente der bisherige Wert aus der Tabelle unten; so ändert sich ohne Eingriff nichts. Setzt du ein Token an einem Element (etwa an einem Container), gilt es für alle Titel darin. Komponentenspezifisch vor global: `--dss-frame-title-size` und `--dss-card-title-size` schlagen `--dss-title-size`.
+Die Tokens sind absichtlich nicht vorbelegt. Ohne Wert gilt je Komponente der bisherige Wert aus der Tabelle unten; so ändert sich ohne Eingriff nichts. Setzt du ein Token an einem Element (etwa an einem Container), gilt es für alle Titel darin. Komponentenspezifisch vor global: `--hoops-frame-title-size` und `--hoops-card-title-size` schlagen `--hoops-title-size`.
 
 <DocTable
   label="Tokens für Komponentenüberschriften"
   head={['Token', 'Wirkt auf', 'Rückfall']}
   rows={[
-    [<code>--dss-title-size</code>, 'Schriftgröße aller Komponentenüberschriften, auch im Modal', 'Wert je Komponente (Tabelle unten)'],
-    [<code>--dss-frame-title-size</code>, 'Table, ScheduleTable, ScheduleGrid, PlayByPlay', <code>--dss-title-size</code>],
-    [<code>--dss-card-title-size</code>, 'PlayerCard (auch hero), TeamCard (auch compact), EmptyState', <code>--dss-title-size</code>],
-    [<code>--dss-title-weight</code>, 'Schriftgewicht aller Komponentenüberschriften', 'Wert je Komponente'],
-    [<code>--dss-title-leading</code>, 'Zeilenhöhe aller Komponentenüberschriften', 'Wert je Komponente'],
+    [<code>--hoops-title-size</code>, 'Schriftgröße aller Komponentenüberschriften, auch im Modal', 'Wert je Komponente (Tabelle unten)'],
+    [<code>--hoops-frame-title-size</code>, 'Table, ScheduleTable, ScheduleGrid, PlayByPlay', <code>--hoops-title-size</code>],
+    [<code>--hoops-card-title-size</code>, 'PlayerCard (auch hero), TeamCard (auch compact), EmptyState', <code>--hoops-title-size</code>],
+    [<code>--hoops-title-weight</code>, 'Schriftgewicht aller Komponentenüberschriften', 'Wert je Komponente'],
+    [<code>--hoops-title-leading</code>, 'Zeilenhöhe aller Komponentenüberschriften', 'Wert je Komponente'],
   ]}
 />
 
@@ -65,14 +65,14 @@ Die Vorgabewerte, im Browser gemessen (BBV, Standardschrift; DBB und die DBB-Sch
   label="Vorgabewerte der Komponentenüberschriften"
   head={['Komponente', 'Klasse', 'Größe', 'Gewicht', 'Zeilenhöhe']}
   rows={[
-    ['Table, ScheduleTable, ScheduleGrid', <code>.dss-frame-title</code>, '15 px (--fs-body)', '600', 'geerbt'],
-    ['PlayByPlay', <code>.dss-pbp-title</code>, '15 px (--fs-body)', '600', 'geerbt'],
-    ['PlayerCard standard', <code>.dss-pc-nm</code>, '18 px (--fs-body-lg)', '600', 'geerbt'],
-    ['PlayerCard hero', <code>.dss-pc-hero .dss-pc-nm</code>, '32 px (--fs-hero)', '700', '1,05'],
-    ['TeamCard standard', <code>.dss-team-nm</code>, '18 px (--fs-body-lg)', '600', '1,2'],
-    ['TeamCard compact', <code>.dss-team--compact .dss-team-nm</code>, '15 px (--fs-body)', '600', '1,2'],
-    ['EmptyState', <code>.dss-empty-title</code>, '18 px (--fs-body-lg)', '700', 'geerbt'],
-    ['Modal', <code>.dss-m-title</code>, '20 px (--fs-h3)', '700', 'geerbt'],
+    ['Table, ScheduleTable, ScheduleGrid', <code>.dss-frame-title</code>, '15 px (--hoops-fs-body)', '600', 'geerbt'],
+    ['PlayByPlay', <code>.dss-pbp-title</code>, '15 px (--hoops-fs-body)', '600', 'geerbt'],
+    ['PlayerCard standard', <code>.dss-pc-nm</code>, '18 px (--hoops-fs-body-lg)', '600', 'geerbt'],
+    ['PlayerCard hero', <code>.dss-pc-hero .dss-pc-nm</code>, '32 px (--hoops-fs-hero)', '700', '1,05'],
+    ['TeamCard standard', <code>.dss-team-nm</code>, '18 px (--hoops-fs-body-lg)', '600', '1,2'],
+    ['TeamCard compact', <code>.dss-team--compact .dss-team-nm</code>, '15 px (--hoops-fs-body)', '600', '1,2'],
+    ['EmptyState', <code>.dss-empty-title</code>, '18 px (--hoops-fs-body-lg)', '700', 'geerbt'],
+    ['Modal', <code>.dss-m-title</code>, '20 px (--hoops-fs-h3)', '700', 'geerbt'],
   ]}
 />
 
@@ -113,7 +113,7 @@ Das Beispiel unten ist eine Seite mit zwei Abschnitten: die `h1` setzt die App, 
 
 ### Modal
 
-Das Modal hat ein `titleAs` (Standard `h2`) und gibt seinem Inhalt und seinem Footer die nächste Ebene weiter: Titel `h2`, Titelkomponenten im Inhalt `h3`; bei `titleAs="h4"` bekommt der Inhalt `h5`, die Ebene wird auf `h6` begrenzt. Ein eigenes `HeadingLevel` im Inhalt oder ein `titleAs` an der Komponente gewinnt. Ein `HeadingLevel` um das Modal ändert den Titel des Modals nicht. In React gilt das auch im Radix-Portal (der Kontext bleibt erhalten). Das Portal hängt das Modal aber an `body`: ein Größen-Token, das nur an einem Container gesetzt ist (etwa `--dss-title-size` an einer Seitenleiste), erreicht den Titel eines React-Modals deshalb nicht; die Svelte-Fassung rendert inline und erbt es. Setze das Token für Modals am `:root` oder am `body`. Das Modal ist die einzige Komponente, die selbst Inhalt mit Titelkomponenten aufnimmt und die Ebene weitergibt; die Card tut es nicht, dort setzt du `HeadingLevel` oder `titleAs`.
+Das Modal hat ein `titleAs` (Standard `h2`) und gibt seinem Inhalt und seinem Footer die nächste Ebene weiter: Titel `h2`, Titelkomponenten im Inhalt `h3`; bei `titleAs="h4"` bekommt der Inhalt `h5`, die Ebene wird auf `h6` begrenzt. Ein eigenes `HeadingLevel` im Inhalt oder ein `titleAs` an der Komponente gewinnt. Ein `HeadingLevel` um das Modal ändert den Titel des Modals nicht. In React gilt das auch im Radix-Portal (der Kontext bleibt erhalten). Das Portal hängt das Modal aber an `body`: ein Größen-Token, das nur an einem Container gesetzt ist (etwa `--hoops-title-size` an einer Seitenleiste), erreicht den Titel eines React-Modals deshalb nicht; die Svelte-Fassung rendert inline und erbt es. Setze das Token für Modals am `:root` oder am `body`. Das Modal ist die einzige Komponente, die selbst Inhalt mit Titelkomponenten aufnimmt und die Ebene weitergibt; die Card tut es nicht, dort setzt du `HeadingLevel` oder `titleAs`.
 
 <FrameworkCode label="Modal mit Tabelle" svelte={modalSvelte} react={modalReact} />
 
@@ -156,7 +156,7 @@ Ohne Svelte oder React gibt es keinen Provider: Du schreibst das Element selbst 
     },
     {
       title: 'Ebene nach Gliederung wählen, Größe per Token',
-      doText: 'Die Karten sind Unterpunkte von „Kader“ (h3). Sollen sie größer wirken, setzt du --dss-card-title-size.',
+      doText: 'Die Karten sind Unterpunkte von „Kader“ (h3). Sollen sie größer wirken, setzt du --hoops-card-title-size.',
       dontText: 'Eine h2 pro Karte, „damit sie größer wirkt“: Die Größe ändert sich dadurch nicht, aber die Karten stehen auf einer Stufe mit „Kader“.',
       good: <Story of={HeadingsStories.DoGroesse} inline />,
       bad: <Story of={HeadingsStories.DontGroesse} inline />,

@@ -373,7 +373,7 @@ export function renderRules(m: Mods, hostile?: Mods): Rules {
     const head = table({ head: [['K1']] });
     return body.includes('<th scope="row">Zeile</th>') && head.includes('<th scope="col">K1</th>');
   });
-  rule('mapHeight: zwischen 200 und 2000 Pixel', () => venue({ name: 'H', lat: 49.3, lng: 7.9, mapHeight: 99999 }).includes('--dss-map-h:2000px') && venue({ name: 'H', lat: 49.3, lng: 7.9, mapHeight: 10 }).includes('--dss-map-h:200px'));
+  rule('mapHeight: zwischen 200 und 2000 Pixel', () => venue({ name: 'H', lat: 49.3, lng: 7.9, mapHeight: 99999 }).includes('--hoops-map-h:2000px') && venue({ name: 'H', lat: 49.3, lng: 7.9, mapHeight: 10 }).includes('--hoops-map-h:200px'));
   rule('VenueCard: „Karte laden“ ist ohne initMap gesperrt, mit mapActive bedienbar', () =>
     venue({ name: 'H', lat: 49.3, lng: 7.9 }).includes('dss-map-load" disabled aria-disabled="true"') && (m['venue-card'].renderVenueCard({ name: 'H', lat: 49.3, lng: 7.9 }, { mapActive: true }) as string).includes('dss-map-load">'));
   rule('ids: andere Eingabe, andere Kennung (zwei Ligencards gleichen Titels)', () => {

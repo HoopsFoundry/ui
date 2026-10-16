@@ -192,14 +192,14 @@ Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es 
 
 ## Dunkelmodus
 
-Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-line-strong`, `--dss-link`, `--dss-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Die **Kacheln** werden mit `dimInDark` (Standard) etwas abgedunkelt: `filter: brightness(0.8)` nur auf der Kachelebene, nie auf Markern oder Steuerung; das Token `--dss-map-dim` ändert den Wert. Die **Marker** sind in beiden Modi gleich: dunkle Füllung mit weißem Ring und dunkler Kontur, die Nummer weiß auf dunkel; der eigene Ort golden mit schwarzer Nummer. So hebt sich der Pin von hellen **und** dunklen Kacheln ab (Messwerte unten). Die Handy-Vorschau weiter unten zeigt beide Modi.
+Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen über die semantischen Tokens (`--hoops-surface`, `--hoops-fg`, `--hoops-line-strong`, `--hoops-link`, `--hoops-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Die **Kacheln** werden mit `dimInDark` (Standard) etwas abgedunkelt: `filter: brightness(0.8)` nur auf der Kachelebene, nie auf Markern oder Steuerung; das Token `--hoops-map-dim` ändert den Wert. Die **Marker** sind in beiden Modi gleich: dunkle Füllung mit weißem Ring und dunkler Kontur, die Nummer weiß auf dunkel; der eigene Ort golden mit schwarzer Nummer. So hebt sich der Pin von hellen **und** dunklen Kacheln ab (Messwerte unten). Die Handy-Vorschau weiter unten zeigt beide Modi.
 
 ### Kacheln im Dunkelmodus: `darkTiles`
 
 OpenStreetMap kennt keinen Dunkelmodus. Zwei Verfahren stehen zur Wahl, beide wirken nur auf die Kachelebene und nur, solange `dimInDark` an ist (Marker, Zoom-Schaltflächen und Quellenangabe bleiben unberührt):
 
-- **`dim`** (Standard): abdunkeln mit `brightness(0.8)` (Token `--dss-map-dim`). Die Straßenfarben bleiben vertraut, die Karte bleibt aber hell.
-- **`invert`**: invertieren und umfärben mit `invert(1)`, `hue-rotate(180deg)`, `brightness(0.85)` und `contrast(0.9)` (Token `--dss-map-invert-filter`). Die Karte wird wirklich dunkel, die Farben wirken dafür fremd (gemessen: Wasser `#aad3df` wird zu einem dunklen Blaugrün, rgb(27, 58, 68), das Land dunkelbraun, weiße Straßen werden fast schwarz, orange Straßen braun).
+- **`dim`** (Standard): abdunkeln mit `brightness(0.8)` (Token `--hoops-map-dim`). Die Straßenfarben bleiben vertraut, die Karte bleibt aber hell.
+- **`invert`**: invertieren und umfärben mit `invert(1)`, `hue-rotate(180deg)`, `brightness(0.85)` und `contrast(0.9)` (Token `--hoops-map-invert-filter`). Die Karte wird wirklich dunkel, die Farben wirken dafür fremd (gemessen: Wasser `#aad3df` wird zu einem dunklen Blaugrün, rgb(27, 58, 68), das Land dunkelbraun, weiße Straßen werden fast schwarz, orange Straßen braun).
 
 Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau rechts zeigt beide im Dunkelmodus (der Rahmen ist dunkel geschaltet):
 
@@ -222,7 +222,7 @@ Bei „Bewegung reduzieren“ und mit `data-motion="reduce"` auf `<html>` (Werkz
 
 ## Zustände
 
-Zoom-Schaltflächen haben Standard, Hover (Fläche `--dss-hover-bg`), Fokus (gestrichelter Gold/Amber-Ring, 3 px, innen) und Gesperrt (45 % Deckkraft, `aria-disabled`). Marker haben Fokus (gestrichelter Ring mit Fläche dahinter, damit er auf jeder Kachel erkennbar ist). „Karte laden“ ist ein normaler Button ([Button](?path=/docs/components-button--docs)), die Quellenangabe ein Link mit Fokus-Ring. Der Hover der Marker ist Leaflets Verhalten (der Marker rückt nach vorn).
+Zoom-Schaltflächen haben Standard, Hover (Fläche `--hoops-hover-bg`), Fokus (gestrichelter Gold/Amber-Ring, 3 px, innen) und Gesperrt (45 % Deckkraft, `aria-disabled`). Marker haben Fokus (gestrichelter Ring mit Fläche dahinter, damit er auf jeder Kachel erkennbar ist). „Karte laden“ ist ein normaler Button ([Button](?path=/docs/components-button--docs)), die Quellenangabe ein Link mit Fokus-Ring. Der Hover der Marker ist Leaflets Verhalten (der Marker rückt nach vorn).
 
 <Canvas of={MapStories.Zustaende} />
 
@@ -412,7 +412,7 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
     ['Quellenangabe (Link)', '28 px hoch, Schrift 13 px'],
     ['Links in der Liste', '44 px hoch'],
     ['„Karte laden“', '44 px hoch (Button md)'],
-    ['Rahmen', '1 px `--dss-line-strong`, Radius 12 px'],
+    ['Rahmen', '1 px `--hoops-line-strong`, Radius 12 px'],
   ]}
 />
 
@@ -420,9 +420,9 @@ Gemessen im Browser (Chromium, 1280 px, BBV und DBB, hell und dunkel).
   label="Kontraste der Karte (gemessen an Pixeln des Browsers, BBV und DBB, hell und dunkel)"
   head={['Text oder Fläche', 'Verhältnis', 'Anforderung']}
   rows={[
-    ['Quellenangabe (Link auf `--dss-surface`)', '11,6 bis 16,1:1', 'mindestens 7:1'],
+    ['Quellenangabe (Link auf `--hoops-surface`)', '11,6 bis 16,1:1', 'mindestens 7:1'],
     ['Name des Orts, Hinweis im Platzhalter, „Karte laden“', '12,6 bis 20,1:1', 'mindestens 7:1'],
-    ['Koordinaten (`--dss-mute`)', '7,8 bis 8,1:1', 'mindestens 7:1'],
+    ['Koordinaten (`--hoops-mute`)', '7,8 bis 8,1:1', 'mindestens 7:1'],
     ['Links in der Liste', '11,2 bis 15,2:1', 'mindestens 7:1'],
     ['Zeichen der Zoom-Schaltflächen', '19,9 bis 21,0:1', 'mindestens 7:1'],
     ['Nummer im Pin (Weiß auf Schwarz) und im eigenen Pin (Schwarz auf Gold)', '17,6 bis 21,0:1 und 8,2 bis 11,1:1 (berechnet)', 'mindestens 7:1'],

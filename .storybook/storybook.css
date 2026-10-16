@@ -1,8 +1,8 @@
 /* Storybook-only stage styling. Real component styles live in tokens.css + the .svelte files. */
 .sb-show-main {
-  font-family: var(--font-body);
-  background: var(--page-bg);
-  color: var(--page-fg);
+  font-family: var(--hoops-font-body);
+  background: var(--hoops-page-bg);
+  color: var(--hoops-page-fg);
 }
 
 /* Give every story a comfortable padded canvas */
@@ -14,17 +14,17 @@
 .sb-row    { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
 .sb-stack  { display: flex; flex-direction: column; gap: 16px; }
 .sb-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 16px; }
-.sb-label  { font-family: var(--font-mono); font-size: 11px; color: var(--page-mute); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
+.sb-label  { font-family: var(--hoops-font-mono); font-size: 11px; color: var(--hoops-page-mute); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; }
 
 /* MDX-Doku-Seiten: DSS-Schrift und -Farben im Standard-Container */
-.sbdocs.sbdocs-wrapper { background: var(--page-bg); }
-.sbdocs-content { font-family: var(--font-body); color: var(--page-fg); }
-.sbdocs-content :is(h1, h2, h3):not(.docs-story *) { font-family: var(--font-display); color: var(--page-fg); }
-.sbdocs-content p, .sbdocs-content li { color: var(--page-fg); }
-.sbdocs-content code:not(pre code) { font-family: var(--font-mono); }
+.sbdocs.sbdocs-wrapper { background: var(--hoops-page-bg); }
+.sbdocs-content { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
+.sbdocs-content :is(h1, h2, h3):not(.docs-story *) { font-family: var(--hoops-font-display); color: var(--hoops-page-fg); }
+.sbdocs-content p, .sbdocs-content li { color: var(--hoops-page-fg); }
+.sbdocs-content code:not(pre code) { font-family: var(--hoops-font-mono); }
 
 /* Canvas-Rahmen und Controls-Tabelle folgen Marke und Hell/Dunkel (Stories erwarten die Seitenfläche) */
-.sbdocs.sbdocs-preview { background: var(--page-bg); border: 1px solid var(--page-line); box-shadow: none; }
+.sbdocs.sbdocs-preview { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); box-shadow: none; }
 .sbdocs .docblock-argstable.docblock-argstable,
 .sbdocs .docblock-argstable.docblock-argstable th,
 .sbdocs .docblock-argstable.docblock-argstable td,
@@ -32,21 +32,21 @@
 .sbdocs .docblock-argstable.docblock-argstable span,
 .sbdocs .docblock-argstable.docblock-argstable select,
 .sbdocs .docblock-argstable.docblock-argstable input,
-.sbdocs .docblock-argstable.docblock-argstable textarea { font-family: var(--font-body); color: var(--page-fg); }
+.sbdocs .docblock-argstable.docblock-argstable textarea { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
 .sbdocs .docblock-argstable.docblock-argstable th,
-.sbdocs .docblock-argstable.docblock-argstable th span { color: var(--page-mute); }
+.sbdocs .docblock-argstable.docblock-argstable th span { color: var(--hoops-page-mute); }
 .sbdocs .docblock-argstable.docblock-argstable th,
-.sbdocs .docblock-argstable.docblock-argstable td { background: var(--page-bg); border-color: var(--page-line); }
-.sbdocs .docblock-argstable.docblock-argstable tbody tr { border-color: var(--page-line); box-shadow: none; }
-.sbdocs .docblock-argstable.docblock-argstable tbody tr td { border-top-color: var(--page-line); box-shadow: none; }
+.sbdocs .docblock-argstable.docblock-argstable td { background: var(--hoops-page-bg); border-color: var(--hoops-page-line); }
+.sbdocs .docblock-argstable.docblock-argstable tbody tr { border-color: var(--hoops-page-line); box-shadow: none; }
+.sbdocs .docblock-argstable.docblock-argstable tbody tr td { border-top-color: var(--hoops-page-line); box-shadow: none; }
 .sbdocs .docblock-argstable.docblock-argstable select,
 .sbdocs .docblock-argstable.docblock-argstable input[type="text"],
 .sbdocs .docblock-argstable.docblock-argstable input[type="number"],
-.sbdocs .docblock-argstable.docblock-argstable textarea { background: var(--surface-0); box-shadow: inset 0 0 0 1px var(--page-line); }
-.sbdocs .docblock-argstable.docblock-argstable label { background: var(--surface-0); box-shadow: inset 0 0 0 1px var(--page-line); }
+.sbdocs .docblock-argstable.docblock-argstable textarea { background: var(--hoops-page-surface-0); box-shadow: inset 0 0 0 1px var(--hoops-page-line); }
+.sbdocs .docblock-argstable.docblock-argstable label { background: var(--hoops-page-surface-0); box-shadow: inset 0 0 0 1px var(--hoops-page-line); }
 .sbdocs .docblock-argstable.docblock-argstable label span { background: transparent; }
 .sbdocs .docblock-argstable.docblock-argstable td:nth-child(3) span,
-.sbdocs .docblock-argstable.docblock-argstable td:not(:first-child) div div > span { font-family: var(--font-mono); background: var(--surface-0); }
+.sbdocs .docblock-argstable.docblock-argstable td:not(:first-child) div div > span { font-family: var(--hoops-font-mono); background: var(--hoops-page-surface-0); }
 
 /* Doku-Seiten: Vorschauen mit position:fixed (Modal) bleiben im Rahmen. transform macht den Rahmen zum Bezugsrahmen. */
 .docs-story:has(.dss-modal-wrap) { transform: translateZ(0); overflow: hidden; }

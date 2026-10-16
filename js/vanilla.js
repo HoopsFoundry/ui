@@ -21,12 +21,12 @@ export { initModal, openModal, closeModal, focusables, MODAL_OPEN_EVENT, MODAL_C
 // eslint-disable-next-line no-undef
 export const VERSION = typeof __DSS_VERSION__ === 'string' ? __DSS_VERSION__ : 'dev';
 
-/** Die Version des geladenen Stylesheets (`dss.css` setzt `--dss-version` auf `:root`) oder `null`, wenn es fehlt. */
+/** Die Version des geladenen Stylesheets (`dss.css` setzt `--hoops-version` auf `:root`) oder `null`, wenn es fehlt. */
 export function cssVersion(doc) {
   const d = doc ?? (typeof document === 'undefined' ? null : document);
   const win = d?.defaultView;
   if (!d?.documentElement || !win?.getComputedStyle) return null;
-  const raw = win.getComputedStyle(d.documentElement).getPropertyValue('--dss-version').trim().replace(/^["']|["']$/g, '');
+  const raw = win.getComputedStyle(d.documentElement).getPropertyValue('--hoops-version').trim().replace(/^["']|["']$/g, '');
   return raw || null;
 }
 

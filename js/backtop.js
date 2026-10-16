@@ -4,7 +4,7 @@
  * `initBackToTop(options)` legt einen runden Knopf unten rechts an (44 px, Symbol als SVG per createElementNS, kein `innerHTML`), der
  * erscheint, sobald die Seite mehr als zwei Fensterhöhen lang ist und man ein Stück gescrollt hat. Ein Klick scrollt nach oben (sanft, außer bei
  * „Bewegung reduzieren“ oder `data-motion="reduce"`) und setzt den Fokus auf die erste `h1`, sonst auf `main`. Lage über Tokens im CSS
- * (`--dss-backtop-offset`, `env(safe-area-inset-*)`, `--dss-z-backtop`); eine feste `dss-bnav` darunter wird erkannt und umgangen.
+ * (`--hoops-backtop-offset`, `env(safe-area-inset-*)`, `--hoops-z-backtop`); eine feste `dss-bnav` darunter wird erkannt und umgangen.
  * Rückgabe `{ destroy() }`. ES-Modul ohne Auto-Start, kein Zugriff auf `window`/`document` beim Import.
  * Typen: js/backtop.d.ts.
  */
@@ -34,7 +34,7 @@ export function backTopVisible({ scrollY, innerHeight, scrollHeight, showAfter =
  * Nach-oben-Knopf. Optionen: `label` (Name des Knopfes, Standard „Nach oben“; auch `backLabel`), `container` (Element oder Auswahl, in den der
  * Knopf kommt, Standard `body`), `button` (vorhandener Knopf, der übernommen wird, statt einen anzulegen), `showAfter` (Pixel, Standard 480),
  * `target` (Auswahl des Fokusziels, Standard `h1`; Rückfall `main`), `avoid` (Auswahl einer festen unteren Leiste, über der der Knopf bleibt,
- * Standard `.dss-bnav`; `null` schaltet das ab), `offset` (zusätzlicher Abstand von unten, CSS-Länge, setzt `--dss-backtop-offset`).
+ * Standard `.dss-bnav`; `null` schaltet das ab), `offset` (zusätzlicher Abstand von unten, CSS-Länge, setzt `--hoops-backtop-offset`).
  */
 export function initBackToTop(options = {}) {
   if (typeof document === 'undefined') return emptyHandle();
@@ -55,7 +55,7 @@ export function initBackToTop(options = {}) {
   const adopted = Boolean(opts.button);
   let icon = null; // das Symbol, das wir einem übernommenen Knopf angefügt haben
   const button = adopted ? opts.button : doc.createElement('button');
-  const before = { hidden: button.hidden, type: button.getAttribute('type'), label: button.getAttribute('aria-label'), cls: button.className, offset: button.style.getPropertyValue('--dss-backtop-offset') };
+  const before = { hidden: button.hidden, type: button.getAttribute('type'), label: button.getAttribute('aria-label'), cls: button.className, offset: button.style.getPropertyValue('--hoops-backtop-offset') };
   if (!adopted) {
     button.type = 'button';
     button.className = 'dss-btn dss-btn--secondary dss-btn--icon dss-backtop';
@@ -79,7 +79,7 @@ export function initBackToTop(options = {}) {
     // Liegt der Fokus auf dem Knopf, der gleich verschwindet, geht er an das Ziel (sonst fiele er auf <body>)
     if (!visible && !button.hidden && doc.activeElement === button) focusTarget();
     button.hidden = !visible;
-    // Feste untere Leiste: der Knopf sitzt darüber (Höhe der Leiste plus Abstand), sonst gilt --dss-backtop-offset aus dem CSS
+    // Feste untere Leiste: der Knopf sitzt darüber (Höhe der Leiste plus Abstand), sonst gilt --hoops-backtop-offset aus dem CSS
     let extra = typeof opts.offset === 'string' && opts.offset.trim() ? opts.offset.trim() : '';
     if (!extra && avoid) {
       const bar = doc.querySelector(avoid);
@@ -88,8 +88,8 @@ export function initBackToTop(options = {}) {
         extra = `${Math.ceil(bar.getBoundingClientRect().height) + DEFAULTS.gap}px`;
       }
     }
-    if (extra) button.style.setProperty('--dss-backtop-offset', extra);
-    else button.style.removeProperty('--dss-backtop-offset');
+    if (extra) button.style.setProperty('--hoops-backtop-offset', extra);
+    else button.style.removeProperty('--hoops-backtop-offset');
   };
 
   /** Das erste sichtbare Element der Auswahl. Ohne Layout (Tests, Server-DOM) gilt das erste; ein verstecktes (display: none) zählt im Browser nicht. */
@@ -133,8 +133,8 @@ export function initBackToTop(options = {}) {
       else button.removeAttribute('class');
       if (before.label === null) button.removeAttribute('aria-label');
       else button.setAttribute('aria-label', before.label);
-      if (before.offset) button.style.setProperty('--dss-backtop-offset', before.offset);
-      else button.style.removeProperty('--dss-backtop-offset');
+      if (before.offset) button.style.setProperty('--hoops-backtop-offset', before.offset);
+      else button.style.removeProperty('--hoops-backtop-offset');
     } else button.remove();
   });
 }

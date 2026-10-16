@@ -10,7 +10,7 @@ Die Schrift des DSS ist eine Skala aus 13 Stufen, vier Familien und einer festen
 
 ## Type scale
 
-13 Stufen als CSS-Variablen (`--fs-*`, `--lh-*`, `--ls-*`, `--fw-*`) und Klassen (`.dss-t-*`). Für die großen Stufen gibt es Handy-Größen (bis 640 px, `--fs-*-sm`), die die Klassen `.dss-t-*` dort verwenden. Komponenten mit fester Kachelgröße bleiben bei `--fs-*`.
+13 Stufen als CSS-Variablen (`--hoops-fs-*`, `--hoops-lh-*`, `--hoops-ls-*`, `--hoops-fw-*`) und Klassen (`.dss-t-*`). Für die großen Stufen gibt es Handy-Größen (bis 640 px, `--hoops-fs-*-sm`), die die Klassen `.dss-t-*` dort verwenden. Komponenten mit fester Kachelgröße bleiben bei `--hoops-fs-*`.
 
 <Canvas of={TypographyStories.Scale} />
 
@@ -28,12 +28,12 @@ Spielstände, Uhren und Statistik stehen in Spalten. Dafür gilt `font-variant-n
 
 ## Im Einsatz
 
-Die Stufen zusammen, wie sie in einer Seite stehen. Fließtext ist auf `--measure` (65ch, `.dss-measure`) begrenzt.
+Die Stufen zusammen, wie sie in einer Seite stehen. Fließtext ist auf `--hoops-measure` (65ch, `.dss-measure`) begrenzt.
 
 <Canvas of={TypographyStories.InContext} />
 
 ## Audit: Schriftgrößen im Code
 
-Alle Komponenten in `css/components.css` und `svelte/` setzen `font-size` ausschließlich über `--fs-*`. Die Zählung läuft zur Laufzeit über die Quelltexte. Neue Komponenten setzen `font-size` nur über die Tokens.
+Alle Komponenten in `css/components.css` und `svelte/` setzen `font-size` ausschließlich über `--hoops-fs-*`. Die Zählung läuft zur Laufzeit über die Quelltexte. Neue Komponenten setzen `font-size` nur über die Tokens.
 
 <Canvas of={TypographyStories.Audit} />

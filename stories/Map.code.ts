@@ -43,7 +43,7 @@ export const leafletDirekt = `<!-- Leaflet direkt, ohne mountMap: die Klassen ds
      Leaflet und leaflet.css lädt die Seite selbst (npm install leaflet). -->
 <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
 
-<div class="dss-map" data-state="ready" data-dim="true" data-tiles="dim" style="--dss-map-h:320px">
+<div class="dss-map" data-state="ready" data-dim="true" data-tiles="dim" style="--hoops-map-h:320px">
   <div class="dss-map-frame" role="region" aria-label="Karte der Sporthalle Nordhain">
     <div class="dss-map-stage">
       <div class="dss-map-canvas" id="karte" role="group" aria-label="Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab."></div>
@@ -250,7 +250,7 @@ const orte: MapMarker[] = [
 <MapView label="Vereinssitz und Hallen" markers={orte} darkTiles="invert" />`;
 
 export const sitzVanilla = `<!-- Vanilla: Kacheln im Dunkelmodus invertieren statt abdunkeln – ein Attribut am Wurzelelement (und data-dim="true") -->
-<div class="dss-map" data-state="ready" data-dim="true" data-tiles="invert" style="--dss-map-h:320px">…</div>
+<div class="dss-map" data-state="ready" data-dim="true" data-tiles="invert" style="--hoops-map-h:320px">…</div>
 
 <!-- Vereinssitz in der Liste: Haus-Badge ohne Zahl (aria-hidden) und der Chip „Vereinssitz“ -->
 <li class="dss-map-item">

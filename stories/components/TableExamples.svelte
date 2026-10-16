@@ -361,23 +361,23 @@
 
 <style>
   .stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  .links { margin: 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
+  .links { margin: 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .wide { width: 100%; }
   .narrow { width: 100%; max-width: 360px; }
   .phone { width: 100%; max-width: 340px; }
   .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 24px; }
   .row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
   .row--col { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .bez { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); margin-bottom: 8px; }
+  .bez { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin-bottom: 8px; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .mute { color: var(--dss-mute); }
+  .mute { color: var(--hoops-mute); }
   /* Sticky Kopf wirkt erst, wenn der Scrollbereich eine Höhe hat */
   .sticky :global(.dss-table-scroll) { max-height: 200px; overflow-y: auto; }
   /* Don't-Nachbildung: Zahlen wie ohne die Klasse num */
   .prop :global(.dss-tbl td.num), .prop :global(.dss-tbl th.right) {
-    text-align: left; font-family: var(--font-body); font-variant-numeric: normal; font-weight: 400;
+    text-align: left; font-family: var(--hoops-font-body); font-variant-numeric: normal; font-weight: 400;
   }
-  .prop :global(.dss-tbl th.right) { font-family: var(--font-mono); font-weight: 600; }
+  .prop :global(.dss-tbl th.right) { font-family: var(--hoops-font-mono); font-weight: 600; }
   /* Don't-Nachbildung: Status nur als Farbfläche, ohne Text */
   .dots :global(.dss-pill-s) { width: 14px; height: 14px; padding: 0; border-radius: 50%; font-size: 0; gap: 0; }
 </style>

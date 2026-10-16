@@ -114,10 +114,10 @@ export function Verein() {
 
 export const tokensCss = `/* Scrollen und Nach-oben-Knopf laufen über Tokens und Opt-in-Klassen, nie über globale Regeln. */
 :root {
-  --dss-scroll-offset: 56px;      /* Höhe einer festen oberen Leiste: die Ziele halten diesen Abstand (plus 1rem) */
-  --dss-backtop-offset: 80px;     /* Abstand des Knopfes von unten, z. B. über einer festen BottomNav (64px plus 16px) */
-  --dss-backtop-gap: 16px;        /* Abstand von rechts */
-  --dss-z-backtop: 20;            /* Ebene des Knopfes (Overlays wie das Modal liegen bei 100) */
+  --hoops-scroll-offset: 56px;      /* Höhe einer festen oberen Leiste: die Ziele halten diesen Abstand (plus 1rem) */
+  --hoops-backtop-offset: 80px;     /* Abstand des Knopfes von unten, z. B. über einer festen BottomNav (64px plus 16px) */
+  --hoops-backtop-gap: 16px;        /* Abstand von rechts */
+  --hoops-z-backtop: 20;            /* Ebene des Knopfes (Overlays wie das Modal liegen bei 100) */
 }
 
 /* Opt-in-Klasse: scroll-padding oben (Token) und unten (4,5rem), damit Fokus nicht unter Leiste oder Knopf endet.

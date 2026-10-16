@@ -202,8 +202,8 @@ describe('Beispiele der Seite sind stimmig', () => {
   it('tokensCss nutzt nur Tokens, die es gibt', () => {
     const css = readFileSync(`${rootDir}css/components.css`, 'utf8');
     const tokens = readFileSync(`${rootDir}tokens/tokens.css`, 'utf8');
-    for (const name of code.tokensCss.match(/--dss-acc-[\w-]+(?=:)/g) ?? []) expect(css, name).toContain(name);
-    expect([...(code.tokensCss.match(/--dss-acc-[\w-]+(?=:)/g) ?? [])]).toHaveLength(5);
+    for (const name of code.tokensCss.match(/--hoops-acc-[\w-]+(?=:)/g) ?? []) expect(css, name).toContain(name);
+    expect([...(code.tokensCss.match(/--hoops-acc-[\w-]+(?=:)/g) ?? [])]).toHaveLength(5);
     for (const m of code.tokensCss.matchAll(/var\((--[\w-]+)\)/g)) expect(tokens, m[1]).toContain(`${m[1]}:`);
   });
 });

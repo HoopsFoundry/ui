@@ -23,10 +23,10 @@
   </div>
 {:else if example === 'farbe'}
   <div class="row">
-    <span class="tint" style="color: var(--dss-chip-warn-fg);"><Icon name="live" /> Live</span>
-    <span class="tint" style="color: var(--dss-chip-err-fg);"><Icon name="foul-d" /> Disqualifiziert</span>
-    <span class="tint" style="color: var(--dss-chip-ok-fg);"><Icon name="valid" /> Validiert</span>
-    <span class="tint" style="color: var(--dss-chip-info-fg);"><Icon name="whistle" /> Schiri</span>
+    <span class="tint" style="color: var(--hoops-chip-warn-fg);"><Icon name="live" /> Live</span>
+    <span class="tint" style="color: var(--hoops-chip-err-fg);"><Icon name="foul-d" /> Disqualifiziert</span>
+    <span class="tint" style="color: var(--hoops-chip-ok-fg);"><Icon name="valid" /> Validiert</span>
+    <span class="tint" style="color: var(--hoops-chip-info-fg);"><Icon name="whistle" /> Schiri</span>
   </div>
 {:else if example === 'barrierefreiheit'}
   <div class="row top">
@@ -68,13 +68,13 @@
   <p class="line"><Icon name="calendar" size={48} /> Samstag, 17:30 Uhr</p>
 {:else if example === 'do-farbe'}
   <div class="col">
-    <span class="tint" style="color: var(--dss-chip-ok-fg);"><Icon name="valid" /> Validiert</span>
-    <span class="tint" style="color: var(--dss-chip-err-fg);"><Icon name="lock" /> Gesperrt</span>
+    <span class="tint" style="color: var(--hoops-chip-ok-fg);"><Icon name="valid" /> Validiert</span>
+    <span class="tint" style="color: var(--hoops-chip-err-fg);"><Icon name="lock" /> Gesperrt</span>
   </div>
 {:else if example === 'dont-farbe'}
   <div class="row">
-    <span class="tint" style="color: var(--dss-chip-ok-fg);"><Icon name="live" size={28} /></span>
-    <span class="tint" style="color: var(--dss-chip-err-fg);"><Icon name="live" size={28} /></span>
+    <span class="tint" style="color: var(--hoops-chip-ok-fg);"><Icon name="live" size={28} /></span>
+    <span class="tint" style="color: var(--hoops-chip-err-fg);"><Icon name="live" size={28} /></span>
   </div>
 {:else if example === 'do-currentcolor'}
   <span class="tint"><Icon name="info" size={28} /> Folgt der Textfarbe</span>
@@ -92,32 +92,32 @@
   .col { display: flex; flex-direction: column; gap: 10px; }
   .stack { display: flex; flex-direction: column; gap: 18px; }
   .hdr {
-    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    font-family: var(--hoops-font-mono); font-size: 11px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--page-mute); margin: 0 0 8px;
+    color: var(--hoops-page-mute); margin: 0 0 8px;
   }
   .tile {
     width: 88px; min-height: 84px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 8px;
-    background: var(--surface-0);
-    border: 1px solid var(--page-line);
-    border-radius: var(--radius-md);
+    background: var(--hoops-page-surface-0);
+    border: 1px solid var(--hoops-page-line);
+    border-radius: var(--hoops-radius-md);
     padding: 10px 6px;
-    color: var(--page-fg);
+    color: var(--hoops-page-fg);
     box-sizing: border-box;
   }
   .base .tile { width: auto; min-width: 56px; padding: 10px 12px; }
   .stack { padding: 4px; }
   .lbl {
-    font-family: var(--font-mono); font-size: 10.5px;
-    color: var(--page-mute);
+    font-family: var(--hoops-font-mono); font-size: 10.5px;
+    color: var(--hoops-page-mute);
     text-align: center; max-width: 100%;
     overflow: hidden; text-overflow: ellipsis;
   }
   .a11y { flex: 1 1 200px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
   .a11y .lbl { text-align: left; overflow: visible; font-size: 11px; }
-  .a11y code { font-family: var(--font-mono); }
-  .tint { display: inline-flex; align-items: center; gap: 6px; color: var(--page-fg); font-size: var(--fs-body); }
-  .line { display: flex; align-items: center; gap: 8px; margin: 0; font-size: var(--fs-body); color: var(--page-fg); }
+  .a11y code { font-family: var(--hoops-font-mono); }
+  .tint { display: inline-flex; align-items: center; gap: 6px; color: var(--hoops-page-fg); font-size: var(--hoops-fs-body); }
+  .line { display: flex; align-items: center; gap: 8px; margin: 0; font-size: var(--hoops-fs-body); color: var(--hoops-page-fg); }
 </style>

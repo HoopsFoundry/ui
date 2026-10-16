@@ -38,7 +38,7 @@
     leading?: Snippet;
     center?: Snippet;
     actions?: Snippet;
-    /** Begrenzt den Inhalt auf `--dss-shell-max` (Hintergrund bleibt voll breit). */
+    /** Begrenzt den Inhalt auf `--hoops-shell-max` (Hintergrund bleibt voll breit). */
     contained?: boolean;
   } = $props();
 </script>

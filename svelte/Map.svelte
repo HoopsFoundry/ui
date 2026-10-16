@@ -153,7 +153,7 @@
   data-state={state}
   data-dim={dimInDark ? 'true' : 'false'}
   data-tiles={tilesMode(darkTiles)}
-  style={`--dss-map-h:${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px`}
+  style={`--hoops-map-h:${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px`}
 >
   <a class="dss-map-skip" href={`#${textId}`}>{mapText.skip}</a>
   <div class="dss-map-frame" role="region" aria-label={label}>

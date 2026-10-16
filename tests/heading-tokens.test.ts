@@ -22,23 +22,23 @@ const body = (selector: string): string => {
 const decl = (selector: string, prop: string): string | undefined =>
   [...body(selector).matchAll(new RegExp(`(?:^|[;\\s])${prop}\\s*:\\s*([^;]+)`, 'g'))].map((m) => m[1].trim()).pop();
 
-const FRAME = (d: string) => `var(--dss-frame-title-size, var(--dss-title-size, ${d}))`;
-const CARD = (d: string) => `var(--dss-card-title-size, var(--dss-title-size, ${d}))`;
-const WEIGHT = (d: string) => `var(--dss-title-weight, ${d})`;
-const LEADING = (d: string) => `var(--dss-title-leading, ${d})`;
+const FRAME = (d: string) => `var(--hoops-frame-title-size, var(--hoops-title-size, ${d}))`;
+const CARD = (d: string) => `var(--hoops-card-title-size, var(--hoops-title-size, ${d}))`;
+const WEIGHT = (d: string) => `var(--hoops-title-weight, ${d})`;
+const LEADING = (d: string) => `var(--hoops-title-leading, ${d})`;
 
 // Selektor: [Größe, Gewicht, Zeilenhöhe]; die Vorgaben sind die Werte vor Einführung der Tokens
 const TITLES: Record<string, [string, string, string]> = {
-  '.dss-frame-title': [FRAME('var(--fs-body)'), WEIGHT('600'), LEADING('inherit')],
-  '.dss-pbp-title': [FRAME('var(--fs-body)'), WEIGHT('600'), LEADING('inherit')],
-  '.dss-pc-nm': [CARD('var(--fs-body-lg)'), WEIGHT('600'), LEADING('inherit')],
-  '.dss-pc-hero .dss-pc-nm': [CARD('var(--fs-hero)'), WEIGHT('700'), LEADING('1.05')],
-  '.dss-empty-title': [CARD('var(--fs-body-lg)'), WEIGHT('700'), LEADING('inherit')],
-  '.dss-team-nm': [CARD('var(--fs-body-lg)'), WEIGHT('600'), LEADING('1.2')],
-  '.dss-team--compact .dss-team-nm': [CARD('var(--fs-body)'), WEIGHT('600'), LEADING('1.2')],
-  '.dss-league-title': [CARD('var(--fs-h3)'), WEIGHT('700'), LEADING('1.2')],
-  '.dss-league--compact .dss-league-title': [CARD('var(--fs-body-lg)'), WEIGHT('700'), LEADING('1.2')],
-  '.dss-m-title': ['var(--dss-title-size, var(--fs-h3))', WEIGHT('700'), LEADING('inherit')],
+  '.dss-frame-title': [FRAME('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('inherit')],
+  '.dss-pbp-title': [FRAME('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('inherit')],
+  '.dss-pc-nm': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('600'), LEADING('inherit')],
+  '.dss-pc-hero .dss-pc-nm': [CARD('var(--hoops-fs-hero)'), WEIGHT('700'), LEADING('1.05')],
+  '.dss-empty-title': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('700'), LEADING('inherit')],
+  '.dss-team-nm': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('600'), LEADING('1.2')],
+  '.dss-team--compact .dss-team-nm': [CARD('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('1.2')],
+  '.dss-league-title': [CARD('var(--hoops-fs-h3)'), WEIGHT('700'), LEADING('1.2')],
+  '.dss-league--compact .dss-league-title': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('700'), LEADING('1.2')],
+  '.dss-m-title': ['var(--hoops-title-size, var(--hoops-fs-h3))', WEIGHT('700'), LEADING('inherit')],
 };
 
 describe('Überschriften: Größe über Tokens mit Rückfall auf die bisherigen Werte', () => {
@@ -51,7 +51,7 @@ describe('Überschriften: Größe über Tokens mit Rückfall auf die bisherigen 
   }
 
   it('die Tokens sind nirgends fest vorbelegt (sonst gäbe es keinen Rückfall auf den Wert je Komponente)', () => {
-    for (const name of ['--dss-title-size', '--dss-title-weight', '--dss-title-leading', '--dss-frame-title-size', '--dss-card-title-size']) {
+    for (const name of ['--hoops-title-size', '--hoops-title-weight', '--hoops-title-leading', '--hoops-frame-title-size', '--hoops-card-title-size']) {
       expect(css, name).not.toMatch(new RegExp(`${name}\\s*:`));
       expect(tokens, name).not.toMatch(new RegExp(`${name}\\s*:`));
     }

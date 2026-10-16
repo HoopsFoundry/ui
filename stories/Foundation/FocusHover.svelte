@@ -94,12 +94,12 @@
 </div>
 
 <style>
-  .wrap { font-family: var(--font-body); color: var(--page-fg); }
+  .wrap { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 16px; }
-  .cell { padding: 20px 22px 26px; border: 1px solid var(--page-line); border-radius: var(--radius-lg); background: var(--surface-0); }
-  .cell.dark { background: var(--base-1000); color: var(--n-100); }
-  .cap { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); margin-bottom: 16px; }
-  .cell.dark .cap { color: var(--n-300); }
+  .cell { padding: 20px 22px 26px; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); background: var(--hoops-page-surface-0); }
+  .cell.dark { background: var(--hoops-base-1000); color: var(--hoops-n-100); }
+  .cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin-bottom: 16px; }
+  .cell.dark .cap { color: var(--hoops-n-300); }
   .cell { overflow: hidden; }
   .tabrow { flex-wrap: wrap; }
   .states { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }

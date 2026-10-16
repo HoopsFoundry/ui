@@ -98,7 +98,7 @@ Datum und Zeit, das Ergebnis zeigt einen Strich. Die Ergebniszelle enthält nur 
 
 <Canvas of={SpielplanStories.ZustandLive} />
 
-Ein grünes „Live“-Tag mit pulsierendem Punkt hinter der Zeit, die Ergebniszahlen sind ebenfalls grün (`--dss-live-fg`) und pulsieren sanft. Zusätzlich sprechen Screenreader „läuft“ hinter dem Ergebnis; grün allein zeigt „live“ nie an. Alle Live-Stellen des Systems stehen auf der Seite [Live](?path=/docs/foundation-live--docs).
+Ein grünes „Live“-Tag mit pulsierendem Punkt hinter der Zeit, die Ergebniszahlen sind ebenfalls grün (`--hoops-live-fg`) und pulsieren sanft. Zusätzlich sprechen Screenreader „läuft“ hinter dem Ergebnis; grün allein zeigt „live“ nie an. Alle Live-Stellen des Systems stehen auf der Seite [Live](?path=/docs/foundation-live--docs).
 
 Im Zeitraster steht das Live-Tag in derselben Zeile wie das grüne Ergebnis und bricht erst um, wenn die Zelle (mindestens 180 px breit) zu schmal wird. Hat ein laufendes Spiel noch keinen Stand, steht das Tag hinter der Paarung.
 
@@ -209,7 +209,7 @@ Beide Tabellen zeigen dieselben Daten; oben `names="full"` (Standard), unten `na
 
 <Canvas of={SpielplanStories.LogosVersus} />
 
-`logos` setzt ein Logo vor den Namen, in `versus`, `columns` und im Zeitraster. Das Bild ist dekorativ: `alt=""`, weil der Name daneben steht (siehe Barrierefreiheit unten); es lädt verzögert (`loading="lazy"`) und liegt mit `object-fit: contain` in einer Kachel in `--dss-surface-2`, damit auch transparente Logos im Dunkelmodus eine Fläche haben. Ohne `logo` erscheint ein Kreis mit den Initialen (die ersten zwei Wörter des vollen Namens, z. B. „SK“ für SV Kiefernau). Platzhalter („Erster Gruppe A“) bekommen in `versus`, `columns` und im Zeitraster kein Logo und keinen Initialenkreis; im Layout `opponent` bleibt der Initialenkreis wie bisher. Logos werden bei Verlierern und abgesagten Spielen nicht abgedunkelt, nur der Text. Freilos-Zeilen („… hat Freilos“) zeigen den Namen ebenfalls mit Kurzname und Logo.
+`logos` setzt ein Logo vor den Namen, in `versus`, `columns` und im Zeitraster. Das Bild ist dekorativ: `alt=""`, weil der Name daneben steht (siehe Barrierefreiheit unten); es lädt verzögert (`loading="lazy"`) und liegt mit `object-fit: contain` in einer Kachel in `--hoops-surface-2`, damit auch transparente Logos im Dunkelmodus eine Fläche haben. Ohne `logo` erscheint ein Kreis mit den Initialen (die ersten zwei Wörter des vollen Namens, z. B. „SK“ für SV Kiefernau). Platzhalter („Erster Gruppe A“) bekommen in `versus`, `columns` und im Zeitraster kein Logo und keinen Initialenkreis; im Layout `opponent` bleibt der Initialenkreis wie bisher. Logos werden bei Verlierern und abgesagten Spielen nicht abgedunkelt, nur der Text. Freilos-Zeilen („… hat Freilos“) zeigen den Namen ebenfalls mit Kurzname und Logo.
 
 <Canvas of={SpielplanStories.LogosVersusKurz} />
 
@@ -321,7 +321,7 @@ Unter 640 px Breite werden Zeilen zu Karten und Anwurfzeiten zu Blöcken mit der
 
 ## Tabellen einklappen
 
-`ScheduleTable` und `ScheduleGrid` lassen sich mit `collapsible` einklappen: Der Rahmenkopf (Titel und `meta`) wird zum Kopf eines Accordions, der Titel steht als Überschrift mit Button, `meta` rechts, dahinter der Pfeil. Die Tabelle bzw. das Zeitraster ist der Bereich. Geschlossen zeigt der Rahmen nur den Kopf. Die Titelgröße bleibt an `--dss-frame-title-size`, die Ebene folgt `titleAs` und `HeadingLevel`. Ohne `title` wirkt `collapsible` nicht (in der Entwicklung Warnung in der Konsole). Standard ist geschlossen; `open` (Svelte `bind:open`, React `open` mit `onOpenChange` oder `defaultOpen`) öffnet. Die Handy-Karten (bis 640 px) und der Scrollbereich der Tabelle (benannte Region, per Tab erreichbar) bleiben im Bereich unverändert.
+`ScheduleTable` und `ScheduleGrid` lassen sich mit `collapsible` einklappen: Der Rahmenkopf (Titel und `meta`) wird zum Kopf eines Accordions, der Titel steht als Überschrift mit Button, `meta` rechts, dahinter der Pfeil. Die Tabelle bzw. das Zeitraster ist der Bereich. Geschlossen zeigt der Rahmen nur den Kopf. Die Titelgröße bleibt an `--hoops-frame-title-size`, die Ebene folgt `titleAs` und `HeadingLevel`. Ohne `title` wirkt `collapsible` nicht (in der Entwicklung Warnung in der Konsole). Standard ist geschlossen; `open` (Svelte `bind:open`, React `open` mit `onOpenChange` oder `defaultOpen`) öffnet. Die Handy-Karten (bis 640 px) und der Scrollbereich der Tabelle (benannte Region, per Tab erreichbar) bleiben im Bereich unverändert.
 
 <Canvas of={SpielplanStories.Einklappbar} />
 
@@ -399,7 +399,7 @@ Die Typen stehen in `js/schedule.d.ts` (Export `@bbv/dss-design-system/schedule.
     ['open / defaultOpen / onOpenChange', 'beide', 'Geöffnet (nur mit collapsible, Standard geschlossen). Svelte: bind:open. React: open mit onOpenChange oder defaultOpen.'],
     ['id', 'beide', 'Anker für Deep-Link und Sprungleiste einer Accordion-Gruppe (nur mit collapsible); ohne id kein Anker.'],
     ['class / className', 'beide', <>Zusätzliche Klasse am Rahmen (Svelte <code>class</code>, React <code>className</code>).</>],
-    ['titleAs', 'beide', <>Überschriftenebene <code>'h2'</code> bis <code>'h6'</code>. Rangfolge: <code>titleAs</code> vor der Ebene aus <code>HeadingLevel</code> vor <code>'h3'</code> (gedacht für einen Abschnitt unter einer h2). Direkt unter der Seitenüberschrift (h1) der App wähle <code>'h2'</code>. Die Größe hängt am Token <code>--dss-frame-title-size</code>, nicht an der Ebene (siehe <a href="?path=/docs/foundation-headings--docs">Headings</a>).</>],
+    ['titleAs', 'beide', <>Überschriftenebene <code>'h2'</code> bis <code>'h6'</code>. Rangfolge: <code>titleAs</code> vor der Ebene aus <code>HeadingLevel</code> vor <code>'h3'</code> (gedacht für einen Abschnitt unter einer h2). Direkt unter der Seitenüberschrift (h1) der App wähle <code>'h2'</code>. Die Größe hängt am Token <code>--hoops-frame-title-size</code>, nicht an der Ebene (siehe <a href="?path=/docs/foundation-headings--docs">Headings</a>).</>],
     ['renderLink', 'React', <>Router-Links für Teamnamen und Liga. Svelte: einfache <code>&lt;a&gt;</code>.</>],
     ['renderTime / time', 'Table', <>Ersetzt die Uhrzeit in allen Layouts (React: Funktion, Svelte: Snippet <code>time</code>).</>],
     ['renderNotice / notice', 'beide', <>Table: zusätzliche Spalte „Hinweis“, nur im Layout <code>columns</code> (in <code>versus</code> und <code>opponent</code> ohne Wirkung). Grid: zusätzlicher Inhalt in der Spielzelle.</>],
@@ -435,7 +435,7 @@ Was optisch durch Chip, Farbe oder Durchstreichung gezeigt wird, steht zusätzli
     ['Handy-Karten', <>Die <code>role</code>-Attribute im Markup bleiben bewusst, damit die Tabellensemantik erhalten bleibt, wenn das Handy-CSS Zeilen zu Karten macht.</>],
     ['Farbe', 'Kein Zustand nur über Farbe: Live hat ein Wort-Tag (die grüne Zahl allein genügt nie), abgesagt und verlegt tragen Text, vorläufig steht im Klartext, S/N/U sind Buchstaben.'],
     ['Fokus', 'Links und Eingaben zeigen den DSS-Fokusring.'],
-    ['Dunkel', <>Der seitenweite Dark Mode wirkt über die <code>--dss-*</code>-Variablen. Der dunkle Rahmen <code>dss-frame--dark</code> ist für Spielpläne nicht vorgesehen.</>],
+    ['Dunkel', <>Der seitenweite Dark Mode wirkt über die <code>--hoops-*</code>-Variablen. Der dunkle Rahmen <code>dss-frame--dark</code> ist für Spielpläne nicht vorgesehen.</>],
   ]}
 />
 

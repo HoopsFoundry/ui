@@ -64,21 +64,21 @@ const BACKTOP: Mutation[] = [
   { name: 'zweiter Aufruf ersetzt nicht', rule: 'BackToTop: ein zweiter Aufruf ersetzt den ersten', from: 'registry.release(key);', to: '' },
 ];
 const CSS: Mutation[] = [
-  { name: 'feste Ebene', rule: 'CSS: Ebene über Token', from: 'z-index: var(--dss-z-backtop, 20);', to: 'z-index: 20;' },
+  { name: 'feste Ebene', rule: 'CSS: Ebene über Token', from: 'z-index: var(--hoops-z-backtop, 20);', to: 'z-index: 20;' },
   { name: 'unten ohne Sicherheitsabstand', rule: 'CSS: Abstand von unten über Token und Sicherheitsabstand', from: ' + env(safe-area-inset-bottom, 0px))', to: ')' },
-  { name: 'rechts ohne Token', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'inset-inline-end: calc(var(--dss-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom:', to: 'right: 16px; bottom:' },
+  { name: 'rechts ohne Token', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'inset-inline-end: calc(var(--hoops-backtop-gap, 16px) + env(safe-area-inset-right, 0px)); bottom:', to: 'right: 16px; bottom:' },
   { name: 'rechts-nach-links ohne linken Sicherheitsabstand', rule: 'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)', from: 'env(safe-area-inset-left, 0px)); } /* von rechts', to: 'env(safe-area-inset-right, 0px)); } /* von rechts' },
   { name: 'im Druck sichtbar', rule: 'CSS: im Druck ausgeblendet', from: '@media print { .dss-pagenav, .dss-backtop { display: none; } }', to: '@media print { .dss-pagenav { display: none; } }' },
   { name: 'verborgener Knopf bleibt sichtbar', rule: 'CSS: Knopf fest positioniert und verborgen mit [hidden]', from: '.dss-backtop[hidden] { display: none; }', to: '' },
-  { name: 'Links 40 px', rule: 'CSS: Links mindestens 44 px', from: 'min-height: var(--touch-sm); max-width: 100%;', to: 'min-height: 40px; max-width: 100%;' },
-  { name: 'feste Schrift', rule: 'CSS: Schrift nur aus Tokens', from: 'font-size: var(--fs-body-sm); font-weight: 600; text-decoration: none; overflow-wrap: anywhere;', to: 'font-size: 13px; font-weight: 600; text-decoration: none; overflow-wrap: anywhere;' },
+  { name: 'Links 40 px', rule: 'CSS: Links mindestens 44 px', from: 'min-height: var(--hoops-touch-sm); max-width: 100%;', to: 'min-height: 40px; max-width: 100%;' },
+  { name: 'feste Schrift', rule: 'CSS: Schrift nur aus Tokens', from: 'font-size: var(--hoops-fs-body-sm); font-weight: 600; text-decoration: none; overflow-wrap: anywhere;', to: 'font-size: 13px; font-weight: 600; text-decoration: none; overflow-wrap: anywhere;' },
   { name: 'globales scroll-padding', rule: 'CSS: keine globalen Selektoren für Scrollen', from: '.dss-pagenav { margin: 1rem 0 1.5rem; }', to: 'html { scroll-padding-bottom: 4.5rem; }\n.dss-pagenav { margin: 1rem 0 1.5rem; }' },
   { name: 'globaler h2[id]-Abstand', rule: 'CSS: keine globalen Selektoren für Scrollen', from: '.dss-pagenav .dss-eyebrow { margin: 0 0 0.5rem; }', to: 'h2[id] { scroll-margin-top: 1rem; }\n.dss-pagenav .dss-eyebrow { margin: 0 0 0.5rem; }' },
-  { name: 'Scroll-Abstand ohne Accordion-Token', rule: 'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion', from: 'var(--dss-scroll-offset, var(--dss-acc-sticky-top, 0px))', to: 'var(--dss-scroll-offset, 0px)' },
-  { name: 'scroll-pad ohne unteren Abstand', rule: 'CSS: Opt-in-Klasse für scroll-padding', from: ' scroll-padding-bottom: var(--dss-scroll-offset-bottom, 4.5rem);', to: '' },
-  { name: 'Links ohne Fokus-Ring', rule: 'CSS: Fokus-Ring der Links', from: '.dss-pagenav-link:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }', to: '.dss-pagenav-link:focus-visible { outline-offset: 2px; }' },
-  { name: 'Liste ohne Umbruch', rule: 'CSS: Liste bricht um', from: 'display: flex; flex-wrap: wrap; gap: var(--space-2); }\n.dss-pagenav-link', to: 'display: flex; gap: var(--space-2); }\n.dss-pagenav-link' },
-  { name: 'festes Hex', rule: 'kein festes Hex', from: 'background: var(--dss-surface); color: var(--dss-link);', to: 'background: var(--dss-surface); color: #0645ad;' },
+  { name: 'Scroll-Abstand ohne Accordion-Token', rule: 'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion', from: 'var(--hoops-scroll-offset, var(--hoops-acc-sticky-top, 0px))', to: 'var(--hoops-scroll-offset, 0px)' },
+  { name: 'scroll-pad ohne unteren Abstand', rule: 'CSS: Opt-in-Klasse für scroll-padding', from: ' scroll-padding-bottom: var(--hoops-scroll-offset-bottom, 4.5rem);', to: '' },
+  { name: 'Links ohne Fokus-Ring', rule: 'CSS: Fokus-Ring der Links', from: '.dss-pagenav-link:focus-visible { outline: var(--hoops-ring-w) var(--hoops-ring-style) var(--hoops-ring-color); outline-offset: 2px; }', to: '.dss-pagenav-link:focus-visible { outline-offset: 2px; }' },
+  { name: 'Liste ohne Umbruch', rule: 'CSS: Liste bricht um', from: 'display: flex; flex-wrap: wrap; gap: var(--hoops-space-2); }\n.dss-pagenav-link', to: 'display: flex; gap: var(--hoops-space-2); }\n.dss-pagenav-link' },
+  { name: 'festes Hex', rule: 'kein festes Hex', from: 'background: var(--hoops-surface); color: var(--hoops-link);', to: 'background: var(--hoops-surface); color: #0645ad;' },
 ];
 const SOURCE: { name: string; rule: string; file: 'pagenav' | 'backtop'; from: string; to: string }[] = [
   { name: 'innerHTML im Knopf', rule: 'Quelltext: kein innerHTML, kein insertAdjacentHTML, kein document.write', file: 'backtop', from: 'svg.append(path);', to: "svg.append(path); svg['inner' + 'HTML'] = ''; svg.innerHTML = '';" },
@@ -128,8 +128,8 @@ const THEME: ThemeMutation[] = [
 const THEME_CSS: Mutation[] = [
   { name: 'beide Symbole sichtbar', rule: 'CSS: Symbole wechseln über den Zustand (Mond im Dunkelmodus, Sonne sonst)', from: '.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: none; }', to: '.dss-theme-toggle:not([data-theme-state="dark"]) .dss-theme-icon--moon { display: block; }' },
   { name: 'Symbol 24 px', rule: 'CSS: Symbolgröße 20 px', from: 'width: 20px; height: 20px; }\n.dss-theme-toggle[data-theme-state', to: 'width: 24px; height: 24px; }\n.dss-theme-toggle[data-theme-state' },
-  { name: 'gedrückt ohne Fläche', rule: 'CSS: gedrückt zeigt die Auswahlfläche', from: 'background: var(--dss-selected-bg); }', to: 'background: transparent; }' },
-  { name: 'festes Hex', rule: 'CSS: kein festes Hex', from: 'background: var(--dss-selected-bg); }', to: 'background: #eeeeee; }' },
+  { name: 'gedrückt ohne Fläche', rule: 'CSS: gedrückt zeigt die Auswahlfläche', from: 'background: var(--hoops-selected-bg); }', to: 'background: transparent; }' },
+  { name: 'festes Hex', rule: 'CSS: kein festes Hex', from: 'background: var(--hoops-selected-bg); }', to: 'background: #eeeeee; }' },
 ];
 const THEME_SRC: Mutation[] = [
   { name: 'Inline-onclick', rule: 'Quelltext: kein innerHTML, kein Inline-onclick, kein eval', from: 'button.hidden = false;', to: "button.setAttribute('onclick', 'x'); button.hidden = false;" },
@@ -231,15 +231,15 @@ const LEAFLET_LOGIC: Mutation[] = [
   { name: 'Haus auch bei Orten', rule: 'Orte: Pin zeigt Nummer oder Punkt, kein Haus', from: "if (item.kind === 'seat') {", to: 'if (true) {' },
 ];
 const MAP_CSS: Mutation[] = [
-  { name: 'invert ohne Umfärben', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: 'filter: var(--dss-map-invert-filter, invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)); }\n@media', to: 'filter: var(--dss-map-invert-filter, invert(1) brightness(0.85) contrast(0.9)); }\n@media' },
+  { name: 'invert ohne Umfärben', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: 'filter: var(--hoops-map-invert-filter, invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9)); }\n@media', to: 'filter: var(--hoops-map-invert-filter, invert(1) brightness(0.85) contrast(0.9)); }\n@media' },
   { name: 'invert auch ohne dimInDark', rule: 'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark', from: ':root[data-theme="dark"] .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles', to: ':root[data-theme="dark"] .dss-map[data-tiles="invert"] .dss-map-tiles' },
   { name: 'invert nicht bei System-Dunkel', rule: 'CSS: invert auch bei System-Dunkel ohne data-theme', from: ':root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invert"] .dss-map-tiles', to: ':root:not([data-theme="light"]) .dss-map[data-dim="true"][data-tiles="invertx"] .dss-map-tiles' },
-  { name: 'dim abgeschafft', rule: 'CSS: dim bleibt der Standard', from: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--dss-map-dim, 0.8)); }', to: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: none; }' },
-  { name: 'Haus in fester Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-pin-house { fill: var(--dss-map-pin-fg, var(--n-0));', to: '.dss-map-pin-house { fill: var(--n-0);' },
-  { name: 'eigener Sitz ohne cta-Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-marker.is-own .dss-map-pin-house { fill: var(--dss-cta-fg); stroke: var(--dss-cta-fg); }', to: '' },
+  { name: 'dim abgeschafft', rule: 'CSS: dim bleibt der Standard', from: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: brightness(var(--hoops-map-dim, 0.8)); }', to: ':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles { filter: none; }' },
+  { name: 'Haus in fester Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-pin-house { fill: var(--hoops-map-pin-fg, var(--hoops-n-0));', to: '.dss-map-pin-house { fill: var(--hoops-n-0);' },
+  { name: 'eigener Sitz ohne cta-Farbe', rule: 'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta', from: '.dss-map-marker.is-own .dss-map-pin-house { fill: var(--hoops-cta-fg); stroke: var(--hoops-cta-fg); }', to: '' },
   { name: 'Haus-Maske entfällt', rule: 'CSS: Haus im Platzhalter und in der Liste als Maske in currentColor', from: 'content: \'\'; display: block; width: 16px; height: 16px; background: currentColor;', to: 'content: \'\'; display: block; width: 16px; height: 16px; background: red;' },
   { name: 'Haus 12 px', rule: 'CSS: Haus-Symbol im Platzhalter 16 px', from: 'content: \'\'; display: block; width: 16px; height: 16px;', to: 'content: \'\'; display: block; width: 12px; height: 12px;' },
-  { name: 'festes Hex beim Haus', rule: 'CSS: kein festes Hex im Abschnitt des Sitzes', from: '.dss-map-pin-house { fill: var(--dss-map-pin-fg, var(--n-0)); stroke: var(--dss-map-pin-fg, var(--n-0));', to: '.dss-map-pin-house { fill: #ffffff; stroke: var(--dss-map-pin-fg, var(--n-0));' },
+  { name: 'festes Hex beim Haus', rule: 'CSS: kein festes Hex im Abschnitt des Sitzes', from: '.dss-map-pin-house { fill: var(--hoops-map-pin-fg, var(--hoops-n-0)); stroke: var(--hoops-map-pin-fg, var(--hoops-n-0));', to: '.dss-map-pin-house { fill: #ffffff; stroke: var(--hoops-map-pin-fg, var(--hoops-n-0));' },
 ];
 const MAP_SRC: { name: string; rule: string; file: 'svelte' | 'react' | 'leaflet'; from: string; to: string }[] = [
   { name: 'data-tiles fehlt (Svelte)', rule: 'Quelle: data-tiles aus tilesMode', file: 'svelte', from: 'data-tiles={tilesMode(darkTiles)}', to: '' },

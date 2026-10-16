@@ -5,7 +5,7 @@
 //
 // Schritte (in dieser Reihenfolge, STEPS):
 //   clean    der Arbeitsbaum ist sauber (git status --porcelain); mit --allow-dirty übersprungen
-//   version  package.json == VERSION in allen sechs Bündeldateien == `--dss-version` in dss.css (und == --expect-version, falls gesetzt)
+//   version  package.json == VERSION in allen sechs Bündeldateien == `--hoops-version` in dss.css (und == --expect-version, falls gesetzt)
 //   build    npm run build:vanilla (mit --no-build übersprungen: das vorhandene dist/vanilla wird geprüft)
 //   budget   jedes Bündel (minifiziert und gzip) bleibt im Größenbudget aus scripts/vanilla-budgets.mjs, sonst Abbruch
 //   pack     release/dss-vanilla-<version>.tgz (dist/vanilla und fonts/ unter dem Ordner dss-vanilla-<version>/, dazu version.json), .sha256 (sha256sum-Format,
@@ -68,7 +68,7 @@ async function bundleVersions(bundleDir) {
 export async function checkVersions({ root = ROOT, bundleDir = join(root, 'dist/vanilla'), expect } = {}) {
   const pkg = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
   const css = await readFile(join(bundleDir, 'dss.css'), 'utf8');
-  const cssVersion = css.match(/--dss-version:\s*"([^"]+)"/)?.[1] ?? null;
+  const cssVersion = css.match(/--hoops-version:\s*"([^"]+)"/)?.[1] ?? null;
   const found = { 'package.json': pkg.version, ...(await bundleVersions(bundleDir)), 'dss.css': cssVersion };
   const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);
   if (expect !== undefined && expect !== pkg.version) wrong.push(['--expect-version', expect]);
@@ -141,7 +141,7 @@ export async function buildManifest({ root = ROOT, bundleDir, version, files, ta
       range: leafletRange,
       note: 'Leaflet gehört nicht zum Release. Es wird nur für die Karte gebraucht, lokal ausgeliefert (loadLeaflet) und erst nach dem Klick geladen.',
     },
-    pairing: 'dss.js, dss-render.js, dss-map.js und dss.css einer Version gehören zusammen (VERSION im Bündel == --dss-version in dss.css).',
+    pairing: 'dss.js, dss-render.js, dss-map.js und dss.css einer Version gehören zusammen (VERSION im Bündel == --hoops-version in dss.css).',
   };
 }
 

@@ -34,7 +34,7 @@
     menuLabel?: string;
     /** Platz rechts in der Leiste, z. B. für einen späteren Turnierumschalter. */
     context?: Snippet;
-    /** Begrenzt den Inhalt auf --dss-shell-max (Hintergrund bleibt voll breit). */
+    /** Begrenzt den Inhalt auf --hoops-shell-max (Hintergrund bleibt voll breit). */
     contained?: boolean;
   } = $props();
 

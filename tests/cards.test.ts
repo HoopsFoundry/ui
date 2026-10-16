@@ -23,19 +23,19 @@ describe('Karten, Spielkarte, Spielerkarte, EmptyState, Skeleton im Dunkelmodus'
 
   for (const [name, block] of Object.entries(blocks)) {
     it(`${name}: kein nacktes --ok/err/warn/info-text oder -soft (haben keinen Dunkelmodus)`, () => {
-      expect(block).not.toMatch(/var\(--(ok|err|warn|info)-(text|soft)\)/);
+      expect(block).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft)\)/);
     });
   }
 
   it('Spielkarte: Zusatztext ohne opacity (3,0:1), Liga und Zusatz mit Textfarben', () => {
     expect(css).not.toMatch(/\.dss-match-muted\s*\{[^}]*opacity/);
-    expect(css).toMatch(/\.dss-match-muted\s*\{\s*color:\s*var\(--dss-mute\)/);
+    expect(css).toMatch(/\.dss-match-muted\s*\{\s*color:\s*var\(--hoops-mute\)/);
   });
 
   it('EmptyState: Fokus-Ring des Buttons auf action/error im Dunkelmodus in Chip-Textfarbe', () => {
-    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-empty--action \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--dss-chip-amber-fg\)/);
-    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-empty--error \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--dss-chip-err-fg\)/);
-    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.dss-empty--error \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--dss-chip-err-fg\)/);
+    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-empty--action \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-amber-fg\)/);
+    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-empty--error \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-err-fg\)/);
+    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.dss-empty--error \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-err-fg\)/);
   });
 
   it('Skeleton: Animation stoppt bei prefers-reduced-motion', () => {

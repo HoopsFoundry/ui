@@ -33,7 +33,7 @@ describe('Version-Abgleich', () => {
   });
   it('eine abweichende CSS-Version bricht ab und nennt die Datei', async () => {
     const dir = await copyBundle('css');
-    await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`--dss-version: "${pkg.version}"`, '--dss-version: "0.0.1"'));
+    await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`--hoops-version: "${pkg.version}"`, '--hoops-version: "0.0.1"'));
     await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/dss\.css 0\.0\.1/);
   });
   it('eine fehlende CSS-Version gilt als Abweichung', async () => {
@@ -86,7 +86,7 @@ describe('Ablauf', () => {
     expect(result.steps).toContain('verify');
     expect(existsSync(out)).toBe(false);
     const bad = await copyBundle('trocken-falsch');
-    await writeFile(`${bad}/dss.css`, ':root { --dss-version: "0.0.1"; }');
+    await writeFile(`${bad}/dss.css`, ':root { --hoops-version: "0.0.1"; }');
     await expect(releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true, dryRun: true })).rejects.toThrow(/Versionen/);
   });
   it('scheitert ein Schritt, bleibt nichts zurück (kein Ausgabeordner, kein temporärer Ordner)', async () => {

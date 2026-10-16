@@ -118,7 +118,7 @@ describe('Seiten und Verweise', () => {
     expect(js.match(/from '\/|import\('\//g) ?? []).toEqual([]);
     const css = read('stories/examples/portal-seite/portal.css');
     expect(css).toContain('[hidden] { display: none !important; }');
-    expect(css).toMatch(/portal-skip:focus-visible[^{]*\{[^}]*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/);
+    expect(css).toMatch(/portal-skip:focus-visible[^{]*\{[^}]*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     expect(JSON.parse(read('stories/examples/portal-seite/data.json')).verein.name).toBe('TSV Nordhain 1920');
   });
 });

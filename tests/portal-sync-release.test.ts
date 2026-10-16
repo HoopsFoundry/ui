@@ -16,7 +16,7 @@ import { startServer, type Route } from './helpers/release-server';
 import { tmpRoot, writeFakeRelease } from './helpers/release-fixture';
 
 const V = '0.9.0';
-const FILES = { 'dss.js': 'export const VERSION = "0.9.0";', 'dss.css': ':root{--dss-version:"0.9.0"}', 'courtlines/court.svg': '<svg/>', 'fonts/fonts.css': '/* f */', 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: V }) + '\n' };
+const FILES = { 'dss.js': 'export const VERSION = "0.9.0";', 'dss.css': ':root{--hoops-version:"0.9.0"}', 'courtlines/court.svg': '<svg/>', 'fonts/fonts.css': '/* f */', 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: V }) + '\n' };
 const sha = (d: Buffer | string) => createHash('sha256').update(d).digest('hex');
 const project = `${tmpRoot}-sync/projekt`;
 const dirs = `${tmpRoot}-sync/releases`;

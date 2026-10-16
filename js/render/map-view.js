@@ -80,7 +80,7 @@ export function renderMapView(props, uid) {
     state === 'loading' ? `<div class="dss-map-canvas" id="${attr(canvasId)}" role="group" aria-label="${attr(mapText.canvasHint)}" inert></div>` : '';
 
   return (
-    `<div class="${klass('dss-map', str(p.className))}" data-state="${state}" data-dim="${dimInDark ? 'true' : 'false'}" data-tiles="${tilesMode(p.darkTiles)}" style="--dss-map-h:${mapHeightPx(p.height)}px">` +
+    `<div class="${klass('dss-map', str(p.className))}" data-state="${state}" data-dim="${dimInDark ? 'true' : 'false'}" data-tiles="${tilesMode(p.darkTiles)}" style="--hoops-map-h:${mapHeightPx(p.height)}px">` +
     `<a class="dss-map-skip" href="#${attr(textId)}">${esc(mapText.skip)}</a>` +
     `<div class="dss-map-frame" role="region"${typeof p.label === 'string' ? ` aria-label="${attr(p.label)}"` : ''}><div class="dss-map-stage">${canvas}` +
     `<div class="dss-map-ph">${pinMarkup}${card}</div>` +

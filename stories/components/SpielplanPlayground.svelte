@@ -204,7 +204,7 @@
       type="text"
       value={game.time}
       aria-label="Anwurfzeit Testspiel"
-      style="width: 7ch; font: inherit; padding: 2px 6px; border: 1px solid var(--dss-line); border-radius: 6px; background: var(--dss-surface); color: var(--dss-fg);"
+      style="width: 7ch; font: inherit; padding: 2px 6px; border: 1px solid var(--hoops-line); border-radius: 6px; background: var(--hoops-surface); color: var(--hoops-fg);"
     />
   {:else}{game.time}{/if}
 {/snippet}

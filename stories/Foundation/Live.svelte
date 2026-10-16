@@ -81,11 +81,11 @@
 {/if}
 
 <style>
-  .wrap { font-family: var(--font-body); color: var(--page-fg); }
+  .wrap { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(420px, 100%), 1fr)); gap: 16px; }
-  .cell { padding: 20px 22px 26px; border: 1px solid var(--page-line); border-radius: var(--radius-lg); background: var(--surface-0); min-width: 0; }
+  .cell { padding: 20px 22px 26px; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); background: var(--hoops-page-surface-0); min-width: 0; }
   .cell.wide { grid-column: 1 / -1; }
-  .cap { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); margin-bottom: 16px; }
+  .cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin-bottom: 16px; }
   .scroll { overflow-x: auto; }
   .scroll-in { min-width: 560px; }
   .narrow { max-width: 320px; }

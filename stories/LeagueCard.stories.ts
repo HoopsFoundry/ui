@@ -37,7 +37,7 @@ export const Spielwiese = {
     collapsible: { control: 'boolean', description: 'Einklappbar: der Kopf (Titel, Untertitel, Live) wird zum Accordion-Kopf, Tabelle, Legende und Link sind der Bereich. Die Spielwiese zeigt sie geöffnet (`open`)', table: t('boolean', 'false') },
     open: { control: 'boolean', description: 'Geöffnet (nur mit `collapsible`; Svelte `bind:open`, React `open` mit `onOpenChange`). Die Spielwiese startet geöffnet', table: t('boolean', 'false') },
     id: { control: 'text', description: 'Anker für Deep-Link und Sprungleiste (nur mit `collapsible`); leer: kein Anker', table: t('string') },
-    titleAs: { control: 'inline-radio', options: [undefined, 'h2', 'h3', 'h4', 'h5', 'h6'], description: 'Überschriftenebene des Titels. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor `h3`. Die Größe hängt am Token `--dss-card-title-size`, nicht an der Ebene. Leer lassen, damit die Ebene gilt, die sich aus der Gliederung ergibt', table: t("'h2' | 'h3' | 'h4' | 'h5' | 'h6'", "'h3'") },
+    titleAs: { control: 'inline-radio', options: [undefined, 'h2', 'h3', 'h4', 'h5', 'h6'], description: 'Überschriftenebene des Titels. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor `h3`. Die Größe hängt am Token `--hoops-card-title-size`, nicht an der Ebene. Leer lassen, damit die Ebene gilt, die sich aus der Gliederung ergibt', table: t("'h2' | 'h3' | 'h4' | 'h5' | 'h6'", "'h3'") },
   },
 };
 

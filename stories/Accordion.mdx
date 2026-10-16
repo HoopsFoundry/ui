@@ -52,7 +52,7 @@ Mit `exclusive` ist immer höchstens ein Bereich offen, ein Öffnen schließt di
 
 ## Deep-Link per Anker
 
-Mit `syncHash` (Standard `true`) öffnet ein passender Anker in der Adresse den Bereich samt aller Eltern-Bereiche und scrollt ihn in Sicht, beim Laden der Seite und bei jedem `hashchange`. Beim Öffnen per Klick setzt die Gruppe `#id` in die Adresse (`history.replaceState`, kein neuer Verlaufseintrag); beim Schließen verschwindet der Anker, wenn er der des geschlossenen Bereichs ist. Der Abstand beim Scrollen (`scroll-margin-top`) berücksichtigt den klebenden Kopf und `--dss-acc-sticky-top`. Auf dem Server passiert nichts (kein `window`-Zugriff).
+Mit `syncHash` (Standard `true`) öffnet ein passender Anker in der Adresse den Bereich samt aller Eltern-Bereiche und scrollt ihn in Sicht, beim Laden der Seite und bei jedem `hashchange`. Beim Öffnen per Klick setzt die Gruppe `#id` in die Adresse (`history.replaceState`, kein neuer Verlaufseintrag); beim Schließen verschwindet der Anker, wenn er der des geschlossenen Bereichs ist. Der Abstand beim Scrollen (`scroll-margin-top`) berücksichtigt den klebenden Kopf und `--hoops-acc-sticky-top`. Auf dem Server passiert nichts (kein `window`-Zugriff).
 
 Im Beispiel öffnet ein Klick auf einen Link den Bereich ohne Seitenwechsel. Das Torhüter-Beispiel öffnet außerdem den Bereich „Kader“, in dem es steht. Diese Doku ist eine eingebettete Seite; der Anker ändert hier nur die Adresse des eingebetteten Fensters. In deiner Seite gilt: `…/liga#kader` öffnet den Kader. Wo mehrere Gruppen auf einer Seite stehen, hält `syncHash={false}` die Adresse unberührt.
 
@@ -85,7 +85,7 @@ Mehrere Accordions/Bereiche mit gleichem Titel oder mehrere Sprungleisten auf ei
 
 ## Kopf klebt oben
 
-Mit `sticky` bleibt der Kopf des geöffneten Bereichs oben stehen, solange sein Bereich im Bild ist, und endet mit dem Bereich. Der Abstand nach oben ist `--dss-acc-sticky-top` (Standard 0), etwa die Höhe einer festen Top-Bar. Der Kopf liegt auf `z-index: 2`, unter Overlays wie dem Modal. Damit es wirkt, darf zwischen Gruppe und Scrollbereich kein Vorfahr `overflow: hidden` setzen. Nur die oberste Gruppe klebt; verschachtelte Gruppen kleben nicht. Im Beispiel scrollt der Rahmen (340 px hoch):
+Mit `sticky` bleibt der Kopf des geöffneten Bereichs oben stehen, solange sein Bereich im Bild ist, und endet mit dem Bereich. Der Abstand nach oben ist `--hoops-acc-sticky-top` (Standard 0), etwa die Höhe einer festen Top-Bar. Der Kopf liegt auf `z-index: 2`, unter Overlays wie dem Modal. Damit es wirkt, darf zwischen Gruppe und Scrollbereich kein Vorfahr `overflow: hidden` setzen. Nur die oberste Gruppe klebt; verschachtelte Gruppen kleben nicht. Im Beispiel scrollt der Rahmen (340 px hoch):
 
 <Canvas of={AccordionStories.KopfKlebt} />
 
@@ -105,7 +105,7 @@ Beim Drucken sind alle Bereiche geöffnet, auch geschlossene (`@media print`); B
 
 ## Überschriftenebene
 
-Die Ebene der Köpfe folgt der gemeinsamen Regel (siehe [Überschriften](?path=/docs/foundation-headings--docs)): `titleAs` am Bereich, sonst `titleAs` an der Gruppe, sonst die Ebene eines umgebenden `HeadingLevel`, sonst `h3`. Der Inhalt eines Bereichs bekommt die Ebene darunter: Titelkomponenten (Table, EmptyState …) und verschachtelte Gruppen zählen dadurch automatisch hoch. Die Größe der Titel ändert die Ebene nie; sie hängt an `--dss-acc-title-size`.
+Die Ebene der Köpfe folgt der gemeinsamen Regel (siehe [Überschriften](?path=/docs/foundation-headings--docs)): `titleAs` am Bereich, sonst `titleAs` an der Gruppe, sonst die Ebene eines umgebenden `HeadingLevel`, sonst `h3`. Der Inhalt eines Bereichs bekommt die Ebene darunter: Titelkomponenten (Table, EmptyState …) und verschachtelte Gruppen zählen dadurch automatisch hoch. Die Größe der Titel ändert die Ebene nie; sie hängt an `--hoops-acc-title-size`.
 
 <Canvas of={AccordionStories.Ebenen} />
 
@@ -113,7 +113,7 @@ Die Ebene der Köpfe folgt der gemeinsamen Regel (siehe [Überschriften](?path=/
 
 ## Zustände
 
-Hover hinterlegt den Kopf, der Fokus-Ring ist gestrichelt in Gold/Amber und liegt innen (`-3px`), damit er nicht abgeschnitten wird. Offen zeigt den gedrehten Pfeil und einen abgesetzten Kopf, Gesperrt ist abgeblendet. Aktiv (gehaltene Maustaste) legt die flache Fläche (`--dss-surface-2`) unter den Kopf.
+Hover hinterlegt den Kopf, der Fokus-Ring ist gestrichelt in Gold/Amber und liegt innen (`-3px`), damit er nicht abgeschnitten wird. Offen zeigt den gedrehten Pfeil und einen abgesetzten Kopf, Gesperrt ist abgeblendet. Aktiv (gehaltene Maustaste) legt die flache Fläche (`--hoops-surface-2`) unter den Kopf.
 
 <Canvas of={AccordionStories.Zustaende} />
 

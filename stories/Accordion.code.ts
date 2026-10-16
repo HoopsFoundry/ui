@@ -165,11 +165,11 @@ export function Mannschaft() {
 
 export const tokensCss = `/* Alle Werte sind Rückfälle: ohne Angabe gilt der heutige Wert. Überschreibe sie in einem Container. */
 .liga-seite {
-  --dss-acc-gap: 8px;               /* Abstand zwischen den Karten */
-  --dss-acc-pad: 14px 20px;         /* Innenabstand von Kopf und Bereich */
-  --dss-acc-radius: var(--radius-xl);
-  --dss-acc-title-size: var(--fs-body); /* sonst --dss-card-title-size, --dss-title-size, 18 px */
-  --dss-acc-sticky-top: 56px;       /* Abstand zu einer festen Kopfzeile (Top-Bar) */
+  --hoops-acc-gap: 8px;               /* Abstand zwischen den Karten */
+  --hoops-acc-pad: 14px 20px;         /* Innenabstand von Kopf und Bereich */
+  --hoops-acc-radius: var(--hoops-radius-xl);
+  --hoops-acc-title-size: var(--hoops-fs-body); /* sonst --hoops-card-title-size, --hoops-title-size, 18 px */
+  --hoops-acc-sticky-top: 56px;       /* Abstand zu einer festen Kopfzeile (Top-Bar) */
 }`;
 
 export const funktionenJs = `import { nextHeader, hashTarget, ancestorsOf, labelWithMeta, summaryText } from '@bbv/dss-design-system/accordion.js';

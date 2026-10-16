@@ -15,7 +15,7 @@ export interface BackToTopOptions {
   target?: string;
   /** Auswahl einer festen unteren Leiste, über der der Knopf sitzt (Standard `.dss-bnav`); `null` schaltet das ab. */
   avoid?: string | null;
-  /** Zusätzlicher Abstand von unten als CSS-Länge; setzt `--dss-backtop-offset` am Knopf. */
+  /** Zusätzlicher Abstand von unten als CSS-Länge; setzt `--hoops-backtop-offset` am Knopf. */
   offset?: string;
 }
 

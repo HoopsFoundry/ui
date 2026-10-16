@@ -6,7 +6,7 @@ import '../docs/blocks/blocks.css';
 
 # Colors
 
-Die Farben des DSS sind drei Achsen (Ink, Amber, Sky) plus ein neutrales Grau und die semantischen Farben für Erfolg, Warnung, Fehler und Info. Komponenten greifen nicht auf die Familien zu, sondern auf **Rollen-Tokens** (`--base-*`, `--signal-*`, `--cool-*`) und auf die `--dss-*`-Variablen. Marke und Hell/Dunkel in der Werkzeugleiste umschalten.
+Die Farben des DSS sind drei Achsen (Ink, Amber, Sky) plus ein neutrales Grau und die semantischen Farben für Erfolg, Warnung, Fehler und Info. Komponenten greifen nicht auf die Familien zu, sondern auf **Rollen-Tokens** (`--hoops-base-*`, `--hoops-signal-*`, `--hoops-cool-*`) und auf die `--hoops-*`-Variablen. Marke und Hell/Dunkel in der Werkzeugleiste umschalten.
 
 ## Hue Ramps: Ink, Amber, Sky, Neutral
 
@@ -16,12 +16,12 @@ Drei-Achsen-Identität, alle Stufen oklch-basiert. Ink ist die Text- und Primär
 
 ## Rollen-Tokens
 
-Die Familien selbst ändern sich mit der Marke nicht. Die Rollen-Tokens schalten dagegen per `data-brand="dbb"` auf die DBB-Marke: `--base-*` wird reines Grau (`base-900` = `#000`), `--signal-*` wird Gold, `--cool-*` wird Grau (Links erben dort die Textfarbe). Schalte oben in der Werkzeugleiste die Marke um, um den Wechsel zu sehen.
+Die Familien selbst ändern sich mit der Marke nicht. Die Rollen-Tokens schalten dagegen per `data-brand="dbb"` auf die DBB-Marke: `--hoops-base-*` wird reines Grau (`base-900` = `#000`), `--hoops-signal-*` wird Gold, `--hoops-cool-*` wird Grau (Links erben dort die Textfarbe). Schalte oben in der Werkzeugleiste die Marke um, um den Wechsel zu sehen.
 
 <Canvas of={ColorsStories.Roles} />
 
 ## Semantische Farben
 
-Erfolg, Warnung, Fehler und Info haben je drei Stufen: `fill` für Flächen und Symbole (nicht als Text), `text` für Text auf hellem Grund (AAA) und `soft` als helle Hintergrundfläche. Fehler hat zusätzlich `button` für Schaltflächen mit weißer Schrift (AAA). Diese Werte gelten in Hell und Dunkel gleich. Für Hinweise, Chips und Statustexte, die auch im Dunkelmodus lesbar sein müssen, nimm die Chip-Tokens `--dss-chip-ok-fg`, `--dss-chip-err-fg`, `--dss-chip-warn-fg` und `--dss-chip-info-fg` (mit `-bg`); sie haben einen eigenen Dunkelmodus.
+Erfolg, Warnung, Fehler und Info haben je drei Stufen: `fill` für Flächen und Symbole (nicht als Text), `text` für Text auf hellem Grund (AAA) und `soft` als helle Hintergrundfläche. Fehler hat zusätzlich `button` für Schaltflächen mit weißer Schrift (AAA). Diese Werte gelten in Hell und Dunkel gleich. Für Hinweise, Chips und Statustexte, die auch im Dunkelmodus lesbar sein müssen, nimm die Chip-Tokens `--hoops-chip-ok-fg`, `--hoops-chip-err-fg`, `--hoops-chip-warn-fg` und `--hoops-chip-info-fg` (mit `-bg`); sie haben einen eigenen Dunkelmodus.
 
 <Canvas of={ColorsStories.SemanticTokens} />

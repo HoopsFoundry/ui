@@ -59,14 +59,14 @@ describe('minifiziertes Bündel im Browser-Modell', () => {
   it('themeBootScript liefert den Inline-Code für den head', () => {
     expect(bundle.themeBootScript()).toMatch(/^\(function/);
   });
-  it('Versionsabgleich: ohne Stylesheet css null, mit dss.css (:root --dss-version) passt es', () => {
+  it('Versionsabgleich: ohne Stylesheet css null, mit dss.css (:root --hoops-version) passt es', () => {
     expect(bundle.checkVersion().css).toBeNull();
     const style = document.createElement('style');
-    style.textContent = `:root { --dss-version: "${bundle.VERSION}"; }`;
+    style.textContent = `:root { --hoops-version: "${bundle.VERSION}"; }`;
     document.head.append(style);
     const result = bundle.checkVersion();
     expect(result).toEqual({ js: bundle.VERSION, css: bundle.VERSION, match: true });
-    style.textContent = ':root { --dss-version: "0.1.0"; }';
+    style.textContent = ':root { --hoops-version: "0.1.0"; }';
     expect(bundle.checkVersion().match).toBe(false);
   });
   it('checkVersion({ warn: true }) meldet fehlendes oder abweichendes Stylesheet mit console.warn, sonst still', () => {
@@ -77,16 +77,16 @@ describe('minifiziertes Bündel im Browser-Modell', () => {
     bundle.checkVersion({ warn: true } as never);
     expect(warn).toHaveBeenCalledTimes(2);
     const style = document.createElement('style');
-    style.textContent = ':root { --dss-version: "0.0.1"; }';
+    style.textContent = ':root { --hoops-version: "0.0.1"; }';
     document.head.append(style);
     bundle.checkVersion(document, { warn: true } as never);
     expect(String(warn.mock.calls[2][0])).toContain('passen nicht zusammen');
-    style.textContent = `:root { --dss-version: "${bundle.VERSION}"; }`;
+    style.textContent = `:root { --hoops-version: "${bundle.VERSION}"; }`;
     bundle.checkVersion(document, { warn: true } as never);
     expect(warn).toHaveBeenCalledTimes(3);
     warn.mockRestore();
   });
   it('dss.css enthält die Version, die das Bündel meldet', () => {
-    expect(readFileSync(`${out}dss.css`, 'utf8')).toContain(`--dss-version: "${bundle.VERSION}"`);
+    expect(readFileSync(`${out}dss.css`, 'utf8')).toContain(`--hoops-version: "${bundle.VERSION}"`);
   });
 });

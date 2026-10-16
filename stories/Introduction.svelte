@@ -26,26 +26,26 @@
 </div>
 
 <style>
-  .grid { font-family: var(--font-body); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 14px; }
+  .grid { font-family: var(--hoops-font-body); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(170px, 100%), 1fr)); gap: 14px; }
   .tile {
-    background: var(--surface-0);
-    border: 1px solid var(--page-line);
-    border-radius: var(--radius-lg);
+    background: var(--hoops-page-surface-0);
+    border: 1px solid var(--hoops-page-line);
+    border-radius: var(--hoops-radius-lg);
     padding: 18px;
   }
   .kpi {
-    font-family: var(--font-display);
+    font-family: var(--hoops-font-display);
     font-size: 44px; line-height: 1;
     font-weight: 800;
-    color: var(--page-fg);
+    color: var(--hoops-page-fg);
     letter-spacing: -0.03em;
   }
-  .kpi span { font-size: 18px; color: var(--page-mute); font-weight: 600; margin-left: 2px; }
+  .kpi span { font-size: 18px; color: var(--hoops-page-mute); font-weight: 600; margin-left: 2px; }
   .lbl {
-    font-family: var(--font-mono); font-size: 11px;
+    font-family: var(--hoops-font-mono); font-size: 11px;
     text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--page-mute); font-weight: 600;
+    color: var(--hoops-page-mute); font-weight: 600;
     margin: 6px 0 8px;
   }
-  .tile p { color: var(--page-fg); font-size: 14px; margin: 4px 0; }
+  .tile p { color: var(--hoops-page-fg); font-size: 14px; margin: 4px 0; }
 </style>

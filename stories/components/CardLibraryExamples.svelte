@@ -264,15 +264,15 @@
   .col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
   .list { display: flex; flex-direction: column; gap: 8px; }
   .narrow { width: 100%; max-width: 380px; }
-  .read { margin: 8px 2px 0; font-size: var(--fs-caption); color: var(--page-mute); }
+  .read { margin: 8px 2px 0; font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }
   /* Gegenbeispiel: Das Bild zeigt nur einen Ausschnitt aus dem Hintergrund (oben links), kein Gesicht */
   .bad-crop :global(.dss-pc-img) { object-fit: none; object-position: 0% 0%; }
   .gap { height: 10px; }
   .gap-s { height: 8px; }
-  .cap, .colhead, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .colhead, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 10px; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 64px repeat(4, minmax(190px, 1fr)); gap: 16px 14px; align-items: center; }
   .cell { padding: 6px; }
 </style>

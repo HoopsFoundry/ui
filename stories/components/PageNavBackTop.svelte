@@ -32,9 +32,9 @@
 {/if}
 
 <style>
-  .demo { padding: 16px 16px 96px; color: var(--page-fg); font-family: var(--font-body); }
-  .demo h1 { margin: 0 0 8px; font-size: var(--fs-h2); }
-  .demo h2 { margin: 24px 0 6px; font-size: var(--fs-h3); }
-  .demo p { margin: 0 0 8px; font-size: var(--fs-body-md); color: var(--dss-fg-soft); }
+  .demo { padding: 16px 16px 96px; color: var(--hoops-page-fg); font-family: var(--hoops-font-body); }
+  .demo h1 { margin: 0 0 8px; font-size: var(--hoops-fs-h2); }
+  .demo h2 { margin: 24px 0 6px; font-size: var(--hoops-fs-h3); }
+  .demo p { margin: 0 0 8px; font-size: var(--hoops-fs-body-md); color: var(--hoops-fg-soft); }
   .bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; }
 </style>

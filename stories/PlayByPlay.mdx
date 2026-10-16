@@ -94,7 +94,7 @@ Was der Baustein dabei tut und was nicht:
 - **Bewegung:** Das Einblenden der Einträge und der Live-Puls stoppen bei `prefers-reduced-motion: reduce`. Das Einblenden läuft auch beim ersten Rendern jedes Eintrags.
 - **Screenreader:** Der Feed ist ein `role="log"`, benannt nach dem Titel. Die Rolle `log` meldet neu eingefügte Einträge höflich (implizit `aria-live="polite"`), ohne die laufende Ansage zu unterbrechen. Mit einem Screenreader ist das hier nicht geprüft, es folgt der Rollen-Definition.
 - **Tastatur:** Der Feed hat `tabindex="0"`, damit sich der scrollbare Bereich mit den Pfeiltasten bewegen lässt. Der Fokus-Ring liegt innen.
-- **Live-Marke:** `live` (Standard `true`) zeigt „Live“ mit grünem Puls im Kopf (die gemeinsame [Live-Sprache](?path=/docs/foundation-live--docs): Text `--dss-live-fg`, auf dem dunklen Rahmen `--dss-live-fg-on-dark`, Punkt `--live-fill`). Setze es nur bei einem laufenden Spiel.
+- **Live-Marke:** `live` (Standard `true`) zeigt „Live“ mit grünem Puls im Kopf (die gemeinsame [Live-Sprache](?path=/docs/foundation-live--docs): Text `--hoops-live-fg`, auf dem dunklen Rahmen `--hoops-live-fg-on-dark`, Punkt `--hoops-live-fill`). Setze es nur bei einem laufenden Spiel.
 
 ## Kampfgericht dunkel
 
@@ -106,7 +106,7 @@ Am Kampfgerichts-Tisch gibt es die dunkle Fläche (`dark`). Sie ist auch im hell
 
 ## Zustände: Hover und Fokus
 
-Eine Reihe hebt sich beim Überfahren ab (`--dss-hover-bg`, auf der dunklen Fläche `--n-900`). Der Feed ist per Tab erreichbar und zeigt den Fokus-Ring gestrichelt in Gold/Amber (3 px, innen; auf dunklen Flächen dezenter). Aktiv und Gesperrt gibt es nicht. Die Fläche ohne `dark` folgt dem Theme der Seite.
+Eine Reihe hebt sich beim Überfahren ab (`--hoops-hover-bg`, auf der dunklen Fläche `--hoops-n-900`). Der Feed ist per Tab erreichbar und zeigt den Fokus-Ring gestrichelt in Gold/Amber (3 px, innen; auf dunklen Flächen dezenter). Aktiv und Gesperrt gibt es nicht. Die Fläche ohne `dark` folgt dem Theme der Seite.
 
 <Canvas of={PlayByPlayStories.Zustaende} />
 
@@ -130,7 +130,7 @@ Dazu kommen Props des Bausteins, die sich nicht als Steuerelement zeigen lassen:
   rows={[
     ['events', 'Ereignis[]', 'Die Ereignisse in der anzuzeigenden Reihenfolge, siehe die Felder oben.'],
     ['title', 'string', "Titel im Kopf und Name des Feeds (Standard „Play-by-Play · neueste oben“). Er muss zur Reihenfolge der Ereignisse passen."],
-    ['titleAs', "'h2' | 'h3' | 'h4' | 'h5' | 'h6'", <>Überschriftenebene des Titels. Rangfolge: <code>titleAs</code> vor der Ebene aus <code>HeadingLevel</code> vor <code>'h3'</code>. Die Größe hängt am Token <code>--dss-frame-title-size</code>, nicht an der Ebene (siehe <a href="?path=/docs/foundation-headings--docs">Headings</a>).</>],
+    ['titleAs', "'h2' | 'h3' | 'h4' | 'h5' | 'h6'", <>Überschriftenebene des Titels. Rangfolge: <code>titleAs</code> vor der Ebene aus <code>HeadingLevel</code> vor <code>'h3'</code>. Die Größe hängt am Token <code>--hoops-frame-title-size</code>, nicht an der Ebene (siehe <a href="?path=/docs/foundation-headings--docs">Headings</a>).</>],
     ['meta', 'string', 'Kurzinfo rechts im Kopf, z. B. Anzahl der Ereignisse.'],
     ['live', 'boolean', 'Zeigt die Marke „Live“ mit Puls (Standard true).'],
     ['dark', 'boolean', 'Dunkle Fläche (Standard false).'],

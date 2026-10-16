@@ -16,7 +16,7 @@ describe('Banner und Modal: Farben mit Dunkelmodus', () => {
   const area = block(/\/\* ── Banner/, /\/\* ── Tabs/);
   it('Regeln im Banner- und Modal-Block nutzen nicht die nackten --*-text-Tokens (ohne Dunkelmodus)', () => {
     expect(area).toContain('.dss-banner--danger');
-    expect(area).not.toMatch(/var\(--(err|ok|warn|info)-text\)/);
+    expect(area).not.toMatch(/var\(--hoops-(err|ok|warn|info)-text\)/);
   });
 });
 

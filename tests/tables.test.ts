@@ -13,7 +13,7 @@ const section = (from: string, to: string) => {
   return css.slice(a, b);
 };
 
-const ring = 'outline:\\s*var\\(--ring-w\\)\\s+var\\(--ring-style\\)\\s+var\\(--ring-color\\)';
+const ring = 'outline:\\s*var\\(--hoops-ring-w\\)\\s+var\\(--hoops-ring-style\\)\\s+var\\(--hoops-ring-color\\)';
 
 describe('Tabelle und PlayByPlay im Dunkelmodus', () => {
   const blocks = {
@@ -23,28 +23,28 @@ describe('Tabelle und PlayByPlay im Dunkelmodus', () => {
   };
   for (const [name, block] of Object.entries(blocks)) {
     it(`${name}: kein nacktes --ok/err/warn/info-text oder -soft (haben keinen Dunkelmodus)`, () => {
-      expect(block).not.toMatch(/var\(--(ok|err|warn|info)-(text|soft)\)/);
+      expect(block).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft)\)/);
     });
   }
 
   it('Positionsmarken und Status-Pillen nutzen die Chip-Tokens', () => {
     const b = blocks['Rahmenkopf bis Pille'];
-    expect(b).toMatch(/\.dss-pos\.pf\s*\{\s*background:\s*var\(--dss-chip-warn-bg\);\s*color:\s*var\(--dss-chip-warn-fg\)/);
-    expect(b).toMatch(/\.dss-pos\.c\s*\{\s*background:\s*var\(--dss-chip-err-bg\);\s*color:\s*var\(--dss-chip-err-fg\)/);
-    expect(b).toMatch(/\.dss-pos\.sg\s*\{\s*background:\s*var\(--dss-chip-info-bg\);\s*color:\s*var\(--dss-chip-info-fg\)/);
-    expect(b).toMatch(/\.dss-pill-s\.on\s*\{\s*background:\s*var\(--dss-chip-ok-bg\);\s*color:\s*var\(--dss-chip-ok-fg\)/);
-    expect(b).toMatch(/\.dss-pill-s\.dnp\s*\{\s*background:\s*var\(--dss-chip-err-bg\);\s*color:\s*var\(--dss-chip-err-fg\)/);
+    expect(b).toMatch(/\.dss-pos\.pf\s*\{\s*background:\s*var\(--hoops-chip-warn-bg\);\s*color:\s*var\(--hoops-chip-warn-fg\)/);
+    expect(b).toMatch(/\.dss-pos\.c\s*\{\s*background:\s*var\(--hoops-chip-err-bg\);\s*color:\s*var\(--hoops-chip-err-fg\)/);
+    expect(b).toMatch(/\.dss-pos\.sg\s*\{\s*background:\s*var\(--hoops-chip-info-bg\);\s*color:\s*var\(--hoops-chip-info-fg\)/);
+    expect(b).toMatch(/\.dss-pill-s\.on\s*\{\s*background:\s*var\(--hoops-chip-ok-bg\);\s*color:\s*var\(--hoops-chip-ok-fg\)/);
+    expect(b).toMatch(/\.dss-pill-s\.dnp\s*\{\s*background:\s*var\(--hoops-chip-err-bg\);\s*color:\s*var\(--hoops-chip-err-fg\)/);
   });
 
-  it('--dss-chip-info-* und -neutral-* sind im Hellmodus und in beiden Dunkelmodus-Blöcken definiert', () => {
+  it('--hoops-chip-info-* und -neutral-* sind im Hellmodus und in beiden Dunkelmodus-Blöcken definiert', () => {
     for (const t of ['info-bg', 'info-fg', 'neutral-bg', 'neutral-fg']) {
-      expect(css.match(new RegExp(`--dss-chip-${t}:`, 'g'))?.length).toBe(3);
+      expect(css.match(new RegExp(`--hoops-chip-${t}:`, 'g'))?.length).toBe(3);
     }
   });
 
   it('Plus/Minus in Zahlenspalten: Chip-Farbe, auf dunkler Fläche feste helle Töne', () => {
-    expect(css).toMatch(/\.dss-tbl td\.num\.plus\s*\{\s*color:\s*var\(--dss-chip-ok-fg\)/);
-    expect(css).toMatch(/\.dss-tbl td\.num\.minus\s*\{\s*color:\s*var\(--dss-chip-err-fg\)/);
+    expect(css).toMatch(/\.dss-tbl td\.num\.plus\s*\{\s*color:\s*var\(--hoops-chip-ok-fg\)/);
+    expect(css).toMatch(/\.dss-tbl td\.num\.minus\s*\{\s*color:\s*var\(--hoops-chip-err-fg\)/);
     expect(css).toMatch(/\.dss-frame--dark \.dss-tbl td\.num\.plus\s*\{\s*color:\s*oklch\(/);
     expect(css).toMatch(/\.dss-frame--dark \.dss-tbl td\.num\.minus\s*\{\s*color:\s*oklch\(/);
   });
@@ -58,15 +58,15 @@ describe('Tabelle und PlayByPlay im Dunkelmodus', () => {
       '../stories/Table.mdx',
       '../stories/PlayByPlay.mdx',
     ]) {
-      expect(read(f), f).not.toMatch(/var\(--(ok|err|warn|info)-(text|soft)\)/);
+      expect(read(f), f).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft)\)/);
     }
   });
 });
 
 describe('Tabelle: eigene Zeile auf Streifen', () => {
   it('is-own überdeckt den Streifen der geraden Zeilen, auch auf dunkler Fläche', () => {
-    expect(css).toMatch(/\.dss-tbl--striped tbody tr\.is-own td\s*\{\s*background:\s*var\(--dss-selected-bg\)/);
-    expect(css).toMatch(/\.dss-frame--dark \.dss-tbl--striped tbody tr\.is-own td\s*\{\s*background:\s*var\(--dss-selected-bg\)/);
+    expect(css).toMatch(/\.dss-tbl--striped tbody tr\.is-own td\s*\{\s*background:\s*var\(--hoops-selected-bg\)/);
+    expect(css).toMatch(/\.dss-frame--dark \.dss-tbl--striped tbody tr\.is-own td\s*\{\s*background:\s*var\(--hoops-selected-bg\)/);
   });
 });
 
@@ -81,8 +81,8 @@ describe('Tabelle: Fokus', () => {
     expect(css).toMatch(new RegExp(':where\\(\\.dss-tbl tbody\\) tr:focus-visible\\s*\\{[^}]*' + ring + ';\\s*outline-offset:\\s*-3px'));
   });
   it('eigene Zeile: Ring im Dunkelmodus in Chip-Textfarbe (Kontrast auf der Auswahlfläche)', () => {
-    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-tbl tr\.is-own :focus-visible\s*\{\s*outline-color:\s*var\(--dss-chip-amber-fg\)/);
-    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.dss-tbl tr\.is-own :focus-visible\s*\{\s*outline-color:\s*var\(--dss-chip-amber-fg\)/);
+    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-tbl tr\.is-own :focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-amber-fg\)/);
+    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.dss-tbl tr\.is-own :focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-amber-fg\)/);
   });
   it('Scrollbereich ist in Svelte und React eine benannte, fokussierbare Region', () => {
     const svelte = read('../svelte/Table.svelte');

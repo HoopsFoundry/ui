@@ -28,17 +28,17 @@ describe('CSS einklappbarer Rahmen', () => {
     expect(inherit).toMatch(/font:\s*inherit/);
     expect(inherit).toMatch(/letter-spacing:\s*inherit/);
     expect(inherit).toMatch(/color:\s*inherit/);
-    expect(noComments).not.toMatch(/--dss-acc-title-size|--dss-acc-pad|--dss-acc-nested-title-size/);
+    expect(noComments).not.toMatch(/--hoops-acc-title-size|--hoops-acc-pad|--hoops-acc-nested-title-size/);
     expect(inherit).not.toMatch(/font-size/);
     // die Titelgrößen selbst bleiben unverändert an den Rahmen- bzw. Karten-Tokens
-    expect(css).toMatch(/\.dss-frame-title\s*\{[^}]*font-size:\s*var\(--dss-frame-title-size,\s*var\(--dss-title-size,\s*var\(--fs-body\)\)\)/);
-    expect(css).toMatch(/\.dss-league-title\s*\{[^}]*font-size:\s*var\(--dss-card-title-size,\s*var\(--dss-title-size,\s*var\(--fs-h3\)\)\)/);
+    expect(css).toMatch(/\.dss-frame-title\s*\{[^}]*font-size:\s*var\(--hoops-frame-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-body\)\)\)/);
+    expect(css).toMatch(/\.dss-league-title\s*\{[^}]*font-size:\s*var\(--hoops-card-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-h3\)\)\)/);
   });
   it('kein Selektor auf h1 bis h6 im Abschnitt', () => {
     expect(noComments).not.toMatch(/(^|[\s,>+~])h[1-6]\b/m);
   });
-  it('keine nackten --*-text-Variablen (nur mit Token-Namen --dss-…)', () => {
-    expect(noComments).not.toMatch(/var\(--(?!dss-)[\w-]*-text\b/);
+  it('keine nackten --*-text-Variablen (nur mit Token-Namen --hoops-…)', () => {
+    expect(noComments).not.toMatch(/var\(--hoops-(ok|err|warn|info|signal|cool|base)-(text|soft)\b/);
   });
   it('Rahmenkopf: ohne Innenabstand, der Button trägt ihn (≥ 44 px Zielhöhe über .dss-acc-trigger)', () => {
     expect(rule('.dss-frame-head--acc, .dss-league-head--acc')).toMatch(/padding:\s*0/);
@@ -52,8 +52,8 @@ describe('CSS einklappbarer Rahmen', () => {
     expect(rule('.dss-league.is-collapsible:not(.is-open) > .dss-league-head--acc')).toMatch(/border-radius:\s*15px/);
   });
   it('Fokus: der gestrichelte Ring kommt von .dss-acc-trigger (innen), auf dunklem Rahmen in der dezenten Farbe', () => {
-    expect(css).toMatch(/\.dss-acc-trigger:focus-visible\s*\{[^}]*outline:\s*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\);\s*outline-offset:\s*-3px/);
-    expect(rule('.dss-frame--dark .dss-acc-trigger:focus-visible')).toMatch(/outline-color:\s*var\(--ring-color-on-dark\)/);
+    expect(css).toMatch(/\.dss-acc-trigger:focus-visible\s*\{[^}]*outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\);\s*outline-offset:\s*-3px/);
+    expect(rule('.dss-frame--dark .dss-acc-trigger:focus-visible')).toMatch(/outline-color:\s*var\(--hoops-ring-color-on-dark\)/);
   });
   it('Hover und Aktiv nutzen vorhandene Tokens (kein Zustand nur über Farbe: der Pfeil dreht sich)', () => {
     expect(frames).toMatch(/\.dss-frame-head--acc \.dss-acc-trigger:hover/);
@@ -68,7 +68,7 @@ describe('CSS einklappbarer Rahmen', () => {
     expect(at).toBeGreaterThan(0);
     const print = frames.slice(at);
     // so spezifisch wie die Regel für „zugeklappt“, sonst bliebe der Strich im Druck durchsichtig
-    expect(print).toMatch(/\.dss-frame\.is-collapsible:not\(\.is-open\) > \.dss-frame-head--acc\s*\{[^}]*border-bottom-color:\s*var\(--dss-line\)/);
+    expect(print).toMatch(/\.dss-frame\.is-collapsible:not\(\.is-open\) > \.dss-frame-head--acc\s*\{[^}]*border-bottom-color:\s*var\(--hoops-line\)/);
     expect(print).toMatch(/position:\s*static/);
   });
   it('Animation und Druck der Bereiche kommen aus dem Accordion (gleiche Klassen), nicht aus einer Kopie', () => {

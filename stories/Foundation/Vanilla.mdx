@@ -136,7 +136,7 @@ Das Render-Bündel ist eine eigene Datei: `dss-render.js` importiert das Accordi
   ]}
 />
 
-Wer nur den Kern braucht, lädt nur `dss.js`; wer Markup erzeugt, lädt beide aus derselben Version. `VERSION` gibt es in beiden Bündeln (und `--dss-version` in `dss.css`); sie müssen übereinstimmen, `checkVersion()` des Kerns prüft nur `dss.js` gegen `dss.css`, ein Vergleich mit `VERSION` aus `dss-render.js` gehört in dein Start-Skript. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code>, <code>VERSION</code> und die `render…`/`mount…`-Paare der Tabelle.
+Wer nur den Kern braucht, lädt nur `dss.js`; wer Markup erzeugt, lädt beide aus derselben Version. `VERSION` gibt es in beiden Bündeln (und `--hoops-version` in `dss.css`); sie müssen übereinstimmen, `checkVersion()` des Kerns prüft nur `dss.js` gegen `dss.css`, ein Vergleich mit `VERSION` aus `dss-render.js` gehört in dein Start-Skript. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code>, <code>VERSION</code> und die `render…`/`mount…`-Paare der Tabelle.
 
 ### Markup auf dem Handy · 390 px Breite
 
@@ -196,7 +196,7 @@ Das Bündel steht allein (es braucht weder `dss.js` noch `dss-render.js`); umgek
 
 ### CSP und Boot-Skript
 
-Das Bündel kommt mit `script-src 'self'` aus: eine Datei von der eigenen Domain, kein `eval`, keine Inline-Handler. Die `initX`-Bausteine setzen Styles über das CSSOM (`element.style`), das `style-src` nicht blockiert. Die Render-Funktionen schreiben für Pins der Karte, die Höhe der Karte (`--dss-map-h`) und die Breite von Tabellenspalten `style`-Attribute ins Markup; `mountX` wendet sie nach dem Einsetzen über das CSSOM an (und entfernt das Attribut), sodass `style-src 'self'` reicht. Setzt du das Ergebnis von `renderX` selbst ein (Crawler, `createContextualFragment` im eigenen Code), blockiert Chromium diese Attribute unter `style-src 'self'`: erlaube sie mit `style-src-attr 'unsafe-inline'` (oder einem Hash je Attributwert) oder nimm `mountX`. Das kleine Inline-Skript `themeBootScript()` im `<head>` gegen das Flackern im Dunkelmodus braucht einen Hash oder eine nonce.
+Das Bündel kommt mit `script-src 'self'` aus: eine Datei von der eigenen Domain, kein `eval`, keine Inline-Handler. Die `initX`-Bausteine setzen Styles über das CSSOM (`element.style`), das `style-src` nicht blockiert. Die Render-Funktionen schreiben für Pins der Karte, die Höhe der Karte (`--hoops-map-h`) und die Breite von Tabellenspalten `style`-Attribute ins Markup; `mountX` wendet sie nach dem Einsetzen über das CSSOM an (und entfernt das Attribut), sodass `style-src 'self'` reicht. Setzt du das Ergebnis von `renderX` selbst ein (Crawler, `createContextualFragment` im eigenen Code), blockiert Chromium diese Attribute unter `style-src 'self'`: erlaube sie mit `style-src-attr 'unsafe-inline'` (oder einem Hash je Attributwert) oder nimm `mountX`. Das kleine Inline-Skript `themeBootScript()` im `<head>` gegen das Flackern im Dunkelmodus braucht einen Hash oder eine nonce.
 
 <CodeBlock label="Content-Security-Policy" language="Shell und HTTP" code={cspHeader} />
 
@@ -211,7 +211,7 @@ Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, häl
     ['dss.js', `${(bundleSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte (dss.js.map)'],
     ['dss.min.js', `${(bundleSizes.min / 1024).toFixed(1)} KiB`, 'minifiziert, mit Quellkarte (dss.min.js.map)'],
     ['dss.min.js (gzip)', `${(bundleSizes.gzip / 1024).toFixed(1)} KiB`, 'so kommt es über das Netz, wenn der Server komprimiert'],
-    ['dss.css', `${(bundleSizes.css / 1024).toFixed(1)} KiB`, 'tokens.css plus components.css, enthält --dss-version; courtlines/ liegt daneben'],
+    ['dss.css', `${(bundleSizes.css / 1024).toFixed(1)} KiB`, 'tokens.css plus components.css, enthält --hoops-version; courtlines/ liegt daneben'],
   ]}
 />
 
@@ -246,7 +246,7 @@ Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `dss-
 
 ## Einbinden aus dem Release
 
-Jedes Release hat sechs Anhänge: den Tarball `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball, bequem für `sha256sum -c`), `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Hinweis zu Leaflet, das Hilfsskript) sowie `dss-sync.mjs` und `dss-sync.mjs.sha256`. Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--dss-version` in `dss.css` dieselbe Version tragen und jedes Bündel sein Größenbudget einhält (sonst bricht es ab). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 und Zeitstempel 0 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist deshalb die veröffentlichte `.sha256`. Das Skript schreibt nach `release/` (nicht im Git; ein vorhandenes Ziel wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.dss-release` trägt) und braucht weder Netz noch Git-Schreibrechte.
+Jedes Release hat sechs Anhänge: den Tarball `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball, bequem für `sha256sum -c`), `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Hinweis zu Leaflet, das Hilfsskript) sowie `dss-sync.mjs` und `dss-sync.mjs.sha256`. Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `dss.css` dieselbe Version tragen und jedes Bündel sein Größenbudget einhält (sonst bricht es ab). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 und Zeitstempel 0 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist deshalb die veröffentlichte `.sha256`. Das Skript schreibt nach `release/` (nicht im Git; ein vorhandenes Ziel wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.dss-release` trägt) und braucht weder Netz noch Git-Schreibrechte.
 
 <CodeBlock label="Holen, prüfen, einsetzen" language="Shell" code={releaseSync} />
 
@@ -254,7 +254,7 @@ Ohne das Skript prüfst du von Hand:
 
 <CodeBlock label="Prüfsumme von Hand" language="Shell" code={manualCheck} />
 
-Der Tarball enthält nur das Bündel; Leaflet gehört nicht dazu (`manifest.json` nennt den Bereich `^1.9.0` aus den Peer-Abhängigkeiten, die Karte braucht es nur nach dem Klick). Eine komplette Seite aus genau diesen Dateien steht im Repository unter `stories/examples/portal-seite/` (Vereinsseite `index.html`, Teamseite `team.html`, Daten in `data.json`): Seitenkopf mit Theme-Umschalter, Seitennavigation, Ligakarten, Teamkarten, Spielplan mit Tabs, Hallenkarte mit Karte, einklappbare Tabellen, Dialog „Fehler melden“ und Nach-oben; alle Bausteine entstehen aus den Daten per `mountX`, Tabs und Dialog aus den kleinen Hilfen am Anfang von `portal.js`. Die Seite benutzt **relative Pfade** (`dss/dss.css`, `./dss/dss.min.js`): auf einer GitHub-Pages-Projektseite unter `/<repo>/` würde ein Pfad mit führendem `/` ins Leere zeigen (die Prüfung lädt die Seite deshalb auch unter `/projekt/`). Ohne JavaScript zeigt sie einen Hinweis (`noscript`), der Meldeknopf und der Theme-Umschalter bleiben verborgen (das Attribut `hidden` muss gegen `display` aus Klassen gewinnen: `[hidden] { display: none !important; }`), und Sprunglink und Menü tragen den gestrichelten Fokusring aus den `--ring-*`-Tokens.
+Der Tarball enthält nur das Bündel; Leaflet gehört nicht dazu (`manifest.json` nennt den Bereich `^1.9.0` aus den Peer-Abhängigkeiten, die Karte braucht es nur nach dem Klick). Eine komplette Seite aus genau diesen Dateien steht im Repository unter `stories/examples/portal-seite/` (Vereinsseite `index.html`, Teamseite `team.html`, Daten in `data.json`): Seitenkopf mit Theme-Umschalter, Seitennavigation, Ligakarten, Teamkarten, Spielplan mit Tabs, Hallenkarte mit Karte, einklappbare Tabellen, Dialog „Fehler melden“ und Nach-oben; alle Bausteine entstehen aus den Daten per `mountX`, Tabs und Dialog aus den kleinen Hilfen am Anfang von `portal.js`. Die Seite benutzt **relative Pfade** (`dss/dss.css`, `./dss/dss.min.js`): auf einer GitHub-Pages-Projektseite unter `/<repo>/` würde ein Pfad mit führendem `/` ins Leere zeigen (die Prüfung lädt die Seite deshalb auch unter `/projekt/`). Ohne JavaScript zeigt sie einen Hinweis (`noscript`), der Meldeknopf und der Theme-Umschalter bleiben verborgen (das Attribut `hidden` muss gegen `display` aus Klassen gewinnen: `[hidden] { display: none !important; }`), und Sprunglink und Menü tragen den gestrichelten Fokusring aus den `--hoops-ring-*`-Tokens.
 
 <CodeBlock label="portal.js (Beispiel-Portalseite)" language="JavaScript" code={portalSource} />
 
@@ -296,7 +296,7 @@ Das Paket veröffentlicht `dist/`, `scripts/portal-sync.mjs` und `scripts/lib/` 
 JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Projekt auseinanderlaufen (neues `dss.js`, altes `dss.css` im Browser-Cache). Das Bündel hilft beim Abgleich:
 
 - `VERSION` ist die Version des Pakets, aus dem `dss.js` gebaut wurde.
-- `dss.css` setzt `--dss-version` auf `:root`; `cssVersion()` liest sie, `checkVersion()` liefert `{ js, css, match }`. Fehlt `dss.css` (oder kommt es aus einem anderen Paket), ist `css` `null` und `match` falsch.
+- `dss.css` setzt `--hoops-version` auf `:root`; `cssVersion()` liest sie, `checkVersion()` liefert `{ js, css, match }`. Fehlt `dss.css` (oder kommt es aus einem anderen Paket), ist `css` `null` und `match` falsch.
 - `checkVersion({ warn: true })` meldet eine Abweichung oder ein fehlendes Stylesheet zusätzlich mit `console.warn` (zum Beispiel einmal beim Start der Seite).
 - `dss-sync.mjs` schreibt zusätzlich `version.json` neben die Dateien, für einen Vergleich im Build oder in der Pipeline.
 

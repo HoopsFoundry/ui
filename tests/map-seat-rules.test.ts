@@ -29,23 +29,23 @@ describe('Kontraste: Marker auf invertierten Kacheln (Dunkelmodus, darkTiles="in
   const css = read('css/components.css');
   const tokens = read('tokens/tokens.css');
   const light = blockOf(css, '/* ── Semantische Aliase · Light');
-  const dark = blockOf(css, ':root[data-theme="dark"] {\n  --dss-fg');
+  const dark = blockOf(css, ':root[data-theme="dark"] {\n  --hoops-fg');
   for (const brand of ['BBV', 'DBB'] as const) {
-    const scope = `--h-signal: var(${brand === 'BBV' ? '--h-amber' : '--h-gold'});\n${light}\n${dark}\n${tokens}`;
+    const scope = `--hoops-h-signal: var(${brand === 'BBV' ? '--hoops-h-amber' : '--hoops-h-gold'});\n${light}\n${dark}\n${tokens}`;
     const c = (t: string) => color(`var(${t})`, scope);
     it(`${brand}: Kontur oder Ring heben sich von jeder invertierten Kachel mit mindestens 3:1 ab`, () => {
       for (const [name, rgb] of Object.entries(TILES)) {
         const shown = invertTile(rgb);
-        expect(Math.max(ratio(c('--base-1000'), shown), ratio(c('--n-0'), shown)), name).toBeGreaterThanOrEqual(3);
+        expect(Math.max(ratio(c('--hoops-base-1000'), shown), ratio(c('--hoops-n-0'), shown)), name).toBeGreaterThanOrEqual(3);
       }
     });
     it(`${brand}: das weiße Haus steht auf dem dunklen Pin mit mindestens 7:1, auf dem goldenen eigenen Pin dessen cta-Vordergrund`, () => {
-      expect(ratio(c('--n-0'), c('--base-1000'))).toBeGreaterThanOrEqual(7);
-      expect(ratio(c('--dss-cta-fg'), c('--dss-cta-bg'))).toBeGreaterThanOrEqual(7);
+      expect(ratio(c('--hoops-n-0'), c('--hoops-base-1000'))).toBeGreaterThanOrEqual(7);
+      expect(ratio(c('--hoops-cta-fg'), c('--hoops-cta-bg'))).toBeGreaterThanOrEqual(7);
     });
     it(`${brand}: Quellenangabe liegt auf eigener Fläche, unabhängig von den Kacheln (≥ 7:1)`, () => {
-      expect(ratio(c('--dss-link'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
-      expect(ratio(c('--dss-fg'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
+      expect(ratio(c('--hoops-link'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
+      expect(ratio(c('--hoops-fg'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
     });
   }
   it('die Filterrechnung stimmt an bekannten Punkten (Weiß wird dunkel, Schwarz hell)', () => {
