@@ -5,11 +5,17 @@
 
 * Storybook wird lokal mit `npm run storybook` betrieben.
 * `npm run build-storybook` erzeugt die statische Veröffentlichung.
-* `.github/workflows/deploy-storybook.yaml` baut und veröffentlicht auf GitHub Pages.
+* `.github/workflows/deploy-webspace.yml` baut das Storybook und überträgt es per rsync über SSH auf den All-Inkl-Webspace (ui.hoopsfoundry.com); `deploy/htaccess` liefert HTTPS-Umleitung und Sicherheits-Header. `.github/workflows/deploy-storybook.yaml` (GitHub Pages) ist nur noch der manuelle Rückfall.
+* `.github/workflows/publish-npm.yml` veröffentlicht manuell per Trusted Publishing (OIDC) auf npm.
 * React-Artefakte werden über `npm run build:react` erzeugt.
 * `package.json` definiert die Inhalte und öffentlichen Exports des Pakets.
 
 Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus. Ein Qualitätsworkflow ist eine geplante Ergänzung, kein vorhandener Nachweis.
+
+=== Webspace und npm
+
+* Webspace: Gebaut wird auf GitHub (kein Node auf dem Webspace). Zugangsdaten sind Repository-Secrets (`DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_PATH`); der Schlüssel gehört einem eingeschränkten Benutzer, der Host-Schlüssel wird geprüft (`StrictHostKeyChecking=yes`). Der Workflow startet zunächst nur manuell; `dry_run: true` (Standard) zeigt mit `rsync -n` nur die Änderungen. Der Push-Trigger auf `main` wird nach einem erfolgreichen Probelauf und einem ersten echten Lauf eingeschaltet. `--delete` entfernt Altdateien, der Ordner `releases/` bleibt. Nicht nachgewiesen ist ein echter Lauf auf GitHub; die Tests prüfen Aufbau und Regeln (`tests/deploy-workflows.test.ts`).
+* npm: `publish-npm.yml` läuft nur manuell, mit `id-token: write` und ohne Token. Voraussetzung ist ein Trusted Publisher bei npm mit genau diesem Dateinamen. Ein echter Lauf (`dry_run: false`) geht nur auf dem Tag `v<version>` (Version aus `package.json`, Commit auf `main`). Das Secret `NPM_ATOKEN` wird nicht verwendet.
 
 === Vanilla-Auslieferung
 

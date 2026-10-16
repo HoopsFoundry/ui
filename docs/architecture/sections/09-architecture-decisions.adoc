@@ -81,6 +81,14 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 ** Tailwind-Projekte lesen die Tokens über `var(--hoops-…)`; die Tailwind-Farbnamen (`ink`, `amber` …) im Preset bleiben.
 * Quellen: Lückenplan `docs/superpowers/plans/2026-10-12-luecken-plan.md`, Abschnitt „Umbenennung auf HoopsFoundry UI“.
 
+=== ADR-009: Doku auf dem Webspace per rsync, npm per Trusted Publishing
+
+* Status: angenommen; Workflows umgesetzt, echter Lauf auf GitHub noch nicht erprobt.
+* Kontext: Die Dokumentation soll auf ui.hoopsfoundry.com in Deutschland liegen (Datenschutz, eigene HTTP-Header). Der Webspace ist statisch, hat SSH mit rsync und `.htaccess`. Für npm soll kein langlebiges Token in den Secrets liegen.
+* Entscheidung: `deploy-webspace.yml` baut auf GitHub und überträgt per rsync über SSH mit einem eingeschränkten Benutzer, Host-Schlüssel-Prüfung und Probelauf-Standard; zunächst nur manueller Start, der Push-Trigger auf `main` kommt nach einem erfolgreichen Probelauf und einem ersten echten Lauf. `deploy/htaccess` im Repo enthält HTTPS-Umleitung, Header und eine Content-Security-Policy zunächst nur als Report-Only (Storybook braucht Inline-Skripte). GitHub Pages bleibt als manueller Rückfall. `publish-npm.yml` veröffentlicht nur manuell per OIDC (Trusted Publishing), nur auf einem Tag, der zur Version passt.
+* Konsequenzen: Ohne die fünf Deploy-Secrets bricht der Lauf ab. `--delete` kann Dateien auf dem Webspace entfernen, deshalb Probelauf vor dem ersten echten Lauf und Ausnahme für `releases/`. Der Dateiname `publish-npm.yml` ist Teil der npm-Konfiguration und darf nicht ohne Anpassung dort umbenannt werden. `NPM_ATOKEN` kann nach dem ersten erfolgreichen OIDC-Lauf gelöscht werden.
+* Quellen: ADR-006, ADR-008.
+
 === Offene Punkte (keine ADRs)
 
 [cols="1,1,2",options="header"]

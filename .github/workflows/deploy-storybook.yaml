@@ -1,9 +1,7 @@
 name: Deploy Storybook to GitHub Pages
 
+# Rückfall: nur manuell. Das reguläre Deployment ist deploy-webspace.yml (All-Inkl).
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 permissions:

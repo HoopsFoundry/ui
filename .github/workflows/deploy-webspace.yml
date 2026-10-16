@@ -1,0 +1,87 @@
+name: Deploy Storybook to Webspace
+
+# Baut das Storybook und überträgt es per rsync über SSH auf den All-Inkl-Webspace (ui.hoopsfoundry.com).
+#  - Zunächst nur manuell (workflow_dispatch): `dry_run: true` (Standard) zeigt mit `rsync -n`, was sich ändern würde, und überträgt nichts;
+#    `dry_run: false` überträgt wirklich.
+#  - Nach einem erfolgreichen Probelauf und einem ersten echten Lauf den Push-Trigger einschalten (Block `push:` unter `on:` ergänzen:
+#    `push:` mit `branches: [main]`) und dann `DRY_RUN` für Pushes weiter auf false lassen.
+# Zugangsdaten stehen als Repository-Secrets: DEPLOY_HOST, DEPLOY_USER, DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS, DEPLOY_PATH.
+# Der Ordner `releases/` auf dem Webspace wird nicht gelöscht. Rückfall: deploy-storybook.yaml (GitHub Pages, nur manuell).
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Nur anzeigen, was übertragen würde (rsync -n)'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-webspace
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  deploy:
+    name: Bauen und übertragen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Storybook
+        run: npm run build-storybook -- --output-dir storybook-static
+        env:
+          CI: 'true'
+
+      - name: .htaccess ablegen
+        run: cp deploy/htaccess storybook-static/.htaccess
+
+      - name: Übertragen (rsync über SSH)
+        env:
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+          for v in DEPLOY_HOST DEPLOY_USER DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS DEPLOY_PATH; do
+            if [ -z "${!v}" ]; then echo "Secret $v fehlt"; exit 1; fi
+          done
+          case "$DEPLOY_PATH" in
+            /|.|./|~|~/|"") echo "DEPLOY_PATH ist zu allgemein: $DEPLOY_PATH"; exit 1 ;;
+          esac
+          if [ ! -f storybook-static/index.html ] || [ ! -f storybook-static/.htaccess ]; then
+            echo "Der Build ist unvollständig (index.html oder .htaccess fehlt)"; exit 1
+          fi
+          key="$RUNNER_TEMP/deploy_key"
+          known="$RUNNER_TEMP/known_hosts"
+          umask 077
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$known"
+          flags=(-az --delete --exclude='/releases/' --itemize-changes)
+          if [ "$DRY_RUN" = "true" ]; then flags+=(-n); echo "Probelauf: es wird nichts übertragen"; fi
+          rsync "${flags[@]}" \
+            -e "ssh -i $key -o UserKnownHostsFile=$known -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" \
+            storybook-static/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
+          rm -f "$key" "$known"

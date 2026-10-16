@@ -5,6 +5,10 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 
 ## [0.10.0] (Unveröffentlicht) — Umbenennung auf HoopsFoundry UI, Marken-Rollen und DBB-Marke
 
+### Hinzugefügt
+
+- **Auslieferung:** Workflow `deploy-webspace.yml` (Storybook per rsync auf den Webspace, Probelauf als Standard, zunächst nur manuell), `deploy/htaccess` (HTTPS, Header, CSP als Report-Only), Workflow `publish-npm.yml` (npm per Trusted Publishing, nur manuell, ohne Token). GitHub Pages (`deploy-storybook.yaml`) ist nur noch der manuelle Rückfall. Siehe ADR-009.
+
 ### Geändert (Bruch)
 
 - **Umbenennung des Systems: aus DSS wird HoopsFoundry UI.** Paket `@bbv/dss-design-system` → `@hoopsfoundry/ui` (Version 0.10.0), Repository `HoopsFoundry/ui`, Doku `ui.hoopsfoundry.com`. Alle Bezeichner wechseln das Präfix von `dss` auf `hoops` (ohne Kompatibilitätsschicht):
