@@ -31,8 +31,8 @@ describe('Code-Beispiele', () => {
     for (const part of ["script-src 'self'", 'sha256', 'nonce', 'eval', 'CSSOM']) expect(code.cspHeader, part).toContain(part);
   });
   it('das Skript im Beispiel ist das Beispiel der Doku: portal-sync.mjs wird roh eingebunden', () => {
-    expect(mdx).toContain("import syncSource from '../examples/portal-sync.mjs?raw'");
-    expect(read('stories/examples/portal-sync.mjs')).toContain('export async function syncDss');
+    expect(mdx).toContain("import syncSource from '../../scripts/portal-sync.mjs?raw'");
+    expect(read('scripts/portal-sync.mjs')).toContain('export async function syncDss');
   });
 });
 
@@ -84,7 +84,7 @@ describe('Doku-Seite', () => {
     expect(mdx.indexOf('\n## ')).toBeLessThan(mdx.indexOf('<Canvas'));
   });
   it('die Pflichtabschnitte sind da', () => {
-    for (const title of ['## Überblick', '## Einbindung ohne Build', '## data-dss: was initAll startet', '## Das Muster: init, destroy, idempotent', '## Markup erzeugen', '### update und destroy', '### Escaping und Eingaben', '### In Node und im Crawler', '### Bündel und Größe', '## Sicherheit', '### CSP und Boot-Skript', '## Bundle-Größen', '## Kopieren ins Projekt', '## Versionsabgleich', '## Alle Exporte', '## Handy · 390 px Breite', "## Dos und Don'ts"]) expect(mdx, title).toContain(title);
+    for (const title of ['## Überblick', '## Einbindung ohne Build', '## data-dss: was initAll startet', '## Das Muster: init, destroy, idempotent', '## Markup erzeugen', '### update und destroy', '### Escaping und Eingaben', '### In Node und im Crawler', '### Bündel und Größe', '## Sicherheit', '### CSP und Boot-Skript', '## Bundle-Größen', '## Kopieren ins Projekt', '## Einbinden aus dem Release', '## Aktualisieren', '## Kompatibilität', '## Wechsel auf npm ab 1.0', '## Versionsabgleich', '## Alle Exporte', '## Handy · 390 px Breite', "## Dos und Don'ts"]) expect(mdx, title).toContain(title);
   });
   it('jede im MDX genutzte Story gibt es, jedes Beispiel gibt es in der Beispielkomponente', () => {
     for (const m of mdx.matchAll(/VanillaStories\.(\w+)/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\b`));

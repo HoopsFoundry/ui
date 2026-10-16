@@ -15,6 +15,8 @@ npm run build:vanilla             # scripts/build-vanilla.mjs → dist/vanilla (
 npm run build                     # beides; läuft auch als `prepare` bei npm install
 node scripts/check-map-browser.mjs   # Browser-Prüfung der Karte ohne Build (Chromium/WebKit via Playwright; --browsers=, --only=); nicht Teil von npm test
 node scripts/check-map-docs.mjs <ordner>  # axe auf den Karten-Seiten eines Storybook-Builds (npx storybook build -o <ordner>)
+node scripts/release-vanilla.mjs --dry-run --allow-dirty --no-build   # Release-Ablauf prüfen (schreibt nichts); ohne --dry-run nach release/ (gitignored)
+node scripts/check-portal-seite.mjs --browsers=chromium,webkit   # Beispiel-Portalseite im Browser (Release → portal-sync → strenge CSP, axe); nicht Teil von npm test
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```

@@ -1,6 +1,7 @@
 // @vitest-environment node
 // Das Render-Bündel dist/vanilla/dss-render.js: lädt in Node ohne window, importiert nur den Kern (./dss.js), kein Framework, kein innerHTML,
 // exportiert genau die dokumentierte Liste, bleibt im eigenen Größenbudget und erzeugt dasselbe Markup wie die Quellmodule.
+import { BUDGETS } from '../scripts/vanilla-budgets.mjs';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { gzipSync } from 'node:zlib';
@@ -13,7 +14,7 @@ let mod: Record<string, (...a: unknown[]) => unknown>;
 
 // Eigenes Budget für das Render-Bündel (gemessen: 51 312 B = 50,2 KiB min, 17 450 B = 17,1 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 37 164 B, 13 241 B; die Karte liegt im Bündel dss-map).
 // Begründung: zehn Komponenten mit Markup, Logik aus league/schedule/team/venue/map; das Accordion kommt aus dem Kern und zählt hier nicht.
-export const RENDER_BUDGET = { minBytes: 52 * 1024, gzipBytes: 18 * 1024 };
+export const RENDER_BUDGET = BUDGETS['dss-render'];
 
 export const RENDER_EXPORTS = [
   'attr', 'esc', 'mount', 'mountEmptyState', 'mountFormChips', 'mountLeagueCard', 'mountMatchCard', 'mountScheduleGrid', 'mountScheduleTable',

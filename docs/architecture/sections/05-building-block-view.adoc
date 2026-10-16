@@ -14,6 +14,8 @@ flowchart TB
   J["js/<br/>reine Logik + Vanilla initX"]
   JR["js/render/<br/>renderX / mountX (Markup aus Daten)"]
   B["dist/vanilla/<br/>dss.js (Kern) + dss-render.js + dss-map.js"]
+  SY["scripts/portal-sync.mjs + lib/<br/>dss-sync (Verbraucher der Auslieferung)"]
+  RL["scripts/release-vanilla.mjs<br/>Release: Tarball, Prüfsummen, Manifest"]
   S["svelte/*.svelte"]
   R["react/*.tsx → dist/react"]
   ST["stories/ + .storybook/"]
@@ -25,6 +27,8 @@ flowchart TB
   R --> J
   JR --> J
   B -. bündelt .-> J
+  RL --> B
+  RL -. bündelt .-> SY
   B -. bündelt .-> JR
   ST --> S
   ST --> R
@@ -50,7 +54,7 @@ flowchart TB
 |`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
 |`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (`dss.js` als Kern, `dss-render.js` als Render-Bündel und `dss-map.js` als Karten-Bündel, je mit eigenem Budget, siehe ADR-007; ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
 |`tests/` |Automatisierte Prüfungen
-|`scripts/` |Entwicklungs- und Prüfwerkzeuge
+|`scripts/` |Entwicklungs- und Prüfwerkzeuge sowie die ausgelieferten Werkzeuge: `portal-sync.mjs` (Befehl `dss-sync`, mit den Hilfen unter `scripts/lib/`: Tarball und Prüfsummen, Download, Dateihilfen und Sperre, Fehlertexte, Node-Prüfung) ist im npm-Paket und als gebündelter Release-Anhang `dss-sync.mjs` enthalten; `release-vanilla.mjs` erzeugt das Release (Tarball, Prüfsummen, Manifest, `dss-sync.mjs`) und `vanilla-budgets.mjs` hält die Größenbudgets der Bündel
 |`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
 |`package.json` |Öffentliche Exports, Build-Kommandos und Abhängigkeiten
 |===

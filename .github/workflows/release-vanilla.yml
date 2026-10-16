@@ -1,0 +1,155 @@
+name: Release Vanilla
+
+# Baut das Vanilla-Paket (dist/vanilla) und hängt es als Release-Anhang an (Tarball, Prüfsummen, manifest.json, dss-sync.mjs).
+#  - Tag `v*` (z. B. v0.9.0): Prüfungen, Bau, danach wird ein GitHub-Release mit den Anhängen angelegt.
+#  - Manuell (workflow_dispatch): Eingabe `version`. Mit `dry_run: true` (Standard) werden die Dateien nur als Workflow-Artefakt hochgeladen,
+#    es entsteht kein Release. Nur mit `dry_run: false` und einem vorhandenen Tag `v<version>` wird veröffentlicht.
+# Der Tag-Commit muss auf `main` liegen. Der Ablauf selbst (Skript scripts/release-vanilla.mjs) läuft lokal ohne Netz und ohne Git-Schreibzugriff;
+# dieser Workflow ist erst bei der ersten Verwendung real erprobt (siehe docs/architecture, Kapitel 7).
+# Aktionen im Job mit Schreibrecht sind auf einen Commit festgelegt (Kommentar nennt die Version).
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version ohne v (muss package.json entsprechen, z. B. 0.9.0)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Nur prüfen und bauen, Artefakt hochladen, kein Release'
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-vanilla-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    name: Prüfen und bauen
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Version bestimmen
+        id: version
+        env:
+          EVENT: ${{ github.event_name }}
+          INPUT_VERSION: ${{ inputs.version }}
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          set -euo pipefail
+          if [ "$EVENT" = "push" ]; then
+            version="${REF_NAME#v}"
+          else
+            version="$INPUT_VERSION"
+          fi
+          if ! [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Ungültige Version (erwartet z. B. 0.9.0 oder 1.0.0-rc.1)"
+            exit 1
+          fi
+          if [ "$EVENT" != "push" ] && [ "$REF_TYPE" = "tag" ] && [ "$REF_NAME" != "v$version" ]; then
+            echo "Der Lauf auf dem Tag $REF_NAME passt nicht zur Version $version"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Tag-Commit liegt auf main
+        if: github.ref_type == 'tag'
+        run: |
+          set -euo pipefail
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "Der Commit des Tags liegt nicht auf main; Release abgebrochen."
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Release-Dateien erzeugen (Version, Prüfsummen, Manifest, dss-sync.mjs)
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: node scripts/release-vanilla.mjs --no-build --expect-version="$VERSION"
+
+      - name: Als Workflow-Artefakt hochladen
+        uses: actions/upload-artifact@v7
+        with:
+          name: dss-vanilla-${{ steps.version.outputs.version }}
+          path: release/
+          if-no-files-found: error
+          retention-days: 14
+
+  release:
+    name: GitHub-Release anlegen
+    # Nur bei einem Tag-Push; ein manueller Lauf veröffentlicht nur mit dry_run=false und nur, wenn er auf dem Tag v<version> läuft
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.dry_run == false && github.ref_type == 'tag')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      # Zum Einschalten der Build-Provenance zusätzlich: id-token: write und attestations: write (siehe Kommentar unten)
+    steps:
+      - name: Release-Dateien laden
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: dss-vanilla-${{ needs.build.outputs.version }}
+          path: release
+
+      # Vorbereitet, nicht aktiv (ungetestet, deshalb nicht eingeschaltet): Build-Provenance nach SLSA für die Anhänge.
+      # Vor dem Einschalten Version und Commit-SHA von actions/attest-build-provenance prüfen und festschreiben, die Rechte oben ergänzen:
+      # - name: Provenance der Anhänge erzeugen
+      #   uses: actions/attest-build-provenance@<Commit-SHA> # <Version>
+      #   with:
+      #     subject-path: |
+      #       release/dss-vanilla-*.tgz
+      #       release/dss-sync.mjs
+      # Prüfen lässt sie sich dann mit: gh attestation verify <Datei> --repo OliEder/dss-design-system
+
+      - name: Release anlegen oder ergänzen
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        with:
+          tag_name: v${{ needs.build.outputs.version }}
+          name: v${{ needs.build.outputs.version }}
+          files: |
+            release/dss-vanilla-${{ needs.build.outputs.version }}.tgz
+            release/dss-vanilla-${{ needs.build.outputs.version }}.tgz.sha256
+            release/dss-vanilla-${{ needs.build.outputs.version }}.sha256
+            release/manifest.json
+            release/dss-sync.mjs
+            release/dss-sync.mjs.sha256
+          fail_on_unmatched_files: true

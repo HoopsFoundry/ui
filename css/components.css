@@ -196,7 +196,7 @@
 .dss-tabs--underline .dss-tab.is-active,
 .dss-tabs--underline .dss-tab[aria-pressed="true"],
 .dss-tabs--underline .dss-tab[aria-selected="true"] { color: var(--dss-fg); border-bottom-color: var(--indicator); }
-.dss-tabs--segmented { display: inline-flex; padding: 3px; background: var(--dss-surface-2); border-radius: var(--radius-md); gap: 2px; }
+.dss-tabs--segmented { display: inline-flex; flex-wrap: wrap; max-width: 100%; padding: 3px; background: var(--dss-surface-2); border-radius: var(--radius-md); gap: 2px; } /* schmaler Raum (320 px): die Schalter brechen um statt die Seite zu verbreitern (WCAG 1.4.10) */
 .dss-tabs--segmented .dss-tab { border-radius: calc(var(--radius-md) - 2px); }
 .dss-tabs--segmented .dss-tab:hover:not(.is-active):not([aria-pressed="true"]) { background: var(--dss-line); }
 .dss-tabs--segmented .dss-tab.is-active,
