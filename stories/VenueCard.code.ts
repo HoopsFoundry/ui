@@ -7,7 +7,7 @@ export const vanilla = `<!-- Vanilla: die Hallenkarte ist reines Markup mit den 
 <div class="dss-venue dss-venue--standard dss-venue--map">
   <div class="dss-venue-in">
     <div class="dss-venue-map">
-      <div class="dss-map" data-state="idle" data-dim="true" data-tiles="dim" style="--dss-map-h:250px">
+      <div class="dss-map" data-state="idle" data-dim="true" data-tiles="dim" style="--hoops-map-h:250px">
         <a class="dss-map-skip" href="#halle-karte-text">Karte überspringen</a>
         <div class="dss-map-frame" role="region" aria-label="Karte: Sporthalle Nordhain">
           <div class="dss-map-stage">

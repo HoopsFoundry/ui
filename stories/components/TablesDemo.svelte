@@ -93,7 +93,7 @@
     {/snippet}
     {#snippet foot()}
       <tr>
-        <td colspan="3" style="text-align: left; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;">Team Total</td>
+        <td colspan="3" style="text-align: left; font-family: var(--hoops-font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;">Team Total</td>
         <td class="num">—</td>
         <td class="num" style="font-size: 15px;">87</td>
         <td class="num">27/52</td>
@@ -128,7 +128,7 @@
         <tr>
           <td>{c.role}</td>
           <td><div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">{c.name}</span></div></div></td>
-          <td style="font-family: var(--font-mono); font-size: 12px;">{c.license}</td>
+          <td style="font-family: var(--hoops-font-mono); font-size: 12px;">{c.license}</td>
           <td class="center"><span class="dss-pill-s on">Bestätigt</span></td>
         </tr>
       {/each}
@@ -139,7 +139,7 @@
   <div style="display: flex; flex-direction: column; gap: 24px;">
     {#each ['touch', 'default', 'compact', 'dense'] as d}
       <div>
-        <div style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--page-mute); margin-bottom: 8px;">
+        <div style="font-family: var(--hoops-font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--hoops-page-mute); margin-bottom: 8px;">
           Dichte · {d} · {d === 'touch' ? '60' : d === 'default' ? '48' : d === 'compact' ? '40' : '32'} px
         </div>
         <Table density={d} {dark} {collapsible} {open} title={collapsible ? `Dichte ${d}` : undefined} caption={`Dichte ${d}`} columns={[

@@ -22,8 +22,8 @@ describe('Vorläufig steht unter der Ergebniszahl', () => {
 
   it('das Tag ist klein (Beschriftungsschrift) und gedämpft, das alte "small" hinter der Zahl ist weg', () => {
     const tag = rule('.dss-sch-prov');
-    expect(tag).toMatch(/font-size:\s*var\(--fs-caption\)/);
-    expect(tag).toMatch(/color:\s*var\(--dss-mute\)/);
+    expect(tag).toMatch(/font-size:\s*var\(--hoops-fs-caption\)/);
+    expect(tag).toMatch(/color:\s*var\(--hoops-mute\)/);
     expect(css).not.toMatch(/\.dss-sch-res small/);
   });
 

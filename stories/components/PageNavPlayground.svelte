@@ -26,8 +26,8 @@
 </div>
 
 <style>
-  .page { box-sizing: border-box; max-width: 640px; padding: 14px 18px; background: var(--dss-surface); border: 1px solid var(--dss-line); border-radius: var(--radius-lg); color: var(--dss-fg); }
-  .page :global(h3) { margin: 18px 0 6px; font-size: var(--fs-h3); line-height: var(--lh-h3); }
-  .page :global(p) { margin: 0 0 8px; font-size: var(--fs-body-md); color: var(--dss-fg-soft); }
+  .page { box-sizing: border-box; max-width: 640px; padding: 14px 18px; background: var(--hoops-surface); border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-lg); color: var(--hoops-fg); }
+  .page :global(h3) { margin: 18px 0 6px; font-size: var(--hoops-fs-h3); line-height: var(--hoops-lh-h3); }
+  .page :global(p) { margin: 0 0 8px; font-size: var(--hoops-fs-body-md); color: var(--hoops-fg-soft); }
   .page :global(.dss-pagenav) { margin: 0 0 14px; }
 </style>

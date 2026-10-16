@@ -51,7 +51,7 @@ describe('Bündel dist/vanilla', () => {
   });
   it('VERSION ist die Version der package.json, dss.css trägt sie ebenfalls', () => {
     expect(mod.VERSION).toBe(pkg.version);
-    expect(text('dss.css')).toContain(`--dss-version: "${pkg.version}"`);
+    expect(text('dss.css')).toContain(`--hoops-version: "${pkg.version}"`);
   });
   it('DSS_BLOCKS nennt alle Bausteine von initAll', () => {
     expect(mod.DSS_BLOCKS).toEqual(['accordion', 'pagenav', 'backtop', 'theme', 'tabs', 'modal', 'map']);
@@ -94,7 +94,7 @@ describe('Bündel dist/vanilla', () => {
   });
   it('CSS: Tokens vor den Komponenten, einschließlich Tabs und natives Dialog', () => {
     const css = text('dss.css');
-    expect(css.indexOf('--dss-version')).toBeLessThan(css.indexOf('.dss-tab'));
+    expect(css.indexOf('--hoops-version')).toBeLessThan(css.indexOf('.dss-tab'));
     expect(css.indexOf(':root')).toBeLessThan(css.indexOf('.dss-tabs'));
     expect(css).toContain('dialog.dss-modal-dialog');
     expect(css).toContain('url("courtlines/court.svg")');

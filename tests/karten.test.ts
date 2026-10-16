@@ -37,9 +37,9 @@ describe('PlayerCard mit Foto: CSS', () => {
     expect(rule('.dss-tn.gast')).toMatch(/color:\s*white/);
   });
 
-  it('hero mit Foto: Porträtfläche mit Verlauf nach --base-1000; unter 560 px Banner oben', () => {
+  it('hero mit Foto: Porträtfläche mit Verlauf nach --hoops-base-1000; unter 560 px Banner oben', () => {
     expect(rule('.dss-pc-hero--photo')).toMatch(/padding:\s*0/);
-    expect(rule('.dss-pc-hero--photo .dss-pc-hero-left::after')).toMatch(/linear-gradient\(90deg, transparent \d+%, var\(--base-1000\)/);
+    expect(rule('.dss-pc-hero--photo .dss-pc-hero-left::after')).toMatch(/linear-gradient\(90deg, transparent \d+%, var\(--hoops-base-1000\)/);
     expect(rule('.dss-pc-hero--photo .dss-pc-img')).toMatch(/position:\s*absolute/);
     const mobile = css.slice(css.indexOf('@media (max-width: 560px)', css.indexOf('.dss-pc-hero--photo')));
     expect(mobile).toMatch(/\.dss-pc-hero--photo \.dss-pc-hero-left::after \{ background: linear-gradient\(180deg/);
@@ -50,10 +50,10 @@ describe('PlayerCard mit Foto: CSS', () => {
     const white = hex('#ffffff');
     const dbb = blockOf(tokens, ':root[data-brand="dbb"] {');
     for (const scope of [tokens, `${dbb}\n${tokens}`]) {
-      const base = color('var(--base-1000)', scope);
+      const base = color('var(--hoops-base-1000)', scope);
       expect(ratio(white, over(white, base, 0.08))).toBeGreaterThanOrEqual(7);
     }
-    expect(css).toMatch(/color-mix\(in srgb, var\(--base-1000\) 92%, transparent\)/);
+    expect(css).toMatch(/color-mix\(in srgb, var\(--hoops-base-1000\) 92%, transparent\)/);
   });
 });
 
@@ -162,15 +162,15 @@ describe('Spielabschnitte: Paket, Quelltext, Demo-Daten', () => {
 describe('TeamCard: CSS', () => {
   it('Karte ist positioniert; klickbar: Hover wie die Spielkarte (Rand, Schatten, 1 px hoch)', () => {
     expect(rule('.dss-team')).toMatch(/position:\s*relative/);
-    expect(rule('.dss-team--link:hover')).toMatch(/border-color:\s*var\(--dss-line-strong\)/);
-    expect(rule('.dss-team--link:hover')).toMatch(/box-shadow:\s*var\(--shadow-md\)/);
+    expect(rule('.dss-team--link:hover')).toMatch(/border-color:\s*var\(--hoops-line-strong\)/);
+    expect(rule('.dss-team--link:hover')).toMatch(/box-shadow:\s*var\(--hoops-shadow-md\)/);
     expect(rule('.dss-team--link:hover')).toMatch(/translateY\(-1px\)/);
   });
 
   it('der Link deckt die ganze Karte ab (::after) und trägt den gestrichelten Ring um die Karte', () => {
     expect(rule('.dss-team-link::after')).toMatch(/position:\s*absolute;\s*inset:\s*0/);
     const ring = rule('.dss-team-link:focus-visible::after');
-    expect(ring).toMatch(/outline:\s*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/);
+    expect(ring).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     expect(ring).toMatch(/outline-offset:\s*2px/);
     expect(rule('.dss-team-link:focus-visible')).toMatch(/outline:\s*none/);
   });
@@ -207,7 +207,7 @@ describe('TeamCard: CSS', () => {
   it('keine nackten --*-text/--*-soft-Farben und keine festen Farbwerte im TeamCard-Block', () => {
     const start = css.indexOf('/* ── TeamCard');
     const block = css.slice(start, css.indexOf('/* ── Fokus-Ring auf immer dunklen Flächen'));
-    expect(block).not.toMatch(/var\(--(ok|err|warn|info)-(text|soft)\)/);
+    expect(block).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft)\)/);
     expect(block).not.toMatch(/#[0-9a-fA-F]{3,6}\b|rgba?\(|oklch\(/);
   });
 
@@ -220,8 +220,8 @@ describe('TeamCard: CSS', () => {
         const defs = dark ? darkBlock : lightBlock;
         const scope = `${dark ? darkBlock : ''}\n${lightBlock}\n${brand}\n${tokens}`;
         const pick = (name: string) => defs.match(new RegExp(`${name}:\\s*([^;]+);`))?.[1] ?? lightBlock.match(new RegExp(`${name}:\\s*([^;]+);`))![1];
-        const surface = color(pick('--dss-surface'), scope);
-        for (const token of ['--dss-fg', '--dss-fg-soft', '--dss-mute']) {
+        const surface = color(pick('--hoops-surface'), scope);
+        for (const token of ['--hoops-fg', '--hoops-fg-soft', '--hoops-mute']) {
           expect(ratio(color(pick(token), scope), surface), `${token} ${dark ? 'dunkel' : 'hell'}`).toBeGreaterThanOrEqual(7);
         }
       }

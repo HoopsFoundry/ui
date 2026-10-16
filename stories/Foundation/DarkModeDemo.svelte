@@ -108,27 +108,27 @@
     <span>Symbol ohne Namen</span>
   </p>
 {:else if example === 'do-token'}
-  <div class="card"><strong>Farben aus Tokens</strong><p>Fläche <code>--dss-surface</code>, Text <code>--dss-fg</code>: im Dunkelmodus dunkel.</p></div>
+  <div class="card"><strong>Farben aus Tokens</strong><p>Fläche <code>--hoops-surface</code>, Text <code>--hoops-fg</code>: im Dunkelmodus dunkel.</p></div>
 {:else if example === 'dont-token'}
   <!-- Falsch: feste Farben bleiben im Dunkelmodus hell und blenden -->
   <div class="card fixed"><strong>Feste Farben</strong><p>Fläche <code>#ffffff</code>, Text <code>#111111</code>: bleibt im Dunkelmodus hell.</p></div>
 {/if}
 
 <style>
-  .demo { max-width: 520px; padding: 16px; color: var(--dss-fg); background: var(--dss-surface); font-family: var(--font-body); }
+  .demo { max-width: 520px; padding: 16px; color: var(--hoops-fg); background: var(--hoops-surface); font-family: var(--hoops-font-body); }
   .narrow { max-width: 380px; }
-  .row { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: var(--fs-body-md); color: var(--page-fg); }
-  .demo .row { color: var(--dss-fg); }
-  .card { padding: 14px 16px; background: var(--dss-surface); border: 1px solid var(--dss-line); border-radius: var(--radius-lg); color: var(--dss-fg); font-size: var(--fs-body-md); }
-  .card p { margin: 4px 0 0; color: var(--dss-fg-soft); }
+  .row { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: var(--hoops-fs-body-md); color: var(--hoops-page-fg); }
+  .demo .row { color: var(--hoops-fg); }
+  .card { padding: 14px 16px; background: var(--hoops-surface); border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-lg); color: var(--hoops-fg); font-size: var(--hoops-fs-body-md); }
+  .card p { margin: 4px 0 0; color: var(--hoops-fg-soft); }
   .card.fixed { background: #ffffff; color: #111111; border-color: #cccccc; }
   .card.fixed p { color: #111111; }
-  .report { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 0; font-size: var(--fs-body-sm); }
+  .report { display: flex; flex-wrap: wrap; gap: 8px 20px; margin: 14px 0 0; font-size: var(--hoops-fs-body-sm); }
   .report div { display: flex; gap: 6px; }
-  .report dt { color: var(--dss-mute); }
-  .report dd { margin: 0; font-family: var(--font-mono); color: var(--dss-fg); }
-  .surface { position: relative; background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .report dt { color: var(--hoops-mute); }
+  .report dd { margin: 0; font-family: var(--hoops-font-mono); color: var(--hoops-fg); }
+  .surface { position: relative; background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: repeat(4, minmax(120px, 1fr)); gap: 16px; }
-  .cap { margin-bottom: 8px; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap { margin-bottom: 8px; font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cell { padding: 6px; }
 </style>

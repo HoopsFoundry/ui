@@ -198,18 +198,18 @@
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; align-items: start; }
   .narrow { width: 100%; max-width: 380px; }
   .gap { height: 12px; }
-  .cap, .colhead { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .colhead { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 10px; }
   .no-text :global(.dss-map-text) { display: none; }
   .no-attr :global(.dss-map-attr) { display: none; }
   .matrix { display: flex; flex-direction: column; gap: 20px; }
   /* position: relative: die versteckten Texte (position: absolute) liegen sonst außerhalb des Scrollbereichs und weiten die Seite */
-  .surface { position: relative; background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { position: relative; background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px 14px; align-items: start; }
   .cell { padding: 6px; display: grid; gap: 8px; justify-items: start; }
-  .swatch { width: 100%; max-width: 190px; height: 84px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-md); }
+  .swatch { width: 100%; max-width: 190px; height: 84px; display: flex; align-items: center; justify-content: center; border-radius: var(--hoops-radius-md); }
   .swatch--light { background: #ecebe6; }
   .swatch--dark { background: #3b3d40; }
-  .attr-static { position: static; border-radius: var(--radius-md); }
-  .code { margin: 0; padding: 12px 14px; overflow-wrap: anywhere; font-family: var(--font-mono); font-size: var(--fs-caption); line-height: 1.5; background: var(--surface-2); border: 1px solid var(--page-line); border-radius: var(--radius-md); color: var(--page-fg); white-space: pre-wrap; }
+  .attr-static { position: static; border-radius: var(--hoops-radius-md); }
+  .code { margin: 0; padding: 12px 14px; overflow-wrap: anywhere; font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); line-height: 1.5; background: var(--hoops-page-surface-2); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-md); color: var(--hoops-page-fg); white-space: pre-wrap; }
 </style>

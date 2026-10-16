@@ -24,17 +24,17 @@ import {
 
 ## Top-Bar: drei Anatomien für drei Kontexte
 
-Die Top-Bar bleibt strukturell gleich: Marke links, Abstandshalter, Aktionen rechts. Der Kontext-Inhalt schaltet die Persönlichkeit: **Live** bringt einen grünen Puls-Indikator mit Spielstand und Uhr (die gemeinsame [Live-Sprache](?path=/docs/foundation-live--docs): Text `--dss-live-fg-on-dark`, Punkt `--live-fill`), **Admin** trägt den Kontext des Vereinsregisters, **Default** bleibt ruhig. Die Leiste ist immer dunkel (Hintergrund `--base-1000`), auch im hellen Theme.
+Die Top-Bar bleibt strukturell gleich: Marke links, Abstandshalter, Aktionen rechts. Der Kontext-Inhalt schaltet die Persönlichkeit: **Live** bringt einen grünen Puls-Indikator mit Spielstand und Uhr (die gemeinsame [Live-Sprache](?path=/docs/foundation-live--docs): Text `--hoops-live-fg-on-dark`, Punkt `--hoops-live-fill`), **Admin** trägt den Kontext des Vereinsregisters, **Default** bleibt ruhig. Die Leiste ist immer dunkel (Hintergrund `--hoops-base-1000`), auch im hellen Theme.
 
 <Canvas of={NavigationStories.TopBarKontexte} />
 
-Eigene Inhalte kommen über drei Plätze: `leading` (nach der Marke), `center` (ersetzt den Kontext) und `actions` (vor dem Nutzer). Mit `contained` bleibt der Inhalt auf `--dss-shell-max` (64 rem) begrenzt, der Hintergrund läuft voll breit. Die Marke ist reiner Text und kein Link, der Nutzer ist eine Anzeige und keine Schaltfläche; bedienbar sind nur die Elemente, die du einsetzt.
+Eigene Inhalte kommen über drei Plätze: `leading` (nach der Marke), `center` (ersetzt den Kontext) und `actions` (vor dem Nutzer). Mit `contained` bleibt der Inhalt auf `--hoops-shell-max` (64 rem) begrenzt, der Hintergrund läuft voll breit. Die Marke ist reiner Text und kein Link, der Nutzer ist eine Anzeige und keine Schaltfläche; bedienbar sind nur die Elemente, die du einsetzt.
 
 <Canvas of={NavigationStories.TopBarEigene} />
 
 ## Bottom-Nav: Schiri-App, Coach-App, Zuschauer-Modus
 
-Für Handy-Oberflächen in der Halle: Bottom-Nav mit 4 oder 5 Einträgen, alternativ mit zentralem **FAB** für die Hauptaktion (z. B. „Punkt buchen“). Badges weisen auf neue Ereignisse hin. Die Leiste ist 64 px hoch; der Abstand zur Unterkante moderner Handys (Safe-Area) ist nicht eingebaut, den ergänzt die App. Der aktuelle Eintrag trägt `aria-current="page"`, oben einen Balken in `--signal-500` und die volle Textfarbe. Der FAB ändert die Auswahl nicht, er löst nur eine Aktion aus; sein Label ist Pflicht (zugänglicher Name), wird aber nicht angezeigt.
+Für Handy-Oberflächen in der Halle: Bottom-Nav mit 4 oder 5 Einträgen, alternativ mit zentralem **FAB** für die Hauptaktion (z. B. „Punkt buchen“). Badges weisen auf neue Ereignisse hin. Die Leiste ist 64 px hoch; der Abstand zur Unterkante moderner Handys (Safe-Area) ist nicht eingebaut, den ergänzt die App. Der aktuelle Eintrag trägt `aria-current="page"`, oben einen Balken in `--hoops-signal-500` und die volle Textfarbe. Der FAB ändert die Auswahl nicht, er löst nur eine Aktion aus; sein Label ist Pflicht (zugänglicher Name), wird aber nicht angezeigt.
 
 <Canvas of={NavigationStories.BottomNavBeispiele} />
 
@@ -87,7 +87,7 @@ Die Steuerelemente gehören zur Demo und wechseln nur, welche Komponenten gezeig
     ['matchLabel, score, clock', 'string', 'Texte des Kontexts (Spielbezeichnung, Spielstand, Uhr).'],
     ['user, userInitials', 'string', 'Nutzer rechts; ohne user entfällt er. Die Initialen stehen in einem runden Avatar.'],
     ['leading, center, actions', 'Snippet / ReactNode', <>Eigene Inhalte (Svelte: Snippets, React: Props). <code>center</code> ersetzt den Kontext.</>],
-    ['contained', 'boolean', <>Begrenzt den Inhalt auf <code>--dss-shell-max</code>, der Hintergrund bleibt voll breit.</>],
+    ['contained', 'boolean', <>Begrenzt den Inhalt auf <code>--hoops-shell-max</code>, der Hintergrund bleibt voll breit.</>],
     ['as', "'header' | 'div'", 'Nur React: macht die Leiste zur banner-Landmark (Standard div).'],
   ]}
 />

@@ -1,6 +1,6 @@
 // @vitest-environment node
 // Release-Ablauf des Vanilla-Pakets (scripts/release-vanilla.mjs): Version-Abgleich, Schritte, Tarball, Prüfsummen, Manifest, Aufräumen.
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { readdir, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -33,7 +33,7 @@ describe('Version-Abgleich', () => {
   });
   it('eine abweichende CSS-Version bricht ab und nennt die Datei', async () => {
     const dir = await copyBundle('css');
-    await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`--dss-version: "${pkg.version}"`, '--dss-version: "0.0.1"'));
+    await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`--hoops-version: "${pkg.version}"`, '--hoops-version: "0.0.1"'));
     await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/dss\.css 0\.0\.1/);
   });
   it('eine fehlende CSS-Version gilt als Abweichung', async () => {
@@ -86,7 +86,7 @@ describe('Ablauf', () => {
     expect(result.steps).toContain('verify');
     expect(existsSync(out)).toBe(false);
     const bad = await copyBundle('trocken-falsch');
-    await writeFile(`${bad}/dss.css`, ':root { --dss-version: "0.0.1"; }');
+    await writeFile(`${bad}/dss.css`, ':root { --hoops-version: "0.0.1"; }');
     await expect(releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true, dryRun: true })).rejects.toThrow(/Versionen/);
   });
   it('scheitert ein Schritt, bleibt nichts zurück (kein Ausgabeordner, kein temporärer Ordner)', async () => {
@@ -322,7 +322,10 @@ describe('Programm: deutsche Fehler, Paketinhalt', () => {
     expect(pack.status).toBe(0);
     const files: string[] = JSON.parse(pack.stdout)[0].files.map((f: { path: string }) => f.path);
     for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/dss.js']) expect(files, f).toContain(f);
-    expect(files.filter((f) => f.startsWith('scripts/')).every((f) => f === 'scripts/portal-sync.mjs' || f.startsWith('scripts/lib/'))).toBe(true);
+    expect(files.filter((f) => f.startsWith('scripts/')).every((f) => ['scripts/portal-sync.mjs', 'scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs'].includes(f) || f.startsWith('scripts/lib/'))).toBe(true);
+    // Migrationsskript der Umbenennung: Befehl hoops-migrate, mit Tabelle und Ersetzungslogik
+    for (const f of ['scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs', 'scripts/lib/token-rename.mjs']) expect(files, f).toContain(f);
+    expect(JSON.parse(readFileSync('package.json', 'utf8')).bin['hoops-migrate']).toBe('scripts/migrate-from-dss.mjs');
     expect(files.some((f) => /release|check-|tests\/|\.worktrees/.test(f))).toBe(false);
   });
 });

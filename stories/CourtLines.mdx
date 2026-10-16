@@ -10,7 +10,7 @@ import { vanilla, svelte, react } from './CourtLines.code';
 
 # CourtLines
 
-Spielfeldlinien (FIBA 28 × 15 m) als dezenter Seitenhintergrund, aus dem Vereinsregister übernommen. Die Linien sind eine reine CSS-Maske (SVG unter `css/courtlines/`), eingefärbt über `--dss-court-color`, dark-sicher und auf dem Handy als Hochformat. Der Hintergrund ist rein dekorativ (`aria-hidden`) und fängt keine Klicks ab (`pointer-events: none`).
+Spielfeldlinien (FIBA 28 × 15 m) als dezenter Seitenhintergrund, aus dem Vereinsregister übernommen. Die Linien sind eine reine CSS-Maske (SVG unter `css/courtlines/`), eingefärbt über `--hoops-court-color`, dark-sicher und auf dem Handy als Hochformat. Der Hintergrund ist rein dekorativ (`aria-hidden`) und fängt keine Klicks ab (`pointer-events: none`).
 
 <Canvas of={CourtLinesStories.Standard} />
 
@@ -24,7 +24,7 @@ Das Feld liegt auf `z-index: 0`. Auf dem Handy (bis 700 px Breite) wechselt die 
 
 ## Farbe und Deckkraft
 
-Die Farbe kommt aus `--dss-court-color`, die Deckkraft aus `--dss-court-opacity`. Beide sind pro Marke und Hell/Dunkel gesetzt; in der Werkzeugleiste siehst du jede Kombination. Die Linien sind bewusst schwach, damit auch gedämpfter Text darüber den AAA-Kontrast hält.
+Die Farbe kommt aus `--hoops-court-color`, die Deckkraft aus `--hoops-court-opacity`. Beide sind pro Marke und Hell/Dunkel gesetzt; in der Werkzeugleiste siehst du jede Kombination. Die Linien sind bewusst schwach, damit auch gedämpfter Text darüber den AAA-Kontrast hält.
 
 <DocTable
   label="Linienfarbe und Deckkraft"
@@ -35,11 +35,11 @@ Die Farbe kommt aus `--dss-court-color`, die Deckkraft aus `--dss-court-opacity`
   ]}
 />
 
-Gemessen auf einem Linienpixel (Linienfarbe mit ihrer Deckkraft über der Fläche) hält der gedämpfte Seitentext `--page-mute` über den Linien in allen vier Kombinationen mindestens 7,04:1, der Fließtext `--dss-fg-soft` mindestens 10,9:1.
+Gemessen auf einem Linienpixel (Linienfarbe mit ihrer Deckkraft über der Fläche) hält der gedämpfte Seitentext `--hoops-page-mute` über den Linien in allen vier Kombinationen mindestens 7,04:1, der Fließtext `--hoops-fg-soft` mindestens 10,9:1.
 
 <DocTable
   label="Kontrast über den Linien"
-  head={['Marke und Modus', '--dss-fg-soft', '--page-mute']}
+  head={['Marke und Modus', '--hoops-fg-soft', '--hoops-page-mute']}
   rows={[
     ['BBV hell', '11,8:1', '7,3:1'],
     ['BBV dunkel', '15,2:1', '7,1:1'],
@@ -73,8 +73,8 @@ Die React-Fassung nimmt zusätzlich `className`. Bedienbare Elemente hat die Kom
     },
     {
       title: 'Die Linien dezent lassen',
-      doText: 'Die Tokens --dss-court-color und --dss-court-opacity bleiben, wie die Marke sie setzt: Text bleibt mühelos lesbar.',
-      dontText: 'Mit voller Deckkraft (hier --dss-court-opacity: 1 per lokalem CSS) kreuzen kräftige Linien den Text.',
+      doText: 'Die Tokens --hoops-court-color und --hoops-court-opacity bleiben, wie die Marke sie setzt: Text bleibt mühelos lesbar.',
+      dontText: 'Mit voller Deckkraft (hier --hoops-court-opacity: 1 per lokalem CSS) kreuzen kräftige Linien den Text.',
       good: <Story of={CourtLinesStories.DoDezent} inline />,
       bad: <Story of={CourtLinesStories.DontDezent} inline />,
     },

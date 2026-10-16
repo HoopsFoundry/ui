@@ -1,6 +1,6 @@
 /* Seitenlayout der Beispiel-Portalseite. Die Bausteine kommen aus dss.css; hier steht nur der Rahmen der Seite. */
-body { margin: 0; background: var(--page-bg); color: var(--page-fg); font-family: system-ui, sans-serif; }
-.portal-skip { position: absolute; left: 1rem; top: -4rem; z-index: 200; padding: 0.75rem 1rem; background: var(--page-bg); color: var(--page-fg); border: 2px solid currentColor; }
+body { margin: 0; background: var(--hoops-page-bg); color: var(--hoops-page-fg); font-family: system-ui, sans-serif; }
+.portal-skip { position: absolute; left: 1rem; top: -4rem; z-index: 200; padding: 0.75rem 1rem; background: var(--hoops-page-bg); color: var(--hoops-page-fg); border: 2px solid currentColor; }
 .portal-skip:focus { top: 1rem; }
 .portal-head { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; padding: 0.75rem 1rem; border-bottom: 1px solid currentColor; }
 .portal-brand { margin: 0; font-weight: 700; font-size: 1.125rem; }
@@ -18,10 +18,10 @@ body { margin: 0; background: var(--page-bg); color: var(--page-fg); font-family
 .portal-foot p { margin: 0 auto; max-width: 64rem; }
 .portal-form { display: grid; gap: 0.5rem; }
 .portal-form label { font-weight: 600; }
-.portal-form textarea { width: 100%; box-sizing: border-box; min-height: 6rem; padding: 0.5rem; font: inherit; color: inherit; background: var(--page-bg); border: 1px solid currentColor; border-radius: 4px; }
+.portal-form textarea { width: 100%; box-sizing: border-box; min-height: 6rem; padding: 0.5rem; font: inherit; color: inherit; background: var(--hoops-page-bg); border: 1px solid currentColor; border-radius: 4px; }
 .portal-stack { display: grid; gap: 1.5rem; }
 /* Sichtbarer Fokus für Sprunglink und Menü: dieselben Ring-Tokens wie die Komponenten (gestrichelt, 3 px) */
-.portal-skip:focus-visible, .portal-menu a:focus-visible { outline: var(--ring-w) var(--ring-style) var(--ring-color); outline-offset: 2px; }
+.portal-skip:focus-visible, .portal-menu a:focus-visible { outline: var(--hoops-ring-w) var(--hoops-ring-style) var(--hoops-ring-color); outline-offset: 2px; }
 .portal-noscript { margin: 0; padding: 0.75rem 1rem; border: 2px solid currentColor; }
 /* Das Attribut hidden muss gegen display aus Klassen (.dss-btn) gewinnen: ohne JavaScript bleiben Theme-Umschalter und Meldeknopf verborgen */
 [hidden] { display: none !important; }

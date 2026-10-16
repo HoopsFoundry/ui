@@ -156,7 +156,7 @@
     { id: 'md2', state: 'scheduled', date: D, time: '17:00', heim: { name: 'TSV Falken Auental', short: 'TSV' }, gast: { name: 'TSV Nordhain 1920', short: 'TSV' } },
   ];
 
-  const inputStyle = 'width: 7ch; font: inherit; padding: 2px 6px; border: 1px solid var(--dss-line); border-radius: 6px; background: var(--dss-surface); color: var(--dss-fg);';
+  const inputStyle = 'width: 7ch; font: inherit; padding: 2px 6px; border: 1px solid var(--hoops-line); border-radius: 6px; background: var(--hoops-surface); color: var(--hoops-fg);';
 </script>
 
 {#if example === 'mini-liga'}
@@ -313,7 +313,7 @@
 
 <style>
   .stack { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
-  .links { margin: 0; font-size: var(--fs-body-sm); color: var(--page-fg); }
-  .readout { margin: 8px 0 0; font-size: var(--fs-body-sm); color: var(--dss-fg-soft); }
-  .shout :global(.dss-tbl tbody tr:not(.dss-sch-group)) { background: var(--signal-400); }
+  .links { margin: 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
+  .readout { margin: 8px 0 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-fg-soft); }
+  .shout :global(.dss-tbl tbody tr:not(.dss-sch-group)) { background: var(--hoops-signal-400); }
 </style>

@@ -184,18 +184,18 @@
   .list { display: flex; flex-direction: column; gap: 8px; }
   .narrow { width: 100%; max-width: 380px; }
   .gap { height: 10px; }
-  .cap, .colhead, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .colhead, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 10px; }
   .wide-list { max-width: 560px; }
-  .fake-stats { margin-top: 10px; padding: 12px 20px; border: 1px solid var(--page-line); border-radius: 14px; }
+  .fake-stats { margin-top: 10px; padding: 12px 20px; border: 1px solid var(--hoops-page-line); border-radius: 14px; }
   .fake-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px; }
-  .fake-grid div { display: flex; flex-direction: column; font-family: var(--font-mono); }
-  .fake-grid b { font-size: var(--fs-stat); color: var(--page-mute); }
-  .fake-grid span { font-size: var(--fs-caption); color: var(--page-mute); }
+  .fake-grid div { display: flex; flex-direction: column; font-family: var(--hoops-font-mono); }
+  .fake-grid b { font-size: var(--hoops-fs-stat); color: var(--hoops-page-mute); }
+  .fake-grid span { font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }
   .fake-nested { position: relative; }
-  .fake-league { position: absolute; top: 22px; right: 20px; z-index: 2; font-size: var(--fs-body-sm); }
+  .fake-league { position: absolute; top: 22px; right: 20px; z-index: 2; font-size: var(--hoops-fs-body-sm); }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 64px repeat(4, minmax(210px, 1fr)); gap: 16px 14px; align-items: center; }
   .states3 { display: grid; grid-template-columns: repeat(3, minmax(300px, 1fr)); gap: 16px 14px; margin-top: 22px; }
   .cell { padding: 6px; }

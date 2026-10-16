@@ -175,7 +175,7 @@ async function resolveSource(source, root) {
  * Legt das Vanilla-Paket nach `to` (Standard `_site/dss`). Mit `fonts: true` auch fonts/ (Schriftdateien und fonts.css).
  * `source`: siehe resolveSource (Standard: installiertes Paket). `leaflet`: `true` kopiert das installierte Leaflet nach `vendorTo`
  * (Standard `_site/vendor/leaflet`) und wirft, wenn es fehlt; `'auto'` kopiert es nur, wenn es installiert ist; `false` (Standard) lässt es aus.
- * `version.json` (Name und Version, für den Abgleich mit `--dss-version`) entsteht zuerst. Gibt `{ version, leaflet }` zurück.
+ * `version.json` (Name und Version, für den Abgleich mit `--hoops-version`) entsteht zuerst. Gibt `{ version, leaflet }` zurück.
  */
 export async function syncDss({ root = process.cwd(), to = join(root, '_site/dss'), vendorTo = join(root, '_site/vendor/leaflet'), fonts = false, leaflet = false, source = { type: 'package' } } = {}) {
   const leafletDist = join(root, 'node_modules/leaflet/dist');

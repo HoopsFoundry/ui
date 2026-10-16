@@ -95,8 +95,8 @@ describe('Seiten und Verweise', () => {
     expect(read('.gitignore')).toMatch(/^release\/$/m);
     expect(pkg.files).toContain('dist/');
     expect(pkg.files).toEqual(expect.arrayContaining(['scripts/portal-sync.mjs', 'scripts/lib/']));
-    expect(pkg.files.filter((f: string) => /scripts/.test(f)).sort()).toEqual(['scripts/lib/', 'scripts/portal-sync.mjs']);
-    expect(pkg.bin).toEqual({ 'dss-sync': 'scripts/portal-sync.mjs' });
+    expect(pkg.files.filter((f: string) => /scripts/.test(f)).sort()).toEqual(['scripts/lib/', 'scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs', 'scripts/portal-sync.mjs']);
+    expect(pkg.bin).toEqual({ 'dss-sync': 'scripts/portal-sync.mjs', 'hoops-migrate': 'scripts/migrate-from-dss.mjs' });
     expect(pkg.exports['./portal-sync.mjs']).toBe('./scripts/portal-sync.mjs');
     expect(pkg.devDependencies.esbuild).toBeTruthy();
     expect(pkg.engines.node).toBe('>=18.0.0');
@@ -118,7 +118,7 @@ describe('Seiten und Verweise', () => {
     expect(js.match(/from '\/|import\('\//g) ?? []).toEqual([]);
     const css = read('stories/examples/portal-seite/portal.css');
     expect(css).toContain('[hidden] { display: none !important; }');
-    expect(css).toMatch(/portal-skip:focus-visible[^{]*\{[^}]*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/);
+    expect(css).toMatch(/portal-skip:focus-visible[^{]*\{[^}]*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     expect(JSON.parse(read('stories/examples/portal-seite/data.json')).verein.name).toBe('TSV Nordhain 1920');
   });
 });

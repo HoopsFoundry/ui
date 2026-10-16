@@ -3,9 +3,9 @@
 
 Das Designsystem stellt Design-Tokens, gemeinsames CSS, Framework-Komponenten (Svelte, React) und wiederverwendbare JavaScript-Hilfen für Basketball-Anwendungen bereit.
 
-=== Name (Arbeitsname, Entscheidung offen)
+=== Name
 
-Das System wird voraussichtlich als „HoopsFoundry DSS" (DSS = Digital Sports System) oder als „HoopsFoundry UI" geführt. Die Entscheidung steht aus; beide Namen sind Arbeitsnamen. Bis zur Entscheidung bleiben Paketname `@bbv/dss-design-system` und Repository-Name `dss-design-system` unverändert. Diese Dokumentation verwendet bis dahin die Kurzform „DSS".
+Das System heißt HoopsFoundry UI (ADR-008). Die Design-Tokens tragen das Präfix `--hoops-`. Klassen (`dss-*`), data-Attribute, Dateinamen, Paketname (`@bbv/dss-design-system`) und Repository-Name tragen noch das alte Kürzel; für diese Teile verwendet die Dokumentation die Kurzform „DSS“.
 
 Hintergrund: Das Kürzel DSS stammt aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
 

@@ -18,7 +18,7 @@ export interface TopBarProps {
   actions?: ReactNode;
   /** `header` macht die Leiste zur banner-Landmark (Standard: div). */
   as?: 'header' | 'div';
-  /** Begrenzt den Inhalt auf `--dss-shell-max` (Hintergrund bleibt voll breit). */
+  /** Begrenzt den Inhalt auf `--hoops-shell-max` (Hintergrund bleibt voll breit). */
   contained?: boolean;
   className?: string;
 }

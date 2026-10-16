@@ -8,118 +8,118 @@
 
    Usage:
        @import "tokens.css";
-       body { color: var(--ink-600); background: var(--n-50); }
+       body { color: var(--hoops-ink-600); background: var(--hoops-n-50); }
    ─────────────────────────────────────────────────────────── */
 
 :root {
   /* ── Hue tokens  ─────────────────── */
-  --h-ink:   60;     /* warm near-black */
-  --h-amber: 83;     /* signal amber */
-  --h-sky:   244;    /* court sky */
+  --hoops-h-ink:   60;     /* warm near-black */
+  --hoops-h-amber: 83;     /* signal amber */
+  --hoops-h-sky:   244;    /* court sky */
 
   /* Marken-Hue für Chips/Fokus-Ring; DBB-Brand überschreibt sie (siehe unten) */
-  --h-cool:   var(--h-sky);
-  --h-signal: var(--h-amber);
+  --hoops-h-cool:   var(--hoops-h-sky);
+  --hoops-h-signal: var(--hoops-h-amber);
 
   /* ── Ink scale · Primary (low chroma anthracite) ────────────── */
-  --ink-0:    oklch(1.000 0     0);
-  --ink-50:   oklch(0.985 0.003 var(--h-ink));
-  --ink-100:  oklch(0.965 0.005 var(--h-ink));
-  --ink-200:  oklch(0.925 0.007 var(--h-ink));
-  --ink-300:  oklch(0.850 0.009 var(--h-ink));
-  --ink-400:  oklch(0.700 0.011 var(--h-ink));
-  --ink-500:  oklch(0.560 0.012 var(--h-ink));
-  --ink-600:  oklch(0.420 0.013 var(--h-ink));    /* body text AAA */
-  --ink-700:  oklch(0.300 0.012 var(--h-ink));    /* deep text */
-  --ink-800:  oklch(0.200 0.010 var(--h-ink));    /* button fill */
-  --ink-900:  oklch(0.130 0.008 var(--h-ink));    /* strong text */
-  --ink-1000: oklch(0.020 0.004 var(--h-ink));    /* dark surface */
+  --hoops-ink-0:    oklch(1.000 0     0);
+  --hoops-ink-50:   oklch(0.985 0.003 var(--hoops-h-ink));
+  --hoops-ink-100:  oklch(0.965 0.005 var(--hoops-h-ink));
+  --hoops-ink-200:  oklch(0.925 0.007 var(--hoops-h-ink));
+  --hoops-ink-300:  oklch(0.850 0.009 var(--hoops-h-ink));
+  --hoops-ink-400:  oklch(0.700 0.011 var(--hoops-h-ink));
+  --hoops-ink-500:  oklch(0.560 0.012 var(--hoops-h-ink));
+  --hoops-ink-600:  oklch(0.420 0.013 var(--hoops-h-ink));    /* body text AAA */
+  --hoops-ink-700:  oklch(0.300 0.012 var(--hoops-h-ink));    /* deep text */
+  --hoops-ink-800:  oklch(0.200 0.010 var(--hoops-h-ink));    /* button fill */
+  --hoops-ink-900:  oklch(0.130 0.008 var(--hoops-h-ink));    /* strong text */
+  --hoops-ink-1000: oklch(0.020 0.004 var(--hoops-h-ink));    /* dark surface */
 
   /* ── Amber scale · Accent A (signal honey) ──────────────────── */
-  --amber-50:   oklch(0.975 0.025 var(--h-amber));
-  --amber-100:  oklch(0.940 0.060 var(--h-amber));
-  --amber-200:  oklch(0.880 0.110 var(--h-amber));
-  --amber-300:  oklch(0.830 0.145 var(--h-amber));
-  --amber-400:  oklch(0.800 0.165 var(--h-amber));   /* fill */
-  --amber-500:  oklch(0.760 0.165 var(--h-amber));
-  --amber-600:  oklch(0.660 0.150 calc(var(--h-amber) - 5));
-  --amber-700:  oklch(0.540 0.130 calc(var(--h-amber) - 10));
-  --amber-800:  oklch(0.420 0.110 calc(var(--h-amber) - 20));  /* text AAA */
-  --amber-900:  oklch(0.290 0.080 calc(var(--h-amber) - 25));
+  --hoops-amber-50:   oklch(0.975 0.025 var(--hoops-h-amber));
+  --hoops-amber-100:  oklch(0.940 0.060 var(--hoops-h-amber));
+  --hoops-amber-200:  oklch(0.880 0.110 var(--hoops-h-amber));
+  --hoops-amber-300:  oklch(0.830 0.145 var(--hoops-h-amber));
+  --hoops-amber-400:  oklch(0.800 0.165 var(--hoops-h-amber));   /* fill */
+  --hoops-amber-500:  oklch(0.760 0.165 var(--hoops-h-amber));
+  --hoops-amber-600:  oklch(0.660 0.150 calc(var(--hoops-h-amber) - 5));
+  --hoops-amber-700:  oklch(0.540 0.130 calc(var(--hoops-h-amber) - 10));
+  --hoops-amber-800:  oklch(0.420 0.110 calc(var(--hoops-h-amber) - 20));  /* text AAA */
+  --hoops-amber-900:  oklch(0.290 0.080 calc(var(--hoops-h-amber) - 25));
 
   /* ── Sky scale · Accent B (court cool blue) ─────────────────── */
-  --sky-50:   oklch(0.975 0.018 var(--h-sky));
-  --sky-100:  oklch(0.940 0.045 var(--h-sky));
-  --sky-200:  oklch(0.880 0.080 var(--h-sky));
-  --sky-300:  oklch(0.820 0.110 var(--h-sky));
-  --sky-400:  oklch(0.760 0.125 var(--h-sky));    /* fill */
-  --sky-500:  oklch(0.680 0.140 calc(var(--h-sky) + 2));
-  --sky-600:  oklch(0.560 0.140 calc(var(--h-sky) + 5));
-  --sky-700:  oklch(0.450 0.135 calc(var(--h-sky) + 8));
-  --sky-800:  oklch(0.345 0.120 calc(var(--h-sky) + 12));  /* text AAA */
-  --sky-900:  oklch(0.230 0.080 calc(var(--h-sky) + 15));
+  --hoops-sky-50:   oklch(0.975 0.018 var(--hoops-h-sky));
+  --hoops-sky-100:  oklch(0.940 0.045 var(--hoops-h-sky));
+  --hoops-sky-200:  oklch(0.880 0.080 var(--hoops-h-sky));
+  --hoops-sky-300:  oklch(0.820 0.110 var(--hoops-h-sky));
+  --hoops-sky-400:  oklch(0.760 0.125 var(--hoops-h-sky));    /* fill */
+  --hoops-sky-500:  oklch(0.680 0.140 calc(var(--hoops-h-sky) + 2));
+  --hoops-sky-600:  oklch(0.560 0.140 calc(var(--hoops-h-sky) + 5));
+  --hoops-sky-700:  oklch(0.450 0.135 calc(var(--hoops-h-sky) + 8));
+  --hoops-sky-800:  oklch(0.345 0.120 calc(var(--hoops-h-sky) + 12));  /* text AAA */
+  --hoops-sky-900:  oklch(0.230 0.080 calc(var(--hoops-h-sky) + 15));
 
   /* ── Neutral scale · cool grey ──────────────────────────────── */
-  --n-0:    oklch(1.000 0     0);
-  --n-50:   oklch(0.985 0.003 250);
-  --n-100:  oklch(0.965 0.005 250);
-  --n-200:  oklch(0.925 0.006 250);
-  --n-300:  oklch(0.860 0.008 250);
-  --n-400:  oklch(0.700 0.010 250);
-  --n-500:  oklch(0.520 0.011 250);
-  --n-600:  oklch(0.420 0.011 250);    /* muted text AAA */
-  --n-700:  oklch(0.320 0.010 250);
-  --n-800:  oklch(0.215 0.009 250);
-  --n-900:  oklch(0.145 0.008 250);
-  --n-950:  oklch(0.085 0.006 250);
-  --n-1000: oklch(0.025 0.004 250);
+  --hoops-n-0:    oklch(1.000 0     0);
+  --hoops-n-50:   oklch(0.985 0.003 250);
+  --hoops-n-100:  oklch(0.965 0.005 250);
+  --hoops-n-200:  oklch(0.925 0.006 250);
+  --hoops-n-300:  oklch(0.860 0.008 250);
+  --hoops-n-400:  oklch(0.700 0.010 250);
+  --hoops-n-500:  oklch(0.520 0.011 250);
+  --hoops-n-600:  oklch(0.420 0.011 250);    /* muted text AAA */
+  --hoops-n-700:  oklch(0.320 0.010 250);
+  --hoops-n-800:  oklch(0.215 0.009 250);
+  --hoops-n-900:  oklch(0.145 0.008 250);
+  --hoops-n-950:  oklch(0.085 0.006 250);
+  --hoops-n-1000: oklch(0.025 0.004 250);
 
   /* ── Semantic ───────────────────────────────────────────────── */
-  --ok-fill:    oklch(0.640 0.150 150);
-  --ok-text:    oklch(0.400 0.130 150);
-  --ok-soft:    oklch(0.960 0.040 150);
+  --hoops-ok-fill:    oklch(0.640 0.150 150);
+  --hoops-ok-text:    oklch(0.400 0.130 150);
+  --hoops-ok-soft:    oklch(0.960 0.040 150);
 
-  --warn-fill:  oklch(0.770 0.165 75);
-  --warn-text:  oklch(0.420 0.120 60);
-  --warn-soft:  oklch(0.970 0.055 80);
+  --hoops-warn-fill:  oklch(0.770 0.165 75);
+  --hoops-warn-text:  oklch(0.420 0.120 60);
+  --hoops-warn-soft:  oklch(0.970 0.055 80);
 
-  --err-fill:   oklch(0.580 0.220 27);   /* foul dots / non-text */
-  --err-button: oklch(0.400 0.190 27);   /* AAA on white text */
-  --err-text:   oklch(0.420 0.180 27);
-  --err-soft:   oklch(0.955 0.045 27);
+  --hoops-err-fill:   oklch(0.580 0.220 27);   /* foul dots / non-text */
+  --hoops-err-button: oklch(0.400 0.190 27);   /* AAA on white text */
+  --hoops-err-text:   oklch(0.420 0.180 27);
+  --hoops-err-soft:   oklch(0.955 0.045 27);
 
-  --info-fill:  oklch(0.620 0.140 245);
-  --info-text:  oklch(0.380 0.130 245);
-  --info-soft:  oklch(0.955 0.035 245);
+  --hoops-info-fill:  oklch(0.620 0.140 245);
+  --hoops-info-text:  oklch(0.380 0.130 245);
+  --hoops-info-soft:  oklch(0.955 0.035 245);
 
   /* ── DBB-Marke · Gold & Orange (nach basketball-bund.de) ───────
      Gold   #c9ae64 · Hover/Active von Buttons, Markenakzent  → gold-400
      Orange #ff9900 · aktive Tabs, Nav-Unterstrich, Hover     → orange-500
-     Neutrale: Schwarz, Weiß, Anthrazit #191919, Grau #f4f4f4 (siehe --n-* im DBB-Block) */
-  --h-gold:   90;
-  --h-orange: 65;
+     Neutrale: Schwarz, Weiß, Anthrazit #191919, Grau #f4f4f4 (siehe --hoops-n-* im DBB-Block) */
+  --hoops-h-gold:   90;
+  --hoops-h-orange: 65;
 
-  --gold-50:  oklch(0.975 0.020 var(--h-gold));
-  --gold-100: oklch(0.945 0.040 var(--h-gold));
-  --gold-200: oklch(0.900 0.065 var(--h-gold));
-  --gold-300: oklch(0.830 0.085 var(--h-gold));
-  --gold-400: oklch(0.759 0.099 var(--h-gold));    /* ≈ #c9ae64 */
-  --gold-500: oklch(0.690 0.100 var(--h-gold));
-  --gold-600: oklch(0.610 0.095 var(--h-gold));
-  --gold-700: oklch(0.510 0.085 var(--h-gold));
-  --gold-800: oklch(0.420 0.072 var(--h-gold));    /* text AAA */
-  --gold-900: oklch(0.290 0.050 var(--h-gold));
+  --hoops-gold-50:  oklch(0.975 0.020 var(--hoops-h-gold));
+  --hoops-gold-100: oklch(0.945 0.040 var(--hoops-h-gold));
+  --hoops-gold-200: oklch(0.900 0.065 var(--hoops-h-gold));
+  --hoops-gold-300: oklch(0.830 0.085 var(--hoops-h-gold));
+  --hoops-gold-400: oklch(0.759 0.099 var(--hoops-h-gold));    /* ≈ #c9ae64 */
+  --hoops-gold-500: oklch(0.690 0.100 var(--hoops-h-gold));
+  --hoops-gold-600: oklch(0.610 0.095 var(--hoops-h-gold));
+  --hoops-gold-700: oklch(0.510 0.085 var(--hoops-h-gold));
+  --hoops-gold-800: oklch(0.420 0.072 var(--hoops-h-gold));    /* text AAA */
+  --hoops-gold-900: oklch(0.290 0.050 var(--hoops-h-gold));
 
-  --orange-50:  oklch(0.975 0.020 var(--h-orange));
-  --orange-100: oklch(0.945 0.045 var(--h-orange));
-  --orange-200: oklch(0.895 0.085 var(--h-orange));
-  --orange-300: oklch(0.840 0.130 var(--h-orange));
-  --orange-400: oklch(0.800 0.160 var(--h-orange));
-  --orange-500: oklch(0.772 0.174 var(--h-orange)); /* ≈ #ff9900 */
-  --orange-600: oklch(0.670 0.182 calc(var(--h-orange) - 15));  /* ≈ #eb6909 */
-  --orange-700: oklch(0.550 0.150 calc(var(--h-orange) - 15));
-  --orange-800: oklch(0.420 0.110 calc(var(--h-orange) - 15));
-  --orange-900: oklch(0.290 0.070 calc(var(--h-orange) - 15));
+  --hoops-orange-50:  oklch(0.975 0.020 var(--hoops-h-orange));
+  --hoops-orange-100: oklch(0.945 0.045 var(--hoops-h-orange));
+  --hoops-orange-200: oklch(0.895 0.085 var(--hoops-h-orange));
+  --hoops-orange-300: oklch(0.840 0.130 var(--hoops-h-orange));
+  --hoops-orange-400: oklch(0.800 0.160 var(--hoops-h-orange));
+  --hoops-orange-500: oklch(0.772 0.174 var(--hoops-h-orange)); /* ≈ #ff9900 */
+  --hoops-orange-600: oklch(0.670 0.182 calc(var(--hoops-h-orange) - 15));  /* ≈ #eb6909 */
+  --hoops-orange-700: oklch(0.550 0.150 calc(var(--hoops-h-orange) - 15));
+  --hoops-orange-800: oklch(0.420 0.110 calc(var(--hoops-h-orange) - 15));
+  --hoops-orange-900: oklch(0.290 0.070 calc(var(--hoops-h-orange) - 15));
 
   /* ── Marken-Rollen · Komponenten nutzen NUR diese Ebene ──────────
      base   = Text/Basis      (BBV: ink    · DBB: n, neutrales Grau)
@@ -128,147 +128,147 @@
      action = Primäre Buttons (BBV: ink    · DBB: Anthrazit)
      indicator = aktive Zustände: Tab-/Nav-Unterstrich (BBV: amber · DBB: orange-600, im Dark Mode orange-500)
      ────────────────────────────────────────────────────────────── */
-  --base-0:    var(--ink-0);
-  --base-50:   var(--ink-50);
-  --base-100:  var(--ink-100);
-  --base-200:  var(--ink-200);
-  --base-300:  var(--ink-300);
-  --base-400:  var(--ink-400);
-  --base-500:  var(--ink-500);
-  --base-600:  var(--ink-600);
-  --base-700:  var(--ink-700);
-  --base-800:  var(--ink-800);
-  --base-900:  var(--ink-900);
-  --base-1000: var(--ink-1000);
+  --hoops-base-0:    var(--hoops-ink-0);
+  --hoops-base-50:   var(--hoops-ink-50);
+  --hoops-base-100:  var(--hoops-ink-100);
+  --hoops-base-200:  var(--hoops-ink-200);
+  --hoops-base-300:  var(--hoops-ink-300);
+  --hoops-base-400:  var(--hoops-ink-400);
+  --hoops-base-500:  var(--hoops-ink-500);
+  --hoops-base-600:  var(--hoops-ink-600);
+  --hoops-base-700:  var(--hoops-ink-700);
+  --hoops-base-800:  var(--hoops-ink-800);
+  --hoops-base-900:  var(--hoops-ink-900);
+  --hoops-base-1000: var(--hoops-ink-1000);
 
-  --signal-50:  var(--amber-50);
-  --signal-100: var(--amber-100);
-  --signal-200: var(--amber-200);
-  --signal-300: var(--amber-300);
-  --signal-400: var(--amber-400);
-  --signal-500: var(--amber-500);
-  --signal-600: var(--amber-600);
-  --signal-700: var(--amber-700);
-  --signal-800: var(--amber-800);
-  --signal-900: var(--amber-900);
+  --hoops-signal-50:  var(--hoops-amber-50);
+  --hoops-signal-100: var(--hoops-amber-100);
+  --hoops-signal-200: var(--hoops-amber-200);
+  --hoops-signal-300: var(--hoops-amber-300);
+  --hoops-signal-400: var(--hoops-amber-400);
+  --hoops-signal-500: var(--hoops-amber-500);
+  --hoops-signal-600: var(--hoops-amber-600);
+  --hoops-signal-700: var(--hoops-amber-700);
+  --hoops-signal-800: var(--hoops-amber-800);
+  --hoops-signal-900: var(--hoops-amber-900);
 
-  --cool-50:  var(--sky-50);
-  --cool-100: var(--sky-100);
-  --cool-200: var(--sky-200);
-  --cool-300: var(--sky-300);
-  --cool-400: var(--sky-400);
-  --cool-500: var(--sky-500);
-  --cool-600: var(--sky-600);
-  --cool-700: var(--sky-700);
-  --cool-800: var(--sky-800);
-  --cool-900: var(--sky-900);
+  --hoops-cool-50:  var(--hoops-sky-50);
+  --hoops-cool-100: var(--hoops-sky-100);
+  --hoops-cool-200: var(--hoops-sky-200);
+  --hoops-cool-300: var(--hoops-sky-300);
+  --hoops-cool-400: var(--hoops-sky-400);
+  --hoops-cool-500: var(--hoops-sky-500);
+  --hoops-cool-600: var(--hoops-sky-600);
+  --hoops-cool-700: var(--hoops-sky-700);
+  --hoops-cool-800: var(--hoops-sky-800);
+  --hoops-cool-900: var(--hoops-sky-900);
 
-  --action-bg:       var(--ink-900);   /* primärer Button */
-  --action-bg-2:     var(--ink-800);   /* Button in components.css */
-  --action-bg-hover: var(--ink-700);
-  --action-fg:       var(--ink-0);
-  --indicator:       var(--amber-400);
+  --hoops-action-bg:       var(--hoops-ink-900);   /* primärer Button */
+  --hoops-action-bg-2:     var(--hoops-ink-800);   /* Button in components.css */
+  --hoops-action-bg-hover: var(--hoops-ink-700);
+  --hoops-action-fg:       var(--hoops-ink-0);
+  --hoops-indicator:       var(--hoops-amber-400);
 
-  --c-cool:          0.07;             /* Chroma der cool-Chips im Dark Mode */
+  --hoops-c-cool:          0.07;             /* Chroma der cool-Chips im Dark Mode */
 
   /* ── Team colors (configurable per match) ───────────────────── */
-  --team-heim:  var(--cool-700);
-  --team-gast:  oklch(0.520 0.180 25);
+  --hoops-team-heim:  var(--hoops-cool-700);
+  --hoops-team-gast:  oklch(0.520 0.180 25);
 
   /* ── Surface aliases ────────────────────────────────────────── */
-  --surface-0:  var(--n-0);
-  --surface-1:  var(--n-50);
-  --surface-2:  var(--n-100);
-  --page-bg:    var(--n-50);
-  --page-fg:    var(--base-900);
-  --page-mute:  var(--n-600);
-  --page-line:  var(--n-200);
+  --hoops-page-surface-0:  var(--hoops-n-0);
+  --hoops-page-surface-1:  var(--hoops-n-50);
+  --hoops-page-surface-2:  var(--hoops-n-100);
+  --hoops-page-bg:    var(--hoops-n-50);
+  --hoops-page-fg:    var(--hoops-base-900);
+  --hoops-page-mute:  var(--hoops-n-600);
+  --hoops-page-line:  var(--hoops-n-200);
 
   /* ── Typography ─────────────────────────────────────────────── */
-  --font-display: 'Sora', system-ui, sans-serif;
-  --font-heading: 'Sora', system-ui, sans-serif;
-  --font-body:    'Manrope', system-ui, sans-serif;
-  --font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --hoops-font-display: 'Sora', system-ui, sans-serif;
+  --hoops-font-heading: 'Sora', system-ui, sans-serif;
+  --hoops-font-body:    'Manrope', system-ui, sans-serif;
+  --hoops-font-mono:    'JetBrains Mono', ui-monospace, monospace;
 
   /* ── Type scale · size / line-height / tracking / weight ──────
      display & clock sind Zahlen-Stile (tabular-nums), label & caption
-     werden in Großbuchstaben gesetzt. Schriftfamilie siehe --font-*. */
-  --fs-display: 88px;  --lh-display: 0.9;   --ls-display: -0.04em;  --fw-display: 800;
-  --fs-clock:   64px;  --lh-clock:   1;     --ls-clock:   -0.02em;  --fw-clock:   700;
-  --fs-h1:      44px;  --lh-h1:      1.05;  --ls-h1:      -0.025em; --fw-h1:      700;
-  --fs-hero:    32px;  --lh-hero:    1.05;  --ls-hero:    -0.025em; --fw-hero:    700;  /* Name in Hero-Karten */
-  --fs-h2:      28px;  --lh-h2:      1.15;  --ls-h2:      -0.015em; --fw-h2:      600;
-  --fs-stat:    22px;  --lh-stat:    1.1;   --ls-stat:    -0.02em;  --fw-stat:    800;  /* Kennzahlen in Karten */
-  --fs-h3:      20px;  --lh-h3:      1.25;  --ls-h3:      -0.01em;  --fw-h3:      600;
-  --fs-body-lg: 18px;  --lh-body-lg: 1.55;  --ls-body-lg: 0;        --fw-body-lg: 400;
-  --fs-body:    15px;  --lh-body:    1.55;  --ls-body:    0;        --fw-body:    400;
-  --fs-body-md: 14px;  --lh-body-md: 1.5;   --ls-body-md: 0;        --fw-body-md: 400;  /* kompakte UI: Tabellen, Listen */
-  --fs-body-sm: 13px;  --lh-body-sm: 1.5;   --ls-body-sm: 0;        --fw-body-sm: 400;
-  --fs-label:   12px;  --lh-label:   1.5;   --ls-label:   0.04em;   --fw-label:   600;
-  --fs-caption: 11px;  --lh-caption: 1.4;   --ls-caption: 0.06em;   --fw-caption: 600;  /* Mono-Beschriftung, Chips */
+     werden in Großbuchstaben gesetzt. Schriftfamilie siehe --hoops-font-*. */
+  --hoops-fs-display: 88px;  --hoops-lh-display: 0.9;   --hoops-ls-display: -0.04em;  --hoops-fw-display: 800;
+  --hoops-fs-clock:   64px;  --hoops-lh-clock:   1;     --hoops-ls-clock:   -0.02em;  --hoops-fw-clock:   700;
+  --hoops-fs-h1:      44px;  --hoops-lh-h1:      1.05;  --hoops-ls-h1:      -0.025em; --hoops-fw-h1:      700;
+  --hoops-fs-hero:    32px;  --hoops-lh-hero:    1.05;  --hoops-ls-hero:    -0.025em; --hoops-fw-hero:    700;  /* Name in Hero-Karten */
+  --hoops-fs-h2:      28px;  --hoops-lh-h2:      1.15;  --hoops-ls-h2:      -0.015em; --hoops-fw-h2:      600;
+  --hoops-fs-stat:    22px;  --hoops-lh-stat:    1.1;   --hoops-ls-stat:    -0.02em;  --hoops-fw-stat:    800;  /* Kennzahlen in Karten */
+  --hoops-fs-h3:      20px;  --hoops-lh-h3:      1.25;  --hoops-ls-h3:      -0.01em;  --hoops-fw-h3:      600;
+  --hoops-fs-body-lg: 18px;  --hoops-lh-body-lg: 1.55;  --hoops-ls-body-lg: 0;        --hoops-fw-body-lg: 400;
+  --hoops-fs-body:    15px;  --hoops-lh-body:    1.55;  --hoops-ls-body:    0;        --hoops-fw-body:    400;
+  --hoops-fs-body-md: 14px;  --hoops-lh-body-md: 1.5;   --hoops-ls-body-md: 0;        --hoops-fw-body-md: 400;  /* kompakte UI: Tabellen, Listen */
+  --hoops-fs-body-sm: 13px;  --hoops-lh-body-sm: 1.5;   --hoops-ls-body-sm: 0;        --hoops-fw-body-sm: 400;
+  --hoops-fs-label:   12px;  --hoops-lh-label:   1.5;   --hoops-ls-label:   0.04em;   --hoops-fw-label:   600;
+  --hoops-fs-caption: 11px;  --hoops-lh-caption: 1.4;   --hoops-ls-caption: 0.06em;   --hoops-fw-caption: 600;  /* Mono-Beschriftung, Chips */
 
-  --tt-display: none;  /* DBB-Schrift setzt Display/H1/H2 in Versalien */
-  --measure:    65ch;  /* maximale Zeilenlänge für Fließtext */
+  --hoops-tt-display: none;  /* DBB-Schrift setzt Display/H1/H2 in Versalien */
+  --hoops-measure:    65ch;  /* maximale Zeilenlänge für Fließtext */
 
   /* ── Spacing scale · 4 px base ──────────────────────────────── */
-  --space-0:  0;
-  --space-1:  4px;
-  --space-2:  8px;
-  --space-3:  12px;
-  --space-4:  16px;
-  --space-5:  20px;
-  --space-6:  24px;
-  --space-8:  32px;
-  --space-10: 40px;
-  --space-12: 48px;
-  --space-16: 64px;
-  --space-20: 80px;
-  --space-24: 96px;
+  --hoops-space-0:  0;
+  --hoops-space-1:  4px;
+  --hoops-space-2:  8px;
+  --hoops-space-3:  12px;
+  --hoops-space-4:  16px;
+  --hoops-space-5:  20px;
+  --hoops-space-6:  24px;
+  --hoops-space-8:  32px;
+  --hoops-space-10: 40px;
+  --hoops-space-12: 48px;
+  --hoops-space-16: 64px;
+  --hoops-space-20: 80px;
+  --hoops-space-24: 96px;
 
   /* ── Radius scale ───────────────────────────────────────────── */
-  --radius-none: 0;
-  --radius-sm:   4px;    /* chips, mini badges */
-  --radius-md:   8px;    /* inputs, fields */
-  --radius-lg:   12px;   /* cards */
-  --radius-xl:   18px;   /* panels, modals */
-  --radius-full: 999px;  /* avatars, pills */
+  --hoops-radius-none: 0;
+  --hoops-radius-sm:   4px;    /* chips, mini badges */
+  --hoops-radius-md:   8px;    /* inputs, fields */
+  --hoops-radius-lg:   12px;   /* cards */
+  --hoops-radius-xl:   18px;   /* panels, modals */
+  --hoops-radius-full: 999px;  /* avatars, pills */
 
   /* ── Shadows ────────────────────────────────────────────────── */
-  --shadow-sm: 0 1px 2px rgba(15, 20, 38, 0.08);
-  --shadow-md: 0 4px 12px rgba(15, 20, 38, 0.08), 0 1px 3px rgba(15, 20, 38, 0.04);
-  --shadow-lg: 0 18px 48px rgba(15, 20, 38, 0.16), 0 4px 12px rgba(15, 20, 38, 0.08);
-  --shadow-xl: 0 30px 80px -10px rgba(15, 20, 38, 0.30), 0 12px 30px -8px rgba(15, 20, 38, 0.18);
+  --hoops-shadow-sm: 0 1px 2px rgba(15, 20, 38, 0.08);
+  --hoops-shadow-md: 0 4px 12px rgba(15, 20, 38, 0.08), 0 1px 3px rgba(15, 20, 38, 0.04);
+  --hoops-shadow-lg: 0 18px 48px rgba(15, 20, 38, 0.16), 0 4px 12px rgba(15, 20, 38, 0.08);
+  --hoops-shadow-xl: 0 30px 80px -10px rgba(15, 20, 38, 0.30), 0 12px 30px -8px rgba(15, 20, 38, 0.18);
 
   /* ── Focus ring ─────────────────────────────────────────────── */
-  --ring-w:     3px;
-  --ring-style: dashed;                          /* gestrichelt: erkennbar auch ohne Farbwahrnehmung, gleich auf allen Flächen */
-  --ring-color: oklch(0.60 0.14 calc(var(--h-amber) - 7.5));  /* Gold/Amber · ≈ #af7100, 4.0:1 auf Weiß, 3.7:1 auf #f4f4f4 (WCAG 1.4.11) */
-  --ring-color-on-dark: var(--amber-700);        /* dezenter für dunklen Grund · ≈ #9b6000, ≥ 3.4:1 auf Schwarz/Anthrazit */
+  --hoops-ring-w:     3px;
+  --hoops-ring-style: dashed;                          /* gestrichelt: erkennbar auch ohne Farbwahrnehmung, gleich auf allen Flächen */
+  --hoops-ring-color: oklch(0.60 0.14 calc(var(--hoops-h-amber) - 7.5));  /* Gold/Amber · ≈ #af7100, 4.0:1 auf Weiß, 3.7:1 auf #f4f4f4 (WCAG 1.4.11) */
+  --hoops-ring-color-on-dark: var(--hoops-amber-700);        /* dezenter für dunklen Grund · ≈ #9b6000, ≥ 3.4:1 auf Schwarz/Anthrazit */
 
   /* ── Touch targets ──────────────────────────────────────────── */
-  --touch-sm: 44px;   /* WCAG minimum */
-  --touch-md: 56px;   /* default web */
-  --touch-lg: 64px;   /* gymnasium-grade */
+  --hoops-touch-sm: 44px;   /* WCAG minimum */
+  --hoops-touch-md: 56px;   /* default web */
+  --hoops-touch-lg: 64px;   /* gymnasium-grade */
 
   /* ── Field heights ──────────────────────────────────────────── */
-  --fld-h-touch:   56px;
-  --fld-h-default: 44px;
-  --fld-h-compact: 36px;
+  --hoops-fld-h-touch:   56px;
+  --hoops-fld-h-default: 44px;
+  --hoops-fld-h-compact: 36px;
 
   /* ── Table row heights ──────────────────────────────────────── */
-  --row-touch:   60px;
-  --row-default: 44px;
-  --row-compact: 36px;
-  --row-dense:   30px;
+  --hoops-row-touch:   60px;
+  --hoops-row-default: 44px;
+  --hoops-row-compact: 36px;
+  --hoops-row-dense:   30px;
 
   /* ── Overlay ────────────────────────────────────────────────── */
-  --backdrop:        oklch(0.13 0.02 250 / 0.55);
-  --backdrop-heavy:  oklch(0.10 0.02 250 / 0.72);
+  --hoops-backdrop:        oklch(0.13 0.02 250 / 0.55);
+  --hoops-backdrop-heavy:  oklch(0.10 0.02 250 / 0.72);
 
   /* ── Breakpoints (CSS only; use @media for actual queries) ──── */
-  --bp-mobile:  640px;
-  --bp-tablet:  1024px;   /* iPad landscape — main Kampfgericht device */
-  --bp-desktop: 1280px;
+  --hoops-bp-mobile:  640px;
+  --hoops-bp-tablet:  1024px;   /* iPad landscape — main Kampfgericht device */
+  --hoops-bp-desktop: 1280px;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -276,98 +276,98 @@
    Quelle: basketball-bund.de (Theme dbb21). Gold #c9ae64 ist die
    Markenfarbe, Orange #ff9900 markiert aktive Zustände.
    Aktivieren: <html data-brand="dbb"> — muss auf <html> stehen
-   (abgeleitete Tokens wie --team-heim lösen am Root auf).
+   (abgeleitete Tokens wie --hoops-team-heim lösen am Root auf).
    Gold und Orange haben pro Stufe ähnliche Helligkeit wie amber,
    die AAA-Slots (fill / text / deep) bleiben gleich.
    ──────────────────────────────────────────────────────────────── */
 :root[data-brand="dbb"] {
-  --h-cool:   var(--h-gold);
-  --h-signal: var(--h-gold);
-  --c-cool:   0;
+  --hoops-h-cool:   var(--hoops-h-gold);
+  --hoops-h-signal: var(--hoops-h-gold);
+  --hoops-c-cool:   0;
 
   /* Neutrale ohne Farbstich (die Seite nutzt reine Grautöne) */
-  --n-0:    oklch(1.000 0 0);
-  --n-50:   oklch(0.985 0 0);
-  --n-100:  oklch(0.967 0 0);    /* #f4f4f4 */
-  --n-200:  oklch(0.925 0 0);
-  --n-300:  oklch(0.870 0 0);    /* #d4d4d4 */
-  --n-400:  oklch(0.700 0 0);
-  --n-500:  oklch(0.520 0 0);
-  --n-600:  oklch(0.420 0 0);
-  --n-700:  oklch(0.320 0 0);
-  --n-800:  oklch(0.250 0 0);
-  --n-900:  oklch(0.145 0 0);
-  --n-950:  oklch(0.085 0 0);
-  --n-1000: oklch(0.025 0 0);
+  --hoops-n-0:    oklch(1.000 0 0);
+  --hoops-n-50:   oklch(0.985 0 0);
+  --hoops-n-100:  oklch(0.967 0 0);    /* #f4f4f4 */
+  --hoops-n-200:  oklch(0.925 0 0);
+  --hoops-n-300:  oklch(0.870 0 0);    /* #d4d4d4 */
+  --hoops-n-400:  oklch(0.700 0 0);
+  --hoops-n-500:  oklch(0.520 0 0);
+  --hoops-n-600:  oklch(0.420 0 0);
+  --hoops-n-700:  oklch(0.320 0 0);
+  --hoops-n-800:  oklch(0.250 0 0);
+  --hoops-n-900:  oklch(0.145 0 0);
+  --hoops-n-950:  oklch(0.085 0 0);
+  --hoops-n-1000: oklch(0.025 0 0);
 
-  --base-0:    var(--n-0);
-  --base-50:   var(--n-50);
-  --base-100:  var(--n-100);
-  --base-200:  var(--n-200);
-  --base-300:  var(--n-300);
-  --base-400:  var(--n-400);
-  --base-500:  var(--n-500);
-  --base-600:  var(--n-600);
-  --base-700:  var(--n-700);
-  --base-800:  var(--n-800);
-  --base-900:  oklch(0 0 0);      /* #000 · Text wie auf der Seite */
-  --base-1000: oklch(0.213 0 0);  /* #191919 · Anthrazit für Footer/dunkle Flächen */
+  --hoops-base-0:    var(--hoops-n-0);
+  --hoops-base-50:   var(--hoops-n-50);
+  --hoops-base-100:  var(--hoops-n-100);
+  --hoops-base-200:  var(--hoops-n-200);
+  --hoops-base-300:  var(--hoops-n-300);
+  --hoops-base-400:  var(--hoops-n-400);
+  --hoops-base-500:  var(--hoops-n-500);
+  --hoops-base-600:  var(--hoops-n-600);
+  --hoops-base-700:  var(--hoops-n-700);
+  --hoops-base-800:  var(--hoops-n-800);
+  --hoops-base-900:  oklch(0 0 0);      /* #000 · Text wie auf der Seite */
+  --hoops-base-1000: oklch(0.213 0 0);  /* #191919 · Anthrazit für Footer/dunkle Flächen */
 
-  --signal-50:  var(--gold-50);
-  --signal-100: var(--gold-100);
-  --signal-200: var(--gold-200);
-  --signal-300: var(--gold-300);
-  --signal-400: var(--gold-400);
-  --signal-500: var(--gold-500);
-  --signal-600: var(--gold-600);
-  --signal-700: var(--gold-700);
-  --signal-800: var(--gold-800);
-  --signal-900: var(--gold-900);
+  --hoops-signal-50:  var(--hoops-gold-50);
+  --hoops-signal-100: var(--hoops-gold-100);
+  --hoops-signal-200: var(--hoops-gold-200);
+  --hoops-signal-300: var(--hoops-gold-300);
+  --hoops-signal-400: var(--hoops-gold-400);
+  --hoops-signal-500: var(--hoops-gold-500);
+  --hoops-signal-600: var(--hoops-gold-600);
+  --hoops-signal-700: var(--hoops-gold-700);
+  --hoops-signal-800: var(--hoops-gold-800);
+  --hoops-signal-900: var(--hoops-gold-900);
 
   /* cool: kein Blau in der DBB-Marke, Links erben die Textfarbe */
-  --cool-50:  var(--n-50);
-  --cool-100: var(--n-100);
-  --cool-200: var(--n-200);
-  --cool-300: var(--n-300);
-  --cool-400: var(--n-400);
-  --cool-500: var(--n-500);
-  --cool-600: var(--n-600);
-  --cool-700: var(--n-700);
-  --cool-800: var(--n-800);
-  --cool-900: var(--n-900);
+  --hoops-cool-50:  var(--hoops-n-50);
+  --hoops-cool-100: var(--hoops-n-100);
+  --hoops-cool-200: var(--hoops-n-200);
+  --hoops-cool-300: var(--hoops-n-300);
+  --hoops-cool-400: var(--hoops-n-400);
+  --hoops-cool-500: var(--hoops-n-500);
+  --hoops-cool-600: var(--hoops-n-600);
+  --hoops-cool-700: var(--hoops-n-700);
+  --hoops-cool-800: var(--hoops-n-800);
+  --hoops-cool-900: var(--hoops-n-900);
 
-  --action-bg:       var(--base-1000);
-  --action-bg-2:     var(--base-1000);
-  --action-bg-hover: var(--n-700);
-  --indicator:       var(--orange-600);   /* ≈ #eb6909 · 3.2:1 auf Weiß */
-  --ring-color:      var(--gold-600);   /* ≈ #998039 · 3.8:1 auf Weiß, 3.5:1 auf #f4f4f4 */
-  --ring-color-on-dark: var(--gold-700);  /* ≈ #796425 · ≥ 3.06:1 auf Anthrazit #191919, 3.6:1 auf Schwarz */
+  --hoops-action-bg:       var(--hoops-base-1000);
+  --hoops-action-bg-2:     var(--hoops-base-1000);
+  --hoops-action-bg-hover: var(--hoops-n-700);
+  --hoops-indicator:       var(--hoops-orange-600);   /* ≈ #eb6909 · 3.2:1 auf Weiß */
+  --hoops-ring-color:      var(--hoops-gold-600);   /* ≈ #998039 · 3.8:1 auf Weiß, 3.5:1 auf #f4f4f4 */
+  --hoops-ring-color-on-dark: var(--hoops-gold-700);  /* ≈ #796425 · ≥ 3.06:1 auf Anthrazit #191919, 3.6:1 auf Schwarz */
 }
 
 /* Auf dunklem Grund trägt die Marken-Orange #ff9900 (≈ 8:1 auf Anthrazit) */
 @media (prefers-color-scheme: dark) {
-  :root[data-brand="dbb"]:not([data-theme="light"]) { --indicator: var(--orange-500); }
+  :root[data-brand="dbb"]:not([data-theme="light"]) { --hoops-indicator: var(--hoops-orange-500); }
 }
-:root[data-brand="dbb"][data-theme="dark"] { --indicator: var(--orange-500); }
+:root[data-brand="dbb"][data-theme="dark"] { --hoops-indicator: var(--hoops-orange-500); }
 
 /* Type scale · Handy (≤ 640px): Die Klassen .dss-t-display/-clock/-h1/-h2 nutzen diese Größen.
-   Komponenten mit fester Kachelgröße (Trikotnummer, Kennzahl) bleiben bei --fs-*. */
+   Komponenten mit fester Kachelgröße (Trikotnummer, Kennzahl) bleiben bei --hoops-fs-*. */
 :root {
-  --fs-display-sm: 56px;
-  --fs-clock-sm:   48px;
-  --fs-h1-sm:      32px;
-  --fs-h2-sm:      24px;
+  --hoops-fs-display-sm: 56px;
+  --hoops-fs-clock-sm:   48px;
+  --hoops-fs-h1-sm:      32px;
+  --hoops-fs-h2-sm:      24px;
 }
 
 /* Größe der Komponentenüberschriften (Table, ScheduleTable, ScheduleGrid, PlayByPlay, PlayerCard, TeamCard, EmptyState, Modal).
    Sie hängt an Klassen, nie am Elementnamen (h2 bis h6 sehen gleich aus). Die Tokens sind absichtlich NICHT vorbelegt:
-   Ohne Wert gilt je Komponente der bisherige Wert (Rahmen --fs-body, Karten --fs-body-lg, Modal --fs-h3). Wer sie
+   Ohne Wert gilt je Komponente der bisherige Wert (Rahmen --hoops-fs-body, Karten --hoops-fs-body-lg, Modal --hoops-fs-h3). Wer sie
    in einem Bereich setzt, ändert alle Titel darin; die Reihenfolge ist komponentenspezifisch vor global:
-     --dss-frame-title-size   Table, ScheduleTable, ScheduleGrid, PlayByPlay   (sonst --dss-title-size)
-     --dss-card-title-size    PlayerCard, TeamCard, EmptyState                 (sonst --dss-title-size)
-     --dss-title-size         alle Komponentenüberschriften inkl. Modal
-     --dss-title-weight       Schriftgewicht aller Komponentenüberschriften
-     --dss-title-leading      Zeilenhöhe aller Komponentenüberschriften */
+     --hoops-frame-title-size   Table, ScheduleTable, ScheduleGrid, PlayByPlay   (sonst --hoops-title-size)
+     --hoops-card-title-size    PlayerCard, TeamCard, EmptyState                 (sonst --hoops-title-size)
+     --hoops-title-size         alle Komponentenüberschriften inkl. Modal
+     --hoops-title-weight       Schriftgewicht aller Komponentenüberschriften
+     --hoops-title-leading      Zeilenhöhe aller Komponentenüberschriften */
 
 /* ────────────────────────────────────────────────────────────────
    Typografie · unabhängig von der Marke (data-type auf <html>)
@@ -381,13 +381,13 @@
    Die Schriftdateien liefert die Anwendung aus (siehe README).
    ──────────────────────────────────────────────────────────────── */
 :root[data-type="dbb"] {
-  --font-display: 'Sucrose', 'Barlow Condensed', 'Rubik', system-ui, sans-serif;
-  --font-heading: 'Sucrose', 'Barlow Condensed', 'Rubik', system-ui, sans-serif;
-  --font-body:    'Rubik', system-ui, sans-serif;
+  --hoops-font-display: 'Sucrose', 'Barlow Condensed', 'Rubik', system-ui, sans-serif;
+  --hoops-font-heading: 'Sucrose', 'Barlow Condensed', 'Rubik', system-ui, sans-serif;
+  --hoops-font-body:    'Rubik', system-ui, sans-serif;
 
   /* Kondensierte Versalien-Headlines: kein negatives Tracking */
-  --ls-display: 0;  --ls-h1: 0;  --ls-h2: 0;  --ls-h3: 0;  --ls-hero: 0;
-  --tt-display: uppercase;
+  --hoops-ls-display: 0;  --hoops-ls-h1: 0;  --hoops-ls-h2: 0;  --hoops-ls-h3: 0;  --hoops-ls-hero: 0;
+  --hoops-tt-display: uppercase;
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -395,25 +395,25 @@
    ──────────────────────────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --page-bg:   var(--n-1000);
-    --page-fg:   var(--n-100);
-    --page-mute: var(--n-400);
-    --page-line: var(--n-800);
-    --surface-0: var(--n-1000);
-    --surface-1: var(--n-950);
-    --surface-2: var(--n-900);
-    --ring-color: var(--ring-color-on-dark);   /* dezenterer Ring auf dunklem Grund */
+    --hoops-page-bg:   var(--hoops-n-1000);
+    --hoops-page-fg:   var(--hoops-n-100);
+    --hoops-page-mute: var(--hoops-n-400);
+    --hoops-page-line: var(--hoops-n-800);
+    --hoops-page-surface-0: var(--hoops-n-1000);
+    --hoops-page-surface-1: var(--hoops-n-950);
+    --hoops-page-surface-2: var(--hoops-n-900);
+    --hoops-ring-color: var(--hoops-ring-color-on-dark);   /* dezenterer Ring auf dunklem Grund */
   }
 }
 :root[data-theme="dark"] {
-  --page-bg:   var(--n-1000);
-  --page-fg:   var(--n-100);
-  --page-mute: var(--n-400);
-  --page-line: var(--n-800);
-  --surface-0: var(--n-1000);
-  --surface-1: var(--n-950);
-  --surface-2: var(--n-900);
-  --ring-color: var(--ring-color-on-dark);
+  --hoops-page-bg:   var(--hoops-n-1000);
+  --hoops-page-fg:   var(--hoops-n-100);
+  --hoops-page-mute: var(--hoops-n-400);
+  --hoops-page-line: var(--hoops-n-800);
+  --hoops-page-surface-0: var(--hoops-n-1000);
+  --hoops-page-surface-1: var(--hoops-n-950);
+  --hoops-page-surface-2: var(--hoops-n-900);
+  --hoops-ring-color: var(--hoops-ring-color-on-dark);
 }
 
 /* ────────────────────────────────────────────────────────────────

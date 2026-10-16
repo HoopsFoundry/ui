@@ -52,11 +52,11 @@ export function mapSeatCssRules(css: string): Rules {
   const auto = body(`:root:not([data-theme="light"]) ${INV}`);
   const dim = body(':root[data-theme="dark"] .dss-map[data-dim="true"] .dss-map-tiles');
   return {
-    'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark': /invert\(1\) hue-rotate\(180deg\)/.test(dark) && /--dss-map-invert-filter/.test(dark),
-    'CSS: invert auch bei System-Dunkel ohne data-theme': /invert\(1\) hue-rotate\(180deg\)/.test(auto) && /--dss-map-invert-filter/.test(auto),
-    'CSS: dim bleibt der Standard': /brightness\(var\(--dss-map-dim, 0\.8\)\)/.test(dim),
+    'CSS: invert im Dunkelmodus (data-theme) nur mit dimInDark': /invert\(1\) hue-rotate\(180deg\)/.test(dark) && /--hoops-map-invert-filter/.test(dark),
+    'CSS: invert auch bei System-Dunkel ohne data-theme': /invert\(1\) hue-rotate\(180deg\)/.test(auto) && /--hoops-map-invert-filter/.test(auto),
+    'CSS: dim bleibt der Standard': /brightness\(var\(--hoops-map-dim, 0\.8\)\)/.test(dim),
     'CSS: Filter nur auf der Kachelebene': [dark, auto, dim].every((b) => b.length > 0) && !/\.dss-map-marker|\.dss-map-attr|\.dss-map-zoom/.test(text.slice(text.indexOf('darkTiles="invert"'), text.indexOf('/* Marker (Inline-SVG)'))),
-    'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta': /fill:\s*var\(--dss-map-pin-fg, var\(--n-0\)\)/.test(body('.dss-map-pin-house')) && /fill:\s*var\(--dss-cta-fg\)/.test(body('.dss-map-marker.is-own .dss-map-pin-house')),
+    'CSS: Haus im Pin in der Textfarbe des Pins, eigener Ort in cta': /fill:\s*var\(--hoops-map-pin-fg, var\(--hoops-n-0\)\)/.test(body('.dss-map-pin-house')) && /fill:\s*var\(--hoops-cta-fg\)/.test(body('.dss-map-marker.is-own .dss-map-pin-house')),
     'CSS: Haus im Platzhalter und in der Liste als Maske in currentColor': /background:\s*currentColor/.test(body('.dss-map-ph-pin.is-seat::before, .dss-map-num.is-seat::before')) && /mask:\s*url\("data:image\/svg\+xml/.test(body('.dss-map-ph-pin.is-seat::before, .dss-map-num.is-seat::before')),
     'CSS: Haus-Symbol im Platzhalter 16 px': /width:\s*16px/.test(body('.dss-map-ph-pin.is-seat::before, .dss-map-num.is-seat::before')) && /height:\s*16px/.test(body('.dss-map-ph-pin.is-seat::before, .dss-map-num.is-seat::before')),
     'CSS: kein festes Hex im Abschnitt des Sitzes': !/#[0-9a-fA-F]{3,8}\b/.test(text.slice(text.indexOf('/* Sitzmarker'), text.indexOf('/* Fokus: Fläche'))),

@@ -82,10 +82,10 @@
 <style>
   .stack { display: flex; flex-direction: column; gap: 8px; max-width: 420px; }
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-  .loose { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-body); font-size: var(--fs-body-md); color: var(--dss-fg); }
-  .cap, .head, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .loose { display: inline-flex; align-items: center; gap: 10px; font-family: var(--hoops-font-body); font-size: var(--hoops-fs-body-md); color: var(--hoops-fg); }
+  .cap, .head, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 8px; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 90px repeat(3, minmax(170px, 1fr)); gap: 14px 24px; align-items: center; }
 </style>

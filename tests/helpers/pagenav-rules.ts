@@ -360,7 +360,7 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
       bar.getBoundingClientRect = () => ({ height: 64 }) as DOMRect;
       document.body.append(bar);
       const h = mod.initBackToTop();
-      const ok = btn().style.getPropertyValue('--dss-backtop-offset') === '80px';
+      const ok = btn().style.getPropertyValue('--hoops-backtop-offset') === '80px';
       h.destroy();
       return ok;
     });
@@ -370,7 +370,7 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
       bar.getBoundingClientRect = () => ({ height: 64 }) as DOMRect;
       document.body.append(bar);
       const h = mod.initBackToTop();
-      const ok = btn().style.getPropertyValue('--dss-backtop-offset') === '';
+      const ok = btn().style.getPropertyValue('--hoops-backtop-offset') === '';
       h.destroy();
       return ok;
     });
@@ -408,17 +408,17 @@ export function pagenavCssRules(css: string): Rules {
   const print = text.slice(text.indexOf('@media print'));
   return {
     'Abschnitt vorhanden': text.length > 400,
-    'CSS: Ebene über Token': /z-index:\s*var\(--dss-z-backtop,\s*20\)/.test(body('.dss-backtop')),
-    'CSS: Abstand von unten über Token und Sicherheitsabstand': /bottom:\s*calc\(var\(--dss-backtop-offset,\s*16px\)\s*\+\s*env\(safe-area-inset-bottom,\s*0px\)\)/.test(body('.dss-backtop')),
-    'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)': /inset-inline-end:\s*calc\(var\(--dss-backtop-gap,\s*16px\)\s*\+\s*env\(safe-area-inset-right,\s*0px\)\)/.test(body('.dss-backtop')) && !/(^|[;\s])right:/.test(body('.dss-backtop')) && /env\(safe-area-inset-left,\s*0px\)/.test(body('.dss-backtop:dir(rtl)')),
+    'CSS: Ebene über Token': /z-index:\s*var\(--hoops-z-backtop,\s*20\)/.test(body('.dss-backtop')),
+    'CSS: Abstand von unten über Token und Sicherheitsabstand': /bottom:\s*calc\(var\(--hoops-backtop-offset,\s*16px\)\s*\+\s*env\(safe-area-inset-bottom,\s*0px\)\)/.test(body('.dss-backtop')),
+    'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)': /inset-inline-end:\s*calc\(var\(--hoops-backtop-gap,\s*16px\)\s*\+\s*env\(safe-area-inset-right,\s*0px\)\)/.test(body('.dss-backtop')) && !/(^|[;\s])right:/.test(body('.dss-backtop')) && /env\(safe-area-inset-left,\s*0px\)/.test(body('.dss-backtop:dir(rtl)')),
     'CSS: im Druck ausgeblendet': /\.dss-pagenav, \.dss-backtop \{ display: none; \}/.test(print),
     'CSS: Knopf fest positioniert und verborgen mit [hidden]': /position:\s*fixed/.test(body('.dss-backtop')) && /display:\s*none/.test(body('.dss-backtop[hidden]')),
-    'CSS: Links mindestens 44 px': /min-height:\s*var\(--touch-sm\)/.test(body('.dss-pagenav-link')),
+    'CSS: Links mindestens 44 px': /min-height:\s*var\(--hoops-touch-sm\)/.test(body('.dss-pagenav-link')),
     'CSS: Schrift nur aus Tokens': !/font-size:\s*[\d.]+(px|rem|em)/.test(text),
     'CSS: keine globalen Selektoren für Scrollen': !/(^|\n)\s*html\s*\{/.test(text) && !/h2\[id\]/.test(text) && !/(^|\n)\s*:root\s*\{[^}]*scroll-/.test(text),
-    'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion': /scroll-margin-top:\s*calc\(var\(--dss-scroll-offset,\s*var\(--dss-acc-sticky-top,\s*0px\)\)\s*\+\s*1rem\)/.test(body('.dss-pagenav-target')),
-    'CSS: Opt-in-Klasse für scroll-padding': /scroll-padding-top:\s*var\(--dss-scroll-offset/.test(body('.dss-scroll-pad')) && /scroll-padding-bottom:\s*var\(--dss-scroll-offset-bottom,\s*4\.5rem\)/.test(body('.dss-scroll-pad')),
-    'CSS: Fokus-Ring der Links': /outline:\s*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/.test(body('.dss-pagenav-link:focus-visible')),
+    'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion': /scroll-margin-top:\s*calc\(var\(--hoops-scroll-offset,\s*var\(--hoops-acc-sticky-top,\s*0px\)\)\s*\+\s*1rem\)/.test(body('.dss-pagenav-target')),
+    'CSS: Opt-in-Klasse für scroll-padding': /scroll-padding-top:\s*var\(--hoops-scroll-offset/.test(body('.dss-scroll-pad')) && /scroll-padding-bottom:\s*var\(--hoops-scroll-offset-bottom,\s*4\.5rem\)/.test(body('.dss-scroll-pad')),
+    'CSS: Fokus-Ring der Links': /outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/.test(body('.dss-pagenav-link:focus-visible')),
     'CSS: Liste bricht um': /flex-wrap:\s*wrap/.test(body('.dss-pagenav-list')),
     'CSS: lange Links brechen um': /overflow-wrap:\s*anywhere/.test(body('.dss-pagenav-link')) && /max-width:\s*100%/.test(body('.dss-pagenav-link')),
     'kein festes Hex': !/#[0-9a-fA-F]{3,8}\b/.test(text),

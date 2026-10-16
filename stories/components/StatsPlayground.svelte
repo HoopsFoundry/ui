@@ -20,7 +20,7 @@
 
 <div style="display: grid; gap: 20px; max-width: 760px;">
   <StatGrid {items} {compact} />
-  <p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: var(--fs-body-sm); color: var(--page-fg, inherit);">
+  <p style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg, inherit);">
     Letzte Spiele <FormChips {form} {variant} />
   </p>
 </div>

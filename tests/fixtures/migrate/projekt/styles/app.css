@@ -1,0 +1,12 @@
+/* Beispiel-Konsument: eigene Seite auf dem alten DSS */
+:root {
+  --shell-gap: 12px;           /* eigene Variable, bleibt */
+  --brand-accent: var(--amber-400);
+}
+.kopf { color: var(--dss-fg); background: var(--surface-0); border-radius: var(--radius-md); }
+.karte { padding: var(--space-3, 12px); box-shadow: var(--shadow-sm, 0 1px 2px rgb(0 0 0 / .1)); font: var(--fs-body) var(--font-body); }
+.kette { color: var(--dss-accent-text, var(--signal-800, var(--ink-900))); }
+.ring { outline: var(--ring-w) dashed var(--ring-color); }
+.btn--sm { color: var(--n-0); }
+.leaflet-container { font: 12px/1.5 var(--leaflet-font, sans-serif); color: var(--tw-ring-color); }
+.knopf--indicator { color: red; }  /* BEM-Modifikator, kein Token */

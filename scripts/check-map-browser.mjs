@@ -49,7 +49,7 @@ const SITZ = { id: 'sitz', lat: 49.2962, lng: 7.9105, label: 'Geschäftsstelle T
 
 const head = (extra = '') => `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Karte</title>
 <link rel="stylesheet" href="/dss/dss.css"><link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
-<style>body{margin:0;padding:1rem;background:var(--page-bg);color:var(--page-fg)}main{max-width:56rem;margin:0 auto;display:grid;gap:1.5rem}</style>${extra}</head><body>`;
+<style>body{margin:0;padding:1rem;background:var(--hoops-page-bg);color:var(--hoops-page-fg)}main{max-width:56rem;margin:0 auto;display:grid;gap:1.5rem}</style>${extra}</head><body>`;
 const CHEVRON = '<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>';
 
 /** Mehrere Karten, dazu Karten in Accordion, Tabs und Modal (alle load auto: sie starten in einem verborgenen Behälter). */

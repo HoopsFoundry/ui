@@ -412,7 +412,7 @@ describe('Styles über das CSSOM (CSP style-src ohne unsafe-inline)', () => {
     for (const html of fragments) expect(html).not.toMatch(/\sstyle="/);
     expect(styleWrites).toEqual([]);
     const root = host.querySelector<HTMLElement>('.dss-map')!;
-    expect(root.style.getPropertyValue('--dss-map-h')).toBe('300px');
+    expect(root.style.getPropertyValue('--hoops-map-h')).toBe('300px');
     const pins = [...host.querySelectorAll<HTMLElement>('.dss-map-ph-pin')];
     expect(pins).toHaveLength(2);
     for (const pin of pins) {
@@ -424,7 +424,7 @@ describe('Styles über das CSSOM (CSP style-src ohne unsafe-inline)', () => {
   it('update schreibt die Höhe über das CSSOM', () => {
     const handle = mountMap(host, BASE as never);
     handle.update({ ...BASE, height: 480 } as never);
-    expect(host.querySelector<HTMLElement>('.dss-map')!.style.getPropertyValue('--dss-map-h')).toBe('480px');
+    expect(host.querySelector<HTMLElement>('.dss-map')!.style.getPropertyValue('--hoops-map-h')).toBe('480px');
   });
 });
 
@@ -587,12 +587,12 @@ describe('Verhalten (nicht nur Quelltextmuster)', () => {
     expect(state.markers.map((m) => m.options.title)).toEqual(['Gymnasium Lindenberg, Vereinssitz', '1, Sporthalle Nordhain', '2, Halle Süd & West']);
     handle.destroy();
   });
-  it('Style-Whitelist und reapplyStyles: nur left, top, width und --dss-map-h gelangen ins CSSOM', async () => {
+  it('Style-Whitelist und reapplyStyles: nur left, top, width und --hoops-map-h gelangen ins CSSOM', async () => {
     const { insertMarkup, reapplyStyles } = await import('../js/render/dom.js');
     const box = document.createElement('div');
-    insertMarkup(box, '<span id="a" style="left:10%;top:20%;color:red;background:url(javascript:1);width:5px;--dss-map-h:300px;--evil:1"></span><i id="b" style="left:calc(1px + 2px)"></i>');
+    insertMarkup(box, '<span id="a" style="left:10%;top:20%;color:red;background:url(javascript:1);width:5px;--hoops-map-h:300px;--evil:1"></span><i id="b" style="left:calc(1px + 2px)"></i>');
     const a = box.querySelector<HTMLElement>('#a')!;
-    expect([a.style.left, a.style.top, a.style.width, a.style.getPropertyValue('--dss-map-h')]).toEqual(['10%', '20%', '5px', '300px']);
+    expect([a.style.left, a.style.top, a.style.width, a.style.getPropertyValue('--hoops-map-h')]).toEqual(['10%', '20%', '5px', '300px']);
     expect(a.style.color).toBe('');
     expect(a.style.getPropertyValue('--evil')).toBe('');
     expect(a.style.background).toBe('');
@@ -605,11 +605,11 @@ describe('Verhalten (nicht nur Quelltextmuster)', () => {
       return set.call(this, name, value);
     });
     const server = document.createElement('div');
-    server.setAttribute('style', '--dss-map-h:410px;color:blue');
+    server.setAttribute('style', '--hoops-map-h:410px;color:blue');
     const pin = document.createElement('span');
     pin.setAttribute('style', 'left:30%;top:40%;position:fixed');
     server.append(pin);
     reapplyStyles(server);
-    expect(calls.sort()).toEqual(['--dss-map-h', 'left', 'top']);
+    expect(calls.sort()).toEqual(['--hoops-map-h', 'left', 'top']);
   });
 });

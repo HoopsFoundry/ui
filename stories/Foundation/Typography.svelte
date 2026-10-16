@@ -1,7 +1,7 @@
 <script>
   import { onMount } from 'svelte';
 
-  // Stufen der Type scale (tokens.css: --fs-*, --lh-*, --ls-*, --fw-*) und die zugehörige Klasse
+  // Stufen der Type scale (tokens.css: --hoops-fs-*, --hoops-lh-*, --hoops-ls-*, --hoops-fw-*) und die zugehörige Klasse
   const steps = [
     { id: 'display', use: 'Spielstand-Anzeige, Trikotnummer groß', sample: '87 : 64' },
     { id: 'clock',   use: 'Spielzeit, 24-s-Uhr (Mono)',           sample: '08:42' },
@@ -25,9 +25,9 @@
     const cs = getComputedStyle(document.documentElement);
     const v = (n) => cs.getPropertyValue(n).trim();
     const next = {};
-    for (const s of steps) next[s.id] = { fs: v(`--fs-${s.id}`), sm: v(`--fs-${s.id}-sm`), lh: v(`--lh-${s.id}`), ls: v(`--ls-${s.id}`), fw: v(`--fw-${s.id}`) };
+    for (const s of steps) next[s.id] = { fs: v(`--hoops-fs-${s.id}`), sm: v(`--hoops-fs-${s.id}-sm`), lh: v(`--hoops-lh-${s.id}`), ls: v(`--hoops-ls-${s.id}`), fw: v(`--hoops-fw-${s.id}`) };
     live = next;
-    fonts = { display: v('--font-display'), heading: v('--font-heading'), body: v('--font-body'), mono: v('--font-mono'), tt: v('--tt-display'), measure: v('--measure') };
+    fonts = { display: v('--hoops-font-display'), heading: v('--hoops-font-heading'), body: v('--hoops-font-body'), mono: v('--hoops-font-mono'), tt: v('--hoops-tt-display'), measure: v('--hoops-measure') };
   }
   onMount(() => {
     read();
@@ -46,10 +46,10 @@
   const sources = import.meta.glob(['../../css/*.css', '../../svelte/*.svelte'], { query: '?raw', import: 'default', eager: true });
   const scalePx = [88, 64, 44, 32, 28, 22, 20, 18, 15, 14, 13, 12, 11];
   const literal = new Map(); // feste px-Werte (sollten leer sein)
-  const viaToken = new Map(); // Nutzung der Tokens --fs-*
+  const viaToken = new Map(); // Nutzung der Tokens --hoops-fs-*
   for (const src of Object.values(sources)) {
     for (const m of String(src).matchAll(/font-size:\s*([0-9.]+)px/g)) literal.set(+m[1], (literal.get(+m[1]) || 0) + 1);
-    for (const m of String(src).matchAll(/font-size:\s*var\(--fs-([a-z-]+)\)/g)) viaToken.set(m[1], (viaToken.get(m[1]) || 0) + 1);
+    for (const m of String(src).matchAll(/font-size:\s*var\(--hoops-fs-([a-z-]+)\)/g)) viaToken.set(m[1], (viaToken.get(m[1]) || 0) + 1);
   }
   const literalRows = [...literal.entries()]
     .map(([px, n]) => {
@@ -83,10 +83,10 @@
         <div class="fam-h"><span class="name">{label}</span><span class="spec">{first(fonts[key])}</span><span class="use">{use}</span></div>
         <div class="weights">
           {#each weights as w}
-            <div class="w"><span class="wl">{w}</span><span style={`font-family: var(--font-${key}); font-weight: ${w}; font-size: 24px;`}>Aa Gg 0123</span></div>
+            <div class="w"><span class="wl">{w}</span><span style={`font-family: var(--hoops-font-${key}); font-weight: ${w}; font-size: 24px;`}>Aa Gg 0123</span></div>
           {/each}
         </div>
-        <div style={`font-family: var(--font-${key}); font-size: 18px; margin-top: 10px;`}>{pangram}</div>
+        <div style={`font-family: var(--hoops-font-${key}); font-size: 18px; margin-top: 10px;`}>{pangram}</div>
       </div>
     {/each}
 
@@ -138,7 +138,7 @@
 
   {:else}
     <p class="muted">
-      Gezählt aus <code>css/*.css</code> und <code>svelte/*.svelte</code>: <strong>{tokenTotal}</strong> Angaben über <code>--fs-*</code>,
+      Gezählt aus <code>css/*.css</code> und <code>svelte/*.svelte</code>: <strong>{tokenTotal}</strong> Angaben über <code>--hoops-fs-*</code>,
       <strong>{literalTotal}</strong> mit festem px-Wert.
     </p>
     {#if literalRows.length}
@@ -157,43 +157,43 @@
     <div class="cap" style="margin-top: 24px;">Nutzung der Stufen</div>
     <table class="audit">
       <thead><tr><th>Stufe</th><th>Vorkommen</th></tr></thead>
-      <tbody>{#each tokenRows as r}<tr><td>--fs-{r.id}</td><td>{r.n}</td></tr>{/each}</tbody>
+      <tbody>{#each tokenRows as r}<tr><td>--hoops-fs-{r.id}</td><td>{r.n}</td></tr>{/each}</tbody>
     </table>
   {/if}
 </div>
 
 <style>
-  .wrap { font-family: var(--font-body); color: var(--page-fg); }
-  .muted { color: var(--page-mute); margin: 0 0 20px; max-width: 72ch; }
-  code { font-family: var(--font-mono); font-size: 0.9em; }
-  .row { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 18px 0; border-top: 1px solid var(--page-line); align-items: baseline; }
-  .meta .name { font-family: var(--font-mono); font-size: 12px; font-weight: 700; }
-  .meta .spec { font-family: var(--font-mono); font-size: 11px; color: var(--page-mute); margin-top: 2px; }
-  .meta .use { font-size: 12px; color: var(--page-mute); margin-top: 4px; }
+  .wrap { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
+  .muted { color: var(--hoops-page-mute); margin: 0 0 20px; max-width: 72ch; }
+  code { font-family: var(--hoops-font-mono); font-size: 0.9em; }
+  .row { display: grid; grid-template-columns: 260px 1fr; gap: 24px; padding: 18px 0; border-top: 1px solid var(--hoops-page-line); align-items: baseline; }
+  .meta .name { font-family: var(--hoops-font-mono); font-size: 12px; font-weight: 700; }
+  .meta .spec { font-family: var(--hoops-font-mono); font-size: 11px; color: var(--hoops-page-mute); margin-top: 2px; }
+  .meta .use { font-size: 12px; color: var(--hoops-page-mute); margin-top: 4px; }
   .sample { overflow: hidden; }
-  .fam { padding: 18px 0 22px; border-top: 1px solid var(--page-line); }
+  .fam { padding: 18px 0 22px; border-top: 1px solid var(--hoops-page-line); }
   .fam-h { display: flex; gap: 16px; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; }
-  .fam-h .name { font-family: var(--font-mono); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
-  .fam-h .spec { font-family: var(--font-mono); font-size: 12px; }
-  .fam-h .use { font-size: 12px; color: var(--page-mute); }
+  .fam-h .name { font-family: var(--hoops-font-mono); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+  .fam-h .spec { font-family: var(--hoops-font-mono); font-size: 12px; }
+  .fam-h .use { font-size: 12px; color: var(--hoops-page-mute); }
   .weights { display: flex; flex-wrap: wrap; gap: 8px 28px; }
   .w { display: flex; flex-direction: column; gap: 2px; }
-  .wl { font-family: var(--font-mono); font-size: 10.5px; color: var(--page-mute); }
+  .wl { font-family: var(--hoops-font-mono); font-size: 10.5px; color: var(--hoops-page-mute); }
   .pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 32px; max-width: 640px; }
-  .cap { font-family: var(--font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); margin-bottom: 8px; }
-  .num { font-family: var(--font-mono); font-size: 28px; font-weight: 700; line-height: 1.3; }
+  .cap { font-family: var(--hoops-font-mono); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin-bottom: 8px; }
+  .num { font-family: var(--hoops-font-mono); font-size: 28px; font-weight: 700; line-height: 1.3; }
   .ctx { max-width: 720px; display: flex; flex-direction: column; gap: 14px; }
   .scoreline { display: flex; gap: 40px; align-items: center; padding: 8px 0; }
   .tbl { border-collapse: collapse; width: 100%; max-width: 420px; }
-  .tbl th, .tbl td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--page-line); }
+  .tbl th, .tbl td { text-align: left; padding: 8px 12px 8px 0; border-bottom: 1px solid var(--hoops-page-line); }
   .num-r { text-align: right !important; }
-  .ctx-in { width: 120px; height: 44px; padding: 0 12px; border: 1px solid var(--page-line); border-radius: var(--radius-md); background: var(--surface-0); color: var(--page-fg); }
-  .hint { color: var(--page-mute); margin: 0; }
-  .audit { border-collapse: collapse; font-family: var(--font-mono); font-size: 13px; }
-  .audit th, .audit td { text-align: left; padding: 6px 28px 6px 0; border-bottom: 1px solid var(--page-line); }
-  .audit th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .ctx-in { width: 120px; height: 44px; padding: 0 12px; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-md); background: var(--hoops-page-surface-0); color: var(--hoops-page-fg); }
+  .hint { color: var(--hoops-page-mute); margin: 0; }
+  .audit { border-collapse: collapse; font-family: var(--hoops-font-mono); font-size: 13px; }
+  .audit th, .audit td { text-align: left; padding: 6px 28px 6px 0; border-bottom: 1px solid var(--hoops-page-line); }
+  .audit th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .audit tr.off td { font-weight: 700; }
-  .ok { font-family: var(--font-mono); font-size: 13px; color: var(--dss-chip-ok-fg); }
+  .ok { font-family: var(--hoops-font-mono); font-size: 13px; color: var(--hoops-chip-ok-fg); }
   @media (max-width: 640px) {
     .row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .scoreline { flex-wrap: wrap; gap: 16px 32px; }

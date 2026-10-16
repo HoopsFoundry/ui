@@ -21,7 +21,7 @@ In den Beispielen dieser Seite sind die Ziele `h3` (unter den `##`-Abschnitten d
 
 <Canvas of={PageNavStories.Aufbau} />
 
-Jeder Link ist 44 px hoch (`--touch-sm`), bricht bei langen Titeln um und hat den gestrichelten Fokus-Ring. Der Link ist ein gewöhnlicher Link: Er funktioniert mit Rechtsklick, Mittelklick und Strg/Umschalt/Cmd („in neuem Tab“) wie jeder andere.
+Jeder Link ist 44 px hoch (`--hoops-touch-sm`), bricht bei langen Titeln um und hat den gestrichelten Fokus-Ring. Der Link ist ein gewöhnlicher Link: Er funktioniert mit Rechtsklick, Mittelklick und Strg/Umschalt/Cmd („in neuem Tab“) wie jeder andere.
 
 ## Einträge: Auswahl und Ausnahmen
 
@@ -78,7 +78,7 @@ Der Knopf hängt am Fenster. Die Vorschau ist deshalb eine eingebettete Seite (3
 
 ## Scrollabstand und Tokens
 
-Die Seitennavigation setzt **keine globalen Regeln** (kein `html { scroll-padding-bottom }`, kein `h2[id] { scroll-margin-top }`). Stattdessen hat jedes Ziel die Klasse `dss-pagenav-target`, deren `scroll-margin-top` `--dss-scroll-offset` plus `1rem` ist. Das Token `--dss-scroll-offset` ist die Höhe einer festen oberen Leiste und fällt auf `--dss-acc-sticky-top` des Accordions zurück, damit beide denselben Wert meinen. Wer zusätzlich Fokus und Tastatur schützen will, setzt die Opt-in-Klasse `dss-scroll-pad` auf `<html>` oder einen Scrollbereich (`scroll-padding-top` und `-bottom`).
+Die Seitennavigation setzt **keine globalen Regeln** (kein `html { scroll-padding-bottom }`, kein `h2[id] { scroll-margin-top }`). Stattdessen hat jedes Ziel die Klasse `dss-pagenav-target`, deren `scroll-margin-top` `--hoops-scroll-offset` plus `1rem` ist. Das Token `--hoops-scroll-offset` ist die Höhe einer festen oberen Leiste und fällt auf `--hoops-acc-sticky-top` des Accordions zurück, damit beide denselben Wert meinen. Wer zusätzlich Fokus und Tastatur schützen will, setzt die Opt-in-Klasse `dss-scroll-pad` auf `<html>` oder einen Scrollbereich (`scroll-padding-top` und `-bottom`).
 
 <FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
 
@@ -162,7 +162,7 @@ Optionen von `initBackToTop(options)`:
     ['showAfter', 'number', 'Gescrollte Pixel, ab denen er erscheint (Standard 480).'],
     ['target', 'string', "Auswahl des Fokusziels (Standard 'h1', Rückfall main)."],
     ['avoid', 'string | null', "Auswahl einer festen unteren Leiste (Standard '.dss-bnav'); null schaltet ab."],
-    ['offset', 'string', 'Zusätzlicher Abstand von unten als CSS-Länge (setzt --dss-backtop-offset).'],
+    ['offset', 'string', 'Zusätzlicher Abstand von unten als CSS-Länge (setzt --hoops-backtop-offset).'],
   ]}
 />
 

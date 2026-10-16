@@ -200,6 +200,8 @@
     "dist/",
     "scripts/lib/",
     "scripts/portal-sync.mjs",
+    "scripts/migrate-from-dss.mjs",
+    "scripts/migration-table.mjs",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -296,6 +298,7 @@
     "vite": "^7.0.0"
   },
   "bin": {
-    "dss-sync": "scripts/portal-sync.mjs"
+    "dss-sync": "scripts/portal-sync.mjs",
+    "hoops-migrate": "scripts/migrate-from-dss.mjs"
   }
 }

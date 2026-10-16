@@ -89,11 +89,11 @@ export function Kennzahlen() {
   );
 }`;
 
-export const tokensCss = `/* Schriftgrößen kommen aus den Tokens: --fs-h2 (Wert), --fs-h3 (kompakt), --fs-caption (Beschriftung und Buchstaben).
+export const tokensCss = `/* Schriftgrößen kommen aus den Tokens: --hoops-fs-h2 (Wert), --hoops-fs-h3 (kompakt), --hoops-fs-caption (Beschriftung und Buchstaben).
    Wer größere Werte will, ändert den Token oder überschreibt die Klasse in seinem Container. */
 .verein-kopf .dss-stats {
   gap: 1rem;                                           /* Abstand der Kacheln (Standard 0,75rem) */
 }
 .verein-kopf .dss-stats .dss-stat-value {
-  font-size: var(--fs-hero);
+  font-size: var(--hoops-fs-hero);
 }`;

@@ -37,21 +37,21 @@ describe('Accordion-CSS: Klassen und Tokens', () => {
   });
   it('Karte ist die Grundform des Bereichs (Rand, Radius, Schatten), flach nimmt sie weg', () => {
     const item = rule('.dss-acc-item');
-    expect(item).toMatch(/border:\s*1px solid var\(--dss-line\)/);
-    expect(item).toMatch(/border-radius:\s*var\(--dss-acc-radius,\s*var\(--radius-lg\)\)/);
-    expect(item).toMatch(/box-shadow:\s*var\(--shadow-sm\)/);
+    expect(item).toMatch(/border:\s*1px solid var\(--hoops-line\)/);
+    expect(item).toMatch(/border-radius:\s*var\(--hoops-acc-radius,\s*var\(--hoops-radius-lg\)\)/);
+    expect(item).toMatch(/box-shadow:\s*var\(--hoops-shadow-sm\)/);
     const flat = rule('.dss-acc--flat > .dss-acc-item');
     expect(flat).toMatch(/border-radius:\s*0/);
     expect(flat).toMatch(/box-shadow:\s*none/);
     expect(flat).toMatch(/border:\s*0/);
   });
   it('Tokens werden nur mit Rückfall gelesen und nicht auf :root vorbelegt', () => {
-    expect(acc).toMatch(/gap:\s*var\(--dss-acc-gap,\s*12px\)/);
-    expect(acc).toMatch(/padding:\s*var\(--dss-acc-pad,\s*12px 18px\)/);
-    expect(acc).toMatch(/var\(--dss-acc-radius,\s*var\(--radius-lg\)\)/);
-    expect(acc).toMatch(/font-size:\s*var\(--dss-acc-title-size,\s*var\(--dss-card-title-size,\s*var\(--dss-title-size,\s*var\(--fs-body-lg\)\)\)\)/);
-    expect(acc).toMatch(/top:\s*var\(--dss-acc-sticky-top,\s*0px\)/);
-    for (const token of ['--dss-acc-gap', '--dss-acc-pad', '--dss-acc-radius', '--dss-acc-title-size', '--dss-acc-sticky-top']) {
+    expect(acc).toMatch(/gap:\s*var\(--hoops-acc-gap,\s*12px\)/);
+    expect(acc).toMatch(/padding:\s*var\(--hoops-acc-pad,\s*12px 18px\)/);
+    expect(acc).toMatch(/var\(--hoops-acc-radius,\s*var\(--hoops-radius-lg\)\)/);
+    expect(acc).toMatch(/font-size:\s*var\(--hoops-acc-title-size,\s*var\(--hoops-card-title-size,\s*var\(--hoops-title-size,\s*var\(--hoops-fs-body-lg\)\)\)\)/);
+    expect(acc).toMatch(/top:\s*var\(--hoops-acc-sticky-top,\s*0px\)/);
+    for (const token of ['--hoops-acc-gap', '--hoops-acc-pad', '--hoops-acc-radius', '--hoops-acc-title-size', '--hoops-acc-sticky-top']) {
       expect(css, token).not.toMatch(new RegExp(`${token}\\s*:`));
       expect(tokens, token).not.toMatch(new RegExp(`${token}\\s*:`));
     }
@@ -82,27 +82,27 @@ describe('Accordion-CSS: Klassen und Tokens', () => {
     expect(rule('.dss-acc-nav-toggle')).toMatch(/min-height:\s*44px/);
     expect(acc).toMatch(/\.dss-acc--nested > \.dss-acc-item > \.dss-acc-title > \.dss-acc-trigger[^{]*\{[^}]*min-height:\s*44px/);
   });
-  it('verwendet keine nackten --*-text/--*-soft-Farben (nur --dss-*)', () => {
-    expect(acc).not.toMatch(/var\(--(ok|err|warn|info)-(text|soft)\)/);
-    expect(acc).not.toMatch(/var\(--[a-z]+-(text|soft)\)/);
+  it('verwendet keine nackten --*-text/--*-soft-Farben (nur --hoops-*)', () => {
+    expect(acc).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft)\)/);
+    expect(acc).not.toMatch(/var\(--hoops-(ok|err|warn|info|signal|cool|base)-(text|soft)\)/);
   });
   it('Elemente mit Hintergrund nutzen semantische Aliase', () => {
-    for (const sel of ['.dss-acc-item', '.dss-acc-nav-link', '.dss-acc-nav-toggle']) expect(rule(sel)).toMatch(/background:\s*var\(--dss-/);
+    for (const sel of ['.dss-acc-item', '.dss-acc-nav-link', '.dss-acc-nav-toggle']) expect(rule(sel)).toMatch(/background:\s*var\(--hoops-/);
   });
 });
 
 describe('Accordion-CSS: Fokus und Zustände', () => {
-  it('Fokus gestrichelt (--ring-style), innen mit -3px am Kopf', () => {
-    expect(rule('.dss-acc-trigger:focus-visible')).toMatch(/outline:\s*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/);
+  it('Fokus gestrichelt (--hoops-ring-style), innen mit -3px am Kopf', () => {
+    expect(rule('.dss-acc-trigger:focus-visible')).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     expect(rule('.dss-acc-trigger:focus-visible')).toMatch(/outline-offset:\s*-3px/);
     for (const sel of ['.dss-acc-nav-link:focus-visible', '.dss-acc-nav-toggle:focus-visible']) {
-      expect(rule(sel)).toMatch(/outline:\s*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/);
+      expect(rule(sel)).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     }
   });
   it('Hover, Aktiv, Offen und Gesperrt sind gestaltet', () => {
-    expect(acc).toMatch(/\.dss-acc-trigger:hover:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--dss-hover-bg\)/);
-    expect(acc).toMatch(/\.dss-acc-trigger:active:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--dss-surface-2\)/);
-    expect(acc).toMatch(/\.dss-acc-trigger\[aria-expanded="true"\][^{]*\{\s*background:\s*var\(--dss-hover-bg\)/);
+    expect(acc).toMatch(/\.dss-acc-trigger:hover:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--hoops-hover-bg\)/);
+    expect(acc).toMatch(/\.dss-acc-trigger:active:not\(\[aria-disabled="true"\]\)\s*\{\s*background:\s*var\(--hoops-surface-2\)/);
+    expect(acc).toMatch(/\.dss-acc-trigger\[aria-expanded="true"\][^{]*\{\s*background:\s*var\(--hoops-hover-bg\)/);
     expect(acc).toMatch(/\.dss-acc-trigger\[aria-disabled="true"\]\s*\{[^}]*cursor:\s*not-allowed/);
   });
   it('der Pfeil dreht sich um 180° bei offen (Button und details)', () => {
@@ -155,16 +155,16 @@ describe('Accordion-CSS: Bewegung reduzieren, data-motion, Druck', () => {
 
 describe('Accordion-CSS: Kopf klebt (sticky)', () => {
   const sticky = rule('.dss-acc--sticky:not(.dss-acc--nested) > .dss-acc-item.is-open > .dss-acc-title,\n.dss-acc--sticky:not(.dss-acc--nested) > details[open].dss-acc-item > summary.dss-acc-trigger');
-  it('position sticky mit Abstand aus --dss-acc-sticky-top, undurchsichtig, unter Overlays (z-index < 100)', () => {
+  it('position sticky mit Abstand aus --hoops-acc-sticky-top, undurchsichtig, unter Overlays (z-index < 100)', () => {
     expect(sticky).toMatch(/position:\s*sticky/);
-    expect(sticky).toMatch(/top:\s*var\(--dss-acc-sticky-top,\s*0px\)/);
-    expect(sticky).toMatch(/background:\s*var\(--dss-surface\)/);
+    expect(sticky).toMatch(/top:\s*var\(--hoops-acc-sticky-top,\s*0px\)/);
+    expect(sticky).toMatch(/background:\s*var\(--hoops-surface\)/);
     const z = Number(sticky.match(/z-index:\s*(\d+)/)![1]);
     expect(z).toBeLessThan(100);
     expect(z).toBeGreaterThan(1);
   });
   it('scroll-margin-top berücksichtigt den klebenden Kopf', () => {
-    expect(rule('.dss-acc-item')).toMatch(/scroll-margin-top:\s*calc\(var\(--dss-acc-sticky-top,\s*0px\) \+ 8px\)/);
+    expect(rule('.dss-acc-item')).toMatch(/scroll-margin-top:\s*calc\(var\(--hoops-acc-sticky-top,\s*0px\) \+ 8px\)/);
   });
   it('kein overflow:hidden zwischen Bereich und Kopf (würde position: sticky brechen)', () => {
     expect(rule('.dss-acc-item')).not.toMatch(/overflow/);
@@ -193,33 +193,33 @@ describe('Accordion-CSS: Sprungleiste unter und über 640 px', () => {
     expect(rule('.dss-acc-nav-list')).toMatch(/flex-wrap:\s*wrap/);
   });
   it('der aktuelle Link ist hervorgehoben (aria-current)', () => {
-    expect(acc).toMatch(/\.dss-acc-nav-link\[aria-current="true"\]\s*\{[^}]*background:\s*var\(--dss-btn-bg\)[^}]*color:\s*var\(--dss-btn-fg\)/);
+    expect(acc).toMatch(/\.dss-acc-nav-link\[aria-current="true"\]\s*\{[^}]*background:\s*var\(--hoops-btn-bg\)[^}]*color:\s*var\(--hoops-btn-fg\)/);
   });
 });
 
 describe('Accordion-Kontraste (Text ≥ 7:1, Pfeil und Fokus ≥ 3:1) in Hell/Dunkel und beiden Marken', () => {
   const blocks = {
     Hell: blockOf(css, '/* ── Semantische Aliase · Light'),
-    'Dunkel (Media-Query)': blockOf(css, ':root:not([data-theme="light"]) {\n    --dss-fg'),
-    'Dunkel (data-theme)': blockOf(css, ':root[data-theme="dark"] {\n  --dss-fg'),
+    'Dunkel (Media-Query)': blockOf(css, ':root:not([data-theme="light"]) {\n    --hoops-fg'),
+    'Dunkel (data-theme)': blockOf(css, ':root[data-theme="dark"] {\n  --hoops-fg'),
   };
   const dbb = blockOf(tokens, ':root[data-brand="dbb"] {');
   const AAA = 7;
   for (const [name, block] of Object.entries(blocks)) {
     for (const brand of ['BBV', 'DBB'] as const) {
-      const scope = `--h-signal: var(${brand === 'BBV' ? '--h-amber' : '--h-gold'});\n${block}\n${brand === 'DBB' ? dbb + '\n' : ''}${tokens}`;
+      const scope = `--hoops-h-signal: var(${brand === 'BBV' ? '--hoops-h-amber' : '--hoops-h-gold'});\n${block}\n${brand === 'DBB' ? dbb + '\n' : ''}${tokens}`;
       const c = (token: string) => color(`var(${token})`, scope);
       it(`${name}, ${brand}`, () => {
-        for (const bg of ['--dss-surface', '--dss-hover-bg', '--dss-surface-2']) {
-          expect(ratio(c('--dss-fg'), c(bg)), `Titel auf ${bg}`).toBeGreaterThanOrEqual(AAA);
-          expect(ratio(c('--dss-mute'), c(bg)), `Zusatzinfo auf ${bg}`).toBeGreaterThanOrEqual(AAA);
-          expect(ratio(c('--ring-color'), c(bg)), `Fokus-Ring auf ${bg}`).toBeGreaterThanOrEqual(3);
+        for (const bg of ['--hoops-surface', '--hoops-hover-bg', '--hoops-surface-2']) {
+          expect(ratio(c('--hoops-fg'), c(bg)), `Titel auf ${bg}`).toBeGreaterThanOrEqual(AAA);
+          expect(ratio(c('--hoops-mute'), c(bg)), `Zusatzinfo auf ${bg}`).toBeGreaterThanOrEqual(AAA);
+          expect(ratio(c('--hoops-ring-color'), c(bg)), `Fokus-Ring auf ${bg}`).toBeGreaterThanOrEqual(3);
         }
-        expect(ratio(c('--dss-fg-soft'), c('--dss-surface')), 'Inhalt').toBeGreaterThanOrEqual(AAA);
-        expect(ratio(c('--dss-fg-soft'), c('--dss-surface')), 'Sprunglink').toBeGreaterThanOrEqual(AAA);
-        expect(ratio(c('--dss-btn-fg'), c('--dss-btn-bg')), 'aktueller Sprunglink').toBeGreaterThanOrEqual(AAA);
-        expect(ratio(c('--dss-fg'), c('--dss-surface-2')), 'Sprungleisten-Schalter').toBeGreaterThanOrEqual(AAA);
-        expect(ratio(c('--dss-line-strong'), c('--dss-surface')) >= 1.2).toBe(true);
+        expect(ratio(c('--hoops-fg-soft'), c('--hoops-surface')), 'Inhalt').toBeGreaterThanOrEqual(AAA);
+        expect(ratio(c('--hoops-fg-soft'), c('--hoops-surface')), 'Sprunglink').toBeGreaterThanOrEqual(AAA);
+        expect(ratio(c('--hoops-btn-fg'), c('--hoops-btn-bg')), 'aktueller Sprunglink').toBeGreaterThanOrEqual(AAA);
+        expect(ratio(c('--hoops-fg'), c('--hoops-surface-2')), 'Sprungleisten-Schalter').toBeGreaterThanOrEqual(AAA);
+        expect(ratio(c('--hoops-line-strong'), c('--hoops-surface')) >= 1.2).toBe(true);
       });
     }
   }

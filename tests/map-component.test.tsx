@@ -495,13 +495,13 @@ describe.each(drivers)('Karte · $name', (driver) => {
     it('height setzt die Höhe über die Variable (mindestens 200); dimInDark steuert data-dim; class wird angehängt', async () => {
       const m = open(driver, { height: 400, dimInDark: false, ...(driver.name === 'Svelte' ? { class: 'meine-karte' } : { className: 'meine-karte' }) });
       const root = q(m, '.dss-map')!;
-      expect(style(root)).toContain('--dss-map-h:400px');
+      expect(style(root)).toContain('--hoops-map-h:400px');
       expect(root.getAttribute('data-dim')).toBe('false');
       expect(root.classList.contains('meine-karte')).toBe(true);
       await m.set({ height: 50 });
-      expect(style(root)).toContain('--dss-map-h:200px');
+      expect(style(root)).toContain('--hoops-map-h:200px');
       await m.set({ height: Number.NaN, dimInDark: true });
-      expect(style(root)).toContain('--dss-map-h:320px');
+      expect(style(root)).toContain('--hoops-map-h:320px');
       expect(root.getAttribute('data-dim')).toBe('true');
     });
   });

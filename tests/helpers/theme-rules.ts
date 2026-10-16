@@ -249,7 +249,7 @@ export function themeCssRules(css: string): Rules {
     'Abschnitt vorhanden': text.length > 200,
     'CSS: Symbole wechseln über den Zustand (Mond im Dunkelmodus, Sonne sonst)': /display:\s*none/.test(sun),
     'CSS: Symbolgröße 20 px': /width:\s*20px/.test(bodyOf(rules, '.dss-theme-toggle .dss-theme-icon')) && /height:\s*20px/.test(bodyOf(rules, '.dss-theme-toggle .dss-theme-icon')),
-    'CSS: gedrückt zeigt die Auswahlfläche': /background:\s*var\(--dss-selected-bg\)/.test(bodyOf(rules, '.dss-theme-toggle[aria-pressed="true"]')),
+    'CSS: gedrückt zeigt die Auswahlfläche': /background:\s*var\(--hoops-selected-bg\)/.test(bodyOf(rules, '.dss-theme-toggle[aria-pressed="true"]')),
     'CSS: kein festes Hex': !/#[0-9a-fA-F]{3,8}\b/.test(text),
   };
 }

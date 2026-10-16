@@ -66,12 +66,12 @@
     {:else if mode === 'tokens'}
       <div class="row">
         <div class="col">
-          <h3 class="cap">titleAs=h2, --dss-title-size: var(--fs-body-md)</h3>
-          <div style="--dss-title-size: var(--fs-body-md)"><PlayerCard jersey="4" name="J. Tanner" position="PG" titleAs="h2" /></div>
+          <h3 class="cap">titleAs=h2, --hoops-title-size: var(--hoops-fs-body-md)</h3>
+          <div style="--hoops-title-size: var(--hoops-fs-body-md)"><PlayerCard jersey="4" name="J. Tanner" position="PG" titleAs="h2" /></div>
         </div>
         <div class="col">
-          <h3 class="cap">titleAs=h4, --dss-title-size: var(--fs-h2)</h3>
-          <div style="--dss-title-size: var(--fs-h2)"><PlayerCard jersey="4" name="J. Tanner" position="PG" titleAs="h4" /></div>
+          <h3 class="cap">titleAs=h4, --hoops-title-size: var(--hoops-fs-h2)</h3>
+          <div style="--hoops-title-size: var(--hoops-fs-h2)"><PlayerCard jersey="4" name="J. Tanner" position="PG" titleAs="h4" /></div>
         </div>
       </div>
     {:else if mode === 'do-ebenen'}
@@ -85,7 +85,7 @@
       </div>
     {:else if mode === 'do-groesse'}
       <h2 class="dss-t-h3">Kader</h2>
-      <div class="row" style="--dss-card-title-size: var(--fs-h3)">
+      <div class="row" style="--hoops-card-title-size: var(--hoops-fs-h3)">
         <HeadingLevel level={3}>{@render spieler()}</HeadingLevel>
       </div>
     {:else if mode === 'dont-groesse'}
@@ -106,19 +106,19 @@
 
   <ul class="outline" aria-hidden="true">
     {#each outline as item}
-      <li style="--d: {item.level - 1}"><code>h{item.level}</code> {item.text}</li>
+      <li style="--hoops-d: {item.level - 1}"><code>h{item.level}</code> {item.text}</li>
     {/each}
   </ul>
 </div>
 
 <style>
-  .wrap { font-family: var(--font-body); color: var(--page-fg); }
+  .wrap { font-family: var(--hoops-font-body); color: var(--hoops-page-fg); }
   .stage { display: grid; gap: 16px; }
   .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
   .col { display: grid; gap: 8px; min-width: 0; }
-  .cap { margin: 0; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
-  .outline { list-style: none; margin: 20px 0 0; padding: 12px 14px; border: 1px dashed var(--page-line); border-radius: var(--radius-md); display: grid; gap: 4px; font-size: var(--fs-body-sm); color: var(--page-mute); }
-  .outline::before { content: 'Gliederung dieses Beispiels'; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-  .outline li { padding-left: calc(var(--d) * 18px); }
-  .outline code { font-family: var(--font-mono); font-weight: 700; color: var(--page-fg); }
+  .cap { margin: 0; font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
+  .outline { list-style: none; margin: 20px 0 0; padding: 12px 14px; border: 1px dashed var(--hoops-page-line); border-radius: var(--hoops-radius-md); display: grid; gap: 4px; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-mute); }
+  .outline::before { content: 'Gliederung dieses Beispiels'; font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .outline li { padding-left: calc(var(--hoops-d) * 18px); }
+  .outline code { font-family: var(--hoops-font-mono); font-weight: 700; color: var(--hoops-page-fg); }
 </style>

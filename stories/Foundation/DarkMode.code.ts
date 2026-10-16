@@ -90,7 +90,7 @@ Content-Security-Policy: script-src 'self' 'nonce-<zufällig je Antwort>'
 
 export const cssTokens = `/* Tokens reagieren nur auf <html>: data-theme="light|dark" erzwingt, ohne Attribut gilt prefers-color-scheme. */
 .karte {
-  background: var(--dss-surface);       /* nie ein festes #fff */
-  color: var(--dss-fg);
-  border: 1px solid var(--dss-line);
+  background: var(--hoops-surface);       /* nie ein festes #fff */
+  color: var(--hoops-fg);
+  border: 1px solid var(--hoops-line);
 }`;

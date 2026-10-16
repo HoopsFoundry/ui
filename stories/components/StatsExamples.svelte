@@ -102,9 +102,9 @@
   .narrow { width: 100%; max-width: 380px; }
   .medium { width: 100%; max-width: 640px; }
   .gap { height: 14px; }
-  .surface { background: var(--dss-surface); border: 1px solid var(--dss-line); border-radius: var(--radius-lg); padding: 14px 18px; }
-  .cap { margin-bottom: 10px; font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
-  .row { display: flex; align-items: center; gap: 14px; font-size: var(--fs-body-md); color: var(--page-fg); }
+  .surface { background: var(--hoops-surface); border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-lg); padding: 14px 18px; }
+  .cap { margin-bottom: 10px; font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
+  .row { display: flex; align-items: center; gap: 14px; font-size: var(--hoops-fs-body-md); color: var(--hoops-page-fg); }
   .who { min-width: 12rem; }
   /* Don't: gleiche Form, nur Farbe */
   .dont-dots { display: inline-flex; gap: 5px; }

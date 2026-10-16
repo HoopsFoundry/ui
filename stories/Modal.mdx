@@ -22,13 +22,13 @@ Jedes Modal hat denselben Aufbau. Verändert werden nur Größe, Symbol-Tönung 
   label="Bestandteile eines Modals"
   head={['Teil', 'Klasse', 'Beschreibung']}
   rows={[
-    ['Hintergrund', 'dss-backdrop', <>Halbtransparente Fläche (<code>--backdrop</code>) mit 4 px Unschärfe über der ganzen Seite.</>],
-    ['Fläche', 'dss-modal', <>Radius <code>--radius-xl</code>, Schatten <code>--shadow-xl</code>, höchstens die Fensterhöhe minus 48 px, nie breiter als das Fenster.</>],
+    ['Hintergrund', 'dss-backdrop', <>Halbtransparente Fläche (<code>--hoops-backdrop</code>) mit 4 px Unschärfe über der ganzen Seite.</>],
+    ['Fläche', 'dss-modal', <>Radius <code>--hoops-radius-xl</code>, Schatten <code>--hoops-shadow-xl</code>, höchstens die Fensterhöhe minus 48 px, nie breiter als das Fenster.</>],
     ['Symbol', 'dss-m-head-icon', <>Optional, getönt nach Schweregrad (<code>danger</code>, <code>warn</code>, <code>ok</code>, <code>info</code>). Bei <code>default</code> entfällt es.</>],
-    ['Titel und Untertitel', 'dss-m-title, dss-m-subtitle', <>Titel in <code>--font-display</code>, 700, <code>--fs-h3</code> (20 px). Der Untertitel ist eine Mono-Zeile in Großbuchstaben mit <code>--dss-mute</code>.</>],
+    ['Titel und Untertitel', 'dss-m-title, dss-m-subtitle', <>Titel in <code>--hoops-font-display</code>, 700, <code>--hoops-fs-h3</code> (20 px). Der Untertitel ist eine Mono-Zeile in Großbuchstaben mit <code>--hoops-mute</code>.</>],
     ['Schließen', 'dss-m-close', 'Runder 32-px-Button oben rechts, nur mit closable.'],
-    ['Inhalt', 'dss-m-body', <>Text in <code>--fs-body</code> (15 px). Bei viel Inhalt scrollt nur dieser Bereich, Kopf und Fuß bleiben stehen.</>],
-    ['Fuß', 'dss-m-footer', <>Aktionen rechtsbündig mit 8 px Abstand auf <code>--dss-surface-2</code>, die Hauptaktion steht rechts außen. Entfällt, wenn kein Fuß übergeben wird.</>],
+    ['Inhalt', 'dss-m-body', <>Text in <code>--hoops-fs-body</code> (15 px). Bei viel Inhalt scrollt nur dieser Bereich, Kopf und Fuß bleiben stehen.</>],
+    ['Fuß', 'dss-m-footer', <>Aktionen rechtsbündig mit 8 px Abstand auf <code>--hoops-surface-2</code>, die Hauptaktion steht rechts außen. Entfällt, wenn kein Fuß übergeben wird.</>],
   ]}
 />
 
@@ -119,7 +119,7 @@ Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das obe
 
 ### Überschriftenebene im Markup
 
-Es gibt in Vanilla keinen `HeadingLevel`-Kontext: Die Ebene steht im Markup. Der Titel ist das Element mit `class="dss-m-title"` (oder `data-dss-modal-title`); sein Tag wählst du, `h2` ist der Standard wie bei `titleAs` in Svelte und React, erlaubt sind `h2` bis `h6`. Überschriften im Inhalt bekommen die nächste Ebene (Titel `h2`, darin `h3`); die Größe hängt am Token `--dss-title-size`, nicht an der Ebene. Die Rangfolge: der Tag, den du schreibst, gilt; das Skript ändert ihn nie. Hat das Modal weder `aria-labelledby` noch `aria-label`, verbindet `initModal` den Titel mit dem Dialog (und vergibt dafür eine id, falls er keine hat). Titel und Inhalt sind Text: das Skript baut nichts mit `innerHTML`, setzt du Texte aus Daten ein, dann mit `textContent` oder `createContextualFragment` auf geprüftem Markup.
+Es gibt in Vanilla keinen `HeadingLevel`-Kontext: Die Ebene steht im Markup. Der Titel ist das Element mit `class="dss-m-title"` (oder `data-dss-modal-title`); sein Tag wählst du, `h2` ist der Standard wie bei `titleAs` in Svelte und React, erlaubt sind `h2` bis `h6`. Überschriften im Inhalt bekommen die nächste Ebene (Titel `h2`, darin `h3`); die Größe hängt am Token `--hoops-title-size`, nicht an der Ebene. Die Rangfolge: der Tag, den du schreibst, gilt; das Skript ändert ihn nie. Hat das Modal weder `aria-labelledby` noch `aria-label`, verbindet `initModal` den Titel mit dem Dialog (und vergibt dafür eine id, falls er keine hat). Titel und Inhalt sind Text: das Skript baut nichts mit `innerHTML`, setzt du Texte aus Daten ein, dann mit `textContent` oder `createContextualFragment` auf geprüftem Markup.
 
 ## Handy · 390 px Breite
 
@@ -160,7 +160,7 @@ Zusätzlich gibt es je nach Fassung:
     ['onclose', 'Svelte', 'Wird nach dem Schließen aufgerufen (Escape, Button, mit dismissOnBackdrop auch Hintergrund).'],
     ['onOpenChange', 'React', 'Wird bei jedem Wunsch zu schließen aufgerufen: Escape, Button, mit dismissOnBackdrop auch Hintergrund.'],
     ['HeadingLevel im Inhalt', 'Svelte, React', <>Das Modal gibt seinem Inhalt die Ebene <code>titleAs + 1</code> (Titel <code>h2</code>, Titelkomponenten darin <code>h3</code>), auch im Radix-Portal. Ein eigenes <code>HeadingLevel</code> oder <code>titleAs</code> an einer Komponente im Inhalt gewinnt. Mehr auf der Seite <a href="?path=/docs/foundation-headings--docs">Headings</a>.</>],
-    ['Größen-Token am Container', 'React', <>Das React-Modal rendert über ein Radix-Portal an <code>body</code> und erreicht Größen-Tokens (<code>--dss-title-size</code>), die an einem Container gesetzt sind, nicht; die Svelte-Fassung rendert inline. Setze das Token für Modals am <code>:root</code> oder am <code>body</code>.</>],
+    ['Größen-Token am Container', 'React', <>Das React-Modal rendert über ein Radix-Portal an <code>body</code> und erreicht Größen-Tokens (<code>--hoops-title-size</code>), die an einem Container gesetzt sind, nicht; die Svelte-Fassung rendert inline. Setze das Token für Modals am <code>:root</code> oder am <code>body</code>.</>],
     ['dismissOnBackdrop', 'Svelte, React', <>Mit <code>true</code> schließt ein Klick neben das Modal es (Standard <code>false</code>). Wirkt nur mit <code>closable</code>.</>],
     ['closeLabel', 'React', <>Zugänglicher Name des Schließen-Buttons (Standard „Schließen“).</>],
     ['className', 'React', 'Zusätzliche Klasse an der Modal-Fläche.'],

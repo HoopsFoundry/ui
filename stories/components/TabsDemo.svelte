@@ -56,9 +56,9 @@
   {#if sidebar}
     <div style="display: flex; gap: 24px; align-items: flex-start;">
       <Tabs {items} {variant} {size} {value} />
-      <div style="flex:1;background:var(--surface-0);border:1px solid var(--page-line);border-radius:var(--radius-lg);padding:24px;min-height:240px;max-width:480px;">
-        <h3 style="margin:0 0 8px;font-family:var(--font-display);">Settings-Section</h3>
-        <p style="margin:0;color:var(--dss-fg-soft);font-size:14px;">Inhalt der gewählten Section.</p>
+      <div style="flex:1;background:var(--hoops-page-surface-0);border:1px solid var(--hoops-page-line);border-radius:var(--hoops-radius-lg);padding:24px;min-height:240px;max-width:480px;">
+        <h3 style="margin:0 0 8px;font-family:var(--hoops-font-display);">Settings-Section</h3>
+        <p style="margin:0;color:var(--hoops-fg-soft);font-size:14px;">Inhalt der gewählten Section.</p>
       </div>
     </div>
   {:else}

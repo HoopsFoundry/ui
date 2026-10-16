@@ -142,7 +142,7 @@ export function stickyOffset(el) {
 
 /**
  * Scrollt das Element in Sicht (nach dem nächsten Frame, damit ein gerade geöffneter Bereich schon im Layout steht). Der Abstand nach
- * oben (`scroll-margin-top`) enthält `--dss-acc-sticky-top`, 8 px und die Höhe des klebenden Kopfes eines umgebenden Bereichs
+ * oben (`scroll-margin-top`) enthält `--hoops-acc-sticky-top`, 8 px und die Höhe des klebenden Kopfes eines umgebenden Bereichs
  * (`stickyOffset`), damit ein verschachteltes Ziel nicht unter dem Kopf der Eltern verschwindet. `options.behavior` ist `'auto'` (Standard,
  * sofort) oder `'smooth'`.
  */
@@ -153,7 +153,7 @@ export function scrollToElement(el, options = {}) {
     if (typeof el.scrollIntoView !== 'function') return;
     const extra = stickyOffset(el);
     const before = el.style.scrollMarginTop;
-    if (extra) el.style.scrollMarginTop = `calc(var(--dss-acc-sticky-top, 0px) + 8px + ${extra}px)`;
+    if (extra) el.style.scrollMarginTop = `calc(var(--hoops-acc-sticky-top, 0px) + 8px + ${extra}px)`;
     el.scrollIntoView({ block: 'start', behavior });
     if (extra) el.style.scrollMarginTop = before;
   };

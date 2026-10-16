@@ -20,7 +20,7 @@ describe('Map: CSS-Abschnitt', () => {
     expect(manifest.Map.export).toBe('MapView');
   });
 
-  it('Zoom-Schaltflächen sind mindestens 44 px breit und hoch (Zahl aus px oder aus --touch-sm gerechnet)', () => {
+  it('Zoom-Schaltflächen sind mindestens 44 px breit und hoch (Zahl aus px oder aus --hoops-touch-sm gerechnet)', () => {
     const btn = body('.dss-map-zoom-btn');
     const px = (value: string) => {
       const token = value.match(/^var\((--[\w-]+)\)$/);
@@ -32,7 +32,7 @@ describe('Map: CSS-Abschnitt', () => {
       const value = btn.match(new RegExp(`(?:^|[;\\s])${prop}:\\s*([^;]+);`))![1].trim();
       expect(px(value), `${prop}: ${value}`).toBeGreaterThanOrEqual(44);
     }
-    expect(px('var(--touch-sm)')).toBe(44);
+    expect(px('var(--hoops-touch-sm)')).toBe(44);
   });
 
   it('Marker haben eine Zielgröße von 44 px Breite (Icon 44 × 46 im Skript)', () => {
@@ -40,11 +40,11 @@ describe('Map: CSS-Abschnitt', () => {
     expect(js).toMatch(/iconSize: \[44, 46\]/);
   });
 
-  it('Fokus-Ringe sind gestrichelt (--ring-style) an Zoom, Kartenfläche, Marker, Quellenlink und Sprungmarke', () => {
+  it('Fokus-Ringe sind gestrichelt (--hoops-ring-style) an Zoom, Kartenfläche, Marker, Quellenlink und Sprungmarke', () => {
     for (const selector of ['.dss-map-zoom-btn:focus-visible', '.dss-map-canvas.leaflet-container:focus-visible', '.dss-map-marker:focus-visible', '.dss-map-attr a:focus-visible', '.dss-map-skip:focus-visible']) {
-      expect(body(selector), selector).toMatch(/outline:\s*var\(--ring-w\) var\(--ring-style\) var\(--ring-color\)/);
+      expect(body(selector), selector).toMatch(/outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/);
     }
-    expect(map).not.toMatch(/outline:\s*(?!var\(--ring-w\)|none)[^;]*solid/);
+    expect(map).not.toMatch(/outline:\s*(?!var\(--hoops-ring-w\)|none)[^;]*solid/);
   });
 
   it('gesperrter Zoom: aria-disabled grau und mit Cursor-Hinweis, kein Hover', () => {
@@ -81,7 +81,7 @@ describe('Map: CSS-Abschnitt', () => {
     expect(attr).not.toMatch(/display:\s*none|opacity|visibility/);
     expect(attr).toMatch(/z-index:\s*1001/);
     expect(body('.dss-map-attr a')).toMatch(/min-height:\s*28px/);
-    expect(body('.dss-map-attr')).toMatch(/background:\s*var\(--dss-surface\)/);
+    expect(body('.dss-map-attr')).toMatch(/background:\s*var\(--hoops-surface\)/);
   });
 
   it('Platzhalter und Status liegen über den Leaflet-Ebenen (z-index ab 900)', () => {
@@ -91,15 +91,15 @@ describe('Map: CSS-Abschnitt', () => {
   });
 
   it('keine nackten --ok/err/warn/info-text oder -soft (haben keinen Dunkelmodus), kein festes Hex, keine Elementselektoren für Überschriften', () => {
-    expect(map).not.toMatch(/var\(--(ok|err|warn|info)-(text|soft|fill)\)/);
+    expect(map).not.toMatch(/var\(--hoops-(ok|err|warn|info)-(text|soft|fill)\)/);
     expect(map.replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/#[0-9a-fA-F]{3,8}\b/);
     expect(RULES.filter(([s]) => /(^|[\s>+~,])h[1-6](?![-\w])/.test(s))).toEqual([]);
   });
 
   it('Pin-Farben laufen über Tokens mit Rückfall (Marken und Themes ändern sie nicht)', () => {
-    expect(body('.dss-map-pin-body')).toMatch(/fill:\s*var\(--dss-map-pin-bg, var\(--base-1000\)\)/);
-    expect(body('.dss-map-pin-body')).toMatch(/stroke:\s*var\(--dss-map-pin-ring, var\(--n-0\)\)/);
-    expect(body('.dss-map-marker.is-own .dss-map-pin-body')).toMatch(/var\(--dss-cta-bg\)/);
+    expect(body('.dss-map-pin-body')).toMatch(/fill:\s*var\(--hoops-map-pin-bg, var\(--hoops-base-1000\)\)/);
+    expect(body('.dss-map-pin-body')).toMatch(/stroke:\s*var\(--hoops-map-pin-ring, var\(--hoops-n-0\)\)/);
+    expect(body('.dss-map-marker.is-own .dss-map-pin-body')).toMatch(/var\(--hoops-cta-bg\)/);
   });
 });
 
@@ -178,8 +178,8 @@ describe('Map: Quelltext', () => {
 // ── Kontraste: Text ≥ 7:1 (AAA), Marker und Rahmen ≥ 3:1; Hell, Dunkel (Media-Query und data-theme), BBV und DBB ──
 const blocks = {
   Hell: blockOf(css, '/* ── Semantische Aliase · Light'),
-  'Dunkel (Media-Query)': blockOf(css, ':root:not([data-theme="light"]) {\n    --dss-fg'),
-  'Dunkel (data-theme)': blockOf(css, ':root[data-theme="dark"] {\n  --dss-fg'),
+  'Dunkel (Media-Query)': blockOf(css, ':root:not([data-theme="light"]) {\n    --hoops-fg'),
+  'Dunkel (data-theme)': blockOf(css, ':root[data-theme="dark"] {\n  --hoops-fg'),
 };
 const dbb = blockOf(tokens, ':root[data-brand="dbb"] {');
 
@@ -190,49 +190,49 @@ const dim = (c: Rgb, factor: number): Rgb => over([0, 0, 0] as Rgb, c, 1 - facto
 describe('Map: Kontraste', () => {
   for (const [name, block] of Object.entries(blocks)) {
     for (const brand of ['BBV', 'DBB'] as const) {
-      const scope = `--h-signal: var(${brand === 'BBV' ? '--h-amber' : '--h-gold'});\n${blocks.Hell}\n${block}\n${brand === 'DBB' ? dbb : ''}\n${tokens}`;
+      const scope = `--hoops-h-signal: var(${brand === 'BBV' ? '--hoops-h-amber' : '--hoops-h-gold'});\n${blocks.Hell}\n${block}\n${brand === 'DBB' ? dbb : ''}\n${tokens}`;
       const c = (token: string) => color(`var(${token})`, scope);
       const dark = name.startsWith('Dunkel');
       describe(`${name}, ${brand}`, () => {
-        it('Quellenangabe (--dss-link auf --dss-surface) und Text ≥ 7:1', () => {
-          expect(ratio(c('--dss-link'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
-          expect(ratio(c('--dss-fg'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
-          expect(ratio(c('--dss-fg-soft'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
+        it('Quellenangabe (--hoops-link auf --hoops-surface) und Text ≥ 7:1', () => {
+          expect(ratio(c('--hoops-link'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
+          expect(ratio(c('--hoops-fg'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
+          expect(ratio(c('--hoops-fg-soft'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
         });
-        it('Koordinaten (--dss-mute) auf Seite und Fläche ≥ 7:1, Platzhalter-Hinweis (--dss-fg-soft auf --dss-surface)', () => {
-          for (const surface of ['--dss-surface', '--dss-surface-2']) expect(ratio(c('--dss-mute'), c(surface)), surface).toBeGreaterThanOrEqual(7);
+        it('Koordinaten (--hoops-mute) auf Seite und Fläche ≥ 7:1, Platzhalter-Hinweis (--hoops-fg-soft auf --hoops-surface)', () => {
+          for (const surface of ['--hoops-surface', '--hoops-surface-2']) expect(ratio(c('--hoops-mute'), c(surface)), surface).toBeGreaterThanOrEqual(7);
         });
         it('Zoom-Schaltfläche: Zeichen ≥ 7:1 auf der Fläche, Rand und Ring ≥ 3:1', () => {
-          expect(ratio(c('--dss-fg'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
-          expect(ratio(c('--dss-fg'), c('--dss-hover-bg'))).toBeGreaterThanOrEqual(7);
-          expect(ratio(c('--dss-line-strong'), c('--dss-surface-2'))).toBeGreaterThanOrEqual(1.2);
+          expect(ratio(c('--hoops-fg'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
+          expect(ratio(c('--hoops-fg'), c('--hoops-hover-bg'))).toBeGreaterThanOrEqual(7);
+          expect(ratio(c('--hoops-line-strong'), c('--hoops-surface-2'))).toBeGreaterThanOrEqual(1.2);
         });
-        it('Marker: Nummer (Weiß auf Pin) und eigene Nummer (--dss-cta-fg auf --dss-cta-bg) ≥ 7:1', () => {
-          expect(ratio(c('--n-0'), c('--base-1000'))).toBeGreaterThanOrEqual(7);
-          expect(ratio(c('--dss-cta-fg'), c('--dss-cta-bg'))).toBeGreaterThanOrEqual(7);
+        it('Marker: Nummer (Weiß auf Pin) und eigene Nummer (--hoops-cta-fg auf --hoops-cta-bg) ≥ 7:1', () => {
+          expect(ratio(c('--hoops-n-0'), c('--hoops-base-1000'))).toBeGreaterThanOrEqual(7);
+          expect(ratio(c('--hoops-cta-fg'), c('--hoops-cta-bg'))).toBeGreaterThanOrEqual(7);
         });
         it('Marker gegen helle und dunkle Kacheln: Füllung oder Ring mit ≥ 3:1 (beide Kachelhelligkeiten)', () => {
           for (const [tile, rgb] of Object.entries(TILES)) {
             const shown = dark ? dim(rgb, 0.8) : rgb;
             // Außen die dunkle Kontur, dann der weiße Ring: beide zusammen umranden den Pin (auch den eigenen in Gold); jeder Kachelton hebt sich von mindestens einem ab
-            const edge = c('--base-1000');
-            const ring = c('--n-0');
+            const edge = c('--hoops-base-1000');
+            const ring = c('--hoops-n-0');
             expect(Math.max(ratio(edge, shown), ratio(ring, shown)), `Rand auf ${tile}`).toBeGreaterThanOrEqual(3);
             // Der Pin-Körper (dunkel) hebt sich vom weißen Ring ab, die Nummer steht auf dem Körper
-            expect(ratio(c('--base-1000'), ring)).toBeGreaterThanOrEqual(7);
+            expect(ratio(c('--hoops-base-1000'), ring)).toBeGreaterThanOrEqual(7);
             // Der goldene Körper des eigenen Pins hebt sich von der dunklen Kontur ab
-            expect(ratio(c('--dss-cta-bg'), edge)).toBeGreaterThanOrEqual(7);
+            expect(ratio(c('--hoops-cta-bg'), edge)).toBeGreaterThanOrEqual(7);
           }
         });
         it('Fokus-Ring auf Fläche ≥ 3:1', () => {
-          const ring = dark ? c('--ring-color-on-dark') : c('--ring-color');
-          expect(ratio(ring, c('--dss-surface'))).toBeGreaterThanOrEqual(3);
+          const ring = dark ? c('--hoops-ring-color-on-dark') : c('--hoops-ring-color');
+          expect(ratio(ring, c('--hoops-surface'))).toBeGreaterThanOrEqual(3);
         });
-        it('Fehlerhinweis und Ladehinweis (--dss-fg auf --dss-surface) ≥ 7:1, Rand der Box ≥ 1,2:1', () => {
-          expect(ratio(c('--dss-fg'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
+        it('Fehlerhinweis und Ladehinweis (--hoops-fg auf --hoops-surface) ≥ 7:1, Rand der Box ≥ 1,2:1', () => {
+          expect(ratio(c('--hoops-fg'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
         });
         it('Eigener Ort steht auch als Text („Eigener Ort“-Chip), Chip-Farben ≥ 7:1', () => {
-          expect(ratio(c('--dss-chip-amber-fg'), c('--dss-chip-amber-bg'))).toBeGreaterThanOrEqual(7);
+          expect(ratio(c('--hoops-chip-amber-fg'), c('--hoops-chip-amber-bg'))).toBeGreaterThanOrEqual(7);
         });
       });
     }

@@ -16,7 +16,7 @@ export const nextUid = () => {
 };
 
 // Inline-Styles der Render-Funktionen: nur diese Eigenschaften, und nur aus unserem eigenen Markup
-const STYLE_PROPS = new Set(['left', 'top', 'width', '--dss-map-h']);
+const STYLE_PROPS = new Set(['left', 'top', 'width', '--hoops-map-h']);
 const STYLE_ATTR = /\sstyle="([^"]*)"/g;
 
 /** Ersetzt `style="…"` im Markup durch `data-dss-style="…"`: das Attribut wird nach dem Einsetzen über das CSSOM angewendet (CSP `style-src`). */

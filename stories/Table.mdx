@@ -30,10 +30,10 @@ Tabellen müssen je nach Fläche unterschiedlich dicht sein: am Kampfgerichts-Ti
   label="Dichten"
   head={['density', 'Zellhöhe', 'Schrift', 'Einsatz']}
   rows={[
-    ['touch', '60 px', '15 px (--fs-body)', 'Hallen-Tisch, Trikot-Auswahl, Touch-First'],
-    ['default (Standard)', '48 px', '14 px (--fs-body-md)', 'Standard-Listen, Web'],
-    ['compact', '40 px', '14 px (--fs-body-md), Zellrand seitlich 12 px', 'Boxscore, Statistiken'],
-    ['dense', '32 px', '13 px (--fs-body-sm), Zellrand seitlich 10 px', 'Admin, Vereinsregister, Logs'],
+    ['touch', '60 px', '15 px (--hoops-fs-body)', 'Hallen-Tisch, Trikot-Auswahl, Touch-First'],
+    ['default (Standard)', '48 px', '14 px (--hoops-fs-body-md)', 'Standard-Listen, Web'],
+    ['compact', '40 px', '14 px (--hoops-fs-body-md), Zellrand seitlich 12 px', 'Boxscore, Statistiken'],
+    ['dense', '32 px', '13 px (--hoops-fs-body-sm), Zellrand seitlich 10 px', 'Admin, Vereinsregister, Logs'],
   ]}
 />
 
@@ -95,7 +95,7 @@ Zahlen stehen rechtsbündig in Mono mit tabellarischen Ziffern (`td.num`, in der
 
 ### Streifen und eigene Zeile
 
-`striped` legt die Fläche `--dss-hover-bg` auf jede zweite Zeile. `tr.is-own` markiert eine Zeile mit der Auswahlfläche und fetter Schrift. Auf gestreiften geraden Zeilen ist die Hover-Fläche dieselbe wie der Streifen; der Hover ist dort nicht sichtbar.
+`striped` legt die Fläche `--hoops-hover-bg` auf jede zweite Zeile. `tr.is-own` markiert eine Zeile mit der Auswahlfläche und fetter Schrift. Auf gestreiften geraden Zeilen ist die Hover-Fläche dieselbe wie der Streifen; der Hover ist dort nicht sichtbar.
 
 <Canvas of={TableStories.Streifen} />
 
@@ -111,7 +111,7 @@ Zellen brechen nicht um (`white-space: nowrap`). Wenn die Tabelle breiter ist al
 
 ## Tabellen einklappen
 
-Mit `collapsible` wird der Rahmenkopf zum Kopf eines Accordions: Der Titel steht als Überschrift mit Button (`<h3><button aria-expanded aria-controls>`), `meta` und die Live-Marke bleiben rechts, dahinter steht der Pfeil. Die Tabelle ist der Bereich. Geschlossen zeigt der Rahmen nur den Kopf, ohne doppelten Strich. Die Größe des Titels bleibt an `--dss-frame-title-size` (die Accordion-Tokens gelten hier nicht), die Ebene folgt `titleAs` und `HeadingLevel`; der Inhalt bekommt die Ebene darunter. Ohne `title` wirkt `collapsible` nicht (in der Entwicklung erscheint eine Warnung in der Konsole). Standard ist geschlossen; `open` (Svelte `bind:open`, React `open` mit `onOpenChange` oder `defaultOpen`) öffnet.
+Mit `collapsible` wird der Rahmenkopf zum Kopf eines Accordions: Der Titel steht als Überschrift mit Button (`<h3><button aria-expanded aria-controls>`), `meta` und die Live-Marke bleiben rechts, dahinter steht der Pfeil. Die Tabelle ist der Bereich. Geschlossen zeigt der Rahmen nur den Kopf, ohne doppelten Strich. Die Größe des Titels bleibt an `--hoops-frame-title-size` (die Accordion-Tokens gelten hier nicht), die Ebene folgt `titleAs` und `HeadingLevel`; der Inhalt bekommt die Ebene darunter. Ohne `title` wirkt `collapsible` nicht (in der Entwicklung erscheint eine Warnung in der Konsole). Standard ist geschlossen; `open` (Svelte `bind:open`, React `open` mit `onOpenChange` oder `defaultOpen`) öffnet.
 
 <Canvas of={TableStories.Einklappbar} />
 
@@ -133,7 +133,7 @@ Innerhalb von `Accordion` melden sich einklappbare Rahmen selbst an: Sprungleist
 
 ## Zustände: Zeile, Link, Schalter, Kontrollkästchen
 
-Die Tabelle selbst hat nur einen Zustand, den Hover der Zeile (`--dss-hover-bg`). Alles Bedienbare in den Zellen kommt aus den eigenen Bausteinen: Link (`.dss-link`), Schalter (`.dss-btn`), Kontrollkästchen (`.dss-check-input`). Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand; auf dunklen Flächen dezenter). Der Scrollbereich hat den Ring innen, weil der Rahmen außen abschneidet. Ein Gedrückt (Aktiv) gibt es für die Zeile nicht; die Spalte zeigt Hover der Zeile plus Aktiv des Elements. Gesperrt gibt es bei Schalter und Kontrollkästchen.
+Die Tabelle selbst hat nur einen Zustand, den Hover der Zeile (`--hoops-hover-bg`). Alles Bedienbare in den Zellen kommt aus den eigenen Bausteinen: Link (`.dss-link`), Schalter (`.dss-btn`), Kontrollkästchen (`.dss-check-input`). Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand; auf dunklen Flächen dezenter). Der Scrollbereich hat den Ring innen, weil der Rahmen außen abschneidet. Ein Gedrückt (Aktiv) gibt es für die Zeile nicht; die Spalte zeigt Hover der Zeile plus Aktiv des Elements. Gesperrt gibt es bei Schalter und Kontrollkästchen.
 
 <Canvas of={TableStories.Zustaende} />
 
@@ -156,7 +156,7 @@ Dazu kommen Props, die sich nicht als Steuerelement zeigen lassen:
   head={['Prop', 'Typ', 'Beschreibung']}
   rows={[
     ['title', 'string (React: ReactNode)', 'Titel im Rahmenkopf. Benennt auch den Scrollbereich, wenn keine caption gesetzt ist.'],
-    ['titleAs', "'h2' | 'h3' | 'h4' | 'h5' | 'h6'", <>Überschriftenebene des Titels. Rangfolge: <code>titleAs</code> vor der Ebene aus <code>HeadingLevel</code> vor <code>'h3'</code>. Die Ebene muss zur Seite passen, ohne Ebene zu überspringen; die Größe hängt am Token <code>--dss-frame-title-size</code>, nicht an der Ebene (siehe <a href="?path=/docs/foundation-headings--docs">Headings</a>).</>],
+    ['titleAs', "'h2' | 'h3' | 'h4' | 'h5' | 'h6'", <>Überschriftenebene des Titels. Rangfolge: <code>titleAs</code> vor der Ebene aus <code>HeadingLevel</code> vor <code>'h3'</code>. Die Ebene muss zur Seite passen, ohne Ebene zu überspringen; die Größe hängt am Token <code>--hoops-frame-title-size</code>, nicht an der Ebene (siehe <a href="?path=/docs/foundation-headings--docs">Headings</a>).</>],
     ['meta', 'string (React: ReactNode)', 'Kurzinfo rechts im Kopf, z. B. Stand oder Spielstand.'],
     ['live', 'boolean', 'Zeigt die Marke „Live“ mit grünem Puls-Punkt im Kopf (Standard false). Der Puls stoppt bei prefers-reduced-motion.'],
     ['striped', 'boolean', 'Jede zweite Zeile mit Fläche (Standard false).'],

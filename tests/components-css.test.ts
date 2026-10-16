@@ -126,8 +126,8 @@ describe('Spielplan · ScheduleTable (Variante A)', () => {
 
   it('Hinweise nutzen die Dark-Mode-fähige Chip-Warnfarbe statt der festen warn-text', () => {
     const rule = css.match(/\.dss-sch-note \{([^}]*)\}/)?.[1] ?? '';
-    expect(rule).toContain('color: var(--dss-chip-warn-fg)');
-    expect(rule).not.toContain('--warn-text');
+    expect(rule).toContain('color: var(--hoops-chip-warn-fg)');
+    expect(rule).not.toContain('--hoops-warn-text');
   });
 
   it('Handy: Zeilen werden zu Karten', () => {
@@ -169,7 +169,7 @@ describe('Spielplan · ScheduleTable (Variante A)', () => {
   it('Abgesagt und verschoben: Datum und Zeit gedämpft', () => {
     for (const state of ['is-cancelled', 'is-postponed']) {
       const m = css.match(new RegExp(`\\.dss-tbl--schedule tr\\.${state} \\.dss-sch-time \\{([^}]*)\\}`));
-      expect(m?.[1]).toContain('color: var(--dss-mute)');
+      expect(m?.[1]).toContain('color: var(--hoops-mute)');
       expect(css).toContain(`.dss-tbl--schedule tr.${state} .dss-sch-date`);
     }
   });
@@ -184,8 +184,8 @@ describe('Spielplan · ScheduleTable (Variante A)', () => {
   });
 
   it('Handy: Hervorhebung und Hover liegen an der Zeile', () => {
-    expect(ruleOf(mobile, '.dss-tbl--schedule tr.dss-sch-row.is-own')).toContain('background: var(--dss-selected-bg)');
-    expect(ruleOf(mobile, '.dss-tbl--schedule tr.dss-sch-row:hover')).toContain('background: var(--dss-hover-bg)');
+    expect(ruleOf(mobile, '.dss-tbl--schedule tr.dss-sch-row.is-own')).toContain('background: var(--hoops-selected-bg)');
+    expect(ruleOf(mobile, '.dss-tbl--schedule tr.dss-sch-row:hover')).toContain('background: var(--hoops-hover-bg)');
   });
 });
 
@@ -216,7 +216,7 @@ describe('Spielplan · ScheduleGrid (Variante B)', () => {
 
   it('Zeitspalte im Kopf wird nicht sticky und die im Rumpf ist deckend', () => {
     expect(gridRule(grid, '.dss-sgrid th.dss-sg-time')).toContain('position: static');
-    expect(gridRule(grid, '.dss-sgrid tbody th.dss-sg-time')).toContain('background: var(--dss-surface)');
+    expect(gridRule(grid, '.dss-sgrid tbody th.dss-sg-time')).toContain('background: var(--hoops-surface)');
   });
 
   it('die Kopfzelle "Zeit" behält den Kopfzellen-Stil, die Schriftregeln gelten nur im Rumpf', () => {
@@ -228,7 +228,7 @@ describe('Spielplan · ScheduleGrid (Variante B)', () => {
     }
     const body = gridRule(grid, '.dss-sgrid tbody th.dss-sg-time');
     expect(body).toContain('text-transform: none');
-    expect(body).toContain('font-family: var(--font-mono)');
+    expect(body).toContain('font-family: var(--hoops-font-mono)');
   });
 
   it('kompaktes Raster: engere Karten und Zellen', () => {
@@ -250,7 +250,7 @@ describe('Spielplan · ScheduleGrid (Variante B)', () => {
   });
 
   it('Hover färbt auch die Zeitzelle (deckend, wegen sticky)', () => {
-    expect(gridRule(grid, '.dss-sgrid tbody tr:hover th.dss-sg-time')).toContain('background: var(--dss-hover-bg)');
+    expect(gridRule(grid, '.dss-sgrid tbody tr:hover th.dss-sg-time')).toContain('background: var(--hoops-hover-bg)');
   });
 
   it('Handy: leere Zellen sind ausgeblendet, Kopfzeile nur für Screenreader', () => {
@@ -260,7 +260,7 @@ describe('Spielplan · ScheduleGrid (Variante B)', () => {
 
   it('Handy: Zeitzelle nicht sticky, Hover liegt an der Zeile', () => {
     expect(gridMobile).toMatch(/\.dss-sgrid tbody th\.dss-sg-time[^{]*\{[^}]*position: static/);
-    expect(gridRule(gridMobile, '.dss-sgrid tbody tr:hover')).toContain('background: var(--dss-hover-bg)');
+    expect(gridRule(gridMobile, '.dss-sgrid tbody tr:hover')).toContain('background: var(--hoops-hover-bg)');
     expect(gridRule(gridMobile, '.dss-sgrid tbody tr:hover td')).toContain('background: none');
   });
 
@@ -272,22 +272,22 @@ describe('Spielplan · ScheduleGrid (Variante B)', () => {
 describe('Button-Höhen', () => {
   const rule = (sel: string) => new RegExp(`\\${sel}\\s*\\{[^}]*\\}`).exec(css)?.[0] ?? '';
   it('sm und md sind 44 px hoch (WCAG 2.5.5, Zielgröße)', () => {
-    expect(rule('.dss-btn--sm')).toContain('height: var(--touch-sm)');
-    expect(rule('.dss-btn--md')).toContain('height: var(--touch-sm)');
+    expect(rule('.dss-btn--sm')).toContain('height: var(--hoops-touch-sm)');
+    expect(rule('.dss-btn--md')).toContain('height: var(--hoops-touch-sm)');
   });
 });
 
 describe('Hilfetext und Pflicht-Sternchen im Dunkelmodus', () => {
-  // --err-text, --ok-text und --warn-text haben keinen Dunkelmodus (2.3:1 auf Schwarz); die Chip-Tokens schon.
+  // --hoops-err-text, --hoops-ok-text und --hoops-warn-text haben keinen Dunkelmodus (2.3:1 auf Schwarz); die Chip-Tokens schon.
   const rule = (sel: string) => new RegExp(`\\${sel}\\s*\\{[^}]*\\}`).exec(css)?.[0] ?? '';
   it.each([
-    ['.dss-field-help--err', '--dss-chip-err-fg'],
-    ['.dss-field-help--ok', '--dss-chip-ok-fg'],
-    ['.dss-field-help--warn', '--dss-chip-warn-fg'],
+    ['.dss-field-help--err', '--hoops-chip-err-fg'],
+    ['.dss-field-help--ok', '--hoops-chip-ok-fg'],
+    ['.dss-field-help--warn', '--hoops-chip-warn-fg'],
   ])('%s nutzt %s', (sel, token) => {
     expect(rule(sel)).toContain(`var(${token})`);
   });
-  it('das Pflicht-Sternchen nutzt --dss-chip-err-fg', () => {
-    expect(css).toMatch(/\.dss-field-label \.req\s*\{[^}]*var\(--dss-chip-err-fg\)/);
+  it('das Pflicht-Sternchen nutzt --hoops-chip-err-fg', () => {
+    expect(css).toMatch(/\.dss-field-label \.req\s*\{[^}]*var\(--hoops-chip-err-fg\)/);
   });
 });

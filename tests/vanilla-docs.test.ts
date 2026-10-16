@@ -103,7 +103,7 @@ describe('Doku-Seite', () => {
     expect([...mdx.matchAll(/doText:/g)]).toHaveLength(4);
   });
   it('die Doku nennt Muster, Sicherheit und Versionsabgleich', () => {
-    for (const part of ['idempotent', 'destroy()', 'createContextualFragment', 'textContent', 'safeHref', 'data-dss-options', '`--dss-version`', 'checkVersion', 'version.json', 'initMap', 'dss-map.js', 'loadLeaflet', 'npm run build:vanilla', 'script-src', 'dss-render.js', 'esc', 'renderLeagueCard', 'mountLeagueCard', 'Crawler']) expect(mdx, part).toContain(part);
+    for (const part of ['idempotent', 'destroy()', 'createContextualFragment', 'textContent', 'safeHref', 'data-dss-options', '`--hoops-version`', 'checkVersion', 'version.json', 'initMap', 'dss-map.js', 'loadLeaflet', 'npm run build:vanilla', 'script-src', 'dss-render.js', 'esc', 'renderLeagueCard', 'mountLeagueCard', 'Crawler']) expect(mdx, part).toContain(part);
   });
   it('die Beispielseite im Code verwendet kein innerHTML', () => {
     const script = examples.slice(0, examples.indexOf('{#if example'));

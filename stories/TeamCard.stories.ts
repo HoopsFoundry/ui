@@ -39,7 +39,7 @@ export const Spielwiese = {
     last: { control: 'object', description: 'Letztes Spiel `{ date?, opponent, ownScore, opponentScore, at? }` mit S/N/U-Chip aus dem Ergebnis', table: t("{ date?: string; opponent: TeamRef; ownScore: number; opponentScore: number; at?: 'heim' | 'gast' }") },
     squad: { control: 'object', description: 'Kader-Kurzliste `{ players, staff? }`: „14 Spieler · 3 Trainer“', table: t('{ players: number; staff?: number }') },
     stats: { control: 'object', description: 'Saison-Statistik `{ twoPtPct?, threePtPct?, trb?, to? }`; nur übergebene Felder erscheinen, ohne Feld entfällt der Block (kein Strich als Platzhalter)', table: t('{ twoPtPct?: number; threePtPct?: number; trb?: number; to?: number }') },
-    titleAs: { control: 'inline-radio', options: ['h2', 'h3', 'h4', 'h5', 'h6'], description: 'Überschriftenebene des Namens in `standard`. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor `h3`. Die Größe hängt am Token `--dss-card-title-size`, nicht an der Ebene. Eine Auswahl hier überstimmt ein umgebendes `HeadingLevel`; leer lassen, damit die Ebene gilt, die sich aus der Gliederung ergibt.', table: t("'h2' | 'h3' | 'h4' | 'h5' | 'h6'", "'h3'") },
+    titleAs: { control: 'inline-radio', options: ['h2', 'h3', 'h4', 'h5', 'h6'], description: 'Überschriftenebene des Namens in `standard`. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor `h3`. Die Größe hängt am Token `--hoops-card-title-size`, nicht an der Ebene. Eine Auswahl hier überstimmt ein umgebendes `HeadingLevel`; leer lassen, damit die Ebene gilt, die sich aus der Gliederung ergibt.', table: t("'h2' | 'h3' | 'h4' | 'h5' | 'h6'", "'h3'") },
   },
 };
 

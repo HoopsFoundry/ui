@@ -84,35 +84,35 @@ describe('VenueCard: Quelltext', () => {
 // ── Kontraste: Text ≥ 7:1 (AAA), Punkte und Rahmen ≥ 3:1; Hell, Dunkel (Media-Query und data-theme), BBV und DBB ──
 const blocks = {
   Hell: blockOf(css, '/* ── Semantische Aliase · Light'),
-  'Dunkel (Media-Query)': blockOf(css, ':root:not([data-theme="light"]) {\n    --dss-fg'),
-  'Dunkel (data-theme)': blockOf(css, ':root[data-theme="dark"] {\n  --dss-fg'),
+  'Dunkel (Media-Query)': blockOf(css, ':root:not([data-theme="light"]) {\n    --hoops-fg'),
+  'Dunkel (data-theme)': blockOf(css, ':root[data-theme="dark"] {\n  --hoops-fg'),
 };
 const dbb = blockOf(tokens, ':root[data-brand="dbb"] {');
-const FLAECHEN = ['--dss-surface', '--dss-surface-2'];
+const FLAECHEN = ['--hoops-surface', '--hoops-surface-2'];
 
 describe('VenueCard: Kontraste', () => {
   for (const [name, block] of Object.entries(blocks)) {
     for (const brand of ['BBV', 'DBB'] as const) {
-      const scope = `--h-signal: var(${brand === 'BBV' ? '--h-amber' : '--h-gold'});\n${block}\n${brand === 'DBB' ? dbb : ''}\n${tokens}`;
+      const scope = `--hoops-h-signal: var(${brand === 'BBV' ? '--hoops-h-amber' : '--hoops-h-gold'});\n${block}\n${brand === 'DBB' ? dbb : ''}\n${tokens}`;
       const c = (token: string) => color(`var(${token})`, scope);
       describe(`${name}, ${brand}`, () => {
-        it('Name, Adresse, Info, Kontakt und Mannschaften (--dss-fg, --dss-fg-soft) ≥ 7:1 auf Karte und Spielkarte', () => {
+        it('Name, Adresse, Info, Kontakt und Mannschaften (--hoops-fg, --hoops-fg-soft) ≥ 7:1 auf Karte und Spielkarte', () => {
           for (const surface of FLAECHEN) {
-            expect(ratio(c('--dss-fg'), c(surface)), `fg auf ${surface}`).toBeGreaterThanOrEqual(7);
-            expect(ratio(c('--dss-fg-soft'), c(surface)), `fg-soft auf ${surface}`).toBeGreaterThanOrEqual(7);
+            expect(ratio(c('--hoops-fg'), c(surface)), `fg auf ${surface}`).toBeGreaterThanOrEqual(7);
+            expect(ratio(c('--hoops-fg-soft'), c(surface)), `fg-soft auf ${surface}`).toBeGreaterThanOrEqual(7);
           }
         });
-        it('Beschriftungen (--dss-mute): Kontakt, Block „Nächste Spiele“, Liga und Feld ≥ 7:1', () => {
-          for (const surface of FLAECHEN) expect(ratio(c('--dss-mute'), c(surface)), surface).toBeGreaterThanOrEqual(7);
+        it('Beschriftungen (--hoops-mute): Kontakt, Block „Nächste Spiele“, Liga und Feld ≥ 7:1', () => {
+          for (const surface of FLAECHEN) expect(ratio(c('--hoops-mute'), c(surface)), surface).toBeGreaterThanOrEqual(7);
         });
-        it('Links (--dss-link) ≥ 7:1 auf der Karte', () => {
-          expect(ratio(c('--dss-link'), c('--dss-surface'))).toBeGreaterThanOrEqual(7);
+        it('Links (--hoops-link) ≥ 7:1 auf der Karte', () => {
+          expect(ratio(c('--hoops-link'), c('--hoops-surface'))).toBeGreaterThanOrEqual(7);
         });
-        it('Trikotpunkt: Rand (--dss-mute) ≥ 3:1 auf der Spielkarte', () => {
-          expect(ratio(c('--dss-mute'), c('--dss-surface-2'))).toBeGreaterThanOrEqual(3);
+        it('Trikotpunkt: Rand (--hoops-mute) ≥ 3:1 auf der Spielkarte', () => {
+          expect(ratio(c('--hoops-mute'), c('--hoops-surface-2'))).toBeGreaterThanOrEqual(3);
         });
         it('Chips Live, Abgesagt, Verschoben: Text auf der Chip-Fläche ≥ 7:1', () => {
-          for (const tone of ['ok', 'err', 'warn']) expect(ratio(c(`--dss-chip-${tone}-fg`), c(`--dss-chip-${tone}-bg`)), tone).toBeGreaterThanOrEqual(7);
+          for (const tone of ['ok', 'err', 'warn']) expect(ratio(c(`--hoops-chip-${tone}-fg`), c(`--hoops-chip-${tone}-bg`)), tone).toBeGreaterThanOrEqual(7);
         });
       });
     }

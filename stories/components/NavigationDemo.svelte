@@ -155,30 +155,30 @@
 
 <style>
   .hdr {
-    font-family: var(--font-mono); font-size: 11px; font-weight: 600;
+    font-family: var(--hoops-font-mono); font-size: 11px; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.08em;
-    color: var(--page-mute);
+    color: var(--hoops-page-mute);
     margin-bottom: 10px;
   }
   .frame {
-    border: 1px solid var(--page-line);
+    border: 1px solid var(--hoops-page-line);
     border-radius: 14px;
     overflow: hidden;
-    background: var(--n-0);
+    background: var(--hoops-n-0);
   }
   .frame.light { padding: 22px; }
   .frame.wide  { padding: 32px 28px; }
   .phone {
     width: 380px;
-    border: 1px solid var(--page-line);
+    border: 1px solid var(--hoops-page-line);
     border-radius: 24px;
     overflow: hidden;
-    background: var(--n-0);
+    background: var(--hoops-n-0);
     padding: 8px 0 0;
   }
   .phone::before {
     content: ''; display: block; width: 100%; height: 200px;
-    background: linear-gradient(0deg, var(--n-50), var(--n-0));
-    border-bottom: 1px solid var(--page-line);
+    background: linear-gradient(0deg, var(--hoops-n-50), var(--hoops-n-0));
+    border-bottom: 1px solid var(--hoops-page-line);
   }
 </style>

@@ -44,7 +44,7 @@ export interface AppNavProps {
   context?: ReactNode;
   /** Eigene Link-Darstellung, z. B. für React Router (`Link` statt `a`). */
   renderLink?: (props: AppNavLinkRenderProps) => ReactNode;
-  /** Begrenzt den Inhalt auf --dss-shell-max (Hintergrund bleibt voll breit). */
+  /** Begrenzt den Inhalt auf --hoops-shell-max (Hintergrund bleibt voll breit). */
   contained?: boolean;
   className?: string;
 }

@@ -5,6 +5,8 @@
 
 Neue Gestaltung soll dokumentierte semantische Rollen-Tokens verwenden. Direkte primitive Farbwerte sind kein Ersatz für ein bestehendes semantisches Token. Marken- und Theme-Varianten gehören in die gemeinsame Grundlage.
 
+Alle eigenen CSS-Custom-Properties tragen das Präfix `--hoops-` (private Hilfsvariablen `--_hoops-`); unpräfixierte Namen sind verboten (ADR-008). Es gibt drei Ebenen: die Skalen und Grundwerte in `tokens/tokens.css` (`--hoops-ink-600`, `--hoops-n-0`, `--hoops-radius-md`, `--hoops-fs-h3`), die Marken-Rollen (`--hoops-base-*`, `--hoops-signal-*`, `--hoops-cool-*`, `--hoops-action-*`, `--hoops-indicator`), die die Marke DBB über `data-brand="dbb"` austauscht, und die semantischen Aliase der Komponenten in `css/components.css` (`--hoops-fg`, `--hoops-surface`, `--hoops-chip-ok-fg` …), die im Dunkelmodus ihre Werte wechseln. Komponenten lesen nur die Rollen und die Aliase. Komponentenvariablen, die Aufrufer setzen dürfen (`--hoops-map-h`, `--hoops-title-size`, `--hoops-acc-gap` …), stehen im selben Namensraum. Die Prüfung `tests/token-prefix.test.ts` hält die Regel fest, eine begründete Allowlist nennt fremde Namen (Leaflet, Tailwind, Storybook). Für Konsumenten migriert `scripts/migrate-from-dss.mjs`.
+
 === Accessibility
 
 Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusmanagement sind Bestandteil der API-Verantwortung. Modal- und Tabs-Parität weisen laut Lückenplan noch offene Punkte auf. Aussagen zu WCAG-Konformität müssen einen benannten Prüfungsumfang haben; Kontrasttests allein beweisen keine vollständige Konformität.

@@ -184,7 +184,7 @@ describe('VenueCard', () => {
     it('load="auto", privacyNote und mapHeight gehen an die Karte', () => {
       const { container } = render(<VenueCard name="H" lat={49.3} lng={7.9} load="auto" mapHeight={300} tileUrl="/tiles/{z}/{x}/{y}.png" />);
       expect(container.querySelector('.dss-map')).toHaveAttribute('data-state', 'loading');
-      expect(container.querySelector('.dss-map')!.getAttribute('style')!.replace(/\s/g, '')).toContain('--dss-map-h:300px');
+      expect(container.querySelector('.dss-map')!.getAttribute('style')!.replace(/\s/g, '')).toContain('--hoops-map-h:300px');
       const note = render(<VenueCard name="H2" lat={49.3} lng={7.9} privacyNote="Über unseren Server." />);
       expect(note.container.querySelector('.dss-map-note')).toHaveTextContent('Über unseren Server.');
     });

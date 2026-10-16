@@ -19,7 +19,7 @@ export interface HeadingLevelProps {
 
 /**
  * Gibt den Komponentenüberschriften im Teilbaum eine Ebene vor (nur `h2` bis `h6`, nie `h1`). Ein `titleAs` an der
- * Komponente gewinnt. Ändert nur die Ebene im Dokument, nicht die Größe (siehe Tokens `--dss-title-size`).
+ * Komponente gewinnt. Ändert nur die Ebene im Dokument, nicht die Größe (siehe Tokens `--hoops-title-size`).
  */
 export function HeadingLevel({ level, by = 1, children }: HeadingLevelProps) {
   const parent = useContext(HeadingLevelContext);

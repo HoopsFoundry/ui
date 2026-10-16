@@ -69,7 +69,7 @@ Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass
 
 <Canvas of={CardLibraryStories.Spielerkarten} />
 
-Nur die Zeile `compact` ist klickbar (mit `onclick`, React: `onClick`, wird sie zum Button). Standard und Hero zeigen den Namen als Überschrift, standardmäßig `h3`; mit `titleAs` (`h2` bis `h6`) oder einem umgebenden `HeadingLevel` wählst du die Ebene, die in deine Gliederung passt (`titleAs` gewinnt vor `HeadingLevel`). Die Größe ändert das nie; sie hängt am Token `--dss-card-title-size` (siehe [Headings](?path=/docs/foundation-headings--docs)).
+Nur die Zeile `compact` ist klickbar (mit `onclick`, React: `onClick`, wird sie zum Button). Standard und Hero zeigen den Namen als Überschrift, standardmäßig `h3`; mit `titleAs` (`h2` bis `h6`) oder einem umgebenden `HeadingLevel` wählst du die Ebene, die in deine Gliederung passt (`titleAs` gewinnt vor `HeadingLevel`). Die Größe ändert das nie; sie hängt am Token `--hoops-card-title-size` (siehe [Headings](?path=/docs/foundation-headings--docs)).
 
 ### Mit Foto
 
@@ -114,7 +114,7 @@ Die Muster haben die Struktur der Zielkomponente, aber nicht ihre genaue Höhe: 
 
 ## Zustände: Hover, Fokus, Aktiv
 
-Klickbare Spielkarten (`a` oder `button`) ändern bei Hover Rand (`--dss-line-strong`) und Schatten und heben sich um 1 px; klickbare Spielerzeilen (`button`) färben Rand und Hintergrund. Beide haben bei Tastaturfokus den gestrichelten Gold/Amber-Ring (3 px, 2 px Abstand, im Dunkelmodus dezenter). Nicht klickbare Karten (`div`), Standard- und Hero-Karte und Skeleton reagieren nicht. Einen eigenen Stil für Gedrückt gibt es nicht, die Spalte zeigt denselben Hover; Gesperrt gibt es nicht.
+Klickbare Spielkarten (`a` oder `button`) ändern bei Hover Rand (`--hoops-line-strong`) und Schatten und heben sich um 1 px; klickbare Spielerzeilen (`button`) färben Rand und Hintergrund. Beide haben bei Tastaturfokus den gestrichelten Gold/Amber-Ring (3 px, 2 px Abstand, im Dunkelmodus dezenter). Nicht klickbare Karten (`div`), Standard- und Hero-Karte und Skeleton reagieren nicht. Einen eigenen Stil für Gedrückt gibt es nicht, die Spalte zeigt denselben Hover; Gesperrt gibt es nicht.
 
 <Canvas of={CardLibraryStories.Zustaende} />
 

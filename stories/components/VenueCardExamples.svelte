@@ -157,11 +157,11 @@
   .narrow { width: 100%; max-width: 380px; }
   .medium { width: 100%; max-width: 700px; }
   .gap { height: 12px; }
-  .cap, .colhead { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .colhead { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 10px; }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
   /* position: relative: die versteckten Texte (position: absolute) liegen sonst außerhalb des Scrollbereichs und weiten die Seite (Standalone-Story bei 420 px) */
-  .surface { position: relative; background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { position: relative; background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: repeat(3, minmax(420px, 1fr)); gap: 16px 14px; align-items: start; }
   .cell { padding: 6px; }
 </style>

@@ -15,7 +15,7 @@ Zwei kleine Bausteine für Zahlen rund um eine Mannschaft: das **Kennzahlen-Gitt
 
 ## Kennzahlen: Aufbau
 
-Eine Kennzahl hat eine Beschriftung und einen Wert. Das Markup ist eine Beschreibungsliste (`dl`): Im Lesefluss steht die Beschriftung zuerst („Siege, 12“), optisch steht der Wert darüber (der Wert ist groß, in `--fs-h2`; die Beschriftung klein, Mono, in `--fs-caption`). Zahlen bekommen das Dezimalkomma (`82.4` wird `82,4`); Texte wie „71 %“ bleiben, wie sie sind. Das Gitter füllt die Breite und bricht um: jede Kachel ist mindestens `8rem` breit, auf schmalem Bildschirm reicht eine Spalte, ohne dass die Seite seitlich scrollt.
+Eine Kennzahl hat eine Beschriftung und einen Wert. Das Markup ist eine Beschreibungsliste (`dl`): Im Lesefluss steht die Beschriftung zuerst („Siege, 12“), optisch steht der Wert darüber (der Wert ist groß, in `--hoops-fs-h2`; die Beschriftung klein, Mono, in `--hoops-fs-caption`). Zahlen bekommen das Dezimalkomma (`82.4` wird `82,4`); Texte wie „71 %“ bleiben, wie sie sind. Das Gitter füllt die Breite und bricht um: jede Kachel ist mindestens `8rem` breit, auf schmalem Bildschirm reicht eine Spalte, ohne dass die Seite seitlich scrollt.
 
 <Canvas of={StatsStories.Aufbau} />
 
@@ -23,7 +23,7 @@ Eine Kennzahl hat eine Beschriftung und einen Wert. Das Markup ist eine Beschrei
 
 ## Kompakt
 
-`compact` nimmt die Kacheln weg (kein Rand, keine Fläche, keine Innenabstände) und stellt die Kennzahlen in eine Zeile, die umbricht. Die Werte sind dann kleiner (`--fs-h3`). Das passt in den Kopf einer Karte oder in eine Seitenleiste.
+`compact` nimmt die Kacheln weg (kein Rand, keine Fläche, keine Innenabstände) und stellt die Kennzahlen in eine Zeile, die umbricht. Die Werte sind dann kleiner (`--hoops-fs-h3`). Das passt in den Kopf einer Karte oder in eine Seitenleiste.
 
 <Canvas of={StatsStories.Kompakt} />
 
@@ -57,7 +57,7 @@ Ohne Framework schreibst du das Markup selbst. Die Klassen und der versteckte Te
 
 ## Dunkelmodus und Marken
 
-Alle Flächen und Texte laufen über die semantischen Tokens (`--dss-surface`, `--dss-fg`, `--dss-chip-*`). Die Bausteine brauchen keinen eigenen Dunkelmodus und folgen der Marke (BBV, DBB).
+Alle Flächen und Texte laufen über die semantischen Tokens (`--hoops-surface`, `--hoops-fg`, `--hoops-chip-*`). Die Bausteine brauchen keinen eigenen Dunkelmodus und folgen der Marke (BBV, DBB).
 
 ## Handy · 390 px Breite
 

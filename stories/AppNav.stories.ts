@@ -11,7 +11,7 @@ export default {
     ariaLabel:   { control: 'text', description: 'Name der Navigation (Landmark)', table: { type: { summary: 'string' }, defaultValue: { summary: "'Hauptnavigation'" } } },
     menuLabel:   { control: false, description: 'Beschriftung des Menü-Buttons unter 720 px', table: { type: { summary: 'string' }, defaultValue: { summary: "'Menü'" } } },
     context:     { control: false, description: 'Platz rechts in der Leiste, z. B. für einen Turnierumschalter (Svelte: Snippet, React: ReactNode)', table: { type: { summary: 'Snippet' } } },
-    contained:   { control: false, description: 'Begrenzt den Inhalt auf `--dss-shell-max` (64 rem), der Hintergrund bleibt voll breit', table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } } },
+    contained:   { control: false, description: 'Begrenzt den Inhalt auf `--hoops-shell-max` (64 rem), der Hintergrund bleibt voll breit', table: { type: { summary: 'boolean' }, defaultValue: { summary: 'false' } } },
     renderLink:  { control: false, description: 'Nur React: eigene Link-Darstellung, z. B. für einen Router. Du bekommst `item`, `className`, `ariaCurrent`, `onNavigate` und `children`', table: { type: { summary: '(props: AppNavLinkRenderProps) => ReactNode' } } },
   },
   args: { tone: 'light', currentHref: '/ergebnisse' },

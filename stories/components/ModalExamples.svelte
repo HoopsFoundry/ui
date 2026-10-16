@@ -201,22 +201,22 @@
 <style>
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 24px; }
   .stack { display: flex; flex-direction: column; gap: 24px; }
-  .cap, .head, .rowlabel { font-family: var(--font-mono); font-size: var(--fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--page-mute); }
+  .cap, .head, .rowlabel { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .cap { margin-bottom: 8px; }
   /* Das Modal ist position: fixed. transform macht den Rahmen zum Bezugsrahmen, sonst überdeckt es die ganze Seite. */
-  .frame { position: relative; transform: translateZ(0); overflow: hidden; width: 100%; height: 400px; border: 1px solid var(--page-line); border-radius: var(--radius-lg); background: var(--page-bg); }
-  .mock { padding: 24px; display: flex; flex-direction: column; gap: 10px; color: var(--page-fg); }
-  .mock-h { font-family: var(--font-display); font-weight: 700; }
-  .mock-l { height: 10px; border-radius: 5px; background: var(--page-line); }
+  .frame { position: relative; transform: translateZ(0); overflow: hidden; width: 100%; height: 400px; border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); background: var(--hoops-page-bg); }
+  .mock { padding: 24px; display: flex; flex-direction: column; gap: 10px; color: var(--hoops-page-fg); }
+  .mock-h { font-family: var(--hoops-font-display); font-weight: 700; }
+  .mock-l { height: 10px; border-radius: 5px; background: var(--hoops-page-line); }
   .mock-s { width: 60%; }
   .phone { max-width: 390px; height: 520px; }
   .page { padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-  .page-t { margin: 0; font-family: var(--font-display); font-weight: 700; color: var(--page-fg); }
+  .page-t { margin: 0; font-family: var(--hoops-font-display); font-weight: 700; color: var(--hoops-page-fg); }
   .matrix { display: flex; flex-direction: column; gap: 16px; }
-  .surface { background: var(--page-bg); border: 1px solid var(--page-line); border-radius: var(--radius-lg); padding: 22px 24px; overflow-x: auto; }
+  .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 90px repeat(5, minmax(120px, 1fr)); gap: 10px 12px; align-items: center; }
-  .cell { display: flex; align-items: center; justify-content: center; min-height: 64px; border-radius: var(--radius-md); padding: 8px; }
-  .cell-body { background: var(--dss-surface); }
-  .cell-foot { background: var(--dss-surface-2); }
-  .none { font-size: var(--fs-caption); color: var(--page-mute); }
+  .cell { display: flex; align-items: center; justify-content: center; min-height: 64px; border-radius: var(--hoops-radius-md); padding: 8px; }
+  .cell-body { background: var(--hoops-surface); }
+  .cell-foot { background: var(--hoops-surface-2); }
+  .none { font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }
 </style>

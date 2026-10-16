@@ -14,7 +14,7 @@ Karten sind die Container, in denen alles wohnt. Der generische Container `Card`
 
 ## Vier Varianten, eine Grammatik
 
-Jede Karte besteht aus einem **Inhalt** (Body) und optional einem **Kopf** (Header) und **Fuß** (Footer). **Default** ist Rand (1 px) + Radius `lg` + Fläche 0 (`--dss-surface`). **Elevated** tauscht den Rand gegen `--shadow-md` (mit einem 1-px-Ring in der Linienfarbe). **Flat** sitzt auf Fläche 2 (`--dss-surface-2`) ohne Rand und Schatten. **Hoverable** wird interaktiv mit Zeiger und Lift.
+Jede Karte besteht aus einem **Inhalt** (Body) und optional einem **Kopf** (Header) und **Fuß** (Footer). **Default** ist Rand (1 px) + Radius `lg` + Fläche 0 (`--hoops-surface`). **Elevated** tauscht den Rand gegen `--hoops-shadow-md` (mit einem 1-px-Ring in der Linienfarbe). **Flat** sitzt auf Fläche 2 (`--hoops-surface-2`) ohne Rand und Schatten. **Hoverable** wird interaktiv mit Zeiger und Lift.
 
 <Canvas of={CardStories.Varianten} />
 
@@ -48,7 +48,7 @@ Mit `href` wird die Karte ein Link (`a`). Mit `onclick` (React: `onClick`) auf d
 
 ## Zustände: Hover, Fokus, Aktiv
 
-Bei `hoverable` wird der Rand kräftiger (`--dss-line-strong`), die Karte bekommt `--shadow-md` und hebt sich um 1 px. Den Lift löst auch `:focus-within` aus, also schon ein fokussiertes Element in der Karte. Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand, im Dunkelmodus dezenter) und erscheint an jeder Karte, die selbst fokussierbar ist (Link, Schalter, `button`). Die anderen Varianten reagieren auf Hover nicht. Einen eigenen Stil für Gedrückt (Aktiv) gibt es nicht, die Spalte zeigt denselben Hover. Gesperrt gibt es bei Karten nicht.
+Bei `hoverable` wird der Rand kräftiger (`--hoops-line-strong`), die Karte bekommt `--hoops-shadow-md` und hebt sich um 1 px. Den Lift löst auch `:focus-within` aus, also schon ein fokussiertes Element in der Karte. Der Fokus-Ring ist gestrichelt in Gold/Amber (3 px, 2 px Abstand, im Dunkelmodus dezenter) und erscheint an jeder Karte, die selbst fokussierbar ist (Link, Schalter, `button`). Die anderen Varianten reagieren auf Hover nicht. Einen eigenen Stil für Gedrückt (Aktiv) gibt es nicht, die Spalte zeigt denselben Hover. Gesperrt gibt es bei Karten nicht.
 
 <Canvas of={CardStories.Zustaende} />
 

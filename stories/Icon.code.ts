@@ -10,7 +10,7 @@ export const vanilla = `<link rel="stylesheet" href="css/components.css" />
 </svg>
 
 <!-- Dekorativ: der Text daneben trägt die Bedeutung -->
-<span style="color: var(--dss-fg)">
+<span style="color: var(--hoops-fg)">
   <svg class="dss-icon" width="24" height="24" viewBox="0 0 24 24"
        role="presentation" aria-hidden="true" focusable="false"><use href="#i-whistle"></use></svg>
   Schiedsrichter
@@ -31,7 +31,7 @@ export const svelte = `<script>
 <Icon name="whistle" />
 
 <!-- Größe in Pixeln; die Farbe kommt vom umgebenden Text (currentColor) -->
-<span style="color: var(--dss-fg)">
+<span style="color: var(--hoops-fg)">
   <Icon name="live" size={16} /> Live
 </span>
 
@@ -44,7 +44,7 @@ export const react = `import { Icon } from '@bbv/dss-design-system/react';
 <Icon name="whistle" />
 
 {/* Größe in Pixeln; die Farbe kommt vom umgebenden Text (currentColor) */}
-<span style={{ color: 'var(--dss-fg)' }}>
+<span style={{ color: 'var(--hoops-fg)' }}>
   <Icon name="live" size={16} /> Live
 </span>
 
