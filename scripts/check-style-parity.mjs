@@ -18,8 +18,9 @@
  */
 import { createServer } from 'node:http';
 import { readFile, writeFile } from 'node:fs/promises';
-import { createReadStream, existsSync } from 'node:fs';
-import { createGunzip, gzipSync } from 'node:zlib';
+import { createReadStream, createWriteStream, existsSync } from 'node:fs';
+import { once } from 'node:events';
+import { createGunzip, createGzip } from 'node:zlib';
 import { createInterface } from 'node:readline';
 import { extname, join, normalize, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -105,7 +106,13 @@ async function capture(dir, out, opts) {
   const server = await serveStatic(root);
   const origin = `http://127.0.0.1:${server.address().port}`;
   const browser = await chromium.launch();
-  const chunks = [];
+  // Zeile für Zeile in die gz-Datei schreiben (alle Docs-Seiten zusammen sind größer, als eine Zeichenkette sein darf)
+  const gz = createGzip();
+  const sink = createWriteStream(out);
+  gz.pipe(sink);
+  let pagesDone = 0;
+  let elementCount = 0;
+  let errorCount = 0;
   const failures = [];
   const workers = Number(opts.workers ?? 4);
   let done = 0;
@@ -146,7 +153,12 @@ async function capture(dir, out, opts) {
           }
           clearTimeout(timer);
           if (opts.verbose || Date.now() - t0 > 15000) console.log(`  ${Date.now() - t0} ms ${key}${result ? '' : ' (FEHLT)'}`);
-          if (result) chunks.push(JSON.stringify({ key, kind: p.kind, error: result.error, rows: result.rows }));
+          if (result) {
+            if (!gz.write(JSON.stringify({ key, kind: p.kind, error: result.error, rows: result.rows }) + '\n')) await once(gz, 'drain');
+            pagesDone++;
+            elementCount += result.rows.length;
+            if (result.error) errorCount++;
+          }
           if (++done % 200 === 0) console.log(`  ${done}/${total}`);
         }
         await page.close().catch(() => {});
@@ -159,13 +171,11 @@ async function capture(dir, out, opts) {
     server.closeAllConnections();
     server.close();
   }
-  chunks.sort();
-  await writeFile(out, gzipSync(Buffer.from(chunks.join('\n') + '\n')));
-  const elements = chunks.reduce((n, c) => n + JSON.parse(c).rows.length, 0);
-  console.log(`erfasst: ${chunks.length} Seiten-Zustände (${pages.length} Seiten × ${BRANDS.length * THEMES.length * WIDTHS.length}), ${elements} Elemente → ${out}`);
+  gz.end();
+  await once(sink, 'finish');
+  console.log(`erfasst: ${pagesDone} Seiten-Zustände (${pages.length} Seiten × ${BRANDS.length * THEMES.length * WIDTHS.length}), ${elementCount} Elemente → ${out}`);
   if (failures.length) { console.error(`${failures.length} Seiten nicht erfasst:\n  ${failures.join('\n  ')}`); process.exitCode = 1; }
-  const errors = chunks.filter((c) => JSON.parse(c).error).length;
-  if (errors) console.log(`Hinweis: ${errors} Zustände zeigen die Storybook-Fehleranzeige (in beiden Läufen gleich zu erwarten).`);
+  if (errorCount) console.log(`Hinweis: ${errorCount} Zustände zeigen die Storybook-Fehleranzeige (in beiden Läufen gleich zu erwarten).`);
 }
 
 async function load(file) {
