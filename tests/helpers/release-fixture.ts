@@ -28,6 +28,7 @@ export async function copyBundle(name: string) {
 export async function loadScript(source: string, file = 'release-vanilla.mjs', extra: Record<string, string> = {}) {
   const dir = `${loadRoot}/${loadCounter++}`;
   await cp(resolve(process.cwd(), 'scripts'), `${dir}/scripts`, { recursive: true });
+  await cp(resolve(process.cwd(), 'project.config.json'), `${dir}/project.config.json`);
   const prepared = source
     .replace("fileURLToPath(new URL('../', import.meta.url))", `'${process.cwd()}/'`)
     .replace('fileURLToPath(import.meta.url) === resolve(process.argv[1])', 'false');

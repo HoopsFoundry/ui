@@ -114,7 +114,11 @@ export function assertBudgets(bundles) {
  */
 export async function bundleSync({ root = ROOT } = {}) {
   const { build } = await import('esbuild');
+  // Konfiguration zur Bauzeit einsetzen (kein Lesen von project.config.json zur Laufzeit im Anhang)
+  const configFile = existsSync(join(root, 'project.config.json')) ? join(root, 'project.config.json') : join(ROOT, 'project.config.json');
+  const project = JSON.parse(await readFile(configFile, 'utf8'));
   const result = await build({
+    plugins: [{ name: 'projekt-konfiguration', setup(b) { b.onLoad({ filter: /project-config\.mjs$/ }, () => ({ contents: `export const PROJECT = ${JSON.stringify(project)};\nexport const REPOSITORY = ${JSON.stringify(`${project.repository.owner}/${project.repository.name}`)};\n`, loader: 'js' })); } }],
     entryPoints: [join(root, 'scripts/portal-sync.mjs')], bundle: true, platform: 'node', format: 'esm', target: 'node18', write: false, legalComments: 'none', logLevel: 'silent',
   });
   const text = result.outputFiles[0].text;

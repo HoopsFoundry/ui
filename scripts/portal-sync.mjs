@@ -30,14 +30,17 @@ import { fileURLToPath } from 'node:url';
 import { download } from './lib/download.mjs';
 import { runCli } from './lib/errors.mjs';
 import { acquireLock, copyDir } from './lib/fsutil.mjs';
+import { PROJECT } from './lib/project-config.mjs';
 import { assertNode } from './lib/runtime.mjs';
 import { parseSums, readTgz } from './lib/tar.mjs';
 
 export { readTgz, parseSums };
-const PACKAGE = '@hoopsfoundry/ui';
+const PACKAGE = PROJECT.npmPackage;
 const MARKER = '.hoops-sync';
-/** Release-Adresse dieses Pakets; die Datei liegt unter `<basis>/v<version>/hoops-ui-<version>.tgz`. */
-export const RELEASE_BASE_URL = 'https://github.com/HoopsFoundry/ui/releases/download';
+/** Eingebaute Release-Adresse (aus project.config.json); die Datei liegt unter `<basis>/v<version>/hoops-ui-<version>.tgz`. Vorrang: --base-url, Variable HOOPS_UI_BASE_URL, dieser Wert. */
+export const RELEASE_BASE_URL = PROJECT.releaseBaseUrl;
+/** Rangfolge der Release-Basisadresse: Option `--base-url` > Variable HOOPS_UI_BASE_URL > eingebauter Wert aus project.config.json. */
+export const resolveBaseUrl = (explicit, env = process.env) => explicit || env.HOOPS_UI_BASE_URL || RELEASE_BASE_URL;
 const VERSION_PATTERN = /^\d{1,6}\.\d{1,6}\.\d{1,6}(-[0-9A-Za-z.-]{1,32})?$/;
 
 const exists = async (path) => {
@@ -147,7 +150,7 @@ async function resolveSource(source, root) {
     const cleanup = () => rm(dir, { recursive: true, force: true });
     try {
       const net = { fetchFn: source.fetch ?? globalThis.fetch, allowInsecureHttp: source.allowInsecureHttp, redirectHosts: source.redirectHosts, timeoutMs: source.timeoutMs, idleMs: source.idleMs, maxBytes: source.maxBytes };
-      await fetchRelease({ version: source.version, baseUrl: source.baseUrl ?? RELEASE_BASE_URL, net }, dir);
+      await fetchRelease({ version: source.version, baseUrl: resolveBaseUrl(source.baseUrl), net }, dir);
     } catch (error) {
       await cleanup();
       throw error;

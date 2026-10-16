@@ -138,7 +138,7 @@ jobs:
       #     subject-path: |
       #       release/hoops-ui-*.tgz
       #       release/hoops-sync.mjs
-      # Prüfen lässt sie sich dann mit: gh attestation verify <Datei> --repo HoopsFoundry/ui
+      # Prüfen lässt sie sich dann mit: gh attestation verify <Datei> --repo "$GITHUB_REPOSITORY"
 
       - name: Release anlegen oder ergänzen
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3

@@ -29,8 +29,8 @@ describe('Aufrufe in der Doku', () => {
     for (const flag of ['--from-release', '--from-package', '--from-dir', '--base-url']) expect(all, flag).toContain(flag);
   });
   it('die Adresse im Beispiel ist die Standard-Adresse des Skripts', () => {
-    expect(releaseSync).toContain('https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/');
-    expect(read('scripts/portal-sync.mjs')).toContain("'https://github.com/HoopsFoundry/ui/releases/download'");
+    expect(releaseSync).toContain(`${JSON.parse(read('project.config.json')).releaseBaseUrl}/v0.10.0/`);
+    expect(read('scripts/portal-sync.mjs')).toContain('PROJECT.releaseBaseUrl');
     expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.10.0.sha256');
     expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.10.0.tgz.sha256');
     expect(getSync).toContain('shasum -a 256 -c hoops-sync.mjs.sha256');

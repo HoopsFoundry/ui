@@ -1,5 +1,6 @@
 // Code-Beispiele der Seite „Vanilla“. Die Tests (tests/vanilla-docs.test.ts, tests/vanilla-docs-dom.test.ts) führen das Markup mit initAll in jsdom aus,
 // prüfen die Liste der Exporte gegen das gebaute Bündel und die Größenangaben gegen die Messung.
+import project from '../../project.config.json';
 import { themeBootScript } from '../../js/theme.js';
 import { buttonMarkup as accordionMarkup } from '../Accordion.code';
 import { dialogMarkup } from '../Modal.code';
@@ -174,10 +175,13 @@ export const renderBudget = { minKB: 52, gzipKB: 18 };
 export const mapSizes = { js: 38932, min: 22360, gzip: 9140 };
 export const mapBudget = { minKB: 24, gzipKB: 10 };
 
+/** Release-Adresse aus project.config.json (die eine Quelle; keine feste Adresse im Code). */
+const RELEASE = project.releaseBaseUrl;
+
 /** Das Hilfsskript holen und prüfen: Release-Anhang `hoops-sync.mjs` mit eigener Prüfsumme. */
 export const getSync = `# Im Projekt des Portals (neben der package.json): das Skript und seine Prüfsumme aus demselben Release laden und prüfen
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-sync.mjs
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-sync.mjs.sha256
+curl -LO ${RELEASE}/v0.10.0/hoops-sync.mjs
+curl -LO ${RELEASE}/v0.10.0/hoops-sync.mjs.sha256
 shasum -a 256 -c hoops-sync.mjs.sha256        # muss "hoops-sync.mjs: OK" melden (Linux: sha256sum -c)
 node --version                              # Node 18 oder neuer
 
@@ -189,7 +193,7 @@ npx hoops-sync --from-package`;
 export const releaseSync = `# Im Projekt (nicht im Paket): hoops-sync.mjs liegt neben der package.json des Portals
 node hoops-sync.mjs --from-release 0.10.0
 # → lädt hoops-ui-0.10.0.tgz und hoops-ui-0.10.0.sha256 von
-#   https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/
+#   ${RELEASE}/v0.10.0/
 # → prüft die SHA-256 des Tarballs und jeder Datei darin, die Version in version.json und den Ordnernamen
 # → ersetzt erst danach _site/hoops (bei einer Abweichung bleibt das alte Ziel unverändert, Exit-Code 1)
 
@@ -203,9 +207,9 @@ node hoops-sync.mjs --from-release 0.10.0 --debug   # bei einem Fehler zusätzli
 /** Prüfsumme von Hand, ohne das Skript. */
 export const manualCheck = `# Beide Dateien eines Releases in einen leeren Ordner laden, den Tarball daneben entpacken, dann prüfen
 mkdir hoops-0.10.0 && cd hoops-0.10.0
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-ui-0.10.0.tgz
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-ui-0.10.0.sha256
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-ui-0.10.0.tgz.sha256
+curl -LO ${RELEASE}/v0.10.0/hoops-ui-0.10.0.tgz
+curl -LO ${RELEASE}/v0.10.0/hoops-ui-0.10.0.sha256
+curl -LO ${RELEASE}/v0.10.0/hoops-ui-0.10.0.tgz.sha256
 shasum -a 256 -c hoops-ui-0.10.0.tgz.sha256   # nur der Tarball (Linux: sha256sum -c)
 tar xzf hoops-ui-0.10.0.tgz
 shasum -a 256 -c hoops-ui-0.10.0.sha256      # Tarball und jede Datei darin; jede Zeile muss "OK" sein`;

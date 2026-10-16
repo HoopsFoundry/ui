@@ -1,6 +1,6 @@
 // @vitest-environment node
 // portal-sync mit --from-release: Download vom lokalen http-Server (kein Netz), Prüfsumme, Version, Archivinhalt, Zielschutz, Schreibrechte.
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { chmod, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -246,6 +246,6 @@ describe('Quelle und Befehlszeile', () => {
   });
   it('die Standard-Adresse zeigt auf die Release-Anhänge dieses Repositorys', async () => {
     const { RELEASE_BASE_URL } = await import(/* @vite-ignore */ '../scripts/portal-sync.mjs');
-    expect(RELEASE_BASE_URL).toBe('https://github.com/HoopsFoundry/ui/releases/download');
+    expect(RELEASE_BASE_URL).toBe(JSON.parse(readFileSync(new URL('../project.config.json', import.meta.url), 'utf8')).releaseBaseUrl);
   });
 });

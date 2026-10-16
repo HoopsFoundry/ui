@@ -198,6 +198,7 @@
     "js/",
     "svelte/",
     "dist/",
+    "project.config.json",
     "scripts/lib/",
     "scripts/portal-sync.mjs",
     "scripts/migrate-from-dss.mjs",
@@ -270,6 +271,8 @@
     }
   },
   "devDependencies": {
+    "@emnapi/core": "^1.11.3",
+    "@emnapi/runtime": "^1.11.3",
     "@radix-ui/react-dialog": "^1.1.23",
     "@storybook/addon-a11y": "^10.6.1",
     "@storybook/addon-docs": "^10.6.1",

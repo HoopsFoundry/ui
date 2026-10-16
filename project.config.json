@@ -1,0 +1,7 @@
+{
+  "name": "HoopsFoundry UI",
+  "npmPackage": "@hoopsfoundry/ui",
+  "repository": { "owner": "HoopsFoundry", "name": "ui" },
+  "domain": "ui.hoopsfoundry.com",
+  "releaseBaseUrl": "https://github.com/HoopsFoundry/ui/releases/download"
+}
