@@ -92,6 +92,17 @@ export function cssRules(css: string): Rules {
     'Zielgröße: Kontaktlinks mindestens 32 px, schmal 44 px': minHeight('.hoops-venue-contact .hoops-link') >= 32 && /\.hoops-venue-contact \.hoops-link \{[^}]*min-height:\s*44px/.test(container),
     'Karte wie die anderen Karten: Rand, Radius 16 px, Fläche': /border:\s*1px solid var\(--hoops-line\)/.test(body('.hoops-venue')) && /border-radius:\s*16px/.test(body('.hoops-venue')) && /background:\s*var\(--hoops-surface\)/.test(body('.hoops-venue')),
     'Trikotpunkt mit Rand in --hoops-mute': /border:\s*1px solid var\(--hoops-mute\)/.test(body('.hoops-venue-dot')),
+    'Kurznamen folgen der Karte (Container-Abfrage 640), nicht dem Fenster': (() => {
+      const sel = '\\.hoops-venue \\.hoops-team-name:not\\(\\.hoops-team-name--short\\)';
+      const queryAt = text.indexOf('@container hoops-venue (max-width: 640px)');
+      const before = text.slice(0, queryAt);
+      const inside = text.slice(queryAt);
+      // Reihenfolge: erst die Rücknahme der Fensterregel, danach die Container-Regel (gleiche Spezifität, die spätere gewinnt)
+      return new RegExp(`${sel} \\.hoops-name-short \\{ display: none; \\}`).test(before)
+        && new RegExp(`${sel} \\.hoops-name-full \\{[^}]*position: static`).test(before)
+        && new RegExp(`${sel} \\.hoops-name-short \\{ display: inline; \\}`).test(inside)
+        && new RegExp(`${sel} \\.hoops-name-full \\{[^}]*clip: rect\\(0, 0, 0, 0\\)`).test(inside);
+    })(),
     'lange Wörter ohne Leerstelle brechen um (Straße, Info, Liga und Feld, Datum, Link, Beschriftung)': ['.hoops-venue-line', '.hoops-venue-info', '.hoops-venue-game-meta', '.hoops-venue-when', '.hoops-venue-more', '.hoops-venue-sec', '.hoops-venue-contact dd', '.hoops-venue-team-name'].every((s) => /overflow-wrap:\s*anywhere/.test(body(s))),
     'Gitterspalten dürfen schrumpfen (minmax(0, 1fr))': ['.hoops-venue-address', '.hoops-venue-game-list', '.hoops-venue-teams'].every((s) => /grid-template-columns:\s*minmax\(0, 1fr\)/.test(body(s))),
     'Adresse ohne Kursivschrift': /font-style:\s*normal/.test(body('.hoops-venue-address')),

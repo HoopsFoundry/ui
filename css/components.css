@@ -1901,6 +1901,14 @@ details[open].hoops-acc-item > summary.hoops-acc-trigger { border-bottom-left-ra
 .hoops-venue--compact .hoops-venue-title { font-weight: var(--hoops-title-weight, 700); font-size: var(--hoops-card-title-size, var(--hoops-title-size, var(--hoops-fs-body-lg))); line-height: var(--hoops-title-leading, 1.2); }
 .hoops-venue--compact .hoops-venue-more { min-height: 44px; }
 
+/* Kurznamen der Mannschaften (names="full", Standard): in der Hallenkarte folgen sie der Breite der Karte (Container-Abfrage), nicht der des Fensters.
+   Die globale Medienabfrage der Namen-Regeln (max-width: 640px) wird hier zurückgenommen und durch dieselbe Schwelle als Container-Abfrage ersetzt;
+   names="short" (.hoops-team-name--short) gilt unverändert immer. Der volle Name bleibt auch hier für Hilfstechnik lesbar (sr-only-Muster). */
+.hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-short { display: none; }
+.hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-full {
+  position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal; user-select: auto;
+}
+
 /* Schmal (Karte höchstens 640 px breit, also auch auf dem Handy und in schmalen Spalten): Karte oben (16:9, mindestens 224 px hoch), Daten darunter.
    Maßgeblich ist die Breite der Karte, nicht die des Fensters (Container-Abfrage), damit sie auch in einer schmalen Spalte am großen Bildschirm passt. */
 @container hoops-venue (max-width: 640px) {
@@ -1911,6 +1919,12 @@ details[open].hoops-acc-item > summary.hoops-acc-trigger { border-bottom-left-ra
   .hoops-venue-body, .hoops-venue--compact .hoops-venue-body { padding: 16px; }
   .hoops-venue-contact > div { grid-template-columns: 5.5rem minmax(0, 1fr); min-height: 44px; }
   .hoops-venue-contact .hoops-link { min-height: 44px; }
+  /* Kurznamen der Mannschaften folgen der Karte (die Fensterregel ist oben zurückgenommen) */
+  .hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-short { display: inline; }
+  .hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-full {
+    position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
+    overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; user-select: none;
+  }
 }
 
 /* Druck: Daten untereinander, die Karte selbst druckt die Liste mit Koordinaten */

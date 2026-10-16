@@ -72,6 +72,9 @@ const CSS: Mutation[] = [
   { name: 'Elementselektor für Überschriften', rule: 'keine Elementselektoren für Überschriften', from: '.hoops-venue-title {', to: 'h3.hoops-venue-title, .hoops-venue h3 {' },
   { name: 'Straße ohne Umbruch langer Wörter', rule: 'lange Wörter ohne Leerstelle brechen um (Straße, Info, Liga und Feld, Datum, Link, Beschriftung)', from: '.hoops-venue-line { display: block; overflow-wrap: anywhere; }', to: '.hoops-venue-line { display: block; }' },
   { name: 'Spieleliste mit auto-Spalte', rule: 'Gitterspalten dürfen schrumpfen (minmax(0, 1fr))', from: '.hoops-venue-game-list { display: grid; grid-template-columns: minmax(0, 1fr);', to: '.hoops-venue-game-list { display: grid;' },
+  { name: 'Kurzname ohne Rücknahme der Fensterregel', rule: 'Kurznamen folgen der Karte (Container-Abfrage 640), nicht dem Fenster', from: '.hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-short { display: none; }', to: '' },
+  { name: 'Kurzname erst bei Fensterbreite (Container-Regel entfällt)', rule: 'Kurznamen folgen der Karte (Container-Abfrage 640), nicht dem Fenster', from: '.hoops-name-short { display: inline; }\n  .hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-full {', to: '.hoops-name-short { display: none; }\n  .hoops-venue .hoops-team-name:not(.hoops-team-name--short) .hoops-name-full {' },
+  { name: 'voller Name bleibt unverborgen schmal', rule: 'Kurznamen folgen der Karte (Container-Abfrage 640), nicht dem Fenster', from: 'overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; user-select: none;\n  }\n}\n', to: 'overflow: hidden; white-space: nowrap; border: 0; user-select: none;\n  }\n}\n' },
   { name: 'Adresse kursiv', rule: 'Adresse ohne Kursivschrift', from: 'font-style: normal;', to: 'font-style: italic;' },
 ];
 
