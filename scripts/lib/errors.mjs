@@ -37,7 +37,8 @@ export function describeError(error, { debug = false, name = 'dss' } = {}) {
   } else {
     text = `${name}: Unerwarteter Fehler: ${message}${debug ? '' : ' (mit --debug folgt der Stack)'}`;
   }
-  return debug && error?.stack ? `${text}\n${error.stack}` : text;
+  // --debug: die ursprüngliche Meldung des Systems und, soweit vorhanden, der Stack (Fehler aus fs.promises haben oft keinen)
+  return debug ? `${text}\nTechnisch: ${error?.code ? `${error.code}: ` : ''}${message}${error?.stack ? `\n${error.stack}` : ''}` : text;
 }
 
 /** Führt `main` aus; bei einem Fehler: deutsche Meldung auf stderr, Exit-Code 1, kein Stack ohne `debug`. */

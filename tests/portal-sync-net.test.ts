@@ -231,7 +231,7 @@ describe('Deutsche Fehlermeldungen und Startprüfung', () => {
   it('eigene Meldungen bleiben, Unbekanntes bekommt einen Hinweis auf --debug, --debug hängt den Stack an', () => {
     expect(describeError(new Error('portal-sync: schon deutsch'), { name: 'x' })).toBe('portal-sync: schon deutsch');
     expect(describeError(new Error('komisch'), { name: 'portal-sync' })).toMatch(/Unerwarteter Fehler: komisch \(mit --debug folgt der Stack\)/);
-    expect(describeError(new Error('komisch'), { name: 'portal-sync', debug: true })).toMatch(/\n\s+at /);
+    expect(describeError(new Error('komisch'), { name: 'portal-sync', debug: true })).toMatch(/Technisch: komisch\n.*\n\s+at /s);
   });
   it('das Programm: Ziel unter einer Datei → deutsche Meldung, Exit 1, kein Stack; mit --debug der Stack', async () => {
     const dir = `${root}/enotdir`;
@@ -245,7 +245,7 @@ describe('Deutsche Fehlermeldungen und Startprüfung', () => {
     expect(plain.stderr).not.toMatch(/\n\s+at /);
     const debug = await node([sync, '--from-dir', `${dir}/quelle`, '--to', `${dir}/datei/unter/dss`, '--debug'], { cwd: dir });
     expect(debug.code).toBe(1);
-    expect(debug.stderr).toMatch(/\n\s+at /);
+    expect(debug.stderr).toMatch(/Technisch: [A-Z]+: /);
     expect(await readdir(dir)).not.toContain('datei.old-1');
   });
   it('Node-Mindestversion: zu alte Versionen werden mit deutscher Meldung abgelehnt', () => {

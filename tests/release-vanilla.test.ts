@@ -299,3 +299,30 @@ describe('Budgets, Ausgabeordner, Hilfsskript', () => {
     expect(run.stderr).not.toMatch(/\bat \w+.*\(/);
   });
 });
+
+describe('Programm: deutsche Fehler, Paketinhalt', () => {
+  const run = (args: string[]) => spawnSync(process.execPath, [resolve(process.cwd(), 'scripts/release-vanilla.mjs'), ...args], { cwd: tmpRoot, encoding: 'utf8' });
+  it('ein Ausgabeziel unter einer Datei ergibt eine deutsche Meldung, Exit 1, keinen Stack; --debug zeigt ihn', async () => {
+    await mkdir(tmpRoot, { recursive: true });
+    await writeFile(`${tmpRoot}/ich-bin-eine-datei`, 'x');
+    const args = ['--allow-dirty', '--no-build', '--dry-run', `--out=${tmpRoot}/ich-bin-eine-datei/unter/release`];
+    const plain = run(args);
+    // die Prüfungen laufen, im Probelauf wird nichts geschrieben; mit Schreiben entsteht der Systemfehler
+    expect(plain.status).toBe(0);
+    const write = run(args.filter((a) => a !== '--dry-run'));
+    expect(write.status).toBe(1);
+    expect(write.stderr).toMatch(/^release-vanilla: .*(kein Ordner|nicht gefunden)/m);
+    expect(write.stderr).not.toMatch(/\n\s+at /);
+    const debug = run([...args.filter((a) => a !== '--dry-run'), '--debug']);
+    expect(debug.status).toBe(1);
+    expect(debug.stderr).toMatch(/Technisch: ENOTDIR: /);
+  });
+  it('npm pack enthält portal-sync.mjs und lib/, aber weder das Release-Skript noch Browser-Prüfungen', () => {
+    const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: process.cwd(), encoding: 'utf8' });
+    expect(pack.status).toBe(0);
+    const files: string[] = JSON.parse(pack.stdout)[0].files.map((f: { path: string }) => f.path);
+    for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/dss.js']) expect(files, f).toContain(f);
+    expect(files.filter((f) => f.startsWith('scripts/')).every((f) => f === 'scripts/portal-sync.mjs' || f.startsWith('scripts/lib/'))).toBe(true);
+    expect(files.some((f) => /release|check-|tests\/|\.worktrees/.test(f))).toBe(false);
+  });
+});
