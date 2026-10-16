@@ -1,7 +1,9 @@
 // @vitest-environment node
 // Stufe T der Umbenennung (DSS → HoopsFoundry UI): Ersetzungsregeln für Design-Tokens (CSS-Custom-Properties) und Mutationstests.
 import { describe, expect, it } from 'vitest';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { buildRegexes, buildTable, renameToken, tableFromPairs, transformText } from '../scripts/lib/token-rename.mjs';
 import { collectNames, listFiles } from '../scripts/codemod-tokens.mjs';
 import { TOKENS } from '../scripts/migration-table.mjs';
@@ -139,5 +141,75 @@ describe('Mutationstests der Ersetzungsregeln', () => {
     expect(names).toEqual(['--x']);
     const m = await loadMutated('codemod-tokens.mjs', 'codemod-tokens.mjs', "['--evil', ", "['--evilx', ");
     expect([...m.collectNames(files).keys()].sort()).toEqual(['--evil', '--x']);
+  });
+});
+
+describe('Dateiliste des Bestands (Rennen mit den Arbeitsordnern anderer Tests)', () => {
+  const dummy = (root: string) => {
+    for (const dir of ['tests/.release-tmp-zzdummy-load/0/scripts', 'tests/.release-tmp-zzdummy/x', '.bundle-tmp-zzdummy', 'tests/.code-tmp-zzdummy']) {
+      mkdirSync(join(root, dir), { recursive: true });
+      writeFileSync(join(root, dir, 'a.css'), ':root { --ohne-praefix: 1; } a { color: var(--ohne-praefix); }\n');
+    }
+  };
+  const cleanup = (root: string) => { for (const dir of ['tests/.release-tmp-zzdummy-load', 'tests/.release-tmp-zzdummy', '.bundle-tmp-zzdummy', 'tests/.code-tmp-zzdummy']) rmSync(join(root, dir), { recursive: true, force: true }); };
+  it('Arbeitsordner unter tests/ und .release-tmp*/.bundle-tmp* werden ignoriert (Git-Weg)', async () => {
+    const root = process.cwd();
+    try {
+      dummy(root);
+      const files = await listFiles(root);
+      expect(files.filter((f) => f.includes('zzdummy'))).toEqual([]);
+      expect(files).toContain('css/components.css');
+    } finally { cleanup(root); }
+  });
+  it('dasselbe im Rückfall ohne Git (Verzeichnislauf)', async () => {
+    const root = mkdtempSync(join(tmpdir(), 'hoops-list-'));
+    try {
+      dummy(root);
+      mkdirSync(join(root, 'css'), { recursive: true });
+      writeFileSync(join(root, 'css/echt.css'), 'a { color: red; }\n');
+      expect(await listFiles(root)).toEqual(['css/echt.css']);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+  it('Mutation: ohne Ausschluss der Arbeitsordner sieht die Liste die Kopien', async () => {
+    const m = await loadMutated('codemod-tokens.mjs', 'codemod-tokens.mjs', 'const TEMP_PFAD = /', 'const TEMP_PFAD = /(?!)/; const UNBENUTZT = /');
+    const root = mkdtempSync(join(tmpdir(), 'hoops-list-'));
+    try {
+      mkdirSync(join(root, 'tests/.release-tmp-zzdummy-load'), { recursive: true });
+      writeFileSync(join(root, 'tests/.release-tmp-zzdummy-load/a.css'), 'a { color: var(--x); }\n');
+      expect((await m.listFiles(root)).some((f: string) => f.includes('zzdummy'))).toBe(true);
+    } finally { rmSync(root, { recursive: true, force: true }); }
+  });
+});
+
+describe('Erkennung eigener Namen in allen Kontexten (collectNames)', () => {
+  const names = (file: string, text: string) => [...collectNames(new Map([[file, text]]), new Map()).keys()];
+  it.each([
+    ['MDX-Text mit reiner Definition', 'stories/Neu.mdx', 'Die Variable\n\n--neu-eins: 12px;\n'],
+    ['Markdown', 'README.md', '`--neu-eins: 12px`'],
+    ['Code-Block in .code.ts', 'stories/Neu.code.ts', 'export const css = `:root {\n  --neu-eins: red;\n}`;'],
+    ['Svelte-<style>', 'stories/Neu.svelte', '<style>\n  .a { --neu-eins: 1px; }\n</style>'],
+    ['Objektschlüssel in JS', 'js/neu.js', "export const s = { '--neu-eins': '1px' };"],
+    ['style={{…}} in TSX', 'react/Neu.tsx', "export const A = () => <div style={{ '--neu-eins': 1 }} />;"],
+    ['Svelte-Direktive style:--x', 'svelte/Neu.svelte', '<div style:--neu-eins="1px"></div>'],
+    ['SVG', 'stories/neu.svg', '<svg style="fill: var(--neu-eins)"></svg>'],
+    ['Textdatei', 'docs/neu.txt', '--neu-eins: 3px'],
+    ['Shell-Skript', 'scripts/neu.sh', 'echo "x" # var(--neu-eins)'],
+    ['JSON', 'tokens/neu.json', '{"css": "var(--neu-eins)"}'],
+    ['HTML', 'stories/neu.html', '<p style="--neu-eins: 1px">'],
+    ['YAML', '.github/neu.yml', 'run: echo "var(--neu-eins)"'],
+  ])('%s', (_name, file, text) => {
+    expect(names(file, text)).toContain('--neu-eins');
+  });
+  it('Kommandozeilen-Optionen in Meldungen von scripts/ und tests/ sind keine Definitionen', () => {
+    expect(names('scripts/x.mjs', "console.error('--from-release: Version fehlt');")).toEqual([]);
+    expect(names('tests/x.test.ts', "expect(msg).toContain('--debug: ')")).toEqual([]);
+  });
+  it('Mutation: ohne die Muster für Definitionen in Text fehlt der Name', async () => {
+    const m = await loadMutated('codemod-tokens.mjs', 'codemod-tokens.mjs', "if (!/^(scripts|tests)\\//.test(file)) for", "if (false) for");
+    expect([...m.collectNames(new Map([['stories/Neu.mdx', '--neu-eins: 12px;']]), new Map()).keys()]).toEqual([]);
+    const k = await loadMutated('codemod-tokens.mjs', 'codemod-tokens.mjs', "for (const m of t.matchAll(/(['\"`])(--[a-zA-Z_][\\w-]*)\\1\\s*:/g)) add(m[2], file);", '');
+    expect([...k.collectNames(new Map([['js/n.js', "{ '--neu-eins': 1 }"]]), new Map()).keys()]).toEqual([]);
+    const d = await loadMutated('codemod-tokens.mjs', 'codemod-tokens.mjs', "for (const m of t.matchAll(/style:(--[a-zA-Z_][\\w-]*)\\s*=/g)) add(m[1], file);", '');
+    expect([...d.collectNames(new Map([['svelte/N.svelte', '<i style:--neu-eins="1">']]), new Map()).keys()]).toEqual([]);
   });
 });

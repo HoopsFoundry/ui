@@ -56,6 +56,14 @@ describe('Präfix --hoops- (Stufe T)', () => {
     const dateien = [...real.keys()];
     for (const ext of ['.css', '.svelte', '.tsx', '.js', '.mdx']) expect(dateien.some((f) => f.endsWith(ext)), ext).toBe(true);
   });
+  it('die Allowlist ist ein fester, geprüfter Satz (neue Einträge brauchen eine bewusste Änderung dieses Tests)', () => {
+    expect(ALLOWLIST.map((a) => a.muster)).toEqual(['--evil', '--token', '--leaflet-', '--tw-', '--sb-', '--docblock-']);
+    expect(findTokenViolations(new Map(real).set('css/x.css', ':root { --ink-9: 1; }'), [...ALLOWLIST, { muster: '--ink-', grund: 'eigene Skala, absichtlich nicht umbenannt und lange begründet' }])).toEqual([]);
+  });
+  it('Mutation: ein zusätzlicher Allowlist-Eintrag "--ink-" mit langer Begründung ist nicht stillschweigend möglich', () => {
+    const erweitert = [...ALLOWLIST, { muster: '--ink-', grund: 'eigene Skala, absichtlich nicht umbenannt und lange begründet' }];
+    expect(erweitert.map((a) => a.muster)).not.toEqual(['--evil', '--token', '--leaflet-', '--tw-', '--sb-', '--docblock-']);
+  });
   it('jeder Allowlist-Eintrag ist begründet', () => {
     for (const a of ALLOWLIST) {
       expect(a.muster).toMatch(/^--[a-z][a-z-]*$/);
@@ -98,5 +106,27 @@ describe('Präfix --hoops- (Stufe T)', () => {
   it('Mutation: Prüfung ist nicht abgeschaltet (Allowlist-Muster greift nur auf Präfix-Grenze)', () => {
     const fast = withEdit('css/components.css', '--hoops-fg:', '--twist:');
     expect(findTokenViolations(fast).join('\n')).toContain('--twist');
+  });
+});
+
+describe('Verbotstest erkennt neue unpräfixierte Namen in allen Kontexten', () => {
+  const mit = (file: string, text: string) => findTokenViolations(new Map(real).set(file, text)).join('\n');
+  it.each([
+    ['reine Definition in MDX', 'stories/Neu.mdx', '--neu-eins: 12px;\n'],
+    ['Definition im Text einer .code.ts', 'stories/Neu.code.ts', 'export const c = `:root { --neu-eins: red; }`;'],
+    ['Definition in Svelte-<style>', 'stories/Neu.svelte', '<style>.a { --neu-eins: 1px; }</style>'],
+    ['Objektschlüssel in JS', 'js/neu.js', "export const s = { '--neu-eins': 1 };"],
+    ['style={{…}} in TSX', 'react/Neu.tsx', "export const A = () => <div style={{ '--neu-eins': 1 }} />;"],
+    ['Svelte-Direktive', 'svelte/Neu.svelte', '<div style:--neu-eins="1"></div>'],
+    ['SVG', 'stories/neu.svg', '<svg style="fill: var(--neu-eins)"></svg>'],
+    ['Textdatei', 'docs/neu.txt', '--neu-eins: 3px'],
+    ['JSON', 'tokens/neu.json', '{"c": "var(--neu-eins)"}'],
+    ['HTML', 'stories/neu.html', '<p style="--neu-eins: 1px">'],
+    ['YAML', '.github/neu.yml', 'x: var(--neu-eins)'],
+  ])('%s', (_n, file, text) => {
+    expect(mit(file, text)).toContain('unpräfixiert: --neu-eins');
+  });
+  it('mit Präfix ist dieselbe Stelle in Ordnung', () => {
+    expect(mit('stories/Neu.mdx', '--hoops-neu-eins: 12px;\n')).toBe('');
   });
 });
