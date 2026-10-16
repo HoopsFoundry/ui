@@ -1,7 +1,9 @@
 # HoopsFoundry UI
 
-**Digitaler Spielbericht · Komponenten-Library für Basketball-Apps**
+**Komponenten-Library für Basketball-Apps**
 Version 0.10 · WCAG 2.1 AAA · Framework-agnostisch · *Pre-release*
+
+HoopsFoundry UI ist kein offizielles Designsystem eines Verbands. Die Marken BBV und DBB sind mitgelieferte Themes (Farben und Schriften), die sich durch eigene ersetzen lassen.
 
 ---
 

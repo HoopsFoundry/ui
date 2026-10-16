@@ -1,7 +1,7 @@
 {
   "name": "@hoopsfoundry/ui",
   "version": "0.10.0",
-  "description": "HoopsFoundry UI — Komponenten-Library für Basketball-Apps (Digitaler Spielbericht, Scoreboard, Vereinsregister)",
+  "description": "HoopsFoundry UI — Komponenten-Library für Basketball-Apps",
   "type": "module",
   "main": "tokens/tokens.css",
   "exports": {
@@ -225,7 +225,6 @@
     "basketball",
     "hoopsfoundry",
     "ui",
-    "spielbericht",
     "dbb",
     "tokens",
     "svelte",
