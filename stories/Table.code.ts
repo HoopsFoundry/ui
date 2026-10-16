@@ -3,19 +3,19 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="css/components.css" />
 <!-- optional: <link rel="stylesheet" href="fonts/fonts.css" /> -->
 
-<!-- Dichte: dss-tbl--touch | --compact | --dense (ohne Angabe 48 px). Dunkel: dss-frame--dark. Streifen: dss-tbl--striped -->
-<div class="dss-frame">
-  <div class="dss-frame-head">
-    <h3 class="dss-frame-title">Spieler-Statistiken</h3>
-    <div class="dss-frame-meta">
+<!-- Dichte: hoops-tbl--touch | --compact | --dense (ohne Angabe 48 px). Dunkel: hoops-frame--dark. Streifen: hoops-tbl--striped -->
+<div class="hoops-frame">
+  <div class="hoops-frame-head">
+    <h3 class="hoops-frame-title">Spieler-Statistiken</h3>
+    <div class="hoops-frame-meta">
       <span>Stand · 4. Viertel</span>
       <!-- nur bei laufendem Spiel -->
-      <span class="dss-crumb"><span class="dss-crumb-dot" aria-hidden="true"></span> Live</span>
+      <span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>
     </div>
   </div>
   <!-- Scrollbereich: Region mit Namen, per Tastatur erreichbar -->
-  <div class="dss-table-scroll" role="region" tabindex="0" aria-label="Spieler-Statistiken">
-    <table class="dss-tbl dss-tbl--compact">
+  <div class="hoops-table-scroll" role="region" tabindex="0" aria-label="Spieler-Statistiken">
+    <table class="hoops-tbl hoops-tbl--compact">
       <thead>
         <tr>
           <th scope="col">Spieler</th>
@@ -26,13 +26,13 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
       </thead>
       <tbody>
         <tr>
-          <td><div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">J. Tanner</span></div></div></td>
+          <td><div class="hoops-player"><div class="hoops-player-info"><span class="hoops-player-name">J. Tanner</span></div></div></td>
           <td class="num">32:14</td>
           <td class="num lead">22</td>
           <td class="num plus">+18</td>
         </tr>
         <tr class="is-own">
-          <td><div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">M. Okafor</span></div></div></td>
+          <td><div class="hoops-player"><div class="hoops-player-info"><span class="hoops-player-name">M. Okafor</span></div></div></td>
           <td class="num">29:45</td>
           <td class="num lead">19</td>
           <td class="num minus">−4</td>
@@ -46,7 +46,7 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 </div>`;
 
 export const svelte = `<script>
-  import Table from '@bbv/dss-design-system/svelte/Table';
+  import Table from '@hoopsfoundry/ui/svelte/Table';
 
   const spieler = [
     { name: 'J. Tanner', min: '32:14', pts: 22, pm: '+18' },
@@ -81,7 +81,7 @@ export const svelte = `<script>
   {/snippet}
 </Table>`;
 
-export const react = `import { Table } from '@bbv/dss-design-system/react';
+export const react = `import { Table } from '@hoopsfoundry/ui/react';
 
 const spieler = [
   { name: 'J. Tanner', min: '32:14', pts: 22, pm: '+18' },
@@ -118,24 +118,24 @@ const spieler = [
 // ── Tabellen einklappen (Table.mdx, Abschnitt „Tabellen einklappen“). Die Tests (tests/collapsible-code.test.ts) übersetzen das
 // React-Beispiel mit dem TypeScript-Compiler, rendern das Svelte-Beispiel und vergleichen das Vanilla-Markup mit der Ausgabe der Komponente.
 
-const CHEVRON = `<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
+const CHEVRON = `<svg class="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>`;
 
 /** Markup eines einklappbaren Tabellenrahmens (geöffnet, mit Zusatzinfo); die Doku zeigt es und prüft es gegen die Komponente. */
-export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
-  <div class="dss-frame is-collapsible is-open" id="boxscore">
-    <div class="dss-frame-head dss-frame-head--acc">
-      <h3 class="dss-frame-title">
-        <button type="button" class="dss-acc-trigger" id="boxscore-trigger" aria-expanded="true" aria-controls="boxscore-panel">
-          <span class="dss-acc-label">Spieler-Statistiken<span class="dss-acc-sep">,</span></span>
-          <span class="dss-frame-meta"><span>Stand · 4. Viertel</span></span>
+export const collapsibleMarkup = `<div class="hoops-acc" data-hoops-acc>
+  <div class="hoops-frame is-collapsible is-open" id="boxscore">
+    <div class="hoops-frame-head hoops-frame-head--acc">
+      <h3 class="hoops-frame-title">
+        <button type="button" class="hoops-acc-trigger" id="boxscore-trigger" aria-expanded="true" aria-controls="boxscore-panel">
+          <span class="hoops-acc-label">Spieler-Statistiken<span class="hoops-acc-sep">,</span></span>
+          <span class="hoops-frame-meta"><span>Stand · 4. Viertel</span></span>
           ${CHEVRON}
         </button>
       </h3>
     </div>
-    <div class="dss-acc-panel" id="boxscore-panel">
-      <div class="dss-acc-panel-inner">
-        <div class="dss-table-scroll" role="region" tabindex="0" aria-label="Spieler-Statistiken">
-          <table class="dss-tbl dss-tbl--compact">
+    <div class="hoops-acc-panel" id="boxscore-panel">
+      <div class="hoops-acc-panel-inner">
+        <div class="hoops-table-scroll" role="region" tabindex="0" aria-label="Spieler-Statistiken">
+          <table class="hoops-tbl hoops-tbl--compact">
             <thead><tr><th scope="col" class="left">Spieler</th><th scope="col" class="right">PTS</th></tr></thead>
             <tbody>
               <tr><td>J. Tanner</td><td class="num lead">22</td></tr>
@@ -149,22 +149,22 @@ export const collapsibleMarkup = `<div class="dss-acc" data-dss-acc>
 </div>`;
 
 export const collapsibleVanilla = `<!-- Wie die normale Tabelle (siehe oben), aber der Kopf ist der Accordion-Kopf: Überschrift mit Button, der Rahmen trägt
-     is-collapsible (und is-open, wenn er offen ist), die Tabelle steht in einem Bereich (dss-acc-panel). Geschlossen: aria-expanded="false",
-     Bereich mit hidden und inert. Der Container mit data-dss-acc macht ihn bedienbar; mehrere Rahmen in einem Container bilden eine Gruppe.
-     Steht der Rahmen im Panel eines Bereichs (dss-acc-item), braucht er einen eigenen Container (div.dss-acc mit data-dss-acc) und einen eigenen
-     initAccordion-Aufruf; initAccordions startet jeden data-dss-acc-Container einzeln. -->
+     is-collapsible (und is-open, wenn er offen ist), die Tabelle steht in einem Bereich (hoops-acc-panel). Geschlossen: aria-expanded="false",
+     Bereich mit hidden und inert. Der Container mit data-hoops-acc macht ihn bedienbar; mehrere Rahmen in einem Container bilden eine Gruppe.
+     Steht der Rahmen im Panel eines Bereichs (hoops-acc-item), braucht er einen eigenen Container (div.hoops-acc mit data-hoops-acc) und einen eigenen
+     initAccordion-Aufruf; initAccordions startet jeden data-hoops-acc-Container einzeln. -->
 ${collapsibleMarkup}
 
 <script type="module">
-  import { initAccordions } from '@bbv/dss-design-system/accordion.js';
+  import { initAccordions } from '@hoopsfoundry/ui/accordion.js';
 
   // Optionen wie beim Accordion: exclusive, syncHash (Standard true), expandAll, nav, sticky
   initAccordions(document, { nav: true });
 </script>`;
 
 export const collapsibleSvelte = `<script>
-  import Accordion from '@bbv/dss-design-system/svelte/Accordion';
-  import Table from '@bbv/dss-design-system/svelte/Table';
+  import Accordion from '@hoopsfoundry/ui/svelte/Accordion';
+  import Table from '@hoopsfoundry/ui/svelte/Table';
 
   let open = $state(true);
 </script>
@@ -203,7 +203,7 @@ export const collapsibleSvelte = `<script>
 </Accordion>`;
 
 export const collapsibleReact = `import { useState } from 'react';
-import { Accordion, Table } from '@bbv/dss-design-system/react';
+import { Accordion, Table } from '@hoopsfoundry/ui/react';
 
 export function Spielseite() {
   const [open, setOpen] = useState(true);

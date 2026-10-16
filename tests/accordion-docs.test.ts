@@ -98,17 +98,17 @@ describe('Accordion-Doku: Korrekturen aus dem Review', () => {
   });
   it('details: Hinweis zur Auffindbarkeit ist belegbar formuliert, Komma-Hinweis vorhanden', () => {
     expect(mdx).toMatch(/HTML erlaubt aber Überschriften im `summary`/);
-    expect(mdx).toMatch(/dss-acc-sep/);
+    expect(mdx).toMatch(/hoops-acc-sep/);
     expect(mdx).toMatch(/Chromium „Spielplan 12 Spiele“/);
     expect(mdx).not.toMatch(/Ehrlicher Hinweis/);
   });
   it('Vanilla: nachträglich ändern und verschachtelte Gruppen', () => {
     expect(mdx).toMatch(/`initAccordion` erneut auf/);
-    expect(mdx).toMatch(/Verschachtelte Gruppen\*\* brauchen `data-dss-acc`/);
+    expect(mdx).toMatch(/Verschachtelte Gruppen\*\* brauchen `data-hoops-acc`/);
   });
-  it('Code-Beispiele nutzen das Komma dss-acc-sep (Button- und details-Weg)', async () => {
+  it('Code-Beispiele nutzen das Komma hoops-acc-sep (Button- und details-Weg)', async () => {
     const code = read('stories/Accordion.code.ts');
-    expect(code.match(/dss-acc-sep/g)!.length).toBeGreaterThanOrEqual(3);
-    expect(code).not.toMatch(/<span class="dss-sr-only">, <\/span>/);
+    expect(code.match(/hoops-acc-sep/g)!.length).toBeGreaterThanOrEqual(3);
+    expect(code).not.toMatch(/<span class="hoops-sr-only">, <\/span>/);
   });
 });

@@ -69,11 +69,11 @@
     {#each steps as s}
       <div class="row">
         <div class="meta">
-          <div class="name">.dss-t-{s.id}</div>
+          <div class="name">.hoops-t-{s.id}</div>
           <div class="spec">{live[s.id]?.fs} / {live[s.id]?.lh} · {live[s.id]?.fw} · {live[s.id]?.ls}{live[s.id]?.sm ? ` · Handy ${live[s.id].sm}` : ''}</div>
           <div class="use">{s.use}</div>
         </div>
-        <div class="sample"><div class={`dss-t-${s.id}`}>{s.sample}</div></div>
+        <div class="sample"><div class={`hoops-t-${s.id}`}>{s.sample}</div></div>
       </div>
     {/each}
 
@@ -99,41 +99,41 @@
         </div>
       </div>
       <div>
-        <div class="cap">tabular-nums (.dss-tnum)</div>
-        <div class="num dss-tnum">
+        <div class="cap">tabular-nums (.hoops-tnum)</div>
+        <div class="num hoops-tnum">
           {#each ['111', '808', '1:11', '98 : 67', '04:20'] as n}<div>{n}</div>{/each}
         </div>
       </div>
     </div>
     <div class="cap" style="margin-top: 28px;">Uhr und Anzeige</div>
     <div class="sb-row" style="gap: 40px;">
-      <div class="dss-t-display">87 : 64</div>
-      <div class="dss-t-clock">08:42</div>
-      <div class="dss-t-caption">Q4 · 02:14 · 24 s</div>
+      <div class="hoops-t-display">87 : 64</div>
+      <div class="hoops-t-clock">08:42</div>
+      <div class="hoops-t-caption">Q4 · 02:14 · 24 s</div>
     </div>
 
   {:else if mode === 'context'}
     <article class="ctx">
-      <div class="dss-t-caption">BBL · 17. Spieltag</div>
-      <h1 class="dss-t-h1">TSV Nordhain gegen Lindenberg Hawks</h1>
-      <p class="dss-t-body-lg dss-measure">Das Topspiel der Bayernliga beginnt um 19:30 Uhr. Beide Mannschaften stehen punktgleich an der Tabellenspitze.</p>
+      <div class="hoops-t-caption">BBL · 17. Spieltag</div>
+      <h1 class="hoops-t-h1">TSV Nordhain gegen Lindenberg Hawks</h1>
+      <p class="hoops-t-body-lg hoops-measure">Das Topspiel der Bayernliga beginnt um 19:30 Uhr. Beide Mannschaften stehen punktgleich an der Tabellenspitze.</p>
       <div class="scoreline">
-        <div class="dss-t-display">87 : 64</div>
-        <div><div class="dss-t-clock">08:42</div><div class="dss-t-caption">Q4</div></div>
+        <div class="hoops-t-display">87 : 64</div>
+        <div><div class="hoops-t-clock">08:42</div><div class="hoops-t-caption">Q4</div></div>
       </div>
-      <h2 class="dss-t-h2">Aufstellung Heim</h2>
-      <h3 class="dss-t-h3">Starter</h3>
+      <h2 class="hoops-t-h2">Aufstellung Heim</h2>
+      <h3 class="hoops-t-h3">Starter</h3>
       <table class="tbl">
-        <thead><tr><th class="dss-t-label">Nr.</th><th class="dss-t-label">Spieler</th><th class="dss-t-label num-r">Pkt.</th></tr></thead>
+        <thead><tr><th class="hoops-t-label">Nr.</th><th class="hoops-t-label">Spieler</th><th class="hoops-t-label num-r">Pkt.</th></tr></thead>
         <tbody>
           {#each [['4', 'J. Tanner', 22], ['7', 'M. Okafor', 19], ['13', 'K. Vogler', 12]] as [n, name, p]}
-            <tr><td class="dss-t-body-md dss-tnum">{n}</td><td class="dss-t-body-md">{name}</td><td class="dss-t-body-md dss-tnum num-r">{p}</td></tr>
+            <tr><td class="hoops-t-body-md hoops-tnum">{n}</td><td class="hoops-t-body-md">{name}</td><td class="hoops-t-body-md hoops-tnum num-r">{p}</td></tr>
           {/each}
         </tbody>
       </table>
-      <label class="dss-t-label" for="ctx-in">Spielernummer</label>
-      <input id="ctx-in" class="dss-t-body ctx-in" value="23" />
-      <p class="dss-t-body-sm hint">Hilfetext: Nummern von 0 bis 99, bei Gleichstand entscheidet der Schiedsrichter.</p>
+      <label class="hoops-t-label" for="ctx-in">Spielernummer</label>
+      <input id="ctx-in" class="hoops-t-body ctx-in" value="23" />
+      <p class="hoops-t-body-sm hint">Hilfetext: Nummern von 0 bis 99, bei Gleichstand entscheidet der Schiedsrichter.</p>
     </article>
 
   {:else}

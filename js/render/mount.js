@@ -1,5 +1,5 @@
 /**
- * DSS Render · einsetzen und aktualisieren
+ * HoopsFoundry UI Render · einsetzen und aktualisieren
  * --------------------------------------------------------------
  * `mount(el, render, props, options)` setzt das Markup einer Render-Funktion in `el` ein (über `Range.createContextualFragment`, nie über
  * eine HTML-Eigenschaft), startet bei einklappbaren Rahmen das Accordion-Verhalten (`initAccordion`) und gibt `{ update(props), destroy() }`
@@ -17,7 +17,7 @@ import { createRegistry } from '../lifecycle.js';
 import { insertMarkup, nextUid } from './dom.js';
 
 const registry = createRegistry('render-mount');
-const GROUP = 'dss-acc';
+const GROUP = 'hoops-acc';
 const noop = { update() {}, destroy() {} };
 
 /** Lage eines Knotens als Liste von Indizes unterhalb von `root`. */
@@ -54,14 +54,14 @@ function restoreFocus(host, memo) {
     if (node && node.nodeType === 1 && node.tagName === memo.tag && node.className === memo.className) target = node;
   }
   // Ist der Knoten verschwunden, bekommt der Kopf des Rahmens (oder der Scrollbereich, sonst das erste bedienbare Element) den Fokus, nicht <body>
-  if (!target) target = host.querySelector('.dss-acc-trigger') ?? host.querySelector('.dss-table-scroll') ?? host.querySelector('a[href], button:not([disabled])');
+  if (!target) target = host.querySelector('.hoops-acc-trigger') ?? host.querySelector('.hoops-table-scroll') ?? host.querySelector('a[href], button:not([disabled])');
   if (target && typeof target.focus === 'function') target.focus({ preventScroll: true });
 }
 
 /** Scrollpositionen der Tabellenbereiche (in Dokumentreihenfolge) merken und zurückgeben. */
-const scrollsOf = (host) => [...host.querySelectorAll('.dss-table-scroll')].map((el) => el.scrollLeft);
+const scrollsOf = (host) => [...host.querySelectorAll('.hoops-table-scroll')].map((el) => el.scrollLeft);
 function restoreScrolls(host, list) {
-  const areas = host.querySelectorAll('.dss-table-scroll');
+  const areas = host.querySelectorAll('.hoops-table-scroll');
   list.forEach((left, index) => {
     if (left && areas[index]) areas[index].scrollLeft = left;
   });
@@ -90,7 +90,7 @@ export function mount(el, render, props, options = {}) {
   let lastHtml = null;
 
   const openState = () => {
-    const trigger = (wrapper ?? el).querySelector('.dss-acc-trigger[aria-expanded]');
+    const trigger = (wrapper ?? el).querySelector('.hoops-acc-trigger[aria-expanded]');
     return trigger ? trigger.getAttribute('aria-expanded') === 'true' : undefined;
   };
   // Gibt es schon eine Gruppe (el oder ein Vorfahr), bedient sie den Rahmen; sonst legt mount eine an. Steht el im Panel eines Bereichs dieser
@@ -99,7 +99,7 @@ export function mount(el, render, props, options = {}) {
     if (!next.collapsible) return false;
     const group = el.closest(`.${GROUP}`);
     if (!group) return true;
-    const panel = el.closest('.dss-acc-panel');
+    const panel = el.closest('.hoops-acc-panel');
     return Boolean(panel) && panel.closest(`.${GROUP}`) === group && group !== el;
   };
 

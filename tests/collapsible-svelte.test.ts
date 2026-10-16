@@ -71,7 +71,7 @@ describe('einzelne Rahmen', () => {
   });
   it('ohne id: kein id-Attribut, kein Anker, ids verbunden', () => {
     start({ grouped: false });
-    const t = [...target.querySelectorAll<HTMLButtonElement>('.dss-acc-trigger')].find((b) => b.textContent!.includes('Vier ohne id'))!;
+    const t = [...target.querySelectorAll<HTMLButtonElement>('.hoops-acc-trigger')].find((b) => b.textContent!.includes('Vier ohne id'))!;
     click(t);
     expect(window.location.hash).toBe('');
     expect(t.getAttribute('aria-expanded')).toBe('true');
@@ -84,7 +84,7 @@ describe('in einer Accordion-Gruppe', () => {
   it('Sprungleiste: nur Rahmen und Bereiche mit id; Klick öffnet und fokussiert den Kopf', async () => {
     start({ nav: true });
     await wait();
-    expect([...target.querySelectorAll('.dss-acc-nav-link')].map((a) => a.textContent)).toEqual(['Eins', 'Zwei', 'Drei', 'Fünf']);
+    expect([...target.querySelectorAll('.hoops-acc-nav-link')].map((a) => a.textContent)).toEqual(['Eins', 'Zwei', 'Drei', 'Fünf']);
     click(target.querySelector('a[href="#t2"]')!);
     await wait();
     expect(isOpen('t2')).toBe(true);
@@ -93,12 +93,12 @@ describe('in einer Accordion-Gruppe', () => {
   it('Alle öffnen / schließen, auch der Rahmen ohne id', async () => {
     start({ expandAll: true });
     await wait();
-    const buttons = [...target.querySelectorAll<HTMLButtonElement>('.dss-acc-bar button')];
+    const buttons = [...target.querySelectorAll<HTMLButtonElement>('.hoops-acc-bar button')];
     click(buttons[0]);
-    expect([...target.querySelectorAll('.dss-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'true')).toBe(true);
+    expect([...target.querySelectorAll('.hoops-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'true')).toBe(true);
     expect(api().get().openT).toBe(true);
     click(buttons[1]);
-    expect([...target.querySelectorAll('.dss-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'false')).toBe(true);
+    expect([...target.querySelectorAll('.hoops-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'false')).toBe(true);
   });
   it('exclusive schließt die anderen, auch den AccordionItem', async () => {
     start({ exclusive: true });
@@ -114,7 +114,7 @@ describe('in einer Accordion-Gruppe', () => {
   it('Tastatur zwischen Köpfen', async () => {
     start({});
     await wait();
-    const heads = [...target.querySelectorAll<HTMLButtonElement>('.dss-acc-trigger')];
+    const heads = [...target.querySelectorAll<HTMLButtonElement>('.hoops-acc-trigger')];
     heads[0].focus();
     key(heads[0], 'ArrowDown');
     expect(document.activeElement).toBe(heads[1]);

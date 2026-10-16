@@ -29,11 +29,11 @@ describe('Code-Beispiele: Vereinssitz und darkTiles', () => {
     const html = await renderSvelteSource(vite, render, tmpDir, 'sitz', code.sitzSvelte);
     expect(html).not.toContain('undefined');
     expect(html).toContain('data-tiles="invert"');
-    expect(html).toContain('dss-map-num is-seat');
+    expect(html).toContain('hoops-map-num is-seat');
     expect(html).toContain('>Vereinssitz<');
-    expect(html).toContain('dss-map-ph-pin is-seat');
+    expect(html).toContain('hoops-map-ph-pin is-seat');
     // der Sitz verbraucht keine Nummer: die Hallen sind 1 und 2
-    expect(html.match(/<span class="dss-map-num(?: is-own)?"[^>]*>(\d)<\/span>/g)?.map((s) => s.replace(/<[^>]+>/g, ''))).toEqual(['1', '2']);
+    expect(html.match(/<span class="hoops-map-num(?: is-own)?"[^>]*>(\d)<\/span>/g)?.map((s) => s.replace(/<[^>]+>/g, ''))).toEqual(['1', '2']);
   });
   it('React besteht den TypeScript-Compiler', () => {
     expect(compileReact({ sitz: code.sitzReact })).toEqual([]);
@@ -43,7 +43,7 @@ describe('Code-Beispiele: Vereinssitz und darkTiles', () => {
     const React = ((await vite.ssrLoadModule(`${rootDir}react/Map.tsx`)) as { MapView: unknown }).MapView;
     const markers = [{ id: 'sitz', lat: 49.2962, lng: 7.9105, label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' }, { id: 'a', lat: 49.3, lng: 7.9, label: 'Halle A', own: true }];
     const props = { label: 'Karte', markers, darkTiles: 'invert' };
-    const ids = (html: string) => normalize(html).replace(/dss-map-(canvas|text)-[^"#]+/g, 'dss-map-$1-x');
+    const ids = (html: string) => normalize(html).replace(/hoops-map-(canvas|text)-[^"#]+/g, 'hoops-map-$1-x');
     expect(ids(renderToStaticMarkup(createElement(React as never, props as never)))).toBe(ids(render(Svelte, { props }).body));
   });
   it('die Aufrufe im Vanilla-Beispiel liefern die genannten Ergebnisse', () => {

@@ -1,21 +1,21 @@
 /**
- * DSS Theme · Hell, Dunkel oder System
+ * HoopsFoundry UI Theme · Hell, Dunkel oder System
  * --------------------------------------------------------------
  * `initTheme(button, options)` macht einen Button zum Umschalter für den Dunkelmodus. Drei Modi: `light`, `dark` und `system` (kein Attribut,
  * das CSS folgt `prefers-color-scheme`; Änderungen der Systemeinstellung werden gehört). Der Button hat eine feste Beschriftung („Dunkelmodus“)
  * und `aria-pressed` (gedrückt = Dunkelmodus aktiv); die Symbole wechseln über `data-theme-state` im CSS, nicht über den Namen. Ein Klick
- * schaltet zwischen hell und dunkel und merkt sich die Wahl (Standard `localStorage`, Schlüssel `dss-theme`, blockierter Speicher bleibt ohne Fehler).
+ * schaltet zwischen hell und dunkel und merkt sich die Wahl (Standard `localStorage`, Schlüssel `hoops-theme`, blockierter Speicher bleibt ohne Fehler).
  * `themeBootScript(options)` liefert den kleinen Inline-Code für den `<head>`, der die gemerkte Wahl vor dem ersten Zeichnen setzt (kein Flackern).
  * Kein Inline-`onclick`, kein globaler Zustand, kein `innerHTML`. Rückgabe `{ destroy(), getMode(), setMode(mode) }`. Typen: js/theme.d.ts.
  */
 import { createCleanups, createRegistry, listen } from './lifecycle.js';
 
-export const THEME_KEY = 'dss-theme';
+export const THEME_KEY = 'hoops-theme';
 export const THEME_ATTRIBUTE = 'data-theme';
 export const THEME_LABEL = 'Dunkelmodus';
 const MODES = ['light', 'dark', 'system'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const SYNC_EVENT = 'dss-theme-sync';
+const SYNC_EVENT = 'hoops-theme-sync';
 const registry = createRegistry('theme');
 
 /** Gültiger Modus (`light`, `dark`, `system`) oder `null`. */
@@ -56,7 +56,7 @@ export function writeTheme(storage, mode, key = THEME_KEY, keepSystem = false) {
 
 const iconEl = (doc, kind) => {
   const svg = doc.createElementNS(SVG_NS, 'svg');
-  const attrs = { class: `dss-theme-icon dss-theme-icon--${kind}`, width: '20', height: '20', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false' };
+  const attrs = { class: `hoops-theme-icon hoops-theme-icon--${kind}`, width: '20', height: '20', viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false' };
   for (const [name, value] of Object.entries(attrs)) svg.setAttribute(name, value);
   const paths = kind === 'sun'
     ? ['M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41']
@@ -77,7 +77,7 @@ const iconEl = (doc, kind) => {
 };
 
 /**
- * Umschalter für den Dunkelmodus. Optionen: `defaultMode` (Modus ohne gemerkte Wahl, Standard `system`; derselbe Wert wie bei `themeBootScript`, damit Boot-Skript und Umschalter übereinstimmen: gemerkte Wahl vor `defaultMode` vor `system`), `storageKey` (Standard `dss-theme`), `storage` (Objekt mit `getItem`, `setItem`, `removeItem`;
+ * Umschalter für den Dunkelmodus. Optionen: `defaultMode` (Modus ohne gemerkte Wahl, Standard `system`; derselbe Wert wie bei `themeBootScript`, damit Boot-Skript und Umschalter übereinstimmen: gemerkte Wahl vor `defaultMode` vor `system`), `storageKey` (Standard `hoops-theme`), `storage` (Objekt mit `getItem`, `setItem`, `removeItem`;
  * Standard `localStorage`, `null` schaltet das Merken ab), `mode` (Anfangsmodus; sonst der gemerkte, sonst `system`), `target` (Element, das
  * das Attribut bekommt; Standard `<html>`: die Tokens reagieren nur dort), `attribute` (Standard `data-theme`), `label` (Standard „Dunkelmodus“,
  * nur wenn der Button keinen eigenen Text hat), `onChange(mode, theme)`.
@@ -137,8 +137,8 @@ export function initTheme(button, options = {}) {
   };
 
   if (!button.hasAttribute('type')) button.setAttribute('type', 'button');
-  button.classList.add('dss-theme-toggle');
-  if (!button.querySelector('.dss-theme-icon')) {
+  button.classList.add('hoops-theme-toggle');
+  if (!button.querySelector('.hoops-theme-icon')) {
     for (const kind of ['sun', 'moon']) {
       const icon = iconEl(doc, kind);
       button.append(icon);
@@ -175,7 +175,7 @@ export function initTheme(button, options = {}) {
   const handle = registry.claim(button, () => {
     cleanups.run();
     for (const icon of created) icon.remove();
-    button.classList.remove('dss-theme-toggle');
+    button.classList.remove('hoops-theme-toggle');
     if (!button.classList.length) button.removeAttribute('class');
     for (const [name, value] of [['aria-pressed', before.pressed], ['aria-label', before.label], ['type', before.type], ['data-theme-state', before.state], ['data-theme-mode', before.mode]]) {
       if (value === null) button.removeAttribute(name);
@@ -190,7 +190,7 @@ export function initTheme(button, options = {}) {
  * Inline-Code für den `<head>`: setzt die gemerkte Wahl (`light` oder `dark`) auf `<html>`, bevor die Seite gezeichnet wird. Eine gemerkte Wahl
  * `system` bleibt ohne Attribut; ohne Eintrag oder bei blockiertem Speicher gilt `defaultMode` (Standard `system`: kein Attribut, das CSS folgt der Systemeinstellung).
  * `initTheme` bekommt dasselbe `defaultMode`. Optionen:
- * `storageKey` (Standard `dss-theme`), `attribute` (Standard `data-theme`), `defaultMode`. Die Werte werden als Zeichenketten eingebettet und so
+ * `storageKey` (Standard `hoops-theme`), `attribute` (Standard `data-theme`), `defaultMode`. Die Werte werden als Zeichenketten eingebettet und so
  * maskiert, dass `</script>` und Zeilentrenner darin nichts ausrichten. Mit einer Content-Security-Policy braucht das Skript ein `nonce` oder
  * einen Hash in `script-src`.
  */

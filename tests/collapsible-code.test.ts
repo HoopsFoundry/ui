@@ -34,8 +34,8 @@ const normalize = (html: string) =>
   html
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/ (hidden|inert)=""/g, ' $1')
-    .replace(/ data-dss-acc(="")?/g, '')
-    .replace(/<div class="dss-acc-tools dss-acc-tools--pending"[^>]*><\/div>/g, '')
+    .replace(/ data-hoops-acc(="")?/g, '')
+    .replace(/<div class="hoops-acc-tools hoops-acc-tools--pending"[^>]*><\/div>/g, '')
     .replace(/&gt;/g, '>')
     .replace(/\s+/g, ' ')
     .replace(/ ?> ?/g, '>')
@@ -47,13 +47,13 @@ const ids = (html: string) => [...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[
 
 const renderSvelte = async (name: string, source: string) => {
   const file = `${tmpDir}${name}.svelte`;
-  writeFileSync(file, source.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+  writeFileSync(file, source.replace(/@hoopsfoundry\/ui\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
   const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
   return render(component, { props: {} }).body;
 };
 
 function reactModule(source: string, target: 'check' | 'run'): string {
-  const map = (line: string) => line.replace('@bbv/dss-design-system/react', target === 'check' ? './index' : `${rootDir}react/index.ts`);
+  const map = (line: string) => line.replace('@hoopsfoundry/ui/react', target === 'check' ? './index' : `${rootDir}react/index.ts`);
   const imports = source.match(/^import [^;]+;$/gm) ?? [];
   const rest = source.replace(/^import [^;]+;$/gm, '').trim();
   return [...imports.map(map), rest].join('\n');
@@ -95,7 +95,7 @@ const PAGES: Page[] = [
   {
     name: 'Table', code: table, exportName: 'Spielseite', frames: 3, titles: ['Spieler-Statistiken', 'Boxscore Heim', 'Boxscore Gast'],
     single: `<script>
-  import Table from '@bbv/dss-design-system/svelte/Table';
+  import Table from '@hoopsfoundry/ui/svelte/Table';
 </script>
 <Table collapsible open id="boxscore" title="Spieler-Statistiken" meta="Stand · 4. Viertel" density="compact" columns={[{ key: 'name', label: 'Spieler' }, { key: 'pts', label: 'PTS', align: 'right' }]}>
   {#snippet rows()}
@@ -107,7 +107,7 @@ const PAGES: Page[] = [
   {
     name: 'Spielplan', code: spielplan, exportName: 'Spieltag', frames: 3, titles: ['Spielplan', 'Heimspiele', 'Hallenbelegung'],
     single: `<script>
-  import ScheduleTable from '@bbv/dss-design-system/svelte/ScheduleTable';
+  import ScheduleTable from '@hoopsfoundry/ui/svelte/ScheduleTable';
   const games = [{ id: 'v1', state: 'finished', time: '19:00', heim: { name: 'Team A', score: 72 }, gast: { name: 'Team B', score: 65 } }];
 </script>
 <ScheduleTable collapsible open id="spielplan" title="Spielplan" meta="Saison 2026/27" {games} layout="versus" density="touch" caption="Heimspiele" />`,
@@ -115,7 +115,7 @@ const PAGES: Page[] = [
   {
     name: 'LeagueCard', code: league, exportName: 'Vereinsseite', frames: 3, titles: ['Oberliga Nordhain Männer', 'Landesliga Ost', 'Bezirksliga West'],
     single: `<script>
-  import LeagueCard from '@bbv/dss-design-system/svelte/LeagueCard';
+  import LeagueCard from '@hoopsfoundry/ui/svelte/LeagueCard';
   const teams = [
     { rank: 1, name: 'Lindenberg Hawks', played: 11, points: 20 },
     { rank: 2, name: 'BG Seeberg', played: 11, points: 18 },
@@ -129,7 +129,7 @@ const PAGES: Page[] = [
 describe.each(PAGES)('Code-Beispiele $name: Tabellen einklappen', (page) => {
   it('Svelte rendert: Köpfe als Überschrift mit Button, ein Rahmen offen, jede id nur einmal, Gruppe mit Sprungleiste im Browser', async () => {
     const html = await renderSvelte(`${page.name}-svelte`, page.code.collapsibleSvelte);
-    expect(html.match(/class="dss-acc-trigger"/g)).toHaveLength(page.frames);
+    expect(html.match(/class="hoops-acc-trigger"/g)).toHaveLength(page.frames);
     expect(tags(html)).toEqual(Array(page.frames).fill('h3'));
     expect(html).toContain('aria-expanded="true"');
     const all = ids(html);
@@ -161,10 +161,10 @@ describe.each(PAGES)('Code-Beispiele $name: Tabellen einklappen', (page) => {
   });
   it('Vanilla: die Klassen gibt es im CSS, der Import-Pfad ist ein Export des Pakets', () => {
     const css = readFileSync(`${rootDir}css/components.css`, 'utf8');
-    for (const cls of new Set(page.code.collapsibleMarkup.match(/dss-[\w-]+/g))) expect(css, cls).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
+    for (const cls of new Set(page.code.collapsibleMarkup.match(/hoops-[\w-]+/g))) expect(css, cls).toMatch(new RegExp(`\\.${cls}(?![\\w-])`));
     const pkg = JSON.parse(readFileSync(`${rootDir}package.json`, 'utf8')) as { exports: Record<string, unknown> };
     expect(pkg.exports['./accordion.js']).toBeTruthy();
-    expect(page.code.collapsibleVanilla).toContain('@bbv/dss-design-system/accordion.js');
+    expect(page.code.collapsibleVanilla).toContain('@hoopsfoundry/ui/accordion.js');
   });
   it('gebundener Zustand: open kommt mit onOpenChange (React) bzw. bind:open (Svelte)', () => {
     expect(/\bopen=\{/.test(page.code.collapsibleReact) && !/onOpenChange=\{/.test(page.code.collapsibleReact)).toBe(false);

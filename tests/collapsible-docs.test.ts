@@ -53,8 +53,8 @@ describe.each(PAGES)('Doku $name', (page) => {
     // Falsche Beispiele (dont-…) sind in der Doku inert und zählen nicht als Region
     for (const n of names.filter((x) => !page.skip.includes(x) && !x.startsWith('dont-'))) {
       const html = render(component, { props: { example: n } }).body;
-      // erzeugte ids (dss-cf-…) zählt der Browser je Seite durch (im Browser geprüft); beim einzelnen Server-Rendern beginnt der Zähler jedes Mal neu
-      ids.push(...[...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]).filter((id) => !id.startsWith('dss-cf-')));
+      // erzeugte ids (hoops-cf-…) zählt der Browser je Seite durch (im Browser geprüft); beim einzelnen Server-Rendern beginnt der Zähler jedes Mal neu
+      ids.push(...[...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[1]).filter((id) => !id.startsWith('hoops-cf-')));
       regions.push(...[...html.matchAll(/role="region"[^>]*aria-label="([^"]+)"/g)].map((m) => m[1]));
       navs.push(...[...html.matchAll(/<nav[^>]*aria-label="([^"]+)"/g)].map((m) => m[1]));
     }
@@ -70,7 +70,7 @@ describe.each(PAGES)('Doku $name', (page) => {
     const component = ((await vite.ssrLoadModule(rootDir + page.examples)) as { default: unknown }).default;
     const first = NEW[page.name][0];
     const html = render(component, { props: { example: first } }).body;
-    expect(html.match(/class="dss-acc-trigger"/g)!.length).toBeGreaterThanOrEqual(page.name === 'Accordion' ? 4 : 2);
+    expect(html.match(/class="hoops-acc-trigger"/g)!.length).toBeGreaterThanOrEqual(page.name === 'Accordion' ? 4 : 2);
     if (page.name !== 'Accordion') {
       expect(html).toContain('aria-expanded="true"');
       expect(html).toContain('aria-expanded="false"');

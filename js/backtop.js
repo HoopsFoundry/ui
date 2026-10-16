@@ -1,10 +1,10 @@
 /**
- * DSS BackToTop · Nach-oben-Knopf
+ * HoopsFoundry UI BackToTop · Nach-oben-Knopf
  * --------------------------------------------------------------
  * `initBackToTop(options)` legt einen runden Knopf unten rechts an (44 px, Symbol als SVG per createElementNS, kein `innerHTML`), der
  * erscheint, sobald die Seite mehr als zwei Fensterhöhen lang ist und man ein Stück gescrollt hat. Ein Klick scrollt nach oben (sanft, außer bei
  * „Bewegung reduzieren“ oder `data-motion="reduce"`) und setzt den Fokus auf die erste `h1`, sonst auf `main`. Lage über Tokens im CSS
- * (`--hoops-backtop-offset`, `env(safe-area-inset-*)`, `--hoops-z-backtop`); eine feste `dss-bnav` darunter wird erkannt und umgangen.
+ * (`--hoops-backtop-offset`, `env(safe-area-inset-*)`, `--hoops-z-backtop`); eine feste `hoops-bnav` darunter wird erkannt und umgangen.
  * Rückgabe `{ destroy() }`. ES-Modul ohne Auto-Start, kein Zugriff auf `window`/`document` beim Import.
  * Typen: js/backtop.d.ts.
  */
@@ -12,7 +12,7 @@ import { createCleanups, createRegistry, emptyHandle, listen } from './lifecycle
 import { reducedMotion } from './motion.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const DEFAULTS = { label: 'Nach oben', showAfter: 480, gap: 16, avoid: '.dss-bnav' };
+const DEFAULTS = { label: 'Nach oben', showAfter: 480, gap: 16, avoid: '.hoops-bnav' };
 const registry = createRegistry('backtop');
 
 /** Pfeil nach oben als SVG (aria-hidden), mit DOM-Aufrufen erzeugt. */
@@ -34,7 +34,7 @@ export function backTopVisible({ scrollY, innerHeight, scrollHeight, showAfter =
  * Nach-oben-Knopf. Optionen: `label` (Name des Knopfes, Standard „Nach oben“; auch `backLabel`), `container` (Element oder Auswahl, in den der
  * Knopf kommt, Standard `body`), `button` (vorhandener Knopf, der übernommen wird, statt einen anzulegen), `showAfter` (Pixel, Standard 480),
  * `target` (Auswahl des Fokusziels, Standard `h1`; Rückfall `main`), `avoid` (Auswahl einer festen unteren Leiste, über der der Knopf bleibt,
- * Standard `.dss-bnav`; `null` schaltet das ab), `offset` (zusätzlicher Abstand von unten, CSS-Länge, setzt `--hoops-backtop-offset`).
+ * Standard `.hoops-bnav`; `null` schaltet das ab), `offset` (zusätzlicher Abstand von unten, CSS-Länge, setzt `--hoops-backtop-offset`).
  */
 export function initBackToTop(options = {}) {
   if (typeof document === 'undefined') return emptyHandle();
@@ -58,10 +58,10 @@ export function initBackToTop(options = {}) {
   const before = { hidden: button.hidden, type: button.getAttribute('type'), label: button.getAttribute('aria-label'), cls: button.className, offset: button.style.getPropertyValue('--hoops-backtop-offset') };
   if (!adopted) {
     button.type = 'button';
-    button.className = 'dss-btn dss-btn--secondary dss-btn--icon dss-backtop';
+    button.className = 'hoops-btn hoops-btn--secondary hoops-btn--icon hoops-backtop';
     button.append(arrow(doc));
   } else {
-    button.classList.add('dss-backtop');
+    button.classList.add('hoops-backtop');
     if (!button.querySelector('svg')) {
       icon = arrow(doc);
       button.append(icon);

@@ -4,7 +4,7 @@
 
 <script lang="ts">
   /**
-   * DSS AppNav · Svelte 5
+   * HoopsFoundry UI AppNav · Svelte 5
    * --------------------------------------------------------------
    * Hauptnavigation mit Gruppen-Dropdowns (Disclosure), gesperrten
    * Einträgen (Links und ganze Gruppen) und mobilem Hamburger-Menü (< 720 px). Nutzt nur Klassen
@@ -38,7 +38,7 @@
     contained?: boolean;
   } = $props();
 
-  const baseId = `dss-appnav-${++seq}`;
+  const baseId = `hoops-appnav-${++seq}`;
   let menuOpen = $state(false);
   let openGroup = $state<string | null>(null);
   let root: HTMLElement | undefined = $state();
@@ -81,12 +81,12 @@
 
 {#snippet link(l: Link)}
   {#if l.disabled}
-    <span role="link" aria-disabled="true" class="dss-appnav-link is-disabled" title={l.hint}>
-      {l.label}{#if l.hint}<span class="dss-sr-only"> – {l.hint}</span>{/if}
+    <span role="link" aria-disabled="true" class="hoops-appnav-link is-disabled" title={l.hint}>
+      {l.label}{#if l.hint}<span class="hoops-sr-only"> – {l.hint}</span>{/if}
     </span>
   {:else}
     <a
-      class="dss-appnav-link"
+      class="hoops-appnav-link"
       class:is-active={isCurrent(l)}
       href={l.href}
       aria-current={isCurrent(l) ? 'page' : undefined}
@@ -98,18 +98,18 @@
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <nav
   bind:this={root}
-  class="dss-appnav dss-appnav--{tone}"
-  class:dss-appnav--contained={contained}
+  class="hoops-appnav hoops-appnav--{tone}"
+  class:hoops-appnav--contained={contained}
   class:is-open={menuOpen}
   aria-label={ariaLabel}
   onkeydown={onKeydown}
   onfocusout={onFocusout}
 >
-  <div class="dss-appnav-bar">
+  <div class="hoops-appnav-bar">
     <button
       bind:this={toggleEl}
       type="button"
-      class="dss-appnav-toggle"
+      class="hoops-appnav-toggle"
       aria-expanded={menuOpen}
       aria-controls="{baseId}-list"
       onclick={() => (menuOpen = !menuOpen)}
@@ -117,20 +117,20 @@
       <Icon name={menuOpen ? 'x' : 'menu'} size={20} />
       <span>{menuLabel}</span>
     </button>
-    <ul id="{baseId}-list" class="dss-appnav-list">
+    <ul id="{baseId}-list" class="hoops-appnav-list">
       {#each items as item (item.id)}
         {#if isGroup(item) && item.disabled}
-          <li class="dss-appnav-item">
-            <button type="button" class="dss-appnav-group-btn is-disabled" disabled title={item.hint}>
-              {item.label}{#if item.hint}<span class="dss-sr-only"> – {item.hint}</span>{/if}
+          <li class="hoops-appnav-item">
+            <button type="button" class="hoops-appnav-group-btn is-disabled" disabled title={item.hint}>
+              {item.label}{#if item.hint}<span class="hoops-sr-only"> – {item.hint}</span>{/if}
             </button>
           </li>
         {:else if isGroup(item)}
-          <li class="dss-appnav-item">
+          <li class="hoops-appnav-item">
             <button
               bind:this={triggers[item.id]}
               type="button"
-              class="dss-appnav-group-btn"
+              class="hoops-appnav-group-btn"
               class:is-active={item.items.some(isCurrent)}
               class:is-open={openGroup === item.id}
               aria-expanded={openGroup === item.id}
@@ -138,19 +138,19 @@
               onclick={() => (openGroup = openGroup === item.id ? null : item.id)}
             >
               {item.label}
-              <Icon name="chevron-d" size={16} class="dss-appnav-chev" />
+              <Icon name="chevron-d" size={16} class="hoops-appnav-chev" />
             </button>
-            <ul id="{baseId}-{slug(item.id)}" class="dss-appnav-panel" hidden={openGroup !== item.id}>
+            <ul id="{baseId}-{slug(item.id)}" class="hoops-appnav-panel" hidden={openGroup !== item.id}>
               {#each item.items as child (child.id)}
                 <li>{@render link(child)}</li>
               {/each}
             </ul>
           </li>
         {:else}
-          <li class="dss-appnav-item">{@render link(item)}</li>
+          <li class="hoops-appnav-item">{@render link(item)}</li>
         {/if}
       {/each}
     </ul>
-    {#if context}<div class="dss-appnav-context">{@render context()}</div>{/if}
+    {#if context}<div class="hoops-appnav-context">{@render context()}</div>{/if}
   </div>
 </nav>

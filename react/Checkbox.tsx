@@ -11,7 +11,7 @@ export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement
 }
 
 /**
- * Natives Kontrollkästchen im DSS-Look; die Klickfläche ist das gesamte Label (≥ 44 px, kompakt 36 px).
+ * Natives Kontrollkästchen im HoopsFoundry-UI-Look; die Klickfläche ist das gesamte Label (≥ 44 px, kompakt 36 px).
  * `className` landet auf dem `<input>`, nicht auf dem Wrapper (Wrapper-Klassen sind nicht vorgesehen).
  */
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Checkbox(
@@ -26,21 +26,21 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(function Che
   return (
     <label
       htmlFor={inputId}
-      className={cn('dss-check', density === 'compact' && 'dss-check--compact', disabled && 'is-disabled')}
+      className={cn('hoops-check', density === 'compact' && 'hoops-check--compact', disabled && 'is-disabled')}
     >
       <input
         ref={ref}
         id={inputId}
         type="checkbox"
-        className={cn('dss-check-input', className)}
+        className={cn('hoops-check-input', className)}
         disabled={disabled}
         aria-describedby={describedBy}
         {...rest}
       />
-      <span className="dss-check-text">
-        <span className="dss-check-label">{label}</span>
+      <span className="hoops-check-text">
+        <span className="hoops-check-label">{label}</span>
         {hint ? (
-          <span id={hintId} className="dss-check-hint">
+          <span id={hintId} className="hoops-check-hint">
             {hint}
           </span>
         ) : null}

@@ -3,42 +3,42 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="css/components.css" />
 <!-- optional: <link rel="stylesheet" href="fonts/fonts.css" /> -->
 
-<!-- Dunkel: dss-pbp-frame--dark. Teamstreifen: dss-pbp-strip--heim | --gast | --none.
-     Art: dss-pbp-event--score-2p | --score-3p | --ft | --foul | --timeout | --sub | --turnover -->
-<div class="dss-pbp-frame">
-  <div class="dss-pbp-head">
-    <h3 class="dss-pbp-title">Play-by-Play · neueste oben</h3>
-    <div class="dss-pbp-meta">
+<!-- Dunkel: hoops-pbp-frame--dark. Teamstreifen: hoops-pbp-strip--heim | --gast | --none.
+     Art: hoops-pbp-event--score-2p | --score-3p | --ft | --foul | --timeout | --sub | --turnover -->
+<div class="hoops-pbp-frame">
+  <div class="hoops-pbp-head">
+    <h3 class="hoops-pbp-title">Play-by-Play · neueste oben</h3>
+    <div class="hoops-pbp-meta">
       <span>2 Events</span>
-      <span class="dss-pbp-live"><span class="dss-pbp-dot" aria-hidden="true"></span> Live</span>
+      <span class="hoops-pbp-live"><span class="hoops-pbp-dot" aria-hidden="true"></span> Live</span>
     </div>
   </div>
-  <div class="dss-pbp-feed" role="log" aria-label="Play-by-Play · neueste oben" tabindex="0">
-    <div class="dss-pbp-event dss-pbp-event--score-3p">
-      <div class="dss-pbp-time">02:14<span class="dss-pbp-q"><span aria-hidden="true">V4</span><span class="dss-sr-only">4. Viertel</span></span></div>
-      <div class="dss-pbp-strip dss-pbp-strip--heim" aria-hidden="true"></div>
-      <div class="dss-pbp-body">
-        <div class="dss-pbp-action">
-          <span class="dss-sr-only">Heim: </span><b>Drei-Punkte-Wurf</b> · Spieler #7
+  <div class="hoops-pbp-feed" role="log" aria-label="Play-by-Play · neueste oben" tabindex="0">
+    <div class="hoops-pbp-event hoops-pbp-event--score-3p">
+      <div class="hoops-pbp-time">02:14<span class="hoops-pbp-q"><span aria-hidden="true">V4</span><span class="hoops-sr-only">4. Viertel</span></span></div>
+      <div class="hoops-pbp-strip hoops-pbp-strip--heim" aria-hidden="true"></div>
+      <div class="hoops-pbp-body">
+        <div class="hoops-pbp-action">
+          <span class="hoops-sr-only">Heim: </span><b>Drei-Punkte-Wurf</b> · Spieler #7
         </div>
-        <div class="dss-pbp-detail">Assist · Spieler #13</div>
+        <div class="hoops-pbp-detail">Assist · Spieler #13</div>
       </div>
-      <div class="dss-pbp-score">
-        <span aria-hidden="true">87<span class="dss-pbp-sep">:</span>64</span>
-        <span class="dss-sr-only">Spielstand 87 zu 64</span>
+      <div class="hoops-pbp-score">
+        <span aria-hidden="true">87<span class="hoops-pbp-sep">:</span>64</span>
+        <span class="hoops-sr-only">Spielstand 87 zu 64</span>
       </div>
     </div>
-    <div class="dss-pbp-event dss-pbp-event--timeout">…</div>
+    <div class="hoops-pbp-event hoops-pbp-event--timeout">…</div>
   </div>
 </div>
 
 <!-- Neues Ereignis: oben einfügen (neueste zuerst) -->
 <script>
-  document.querySelector('.dss-pbp-feed').prepend(eintrag);
+  document.querySelector('.hoops-pbp-feed').prepend(eintrag);
 </script>`;
 
 export const svelte = `<script>
-  import PlayByPlay from '@bbv/dss-design-system/svelte/PlayByPlay';
+  import PlayByPlay from '@hoopsfoundry/ui/svelte/PlayByPlay';
 
   let events = $state([
     { id: 2, time: '02:38', period: 4, team: 'gast', title: 'Defensiv-Rebound · Spieler #23', score: { heim: 84, gast: 64 } },
@@ -55,7 +55,7 @@ export const svelte = `<script>
 <!-- title, titleAs ('h2' bis 'h6', Standard h3 bzw. Ebene aus HeadingLevel), meta, live (Standard true), dark, periods (4 | 8, Standard 4) -->`;
 
 export const react = `import { useEffect, useState } from 'react';
-import { PlayByPlay, type PbpEvent } from '@bbv/dss-design-system/react';
+import { PlayByPlay, type PbpEvent } from '@hoopsfoundry/ui/react';
 
 const start: PbpEvent[] = [
   { id: 2, time: '02:38', period: 4, team: 'gast', title: 'Defensiv-Rebound · Spieler #23', score: { heim: 84, gast: 64 } },

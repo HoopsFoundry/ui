@@ -45,27 +45,27 @@ export function BottomNav({
   };
 
   return (
-    <nav aria-label={ariaLabel} className={cn('dss-bnav', className)}>
+    <nav aria-label={ariaLabel} className={cn('hoops-bnav', className)}>
       {items.map((item) => {
         if (item.fab) {
           const icon = <Icon name={item.icon ?? 'plus'} size={22} />;
           return item.href ? (
-            <a key={item.id} className="dss-bnav-fab" href={item.href} aria-label={item.label} onClick={() => onAction?.(item.id)}>
+            <a key={item.id} className="hoops-bnav-fab" href={item.href} aria-label={item.label} onClick={() => onAction?.(item.id)}>
               {icon}
             </a>
           ) : (
-            <button key={item.id} type="button" className="dss-bnav-fab" aria-label={item.label} onClick={() => onAction?.(item.id)}>
+            <button key={item.id} type="button" className="hoops-bnav-fab" aria-label={item.label} onClick={() => onAction?.(item.id)}>
               {icon}
             </button>
           );
         }
         const active = value === item.id;
-        const itemClass = cn('dss-bnav-item', active && 'is-active');
+        const itemClass = cn('hoops-bnav-item', active && 'is-active');
         const body: ReactNode = (
           <>
-            {item.icon ? <Icon name={item.icon} size={22} className="dss-bnav-ic" /> : null}
-            <span className="dss-bnav-lbl">{item.label}</span>
-            {item.badge !== undefined ? <span className="dss-bnav-badge">{item.badge}</span> : null}
+            {item.icon ? <Icon name={item.icon} size={22} className="hoops-bnav-ic" /> : null}
+            <span className="hoops-bnav-lbl">{item.label}</span>
+            {item.badge !== undefined ? <span className="hoops-bnav-badge">{item.badge}</span> : null}
           </>
         );
         return item.href ? (

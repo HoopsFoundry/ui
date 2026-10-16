@@ -45,7 +45,7 @@ Jeder Event-Eintrag hat:
 
 ## Viertel und Achtel
 
-`period` zählt ab 1; `periods` an der Komponente legt fest, ob 4 Viertel (Standard) oder 8 Achtel gespielt werden (Mini-Basketball). Der Chip unter der Zeit bleibt kurz, weil die Spalte nur 70 px breit ist; der volle Text steht für Screenreader im Dokument (`dss-sr-only`), der Chip selbst ist `aria-hidden`.
+`period` zählt ab 1; `periods` an der Komponente legt fest, ob 4 Viertel (Standard) oder 8 Achtel gespielt werden (Mini-Basketball). Der Chip unter der Zeit bleibt kurz, weil die Spalte nur 70 px breit ist; der volle Text steht für Screenreader im Dokument (`hoops-sr-only`), der Chip selbst ist `aria-hidden`.
 
 <Canvas of={PlayByPlayStories.Abschnitte} />
 
@@ -62,7 +62,7 @@ Jeder Event-Eintrag hat:
   ]}
 />
 
-Die Regel für die Verlängerung: ist `period` größer als `periods`, beginnt sie, und `period − periods` zählt sie (1 = „Verlängerung“, ab 2 „2. Verlängerung“). Jeder andere Wert von `periods` als 8 gilt als 4. Die Funktionen stehen auch ohne Komponente bereit (`periodLabel`, `periodShort`, `resolvePeriod` aus `@bbv/dss-design-system/periods.js`).
+Die Regel für die Verlängerung: ist `period` größer als `periods`, beginnt sie, und `period − periods` zählt sie (1 = „Verlängerung“, ab 2 „2. Verlängerung“). Jeder andere Wert von `periods` als 8 gilt als 4. Die Funktionen stehen auch ohne Komponente bereit (`periodLabel`, `periodShort`, `resolvePeriod` aus `@hoopsfoundry/ui/periods.js`).
 
 ## Ereignisarten
 

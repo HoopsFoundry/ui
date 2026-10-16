@@ -29,7 +29,7 @@ describe('Checkbox', () => {
 
   it('setzt Dichte- und Disabled-Klassen', () => {
     const { container } = render(<Checkbox label="A" density="compact" disabled />);
-    expect(container.querySelector('label')).toHaveClass('dss-check', 'dss-check--compact', 'is-disabled');
+    expect(container.querySelector('label')).toHaveClass('hoops-check', 'hoops-check--compact', 'is-disabled');
     expect(screen.getByRole('checkbox')).toBeDisabled();
   });
 

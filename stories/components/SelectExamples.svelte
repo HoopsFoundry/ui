@@ -19,9 +19,9 @@
 </script>
 
 {#snippet cell(row, col)}
-  <div class="dss-field {row.tone ? `is-${row.tone}` : ''}">
+  <div class="hoops-field {row.tone ? `is-${row.tone}` : ''}">
     <select
-      class="dss-select {row.compact ? 'dss-select--compact' : ''} {col === 'Fokus' ? 'pseudo-focus-visible' : ''}"
+      class="hoops-select {row.compact ? 'hoops-select--compact' : ''} {col === 'Fokus' ? 'pseudo-focus-visible' : ''}"
       disabled={col === 'Gesperrt'}
       aria-label="{row.name}, {col}"
       aria-invalid={row.tone === 'error' ? 'true' : undefined}
@@ -82,7 +82,7 @@
   <div class="narrow"><Select label="Turniermodus" {options} value="round-robin" /></div>
 {:else if example === 'dont-label'}
   <div class="narrow">
-    <div class="dss-field"><select class="dss-select" aria-label="Turniermodus">{#each options as o}<option value={o.value}>{o.label}</option>{/each}</select></div>
+    <div class="hoops-field"><select class="hoops-select" aria-label="Turniermodus">{#each options as o}<option value={o.value}>{o.label}</option>{/each}</select></div>
   </div>
 {:else if example === 'do-fehler'}
   <div class="narrow"><Select label="Turniermodus" {options} required state="error" help="Bitte einen Modus wählen." /></div>

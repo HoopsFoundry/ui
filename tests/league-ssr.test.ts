@@ -105,9 +105,9 @@ describe('LeagueCard: Svelte und React erzeugen dasselbe Markup', () => {
 
   it('die Fälle sind aussagekräftig: Zonen-Legende, Live-Text und eigene Zeile stehen im Markup', async () => {
     const html = await same(cases['Zonen und eigene']);
-    expect(html).toContain('dss-league-legend');
+    expect(html).toContain('hoops-league-legend');
     expect(html).toContain('eigene Mannschaft');
     expect(await same(cases['Live Zahl'])).toContain('2 Spiele laufen');
-    expect(await same(cases['Zonen außerhalb des Fensters'])).not.toContain('dss-league-legend');
+    expect(await same(cases['Zonen außerhalb des Fensters'])).not.toContain('hoops-league-legend');
   });
 });

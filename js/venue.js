@@ -1,5 +1,5 @@
 /**
- * DSS Venue · Hilfsfunktionen für die Hallenkarte (VenueCard)
+ * HoopsFoundry UI Venue · Hilfsfunktionen für die Hallenkarte (VenueCard)
  * --------------------------------------------------------------
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte und React nutzen dieselbe Logik.
  * Typen: js/venue.d.ts.

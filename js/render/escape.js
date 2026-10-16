@@ -1,5 +1,5 @@
 /**
- * DSS Render · Escaping
+ * HoopsFoundry UI Render · Escaping
  * --------------------------------------------------------------
  * Jeder Text und jeder Attributwert, der in Markup der Render-Funktionen gelangt, läuft durch `esc` (bzw. `attr`). Das ist die einzige
  * Stelle, an der aus Daten Markup wird; die Render-Funktionen setzen nie Zeichenketten von außen ungeprüft ein. Ohne DOM, ohne Abhängigkeiten.

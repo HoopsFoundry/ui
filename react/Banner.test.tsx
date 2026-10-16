@@ -7,7 +7,7 @@ describe('Banner', () => {
   it('rendert info als Standard mit role=status', () => {
     render(<Banner>Geschätzte Dauer: 180 Minuten.</Banner>);
     const banner = screen.getByRole('status');
-    expect(banner).toHaveClass('dss-banner', 'dss-banner--info');
+    expect(banner).toHaveClass('hoops-banner', 'hoops-banner--info');
     expect(banner).toHaveTextContent('Geschätzte Dauer: 180 Minuten.');
   });
 
@@ -17,7 +17,7 @@ describe('Banner', () => {
     ['danger', 'alert'],
   ] as const)('severity %s hat role=%s', (severity, role) => {
     render(<Banner severity={severity}>Text</Banner>);
-    expect(screen.getByRole(role)).toHaveClass(`dss-banner--${severity}`);
+    expect(screen.getByRole(role)).toHaveClass(`hoops-banner--${severity}`);
   });
 
   it('erlaubt ein explizites role', () => {
@@ -27,8 +27,8 @@ describe('Banner', () => {
 
   it('rendert den Titel und ein dekoratives Icon', () => {
     const { container } = render(<Banner severity="warn" title="Hallenzeit knapp">Text</Banner>);
-    expect(screen.getByText('Hallenzeit knapp')).toHaveClass('dss-banner-title');
-    expect(container.querySelector('svg.dss-banner-icon')).toHaveAttribute('aria-hidden', 'true');
+    expect(screen.getByText('Hallenzeit knapp')).toHaveClass('hoops-banner-title');
+    expect(container.querySelector('svg.hoops-banner-icon')).toHaveAttribute('aria-hidden', 'true');
   });
 
   it('lässt das Icon mit icon={false} weg', () => {
@@ -38,7 +38,7 @@ describe('Banner', () => {
 
   it('merged className und reicht native Props durch', () => {
     render(<Banner className="extra" data-testid="b">Text</Banner>);
-    expect(screen.getByTestId('b')).toHaveClass('extra', 'dss-banner');
+    expect(screen.getByTestId('b')).toHaveClass('extra', 'hoops-banner');
   });
 
   it('hat keine axe-Verstöße', async () => {

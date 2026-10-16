@@ -63,9 +63,9 @@ describe('BottomNav', () => {
 
   it('zeigt das Badge und den FAB mit zugänglichem Namen', () => {
     const { container } = render(<BottomNav items={ITEMS} />);
-    expect(container.querySelector('.dss-bnav-badge')).toHaveTextContent('3');
+    expect(container.querySelector('.hoops-bnav-badge')).toHaveTextContent('3');
     const fab = screen.getByRole('button', { name: 'Erfassen' });
-    expect(fab).toHaveClass('dss-bnav-fab');
+    expect(fab).toHaveClass('hoops-bnav-fab');
     expect(fab).not.toHaveAttribute('aria-current');
   });
 

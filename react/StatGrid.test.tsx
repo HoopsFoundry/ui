@@ -7,18 +7,18 @@ describe('StatGrid', () => {
   it('Beschreibungsliste: Beschriftung als dt, Wert als dd, Zahlen mit Dezimalkomma', () => {
     const { container } = render(<StatGrid items={[{ label: 'Siege', value: 12 }, { label: 'Punkte pro Spiel', value: 82.4 }]} />);
     const dl = container.querySelector('dl')!;
-    expect(dl).toHaveClass('dss-stats');
+    expect(dl).toHaveClass('hoops-stats');
     expect(dl.querySelectorAll('dt')).toHaveLength(2);
     expect(within(dl).getByText('82,4').tagName).toBe('DD');
   });
   it('compact', () => {
     const { container } = render(<StatGrid compact items={[{ label: 'A', value: 1 }]} />);
-    expect(container.querySelector('dl')).toHaveClass('dss-stats', 'dss-stats--compact');
+    expect(container.querySelector('dl')).toHaveClass('hoops-stats', 'hoops-stats--compact');
   });
   it('fehlender Wert: Gedankenstrich ist aria-hidden, versteckter Text „keine Angabe“', () => {
     render(<StatGrid items={[{ label: 'Rebounds', value: null }]} />);
     expect(screen.getByText('–')).toHaveAttribute('aria-hidden', 'true');
-    expect(screen.getByText('keine Angabe')).toHaveClass('dss-sr-only');
+    expect(screen.getByText('keine Angabe')).toHaveClass('hoops-sr-only');
   });
   it('Texte sind nie HTML', () => {
     const { container } = render(<StatGrid items={[{ label: '<b>x</b>', value: '<img src=x onerror=alert(1)>' }]} />);

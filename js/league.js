@@ -1,5 +1,5 @@
 /**
- * DSS League · Hilfsfunktionen für die Ligencard (LeagueCard)
+ * HoopsFoundry UI League · Hilfsfunktionen für die Ligencard (LeagueCard)
  * --------------------------------------------------------------
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte und React nutzen dieselbe Logik.
  * Typen: js/league.d.ts.

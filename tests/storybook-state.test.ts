@@ -24,10 +24,10 @@ describe('applyState', () => {
   });
 
   it('normal entfernt nur die gesetzten Klassen und lässt eigene stehen', () => {
-    const root = mount('<button id="a" class="dss-btn">x</button><button id="f" class="pseudo-focus-visible">y</button>');
+    const root = mount('<button id="a" class="hoops-btn">x</button><button id="f" class="pseudo-focus-visible">y</button>');
     applyState(root, 'hover');
     applyState(root, 'normal');
-    expect(root.querySelector('#a')!.className).toBe('dss-btn');
+    expect(root.querySelector('#a')!.className).toBe('hoops-btn');
     expect(root.querySelector('#f')!.className).toBe('pseudo-focus-visible');
   });
 
@@ -49,15 +49,15 @@ describe('applyState', () => {
 });
 
 describe('Fokus: Vorfahren', () => {
-  it('Fokus setzt .pseudo-focus-within auf Vorfahren (Ring liegt auf .dss-input-group), Wechsel räumt auf', () => {
-    const root = mount('<div id="g" class="dss-input-group"><input id="i"></div>');
+  it('Fokus setzt .pseudo-focus-within auf Vorfahren (Ring liegt auf .hoops-input-group), Wechsel räumt auf', () => {
+    const root = mount('<div id="g" class="hoops-input-group"><input id="i"></div>');
     applyState(root, 'focus');
     expect(root.querySelector('#g')!.classList.contains('pseudo-focus-within')).toBe(true);
     applyState(root, 'hover');
-    expect(root.querySelector('#g')!.className).toBe('dss-input-group');
+    expect(root.querySelector('#g')!.className).toBe('hoops-input-group');
     applyState(root, 'focus');
     applyState(root, 'normal');
-    expect(root.querySelector('#g')!.className).toBe('dss-input-group');
+    expect(root.querySelector('#g')!.className).toBe('hoops-input-group');
     expect(root.querySelector('#g')!.hasAttribute('data-forced-within')).toBe(false);
   });
 });

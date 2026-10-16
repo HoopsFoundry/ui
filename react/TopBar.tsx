@@ -25,7 +25,7 @@ export interface TopBarProps {
 
 /** Dunkle App-Leiste (56 px): Marke links, optionaler Spielkontext, Aktionen rechts. */
 export function TopBar({
-  brand = 'DSS',
+  brand = 'HoopsFoundry UI',
   mark = 'D',
   context = 'default',
   matchLabel = '',
@@ -41,9 +41,9 @@ export function TopBar({
   className,
 }: TopBarProps) {
   return (
-    <Root className={cn('dss-topbar', 'dss-topbar--dark', contained && 'dss-topbar--contained', className)}>
-      <div className="dss-topbar-brand">
-        <span className="dss-topbar-mark" aria-hidden="true">
+    <Root className={cn('hoops-topbar', 'hoops-topbar--dark', contained && 'hoops-topbar--contained', className)}>
+      <div className="hoops-topbar-brand">
+        <span className="hoops-topbar-mark" aria-hidden="true">
           {mark}
         </span>
         {brand}
@@ -52,27 +52,27 @@ export function TopBar({
       {leading}
 
       {center ? (
-        <div className="dss-topbar-center">{center}</div>
+        <div className="hoops-topbar-center">{center}</div>
       ) : context === 'live' ? (
-        <div className="dss-topbar-ctx">
-          <span className="dss-topbar-live">Live</span>
+        <div className="hoops-topbar-ctx">
+          <span className="hoops-topbar-live">Live</span>
           {matchLabel ? <span>{matchLabel}</span> : null}
-          {score ? <span className="dss-topbar-score">{score}</span> : null}
-          {clock ? <span className="dss-topbar-clock">{clock}</span> : null}
+          {score ? <span className="hoops-topbar-score">{score}</span> : null}
+          {clock ? <span className="hoops-topbar-clock">{clock}</span> : null}
         </div>
       ) : context === 'admin' && matchLabel ? (
-        <div className="dss-topbar-ctx">
+        <div className="hoops-topbar-ctx">
           <span>{matchLabel}</span>
         </div>
       ) : null}
 
-      <span className="dss-topbar-spacer" />
+      <span className="hoops-topbar-spacer" />
 
       {actions}
 
       {user ? (
-        <div className="dss-topbar-user">
-          {userInitials ? <span className="dss-topbar-av">{userInitials}</span> : null}
+        <div className="hoops-topbar-user">
+          {userInitials ? <span className="hoops-topbar-av">{userInitials}</span> : null}
           {user}
         </div>
       ) : null}

@@ -10,13 +10,13 @@ export const ohneBuildSeite = ohneBuildHtml;
 
 export const vanilla = `<!-- Vanilla: mountMap setzt das Markup der Karte in einen Behälter und startet das Verhalten (Zwei-Klick-Platzhalter, Zoom, Marker, Fehler).
      Leaflet und leaflet.css liefert deine Seite lokal aus (Abschnitt „Ohne Build einbinden“), nicht von unpkg. -->
-<link rel="stylesheet" href="/dss/dss.css" />
+<link rel="stylesheet" href="/hoops/hoops.css" />
 <link rel="stylesheet" href="/vendor/leaflet/leaflet.css" />
 
 <div id="karte"></div>
 
 <script type="module">
-  import { mountMap } from '/dss/dss-map.min.js';
+  import { mountMap } from '/hoops/hoops-map.min.js';
 
   // dieselben Eigenschaften wie bei MapView (React) und Map (Svelte); ein Marker ohne href ist kein Link
   const halle = { id: 'nordhain', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain', own: true };
@@ -38,25 +38,25 @@ export const vanilla = `<!-- Vanilla: mountMap setzt das Markup der Karte in ein
   // Als Zeichenkette (Server, Crawler): renderMap(props) liefert dasselbe Markup; initMap(el, props) macht vorhandenes Markup lebendig
 </script>`;
 
-export const leafletDirekt = `<!-- Leaflet direkt, ohne mountMap: die Klassen dss-map* (Rahmen, Zoom, Quellenangabe, Liste) und die reinen Funktionen aus map.js. Das ist der
+export const leafletDirekt = `<!-- Leaflet direkt, ohne mountMap: die Klassen hoops-map* (Rahmen, Zoom, Quellenangabe, Liste) und die reinen Funktionen aus map.js. Das ist der
      Weg, wenn du die Karte ganz selbst steuern willst; die Zwei-Klick-Lösung, die Zustände und die Fehlerfälle von mountMap hast du dann nicht.
      Leaflet und leaflet.css lädt die Seite selbst (npm install leaflet). -->
 <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
 
-<div class="dss-map" data-state="ready" data-dim="true" data-tiles="dim" style="--hoops-map-h:320px">
-  <div class="dss-map-frame" role="region" aria-label="Karte der Sporthalle Nordhain">
-    <div class="dss-map-stage">
-      <div class="dss-map-canvas" id="karte" role="group" aria-label="Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab."></div>
-      <p class="dss-map-attr"><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
+<div class="hoops-map" data-state="ready" data-dim="true" data-tiles="dim" style="--hoops-map-h:320px">
+  <div class="hoops-map-frame" role="region" aria-label="Karte der Sporthalle Nordhain">
+    <div class="hoops-map-stage">
+      <div class="hoops-map-canvas" id="karte" role="group" aria-label="Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab."></div>
+      <p class="hoops-map-attr"><a href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
     </div>
   </div>
-  <div class="dss-map-text" id="karte-text">
-    <ol class="dss-map-list" aria-label="Orte auf der Karte">
-      <li class="dss-map-item">
-        <div class="dss-map-item-body">
-          <p class="dss-map-name"><span>Sporthalle Nordhain</span></p>
-          <p class="dss-map-coords" id="karte-koordinaten"></p>
-          <div class="dss-map-links"><a class="dss-link" id="karte-route" href="#">Route planen</a></div>
+  <div class="hoops-map-text" id="karte-text">
+    <ol class="hoops-map-list" aria-label="Orte auf der Karte">
+      <li class="hoops-map-item">
+        <div class="hoops-map-item-body">
+          <p class="hoops-map-name"><span>Sporthalle Nordhain</span></p>
+          <p class="hoops-map-coords" id="karte-koordinaten"></p>
+          <div class="hoops-map-links"><a class="hoops-link" id="karte-route" href="#">Route planen</a></div>
         </div>
       </li>
     </ol>
@@ -65,7 +65,7 @@ export const leafletDirekt = `<!-- Leaflet direkt, ohne mountMap: die Klassen ds
 
 <script type="module">
   import L from 'leaflet';
-  import { formatCoords, mapLinks, validTileUrl } from '@bbv/dss-design-system/map.js';
+  import { formatCoords, mapLinks, validTileUrl } from '@hoopsfoundry/ui/map.js';
 
   const halle = { lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain' };
   const kacheln = '/tiles/{z}/{x}/{y}.png'; // eigener Proxy, siehe Datenschutz und Kachelserver
@@ -73,14 +73,14 @@ export const leafletDirekt = `<!-- Leaflet direkt, ohne mountMap: die Klassen ds
 
   // Eigene Zoom-Schaltflächen und Quellenangabe: Leaflets Standardsteuerung aus
   const karte = L.map('karte', { zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 19 }).setView([halle.lat, halle.lng], 15);
-  L.tileLayer(kacheln, { className: 'dss-map-tiles', minZoom: 3, maxZoom: 19 }).addTo(karte);
+  L.tileLayer(kacheln, { className: 'hoops-map-tiles', minZoom: 3, maxZoom: 19 }).addTo(karte);
   // Marker als Inline-SVG (L.divIcon): Leaflets Standard-Markerbilder brauchen Bildpfade, die Bundler nicht finden
   const pin = L.divIcon({
-    className: 'dss-map-marker', iconSize: [44, 46], iconAnchor: [22, 45],
-    html: '<svg class="dss-map-pin" viewBox="0 0 36 46" width="36" height="46" aria-hidden="true" focusable="false">'
-      + '<path class="dss-map-pin-edge" d="M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z"/>'
-      + '<path class="dss-map-pin-body" d="M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z"/>'
-      + '<circle class="dss-map-pin-dot" cx="18" cy="16.5" r="5.5"/></svg>',
+    className: 'hoops-map-marker', iconSize: [44, 46], iconAnchor: [22, 45],
+    html: '<svg class="hoops-map-pin" viewBox="0 0 36 46" width="36" height="46" aria-hidden="true" focusable="false">'
+      + '<path class="hoops-map-pin-edge" d="M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z"/>'
+      + '<path class="hoops-map-pin-body" d="M18 1.5C9.4 1.5 2.5 8.2 2.5 16.4c0 10.8 15.5 27.6 15.5 27.6s15.5-16.8 15.5-27.6C33.5 8.2 26.6 1.5 18 1.5z"/>'
+      + '<circle class="hoops-map-pin-dot" cx="18" cy="16.5" r="5.5"/></svg>',
   });
   L.marker([halle.lat, halle.lng], { icon: pin, title: halle.label, keyboard: true }).addTo(karte);
 
@@ -94,7 +94,7 @@ export const initMapBeispiel = `<!-- Markup vom Server (oder aus renderMap): ini
 <div id="karte">${'$'}{renderMap(props)}</div>
 
 <script type="module">
-  import { initMap } from '/dss/dss-map.min.js';
+  import { initMap } from '/hoops/hoops-map.min.js';
 
   const karte = initMap(document.querySelector('#karte'), {
     label: 'Karte der Sporthalle Nordhain',
@@ -105,16 +105,16 @@ export const initMapBeispiel = `<!-- Markup vom Server (oder aus renderMap): ini
   // karte.update(neueEigenschaften);  karte.destroy();   // destroy stellt das Markup vom Anfang wieder her
 </script>`;
 
-export const initAllKarte = `<!-- Ohne eigenes Skript je Karte: data-dss="map" und die Eigenschaften als JSON. Ein leerer Behälter wird zur Karte (mountMap),
+export const initAllKarte = `<!-- Ohne eigenes Skript je Karte: data-hoops="map" und die Eigenschaften als JSON. Ein leerer Behälter wird zur Karte (mountMap),
      vorhandenes Markup von renderMap oder renderVenueCard(props, { init: true }) wird lebendig (initMap). -->
-<div data-dss="map" data-dss-options='{"label":"Karte der Sporthalle Nordhain","markers":[{"id":"nordhain","lat":49.3,"lng":7.9,"label":"Sporthalle Nordhain"}],"tileUrl":"/tiles/{z}/{x}/{y}.png"}'></div>
+<div data-hoops="map" data-hoops-options='{"label":"Karte der Sporthalle Nordhain","markers":[{"id":"nordhain","lat":49.3,"lng":7.9,"label":"Sporthalle Nordhain"}],"tileUrl":"/tiles/{z}/{x}/{y}.png"}'></div>
 
 <script type="module">
-  import { initAll } from '/dss/dss.min.js';
-  import { initMapBlock } from '/dss/dss-map.min.js';
+  import { initAll } from '/hoops/hoops.min.js';
+  import { initMapBlock } from '/hoops/hoops-map.min.js';
 
   // Die Karte gehört nicht zum Kern: initAll startet sie über start (initMapBlock aus dem Karten-Bündel). Gemeinsame Optionen
-  // (loadLeaflet, tileUrl …) stehen daneben und gelten für jede Karte; data-dss-options überschreibt sie je Element.
+  // (loadLeaflet, tileUrl …) stehen daneben und gelten für jede Karte; data-hoops-options überschreibt sie je Element.
   initAll(document, {
     map: { start: initMapBlock, loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js') },
   });
@@ -126,13 +126,13 @@ export const importmapVariante = `<!-- Variante 1: eine importmap. Das Karten-B�
   { "imports": { "leaflet": "/vendor/leaflet/leaflet-src.esm.js" } }
 </script>
 <script type="module">
-  import { mountMap } from '/dss/dss-map.min.js';
+  import { mountMap } from '/hoops/hoops-map.min.js';
   mountMap(document.querySelector('#karte'), { label: 'Karte der Sporthalle Nordhain', markers: [{ id: 'a', lat: 49.3, lng: 7.9, label: 'Sporthalle Nordhain' }], tileUrl: '/tiles/{z}/{x}/{y}.png' });
 </script>`;
 
 export const globalVariante = `<!-- Variante 3: das klassische leaflet.js (UMD, setzt window.L), erst nach dem Klick als Skript nachgeladen -->
 <script type="module">
-  import { mountMap } from '/dss/dss-map.min.js';
+  import { mountMap } from '/hoops/hoops-map.min.js';
 
   const loadLeaflet = () => window.L
     ? Promise.resolve(window.L)
@@ -148,11 +148,11 @@ export const globalVariante = `<!-- Variante 3: das klassische leaflet.js (UMD, 
 </script>`;
 
 export const kopieren = `# Einmal beim Bau der Seite (oder per portal-sync.mjs, siehe Foundation/Vanilla): die Dateien liegen danach im eigenen Projekt
-cp node_modules/@bbv/dss-design-system/dist/vanilla/dss.css            _site/dss/
-cp -r node_modules/@bbv/dss-design-system/dist/vanilla/courtlines      _site/dss/                # nur, wenn deine Seiten die Court-Linien nutzen
-cp node_modules/@bbv/dss-design-system/dist/vanilla/dss-map.min.js     _site/dss/
-cp node_modules/@bbv/dss-design-system/dist/vanilla/dss-render.min.js  _site/dss/                # nur für die Hallenkarte aus Daten ...
-cp node_modules/@bbv/dss-design-system/dist/vanilla/dss.min.js         _site/dss/                # ... und der Kern, den dss-render.min.js einbindet (sonst 404)
+cp node_modules/@hoopsfoundry/ui/dist/vanilla/hoops.css            _site/hoops/
+cp -r node_modules/@hoopsfoundry/ui/dist/vanilla/courtlines      _site/hoops/                # nur, wenn deine Seiten die Court-Linien nutzen
+cp node_modules/@hoopsfoundry/ui/dist/vanilla/hoops-map.min.js     _site/hoops/
+cp node_modules/@hoopsfoundry/ui/dist/vanilla/hoops-render.min.js  _site/hoops/                # nur für die Hallenkarte aus Daten ...
+cp node_modules/@hoopsfoundry/ui/dist/vanilla/hoops.min.js         _site/hoops/                # ... und der Kern, den hoops-render.min.js einbindet (sonst 404)
 cp node_modules/leaflet/dist/leaflet.css                                _site/vendor/leaflet/
 cp node_modules/leaflet/dist/leaflet-src.esm.js                         _site/vendor/leaflet/   # als ES-Modul (Variante 1 und 2)
 cp node_modules/leaflet/dist/leaflet.js                                 _site/vendor/leaflet/   # nur für Variante 3 (window.L)
@@ -160,7 +160,7 @@ cp -r node_modules/leaflet/dist/images                                  _site/ve
 
 
 export const svelte = `<script lang="ts">
-  import MapView from '@bbv/dss-design-system/svelte/Map';
+  import MapView from '@hoopsfoundry/ui/svelte/Map';
   import 'leaflet/dist/leaflet.css';
 
   const hallen = [
@@ -185,7 +185,7 @@ export const svelte = `<script lang="ts">
 <!-- Ein Marker, feste Mitte, ohne Gesten (Tasten und Zoom-Schaltflächen bleiben) -->
 <MapView label="Lage der Sporthalle Nordhain" markers={[hallen[0]]} zoom={16} interactive={false} height={240} showList={false} />`;
 
-export const react = `import { MapView, type MapMarker } from '@bbv/dss-design-system/react';
+export const react = `import { MapView, type MapMarker } from '@hoopsfoundry/ui/react';
 import 'leaflet/dist/leaflet.css';
 
 const hallen: MapMarker[] = [
@@ -207,7 +207,7 @@ const hallen: MapMarker[] = [
 {/* Ein Marker, feste Mitte, ohne Gesten (Tasten und Zoom-Schaltflächen bleiben) */}
 <MapView label="Lage der Sporthalle Nordhain" markers={[hallen[0]]} zoom={16} interactive={false} height={240} showList={false} />`;
 
-export const funktionenJs = `import { boundsOf, formatCoords, isCoord, mapLinks, validTileUrl } from '@bbv/dss-design-system/map.js';
+export const funktionenJs = `import { boundsOf, formatCoords, isCoord, mapLinks, validTileUrl } from '@hoopsfoundry/ui/map.js';
 
 formatCoords(49.4875, 8.466); // '49,4875° N, 8,4660° O'
 formatCoords(-33.8688, 151.2093); // '33,8688° S, 151,2093° O'
@@ -224,7 +224,7 @@ export const einbindungVite = `// Vite, SvelteKit, Next.js u. a.: leaflet instal
 import 'leaflet/dist/leaflet.css'; // Layout, Gesten, Ebenen; die Optik von Zoom, Marker und Quelle liefert components.css`;
 
 export const sitzSvelte = `<script>
-  import MapView from '@bbv/dss-design-system/svelte/Map';
+  import MapView from '@hoopsfoundry/ui/svelte/Map';
 
   const orte = [
     // kind: 'seat' – der Vereinssitz: Haus-Symbol statt Nummer, ohne Nummer, zählt in der Nummerierung nicht mit
@@ -237,7 +237,7 @@ export const sitzSvelte = `<script>
 <!-- darkTiles: im Dunkelmodus die Kacheln abdunkeln ('dim', Standard) oder invertieren und umfärben ('invert'); wirkt nur mit dimInDark -->
 <MapView label="Vereinssitz und Hallen" markers={orte} darkTiles="invert" />`;
 
-export const sitzReact = `import { MapView, type MapMarker } from '@bbv/dss-design-system/react';
+export const sitzReact = `import { MapView, type MapMarker } from '@hoopsfoundry/ui/react';
 
 const orte: MapMarker[] = [
   // kind: 'seat' – der Vereinssitz: Haus-Symbol statt Nummer, ohne Nummer, zählt in der Nummerierung nicht mit
@@ -250,19 +250,19 @@ const orte: MapMarker[] = [
 <MapView label="Vereinssitz und Hallen" markers={orte} darkTiles="invert" />`;
 
 export const sitzVanilla = `<!-- Vanilla: Kacheln im Dunkelmodus invertieren statt abdunkeln – ein Attribut am Wurzelelement (und data-dim="true") -->
-<div class="dss-map" data-state="ready" data-dim="true" data-tiles="invert" style="--hoops-map-h:320px">…</div>
+<div class="hoops-map" data-state="ready" data-dim="true" data-tiles="invert" style="--hoops-map-h:320px">…</div>
 
 <!-- Vereinssitz in der Liste: Haus-Badge ohne Zahl (aria-hidden) und der Chip „Vereinssitz“ -->
-<li class="dss-map-item">
-  <span class="dss-map-num is-seat" aria-hidden="true"></span>
-  <div class="dss-map-item-body">
-    <p class="dss-map-name"><span>Geschäftsstelle TSV Nordhain</span><span class="dss-chip">Vereinssitz</span></p>
-    <p class="dss-map-coords">49,2962° N, 7,9105° O</p>
+<li class="hoops-map-item">
+  <span class="hoops-map-num is-seat" aria-hidden="true"></span>
+  <div class="hoops-map-item-body">
+    <p class="hoops-map-name"><span>Geschäftsstelle TSV Nordhain</span><span class="hoops-chip">Vereinssitz</span></p>
+    <p class="hoops-map-coords">49,2962° N, 7,9105° O</p>
   </div>
 </li>
 
 <script type="module">
-  import { markerName, tilesMode, mapItems } from '@bbv/dss-design-system/map.js';
+  import { markerName, tilesMode, mapItems } from '@hoopsfoundry/ui/map.js';
 
   markerName({ label: 'Geschäftsstelle TSV Nordhain', kind: 'seat' });  // 'Geschäftsstelle TSV Nordhain, Vereinssitz'
   tilesMode('invert');                                                  // 'invert' (alles andere ergibt 'dim')

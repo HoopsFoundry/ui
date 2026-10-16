@@ -18,17 +18,17 @@ describe('VenueCard', () => {
   it('minimal: nur der Name als h3, keine weiteren Blöcke, keine Karte', () => {
     const { container } = render(<VenueCard name="Sporthalle Nordhain" />);
     expect(screen.getByRole('heading', { level: 3, name: 'Sporthalle Nordhain' })).toBeInTheDocument();
-    expect(container.firstElementChild).toHaveClass('dss-venue', 'dss-venue--standard');
-    expect(container.firstElementChild).not.toHaveClass('dss-venue--map');
-    for (const part of ['address', 'dl', 'ul', 'a', 'button', '.dss-venue-info', '.dss-venue-map', '.dss-map']) expect(container.querySelector(part), part).toBeNull();
+    expect(container.firstElementChild).toHaveClass('hoops-venue', 'hoops-venue--standard');
+    expect(container.firstElementChild).not.toHaveClass('hoops-venue--map');
+    for (const part of ['address', 'dl', 'ul', 'a', 'button', '.hoops-venue-info', '.hoops-venue-map', '.hoops-map']) expect(container.querySelector(part), part).toBeNull();
   });
 
   it('alle Blöcke: Karte, Adresse, Info, Kontakt, Spiele, Link', () => {
     const { container } = render(<VenueCard {...FULL} />);
-    expect(container.firstElementChild).toHaveClass('dss-venue--map');
+    expect(container.firstElementChild).toHaveClass('hoops-venue--map');
     expect(screen.getByRole('region', { name: 'Karte: Sporthalle Nordhain' })).toBeInTheDocument();
     expect(container.querySelector('address')).toHaveTextContent('Am Sportpark 412345 Nordhain');
-    expect(container.querySelectorAll('address .dss-venue-line')).toHaveLength(2);
+    expect(container.querySelectorAll('address .hoops-venue-line')).toHaveLength(2);
     expect(screen.getByText('Zwei Spielfelder.')).toBeInTheDocument();
     expect(screen.getByRole('list', { name: 'Nächste Spiele in der Halle' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Zur Hallenseite, Sporthalle Nordhain' })).toHaveAttribute('href', '/hallen/nordhain');
@@ -36,7 +36,7 @@ describe('VenueCard', () => {
 
   it('Adresse: höchstens zwei Zeilen, leere Teile entfallen, ohne Angabe kein address-Element', () => {
     const { container, rerender } = render(<VenueCard name="H" address={{ zip: '12345', city: 'Nordhain' }} />);
-    expect(container.querySelectorAll('.dss-venue-line')).toHaveLength(1);
+    expect(container.querySelectorAll('.hoops-venue-line')).toHaveLength(1);
     expect(container.querySelector('address')).toHaveTextContent('12345 Nordhain');
     rerender(<VenueCard name="H" address={{ street: ' ', zip: '', city: '' }} />);
     expect(container.querySelector('address')).toBeNull();
@@ -44,9 +44,9 @@ describe('VenueCard', () => {
 
   it('Kurzinfo nur mit Text', () => {
     const { container, rerender } = render(<VenueCard name="H" info="  Zugang über den Hof  " />);
-    expect(container.querySelector('.dss-venue-info')).toHaveTextContent('Zugang über den Hof');
+    expect(container.querySelector('.hoops-venue-info')).toHaveTextContent('Zugang über den Hof');
     rerender(<VenueCard name="H" info="   " />);
-    expect(container.querySelector('.dss-venue-info')).toBeNull();
+    expect(container.querySelector('.hoops-venue-info')).toBeNull();
   });
 
   describe('Kontakt', () => {
@@ -64,7 +64,7 @@ describe('VenueCard', () => {
     });
     it('ungültige Angaben bleiben Text ohne Link (nur sichere Links)', () => {
       const { container } = render(<VenueCard name="H" contact={{ name: 'A', phone: 'nur vormittags', email: 'a@example.org?bcc=x@example.org' }} />);
-      expect(container.querySelector('.dss-venue-contact a')).toBeNull();
+      expect(container.querySelector('.hoops-venue-contact a')).toBeNull();
       expect(screen.getByText('nur vormittags')).toBeInTheDocument();
       expect(screen.getByText('a@example.org?bcc=x@example.org')).toBeInTheDocument();
     });
@@ -126,27 +126,27 @@ describe('VenueCard', () => {
     });
     it('ohne Spiele (leer oder nur beendete) kein Block', () => {
       const { container, rerender } = render(<VenueCard name="H" games={[]} />);
-      expect(container.querySelector('.dss-venue-games')).toBeNull();
+      expect(container.querySelector('.hoops-venue-games')).toBeNull();
       rerender(<VenueCard name="H" games={[game('a', { state: 'finished' })]} />);
-      expect(container.querySelector('.dss-venue-games')).toBeNull();
+      expect(container.querySelector('.hoops-venue-games')).toBeNull();
     });
     it('compact zeigt keine Spiele', () => {
       const { container } = render(<VenueCard name="H" games={GAMES} size="compact" />);
-      expect(container.querySelector('.dss-venue-games')).toBeNull();
-      expect(container.firstElementChild).toHaveClass('dss-venue--compact');
+      expect(container.querySelector('.hoops-venue-games')).toBeNull();
+      expect(container.firstElementChild).toHaveClass('hoops-venue--compact');
     });
     it('logos und Kurznamen: Initialen ohne Logo, Logo als dekoratives Bild, voller Name für Hilfstechnik', () => {
       const withLogo = game('1', { heim: { name: 'TSV Nordhain 1920', short: 'Nordhain', logo: '/l.svg' }, gast: { name: 'BG Seeberg', short: 'Seeberg' } });
       const { container } = render(<VenueCard name="H" games={[withLogo]} logos names="short" />);
       expect(container.querySelector('img')).toHaveAttribute('alt', '');
-      expect(container.querySelector('.dss-team-logo--initials')).toHaveTextContent('BS');
-      expect(container.querySelectorAll('.dss-team-name--short')).toHaveLength(2);
-      expect(screen.getByText('TSV Nordhain 1920')).toHaveClass('dss-name-full');
-      expect(container.querySelector('.dss-name-short')).toHaveAttribute('aria-hidden', 'true');
+      expect(container.querySelector('.hoops-team-logo--initials')).toHaveTextContent('BS');
+      expect(container.querySelectorAll('.hoops-team-name--short')).toHaveLength(2);
+      expect(screen.getByText('TSV Nordhain 1920')).toHaveClass('hoops-name-full');
+      expect(container.querySelector('.hoops-name-short')).toHaveAttribute('aria-hidden', 'true');
     });
     it('ohne logos kein Logo', () => {
       const { container } = render(<VenueCard name="H" games={GAMES} />);
-      expect(container.querySelector('.dss-team-logo')).toBeNull();
+      expect(container.querySelector('.hoops-team-logo')).toBeNull();
     });
   });
 
@@ -154,22 +154,22 @@ describe('VenueCard', () => {
     it('ohne Koordinaten keine Karte, die Daten nehmen die ganze Breite', () => {
       for (const coords of [{}, { lat: 49.3 }, { lng: 7.9 }, { lat: 91, lng: 7.9 }, { lat: Number.NaN, lng: 7.9 }]) {
         const { container, unmount } = render(<VenueCard name="H" {...coords} />);
-        expect(container.querySelector('.dss-map'), JSON.stringify(coords)).toBeNull();
-        expect(container.firstElementChild).not.toHaveClass('dss-venue--map');
+        expect(container.querySelector('.hoops-map'), JSON.stringify(coords)).toBeNull();
+        expect(container.firstElementChild).not.toHaveClass('hoops-venue--map');
         unmount();
       }
     });
     it('Karte ist nicht interaktiv, zeigt den Platzhalter und lädt nichts', () => {
       const { container } = render(<VenueCard {...FULL} />);
-      expect(container.querySelector('.dss-map')).toHaveAttribute('data-state', 'idle');
+      expect(container.querySelector('.hoops-map')).toHaveAttribute('data-state', 'idle');
       expect(screen.getByRole('button', { name: 'Karte laden' })).toBeInTheDocument();
-      expect(container.querySelector('.dss-map-canvas')).toBeNull();
+      expect(container.querySelector('.hoops-map-canvas')).toBeNull();
     });
     it('der Platzhalter wiederholt die Adresse nicht: sie steht genau einmal im Text', () => {
       const { container } = render(<VenueCard {...FULL} />);
       expect(container.textContent!.split('Am Sportpark 4')).toHaveLength(2);
-      expect(container.querySelector('.dss-map-ph')!.textContent).not.toContain('Sportpark');
-      expect(container.querySelector('.dss-map-text')).toHaveClass('is-quiet');
+      expect(container.querySelector('.hoops-map-ph')!.textContent).not.toContain('Sportpark');
+      expect(container.querySelector('.hoops-map-text')).toHaveClass('is-quiet');
     });
     it('Name der Karte je Halle verschieden (landmark-unique)', () => {
       render(<><VenueCard name="Halle A" lat={49.3} lng={7.9} /><VenueCard name="Halle B" lat={49.31} lng={7.91} /></>);
@@ -183,10 +183,10 @@ describe('VenueCard', () => {
     });
     it('load="auto", privacyNote und mapHeight gehen an die Karte', () => {
       const { container } = render(<VenueCard name="H" lat={49.3} lng={7.9} load="auto" mapHeight={300} tileUrl="/tiles/{z}/{x}/{y}.png" />);
-      expect(container.querySelector('.dss-map')).toHaveAttribute('data-state', 'loading');
-      expect(container.querySelector('.dss-map')!.getAttribute('style')!.replace(/\s/g, '')).toContain('--hoops-map-h:300px');
+      expect(container.querySelector('.hoops-map')).toHaveAttribute('data-state', 'loading');
+      expect(container.querySelector('.hoops-map')!.getAttribute('style')!.replace(/\s/g, '')).toContain('--hoops-map-h:300px');
       const note = render(<VenueCard name="H2" lat={49.3} lng={7.9} privacyNote="Über unseren Server." />);
-      expect(note.container.querySelector('.dss-map-note')).toHaveTextContent('Über unseren Server.');
+      expect(note.container.querySelector('.hoops-map-note')).toHaveTextContent('Über unseren Server.');
     });
   });
 
@@ -206,7 +206,7 @@ describe('VenueCard', () => {
   describe('Überschriftenebene', () => {
     it('Standard h3, nie h1', () => {
       const { container } = render(<VenueCard name="H" />);
-      expect(container.querySelector('.dss-venue-title')!.tagName).toBe('H3');
+      expect(container.querySelector('.hoops-venue-title')!.tagName).toBe('H3');
       expect(container.querySelector('h1')).toBeNull();
     });
     it('titleAs gewinnt vor HeadingLevel vor h3', () => {
@@ -216,16 +216,16 @@ describe('VenueCard', () => {
           <VenueCard name="B" titleAs="h2" />
         </HeadingLevel>,
       );
-      const tags = [...container.querySelectorAll('.dss-venue-title')].map((h) => h.tagName);
+      const tags = [...container.querySelectorAll('.hoops-venue-title')].map((h) => h.tagName);
       expect(tags).toEqual(['H5', 'H2']);
     });
     it('compact hat dieselbe Überschrift mit Ebene', () => {
       const { container } = render(<VenueCard name="H" size="compact" titleAs="h4" />);
-      expect(container.querySelector('.dss-venue-title')!.tagName).toBe('H4');
+      expect(container.querySelector('.hoops-venue-title')!.tagName).toBe('H4');
     });
     it('ungültiges titleAs fällt zurück (nie h1)', () => {
       const { container } = render(<VenueCard name="H" titleAs={'h1' as never} />);
-      expect(container.querySelector('.dss-venue-title')!.tagName).toBe('H3');
+      expect(container.querySelector('.hoops-venue-title')!.tagName).toBe('H3');
     });
   });
 
@@ -248,7 +248,7 @@ describe('VenueCard', () => {
 
   it('className landet am Wurzelelement', () => {
     const { container } = render(<VenueCard name="H" className="meine-klasse" />);
-    expect(container.firstElementChild).toHaveClass('dss-venue', 'meine-klasse');
+    expect(container.firstElementChild).toHaveClass('hoops-venue', 'meine-klasse');
   });
 
   describe('axe', () => {

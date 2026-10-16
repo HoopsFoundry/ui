@@ -88,8 +88,8 @@ export function MapView({
   className,
 }: MapViewProps) {
   const uid = useId();
-  const canvasId = `dss-map-canvas-${uid}`;
-  const textId = `dss-map-text-${uid}`;
+  const canvasId = `hoops-map-canvas-${uid}`;
+  const textId = `hoops-map-text-${uid}`;
   const [phase, setPhase] = useState<Phase>(load === 'auto' ? 'loading' : 'idle');
   const [failure, setFailure] = useState<string | null>(null);
   const [zoomNow, setZoomNow] = useState({ zoom: 0, min: 0, max: 99 });
@@ -111,7 +111,7 @@ export function MapView({
   optionsRef.current = options;
 
   useEffect(() => {
-    if (!urlOk) devWarn(`[dss-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
+    if (!urlOk) devWarn(`[hoops-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
   }, [urlOk, tileUrl]);
 
   // Neue Kachel-Adresse: ein früherer Fehler gilt nicht mehr, die Karte versucht es erneut
@@ -162,31 +162,31 @@ export function MapView({
 
   return (
     <div
-      className={cn('dss-map', className)}
+      className={cn('hoops-map', className)}
       data-state={state}
       data-dim={dimInDark ? 'true' : 'false'}
       data-tiles={tilesMode(darkTiles)}
       style={{ '--hoops-map-h': `${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px` } as React.CSSProperties}
     >
-      <a className="dss-map-skip" href={`#${textId}`}>
+      <a className="hoops-map-skip" href={`#${textId}`}>
         {mapText.skip}
       </a>
-      <div className="dss-map-frame" role="region" aria-label={label}>
-        <div className="dss-map-stage">
-          {running ? <div className="dss-map-canvas" id={canvasId} role="group" aria-label={mapText.canvasHint} ref={canvas} {...inert} /> : null}
+      <div className="hoops-map-frame" role="region" aria-label={label}>
+        <div className="hoops-map-stage">
+          {running ? <div className="hoops-map-canvas" id={canvasId} role="group" aria-label={mapText.canvasHint} ref={canvas} {...inert} /> : null}
           {state !== 'ready' ? (
-            <div className="dss-map-ph">
+            <div className="hoops-map-ph">
               {(state === 'error' ? [] : pins).map((pin) => (
-                <span key={pin.id} className={cn('dss-map-ph-pin', pin.own && 'is-own', pin.kind === 'seat' && 'is-seat')} style={{ left: `${pin.x}%`, top: `${pin.y}%` }} aria-hidden="true">
+                <span key={pin.id} className={cn('hoops-map-ph-pin', pin.own && 'is-own', pin.kind === 'seat' && 'is-seat')} style={{ left: `${pin.x}%`, top: `${pin.y}%` }} aria-hidden="true">
                   {pin.number ?? ''}
                 </span>
               ))}
               {state === 'idle' ? (
-                <div className="dss-map-ph-card">
-                  <p className="dss-map-note">{privacyNote}</p>
+                <div className="hoops-map-ph-card">
+                  <p className="hoops-map-note">{privacyNote}</p>
                   <button
                     type="button"
-                    className="dss-btn dss-btn--primary dss-btn--md dss-map-load"
+                    className="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load"
                     onClick={() => {
                       userStarted.current = true;
                       setPhase('loading');
@@ -199,53 +199,53 @@ export function MapView({
             </div>
           ) : null}
           {state === 'ready' ? (
-            <div className="dss-map-zoom" role="group" aria-label={mapText.zoomGroup}>
-              <button type="button" className="dss-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onClick={() => canIn && controller.current?.zoomIn()}>
+            <div className="hoops-map-zoom" role="group" aria-label={mapText.zoomGroup}>
+              <button type="button" className="hoops-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onClick={() => canIn && controller.current?.zoomIn()}>
                 <Plus />
               </button>
-              <button type="button" className="dss-map-zoom-btn" aria-label={mapText.zoomOut} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onClick={() => canOut && controller.current?.zoomOut()}>
+              <button type="button" className="hoops-map-zoom-btn" aria-label={mapText.zoomOut} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onClick={() => canOut && controller.current?.zoomOut()}>
                 <Minus />
               </button>
             </div>
           ) : null}
-          <div className="dss-map-status" role="status">
+          <div className="hoops-map-status" role="status">
             {status}
           </div>
-          <p className="dss-map-attr">
+          <p className="hoops-map-attr">
             <a href={mapText.attributionHref}>{source}</a>
           </p>
         </div>
       </div>
-      <div className={cn('dss-map-text', !showList && 'is-quiet')} id={textId} tabIndex={-1}>
-        <ol className="dss-map-list" aria-label={mapText.listLabel}>
+      <div className={cn('hoops-map-text', !showList && 'is-quiet')} id={textId} tabIndex={-1}>
+        <ol className="hoops-map-list" aria-label={mapText.listLabel}>
           {items.map((item) => (
-            <li key={item.id} className="dss-map-item" value={item.number ?? undefined}>
+            <li key={item.id} className="hoops-map-item" value={item.number ?? undefined}>
               {item.kind === 'seat' ? (
-                <span className={cn('dss-map-num', 'is-seat', item.own && 'is-own')} aria-hidden="true" />
+                <span className={cn('hoops-map-num', 'is-seat', item.own && 'is-own')} aria-hidden="true" />
               ) : item.number !== null ? (
-                <span className={cn('dss-map-num', item.own && 'is-own')} aria-hidden="true">
+                <span className={cn('hoops-map-num', item.own && 'is-own')} aria-hidden="true">
                   {item.number}
                 </span>
               ) : null}
-              <div className="dss-map-item-body">
-                <p className="dss-map-name">
+              <div className="hoops-map-item-body">
+                <p className="hoops-map-name">
                   {item.href ? (
-                    <a className="dss-link" href={item.href}>
+                    <a className="hoops-link" href={item.href}>
                       {item.label}
                     </a>
                   ) : (
                     <span>{item.label}</span>
                   )}
-                  {item.kind === 'seat' ? <span className="dss-chip">{item.seatText}</span> : null}
-                  {item.own ? <span className="dss-chip dss-chip--amber">{mapText.own}</span> : null}
+                  {item.kind === 'seat' ? <span className="hoops-chip">{item.seatText}</span> : null}
+                  {item.own ? <span className="hoops-chip hoops-chip--amber">{mapText.own}</span> : null}
                 </p>
-                <p className="dss-map-coords">{item.coords}</p>
+                <p className="hoops-map-coords">{item.coords}</p>
                 {showList && item.links.length > 0 ? (
-                  <div className="dss-map-links">
+                  <div className="hoops-map-links">
                     {item.links.map((link) => (
-                      <a key={link.kind} className="dss-link" href={link.href}>
+                      <a key={link.kind} className="hoops-link" href={link.href}>
                         {link.text}
-                        <span className="dss-sr-only">, {item.label}</span>
+                        <span className="hoops-sr-only">, {item.label}</span>
                       </a>
                     ))}
                   </div>

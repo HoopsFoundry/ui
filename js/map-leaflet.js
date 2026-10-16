@@ -1,5 +1,5 @@
 /**
- * DSS Map · Leaflet-Anbindung (intern, von Svelte und React gemeinsam genutzt)
+ * HoopsFoundry UI Map · Leaflet-Anbindung (intern, von Svelte und React gemeinsam genutzt)
  * --------------------------------------------------------------
  * Lädt Leaflet erst beim Erzeugen der Karte (`import('leaflet')`), nie beim Import dieses Moduls: kein Zugriff auf `window` oder
  * `document` auf der obersten Ebene, Apps ohne Karte zahlen nichts. Zoom-Schaltflächen, Quellenangabe, Platzhalter und Fehlerhinweis
@@ -44,15 +44,15 @@ const svgEl = (name, attrs) => {
 
 /** Marker als SVG: Kontur und weißer Ring (sichtbar auf hellen und dunklen Kacheln), Füllung, Nummer, Punkt oder (Sitzmarker) Haus. */
 export function pinElement(item) {
-  const svg = svgEl('svg', { viewBox: '0 0 36 46', width: '36', height: '46', class: 'dss-map-pin', 'aria-hidden': 'true', focusable: 'false' });
-  svg.appendChild(svgEl('path', { d: PIN_PATH, class: 'dss-map-pin-edge' }));
-  svg.appendChild(svgEl('path', { d: PIN_PATH, class: 'dss-map-pin-body' }));
+  const svg = svgEl('svg', { viewBox: '0 0 36 46', width: '36', height: '46', class: 'hoops-map-pin', 'aria-hidden': 'true', focusable: 'false' });
+  svg.appendChild(svgEl('path', { d: PIN_PATH, class: 'hoops-map-pin-edge' }));
+  svg.appendChild(svgEl('path', { d: PIN_PATH, class: 'hoops-map-pin-body' }));
   if (item.kind === 'seat') {
-    svg.appendChild(svgEl('path', { d: HOUSE_PATH, class: 'dss-map-pin-house' }));
+    svg.appendChild(svgEl('path', { d: HOUSE_PATH, class: 'hoops-map-pin-house' }));
   } else if (item.number === null || item.number === undefined) {
-    svg.appendChild(svgEl('circle', { cx: '18', cy: '16.5', r: '5.5', class: 'dss-map-pin-dot' }));
+    svg.appendChild(svgEl('circle', { cx: '18', cy: '16.5', r: '5.5', class: 'hoops-map-pin-dot' }));
   } else {
-    const text = svgEl('text', { x: '18', y: '16.5', class: `dss-map-pin-num${String(item.number).length > 2 ? ' is-small' : ''}`, 'text-anchor': 'middle', 'dominant-baseline': 'central' });
+    const text = svgEl('text', { x: '18', y: '16.5', class: `hoops-map-pin-num${String(item.number).length > 2 ? ' is-small' : ''}`, 'text-anchor': 'middle', 'dominant-baseline': 'central' });
     text.textContent = String(item.number);
     svg.appendChild(text);
   }
@@ -84,7 +84,7 @@ export function createMapController(el, opts, hooks = {}) {
 
   const fail = (reason, error) => {
     if (destroyed) return;
-    devWarn(`[dss-map] Die Karte konnte nicht geladen werden (${reason}).`, error);
+    devWarn(`[hoops-map] Die Karte konnte nicht geladen werden (${reason}).`, error);
     hooks.onError?.(reason);
   };
 
@@ -92,7 +92,7 @@ export function createMapController(el, opts, hooks = {}) {
     if (map) hooks.onZoom?.({ zoom: map.getZoom(), min: map.getMinZoom(), max: map.getMaxZoom() });
   };
 
-  const markerIcon = (item) => L.divIcon({ html: pinElement(item), className: `dss-map-marker${item.own ? ' is-own' : ''}${item.kind === 'seat' ? ' is-seat' : ''}`, iconSize: [44, 46], iconAnchor: [22, 45] });
+  const markerIcon = (item) => L.divIcon({ html: pinElement(item), className: `hoops-map-marker${item.own ? ' is-own' : ''}${item.kind === 'seat' ? ' is-seat' : ''}`, iconSize: [44, 46], iconAnchor: [22, 45] });
 
   const syncMarkers = (items) => {
     const keep = new Set(items.map((i) => i.id));
@@ -181,7 +181,7 @@ export function createMapController(el, opts, hooks = {}) {
         doubleClickZoom: current.interactive !== false, touchZoom: current.interactive !== false, boxZoom: current.interactive !== false,
       });
       layerUrl = url;
-      layer = L.tileLayer(url, { minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, className: 'dss-map-tiles' });
+      layer = L.tileLayer(url, { minZoom: MIN_ZOOM, maxZoom: MAX_ZOOM, className: 'hoops-map-tiles' });
       layer.on('loading', () => { tileOk = 0; tileBad = 0; });
       layer.on('tileload', () => { tileOk += 1; everLoaded = true; });
       layer.on('tileerror', () => { tileBad += 1; });

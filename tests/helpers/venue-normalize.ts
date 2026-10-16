@@ -9,7 +9,7 @@ export const normalize = (html: string) => {
   return html
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/ onerror="this\.__e=event"/g, '')
-    .replace(/(dss-map-(?:canvas|text)-)([^"#]+)/g, (_m, prefix: string, id: string) => `${prefix}${key(id)}`)
+    .replace(/(hoops-map-(?:canvas|text)-)([^"#]+)/g, (_m, prefix: string, id: string) => `${prefix}${key(id)}`)
     .replace(/ (hidden|inert)=""/g, ' $1')
     .replace(/&quot;/g, '"')
     .replace(/&gt;/g, '>')

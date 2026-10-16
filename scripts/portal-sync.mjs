@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-// dss-sync / portal-sync: legt das Vanilla-Paket (dist/vanilla) in ein statisches Projekt (GitHub Pages u. ä.) nach _site/dss.
-// Das Skript ist Teil des Produkts: im npm-Paket (scripts/portal-sync.mjs, Befehl `dss-sync`) und als Release-Anhang `dss-sync.mjs`
+// hoops-sync / portal-sync: legt das Vanilla-Paket (dist/vanilla) in ein statisches Projekt (GitHub Pages u. ä.) nach _site/hoops.
+// Das Skript ist Teil des Produkts: im npm-Paket (scripts/portal-sync.mjs, Befehl `hoops-sync`) und als Release-Anhang `hoops-sync.mjs`
 // (eine Datei ohne Abhängigkeiten, mit eigener .sha256). Aufruf im Projekt vor dem Veröffentlichen:
 //
-//   node dss-sync.mjs --from-release 0.9.0           # Release-Anhang von GitHub, Prüfsumme wird geprüft (Auslieferung bis 1.0)
-//   node dss-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard; ab 1.0 die Auslieferung)
-//   node dss-sync.mjs --from-dir pfad/zum/ordner     # entpackter Release-Ordner oder Paketordner (offline, z. B. nach manuellem Download)
-//   Weitere Schalter: --to <ordner> (Standard _site/dss), --no-fonts, --leaflet (Leaflet aus node_modules nach _site/vendor/leaflet, Pflicht),
+//   node hoops-sync.mjs --from-release 0.10.0           # Release-Anhang von GitHub, Prüfsumme wird geprüft (Auslieferung bis 1.0)
+//   node hoops-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard; ab 1.0 die Auslieferung)
+//   node hoops-sync.mjs --from-dir pfad/zum/ordner     # entpackter Release-Ordner oder Paketordner (offline, z. B. nach manuellem Download)
+//   Weitere Schalter: --to <ordner> (Standard _site/hoops), --no-fonts, --leaflet (Leaflet aus node_modules nach _site/vendor/leaflet, Pflicht),
 //   --base-url <url> (Standard: GitHub-Release-Adresse dieses Pakets), --allow-insecure-http (http außerhalb von Loopback),
 //   --allow-redirect-host <host> (weiteren Host für Weiterleitungen freigeben), --debug (Stack bei Fehlern).
-// Ergebnis:  _site/dss/dss.js, dss.min.js, dss-render*.js, dss-map*.js, dss.css, *.d.ts, Quellkarten, courtlines/, version.json  (und optional fonts/).
+// Ergebnis:  _site/hoops/hoops.js, hoops.min.js, hoops-render*.js, hoops-map*.js, hoops.css, *.d.ts, Quellkarten, courtlines/, version.json  (und optional fonts/).
 // Voraussetzung: Node 18 oder neuer (getestet mit 18.20.8, 20.20.2 und 22.21.0).
 //
 // Die Quelle ist austauschbar: Der Aufbau von dist/vanilla ist in allen drei Fällen derselbe. Der Wechsel auf npm ab 1.0 ändert nur die Quelle
@@ -19,8 +19,8 @@
 //  - die Quelle wird vollständig geholt und geprüft (Prüfsumme, Version, Dateinamen), bevor das Ziel angefasst wird;
 //  - gebaut wird zuerst in einem Nachbarordner (`<ziel>.tmp-<pid>`); danach wird das alte Ziel nach `<ziel>.old-<pid>` verschoben, das neue eingesetzt
 //    und das alte gelöscht; scheitert das Einsetzen, kommt das alte Ziel zurück;
-//  - eine Sperrdatei `.dss-sync.lock` im Elternordner verhindert zwei gleichzeitige Läufe;
-//  - ein Ziel, das nicht leer ist und keine Marker-Datei `.dss-sync` trägt, wird nie gelöscht (Abbruch mit Fehler);
+//  - eine Sperrdatei `.hoops-sync.lock` im Elternordner verhindert zwei gleichzeitige Läufe;
+//  - ein Ziel, das nicht leer ist und keine Marker-Datei `.hoops-sync` trägt, wird nie gelöscht (Abbruch mit Fehler);
 //  - das Projekt-Root, ein Elternordner davon und `node_modules` sind als Ziel verboten.
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readdir, readFile, realpath, rename, rm, stat, writeFile } from 'node:fs/promises';
@@ -34,10 +34,10 @@ import { assertNode } from './lib/runtime.mjs';
 import { parseSums, readTgz } from './lib/tar.mjs';
 
 export { readTgz, parseSums };
-const PACKAGE = '@bbv/dss-design-system';
-const MARKER = '.dss-sync';
-/** Release-Adresse dieses Pakets; die Datei liegt unter `<basis>/v<version>/dss-vanilla-<version>.tgz`. */
-export const RELEASE_BASE_URL = 'https://github.com/OliEder/dss-design-system/releases/download';
+const PACKAGE = '@hoopsfoundry/ui';
+const MARKER = '.hoops-sync';
+/** Release-Adresse dieses Pakets; die Datei liegt unter `<basis>/v<version>/hoops-ui-<version>.tgz`. */
+export const RELEASE_BASE_URL = 'https://github.com/HoopsFoundry/ui/releases/download';
 const VERSION_PATTERN = /^\d{1,6}\.\d{1,6}\.\d{1,6}(-[0-9A-Za-z.-]{1,32})?$/;
 
 const exists = async (path) => {
@@ -51,12 +51,12 @@ const exists = async (path) => {
 const sha256 = (data) => createHash('sha256').update(data).digest('hex');
 
 /**
- * Holt `dss-vanilla-<version>.tgz` und `.sha256` unter `<baseUrl>/v<version>/`, prüft die Prüfsumme des Tarballs und jeder Datei darin, prüft,
+ * Holt `hoops-ui-<version>.tgz` und `.sha256` unter `<baseUrl>/v<version>/`, prüft die Prüfsumme des Tarballs und jeder Datei darin, prüft,
  * dass Ordnername und `version.json` die verlangte Version tragen, und schreibt den Inhalt in `dir`. Wirft bei jeder Abweichung; `dir` bleibt dann leer.
  */
 async function fetchRelease({ version, baseUrl, net }, dir) {
-  if (typeof version !== 'string' || !VERSION_PATTERN.test(version)) throw new Error(`portal-sync: ungültige Version ${JSON.stringify(version)} (erwartet z. B. 0.9.0).`);
-  const prefix = `dss-vanilla-${version}`;
+  if (typeof version !== 'string' || !VERSION_PATTERN.test(version)) throw new Error(`portal-sync: ungültige Version ${JSON.stringify(version)} (erwartet z. B. 0.10.0).`);
+  const prefix = `hoops-ui-${version}`;
   const base = `${String(baseUrl).replace(/\/+$/, '')}/v${version}`;
   const tgz = await download(`${base}/${prefix}.tgz`, net);
   const sums = parseSums((await download(`${base}/${prefix}.sha256`, { ...net, maxBytes: 1024 * 1024 })).toString('utf8'));
@@ -137,13 +137,13 @@ export async function replaceDir(target, root, fill, hooks = {}) {
 
 /**
  * Löst die Quelle auf: gibt `{ distDir, fontsDir, name, version, cleanup }` zurück. `distDir` hat den Aufbau von dist/vanilla.
- *  - `{ type: 'package' }` (Standard): node_modules/@bbv/dss-design-system im Projekt `root`;
- *  - `{ type: 'dir', path }`: ein Paketordner (mit dist/vanilla) oder ein entpackter Release-Ordner (mit dss.js und version.json);
+ *  - `{ type: 'package' }` (Standard): node_modules/@hoopsfoundry/ui im Projekt `root`;
+ *  - `{ type: 'dir', path }`: ein Paketordner (mit dist/vanilla) oder ein entpackter Release-Ordner (mit hoops.js und version.json);
  *  - `{ type: 'release', version, baseUrl?, fetch? }`: Release-Anhang, geprüft und in einen temporären Ordner entpackt.
  */
 async function resolveSource(source, root) {
   if (source.type === 'release') {
-    const dir = await mkdtemp(join(tmpdir(), 'dss-release-'));
+    const dir = await mkdtemp(join(tmpdir(), 'hoops-release-'));
     const cleanup = () => rm(dir, { recursive: true, force: true });
     try {
       const net = { fetchFn: source.fetch ?? globalThis.fetch, allowInsecureHttp: source.allowInsecureHttp, redirectHosts: source.redirectHosts, timeoutMs: source.timeoutMs, idleMs: source.idleMs, maxBytes: source.maxBytes };
@@ -161,23 +161,23 @@ async function resolveSource(source, root) {
     const pkg = JSON.parse(await readFile(join(base, 'package.json'), 'utf8'));
     return { distDir: join(base, 'dist/vanilla'), fontsDir: join(base, 'fonts'), name: pkg.name, version: pkg.version, cleanup: async () => {} };
   }
-  if (source.type === 'dir' && (await exists(join(base, 'dss.js')))) {
+  if (source.type === 'dir' && (await exists(join(base, 'hoops.js')))) {
     const info = JSON.parse(await readFile(join(base, 'version.json'), 'utf8').catch(() => 'null'));
     if (!info?.version) throw new Error(`portal-sync: ${base} hat keine lesbare version.json (kein Release-Ordner?).`);
     return { distDir: base, fontsDir: join(base, 'fonts'), name: info.name, version: info.version, cleanup: async () => {} };
   }
   // ohne installiertes Paket: derselbe Fehler wie zuvor (package.json fehlt)
   await readFile(join(base, 'package.json'), 'utf8');
-  throw new Error(`portal-sync: ${base} enthält weder dist/vanilla noch dss.js.`);
+  throw new Error(`portal-sync: ${base} enthält weder dist/vanilla noch hoops.js.`);
 }
 
 /**
- * Legt das Vanilla-Paket nach `to` (Standard `_site/dss`). Mit `fonts: true` auch fonts/ (Schriftdateien und fonts.css).
+ * Legt das Vanilla-Paket nach `to` (Standard `_site/hoops`). Mit `fonts: true` auch fonts/ (Schriftdateien und fonts.css).
  * `source`: siehe resolveSource (Standard: installiertes Paket). `leaflet`: `true` kopiert das installierte Leaflet nach `vendorTo`
  * (Standard `_site/vendor/leaflet`) und wirft, wenn es fehlt; `'auto'` kopiert es nur, wenn es installiert ist; `false` (Standard) lässt es aus.
  * `version.json` (Name und Version, für den Abgleich mit `--hoops-version`) entsteht zuerst. Gibt `{ version, leaflet }` zurück.
  */
-export async function syncDss({ root = process.cwd(), to = join(root, '_site/dss'), vendorTo = join(root, '_site/vendor/leaflet'), fonts = false, leaflet = false, source = { type: 'package' } } = {}) {
+export async function syncHoops({ root = process.cwd(), to = join(root, '_site/hoops'), vendorTo = join(root, '_site/vendor/leaflet'), fonts = false, leaflet = false, source = { type: 'package' } } = {}) {
   const leafletDist = join(root, 'node_modules/leaflet/dist');
   const hasLeaflet = await exists(leafletDist);
   if (leaflet === true && !hasLeaflet) throw new Error('portal-sync: leaflet ist nicht installiert (node_modules/leaflet/dist fehlt).');
@@ -188,7 +188,7 @@ export async function syncDss({ root = process.cwd(), to = join(root, '_site/dss
   const src = await resolveSource(source, root);
   let unlock = async () => {};
   try {
-    unlock = await acquireLock(dirname(resolve(to)), '.dss-sync.lock', 'portal-sync');
+    unlock = await acquireLock(dirname(resolve(to)), '.hoops-sync.lock', 'portal-sync');
     await replaceDir(to, root, async (tmp) => {
       await writeFile(join(tmp, 'version.json'), `${JSON.stringify({ name: src.name, version: src.version })}\n`);
       // fonts/ und version.json aus einem Release-Ordner kommen nicht ungefragt mit
@@ -203,7 +203,7 @@ export async function syncDss({ root = process.cwd(), to = join(root, '_site/dss
   return { version: src.version, leaflet: withLeaflet };
 }
 
-/** Liest die Befehlszeile (`--from-release 0.9.0`, `--from-dir pfad`, `--from-package`, `--to`, `--base-url`, `--no-fonts`, `--leaflet`, `--allow-insecure-http`, `--allow-redirect-host`, `--debug`). */
+/** Liest die Befehlszeile (`--from-release 0.10.0`, `--from-dir pfad`, `--from-package`, `--to`, `--base-url`, `--no-fonts`, `--leaflet`, `--allow-insecure-http`, `--allow-redirect-host`, `--debug`). */
 export function parseArgs(argv) {
   const options = { source: { type: 'package' }, fonts: true, leaflet: 'auto' };
   const value = (i, flag) => {
@@ -240,7 +240,7 @@ export function parseArgs(argv) {
   return options;
 }
 
-// Direktaufruf (node portal-sync.mjs oder der Befehl dss-sync, auch über eine Verknüpfung): kopiert mit den Standardpfaden
+// Direktaufruf (node portal-sync.mjs oder der Befehl hoops-sync, auch über eine Verknüpfung): kopiert mit den Standardpfaden
 const isMain = async () => {
   if (!process.argv[1]) return false;
   try {
@@ -254,7 +254,7 @@ if (await isMain()) {
   await runCli('portal-sync', async () => {
     assertNode('portal-sync');
     const options = parseArgs(process.argv.slice(2));
-    const { version, leaflet } = await syncDss(options);
-    console.log(`${PACKAGE} ${version} nach ${options.to ? options.to : '_site/dss'} kopiert${leaflet ? ', Leaflet nach _site/vendor/leaflet' : ''}`);
+    const { version, leaflet } = await syncHoops(options);
+    console.log(`${PACKAGE} ${version} nach ${options.to ? options.to : '_site/hoops'} kopiert${leaflet ? ', Leaflet nach _site/vendor/leaflet' : ''}`);
   }, { debug });
 }

@@ -23,7 +23,7 @@ describe('Icon', () => {
     const svg = container.querySelector('svg')!;
     expect(svg).toHaveAttribute('width', '16');
     expect(svg).toHaveAttribute('height', '16');
-    expect(svg).toHaveClass('dss-icon', 'extra');
+    expect(svg).toHaveClass('hoops-icon', 'extra');
   });
 
   it('fügt den Sprite genau einmal ein und parst alle Symbole', () => {
@@ -33,9 +33,9 @@ describe('Icon', () => {
         <Icon name="trophy" />
       </>,
     );
-    expect(document.querySelectorAll('#dss-icon-sprite')).toHaveLength(1);
+    expect(document.querySelectorAll('#hoops-icon-sprite')).toHaveLength(1);
     // Fängt kaputtes XML ab: bei einem Parse-Fehler gäbe es kein einziges <symbol>.
-    expect(document.querySelectorAll('#dss-icon-sprite symbol')).toHaveLength(ICON_NAMES.length);
+    expect(document.querySelectorAll('#hoops-icon-sprite symbol')).toHaveLength(ICON_NAMES.length);
   });
 
   it('hat für jeden Namen ein Symbol im Sprite', () => {

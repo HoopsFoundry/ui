@@ -50,11 +50,11 @@
         {#each stateNames as s}<div class="head">{s}</div>{/each}
         {#each variants as v}
           <div class="rowlabel">{v}</div>
-          <div><button type="button" class="dss-btn dss-btn--{v} dss-btn--md">{v}</button></div>
-          <div><button type="button" class="dss-btn dss-btn--{v} dss-btn--md pseudo-hover">{v}</button></div>
-          <div><button type="button" class="dss-btn dss-btn--{v} dss-btn--md pseudo-focus-visible">{v}</button></div>
-          <div><button type="button" class="dss-btn dss-btn--{v} dss-btn--md pseudo-hover pseudo-active">{v}</button></div>
-          <div><button type="button" class="dss-btn dss-btn--{v} dss-btn--md" disabled>{v}</button></div>
+          <div><button type="button" class="hoops-btn hoops-btn--{v} hoops-btn--md">{v}</button></div>
+          <div><button type="button" class="hoops-btn hoops-btn--{v} hoops-btn--md pseudo-hover">{v}</button></div>
+          <div><button type="button" class="hoops-btn hoops-btn--{v} hoops-btn--md pseudo-focus-visible">{v}</button></div>
+          <div><button type="button" class="hoops-btn hoops-btn--{v} hoops-btn--md pseudo-hover pseudo-active">{v}</button></div>
+          <div><button type="button" class="hoops-btn hoops-btn--{v} hoops-btn--md" disabled>{v}</button></div>
         {/each}
       </div>
     </div>
@@ -79,11 +79,11 @@
   <Button variant="amber" size="md">2-Punkte buchen</Button>
 {:else if example === 'do-grund'}
   <div class="reason">
-    <button type="button" class="dss-btn dss-btn--primary dss-btn--md" disabled aria-describedby="btn-grund">Freigeben</button>
+    <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md" disabled aria-describedby="btn-grund">Freigeben</button>
     <p id="btn-grund" class="hint">Freigabe erst, wenn beide Teams unterschrieben haben.</p>
   </div>
 {:else if example === 'dont-grund'}
-  <button type="button" class="dss-btn dss-btn--primary dss-btn--md" disabled>Freigeben</button>
+  <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md" disabled>Freigeben</button>
 {/if}
 
 <style>

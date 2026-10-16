@@ -6,7 +6,7 @@
 . Die Anwendung beschafft und normalisiert Daten.
 . Eine native Komponente erhält dokumentierte Eingaben.
 . Gemeinsame Hilfen berechnen darstellungsrelevante Werte.
-. Die Komponente gibt semantisches Markup mit DSS-Klassen aus.
+. Die Komponente gibt semantisches Markup mit HoopsFoundry-UI-Klassen aus.
 . Die Anwendung aktualisiert Eingaben bei Änderungen.
 
 === Vanilla-Lifecycle als Architekturziel

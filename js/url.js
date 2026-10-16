@@ -1,5 +1,5 @@
 /**
- * DSS URL · Prüfung von Links
+ * HoopsFoundry UI URL · Prüfung von Links
  * --------------------------------------------------------------
  * Gemeinsam für Karte (Marker-Ziele), Hallenkarte, Seitennavigation und die Render-Funktionen. Ohne DOM, ohne Abhängigkeiten.
  * Typen: js/url.d.ts. `js/map.js` exportiert `safeHref` weiterhin (Abwärtskompatibilität).

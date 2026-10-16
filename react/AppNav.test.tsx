@@ -89,7 +89,7 @@ describe('AppNav', () => {
     expect(locked).not.toHaveAttribute('href');
     expect(locked).not.toHaveAttribute('tabindex');
     expect(locked).toHaveAttribute('title', 'Erst nach dem Zeitplan verfügbar');
-    expect(within(locked).getByText(/Erst nach dem Zeitplan verfügbar/)).toHaveClass('dss-sr-only');
+    expect(within(locked).getByText(/Erst nach dem Zeitplan verfügbar/)).toHaveClass('hoops-sr-only');
   });
 
   it('rendert eine gesperrte Gruppe als deaktivierten Button ohne Dropdown', () => {
@@ -106,8 +106,8 @@ describe('AppNav', () => {
     expect(group).toHaveClass('is-disabled');
     expect(group).not.toHaveAttribute('aria-expanded');
     expect(group).toHaveAttribute('title', 'Erst nach Turnierende verfügbar');
-    expect(within(group).getByText(/Erst nach Turnierende verfügbar/)).toHaveClass('dss-sr-only');
-    expect(document.querySelector('.dss-appnav-panel')).toBeNull();
+    expect(within(group).getByText(/Erst nach Turnierende verfügbar/)).toHaveClass('hoops-sr-only');
+    expect(document.querySelector('.hoops-appnav-panel')).toBeNull();
   });
 
   it('nutzt renderLink für Router-Links', () => {
@@ -136,7 +136,7 @@ describe('AppNav', () => {
 
   it('setzt die Tonalität und rendert den Kontext-Slot', () => {
     const { container } = render(<AppNav items={ITEMS} tone="dark" context={<span>Turnier A</span>} />);
-    expect(container.querySelector('nav')).toHaveClass('dss-appnav--dark');
+    expect(container.querySelector('nav')).toHaveClass('hoops-appnav--dark');
     expect(screen.getByText('Turnier A')).toBeInTheDocument();
   });
 
@@ -149,7 +149,7 @@ describe('AppNav', () => {
 
   it('setzt die Klasse für die begrenzte Inhaltsbreite mit contained', () => {
     const { container } = render(<AppNav items={ITEMS} contained />);
-    expect(container.querySelector('nav')).toHaveClass('dss-appnav--contained');
+    expect(container.querySelector('nav')).toHaveClass('hoops-appnav--contained');
   });
 
   it('bildet gültige IDs für aria-controls auch bei Sonderzeichen in der Gruppen-ID', () => {

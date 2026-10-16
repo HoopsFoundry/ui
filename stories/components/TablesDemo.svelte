@@ -27,19 +27,19 @@
     {#snippet rows()}
       {#each roster as r}
         <tr>
-          <td class="center"><input type="checkbox" class="dss-check-input" checked={r.status === 'on'} aria-label={`${r.name} im Spielbericht`} /></td>
-          <td class="center"><span class={`dss-tn heim ${r.cap ? 'captain' : ''}`}>{r.num}</span></td>
+          <td class="center"><input type="checkbox" class="hoops-check-input" checked={r.status === 'on'} aria-label={`${r.name} im Spielbericht`} /></td>
+          <td class="center"><span class={`hoops-tn heim ${r.cap ? 'captain' : ''}`}>{r.num}</span></td>
           <td>
-            <div class={`dss-player ${r.status === 'bench' ? 'bench' : ''} ${r.status === 'dnp' ? 'dnp' : ''}`}>
-              <div class="dss-player-info">
-                <span class="dss-player-name">{r.name}{r.cap ? ' (C)' : ''}</span>
-                {#if r.cap}<span class="dss-player-meta">Kapitän</span>{/if}
+            <div class={`hoops-player ${r.status === 'bench' ? 'bench' : ''} ${r.status === 'dnp' ? 'dnp' : ''}`}>
+              <div class="hoops-player-info">
+                <span class="hoops-player-name">{r.name}{r.cap ? ' (C)' : ''}</span>
+                {#if r.cap}<span class="hoops-player-meta">Kapitän</span>{/if}
               </div>
             </div>
           </td>
-          <td class="center"><span class={`dss-pos ${r.pos.toLowerCase()}`}>{r.pos}</span></td>
+          <td class="center"><span class={`hoops-pos ${r.pos.toLowerCase()}`}>{r.pos}</span></td>
           <td class="center">
-            <span class={`dss-pill-s ${r.status === 'on' ? 'on' : ''} ${r.status === 'dnp' ? 'dnp' : ''} ${r.cap ? 'cap' : ''}`}>
+            <span class={`hoops-pill-s ${r.status === 'on' ? 'on' : ''} ${r.status === 'dnp' ? 'dnp' : ''} ${r.cap ? 'cap' : ''}`}>
               {r.status === 'on' ? 'Aktiv' : r.status === 'bench' ? 'Bank' : 'DNP'}
             </span>
           </td>
@@ -76,9 +76,9 @@
     {#snippet rows()}
       {#each boxscore as p}
         <tr>
-          <td><span class="dss-tn heim small">{p.num}</span></td>
-          <td><div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">{p.name}</span></div></div></td>
-          <td class="center"><span class={`dss-pos ${p.pos}`}>{p.pos.toUpperCase()}</span></td>
+          <td><span class="hoops-tn heim small">{p.num}</span></td>
+          <td><div class="hoops-player"><div class="hoops-player-info"><span class="hoops-player-name">{p.name}</span></div></div></td>
+          <td class="center"><span class={`hoops-pos ${p.pos}`}>{p.pos.toUpperCase()}</span></td>
           <td class="num">{p.min}</td>
           <td class="num lead">{p.pts}</td>
           <td class="num">{p.p2}</td>
@@ -127,9 +127,9 @@
       {#each crew as c}
         <tr>
           <td>{c.role}</td>
-          <td><div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">{c.name}</span></div></div></td>
+          <td><div class="hoops-player"><div class="hoops-player-info"><span class="hoops-player-name">{c.name}</span></div></div></td>
           <td style="font-family: var(--hoops-font-mono); font-size: 12px;">{c.license}</td>
-          <td class="center"><span class="dss-pill-s on">Bestätigt</span></td>
+          <td class="center"><span class="hoops-pill-s on">Bestätigt</span></td>
         </tr>
       {/each}
     {/snippet}
@@ -152,8 +152,8 @@
           {#snippet rows()}
             {#each boxscore.slice(0, 4) as p}
               <tr>
-                <td><span class="dss-tn heim small">{p.num}</span></td>
-                <td><div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">{p.name}</span></div></div></td>
+                <td><span class="hoops-tn heim small">{p.num}</span></td>
+                <td><div class="hoops-player"><div class="hoops-player-info"><span class="hoops-player-name">{p.name}</span></div></div></td>
                 <td class="num lead">{p.pts}</td>
                 <td class="num">{p.reb}</td>
                 <td class="num">{p.ast}</td>

@@ -32,36 +32,36 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
     const content = step.state === 'done' ? <Icon name="check" size={14} /> : <span aria-hidden="true">{index + 1}</span>;
     if (onStep && step.state !== 'pending') {
       return (
-        <button type="button" className="dss-step-dot" aria-label={`${index + 1}. ${step.label}`} onClick={() => onStep(step.id)}>
+        <button type="button" className="hoops-step-dot" aria-label={`${index + 1}. ${step.label}`} onClick={() => onStep(step.id)}>
           {content}
         </button>
       );
     }
     return (
-      <span className="dss-step-dot" aria-hidden="true">
+      <span className="hoops-step-dot" aria-hidden="true">
         {content}
       </span>
     );
   };
 
   const label = (step: StepItem): ReactNode => (
-    <div className="dss-step-label">
+    <div className="hoops-step-label">
       {step.label}
-      <span className="dss-sr-only"> ({STATE_TEXT[step.state]})</span>
+      <span className="hoops-sr-only"> ({STATE_TEXT[step.state]})</span>
     </div>
   );
 
   if (variant === 'compact') {
     return (
-      <div className={cn('dss-step', 'dss-step--c', className)} role="group" aria-label={ariaLabel}>
-        <div className="dss-step-track" aria-hidden="true">
-          <div className="dss-step-fill" style={{ width: `${steps.length ? (doneCount / steps.length) * 100 : 0}%` }} />
+      <div className={cn('hoops-step', 'hoops-step--c', className)} role="group" aria-label={ariaLabel}>
+        <div className="hoops-step-track" aria-hidden="true">
+          <div className="hoops-step-fill" style={{ width: `${steps.length ? (doneCount / steps.length) * 100 : 0}%` }} />
         </div>
-        <div className="dss-step-info">
-          <span className="dss-step-num">
+        <div className="hoops-step-info">
+          <span className="hoops-step-num">
             {currentIdx + 1} / {steps.length}
           </span>
-          <span className="dss-step-cur">{steps[currentIdx]?.label ?? '—'}</span>
+          <span className="hoops-step-cur">{steps[currentIdx]?.label ?? '—'}</span>
         </div>
       </div>
     );
@@ -69,20 +69,20 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
 
   if (variant === 'vertical') {
     return (
-      <ol className={cn('dss-step', 'dss-step--v', className)} aria-label={ariaLabel}>
+      <ol className={cn('hoops-step', 'hoops-step--v', className)} aria-label={ariaLabel}>
         {steps.map((step, i) => (
           <li
             key={step.id}
-            className={cn('dss-step-item', `is-${step.state}`)}
+            className={cn('hoops-step-item', `is-${step.state}`)}
             aria-current={step.state === 'current' ? 'step' : undefined}
           >
-            <div className="dss-step-rail">
+            <div className="hoops-step-rail">
               {dot(step, i)}
-              {i < steps.length - 1 ? <span className="dss-step-vline" aria-hidden="true" /> : null}
+              {i < steps.length - 1 ? <span className="hoops-step-vline" aria-hidden="true" /> : null}
             </div>
-            <div className="dss-step-body">
+            <div className="hoops-step-body">
               {label(step)}
-              {step.description ? <div className="dss-step-desc">{step.description}</div> : null}
+              {step.description ? <div className="hoops-step-desc">{step.description}</div> : null}
             </div>
           </li>
         ))}
@@ -91,16 +91,16 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
   }
 
   return (
-    <ol className={cn('dss-step', 'dss-step--h', className)} aria-label={ariaLabel}>
+    <ol className={cn('hoops-step', 'hoops-step--h', className)} aria-label={ariaLabel}>
       {steps.map((step, i) => (
         <li
           key={step.id}
-          className={cn('dss-step-item', `is-${step.state}`)}
+          className={cn('hoops-step-item', `is-${step.state}`)}
           aria-current={step.state === 'current' ? 'step' : undefined}
         >
           {dot(step, i)}
           {label(step)}
-          {i < steps.length - 1 ? <span className="dss-step-line" aria-hidden="true" /> : null}
+          {i < steps.length - 1 ? <span className="hoops-step-line" aria-hidden="true" /> : null}
         </li>
       ))}
     </ol>

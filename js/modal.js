@@ -1,20 +1,20 @@
 /**
- * DSS Modal · Dialog auf vorhandenem Markup
+ * HoopsFoundry UI Modal · Dialog auf vorhandenem Markup
  * --------------------------------------------------------------
- * `initModal(root, options)` macht ein `dss-modal` bedienbar, `openModal(el)` und `closeModal(el)` öffnen und schließen es. Zwei Wege:
+ * `initModal(root, options)` macht ein `hoops-modal` bedienbar, `openModal(el)` und `closeModal(el)` öffnen und schließen es. Zwei Wege:
  *  - **Natives `<dialog>`** (`root` ist ein `dialog`): `showModal()` übernimmt Hintergrund (`::backdrop`), Top-Layer und das Abschalten der Seite dahinter.
  *  - **Sonst** (ein Element mit `hidden`, das Hintergrund und `role="dialog"` enthält): `role="dialog"`, `aria-modal="true"`, die Geschwister des
  *    Modals werden `inert`, `hidden` wird umgeschaltet. Dasselbe gilt für ein `dialog` ohne `showModal` (alte Browser, jsdom).
- * Gemeinsam: der Fokus geht beim Öffnen auf `[data-dss-modal-focus]`/`[autofocus]`, sonst auf die Fläche (`.dss-modal`, `tabindex="-1"`) und kehrt
+ * Gemeinsam: der Fokus geht beim Öffnen auf `[data-hoops-modal-focus]`/`[autofocus]`, sonst auf die Fläche (`.hoops-modal`, `tabindex="-1"`) und kehrt
  * beim Schließen zum Auslöser zurück; Tab bleibt im Modal (Fokusfalle); Escape schließt (außer `closable: false`); ein Klick auf den Hintergrund
  * schließt nur mit `dismissOnBackdrop` (Standard aus, wie in den Svelte-/React-Modals); die Seite dahinter scrollt nicht (Scroll-Sperre, Rückbau
- * beim Schließen). Auslöser sind `data-dss-modal-open="<id>"` (irgendwo im Dokument) und `data-dss-modal-close` oder `.dss-m-close` (im Modal).
- * Meldet `dss:modalopen` und `dss:modalclose`. Kein `innerHTML`, kein Zugriff auf `window`/`document` beim Import. Typen: js/modal.d.ts.
+ * beim Schließen). Auslöser sind `data-hoops-modal-open="<id>"` (irgendwo im Dokument) und `data-hoops-modal-close` oder `.hoops-m-close` (im Modal).
+ * Meldet `hoops:modalopen` und `hoops:modalclose`. Kein `innerHTML`, kein Zugriff auf `window`/`document` beim Import. Typen: js/modal.d.ts.
  */
 import { createCleanups, createRegistry, listen, snapshotAttributes } from './lifecycle.js';
 
-export const MODAL_OPEN_EVENT = 'dss:modalopen';
-export const MODAL_CLOSE_EVENT = 'dss:modalclose';
+export const MODAL_OPEN_EVENT = 'hoops:modalopen';
+export const MODAL_CLOSE_EVENT = 'hoops:modalclose';
 const registry = createRegistry('modal');
 const instances = new WeakMap(); // Wurzel -> Handle
 const stack = []; // offene Modals, das oberste zuletzt (nur es reagiert auf Tastatur und Fokus)
@@ -91,7 +91,7 @@ const isElement = (value) => Boolean(value) && typeof value === 'object' && valu
 
 /**
  * Macht ein Modal bedienbar (geschlossen). Optionen: `dismissOnBackdrop` (Klick auf den Hintergrund schließt; Standard `false`), `closable`
- * (Escape und Hintergrund schließen; Standard `true`; `data-dss-modal-close` schließt immer), `initialFocus` (CSS-Auswahl im Modal),
+ * (Escape und Hintergrund schließen; Standard `true`; `data-hoops-modal-close` schließt immer), `initialFocus` (CSS-Auswahl im Modal),
  * `returnFocus` (Element, das beim Schließen den Fokus bekommt, oder `false`; Standard der Auslöser), `lockScroll` (Standard `true`),
  * `onOpen(detail)`, `onClose(detail)`. Rückgabe `{ destroy(), open(trigger?), close(reason?), isOpen() }`.
  */
@@ -108,10 +108,10 @@ export function initModal(root, options = {}) {
 
   const cleanups = createCleanups();
   const isDialog = root.localName === 'dialog';
-  const dialogEl = isDialog ? root : root.matches('[role="dialog"], [role="alertdialog"]') ? root : root.querySelector('[role="dialog"], [role="alertdialog"]') ?? root.querySelector('.dss-modal') ?? root;
-  const surface = root.querySelector('.dss-modal') ?? dialogEl;
-  const backdropEl = root.querySelector('.dss-backdrop');
-  const wrapEl = root.querySelector('.dss-modal-wrap');
+  const dialogEl = isDialog ? root : root.matches('[role="dialog"], [role="alertdialog"]') ? root : root.querySelector('[role="dialog"], [role="alertdialog"]') ?? root.querySelector('.hoops-modal') ?? root;
+  const surface = root.querySelector('.hoops-modal') ?? dialogEl;
+  const backdropEl = root.querySelector('.hoops-backdrop');
+  const wrapEl = root.querySelector('.hoops-modal-wrap');
 
   // Markup vorbereiten (destroy stellt es wieder her)
   cleanups.add(snapshotAttributes(root, ['hidden', 'open']));
@@ -122,16 +122,16 @@ export function initModal(root, options = {}) {
   if (!isDialog && !dialogEl.hasAttribute('role')) dialogEl.setAttribute('role', 'dialog');
   if (!isDialog) dialogEl.setAttribute('aria-modal', 'true');
   if (!dialogEl.hasAttribute('aria-labelledby') && !dialogEl.hasAttribute('aria-label')) {
-    const title = root.querySelector('.dss-m-title, [data-dss-modal-title]');
+    const title = root.querySelector('.hoops-m-title, [data-hoops-modal-title]');
     if (title) {
       cleanups.add(snapshotAttributes(title, ['id']));
-      if (!title.id) title.id = `dss-modal-title-${++uid}`;
+      if (!title.id) title.id = `hoops-modal-title-${++uid}`;
       dialogEl.setAttribute('aria-labelledby', title.id);
     }
   }
   if (!surface.hasAttribute('tabindex')) surface.setAttribute('tabindex', '-1');
   if (!dialogEl.hasAttribute('aria-labelledby') && !dialogEl.hasAttribute('aria-label') && !productionBuild()) {
-    console.warn('DSS Modal: Das Modal hat keinen zugänglichen Namen. Gib dem Titel class="dss-m-title" (oder data-dss-modal-title) oder dem Dialog aria-label/aria-labelledby.', root);
+    console.warn('HoopsFoundry UI Modal: Das Modal hat keinen zugänglichen Namen. Gib dem Titel class="hoops-m-title" (oder data-hoops-modal-title) oder dem Dialog aria-label/aria-labelledby.', root);
   }
 
   let opened = false;
@@ -154,7 +154,7 @@ export function initModal(root, options = {}) {
         target = null;
       }
     }
-    return target ?? root.querySelector('[data-dss-modal-focus], [autofocus]') ?? surface;
+    return target ?? root.querySelector('[data-hoops-modal-focus], [autofocus]') ?? surface;
   };
   const isTop = () => stack[stack.length - 1] === record;
 
@@ -272,8 +272,8 @@ export function initModal(root, options = {}) {
   }
   // Auslöser im Dokument
   cleanups.add(listen(doc, 'click', (event) => {
-    const trigger = event.target instanceof doc.defaultView.Element ? event.target.closest('[data-dss-modal-open]') : null;
-    if (!trigger || !root.id || trigger.getAttribute('data-dss-modal-open') !== root.id || root.contains(trigger)) return;
+    const trigger = event.target instanceof doc.defaultView.Element ? event.target.closest('[data-hoops-modal-open]') : null;
+    if (!trigger || !root.id || trigger.getAttribute('data-hoops-modal-open') !== root.id || root.contains(trigger)) return;
     event.preventDefault();
     open(trigger);
   }));
@@ -284,7 +284,7 @@ export function initModal(root, options = {}) {
   cleanups.add(listen(root, 'click', (event) => {
     const target = event.target;
     if (!(target instanceof doc.defaultView.Element)) return;
-    const button = target.closest('.dss-m-close, [data-dss-modal-close]');
+    const button = target.closest('.hoops-m-close, [data-hoops-modal-close]');
     if (button && root.contains(button)) {
       event.preventDefault();
       close('close-button');

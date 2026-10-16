@@ -64,7 +64,7 @@ export const SpielerkarteSpielwiese = {
     size: { control: 'inline-radio', options: ['compact', 'standard', 'hero'], description: 'Maßstab: Listenzeile, Karte mit Kennzahlen oder dunkle Großkarte', table: t("'compact' | 'standard' | 'hero'", "'standard'") },
     jersey: { control: 'text', description: 'Trikotnummer', table: t('string | number') },
     name: { control: 'text', description: 'Name des Spielers', table: t('string') },
-    position: { control: 'select', options: ['', 'PG', 'SG', 'SF', 'PF', 'C'], description: 'Position; färbt die Marke (`dss-pos`)', table: t('string', "''") },
+    position: { control: 'select', options: ['', 'PG', 'SG', 'SF', 'PF', 'C'], description: 'Position; färbt die Marke (`hoops-pos`)', table: t('string', "''") },
     team: { control: 'inline-radio', options: ['heim', 'gast'], description: 'Mannschaftsfarbe der Trikotnummer', table: t("'heim' | 'gast'", "'heim'") },
     captain: { control: 'boolean', description: 'Kapitän: Ring um die Trikotnummer, „(C)“ bzw. Kennzeichen „Kapitän“', table: t('boolean', 'false') },
     age: { control: 'text', description: 'Alter, nur `standard` und `hero`', table: t('string', "''") },

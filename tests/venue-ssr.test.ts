@@ -100,10 +100,10 @@ describe('VenueCard: Svelte und React erzeugen dasselbe Markup', () => {
 
   it('die Fälle sind aussagekräftig: Karte, Kontaktlinks, Spiele und Zustände stehen im Markup', async () => {
     const html = await same(cases['alles zusammen']);
-    for (const needle of ['role="region"', 'aria-label="Karte: Sporthalle Nordhain"', 'href="tel:03023125100"', 'href="mailto:hallenwart@example.org"', '<address', 'Abgesagt', 'dss-venue-maplinks', 'aria-label="Belegung"']) {
+    for (const needle of ['role="region"', 'aria-label="Karte: Sporthalle Nordhain"', 'href="tel:03023125100"', 'href="mailto:hallenwart@example.org"', '<address', 'Abgesagt', 'hoops-venue-maplinks', 'aria-label="Belegung"']) {
       expect(html, needle).toContain(needle);
     }
-    expect(await same(cases['nur name'])).not.toContain('dss-map');
+    expect(await same(cases['nur name'])).not.toContain('hoops-map');
     expect(await same(cases['Kontakt ungültig'])).not.toContain('href="tel:');
   });
 

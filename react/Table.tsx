@@ -48,7 +48,7 @@ export interface TableProps {
 
 const ARIA_SORT = { asc: 'ascending', desc: 'descending' } as const;
 
-/** Datentabelle im DSS-Rahmen (Titelzeile optional). Zellen liefert die Anwendung als `<tr>`-Kinder. */
+/** Datentabelle im HoopsFoundry-UI-Rahmen (Titelzeile optional). Zellen liefert die Anwendung als `<tr>`-Kinder. */
 export function Table({
   title,
   titleAs,
@@ -75,16 +75,16 @@ export function Table({
     <>
       {meta ? <span>{meta}</span> : null}
       {live ? (
-        <span className="dss-crumb">
-          <span className="dss-crumb-dot" aria-hidden="true" /> Live
+        <span className="hoops-crumb">
+          <span className="hoops-crumb-dot" aria-hidden="true" /> Live
         </span>
       ) : null}
     </>
   );
   const region = (
-    <div className="dss-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Tabelle'}>
-      <table className={cn('dss-tbl', `dss-tbl--${density}`, striped && 'dss-tbl--striped')}>
-        {caption ? <caption className="dss-sr-only">{caption}</caption> : null}
+    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Tabelle'}>
+      <table className={cn('hoops-tbl', `hoops-tbl--${density}`, striped && 'hoops-tbl--striped')}>
+        {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
         {columns ? (
           <thead>
             <tr>
@@ -108,7 +108,7 @@ export function Table({
       </table>
     </div>
   );
-  const rootClass = cn('dss-frame', dark && 'dss-frame--dark', className);
+  const rootClass = cn('hoops-frame', dark && 'hoops-frame--dark', className);
 
   if (collapsible && title) {
     return (
@@ -120,19 +120,19 @@ export function Table({
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
-        meta={meta || live ? <span className="dss-frame-meta">{metaItems}</span> : undefined}
+        meta={meta || live ? <span className="hoops-frame-meta">{metaItems}</span> : undefined}
       >
         {region}
       </CollapsibleFrame>
     );
   }
-  if (collapsible) devWarn('[DSS] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
+  if (collapsible) devWarn('[HoopsFoundry UI] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
     <div className={rootClass}>
       {hasHead ? (
-        <div className="dss-frame-head">
-          {title ? <Heading className="dss-frame-title">{title}</Heading> : <span />}
-          <div className="dss-frame-meta">{metaItems}</div>
+        <div className="hoops-frame-head">
+          {title ? <Heading className="hoops-frame-title">{title}</Heading> : <span />}
+          <div className="hoops-frame-meta">{metaItems}</div>
         </div>
       ) : null}
       {region}

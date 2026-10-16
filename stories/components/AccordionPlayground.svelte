@@ -46,8 +46,8 @@
 </script>
 
 {#snippet zaehler()}4 Einträge{/snippet}
-{#snippet chip()}<span class="dss-chip dss-chip--amber dss-chip--mono">Neu</span>{/snippet}
-{#snippet live()}<span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{/snippet}
+{#snippet chip()}<span class="hoops-chip hoops-chip--amber hoops-chip--mono">Neu</span>{/snippet}
+{#snippet live()}<span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span>Live</span>{/snippet}
 
 <Accordion {exclusive} {variant} {expandAll} {nav} {navLabel} {sticky} {syncHash} titleAs={titleAs || undefined}>
   {#each Array.from({ length: n }, (_, i) => i) as i (i)}

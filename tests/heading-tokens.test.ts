@@ -29,16 +29,16 @@ const LEADING = (d: string) => `var(--hoops-title-leading, ${d})`;
 
 // Selektor: [Größe, Gewicht, Zeilenhöhe]; die Vorgaben sind die Werte vor Einführung der Tokens
 const TITLES: Record<string, [string, string, string]> = {
-  '.dss-frame-title': [FRAME('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('inherit')],
-  '.dss-pbp-title': [FRAME('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('inherit')],
-  '.dss-pc-nm': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('600'), LEADING('inherit')],
-  '.dss-pc-hero .dss-pc-nm': [CARD('var(--hoops-fs-hero)'), WEIGHT('700'), LEADING('1.05')],
-  '.dss-empty-title': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('700'), LEADING('inherit')],
-  '.dss-team-nm': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('600'), LEADING('1.2')],
-  '.dss-team--compact .dss-team-nm': [CARD('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('1.2')],
-  '.dss-league-title': [CARD('var(--hoops-fs-h3)'), WEIGHT('700'), LEADING('1.2')],
-  '.dss-league--compact .dss-league-title': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('700'), LEADING('1.2')],
-  '.dss-m-title': ['var(--hoops-title-size, var(--hoops-fs-h3))', WEIGHT('700'), LEADING('inherit')],
+  '.hoops-frame-title': [FRAME('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('inherit')],
+  '.hoops-pbp-title': [FRAME('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('inherit')],
+  '.hoops-pc-nm': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('600'), LEADING('inherit')],
+  '.hoops-pc-hero .hoops-pc-nm': [CARD('var(--hoops-fs-hero)'), WEIGHT('700'), LEADING('1.05')],
+  '.hoops-empty-title': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('700'), LEADING('inherit')],
+  '.hoops-team-nm': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('600'), LEADING('1.2')],
+  '.hoops-team--compact .hoops-team-nm': [CARD('var(--hoops-fs-body)'), WEIGHT('600'), LEADING('1.2')],
+  '.hoops-league-title': [CARD('var(--hoops-fs-h3)'), WEIGHT('700'), LEADING('1.2')],
+  '.hoops-league--compact .hoops-league-title': [CARD('var(--hoops-fs-body-lg)'), WEIGHT('700'), LEADING('1.2')],
+  '.hoops-m-title': ['var(--hoops-title-size, var(--hoops-fs-h3))', WEIGHT('700'), LEADING('inherit')],
 };
 
 describe('Überschriften: Größe über Tokens mit Rückfall auf die bisherigen Werte', () => {

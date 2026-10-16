@@ -1,12 +1,12 @@
 <script lang="ts">
   /**
-   * DSS VenueCard (Hallenkarte) · Svelte 5
+   * HoopsFoundry UI VenueCard (Hallenkarte) · Svelte 5
    * --------------------------------------------------------------
    * Halle auf einen Blick: links eine kleine Karte (Map, nicht interaktiv, Zwei-Klick-Platzhalter), rechts Name, Adresse, Kurzinfo,
    * Kontakt, die nächsten Spiele in der Halle und ein Link zur Hallenseite. Alles außer `name` ist optional; was fehlt, erscheint
    * nicht. Ohne `lat`/`lng` gibt es keine Karte, die Daten nehmen dann die ganze Breite. Unter 640 px steht die Karte oben (16:9).
    * Die Adresse steht als Text (`address`); die Karte ergänzt sie und wiederholt sie nicht. Nutzt nur Klassen aus css/components.css
-   * (`dss-venue*`, dazu `dss-map*` der eingebetteten Karte). Regeln: js/venue.js.
+   * (`hoops-venue*`, dazu `hoops-map*` der eingebetteten Karte). Regeln: js/venue.js.
    *
    *   standard — Karte ~ 40 %, mit den nächsten Spielen (`games`, höchstens `limit`, Standard 2)
    *   compact  — kleinere Karte (~ 30 %), ohne Spiele
@@ -105,20 +105,20 @@
 
 {#snippet teamLine(team: ScheduleTeam, side: 'heim' | 'gast')}
   {@const kurz = shortName(team)}
-  <div class="dss-venue-team">
-    <span class={`dss-venue-dot dss-venue-dot--${side}`} aria-hidden="true"></span>
-    {#if logos}<span class={`dss-team-logo dss-team-logo--sm${team.logo ? '' : ' dss-team-logo--initials'}`} aria-hidden="true">{#if team.logo}<img src={team.logo} alt="" loading="lazy" />{:else}{initials(team.name, 2)}{/if}</span>{/if}
-    <span class="dss-sr-only">{side === 'heim' ? venueText.home : venueText.away}:</span>
-    <span class="dss-venue-team-name">
-      {#if kurz}<span class="dss-team-name" class:dss-team-name--short={names === 'short'}><span class="dss-name-full">{team.name}</span><span class="dss-name-short" aria-hidden="true" title={team.name}>{kurz}</span></span>{:else}{team.name}{/if}
+  <div class="hoops-venue-team">
+    <span class={`hoops-venue-dot hoops-venue-dot--${side}`} aria-hidden="true"></span>
+    {#if logos}<span class={`hoops-team-logo hoops-team-logo--sm${team.logo ? '' : ' hoops-team-logo--initials'}`} aria-hidden="true">{#if team.logo}<img src={team.logo} alt="" loading="lazy" />{:else}{initials(team.name, 2)}{/if}</span>{/if}
+    <span class="hoops-sr-only">{side === 'heim' ? venueText.home : venueText.away}:</span>
+    <span class="hoops-venue-team-name">
+      {#if kurz}<span class="hoops-team-name" class:hoops-team-name--short={names === 'short'}><span class="hoops-name-full">{team.name}</span><span class="hoops-name-short" aria-hidden="true" title={team.name}>{kurz}</span></span>{:else}{team.name}{/if}
     </span>
   </div>
 {/snippet}
 
-<div class={`dss-venue dss-venue--${size}${hasMap ? ' dss-venue--map' : ''}${klass ? ` ${klass}` : ''}`}>
-  <div class="dss-venue-in">
+<div class={`hoops-venue hoops-venue--${size}${hasMap ? ' hoops-venue--map' : ''}${klass ? ` ${klass}` : ''}`}>
+  <div class="hoops-venue-in">
   {#if hasMap}
-    <div class="dss-venue-map">
+    <div class="hoops-venue-map">
       <MapView
         label={venueMapLabel(title)}
         markers={marker}
@@ -130,48 +130,48 @@
         {privacyNote}
         appLinks={[]}
       />
-      <div class="dss-venue-maplinks">
+      <div class="hoops-venue-maplinks">
         {#each mapLinks as link (link.kind)}
-          <a class="dss-link" href={link.href}>{link.text}{#if title}<span class="dss-sr-only">, {title}</span>{/if}</a>
+          <a class="hoops-link" href={link.href}>{link.text}{#if title}<span class="hoops-sr-only">, {title}</span>{/if}</a>
         {/each}
       </div>
     </div>
   {/if}
 
-  <div class="dss-venue-body">
-    {#if title}<svelte:element this={heading.tag} class="dss-venue-title">{title}</svelte:element>{/if}
+  <div class="hoops-venue-body">
+    {#if title}<svelte:element this={heading.tag} class="hoops-venue-title">{title}</svelte:element>{/if}
 
     {#if lines.length}
-      <address class="dss-venue-address">{#each lines as line, i (i)}<span class="dss-venue-line">{line}</span>{/each}</address>
+      <address class="hoops-venue-address">{#each lines as line, i (i)}<span class="hoops-venue-line">{line}</span>{/each}</address>
     {/if}
 
-    {#if info && info.trim()}<p class="dss-venue-info">{info.trim()}</p>{/if}
+    {#if info && info.trim()}<p class="hoops-venue-info">{info.trim()}</p>{/if}
 
     {#if person}
-      <dl class="dss-venue-contact">
+      <dl class="hoops-venue-contact">
         {#if person.name}<div><dt>{venueText.contact}</dt><dd>{person.name}</dd></div>{/if}
-        {#if person.phone}<div><dt>{venueText.phone}</dt><dd>{#if person.phone.href}<a class="dss-link" href={person.phone.href}>{person.phone.text}</a>{:else}{person.phone.text}{/if}</dd></div>{/if}
-        {#if person.email}<div><dt>{venueText.email}</dt><dd>{#if person.email.href}<a class="dss-link" href={person.email.href}>{person.email.text}</a>{:else}{person.email.text}{/if}</dd></div>{/if}
+        {#if person.phone}<div><dt>{venueText.phone}</dt><dd>{#if person.phone.href}<a class="hoops-link" href={person.phone.href}>{person.phone.text}</a>{:else}{person.phone.text}{/if}</dd></div>{/if}
+        {#if person.email}<div><dt>{venueText.email}</dt><dd>{#if person.email.href}<a class="hoops-link" href={person.email.href}>{person.email.text}</a>{:else}{person.email.text}{/if}</dd></div>{/if}
       </dl>
     {/if}
 
     {#if rows.length}
-      <div class="dss-venue-games">
-        <div class="dss-venue-sec" aria-hidden="true">{gamesLabel}</div>
-        <ul class="dss-venue-game-list" aria-label={gamesLabel}>
+      <div class="hoops-venue-games">
+        <div class="hoops-venue-sec" aria-hidden="true">{gamesLabel}</div>
+        <ul class="hoops-venue-game-list" aria-label={gamesLabel}>
           {#each rows as game, i (keys[i])}
             {@const when = gameWhen(game)}
             {@const meta = gameMeta(game)}
             {@const state = gameState(game)}
-            <li class="dss-venue-game">
+            <li class="hoops-venue-game">
               {#if when || state}
-                <div class="dss-venue-game-head">
-                  {#if when}<span class="dss-venue-when">{when}</span>{/if}
-                  {#if state}<span class={`dss-chip dss-chip--${state.tone}`}>{state.text}</span>{/if}
+                <div class="hoops-venue-game-head">
+                  {#if when}<span class="hoops-venue-when">{when}</span>{/if}
+                  {#if state}<span class={`hoops-chip hoops-chip--${state.tone}`}>{state.text}</span>{/if}
                 </div>
               {/if}
-              {#if meta}<div class="dss-venue-game-meta">{meta}</div>{/if}
-              <div class="dss-venue-teams">
+              {#if meta}<div class="hoops-venue-game-meta">{meta}</div>{/if}
+              <div class="hoops-venue-teams">
                 {#if game.heim?.name}{@render teamLine(game.heim, 'heim')}{/if}
                 {#if game.gast?.name}{@render teamLine(game.gast, 'gast')}{/if}
               </div>
@@ -182,8 +182,8 @@
     {/if}
 
     {#if target}
-      <div class="dss-venue-foot">
-        <a class="dss-link dss-venue-more" href={target}>{linkLabel}{#if title}<span class="dss-sr-only">, {title}</span>{/if}</a>
+      <div class="hoops-venue-foot">
+        <a class="hoops-link hoops-venue-more" href={target}>{linkLabel}{#if title}<span class="hoops-sr-only">, {title}</span>{/if}</a>
       </div>
     {/if}
   </div>

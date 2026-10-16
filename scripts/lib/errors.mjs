@@ -1,7 +1,7 @@
 // Zentrale Übersetzung von Systemfehlern in deutsche Meldungen für die Skripte portal-sync.mjs und release-vanilla.mjs.
 // Eigene Fehler der Skripte (Meldung beginnt mit dem Skriptnamen und einem Doppelpunkt) bleiben unverändert.
 
-const OWN = /^(portal-sync|release-vanilla|dss-sync): /;
+const OWN = /^(portal-sync|release-vanilla|hoops-sync): /;
 
 const TEXT = {
   ENOENT: (p) => `Datei oder Ordner nicht gefunden${p}.`,
@@ -23,7 +23,7 @@ const TEXT = {
 /**
  * Deutsche Meldung zu einem Fehler. Mit `debug` folgt der Stack. Gibt immer eine Zeichenkette zurück, nie den Fehler selbst.
  */
-export function describeError(error, { debug = false, name = 'dss' } = {}) {
+export function describeError(error, { debug = false, name = 'hoops' } = {}) {
   const message = String(error?.message ?? error);
   let text;
   if (OWN.test(message)) {

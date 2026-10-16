@@ -38,59 +38,59 @@
 
   // Erzwingt einen Zustand auf dem Scrollbereich der Tabelle (die Tabelle selbst nimmt keine Klasse dafür)
   function forceFocus(node: HTMLElement) {
-    node.querySelector('.dss-table-scroll')?.classList.add('pseudo-focus-visible');
+    node.querySelector('.hoops-table-scroll')?.classList.add('pseudo-focus-visible');
   }
 </script>
 
 {#snippet spieler(name: string)}
-  <div class="dss-player"><div class="dss-player-info"><span class="dss-player-name">{name}</span></div></div>
+  <div class="hoops-player"><div class="hoops-player-info"><span class="hoops-player-name">{name}</span></div></div>
 {/snippet}
 
 {#snippet statRows(list: typeof boxscore)}
   {#each list as p}
-    <tr><td><span class="dss-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.reb}</td></tr>
+    <tr><td><span class="hoops-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.reb}</td></tr>
   {/each}
 {/snippet}
 
 {#if example === 'zellen'}
   <div class="gallery">
     <div>
-      <div class="bez">Trikotnummer · dss-tn</div>
+      <div class="bez">Trikotnummer · hoops-tn</div>
       <div class="row">
-        <span class="dss-tn">4</span>
-        <span class="dss-tn heim">7</span>
-        <span class="dss-tn gast">11</span>
-        <span class="dss-tn heim captain">13</span>
-        <span class="dss-tn heim small">15</span>
-        <span class="dss-tn gast large">21</span>
+        <span class="hoops-tn">4</span>
+        <span class="hoops-tn heim">7</span>
+        <span class="hoops-tn gast">11</span>
+        <span class="hoops-tn heim captain">13</span>
+        <span class="hoops-tn heim small">15</span>
+        <span class="hoops-tn gast large">21</span>
       </div>
     </div>
     <div>
-      <div class="bez">Position · dss-pos</div>
+      <div class="bez">Position · hoops-pos</div>
       <div class="row">
-        <span class="dss-pos">?</span>
-        <span class="dss-pos pg">PG</span>
-        <span class="dss-pos sg">SG</span>
-        <span class="dss-pos sf">SF</span>
-        <span class="dss-pos pf">PF</span>
-        <span class="dss-pos c">C</span>
+        <span class="hoops-pos">?</span>
+        <span class="hoops-pos pg">PG</span>
+        <span class="hoops-pos sg">SG</span>
+        <span class="hoops-pos sf">SF</span>
+        <span class="hoops-pos pf">PF</span>
+        <span class="hoops-pos c">C</span>
       </div>
     </div>
     <div>
-      <div class="bez">Status · dss-pill-s</div>
+      <div class="bez">Status · hoops-pill-s</div>
       <div class="row">
-        <span class="dss-pill-s">Bank</span>
-        <span class="dss-pill-s on">Aktiv</span>
-        <span class="dss-pill-s cap">Kapitän</span>
-        <span class="dss-pill-s dnp">DNP</span>
+        <span class="hoops-pill-s">Bank</span>
+        <span class="hoops-pill-s on">Aktiv</span>
+        <span class="hoops-pill-s cap">Kapitän</span>
+        <span class="hoops-pill-s dnp">DNP</span>
       </div>
     </div>
     <div>
-      <div class="bez">Spieler · dss-player</div>
+      <div class="bez">Spieler · hoops-player</div>
       <div class="row row--col">
         {@render spieler('J. Tanner')}
-        <div class="dss-player bench"><div class="dss-player-info"><span class="dss-player-name">P. Kessel</span></div></div>
-        <div class="dss-player dnp"><div class="dss-player-info"><span class="dss-player-name">C. Fenwick</span><span class="dss-player-meta">nicht eingesetzt</span></div></div>
+        <div class="hoops-player bench"><div class="hoops-player-info"><span class="hoops-player-name">P. Kessel</span></div></div>
+        <div class="hoops-player dnp"><div class="hoops-player-info"><span class="hoops-player-name">C. Fenwick</span><span class="hoops-player-meta">nicht eingesetzt</span></div></div>
       </div>
     </div>
   </div>
@@ -137,7 +137,7 @@
       ]}>
       {#snippet rows()}
         {#each kurz as p, i}
-          <tr class={i === 1 ? 'is-own' : ''}><td><span class="dss-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td></tr>
+          <tr class={i === 1 ? 'is-own' : ''}><td><span class="hoops-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td></tr>
         {/each}
       {/snippet}
     </Table>
@@ -153,7 +153,7 @@
       ]}>
       {#snippet rows()}
         {#each [...boxscore, ...boxscore] as p}
-          <tr><td><span class="dss-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.reb}</td></tr>
+          <tr><td><span class="hoops-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.reb}</td></tr>
         {/each}
       {/snippet}
     </Table>
@@ -177,11 +177,11 @@
               {#if s === 'Gesperrt'}
                 <span class="mute">kein Link</span>
               {:else}
-                <a class={`dss-link ${c}`} href="#spieler" onclick={stay}>J. Tanner</a>
+                <a class={`hoops-link ${c}`} href="#spieler" onclick={stay}>J. Tanner</a>
               {/if}
             </td>
-            <td><button type="button" class={`dss-btn dss-btn--secondary dss-btn--sm ${c}`} disabled={s === 'Gesperrt'}>Öffnen</button></td>
-            <td class="center"><input type="checkbox" class={`dss-check-input ${c}`} checked disabled={s === 'Gesperrt'} style={s === 'Gesperrt' ? 'opacity: 0.5; cursor: not-allowed;' : undefined} aria-label={`Kontrollkästchen, ${s}`} /></td>
+            <td><button type="button" class={`hoops-btn hoops-btn--secondary hoops-btn--sm ${c}`} disabled={s === 'Gesperrt'}>Öffnen</button></td>
+            <td class="center"><input type="checkbox" class={`hoops-check-input ${c}`} checked disabled={s === 'Gesperrt'} style={s === 'Gesperrt' ? 'opacity: 0.5; cursor: not-allowed;' : undefined} aria-label={`Kontrollkästchen, ${s}`} /></td>
           </tr>
         {/each}
       {/snippet}
@@ -229,7 +229,7 @@
       ]}>
       {#snippet rows()}
         {#each kurz.slice(0, 3) as p, i}
-          <tr><td>{@render spieler(p.name)}</td><td class="center"><span class={`dss-pill-s ${i === 2 ? '' : 'on'}`}>{i === 2 ? 'Bank' : 'Aktiv'}</span></td></tr>
+          <tr><td>{@render spieler(p.name)}</td><td class="center"><span class={`hoops-pill-s ${i === 2 ? '' : 'on'}`}>{i === 2 ? 'Bank' : 'Aktiv'}</span></td></tr>
         {/each}
       {/snippet}
     </Table>
@@ -250,7 +250,7 @@
         ]}>
         {#snippet rows()}
           {#each kurz.slice(0, 3) as p}
-            <tr><td><span class="dss-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.min}</td><td class="num">{p.p2}</td><td class="num">{p.p3}</td><td class="num">{p.ft}</td><td class="num">{p.reb}</td></tr>
+            <tr><td><span class="hoops-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num lead">{p.pts}</td><td class="num">{p.min}</td><td class="num">{p.p2}</td><td class="num">{p.p3}</td><td class="num">{p.ft}</td><td class="num">{p.reb}</td></tr>
           {/each}
         {/snippet}
       </Table>
@@ -268,7 +268,7 @@
         ]}>
         {#snippet rows()}
           {#each kurz.slice(0, 3) as p}
-            <tr><td><span class="dss-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num">{p.min}</td><td class="num">{p.p2}</td><td class="num">{p.p3}</td><td class="num">{p.ft}</td><td class="num">{p.reb}</td><td class="num lead">{p.pts}</td></tr>
+            <tr><td><span class="hoops-tn heim small">{p.num}</span></td><td>{@render spieler(p.name)}</td><td class="num">{p.min}</td><td class="num">{p.p2}</td><td class="num">{p.p3}</td><td class="num">{p.ft}</td><td class="num">{p.reb}</td><td class="num lead">{p.pts}</td></tr>
           {/each}
         {/snippet}
       </Table>
@@ -301,7 +301,7 @@
       ]}>
       {#snippet rows()}
         {#each kurz as p, i}
-          <tr><td>{@render spieler(p.name)}</td><td class="center"><span class={`dss-pill-s ${statusClass[stati[i]]}`}>{stati[i]}</span></td></tr>
+          <tr><td>{@render spieler(p.name)}</td><td class="center"><span class={`hoops-pill-s ${statusClass[stati[i]]}`}>{stati[i]}</span></td></tr>
         {/each}
       {/snippet}
     </Table>
@@ -318,7 +318,7 @@
 {:else if example === 'einklappbar-id'}
   <div class="stack">
     <p class="links">
-      Direkt springen: <a class="dss-link" href="#tab-gast">Statistik Lindenberg Hawks</a>
+      Direkt springen: <a class="hoops-link" href="#tab-gast">Statistik Lindenberg Hawks</a>
     </p>
     <Table collapsible id="tab-heim" title="Statistik TSV Nordhain" meta="Stand · 4. Viertel" density="compact" columns={statCols}>
       {#snippet rows()}{@render statRows(kurz)}{/snippet}
@@ -372,12 +372,12 @@
   .matrix { display: flex; flex-direction: column; gap: 16px; }
   .mute { color: var(--hoops-mute); }
   /* Sticky Kopf wirkt erst, wenn der Scrollbereich eine Höhe hat */
-  .sticky :global(.dss-table-scroll) { max-height: 200px; overflow-y: auto; }
+  .sticky :global(.hoops-table-scroll) { max-height: 200px; overflow-y: auto; }
   /* Don't-Nachbildung: Zahlen wie ohne die Klasse num */
-  .prop :global(.dss-tbl td.num), .prop :global(.dss-tbl th.right) {
+  .prop :global(.hoops-tbl td.num), .prop :global(.hoops-tbl th.right) {
     text-align: left; font-family: var(--hoops-font-body); font-variant-numeric: normal; font-weight: 400;
   }
-  .prop :global(.dss-tbl th.right) { font-family: var(--hoops-font-mono); font-weight: 600; }
+  .prop :global(.hoops-tbl th.right) { font-family: var(--hoops-font-mono); font-weight: 600; }
   /* Don't-Nachbildung: Status nur als Farbfläche, ohne Text */
-  .dots :global(.dss-pill-s) { width: 14px; height: 14px; padding: 0; border-radius: 50%; font-size: 0; gap: 0; }
+  .dots :global(.hoops-pill-s) { width: 14px; height: 14px; padding: 0; border-radius: 50%; font-size: 0; gap: 0; }
 </style>

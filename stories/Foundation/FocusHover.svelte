@@ -9,85 +9,85 @@
     <div class="cell">
       <div class="cap">Button · primary</div>
       <div class="states">
-        <button class="dss-btn dss-btn--primary dss-btn--md">Ruhe</button>
-        <button class="dss-btn dss-btn--primary dss-btn--md pseudo-hover">Hover</button>
-        <button class="dss-btn dss-btn--primary dss-btn--md pseudo-focus-visible">Fokus</button>
+        <button class="hoops-btn hoops-btn--primary hoops-btn--md">Ruhe</button>
+        <button class="hoops-btn hoops-btn--primary hoops-btn--md pseudo-hover">Hover</button>
+        <button class="hoops-btn hoops-btn--primary hoops-btn--md pseudo-focus-visible">Fokus</button>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Button · amber (CTA)</div>
       <div class="states">
-        <button class="dss-btn dss-btn--amber dss-btn--md">Ruhe</button>
-        <button class="dss-btn dss-btn--amber dss-btn--md pseudo-hover">Hover</button>
-        <button class="dss-btn dss-btn--amber dss-btn--md pseudo-focus-visible">Fokus</button>
+        <button class="hoops-btn hoops-btn--amber hoops-btn--md">Ruhe</button>
+        <button class="hoops-btn hoops-btn--amber hoops-btn--md pseudo-hover">Hover</button>
+        <button class="hoops-btn hoops-btn--amber hoops-btn--md pseudo-focus-visible">Fokus</button>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Button · secondary und ghost</div>
       <div class="states">
-        <button class="dss-btn dss-btn--secondary dss-btn--md pseudo-hover">Hover</button>
-        <button class="dss-btn dss-btn--secondary dss-btn--md pseudo-focus-visible">Fokus</button>
-        <button class="dss-btn dss-btn--ghost dss-btn--md pseudo-hover">Hover</button>
-        <button class="dss-btn dss-btn--ghost dss-btn--md pseudo-focus-visible">Fokus</button>
+        <button class="hoops-btn hoops-btn--secondary hoops-btn--md pseudo-hover">Hover</button>
+        <button class="hoops-btn hoops-btn--secondary hoops-btn--md pseudo-focus-visible">Fokus</button>
+        <button class="hoops-btn hoops-btn--ghost hoops-btn--md pseudo-hover">Hover</button>
+        <button class="hoops-btn hoops-btn--ghost hoops-btn--md pseudo-focus-visible">Fokus</button>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Link</div>
       <div class="states">
-        <a class="dss-link" href="#x" onclick={(e) => e.preventDefault()}>Ruhe</a>
-        <a class="dss-link pseudo-hover" href="#x" onclick={(e) => e.preventDefault()}>Hover</a>
-        <a class="dss-link pseudo-focus-visible" href="#x" onclick={(e) => e.preventDefault()}>Fokus</a>
+        <a class="hoops-link" href="#x" onclick={(e) => e.preventDefault()}>Ruhe</a>
+        <a class="hoops-link pseudo-hover" href="#x" onclick={(e) => e.preventDefault()}>Hover</a>
+        <a class="hoops-link pseudo-focus-visible" href="#x" onclick={(e) => e.preventDefault()}>Fokus</a>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Eingabefeld</div>
       <div class="states col">
-        <div class="dss-field"><div class="dss-input-group"><input class="dss-input dss-input--default" placeholder="Ruhe" aria-label="Ruhe" /></div></div>
-        <div class="dss-field"><div class="dss-input-group pseudo-focus-within"><input class="dss-input dss-input--default" value="Fokus" aria-label="Fokus" /></div></div>
+        <div class="hoops-field"><div class="hoops-input-group"><input class="hoops-input hoops-input--default" placeholder="Ruhe" aria-label="Ruhe" /></div></div>
+        <div class="hoops-field"><div class="hoops-input-group pseudo-focus-within"><input class="hoops-input hoops-input--default" value="Fokus" aria-label="Fokus" /></div></div>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Select</div>
       <div class="states col">
-        <select class="dss-select" aria-label="Ruhe"><option>Ruhe</option></select>
-        <select class="dss-select pseudo-focus-visible" aria-label="Fokus"><option>Fokus</option></select>
+        <select class="hoops-select" aria-label="Ruhe"><option>Ruhe</option></select>
+        <select class="hoops-select pseudo-focus-visible" aria-label="Fokus"><option>Fokus</option></select>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Tabs · underline · aktiv, Hover, Fokus</div>
-      <div class="dss-tabs dss-tabs--underline dss-tabs--md tabrow" role="tablist">
-        <button class="dss-tab is-active" role="tab" aria-selected="true">{tabs[0]}</button>
-        <button class="dss-tab pseudo-hover" role="tab" aria-selected="false">{tabs[1]}</button>
-        <button class="dss-tab pseudo-focus-visible" role="tab" aria-selected="false">{tabs[2]}</button>
+      <div class="hoops-tabs hoops-tabs--underline hoops-tabs--md tabrow" role="tablist">
+        <button class="hoops-tab is-active" role="tab" aria-selected="true">{tabs[0]}</button>
+        <button class="hoops-tab pseudo-hover" role="tab" aria-selected="false">{tabs[1]}</button>
+        <button class="hoops-tab pseudo-focus-visible" role="tab" aria-selected="false">{tabs[2]}</button>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Karte · hoverable</div>
       <div class="states">
-        <div class="dss-card dss-card--hoverable dss-card--pad-sm"><div class="dss-card-body">Ruhe</div></div>
-        <div class="dss-card dss-card--hoverable dss-card--pad-sm pseudo-hover"><div class="dss-card-body">Hover</div></div>
+        <div class="hoops-card hoops-card--hoverable hoops-card--pad-sm"><div class="hoops-card-body">Ruhe</div></div>
+        <div class="hoops-card hoops-card--hoverable hoops-card--pad-sm pseudo-hover"><div class="hoops-card-body">Hover</div></div>
       </div>
     </div>
 
     <div class="cell">
       <div class="cap">Checkbox</div>
       <div class="states">
-        <label class="dss-check"><input type="checkbox" class="dss-check-input" /><span class="dss-check-text">Ruhe</span></label>
-        <label class="dss-check"><input type="checkbox" class="dss-check-input pseudo-focus-visible" checked /><span class="dss-check-text">Fokus</span></label>
+        <label class="hoops-check"><input type="checkbox" class="hoops-check-input" /><span class="hoops-check-text">Ruhe</span></label>
+        <label class="hoops-check"><input type="checkbox" class="hoops-check-input pseudo-focus-visible" checked /><span class="hoops-check-text">Fokus</span></label>
       </div>
     </div>
 
     <div class="cell dark">
       <div class="cap">Fokus auf dunkler Fläche</div>
       <div class="states">
-        <button class="dss-btn dss-btn--secondary dss-btn--md pseudo-focus-visible">Fokus</button>
+        <button class="hoops-btn hoops-btn--secondary hoops-btn--md pseudo-focus-visible">Fokus</button>
       </div>
     </div>
   </div>
@@ -104,5 +104,5 @@
   .tabrow { flex-wrap: wrap; }
   .states { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; }
   .states.col { flex-direction: column; align-items: stretch; gap: 14px; }
-  .states.col :global(.dss-field), .states.col :global(.dss-input-group), .states.col :global(.dss-input), .states.col :global(.dss-select) { min-width: 0; max-width: 100%; box-sizing: border-box; }
+  .states.col :global(.hoops-field), .states.col :global(.hoops-input-group), .states.col :global(.hoops-input), .states.col :global(.hoops-select) { min-width: 0; max-width: 100%; box-sizing: border-box; }
 </style>

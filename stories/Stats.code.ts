@@ -2,23 +2,23 @@
 // rendern das Svelte-Beispiel und vergleichen das Vanilla-Markup mit der Ausgabe der Komponenten.
 
 /** Markup des Kennzahlen-Gitters; die Doku zeigt es und rendert es auch. */
-export const statsMarkup = `<dl class="dss-stats">
-  <div class="dss-stat"><dt class="dss-stat-label">Siege</dt><dd class="dss-stat-value">12</dd></div>
-  <div class="dss-stat"><dt class="dss-stat-label">Niederlagen</dt><dd class="dss-stat-value">3</dd></div>
-  <div class="dss-stat"><dt class="dss-stat-label">Punkte pro Spiel</dt><dd class="dss-stat-value">82,4</dd></div>
-  <div class="dss-stat"><dt class="dss-stat-label">Rebounds</dt><dd class="dss-stat-value"><span aria-hidden="true">–</span><span class="dss-sr-only">keine Angabe</span></dd></div>
+export const statsMarkup = `<dl class="hoops-stats">
+  <div class="hoops-stat"><dt class="hoops-stat-label">Siege</dt><dd class="hoops-stat-value">12</dd></div>
+  <div class="hoops-stat"><dt class="hoops-stat-label">Niederlagen</dt><dd class="hoops-stat-value">3</dd></div>
+  <div class="hoops-stat"><dt class="hoops-stat-label">Punkte pro Spiel</dt><dd class="hoops-stat-value">82,4</dd></div>
+  <div class="hoops-stat"><dt class="hoops-stat-label">Rebounds</dt><dd class="hoops-stat-value"><span aria-hidden="true">–</span><span class="hoops-sr-only">keine Angabe</span></dd></div>
 </dl>`;
 
-export const statsCompactMarkup = `<dl class="dss-stats dss-stats--compact">
-  <div class="dss-stat"><dt class="dss-stat-label">Siege</dt><dd class="dss-stat-value">12</dd></div>
-  <div class="dss-stat"><dt class="dss-stat-label">Niederlagen</dt><dd class="dss-stat-value">3</dd></div>
-  <div class="dss-stat"><dt class="dss-stat-label">Korbdifferenz</dt><dd class="dss-stat-value">+96</dd></div>
+export const statsCompactMarkup = `<dl class="hoops-stats hoops-stats--compact">
+  <div class="hoops-stat"><dt class="hoops-stat-label">Siege</dt><dd class="hoops-stat-value">12</dd></div>
+  <div class="hoops-stat"><dt class="hoops-stat-label">Niederlagen</dt><dd class="hoops-stat-value">3</dd></div>
+  <div class="hoops-stat"><dt class="hoops-stat-label">Korbdifferenz</dt><dd class="hoops-stat-value">+96</dd></div>
 </dl>`;
 
 /** Markup der Form (Punkte); der versteckte Text ist formLabel(form) aus league.js. */
-export const formMarkup = `<span class="dss-form"><span class="dss-form-list" aria-hidden="true"><span class="dss-form-item dss-form-item--s"></span><span class="dss-form-item dss-form-item--s"></span><span class="dss-form-item dss-form-item--n"></span><span class="dss-form-item dss-form-item--s"></span><span class="dss-form-item dss-form-item--u"></span></span><span class="dss-sr-only">Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden</span></span>`;
+export const formMarkup = `<span class="hoops-form"><span class="hoops-form-list" aria-hidden="true"><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--n"></span><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--u"></span></span><span class="hoops-sr-only">Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden</span></span>`;
 
-export const formLettersMarkup = `<span class="dss-form dss-form--letters"><span class="dss-form-list" aria-hidden="true"><span class="dss-form-item dss-form-item--s"></span><span class="dss-form-item dss-form-item--n"></span><span class="dss-form-item dss-form-item--u"></span></span><span class="dss-sr-only">Form: Sieg, Niederlage, Unentschieden</span></span>`;
+export const formLettersMarkup = `<span class="hoops-form hoops-form--letters"><span class="hoops-form-list" aria-hidden="true"><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--n"></span><span class="hoops-form-item hoops-form-item--u"></span></span><span class="hoops-sr-only">Form: Sieg, Niederlage, Unentschieden</span></span>`;
 
 export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="tokens/tokens.css" />
@@ -39,8 +39,8 @@ ${formMarkup}
 ${formLettersMarkup}
 
 <script type="module">
-  import { formEntries, formLabel } from '@bbv/dss-design-system/league.js';
-  import { statItems } from '@bbv/dss-design-system/stats.js';
+  import { formEntries, formLabel } from '@hoopsfoundry/ui/league.js';
+  import { statItems } from '@hoopsfoundry/ui/stats.js';
 
   formEntries(['S', 'N', 'x', 'S']);  // ['S', 'N', 'S'] (höchstens die letzten fünf, Ungültiges entfällt)
   formLabel(['S', 'S', 'N']);         // 'Form: Sieg, Sieg, Niederlage'
@@ -49,8 +49,8 @@ ${formLettersMarkup}
 </script>`;
 
 export const svelte = `<script>
-  import StatGrid from '@bbv/dss-design-system/svelte/StatGrid';
-  import FormChips from '@bbv/dss-design-system/svelte/FormChips';
+  import StatGrid from '@hoopsfoundry/ui/svelte/StatGrid';
+  import FormChips from '@hoopsfoundry/ui/svelte/FormChips';
 
   const stats = [
     { label: 'Siege', value: 12 },
@@ -67,7 +67,7 @@ export const svelte = `<script>
 <FormChips form={['S', 'S', 'N', 'S', 'U']} />
 <FormChips form={['S', 'N', 'U']} variant="letters" />`;
 
-export const react = `import { StatGrid, FormChips } from '@bbv/dss-design-system/react';
+export const react = `import { StatGrid, FormChips } from '@hoopsfoundry/ui/react';
 
 const stats = [
   { label: 'Siege', value: 12 },
@@ -91,9 +91,9 @@ export function Kennzahlen() {
 
 export const tokensCss = `/* Schriftgrößen kommen aus den Tokens: --hoops-fs-h2 (Wert), --hoops-fs-h3 (kompakt), --hoops-fs-caption (Beschriftung und Buchstaben).
    Wer größere Werte will, ändert den Token oder überschreibt die Klasse in seinem Container. */
-.verein-kopf .dss-stats {
+.verein-kopf .hoops-stats {
   gap: 1rem;                                           /* Abstand der Kacheln (Standard 0,75rem) */
 }
-.verein-kopf .dss-stats .dss-stat-value {
+.verein-kopf .hoops-stats .hoops-stat-value {
   font-size: var(--hoops-fs-hero);
 }`;

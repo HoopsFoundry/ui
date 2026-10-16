@@ -1,4 +1,4 @@
-// Das gebaute Bündel im Browser-Modell (jsdom): initAll startet jeden Baustein per data-dss, Tabs und Modal arbeiten, destroy räumt auf,
+// Das gebaute Bündel im Browser-Modell (jsdom): initAll startet jeden Baustein per data-hoops, Tabs und Modal arbeiten, destroy räumt auf,
 // Versionsabgleich mit dem geladenen Stylesheet.
 import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
@@ -17,7 +17,7 @@ let bundle: Bundle;
 const click = (el: Element) => el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
 
 beforeAll(async () => {
-  bundle = await import(/* @vite-ignore */ pathToFileURL(`${out}dss.min.js`).href);
+  bundle = await import(/* @vite-ignore */ pathToFileURL(`${out}hoops.min.js`).href);
   polyfillDialog();
 });
 afterAll(() => removeDialogPolyfill());
@@ -30,18 +30,18 @@ afterEach(() => {
 });
 
 const page = () => `
-<button type="button" id="theme" data-dss="theme"></button>
-<main data-dss="pagenav"><h1>Verein</h1><h2>Tabelle</h2><p>x</p><h2>Spielplan</h2><p>y</p><h2>Kader</h2><p>z</p></main>
+<button type="button" id="theme" data-hoops="theme"></button>
+<main data-hoops="pagenav"><h1>Verein</h1><h2>Tabelle</h2><p>x</p><h2>Spielplan</h2><p>y</p><h2>Kader</h2><p>z</p></main>
 ${tabsMarkup('', 'a')}${tabsMarkup('', 'b')}${divMarkup('m1')}${dialogMarkup('m2')}`;
 
 describe('minifiziertes Bündel im Browser-Modell', () => {
-  it('initAll startet jeden Baustein per data-dss (mehrere Elemente je Baustein)', () => {
+  it('initAll startet jeden Baustein per data-hoops (mehrere Elemente je Baustein)', () => {
     vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => { cb(0); return 0; });
     mountHtml(page());
     const handle = bundle.initAll(document);
     expect(handle.count).toBe(1 + 1 + 2 + 2);
     expect(document.getElementById('theme')!.getAttribute('aria-pressed')).toBe('false');
-    expect(document.querySelector('nav.dss-pagenav')).not.toBeNull();
+    expect(document.querySelector('nav.hoops-pagenav')).not.toBeNull();
     keydown(document.getElementById('a-alle')!, 'ArrowRight');
     keydown(document.getElementById('b-alle')!, 'ArrowRight');
     expect(document.getElementById('a-heim')!.getAttribute('aria-selected')).toBe('true');
@@ -53,13 +53,13 @@ describe('minifiziertes Bündel im Browser-Modell', () => {
     click(document.getElementById('m2-auf')!);
     expect(document.getElementById('m2')!.hasAttribute('open')).toBe(true);
     handle.destroy();
-    expect(document.querySelector('nav.dss-pagenav')).toBeNull();
+    expect(document.querySelector('nav.hoops-pagenav')).toBeNull();
     expect(document.getElementById('a-heim')!.getAttribute('aria-selected')).toBe('false');
   });
   it('themeBootScript liefert den Inline-Code für den head', () => {
     expect(bundle.themeBootScript()).toMatch(/^\(function/);
   });
-  it('Versionsabgleich: ohne Stylesheet css null, mit dss.css (:root --hoops-version) passt es', () => {
+  it('Versionsabgleich: ohne Stylesheet css null, mit hoops.css (:root --hoops-version) passt es', () => {
     expect(bundle.checkVersion().css).toBeNull();
     const style = document.createElement('style');
     style.textContent = `:root { --hoops-version: "${bundle.VERSION}"; }`;
@@ -73,7 +73,7 @@ describe('minifiziertes Bündel im Browser-Modell', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     bundle.checkVersion(document, { warn: true } as never);
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(String(warn.mock.calls[0][0])).toContain('dss.css ist nicht geladen');
+    expect(String(warn.mock.calls[0][0])).toContain('hoops.css ist nicht geladen');
     bundle.checkVersion({ warn: true } as never);
     expect(warn).toHaveBeenCalledTimes(2);
     const style = document.createElement('style');
@@ -86,7 +86,7 @@ describe('minifiziertes Bündel im Browser-Modell', () => {
     expect(warn).toHaveBeenCalledTimes(3);
     warn.mockRestore();
   });
-  it('dss.css enthält die Version, die das Bündel meldet', () => {
-    expect(readFileSync(`${out}dss.css`, 'utf8')).toContain(`--hoops-version: "${bundle.VERSION}"`);
+  it('hoops.css enthält die Version, die das Bündel meldet', () => {
+    expect(readFileSync(`${out}hoops.css`, 'utf8')).toContain(`--hoops-version: "${bundle.VERSION}"`);
   });
 });

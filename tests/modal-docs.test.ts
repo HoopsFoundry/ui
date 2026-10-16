@@ -26,14 +26,14 @@ const examples = read('stories/components/ModalExamples.svelte');
 /** Kopf, Inhalt und Fuß der Fläche, ohne das, was nur die Fassungen unterscheidet (ids, Rollen, tabindex, data-Attribute, type, aria-hidden an Symbolen). */
 function parts(html: string) {
   const doc = new JSDOMClass(`<body>${html.replace(/<!--[\s\S]*?-->/g, '')}</body>`).window.document;
-  const surface = doc.querySelector('.dss-modal')!;
+  const surface = doc.querySelector('.hoops-modal')!;
   const clean = (el: Element | null) => normalize((el?.outerHTML ?? '')
-    .replace(/ (id|role|aria-modal|aria-labelledby|tabindex|type|focusable)="[^"]*"/g, '').replace(/ data-dss[\w-]*(="[^"]*")?/g, '')
+    .replace(/ (id|role|aria-modal|aria-labelledby|tabindex|type|focusable)="[^"]*"/g, '').replace(/ data-hoops[\w-]*(="[^"]*")?/g, '')
     .replace(/ aria-hidden="true"/g, '').replace(/ disabled(="")?/g, ''));
-  return { head: clean(surface.querySelector('.dss-m-head')), body: clean(surface.querySelector('.dss-m-body')), footer: clean(surface.querySelector('.dss-m-footer')), classes: surface.className.split(/\s+/).filter((c) => c !== 'dss-modal--md').sort() };
+  return { head: clean(surface.querySelector('.hoops-m-head')), body: clean(surface.querySelector('.hoops-m-body')), footer: clean(surface.querySelector('.hoops-m-footer')), classes: surface.className.split(/\s+/).filter((c) => c !== 'hoops-modal--md').sort() };
 }
 const sv = (name: string, body: string) =>
-  renderSvelteSource(vite, render, tmpDir, name, `<script>\nimport Modal from '@bbv/dss-design-system/svelte/Modal';\nimport Button from '@bbv/dss-design-system/svelte/Button';\n</script>\n${body}`);
+  renderSvelteSource(vite, render, tmpDir, name, `<script>\nimport Modal from '@hoopsfoundry/ui/svelte/Modal';\nimport Button from '@hoopsfoundry/ui/svelte/Button';\n</script>\n${body}`);
 
 describe('Vanilla-Markup gegen die Svelte-Komponente', () => {
   it('natives Dialog: Kopf, Inhalt und Fuß wie Modal mit Untertitel (md)', async () => {
@@ -55,8 +55,8 @@ describe('Vanilla-Markup gegen die Svelte-Komponente', () => {
     expect(actual.footer).toBe(expected.footer);
     expect(actual.classes).toEqual(expected.classes);
     // das Symbol der Svelte-Fassung hat stroke-linejoin und andere Pfade: Klassen und Aufbau stimmen
-    expect(actual.head).toContain('dss-m-head-icon dss-m-head-icon--danger');
-    expect(expected.head).toContain('dss-m-head-icon dss-m-head-icon--danger');
+    expect(actual.head).toContain('hoops-m-head-icon hoops-m-head-icon--danger');
+    expect(expected.head).toContain('hoops-m-head-icon hoops-m-head-icon--danger');
     expect(actual.head.replace(/<svg.*?<\/svg>/g, '<svg/>')).toBe(expected.head.replace(/<svg.*?<\/svg>/g, '<svg/>'));
   });
 });
@@ -65,9 +65,9 @@ describe('Code-Beispiel', () => {
   it('enthält beide Markup-Wege, beide Aufrufarten, Optionen und Ereignisse', () => {
     expect(code.vanilla).toContain(code.dialogMarkup);
     expect(code.vanilla).toContain(code.divMarkup);
-    expect(code.vanilla).toContain("import { initAll } from '@bbv/dss-design-system/vanilla-core.js'");
-    expect(code.vanilla).toContain("import { initModal, openModal, closeModal } from '@bbv/dss-design-system/modal.js'");
-    for (const part of ['dismissOnBackdrop', 'closable', 'initialFocus', 'returnFocus', 'dss:modalopen', 'dss:modalclose', 'data-dss-modal-open', 'data-dss-modal-close', 'data-dss-modal-focus', 'destroy']) expect(code.vanilla, part).toContain(part);
+    expect(code.vanilla).toContain("import { initAll } from '@hoopsfoundry/ui/vanilla-core.js'");
+    expect(code.vanilla).toContain("import { initModal, openModal, closeModal } from '@hoopsfoundry/ui/modal.js'");
+    for (const part of ['dismissOnBackdrop', 'closable', 'initialFocus', 'returnFocus', 'hoops:modalopen', 'hoops:modalclose', 'data-hoops-modal-open', 'data-hoops-modal-close', 'data-hoops-modal-focus', 'destroy']) expect(code.vanilla, part).toContain(part);
   });
   it('die Importpfade gibt es als Exporte; jede Klasse im Markup gibt es im CSS', () => {
     const pkg = JSON.parse(read('package.json'));
@@ -81,11 +81,11 @@ describe('Code-Beispiel', () => {
       expect(new Set(ids).size).toBe(ids.length);
       for (const m of markup.matchAll(/aria-labelledby="([^"]+)"/g)) expect(ids).toContain(m[1]);
     }
-    expect(`${code.dialogMarkup}${code.divMarkup}`.match(/<h2 class="dss-m-title"/g)).toHaveLength(2);
+    expect(`${code.dialogMarkup}${code.divMarkup}`.match(/<h2 class="hoops-m-title"/g)).toHaveLength(2);
   });
   it('das zweite Beispiel startet geschlossen (hidden), der Fokus startet auf der sicheren Wahl', () => {
-    expect(code.divMarkup).toMatch(/<div id="verwerfen" data-dss="modal" hidden>/);
-    expect(code.divMarkup).toMatch(/data-dss-modal-focus>Behalten</);
+    expect(code.divMarkup).toMatch(/<div id="verwerfen" data-hoops="modal" hidden>/);
+    expect(code.divMarkup).toMatch(/data-hoops-modal-focus>Behalten</);
   });
 });
 

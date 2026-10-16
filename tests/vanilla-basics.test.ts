@@ -97,25 +97,25 @@ describe('Lebenszyklus-Muster (js/lifecycle.js)', () => {
 });
 
 describe('Accordion folgt dem Muster { destroy() }', () => {
-  const html = `<div class="dss-acc" data-dss-acc><details class="dss-acc-item" id="a"><summary class="dss-acc-trigger"><span class="dss-acc-label">A</span></summary><div class="dss-acc-panel">x</div></details></div>`;
+  const html = `<div class="hoops-acc" data-hoops-acc><details class="hoops-acc-item" id="a"><summary class="hoops-acc-trigger"><span class="hoops-acc-label">A</span></summary><div class="hoops-acc-panel">x</div></details></div>`;
   const mount = () => {
     document.body.replaceChildren(document.createRange().createContextualFragment(html));
-    return document.querySelector<HTMLElement>('.dss-acc')!;
+    return document.querySelector<HTMLElement>('.hoops-acc')!;
   };
   it('initAccordion liefert eine Funktion (wie bisher) mit .destroy', () => {
     const h = initAccordion(mount(), { syncHash: false, expandAll: true });
     expect(typeof h).toBe('function');
     expect(typeof h.destroy).toBe('function');
-    expect(document.querySelector('.dss-acc-bar')).not.toBeNull();
+    expect(document.querySelector('.hoops-acc-bar')).not.toBeNull();
     h.destroy();
-    expect(document.querySelector('.dss-acc-bar')).toBeNull();
+    expect(document.querySelector('.hoops-acc-bar')).toBeNull();
     expect(() => { h.destroy(); h(); }).not.toThrow();
   });
   it('ein zweiter Aufruf für dieselbe Wurzel ersetzt die erste Fassung (idempotent)', () => {
     const root = mount();
     initAccordion(root, { syncHash: false, expandAll: true });
     initAccordion(root, { syncHash: false, expandAll: true });
-    expect(root.querySelectorAll('.dss-acc-bar').length).toBe(1);
+    expect(root.querySelectorAll('.hoops-acc-bar').length).toBe(1);
   });
   it('ohne Wurzel: Handle, das nichts tut', () => {
     const h = initAccordion(null as never);
@@ -125,8 +125,8 @@ describe('Accordion folgt dem Muster { destroy() }', () => {
   it('initAccordions liefert ebenfalls .destroy und räumt alle auf', () => {
     mount();
     const h = initAccordions(document, { syncHash: false, expandAll: true });
-    expect(document.querySelector('.dss-acc-bar')).not.toBeNull();
+    expect(document.querySelector('.hoops-acc-bar')).not.toBeNull();
     h.destroy();
-    expect(document.querySelector('.dss-acc-bar')).toBeNull();
+    expect(document.querySelector('.hoops-acc-bar')).toBeNull();
   });
 });

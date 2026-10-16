@@ -19,7 +19,7 @@ const load = async (path: string, name = 'default') => ((await vite.ssrLoadModul
 const normalize = (html: string) =>
   html
     .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/dss-cf-[^"\s]*?(?=-(?:trigger|panel)")/g, 'dss-cf-ID')
+    .replace(/hoops-cf-[^"\s]*?(?=-(?:trigger|panel)")/g, 'hoops-cf-ID')
     .replace(/ (hidden|inert)=""/g, ' $1')
     .replace(/&gt;/g, '>')
     .replace(/\s+/g, ' ')
@@ -126,24 +126,24 @@ describe('Server-Markup einklappbarer Rahmen', () => {
   it('zu: aria-expanded false, Bereich hidden und inert, keine Region am Bereich', () => {
     const out = html(one('Table', { id: 'x', title: 'T' }));
     expect(out).toContain('aria-expanded="false"');
-    expect(out).toMatch(/<div class="dss-acc-panel" id="x-panel" hidden(="")? inert/);
-    expect(out).not.toMatch(/dss-acc-panel"[^>]*role="region"/);
+    expect(out).toMatch(/<div class="hoops-acc-panel" id="x-panel" hidden(="")? inert/);
+    expect(out).not.toMatch(/hoops-acc-panel"[^>]*role="region"/);
     expect(out).toContain('aria-controls="x-panel"');
   });
   it('ohne id: kein id-Attribut am Rahmen, aber verbundene ids von Kopf und Bereich', () => {
     const out = html(one('LeagueCard', { title: 'T' }));
-    expect(out).not.toMatch(/<div class="dss-league[^"]*" id=/);
-    const trigger = out.match(/id="(dss-cf-[^"]+)-trigger"/)![1];
+    expect(out).not.toMatch(/<div class="hoops-league[^"]*" id=/);
+    const trigger = out.match(/id="(hoops-cf-[^"]+)-trigger"/)![1];
     expect(out).toContain(`aria-controls="${trigger}-panel"`);
   });
   it('ohne title: kein einklappbarer Rahmen', () => {
     const out = html(one('Table', { id: 'x' }, true));
     expect(out).not.toContain('is-collapsible');
-    expect(out).not.toContain('dss-acc-trigger');
+    expect(out).not.toContain('hoops-acc-trigger');
   });
   it('ohne collapsible: unverändert (kein Accordion-Markup)', () => {
     const out = render(Host, { props: { cfg: { items: [{ comp: 'Table', props: { title: 'T', collapsible: false } }] } } }).body;
-    expect(out).not.toContain('dss-acc-');
+    expect(out).not.toContain('hoops-acc-');
   });
 });
 
@@ -153,8 +153,8 @@ describe('ohne collapsible: kein Accordion-Markup, Svelte gleich React', () => {
       const cfg = one(comp, props, true);
       const s = render(Host, { props: { cfg } }).body;
       const r = renderToStaticMarkup(reactTree(cfg));
-      expect(s).not.toMatch(/--acc|is-collapsible|dss-acc/);
-      expect(r).not.toMatch(/--acc|is-collapsible|dss-acc/);
+      expect(s).not.toMatch(/--acc|is-collapsible|hoops-acc/);
+      expect(r).not.toMatch(/--acc|is-collapsible|hoops-acc/);
       expect(normalize(s)).toBe(normalize(r));
     }
   });

@@ -49,7 +49,7 @@ Fehlt der Wert eines Teams, bleibt die Zelle leer (ein Strich als Platzhalter er
 
 ## Ausschnitt: welche Zeilen erscheinen
 
-Die Karte zeigt nie die ganze Tabelle. Die Regel steht in der reinen Funktion `leagueWindow` (`@bbv/dss-design-system/league.js`), Svelte und React nutzen dieselbe:
+Die Karte zeigt nie die ganze Tabelle. Die Regel steht in der reinen Funktion `leagueWindow` (`@hoopsfoundry/ui/league.js`), Svelte und React nutzen dieselbe:
 
 - **Mit eigener Mannschaft** (`own: true` an einem Team; bei mehreren zählt die erste in der Reihenfolge der Plätze): **zwei Teams davor, die eigene, eins dahinter**, vier Zeilen. An den Rändern verschiebt sich das Fenster, sodass immer vier Zeilen erscheinen: Platz 1 zeigt die Plätze 1 bis 4, der letzte Platz die letzten vier.
 - **Ohne eigene Mannschaft:** die ersten `limit` Plätze (Standard **3**).
@@ -139,16 +139,16 @@ Die Vorlage des Vereinsregisters hat Zeilen von etwa 60 px; `standard` entsprich
 
 Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel: S, N, Diff und Form entfallen, die Namen erscheinen als Kurzname (wo vorhanden), die Seite scrollt nicht seitlich. Im Dunkelmodus gelten dieselben Tokens; alle Texte haben mindestens 7:1.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">LeagueCard · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: LeagueCard hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">LeagueCard · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: LeagueCard hell">
       <iframe title="Handy-Vorschau: Ligencard hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-leaguecard--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">LeagueCard · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: LeagueCard dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">LeagueCard · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: LeagueCard dunkel">
       <iframe title="Handy-Vorschau: Ligencard dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-leaguecard--handy" loading="lazy" />
     </div>
   </div>
@@ -192,7 +192,7 @@ Die Ligencard gibt nie eine `h1` aus. Ohne weitere Angabe ist der Titel eine `h3
 
 ## Verwendung: Import und Props
 
-Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; `leagueWindow` & Co. kommen aus `@bbv/dss-design-system/league.js`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
+Importiere die Karte über den Path-Export (Svelte) bzw. aus dem React-Paket; `leagueWindow` & Co. kommen aus `@hoopsfoundry/ui/league.js`. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
 
 <FrameworkCode label="LeagueCard" vanilla={vanilla} svelte={svelte} react={react} />
 

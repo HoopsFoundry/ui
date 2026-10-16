@@ -75,27 +75,27 @@ export function cssRules(css: string): Rules {
   const text = section(css);
   const rules = rulesOf(text);
   const body = (selector: string) => rules.filter(([s]) => s === selector).map(([, b]) => b).join(';');
-  const container = text.slice(text.indexOf('@container dss-venue (max-width: 640px)'));
+  const container = text.slice(text.indexOf('@container hoops-venue (max-width: 640px)'));
   const minHeight = (selector: string) => Number(body(selector).match(/min-height:\s*(\d+)px/)?.[1] ?? 0);
   return {
     'Abschnitt vorhanden': text.length > 0,
-    'Container-Abfrage bei 640 px': /@container dss-venue \(max-width: 640px\)/.test(text) && /container:\s*dss-venue \/ inline-size/.test(body('.dss-venue')),
-    'Karte etwa 40 %, mindestens 224 px': /grid-template-columns:\s*minmax\(224px, 40%\) minmax\(0, 1fr\)/.test(body('.dss-venue--map .dss-venue-in')),
-    'compact: Karte etwa 30 %': /grid-template-columns:\s*minmax\(224px, 30%\) minmax\(0, 1fr\)/.test(body('.dss-venue--map.dss-venue--compact .dss-venue-in')),
-    'schmal: eine Spalte, Karte oben im Format 16:9': /\.dss-venue--map \.dss-venue-in[^{]*\{\s*grid-template-columns:\s*minmax\(0, 1fr\)/.test(container) && /aspect-ratio:\s*16 \/ 9/.test(container) && /min-height:\s*224px/.test(container),
-    'Kartenrahmen ohne Mindestbreite 240': /\.dss-venue-map \.dss-map-frame \{[^}]*min-width:\s*0/.test(text),
-    'Titel hängt an den Überschriften-Tokens': /font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-h3\)\)\)/.test(body('.dss-venue-title')) && /font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-body-lg\)\)\)/.test(body('.dss-venue--compact .dss-venue-title')),
+    'Container-Abfrage bei 640 px': /@container hoops-venue \(max-width: 640px\)/.test(text) && /container:\s*hoops-venue \/ inline-size/.test(body('.hoops-venue')),
+    'Karte etwa 40 %, mindestens 224 px': /grid-template-columns:\s*minmax\(224px, 40%\) minmax\(0, 1fr\)/.test(body('.hoops-venue--map .hoops-venue-in')),
+    'compact: Karte etwa 30 %': /grid-template-columns:\s*minmax\(224px, 30%\) minmax\(0, 1fr\)/.test(body('.hoops-venue--map.hoops-venue--compact .hoops-venue-in')),
+    'schmal: eine Spalte, Karte oben im Format 16:9': /\.hoops-venue--map \.hoops-venue-in[^{]*\{\s*grid-template-columns:\s*minmax\(0, 1fr\)/.test(container) && /aspect-ratio:\s*16 \/ 9/.test(container) && /min-height:\s*224px/.test(container),
+    'Kartenrahmen ohne Mindestbreite 240': /\.hoops-venue-map \.hoops-map-frame \{[^}]*min-width:\s*0/.test(text),
+    'Titel hängt an den Überschriften-Tokens': /font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-h3\)\)\)/.test(body('.hoops-venue-title')) && /font-size:\s*var\(--hoops-card-title-size, var\(--hoops-title-size, var\(--hoops-fs-body-lg\)\)\)/.test(body('.hoops-venue--compact .hoops-venue-title')),
     'keine Elementselektoren für Überschriften': rules.every(([s]) => !/(^|[\s>+~,])h[1-6](?![-\w])/.test(s)),
     'kein festes Hex': !/#[0-9a-fA-F]{3,8}\b/.test(text),
-    'Zielgröße: Link zur Hallenseite 48 px, compact 44 px': minHeight('.dss-venue-more') === 48 && minHeight('.dss-venue--compact .dss-venue-more') === 44,
-    'Zielgröße: Links unter der Karte 44 px': minHeight('.dss-venue-maplinks .dss-link') === 44,
-    'Zielgröße: Kontaktlinks mindestens 32 px, schmal 44 px': minHeight('.dss-venue-contact .dss-link') >= 32 && /\.dss-venue-contact \.dss-link \{[^}]*min-height:\s*44px/.test(container),
-    'Karte wie die anderen Karten: Rand, Radius 16 px, Fläche': /border:\s*1px solid var\(--hoops-line\)/.test(body('.dss-venue')) && /border-radius:\s*16px/.test(body('.dss-venue')) && /background:\s*var\(--hoops-surface\)/.test(body('.dss-venue')),
-    'Trikotpunkt mit Rand in --hoops-mute': /border:\s*1px solid var\(--hoops-mute\)/.test(body('.dss-venue-dot')),
-    'lange Wörter ohne Leerstelle brechen um (Straße, Info, Liga und Feld, Datum, Link, Beschriftung)': ['.dss-venue-line', '.dss-venue-info', '.dss-venue-game-meta', '.dss-venue-when', '.dss-venue-more', '.dss-venue-sec', '.dss-venue-contact dd', '.dss-venue-team-name'].every((s) => /overflow-wrap:\s*anywhere/.test(body(s))),
-    'Gitterspalten dürfen schrumpfen (minmax(0, 1fr))': ['.dss-venue-address', '.dss-venue-game-list', '.dss-venue-teams'].every((s) => /grid-template-columns:\s*minmax\(0, 1fr\)/.test(body(s))),
-    'Adresse ohne Kursivschrift': /font-style:\s*normal/.test(body('.dss-venue-address')),
-    'Druck: eine Spalte ohne Links unter der Karte': /@media print \{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*\.dss-venue-maplinks \{ display: none; \}/.test(text),
+    'Zielgröße: Link zur Hallenseite 48 px, compact 44 px': minHeight('.hoops-venue-more') === 48 && minHeight('.hoops-venue--compact .hoops-venue-more') === 44,
+    'Zielgröße: Links unter der Karte 44 px': minHeight('.hoops-venue-maplinks .hoops-link') === 44,
+    'Zielgröße: Kontaktlinks mindestens 32 px, schmal 44 px': minHeight('.hoops-venue-contact .hoops-link') >= 32 && /\.hoops-venue-contact \.hoops-link \{[^}]*min-height:\s*44px/.test(container),
+    'Karte wie die anderen Karten: Rand, Radius 16 px, Fläche': /border:\s*1px solid var\(--hoops-line\)/.test(body('.hoops-venue')) && /border-radius:\s*16px/.test(body('.hoops-venue')) && /background:\s*var\(--hoops-surface\)/.test(body('.hoops-venue')),
+    'Trikotpunkt mit Rand in --hoops-mute': /border:\s*1px solid var\(--hoops-mute\)/.test(body('.hoops-venue-dot')),
+    'lange Wörter ohne Leerstelle brechen um (Straße, Info, Liga und Feld, Datum, Link, Beschriftung)': ['.hoops-venue-line', '.hoops-venue-info', '.hoops-venue-game-meta', '.hoops-venue-when', '.hoops-venue-more', '.hoops-venue-sec', '.hoops-venue-contact dd', '.hoops-venue-team-name'].every((s) => /overflow-wrap:\s*anywhere/.test(body(s))),
+    'Gitterspalten dürfen schrumpfen (minmax(0, 1fr))': ['.hoops-venue-address', '.hoops-venue-game-list', '.hoops-venue-teams'].every((s) => /grid-template-columns:\s*minmax\(0, 1fr\)/.test(body(s))),
+    'Adresse ohne Kursivschrift': /font-style:\s*normal/.test(body('.hoops-venue-address')),
+    'Druck: eine Spalte ohne Links unter der Karte': /@media print \{[\s\S]*grid-template-columns:\s*minmax\(0, 1fr\)[\s\S]*\.hoops-venue-maplinks \{ display: none; \}/.test(text),
   };
 }
 
@@ -112,7 +112,7 @@ export function sourceRules(svelte: string, react: string): Rules {
     'Adresse als address-Element': both((s) => s.includes('<address')),
     'Kontakt als Definitionsliste': both((s) => s.includes('<dl') && s.includes('<dt>') && s.includes('<dd>')),
     'Spieleliste mit Namen': both((s) => s.includes('aria-label={gamesLabel}')),
-    'Link zur Hallenseite nennt die Halle': both((s) => /dss-link dss-venue-more[^>]*>\s*\{linkLabel\}\s*(\{#if title\}|\{title \?)\s*<span[^>]*dss-sr-only[^>]*>, \{title\}<\/span>/.test(s)),
+    'Link zur Hallenseite nennt die Halle': both((s) => /hoops-link hoops-venue-more[^>]*>\s*\{linkLabel\}\s*(\{#if title\}|\{title \?)\s*<span[^>]*hoops-sr-only[^>]*>, \{title\}<\/span>/.test(s)),
     'ohne Namen keine Überschrift': both((s) => /title \? <Heading|\{#if title\}<svelte:element/.test(s)),
     'Listenschlüssel aus gameKeys': both((s) => s.includes('gameKeys(rows)') && /keys\[(i|index)\]/.test(s)),
     'Standardwerte': both((s) => /size = 'standard'/.test(s) && /load = 'click'/.test(s) && /mapHeight = 250/.test(s) && /logos = false/.test(s) && /names = 'full'/.test(s)),

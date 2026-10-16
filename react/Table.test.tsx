@@ -25,8 +25,8 @@ describe('Table', () => {
       </Table>,
     );
     expect(screen.getByRole('heading', { name: 'Tabelle', level: 3 })).toBeInTheDocument();
-    expect(container.querySelector('.dss-frame-meta')).toHaveTextContent('Gruppe A');
-    expect(container.querySelector('.dss-crumb')).toHaveTextContent('Live');
+    expect(container.querySelector('.hoops-frame-meta')).toHaveTextContent('Gruppe A');
+    expect(container.querySelector('.hoops-crumb')).toHaveTextContent('Live');
   });
 
   it('nutzt die gewünschte Überschriftenebene', () => {
@@ -40,7 +40,7 @@ describe('Table', () => {
 
   it('rendert ohne Titel, Meta und Live keinen Kopfbereich', () => {
     const { container } = render(<Table columns={COLUMNS}>{ROWS}</Table>);
-    expect(container.querySelector('.dss-frame-head')).toBeNull();
+    expect(container.querySelector('.hoops-frame-head')).toBeNull();
   });
 
   it('setzt Spalten-Ausrichtung, Breite und aria-sort', () => {
@@ -58,8 +58,8 @@ describe('Table', () => {
         {ROWS}
       </Table>,
     );
-    expect(container.firstElementChild).toHaveClass('dss-frame', 'dss-frame--dark');
-    expect(container.querySelector('table')).toHaveClass('dss-tbl', 'dss-tbl--dense', 'dss-tbl--striped');
+    expect(container.firstElementChild).toHaveClass('hoops-frame', 'hoops-frame--dark');
+    expect(container.querySelector('table')).toHaveClass('hoops-tbl', 'hoops-tbl--dense', 'hoops-tbl--striped');
   });
 
   it('rendert tfoot und gibt der Tabelle über caption einen Namen', () => {

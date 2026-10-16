@@ -33,16 +33,16 @@ async function run(code: string, names: string[]) {
   const script = code.match(/<script type="module">([\s\S]*)<\/script>/)![1];
   const markup = code.replace(/<script type="module">[\s\S]*<\/script>/, '');
   document.body.replaceChildren(document.createRange().createContextualFragment(markup));
-  // Die Seitenpfade (/dss/…) zeigen im Test auf die Quellmodule; Leaflet kommt aus dem gespielten Modul (der Lader wird erst nach dem Klick gerufen)
+  // Die Seitenpfade (/hoops/…) zeigen im Test auf die Quellmodule; Leaflet kommt aus dem gespielten Modul (der Lader wird erst nach dem Klick gerufen)
   const mapUrl = pathToFileURL(resolve(process.cwd(), 'js/map-bundle.js')).href;
-  const source = `${script.replace('@bbv/dss-design-system/render.js', indexUrl).replace('/dss/dss-render.min.js', indexUrl).replace('/dss/dss-map.min.js', mapUrl)}\nexport { ${names.join(', ')} };\n// Lauf ${++runs}`; // jeder Lauf ein eigenes Modul (gleicher Text wäre zwischengespeichert)
+  const source = `${script.replace('@hoopsfoundry/ui/render.js', indexUrl).replace('/hoops/hoops-render.min.js', indexUrl).replace('/hoops/hoops-map.min.js', mapUrl)}\nexport { ${names.join(', ')} };\n// Lauf ${++runs}`; // jeder Lauf ein eigenes Modul (gleicher Text wäre zwischengespeichert)
   return (await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)) as Record<string, unknown>;
 }
 
 type Row = string | number | { text: string | number; className?: string; href?: string; header?: boolean } | { cells: Row[]; className?: string };
 const cellHtml = (cell: Row): string => {
   const c = typeof cell === 'object' && cell ? (cell as { text: string | number; className?: string; href?: string }) : { text: cell as string | number };
-  const inner = c.href ? `<a class="dss-link" href="${c.href}">${c.text}</a>` : String(c.text);
+  const inner = c.href ? `<a class="hoops-link" href="${c.href}">${c.text}</a>` : String(c.text);
   return `<td${c.className ? ` class="${c.className}"` : ''}>${inner}</td>`;
 };
 const rowOf = (row: Row) => (Array.isArray(row) ? { cells: row } : (row as { cells: Row[]; className?: string }));
@@ -55,7 +55,7 @@ async function components(name: string, props: Record<string, unknown>) {
   const svelte = await p.svelte('Table', { ...rest, rows: p.snippet(rows.map((r) => `<tr${r.className ? ` class="${r.className}"` : ''}>${r.cells.map(cellHtml).join('')}</tr>`).join('')) });
   const react = await p.react('Table', rest, rows.map((r, k) => createElement('tr', { key: k, className: r.className }, r.cells.map((c, i) => {
     const x = typeof c === 'object' ? (c as { text: string | number; className?: string; href?: string }) : { text: c as string | number };
-    return createElement('td', { key: i, className: x.className }, x.href ? createElement('a', { className: 'dss-link', href: x.href }, x.text) : x.text);
+    return createElement('td', { key: i, className: x.className }, x.href ? createElement('a', { className: 'hoops-link', href: x.href }, x.text) : x.text);
   }))));
   return { svelte, react };
 }
@@ -72,16 +72,16 @@ describe.each(Object.entries(DOCS))('Beispiel %s', (_name, doc) => {
       const grouped = props.collapsible === true;
       // die Hallenkarte sperrt „Karte laden“, solange initMap fehlt (die Komponente ist bedienbar), mit initMap ist sie bedienbar: sonst gleiches Markup
       if (doc.component === 'VenueCard') {
-        const load = document.querySelector<HTMLButtonElement>('.dss-map-load')!;
+        const load = document.querySelector<HTMLButtonElement>('.hoops-map-load')!;
         const live = 'live' in doc && doc.live === true;
         expect(load.disabled).toBe(!live);
         expect(load.hasAttribute('aria-disabled')).toBe(!live);
       }
-      const actual = normalize((grouped ? shown.replace(/^<div class="dss-acc">([\s\S]*)<\/div>$/, '$1') : shown).replace(' disabled=""', '').replace(' aria-disabled="true"', ''));
+      const actual = normalize((grouped ? shown.replace(/^<div class="hoops-acc">([\s\S]*)<\/div>$/, '$1') : shown).replace(' disabled=""', '').replace(' aria-disabled="true"', ''));
       expect(actual.length, `${id} ist nicht leer`).toBeGreaterThan(50);
       expect(actual).toBe(expected.react);
       expect(actual).toBe(expected.svelte);
-      if (grouped) expect(shown.startsWith('<div class="dss-acc">')).toBe(true);
+      if (grouped) expect(shown.startsWith('<div class="hoops-acc">')).toBe(true);
       for (const { variable: htmlVariable, of } of doc.strings) {
         if (of !== variable) continue;
         expect(normalize((out[htmlVariable] as string).replace(' disabled aria-disabled="true"', ''))).toBe(expected.react);
@@ -89,7 +89,7 @@ describe.each(Object.entries(DOCS))('Beispiel %s', (_name, doc) => {
     }
   });
   it('das Beispiel nutzt die Pfade des Pakets und kein innerHTML', () => {
-    expect(doc.code).toMatch(/from '(@bbv\/dss-design-system\/render\.js|\/dss\/dss-render\.min\.js)'/);
+    expect(doc.code).toMatch(/from '(@hoopsfoundry\/ui\/render\.js|\/hoops\/hoops-render\.min\.js)'/);
     expect(doc.code).not.toMatch(/innerHTML\s*=/);
     expect(doc.code).toContain('document.querySelector(');
   });
@@ -101,7 +101,7 @@ describe('Beispiele: Aktualisieren und Aufräumen', () => {
     await run(code, ['liga']);
     const el = document.getElementById('liga')!;
     expect(el.textContent).toContain('67 von 132 Spielen gespielt');
-    expect(el.querySelector('.dss-league-link')?.getAttribute('href')).toBe('/teams/nordhain');
+    expect(el.querySelector('.hoops-league-link')?.getAttribute('href')).toBe('/teams/nordhain');
     (window as unknown as { __karte: { destroy(): void } }).__karte.destroy();
     expect(el.childNodes).toHaveLength(0);
   });
@@ -120,24 +120,24 @@ describe('Beispiele der Seite Foundation/Vanilla (Markup erzeugen)', () => {
 
   it('Seite aus Daten: mountX füllt die Container, initAll folgt', async () => {
     const vanillaUrl = pathToFileURL(resolve(process.cwd(), 'js/vanilla.js')).href;
-    const code = renderPage.replace('/dss/dss.min.js', vanillaUrl).replace('/dss/dss-render.min.js', indexUrl);
+    const code = renderPage.replace('/hoops/hoops.min.js', vanillaUrl).replace('/hoops/hoops-render.min.js', indexUrl);
     const script = code.match(/<script type="module">([\s\S]*)<\/script>/)![1];
     document.body.replaceChildren(document.createRange().createContextualFragment(code.replace(/<script type="module">[\s\S]*<\/script>/, '')));
     await load(script);
-    expect(document.querySelector('#tabelle .dss-league-title')?.textContent).toBe('Oberliga Nordhain Männer');
-    expect(document.querySelectorAll('#spielplan .dss-sch-row')).toHaveLength(2);
-    expect(document.querySelector('#halle .dss-venue-title')?.textContent).toBe('Sporthalle Nordhain');
-    expect(document.querySelector('#halle .dss-map-load')?.textContent).toBe('Karte laden');
+    expect(document.querySelector('#tabelle .hoops-league-title')?.textContent).toBe('Oberliga Nordhain Männer');
+    expect(document.querySelectorAll('#spielplan .hoops-sch-row')).toHaveLength(2);
+    expect(document.querySelector('#halle .hoops-venue-title')?.textContent).toBe('Sporthalle Nordhain');
+    expect(document.querySelector('#halle .hoops-map-load')?.textContent).toBe('Karte laden');
   });
   it('Node: die Seite entsteht ohne DOM aus dem gebauten Render-Bündel, der Titel ist maskiert', async () => {
     vi.unstubAllGlobals();
     vi.stubGlobal('document', undefined);
-    const code = renderNode.replace('@bbv/dss-design-system/vanilla/dss-render.js', pathToFileURL(`${bundleDir}dss-render.js`).href);
+    const code = renderNode.replace('@hoopsfoundry/ui/vanilla/hoops-render.js', pathToFileURL(`${bundleDir}hoops-render.js`).href);
     const out = await load(`${code}\nexport { seite };`);
     const seite = out.seite as string;
     expect(seite).toContain('<title>TSV Nordhain &lt;1920&gt;</title>');
-    expect(seite).toContain('<h3 class="dss-league-title">Oberliga</h3>');
-    expect(seite).toContain('dss-team--standard');
+    expect(seite).toContain('<h3 class="hoops-league-title">Oberliga</h3>');
+    expect(seite).toContain('hoops-team--standard');
     expect(seite).not.toContain('<1920>');
   });
   it('esc, attr und safeHref liefern, was die Kommentare sagen; die Render-Funktion enthält nur Text', async () => {
@@ -148,8 +148,8 @@ describe('Beispiele der Seite Foundation/Vanilla (Markup erzeugen)', () => {
       return `[${expr}, ${expected}]`;
     });
     const imports = renderEscape.split('\n').filter((line) => line.startsWith('import ')).join('\n')
-      .replace('@bbv/dss-design-system/vanilla/dss-render.js', pathToFileURL(`${bundleDir}dss-render.js`).href)
-      .replace("'@bbv/dss-design-system/vanilla'", `'${pathToFileURL(`${bundleDir}dss.js`).href}'`);
+      .replace('@hoopsfoundry/ui/vanilla/hoops-render.js', pathToFileURL(`${bundleDir}hoops-render.js`).href)
+      .replace("'@hoopsfoundry/ui/vanilla'", `'${pathToFileURL(`${bundleDir}hoops.js`).href}'`);
     const tail = renderEscape.slice(renderEscape.indexOf('// Eine Render-Funktion maskiert alles selbst'));
     const out = await load(`${imports}\nexport const rows = [${rows.join(', ')}];\nexport const html = ${tail.split('\n').filter((l) => !l.startsWith('//')).join('\n').replace(/;\s*$/, '')};`);
     for (const [actual, expected] of out.rows as [unknown, unknown][]) expect(actual).toBe(expected);

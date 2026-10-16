@@ -34,7 +34,7 @@ describe('Register über Kopien hinweg', () => {
     const h1 = first.initTabs(bar);
     const h2 = second.initTabs(bar);
     const spy = vi.fn();
-    bar.addEventListener('dss:tabchange', spy);
+    bar.addEventListener('hoops:tabchange', spy);
     keydown(document.getElementById('r-alle')!, 'ArrowRight');
     expect(spy).toHaveBeenCalledTimes(1);
     h2.destroy();
@@ -46,7 +46,7 @@ describe('Register über Kopien hinweg', () => {
     const source = read('js/accordion.js');
     const first = (await loadModule(source)) as typeof import('../js/accordion.js');
     const second = (await loadModule(`${source}\n// zweite Kopie`)) as typeof import('../js/accordion.js');
-    mountHtml('<div class="dss-acc" id="grp"><div class="dss-acc-item" id="a1"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a1t" aria-expanded="false" aria-controls="a1p">T</button></h3><div class="dss-acc-panel" id="a1p" hidden></div></div></div>');
+    mountHtml('<div class="hoops-acc" id="grp"><div class="hoops-acc-item" id="a1"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="a1t" aria-expanded="false" aria-controls="a1p">T</button></h3><div class="hoops-acc-panel" id="a1p" hidden></div></div></div>');
     const root = document.getElementById('grp')!;
     const h1 = first.initAccordion(root, { syncHash: false });
     const h2 = second.initAccordion(root, { syncHash: false });

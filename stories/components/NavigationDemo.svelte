@@ -38,7 +38,7 @@
     <div class="hdr">Top-Bar · Live-Spiel</div>
     <div class="frame">
       <TopBar
-        brand="DSS"
+        brand="HoopsFoundry UI"
         mark="D"
         context="live"
         matchLabel="BBL · 17. Spieltag"
@@ -67,7 +67,7 @@
   <section>
     <div class="hdr">Top-Bar · Default</div>
     <div class="frame">
-      <TopBar brand="DSS Coach" mark="C" user="Timo B." userInitials="TB" />
+      <TopBar brand="HoopsFoundry UI Coach" mark="C" user="Timo B." userInitials="TB" />
     </div>
   </section>
 {/if}

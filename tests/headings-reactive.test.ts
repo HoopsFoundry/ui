@@ -30,14 +30,14 @@ const innen = () => tagsIn('#innen');
 
 describe('HeadingLevel in Svelte ist reaktiv', () => {
   it('Ausgangslage: level 3, inneres by=2 ergibt h5', () => {
-    expect(target.querySelector('#direkt .dss-empty-title')!.tagName).toBe('H3');
+    expect(target.querySelector('#direkt .hoops-empty-title')!.tagName).toBe('H3');
     expect(innen()).toEqual(['h5:innen', 'h5:Karte', 'h5:Team', 'h5:Tabelle']);
   });
 
   it('äußeres level 3 -> 5: inneres by=2 ergibt h6 (Obergrenze), alle Titelkomponenten folgen', () => {
     set({ outer: 5 });
     expect(innen()).toEqual(['h6:innen', 'h6:Karte', 'h6:Team', 'h6:Tabelle']);
-    expect(target.querySelector('#direkt .dss-empty-title')!.tagName).toBe('H5');
+    expect(target.querySelector('#direkt .hoops-empty-title')!.tagName).toBe('H5');
   });
 
   it('äußeres level nach unten: 3 -> 2 ergibt innen h4', () => {

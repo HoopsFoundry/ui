@@ -41,7 +41,7 @@ const wait = async () => {
   await new Promise((r) => setTimeout(r, 0));
   flushSync();
 };
-const tag = (id: string) => target.querySelector(`[id="${id}"] > .dss-acc-title`)!.tagName.toLowerCase();
+const tag = (id: string) => target.querySelector(`[id="${id}"] > .hoops-acc-title`)!.tagName.toLowerCase();
 
 beforeEach(() => start());
 afterEach(() => {
@@ -81,13 +81,13 @@ describe('Svelte Accordion: Öffnen und bind:open', () => {
     expect(isOpen('b')).toBe(true);
   });
   it('Zusatzinfo steht im Kopf, einmal; ohne meta entfällt sie', () => {
-    expect(trigger('a').querySelector('.dss-acc-meta')!.textContent).toBe('14 Spieler');
-    expect(trigger('a').querySelector('.dss-acc-label')!.textContent).toBe('Tabelle,');
+    expect(trigger('a').querySelector('.hoops-acc-meta')!.textContent).toBe('14 Spieler');
+    expect(trigger('a').querySelector('.hoops-acc-label')!.textContent).toBe('Tabelle,');
     set({ metaOn: false });
-    expect(trigger('a').querySelector('.dss-acc-meta')).toBeNull();
+    expect(trigger('a').querySelector('.hoops-acc-meta')).toBeNull();
   });
   it('Überschrift enthält den Button, der Pfeil ist aria-hidden', () => {
-    expect(target.querySelector('h3.dss-acc-title > button.dss-acc-trigger')).toBe(trigger('a'));
+    expect(target.querySelector('h3.hoops-acc-title > button.hoops-acc-trigger')).toBe(trigger('a'));
     expect(trigger('a').querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');
   });
 });
@@ -113,19 +113,19 @@ describe('Svelte Accordion: Alle öffnen / schließen', () => {
   it('erscheint nach dem Anmelden, öffnet alle (gesperrte nicht), sagt an, schließt', async () => {
     set({ expandAll: true });
     await wait();
-    const buttons = [...target.querySelectorAll<HTMLButtonElement>('.dss-acc-bar button')];
+    const buttons = [...target.querySelectorAll<HTMLButtonElement>('.hoops-acc-bar button')];
     expect(buttons.map((b) => b.textContent)).toEqual(['Alle öffnen', 'Alle schließen']);
     click(buttons[0]);
     expect([isOpen('a'), isOpen('b'), isOpen('c')]).toEqual([true, false, true]);
-    expect(target.querySelector('.dss-acc-bar [aria-live="polite"]')!.textContent).toBe('2 von 3 Bereichen geöffnet');
+    expect(target.querySelector('.hoops-acc-bar [aria-live="polite"]')!.textContent).toBe('2 von 3 Bereichen geöffnet');
     click(buttons[1]);
     expect([isOpen('a'), isOpen('b'), isOpen('c')]).toEqual([false, false, false]);
-    expect(target.querySelector('.dss-acc-bar [aria-live="polite"]')!.textContent).toBe('Alle Bereiche geschlossen');
+    expect(target.querySelector('.hoops-acc-bar [aria-live="polite"]')!.textContent).toBe('Alle Bereiche geschlossen');
   });
   it('bei exclusive nicht angeboten', async () => {
     set({ expandAll: true, exclusive: true });
     await wait();
-    expect(target.querySelector('.dss-acc-bar')).toBeNull();
+    expect(target.querySelector('.hoops-acc-bar')).toBeNull();
   });
 });
 
@@ -209,21 +209,21 @@ describe('Svelte Accordion: Sprungleiste', () => {
   it('der Schalter klappt die Liste', async () => {
     set({ nav: true });
     await wait();
-    const toggle = target.querySelector<HTMLButtonElement>('.dss-acc-nav-toggle')!;
+    const toggle = target.querySelector<HTMLButtonElement>('.hoops-acc-nav-toggle')!;
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(target.querySelector('.dss-acc-nav')!.classList.contains('is-open')).toBe(true);
+    expect(target.querySelector('.hoops-acc-nav')!.classList.contains('is-open')).toBe(true);
   });
   it('neue Bereiche erscheinen in der Sprungleiste, entfernte verschwinden', async () => {
     set({ nav: true });
     await wait();
     set({ extra: 2 });
     await wait();
-    expect([...target.querySelectorAll('.dss-acc-nav-link')].map((l) => l.textContent)).toEqual(['Tabelle', 'Spielplan', 'Kader', 'Extra 0', 'Extra 1']);
+    expect([...target.querySelectorAll('.hoops-acc-nav-link')].map((l) => l.textContent)).toEqual(['Tabelle', 'Spielplan', 'Kader', 'Extra 0', 'Extra 1']);
     set({ extra: 0 });
     await wait();
-    expect(target.querySelectorAll('.dss-acc-nav-link').length).toBe(3);
+    expect(target.querySelectorAll('.hoops-acc-nav-link').length).toBe(3);
   });
 });
 
@@ -245,9 +245,9 @@ describe('Svelte Accordion: Region nur bis 6 Bereiche', () => {
 describe('Svelte Accordion: Ebenen sind reaktiv', () => {
   it('Standard h3, Inhalt h4; verschachtelt h4 und Inhalt h5', () => {
     expect(['a', 'c'].map(tag)).toEqual(['h3', 'h3']);
-    expect(target.querySelector('[id="c"] > .dss-acc-panel > .dss-acc-panel-inner .dss-empty-title')!.tagName).toBe('H4');
+    expect(target.querySelector('[id="c"] > .hoops-acc-panel > .hoops-acc-panel-inner .hoops-empty-title')!.tagName).toBe('H4');
     expect(tag('c1')).toBe('h4');
-    expect(target.querySelector('[id="c1"] .dss-empty-title')!.tagName).toBe('H5');
+    expect(target.querySelector('[id="c1"] .hoops-empty-title')!.tagName).toBe('H5');
   });
   it('titleAs der Gruppe, des Bereichs und HeadingLevel folgen zur Laufzeit', () => {
     set({ titleAs: 'h5' });
@@ -258,16 +258,16 @@ describe('Svelte Accordion: Ebenen sind reaktiv', () => {
     expect(['a', 'c', 'c1'].map(tag)).toEqual(['h2', 'h2', 'h3']);
     set({ level: 4 });
     expect(['a', 'c', 'c1'].map(tag)).toEqual(['h4', 'h4', 'h5']);
-    expect(target.querySelector('[id="c1"] .dss-empty-title')!.tagName).toBe('H6');
+    expect(target.querySelector('[id="c1"] .hoops-empty-title')!.tagName).toBe('H6');
   });
   it('Variante und sticky als Klassen', () => {
-    const root = target.querySelector('.dss-acc')!;
-    expect(root.classList.contains('dss-acc--card')).toBe(true);
+    const root = target.querySelector('.hoops-acc')!;
+    expect(root.classList.contains('hoops-acc--card')).toBe(true);
     set({ variant: 'flat', sticky: true });
-    expect(root.classList.contains('dss-acc--flat')).toBe(true);
-    expect(root.classList.contains('dss-acc--sticky')).toBe(true);
-    expect(root.classList.contains('dss-acc--card')).toBe(false);
-    expect(target.querySelectorAll('.dss-acc--nested').length).toBe(1);
+    expect(root.classList.contains('hoops-acc--flat')).toBe(true);
+    expect(root.classList.contains('hoops-acc--sticky')).toBe(true);
+    expect(root.classList.contains('hoops-acc--card')).toBe(false);
+    expect(target.querySelectorAll('.hoops-acc--nested').length).toBe(1);
   });
 });
 
@@ -324,7 +324,7 @@ describe('Svelte Accordion: navLabel', () => {
     set({ nav: true });
     await wait();
     expect(target.querySelector('nav')!.getAttribute('aria-label')).toBe('Bereiche');
-    expect(target.querySelector('.dss-acc-nav-toggle')!.textContent).toBe('Bereiche');
+    expect(target.querySelector('.hoops-acc-nav-toggle')!.textContent).toBe('Bereiche');
   });
   it('navLabel setzt Navigation und Schalter', async () => {
     void unmount(instance);
@@ -334,6 +334,6 @@ describe('Svelte Accordion: navLabel', () => {
     flushSync();
     await wait();
     expect(target.querySelector('nav')!.getAttribute('aria-label')).toBe('Bereiche der Liga-Seite');
-    expect(target.querySelector('.dss-acc-nav-toggle')!.textContent).toBe('Bereiche der Liga-Seite');
+    expect(target.querySelector('.hoops-acc-nav-toggle')!.textContent).toBe('Bereiche der Liga-Seite');
   });
 });

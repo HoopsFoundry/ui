@@ -3,9 +3,15 @@
 Alle nennenswerten Änderungen an diesem Design System werden hier dokumentiert.
 Versionierung folgt [Semantic Versioning](https://semver.org/).
 
-## [Unveröffentlicht] — Marken-Rollen und DBB-Marke
+## [0.10.0] (Unveröffentlicht) — Umbenennung auf HoopsFoundry UI, Marken-Rollen und DBB-Marke
 
 ### Geändert (Bruch)
+
+- **Umbenennung des Systems: aus DSS wird HoopsFoundry UI.** Paket `@bbv/dss-design-system` → `@hoopsfoundry/ui` (Version 0.10.0), Repository `HoopsFoundry/ui`, Doku `ui.hoopsfoundry.com`. Alle Bezeichner wechseln das Präfix von `dss` auf `hoops` (ohne Kompatibilitätsschicht):
+  - **Klassen (Stufe K):** Familienregel `dss-<name>` → `hoops-<name>`, zum Beispiel `dss-btn--sm` → `hoops-btn--sm`, `dss-acc-trigger` → `hoops-acc-trigger`, `dss-sr-only` → `hoops-sr-only`. Zustandsklassen (`is-open`, `is-active`) bleiben. Auch zusammengesetzte Namen (`dss-${x}`) und Selektoren in Skripten sind betroffen.
+  - **Attribute, Ereignisse, Schlüssel, Dateien (Stufe D):** `data-dss` → `data-hoops`, `data-dss-options` → `data-hoops-options`, `data-dss-acc` → `data-hoops-acc`, `data-dss-modal-open/-close/-focus` → `data-hoops-modal-open/-close/-focus`; Ereignisse `dss:tabchange`, `dss:modalopen`, `dss:modalclose` → `hoops:…`; Speicherschlüssel `dss-theme` → `hoops-theme`; `Symbol.for('dss.registry')` → `hoops.registry`; Dateien `dss.js`, `dss.min.js`, `dss.d.ts`, `dss.css`, `dss-render.*`, `dss-map.*` → `hoops.*`, `hoops-render.*`, `hoops-map.*`; Befehl `dss-sync` → `hoops-sync` (Release-Anhang `hoops-sync.mjs`); Marker `.dss-sync`, `.dss-release` → `.hoops-sync`, `.hoops-release`; Release-Tarball `dss-vanilla-<version>.tgz` → `hoops-ui-<version>.tgz`; Zielordner des Portals `_site/dss` → `_site/hoops`.
+  - **Marke (Stufe M):** Texte, Doku, arc42 und Storybook sprechen von „HoopsFoundry UI“; die Abkürzung DSS entfällt. Die historischen Design-Entwürfe liegen unverändert in `docs/entwuerfe/`. Neu: `LICENSE` (MIT).
+- **Migration:** `hoops-migrate` (`node scripts/migrate-from-dss.mjs <projektordner>`) kennt jetzt die Stufen T, D und K (`--stufen=T,D,K`, Standard alle); Probelauf ist der Standard. Neue Prüfungen: `tests/no-dss.test.ts` (kein alter Name im Bestand außer begründeter Allowlist), `tests/codemod-names.test.ts`; Werkzeuge: `scripts/codemod-names.mjs`, `scripts/lib/name-rename.mjs`.
 
 - **Umbenennung der Design-Tokens, Stufe T von DSS auf HoopsFoundry UI:** Alle eigenen CSS-Custom-Properties tragen jetzt das Präfix `--hoops-`. `--dss-foo` wird `--hoops-foo` (auch `--_dss-foo` zu `--_hoops-foo`), bisher unpräfixierte Tokens wie `--n-0`, `--ink-600`, `--ring-w`, `--radius-md`, `--fs-h3`, `--font-display`, `--amber-500` werden `--hoops-n-0`, `--hoops-ink-600`, `--hoops-ring-w` usw. Eine Kompatibilitätsschicht gibt es nicht. Werte, Markup und Darstellung bleiben gleich (nachgewiesen mit `scripts/check-style-parity.mjs`: berechnete Stile und Rechtecke aller Stories, Marken BBV und DBB, hell und dunkel, 1280 und 420 px). Klassen (`dss-*`), data-Attribute, Dateinamen und Paketname ändern sich erst in den folgenden Stufen.
 - **Ersetzungstabelle (Auszug, vollständig in `scripts/migration-table.mjs`, 302 Namen):**

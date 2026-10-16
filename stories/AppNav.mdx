@@ -44,7 +44,7 @@ Eine Gruppe ist ein Disclosure-Button (`aria-expanded`, `aria-controls`): Ein Kl
   ]}
 />
 
-In der Vanilla-Fassung übernimmt `js/appnav.js` dasselbe Verhalten für alle Elemente mit `data-dss-appnav`. Einen Unterschied gibt es im Markup: Das Pfeil-Symbol der Gruppen setzt du dort selbst.
+In der Vanilla-Fassung übernimmt `js/appnav.js` dasselbe Verhalten für alle Elemente mit `data-hoops-appnav`. Einen Unterschied gibt es im Markup: Das Pfeil-Symbol der Gruppen setzt du dort selbst.
 
 ## Zustände: Hover, Fokus, Aktuell, Gesperrt
 
@@ -56,18 +56,18 @@ Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeuglei
 
 ## Mobil: Hamburger-Menü unter 720 px
 
-Unter 720 px Fensterbreite verschwindet die Liste hinter dem Menü-Button (`dss-appnav-toggle`, `aria-expanded`). Ein Klick öffnet die Liste untereinander mit ganzer Zeilenbreite, die Gruppen klappen eingerückt darunter auf. Diese Regel hängt an der Breite des Fensters, nicht an der des Rahmens. Darum sind die Vorschauen eingebettete Seiten mit fester Breite von 390 px: links geschlossen, rechts mit offenem Menü und geöffneter Gruppe „Vorbereiten“.
+Unter 720 px Fensterbreite verschwindet die Liste hinter dem Menü-Button (`hoops-appnav-toggle`, `aria-expanded`). Ein Klick öffnet die Liste untereinander mit ganzer Zeilenbreite, die Gruppen klappen eingerückt darunter auf. Diese Regel hängt an der Breite des Fensters, nicht an der des Rahmens. Darum sind die Vorschauen eingebettete Seiten mit fester Breite von 390 px: links geschlossen, rechts mit offenem Menü und geöffneter Gruppe „Vorbereiten“.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <div className="dss-doc-cap">Geschlossen</div>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: AppNav geschlossen">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <div className="hoops-doc-cap">Geschlossen</div>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: AppNav geschlossen">
       <iframe title="Handy-Vorschau: AppNav mit geschlossenem Menü in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-appnav--mobil-geschlossen" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <div className="dss-doc-cap">Menü offen</div>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: AppNav mit offenem Menü">
+  <div className="hoops-phone">
+    <div className="hoops-doc-cap">Menü offen</div>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: AppNav mit offenem Menü">
       <iframe title="Handy-Vorschau: AppNav mit offenem Menü in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-appnav--mobil-offen" loading="lazy" />
     </div>
   </div>

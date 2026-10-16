@@ -39,13 +39,13 @@
   <!-- inert: die Beispiele haben eigene h1/h2/h3 und eine andere Gliederung als die Doku-Seite; Screenreader der Doku sehen sie nicht (die Gliederung unten zeigt sie) -->
   <div class="stage" inert>
     {#if mode === 'seite'}
-      <h1 class="dss-t-h1">Mannschaft</h1>
+      <h1 class="hoops-t-h1">Mannschaft</h1>
       <section>
-        <h2 class="dss-t-h2">Spiele</h2>
+        <h2 class="hoops-t-h2">Spiele</h2>
         <HeadingLevel level={3}>{@render spiele()}</HeadingLevel>
       </section>
       <section>
-        <h2 class="dss-t-h2">Kader</h2>
+        <h2 class="hoops-t-h2">Kader</h2>
         <HeadingLevel level={3}><div class="row">{@render spieler()}</div></HeadingLevel>
       </section>
     {:else if mode === 'rangfolge'}
@@ -75,32 +75,32 @@
         </div>
       </div>
     {:else if mode === 'do-ebenen'}
-      <h2 class="dss-t-h3">Kader</h2>
+      <h2 class="hoops-t-h3">Kader</h2>
       <HeadingLevel level={3}><div class="row">{@render spieler()}</div></HeadingLevel>
     {:else if mode === 'dont-ebenen'}
-      <h2 class="dss-t-h3">Kader</h2>
+      <h2 class="hoops-t-h3">Kader</h2>
       <div class="row">
         <PlayerCard jersey="4" name="J. Tanner" position="PG" titleAs="h5" />
         <PlayerCard jersey="11" name="M. Kraus" position="C" team="gast" titleAs="h5" />
       </div>
     {:else if mode === 'do-groesse'}
-      <h2 class="dss-t-h3">Kader</h2>
+      <h2 class="hoops-t-h3">Kader</h2>
       <div class="row" style="--hoops-card-title-size: var(--hoops-fs-h3)">
         <HeadingLevel level={3}>{@render spieler()}</HeadingLevel>
       </div>
     {:else if mode === 'dont-groesse'}
-      <h2 class="dss-t-h3">Kader</h2>
+      <h2 class="hoops-t-h3">Kader</h2>
       <div class="row">
         <PlayerCard jersey="4" name="J. Tanner" position="PG" titleAs="h2" />
         <PlayerCard jersey="11" name="M. Kraus" position="C" team="gast" titleAs="h2" />
       </div>
     {:else if mode === 'do-h1'}
-      <h1 class="dss-t-h2">Mannschaft</h1>
-      <h2 class="dss-t-h3">Spiele</h2>
-      <h2 class="dss-t-h3">Kader</h2>
+      <h1 class="hoops-t-h2">Mannschaft</h1>
+      <h2 class="hoops-t-h3">Spiele</h2>
+      <h2 class="hoops-t-h3">Kader</h2>
     {:else}
-      <h1 class="dss-t-h2">Spiele</h1>
-      <h1 class="dss-t-h2">Kader</h1>
+      <h1 class="hoops-t-h2">Spiele</h1>
+      <h1 class="hoops-t-h2">Kader</h1>
     {/if}
   </div>
 

@@ -9,31 +9,31 @@ import { createHash } from 'node:crypto';
 import { gzipSync } from 'node:zlib';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { parseArgs, readTgz, syncDss } from '../scripts/portal-sync.mjs';
+import { parseArgs, readTgz, syncHoops } from '../scripts/portal-sync.mjs';
 // @ts-expect-error reines ES-Modul ohne Typen
 import { createTar } from '../scripts/release-vanilla.mjs';
 import { startServer, type Route } from './helpers/release-server';
 import { tmpRoot, writeFakeRelease } from './helpers/release-fixture';
 
 const V = '0.9.0';
-const FILES = { 'dss.js': 'export const VERSION = "0.9.0";', 'dss.css': ':root{--hoops-version:"0.9.0"}', 'courtlines/court.svg': '<svg/>', 'fonts/fonts.css': '/* f */', 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: V }) + '\n' };
+const FILES = { 'hoops.js': 'export const VERSION = "0.9.0";', 'hoops.css': ':root{--hoops-version:"0.9.0"}', 'courtlines/court.svg': '<svg/>', 'fonts/fonts.css': '/* f */', 'version.json': JSON.stringify({ name: '@hoopsfoundry/ui', version: V }) + '\n' };
 const sha = (d: Buffer | string) => createHash('sha256').update(d).digest('hex');
 const project = `${tmpRoot}-sync/projekt`;
 const dirs = `${tmpRoot}-sync/releases`;
 // jeder Test bekommt ein eigenes TMPDIR: parallele Läufe anderer Tests oder Prozesse im geteilten Temp-Ordner stören die Zählung nicht
-const tmpCount = () => readdirSync(tmpdir()).filter((n) => n.startsWith('dss-release-')).length;
+const tmpCount = () => readdirSync(tmpdir()).filter((n) => n.startsWith('hoops-release-')).length;
 const realTmp = process.env.TMPDIR;
 
 type Server = Awaited<ReturnType<typeof startServer>>;
 let server: Server;
 const routes = new Map<string, Route>();
 const serve = (version: string, tgz: Buffer, sums: string) => {
-  routes.set(`/v${version}/dss-vanilla-${version}.tgz`, { body: tgz });
-  routes.set(`/v${version}/dss-vanilla-${version}.sha256`, { body: sums });
+  routes.set(`/v${version}/hoops-ui-${version}.tgz`, { body: tgz });
+  routes.set(`/v${version}/hoops-ui-${version}.sha256`, { body: sums });
 };
 const sync = (options: Record<string, unknown> = {}, version = V) =>
-  syncDss({ root: project, source: { type: 'release', version, baseUrl: server.baseUrl }, ...options });
-const snapshot = async () => (existsSync(`${project}/_site/dss`) ? (await readdir(`${project}/_site/dss`)).sort() : null);
+  syncHoops({ root: project, source: { type: 'release', version, baseUrl: server.baseUrl }, ...options });
+const snapshot = async () => (existsSync(`${project}/_site/hoops`) ? (await readdir(`${project}/_site/hoops`)).sort() : null);
 
 beforeAll(async () => {
   await rm(`${tmpRoot}-sync`, { recursive: true, force: true });
@@ -49,9 +49,9 @@ beforeEach(async () => {
   routes.clear();
   server.requests.length = 0;
   await rm(project, { recursive: true, force: true });
-  await mkdir(`${project}/_site/dss`, { recursive: true });
-  await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-  await writeFile(`${project}/_site/dss/.dss-sync`, '');
+  await mkdir(`${project}/_site/hoops`, { recursive: true });
+  await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+  await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
   await mkdir(`${project}/node_modules/leaflet/dist`, { recursive: true });
   await writeFile(`${project}/node_modules/leaflet/dist/leaflet.js`, '//l');
 });
@@ -75,7 +75,7 @@ const rawRelease = (version: string, entries: { path: string; data: string }[], 
   let tar = createTar(entries.map((e) => ({ path: e.path, data: Buffer.from(e.data) })));
   if (tweak) tar = tweak(tar);
   const tgz = gzipSync(tar);
-  const sums = [`${sha(tgz)}  dss-vanilla-${version}.tgz`, ...entries.map((e) => `${sha(e.data)}  ${e.path}`)].join('\n') + '\n';
+  const sums = [`${sha(tgz)}  hoops-ui-${version}.tgz`, ...entries.map((e) => `${sha(e.data)}  ${e.path}`)].join('\n') + '\n';
   serve(version, tgz, sums);
 };
 
@@ -86,10 +86,10 @@ describe('--from-release: Erfolg', () => {
     const before = tmpCount();
     const result = await sync();
     expect(result).toEqual({ version: V, leaflet: false });
-    expect(server.requests).toEqual([`/v${V}/dss-vanilla-${V}.tgz`, `/v${V}/dss-vanilla-${V}.sha256`]);
-    expect((await snapshot())).toEqual(['.dss-sync', 'courtlines', 'dss.css', 'dss.js', 'version.json']);
-    expect(await readFile(`${project}/_site/dss/dss.js`, 'utf8')).toBe(FILES['dss.js']);
-    expect(JSON.parse(await readFile(`${project}/_site/dss/version.json`, 'utf8'))).toEqual({ name: '@bbv/dss-design-system', version: V });
+    expect(server.requests).toEqual([`/v${V}/hoops-ui-${V}.tgz`, `/v${V}/hoops-ui-${V}.sha256`]);
+    expect((await snapshot())).toEqual(['.hoops-sync', 'courtlines', 'hoops.css', 'hoops.js', 'version.json']);
+    expect(await readFile(`${project}/_site/hoops/hoops.js`, 'utf8')).toBe(FILES['hoops.js']);
+    expect(JSON.parse(await readFile(`${project}/_site/hoops/version.json`, 'utf8'))).toEqual({ name: '@hoopsfoundry/ui', version: V });
     expect(tmpCount()).toBe(before);
   });
   it('fonts und Leaflet kommen nur auf Verlangen mit', async () => {
@@ -97,7 +97,7 @@ describe('--from-release: Erfolg', () => {
     serve(V, fake.tgz, fake.sums);
     const result = await sync({ fonts: true, leaflet: true });
     expect(result.leaflet).toBe(true);
-    expect(await readFile(`${project}/_site/dss/fonts/fonts.css`, 'utf8')).toBe('/* f */');
+    expect(await readFile(`${project}/_site/hoops/fonts/fonts.css`, 'utf8')).toBe('/* f */');
     expect(existsSync(`${project}/_site/vendor/leaflet/leaflet.js`)).toBe(true);
   });
   it('--from-dir: ein entpackter Release-Ordner (offline) und ein Paketordner gehen ebenso', async () => {
@@ -107,35 +107,35 @@ describe('--from-release: Erfolg', () => {
       await mkdir(resolve(out, f.path, '..'), { recursive: true });
       await writeFile(resolve(out, f.path), f.data);
     }
-    const result = await syncDss({ root: project, source: { type: 'dir', path: out } });
+    const result = await syncHoops({ root: project, source: { type: 'dir', path: out } });
     expect(result.version).toBe(V);
-    expect(existsSync(`${project}/_site/dss/dss.js`)).toBe(true);
-    expect(existsSync(`${project}/_site/dss/fonts`)).toBe(false);
-    await expect(syncDss({ root: project, source: { type: 'dir', path: `${dirs}/gibtsnicht` } })).rejects.toThrow(/existiert nicht/);
+    expect(existsSync(`${project}/_site/hoops/hoops.js`)).toBe(true);
+    expect(existsSync(`${project}/_site/hoops/fonts`)).toBe(false);
+    await expect(syncHoops({ root: project, source: { type: 'dir', path: `${dirs}/gibtsnicht` } })).rejects.toThrow(/existiert nicht/);
     await mkdir(`${dirs}/leer`, { recursive: true });
-    await expect(syncDss({ root: project, source: { type: 'dir', path: `${dirs}/leer` } })).rejects.toThrow();
+    await expect(syncHoops({ root: project, source: { type: 'dir', path: `${dirs}/leer` } })).rejects.toThrow();
   });
 });
 
 describe('--from-release: Abbruch lässt das Ziel unverändert', () => {
   const unchanged = async () => {
-    expect(await snapshot()).toEqual(['.dss-sync', 'alt.js']);
-    expect(await readFile(`${project}/_site/dss/alt.js`, 'utf8')).toBe('alt');
+    expect(await snapshot()).toEqual(['.hoops-sync', 'alt.js']);
+    expect(await readFile(`${project}/_site/hoops/alt.js`, 'utf8')).toBe('alt');
     expect((await readdir(`${project}/_site`)).filter((n) => n.includes('.tmp-'))).toEqual([]);
   };
   it('falsche Prüfsumme des Tarballs', async () => {
     const fake = await writeFakeRelease(`${dirs}/falsch`, V, FILES);
     serve(V, Buffer.concat([fake.tgz.subarray(0, fake.tgz.length - 1), Buffer.from([fake.tgz.at(-1)! ^ 1])]), fake.sums);
     const before = tmpCount();
-    await expect(sync()).rejects.toThrow(/Prüfsumme von dss-vanilla-0\.9\.0\.tgz stimmt nicht/);
+    await expect(sync()).rejects.toThrow(/Prüfsumme von hoops-ui-0\.9\.0\.tgz stimmt nicht/);
     await unchanged();
     expect(tmpCount()).toBe(before);
   });
   it('falsche Prüfsumme einer Datei im Archiv (Tarball-Hash stimmt)', async () => {
     const fake = await writeFakeRelease(`${dirs}/datei`, V, FILES);
-    const wrong = fake.sums.replace(sha(FILES['dss.js']), sha('anders'));
+    const wrong = fake.sums.replace(sha(FILES['hoops.js']), sha('anders'));
     serve(V, fake.tgz, wrong);
-    await expect(sync()).rejects.toThrow(/Datei dss\.js stimmt nicht/);
+    await expect(sync()).rejects.toThrow(/Datei hoops\.js stimmt nicht/);
     await unchanged();
   });
   it('Prüfsummen-Datei ohne Zeile für den Tarball oder unlesbar', async () => {
@@ -149,14 +149,14 @@ describe('--from-release: Abbruch lässt das Ziel unverändert', () => {
   it('404 für den Tarball und für die Prüfsumme', async () => {
     await expect(sync()).rejects.toThrow(/HTTP 404/);
     const fake = await writeFakeRelease(`${dirs}/n404`, V, FILES);
-    routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: fake.tgz });
+    routes.set(`/v${V}/hoops-ui-${V}.tgz`, { body: fake.tgz });
     await expect(sync()).rejects.toThrow(/sha256.*HTTP 404/);
     await unchanged();
   });
   it('abgebrochener Download (weniger Bytes als angekündigt)', async () => {
     const fake = await writeFakeRelease(`${dirs}/teil`, V, FILES);
-    routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: fake.tgz.subarray(0, 200), declared: fake.tgz.length, abort: true });
-    routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: fake.sums });
+    routes.set(`/v${V}/hoops-ui-${V}.tgz`, { body: fake.tgz.subarray(0, 200), declared: fake.tgz.length, abort: true });
+    routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: fake.sums });
     await expect(sync()).rejects.toThrow(/Download (abgebrochen|fehlgeschlagen|unvollständig)/);
     await unchanged();
   });
@@ -169,11 +169,11 @@ describe('--from-release: Abbruch lässt das Ziel unverändert', () => {
   it('falsche Version: version.json oder Ordnername passen nicht zur verlangten Version', async () => {
     const other = await writeFakeRelease(`${dirs}/v`, V, FILES);
     // unter der Adresse von 1.0.0 liegt das Archiv der 0.9.0 (Ordner und version.json nennen 0.9.0)
-    routes.set('/v1.0.0/dss-vanilla-1.0.0.tgz', { body: other.tgz });
-    routes.set('/v1.0.0/dss-vanilla-1.0.0.sha256', { body: other.sums.replace(`dss-vanilla-${V}.tgz`, 'dss-vanilla-1.0.0.tgz') });
-    await expect(sync({}, '1.0.0')).rejects.toThrow(/oberster Ordner dss-vanilla-0\.9\.0 statt dss-vanilla-1\.0\.0/);
+    routes.set('/v1.0.0/hoops-ui-1.0.0.tgz', { body: other.tgz });
+    routes.set('/v1.0.0/hoops-ui-1.0.0.sha256', { body: other.sums.replace(`hoops-ui-${V}.tgz`, 'hoops-ui-1.0.0.tgz') });
+    await expect(sync({}, '1.0.0')).rejects.toThrow(/oberster Ordner hoops-ui-0\.9\.0 statt hoops-ui-1\.0\.0/);
     // richtiger Ordner, aber version.json nennt eine andere Version
-    const fake = await writeFakeRelease(`${dirs}/v2`, '1.0.0', { ...FILES, 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: '0.9.0' }) });
+    const fake = await writeFakeRelease(`${dirs}/v2`, '1.0.0', { ...FILES, 'version.json': JSON.stringify({ name: '@hoopsfoundry/ui', version: '0.9.0' }) });
     serve('1.0.0', fake.tgz, fake.sums);
     await expect(sync({}, '1.0.0')).rejects.toThrow(/version\.json im Archiv nennt/);
     await unchanged();
@@ -184,12 +184,12 @@ describe('--from-release: Abbruch lässt das Ziel unverändert', () => {
     await unchanged();
   });
   const bad: [string, { path: string; data: string }[], ((t: Buffer) => Buffer) | undefined, RegExp][] = [
-    ['Pfad mit ..', [{ path: `dss-vanilla-${V}/../evil.js`, data: 'x' }], undefined, /unzulässiger Pfad/],
+    ['Pfad mit ..', [{ path: `hoops-ui-${V}/../evil.js`, data: 'x' }], undefined, /unzulässiger Pfad/],
     ['absoluter Pfad', [{ path: '/etc/evil', data: 'x' }], undefined, /unzulässiger Pfad/],
-    ['Rückwärtsstrich (Windows)', [{ path: `dss-vanilla-${V}/a\\..\\b.js`, data: 'x' }], undefined, /unzulässiger Pfad/],
-    ['Laufwerk (Windows)', [{ path: `dss-vanilla-${V}/C:/x.js`, data: 'x' }], undefined, /unzulässiger Pfad/],
-    ['doppelter Eintrag', [{ path: `dss-vanilla-${V}/a.js`, data: 'x' }, { path: `dss-vanilla-${V}/a.js`, data: 'y' }], undefined, /doppelter Eintrag/],
-    ['Verknüpfung', [{ path: `dss-vanilla-${V}/a.js`, data: '' }], (t) => withType(t, '2'), /Eintragstyp/],
+    ['Rückwärtsstrich (Windows)', [{ path: `hoops-ui-${V}/a\\..\\b.js`, data: 'x' }], undefined, /unzulässiger Pfad/],
+    ['Laufwerk (Windows)', [{ path: `hoops-ui-${V}/C:/x.js`, data: 'x' }], undefined, /unzulässiger Pfad/],
+    ['doppelter Eintrag', [{ path: `hoops-ui-${V}/a.js`, data: 'x' }, { path: `hoops-ui-${V}/a.js`, data: 'y' }], undefined, /doppelter Eintrag/],
+    ['Verknüpfung', [{ path: `hoops-ui-${V}/a.js`, data: '' }], (t) => withType(t, '2'), /Eintragstyp/],
     ['Datei ohne Ordner', [{ path: 'a.js', data: 'x' }], undefined, /obersten Ordner/],
   ];
   it.each(bad)('Archiv mit %s wird abgelehnt, es entsteht nichts außerhalb', async (_n, entries, tweak, pattern) => {
@@ -199,7 +199,7 @@ describe('--from-release: Abbruch lässt das Ziel unverändert', () => {
     expect(existsSync(`${project}/_site/evil.js`) || existsSync(`${project}/evil.js`) || existsSync('/etc/evil.js')).toBe(false);
   });
   it('kein gültiges gzip', async () => {
-    serve(V, Buffer.from('kein gzip'), `${sha('kein gzip')}  dss-vanilla-${V}.tgz\n`);
+    serve(V, Buffer.from('kein gzip'), `${sha('kein gzip')}  hoops-ui-${V}.tgz\n`);
     await expect(sync()).rejects.toThrow(/kein gültiges \.tgz/);
     await unchanged();
   });
@@ -225,7 +225,7 @@ describe('--from-release: Zielschutz und Schreibrechte', () => {
     await chmod(`${project}/_site`, 0o555);
     await expect(sync()).rejects.toThrow();
     await chmod(`${project}/_site`, 0o755);
-    expect(await readdir(`${project}/_site/dss`)).toContain('alt.js');
+    expect(await readdir(`${project}/_site/hoops`)).toContain('alt.js');
     expect((await readdir(`${project}/_site`)).filter((n) => n.includes('.tmp-'))).toEqual([]);
   });
 });
@@ -246,6 +246,6 @@ describe('Quelle und Befehlszeile', () => {
   });
   it('die Standard-Adresse zeigt auf die Release-Anhänge dieses Repositorys', async () => {
     const { RELEASE_BASE_URL } = await import(/* @vite-ignore */ '../scripts/portal-sync.mjs');
-    expect(RELEASE_BASE_URL).toBe('https://github.com/OliEder/dss-design-system/releases/download');
+    expect(RELEASE_BASE_URL).toBe('https://github.com/HoopsFoundry/ui/releases/download');
   });
 });

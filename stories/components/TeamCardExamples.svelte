@@ -29,7 +29,7 @@
 
   // Erzwingt einen Zustand auf dem Link der Karte (Hover und Fokus wirken über den Link, siehe css/components.css)
   function mark(node: HTMLElement, cls: string) {
-    const target = node.querySelector<HTMLElement>('.dss-team-link');
+    const target = node.querySelector<HTMLElement>('.hoops-team-link');
     if (cls && target) target.classList.add(...cls.split(' '));
   }
   const cols = ['Standard', 'Hover', 'Fokus', 'Aktiv'] as const;
@@ -150,7 +150,7 @@
   <!-- Falsch: ganze Karte klickbar und zusätzlich ein zweiter Link (Liga) in der Karte; die Komponente verhindert das (leagueHref zählt nur ohne href), die Doku stellt es mit eigenem Markup nach. -->
   <div class="narrow fake-nested">
     <TeamCard {...TEAM} next={undefined} last={undefined} league="" href="#nordhain" />
-    <a class="dss-link fake-league" href="#liga">Bayernliga Süd</a>
+    <a class="hoops-link fake-league" href="#liga">Bayernliga Süd</a>
   </div>
 {:else if example === 'zustaende'}
   <!-- data-fixed-states: die Werkzeugleiste "Zustand" lässt diese Matrix in Ruhe -->

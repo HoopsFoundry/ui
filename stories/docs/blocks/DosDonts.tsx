@@ -8,25 +8,25 @@ const INERT = { inert: '' } as Record<string, string>;
 /** Beispielpaare "richtig / falsch". Falsche Beispiele sind nur Anschauung (inert). Nur Storybook-Doku. */
 export function DosDonts({ pairs }: { pairs: DosDontsPair[] }) {
   return (
-    <div className="dss-dd">
+    <div className="hoops-dd">
       {pairs.map((p) => (
-        <section key={p.title} className="dss-dd-pair">
-          <h3 className="dss-dd-title">{p.title}</h3>
-          <div className="dss-dd-cols">
-            <figure className="dss-dd-col dss-dd-do">
-              <div className="dss-dd-stage">{p.good}</div>
+        <section key={p.title} className="hoops-dd-pair">
+          <h3 className="hoops-dd-title">{p.title}</h3>
+          <div className="hoops-dd-cols">
+            <figure className="hoops-dd-col hoops-dd-do">
+              <div className="hoops-dd-stage">{p.good}</div>
               <figcaption>
-                <span className="dss-dd-badge">✓ Do</span> {p.doText}
+                <span className="hoops-dd-badge">✓ Do</span> {p.doText}
               </figcaption>
             </figure>
-            <figure className="dss-dd-col dss-dd-dont">
-              <div className="dss-dd-stage" {...INERT}>
+            <figure className="hoops-dd-col hoops-dd-dont">
+              <div className="hoops-dd-stage" {...INERT}>
                 {p.bad}
               </div>
               <figcaption>
-                <span className="dss-dd-badge">
-                  ✗ Don't<span className="dss-sr-only"> </span>
-                  <span className="dss-sr-only">Beispiel für falsche Verwendung</span>
+                <span className="hoops-dd-badge">
+                  ✗ Don't<span className="hoops-sr-only"> </span>
+                  <span className="hoops-sr-only">Beispiel für falsche Verwendung</span>
                 </span>{' '}
                 {p.dontText}
               </figcaption>

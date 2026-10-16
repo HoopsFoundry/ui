@@ -127,12 +127,12 @@ describe('createCollapsible', () => {
 describe('Vanilla: einklappbarer Rahmen', () => {
   const mount = (html: string) => {
     document.body.replaceChildren(document.createRange().createContextualFragment(html));
-    return document.querySelector<HTMLElement>('.dss-acc')!;
+    return document.querySelector<HTMLElement>('.hoops-acc')!;
   };
   // Der Rahmen aus dem Markup der Doku, per DOM herausgelöst
-  const frameHtml = () => document.createRange().createContextualFragment(tableMarkup).querySelector('.dss-frame')!.outerHTML;
+  const frameHtml = () => document.createRange().createContextualFragment(tableMarkup).querySelector('.hoops-frame')!.outerHTML;
   const group = (n: number, extra = '') =>
-    `<div class="dss-acc" data-dss-acc>${Array.from({ length: n }, (_, i) => frameHtml().replace(/boxscore/g, `f${i}`).replace('Spieler-Statistiken"', `Rahmen ${i}"`).replace('Spieler-Statistiken<', `Rahmen ${i}<`)).join('')}${extra}</div>`;
+    `<div class="hoops-acc" data-hoops-acc>${Array.from({ length: n }, (_, i) => frameHtml().replace(/boxscore/g, `f${i}`).replace('Spieler-Statistiken"', `Rahmen ${i}"`).replace('Spieler-Statistiken<', `Rahmen ${i}<`)).join('')}${extra}</div>`;
   const trig = (id: string) => document.querySelector<HTMLButtonElement>(`[id="${id}-trigger"]`)!;
 
   it('der Skript-Weg schaltet aria-expanded, hidden, inert und is-open', () => {
@@ -153,17 +153,17 @@ describe('Vanilla: einklappbarer Rahmen', () => {
   it('Gruppe: Sprungleiste mit dem Titel (ohne Komma), exclusive, Alle öffnen', () => {
     const root = mount(group(3));
     initAccordion(root, { syncHash: false, nav: true, expandAll: true });
-    expect([...document.querySelectorAll('.dss-acc-nav-link')].map((a) => a.textContent)).toEqual(['Rahmen 0', 'Rahmen 1', 'Rahmen 2']);
-    const [open, close] = [...document.querySelectorAll<HTMLButtonElement>('.dss-acc-bar button')];
+    expect([...document.querySelectorAll('.hoops-acc-nav-link')].map((a) => a.textContent)).toEqual(['Rahmen 0', 'Rahmen 1', 'Rahmen 2']);
+    const [open, close] = [...document.querySelectorAll<HTMLButtonElement>('.hoops-acc-bar button')];
     open.click();
-    expect([...document.querySelectorAll('.dss-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'true')).toBe(true);
+    expect([...document.querySelectorAll('.hoops-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'true')).toBe(true);
     close.click();
-    expect([...document.querySelectorAll('.dss-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'false')).toBe(true);
+    expect([...document.querySelectorAll('.hoops-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'false')).toBe(true);
   });
   it('exclusive hält nur einen Rahmen offen', () => {
     const root = mount(group(3));
     initAccordion(root, { syncHash: false, exclusive: true });
-    expect([...document.querySelectorAll('.dss-acc-trigger')].filter((b) => b.getAttribute('aria-expanded') === 'true')).toHaveLength(1);
+    expect([...document.querySelectorAll('.hoops-acc-trigger')].filter((b) => b.getAttribute('aria-expanded') === 'true')).toHaveLength(1);
     trig('f1').click();
     expect(trig('f1').getAttribute('aria-expanded')).toBe('true');
     expect(trig('f0').getAttribute('aria-expanded')).toBe('false');
@@ -173,7 +173,7 @@ describe('Vanilla: einklappbarer Rahmen', () => {
     const root = mount(group(3));
     initAccordion(root);
     expect(trig('f2').getAttribute('aria-expanded')).toBe('true');
-    const heads = [...document.querySelectorAll<HTMLButtonElement>('.dss-acc-trigger')];
+    const heads = [...document.querySelectorAll<HTMLButtonElement>('.hoops-acc-trigger')];
     heads[0].focus();
     expect(moveFocus(root, heads[0], 'ArrowDown')).toBe(true);
     expect(document.activeElement).toBe(heads[1]);
@@ -181,11 +181,11 @@ describe('Vanilla: einklappbarer Rahmen', () => {
   it('ein einzelner Rahmen im Panel eines Bereichs gehört nicht zur äußeren Gruppe', () => {
     const inner = frameHtml();
     const root = mount(
-      `<div class="dss-acc" data-dss-acc><div class="dss-acc-item is-open" id="p"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="p-trigger" aria-expanded="true" aria-controls="p-panel"><span class="dss-acc-label">Eltern</span></button></h3><div class="dss-acc-panel" id="p-panel"><div class="dss-acc-panel-inner">${inner}</div></div></div></div>`,
+      `<div class="hoops-acc" data-hoops-acc><div class="hoops-acc-item is-open" id="p"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="p-trigger" aria-expanded="true" aria-controls="p-panel"><span class="hoops-acc-label">Eltern</span></button></h3><div class="hoops-acc-panel" id="p-panel"><div class="hoops-acc-panel-inner">${inner}</div></div></div></div>`,
     );
     initAccordion(root, { syncHash: false, exclusive: true, nav: true });
-    expect([...document.querySelectorAll('.dss-acc-nav-link')].map((a) => a.textContent)).toEqual(['Eltern']);
-    const heads = [...root.querySelectorAll<HTMLButtonElement>('.dss-acc-trigger')];
+    expect([...document.querySelectorAll('.hoops-acc-nav-link')].map((a) => a.textContent)).toEqual(['Eltern']);
+    const heads = [...root.querySelectorAll<HTMLButtonElement>('.hoops-acc-trigger')];
     const child = heads.find((b) => b.id === 'boxscore-trigger')!;
     expect(moveFocus(root, child, 'ArrowUp')).toBe(false);
     child.click(); // wird von der äußeren Gruppe nicht behandelt: der Elternbereich bleibt offen
@@ -203,8 +203,8 @@ describe('interne Bausteine: Parität Svelte und React', () => {
     expect(svelte).not.toMatch(/<style[\s>]/);
   });
   it('beide nutzen dieselben Klassen und den gemeinsamen Baustein', () => {
-    const classes = (src: string) => new Set(src.match(/dss-[\w-]+/g));
-    for (const cls of classes(svelte)) if (cls !== 'dss-cf') expect(react, cls).toContain(cls);
+    const classes = (src: string) => new Set(src.match(/hoops-[\w-]+/g));
+    for (const cls of classes(svelte)) if (cls !== 'hoops-cf') expect(react, cls).toContain(cls);
     expect(svelte).toContain('createCollapsible');
     expect(react).toContain('createCollapsible');
   });

@@ -24,9 +24,9 @@ async function run(example: string, markup = example) {
   document.body.replaceChildren(document.createRange().createContextualFragment(html));
   (globalThis as { __L?: unknown }).__L = mock.L;
   const source = script
-    .replace('/dss/dss-map.min.js', url('js/map-bundle.js'))
-    .replace('/dss/dss-render.min.js', url('js/render/index.js'))
-    .replace('/dss/dss.min.js', url('js/vanilla.js'))
+    .replace('/hoops/hoops-map.min.js', url('js/map-bundle.js'))
+    .replace('/hoops/hoops-render.min.js', url('js/render/index.js'))
+    .replace('/hoops/hoops.min.js', url('js/vanilla.js'))
     .replaceAll("import('/vendor/leaflet/leaflet-src.esm.js')", 'Promise.resolve(globalThis.__L)');
   return (await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(`${source}\n// Lauf ${++runs}`).toString('base64')}`)) as Record<string, unknown>;
 }
@@ -47,13 +47,13 @@ describe('Beispiel vanilla (mountMap)', () => {
     const el = document.querySelector('#karte')!;
     expect(el.querySelector('[role="region"]')!.getAttribute('aria-label')).toBe('Karte der Sporthalle Nordhain');
     // update steht im Beispiel schon vor dem Klick: zwei Orte in der Liste, zwei Pins
-    expect(el.querySelectorAll('.dss-map-item')).toHaveLength(2);
+    expect(el.querySelectorAll('.hoops-map-item')).toHaveLength(2);
     expect(mock.state.maps).toHaveLength(0);
-    click(el.querySelector('.dss-map-load'));
+    click(el.querySelector('.hoops-map-load'));
     await vi.waitFor(() => expect(mock.state.maps).toHaveLength(1));
     expect(mock.lastLayer().url).toBe('/tiles/{z}/{x}/{y}.png');
     expect(mock.state.markers).toHaveLength(2);
-    expect(el.querySelector('.dss-map')!.getAttribute('data-state')).toBe('ready');
+    expect(el.querySelector('.hoops-map')!.getAttribute('data-state')).toBe('ready');
   });
   it('nur Pfade des Pakets und lokale Dateien: kein unpkg, kein CDN, keine echte Kachel-Adresse', () => {
     for (const text of [code.vanilla, code.initMapBeispiel, code.initAllKarte, code.importmapVariante, code.globalVariante, code.kopieren, code.ohneBuildSeite]) {
@@ -62,7 +62,7 @@ describe('Beispiel vanilla (mountMap)', () => {
       expect(live).not.toMatch(/unpkg|cdn|jsdelivr|cdnjs|tile\.openstreetmap\.org/i);
       expect(live).not.toMatch(/innerHTML\s*=/);
     }
-    expect(code.vanilla).toContain("from '/dss/dss-map.min.js'");
+    expect(code.vanilla).toContain("from '/hoops/hoops-map.min.js'");
     expect(code.vanilla).toContain('/vendor/leaflet/leaflet.css');
   });
 });
@@ -75,19 +75,19 @@ describe('Beispiel initMap', () => {
     expect(out).toBeDefined();
     const before = renderMap(props as never, { uid: 'doc' });
     expect(document.querySelector('#karte')!.innerHTML.length).toBeGreaterThan(100);
-    click(document.querySelector('.dss-map-load'));
+    click(document.querySelector('.hoops-map-load'));
     await vi.waitFor(() => expect(mock.state.maps).toHaveLength(1));
     expect(before).toContain('Karte laden');
   });
 });
 
-describe('Beispiel data-dss="map" und initAll', () => {
-  it('ein leerer Behälter wird zur Karte, Optionen aus data-dss-options', async () => {
+describe('Beispiel data-hoops="map" und initAll', () => {
+  it('ein leerer Behälter wird zur Karte, Optionen aus data-hoops-options', async () => {
     await run(code.initAllKarte);
-    const el = document.querySelector('[data-dss="map"]')!;
-    expect(el.querySelector('.dss-map')).not.toBeNull();
+    const el = document.querySelector('[data-hoops="map"]')!;
+    expect(el.querySelector('.hoops-map')).not.toBeNull();
     expect(el.querySelector('[role="region"]')!.getAttribute('aria-label')).toBe('Karte der Sporthalle Nordhain');
-    click(el.querySelector('.dss-map-load'));
+    click(el.querySelector('.hoops-map-load'));
     await vi.waitFor(() => expect(mock.state.maps).toHaveLength(1));
     expect(mock.lastLayer().url).toBe('/tiles/{z}/{x}/{y}.png');
   });
@@ -125,11 +125,11 @@ describe('Beispiele: importmap und window.L', () => {
 describe('Beispielseite ohne Build', () => {
   const page = read('stories/examples/karte-ohne-build/index.html');
   it('liegt in der Doku als dieselbe Datei', () => expect(code.ohneBuildSeite).toBe(page));
-  it('verweist nur auf Dateien, die das Paket und Leaflet liefern (/dss/ und /vendor/leaflet/)', () => {
+  it('verweist nur auf Dateien, die das Paket und Leaflet liefern (/hoops/ und /vendor/leaflet/)', () => {
     const refs = [...page.matchAll(/(?:href|src)="([^"]+)"|from '([^']+)'|import\('([^']+)'\)/g)].map((m) => m[1] ?? m[2] ?? m[3]).filter((r) => r.startsWith('/'));
     expect(refs.length).toBeGreaterThanOrEqual(6);
     for (const ref of refs) {
-      if (ref.startsWith('/dss/')) expect(existsSync(`${bundleDir}${ref.slice(5)}`), ref).toBe(true);
+      if (ref.startsWith('/hoops/')) expect(existsSync(`${bundleDir}${ref.slice('/hoops/'.length)}`), ref).toBe(true);
       else if (ref.startsWith('/vendor/leaflet/')) expect(existsSync(resolve(root, 'node_modules/leaflet/dist', ref.slice(16))), ref).toBe(true);
       else expect(ref, ref).toMatch(/^\/tiles\//);
     }
@@ -139,7 +139,7 @@ describe('Beispielseite ohne Build', () => {
     expect(page).not.toMatch(/https?:\/\//);
   });
   it('die Dateien des Kopier-Beispiels gibt es', () => {
-    const files = [...code.kopieren.matchAll(/(?:cp -r|cp)\s+(node_modules\/\S+)/g)].map((m) => m[1].replace('@bbv/dss-design-system/dist/vanilla/', ''));
+    const files = [...code.kopieren.matchAll(/(?:cp -r|cp)\s+(node_modules\/\S+)/g)].map((m) => m[1].replace('@hoopsfoundry/ui/dist/vanilla/', ''));
     expect(files.length).toBeGreaterThanOrEqual(6);
     for (const file of files) {
       if (file.startsWith('node_modules/leaflet/')) expect(existsSync(resolve(root, file)), file).toBe(true);
@@ -151,9 +151,9 @@ describe('Beispielseite ohne Build', () => {
 describe('Kopierliste gegen die statischen Importe der Bündel', () => {
   const copied = new Set([...code.kopieren.matchAll(/^cp (?:-r )?node_modules\/\S*\/(\S+)\s/gm)].map((m) => m[1]));
   it('jede statisch importierte Datei der kopierten Bündel steht in der Liste (kein 404 beim Laden)', () => {
-    const bundles = ['dss-map.min.js', 'dss-render.min.js'].filter((name) => copied.has(name));
-    expect(bundles).toEqual(['dss-map.min.js', 'dss-render.min.js']);
-    for (const name of ['dss-map', 'dss-render', 'dss'].flatMap((n) => [`${n}.js`, `${n}.min.js`])) {
+    const bundles = ['hoops-map.min.js', 'hoops-render.min.js'].filter((name) => copied.has(name));
+    expect(bundles).toEqual(['hoops-map.min.js', 'hoops-render.min.js']);
+    for (const name of ['hoops-map', 'hoops-render', 'hoops'].flatMap((n) => [`${n}.js`, `${n}.min.js`])) {
       const text = readFileSync(`${bundleDir}${name}`, 'utf8');
       const imports = [...text.matchAll(/(?:^|[;}\s])(?:import|export)\s*(?:[^'";]*?\s*from\s*)?["'](\.{1,2}\/[^"']+)["']/g)].map((m) => m[1].replace(/^\.\//, ''));
       for (const file of imports) {
@@ -161,27 +161,27 @@ describe('Kopierliste gegen die statischen Importe der Bündel', () => {
         if (bundles.includes(name)) expect(copied.has(file), `${name} importiert ${file}, die Kopierliste nennt sie nicht`).toBe(true);
       }
     }
-    expect(copied.has('dss.min.js')).toBe(true);
+    expect(copied.has('hoops.min.js')).toBe(true);
   });
   it('die Dokumentation nennt die Abhängigkeit (Map und Foundation/Vanilla)', () => {
-    expect(read('stories/Map.mdx')).toContain('importiert statisch `./dss.min.js`');
-    expect(read('stories/Foundation/Vanilla.mdx')).toContain('importiert `dss-render.min.js` statisch `./dss.min.js`');
+    expect(read('stories/Map.mdx')).toContain('importiert statisch `./hoops.min.js`');
+    expect(read('stories/Foundation/Vanilla.mdx')).toContain('importiert `hoops-render.min.js` statisch `./hoops.min.js`');
   });
 });
 
 describe('Beispiel Hallenkarte vom Server', () => {
-  it('renderVenueCard mit init: true trägt data-dss und Optionen; initAll mit initMapBlock macht sie lebendig', async () => {
+  it('renderVenueCard mit init: true trägt data-hoops und Optionen; initAll mit initMapBlock macht sie lebendig', async () => {
     expect(hallenKarteServer).toContain('{ init: true }');
     expect(hallenKarteServer).toContain("initAll(document, { map: { start: initMapBlock");
     const html = renderVenueCard({ name: 'Sporthalle Nordhain', lat: 49.3, lng: 7.9, tileUrl: '/tiles/{z}/{x}/{y}.png' } as never, { init: true });
-    expect(html).toContain('data-dss="map"');
-    expect(html).toContain('data-dss-options="');
+    expect(html).toContain('data-hoops="map"');
+    expect(html).toContain('data-hoops-options="');
   });
 });
 
 describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
   it('README, CHANGELOG, Einführung und Foundation/Vanilla nennen die Karte ohne Framework', () => {
-    expect(read('README.md')).toContain('dss-map.js');
+    expect(read('README.md')).toContain('hoops-map.js');
     expect(read('README.md')).toContain('loadLeaflet');
     expect(read('CHANGELOG.md')).toContain('Vanilla-Paket V2b');
     expect(read('stories/Introduction.mdx')).toContain('mountMap');
@@ -193,7 +193,7 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
   it('arc42: ADR-003, ADR-005 und ADR-007 nennen die Vanilla-Karte, das Karten-Bündel und seine Größen in KiB; keine Planstände', () => {
     const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
     expect(adr).toContain('Vanilla-Fassung: `js/map-vanilla.js`');
-    expect(adr).toContain('`dss-map.js` (Karte)');
+    expect(adr).toContain('`hoops-map.js` (Karte)');
     expect(adr).toContain('Karte 24 KiB min und 10 KiB gzip');
     expect(read('docs/architecture/sections/05-building-block-view.adoc')).toContain('`js/map-vanilla.js`');
     expect(read('docs/architecture/sections/06-runtime-view.adoc')).toContain('`initMap` und `mountMap`');
@@ -204,7 +204,7 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
   });
   it('die Zahlen der Doku stimmen mit dem Bündel überein (KiB)', () => {
     const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
-    expect(adr).toMatch(/gemessen 21,7 und 8,9/);
+    expect(adr).toMatch(/gemessen 21,8 und 8,9/);
     expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 24, gzipKB: 10 };');
   });
 });

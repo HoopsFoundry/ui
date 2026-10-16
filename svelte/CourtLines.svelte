@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS CourtLines · Svelte 5
+   * HoopsFoundry UI CourtLines · Svelte 5
    * --------------------------------------------------------------
    * Dezente Spielfeldlinien (FIBA 28 × 15 m) als Seitenhintergrund, rein dekorativ.
    * Nutzt nur Klassen aus css/components.css (SVG-Maske aus css/courtlines/).
@@ -12,6 +12,6 @@
   let { position = 'fixed' }: { position?: 'fixed' | 'absolute' } = $props();
 </script>
 
-<div class="dss-courtbg" class:dss-courtbg--absolute={position === 'absolute'} aria-hidden="true">
-  <div class="dss-courtlines"></div>
+<div class="hoops-courtbg" class:hoops-courtbg--absolute={position === 'absolute'} aria-hidden="true">
+  <div class="hoops-courtlines"></div>
 </div>

@@ -38,7 +38,7 @@
 {#if example === 'demo'}
   <div class="demo" use:demo>
     <p class="row">
-      <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" hidden></button>
+      <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button>
       <span>Hell, dunkel oder System: Klicke auf den Knopf.</span>
     </p>
     <div class="card">
@@ -59,42 +59,42 @@
       {#each cols as name, i (name)}
         <div class="cell">
           <div class="cap">{name}</div>
-          <div class="holder" use:cell={{ pressed: name === 'Gedrückt', cls: stateClass[name] }}><button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" hidden></button></div>
+          <div class="holder" use:cell={{ pressed: name === 'Gedrückt', cls: stateClass[name] }}><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button></div>
         </div>
       {/each}
     </div>
   </div>
 {:else if example === 'handy'}
   <div class="narrow demo" use:demo>
-    <p class="row"><button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" hidden></button><span>Dunkelmodus</span></p>
+    <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>Dunkelmodus</span></p>
     <div class="card"><strong>TSV Nordhain 1920</strong><p>Platz 3 von 12 in der Bayernliga Süd.</p></div>
     <dl class="report"><div><dt>Modus</dt><dd>{report.mode}</dd></div><div><dt>aria-pressed</dt><dd>{report.pressed}</dd></div></dl>
   </div>
 {:else if example === 'handy-dunkel'}
   <div class="narrow demo" use:demo>
-    <p class="row"><button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" hidden></button><span>Dunkelmodus</span></p>
+    <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>Dunkelmodus</span></p>
     <div class="card"><strong>Lindenberg Hawks</strong><p>Nächstes Spiel: Samstag, 19:30 Uhr.</p></div>
     <dl class="report"><div><dt>Zustand</dt><dd>{report.state}</dd></div><div><dt>aria-pressed</dt><dd>{report.pressed}</dd></div></dl>
   </div>
 {:else if example === 'do-name'}
   <p class="row">
-    <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon dss-theme-toggle" aria-label="Dunkelmodus" aria-pressed="true" data-theme-state="dark">
-      <svg class="dss-theme-icon dss-theme-icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
-      <svg class="dss-theme-icon dss-theme-icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
+    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon hoops-theme-toggle" aria-label="Dunkelmodus" aria-pressed="true" data-theme-state="dark">
+      <svg class="hoops-theme-icon hoops-theme-icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
+      <svg class="hoops-theme-icon hoops-theme-icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
     </button>
     <span>Name „Dunkelmodus“, <code>aria-pressed="true"</code></span>
   </p>
 {:else if example === 'dont-name'}
   <!-- Falsch: der Name wechselt mit dem Zustand; ein Screenreader liest „Zum Dark-Modus wechseln“ und wer ihn schon benutzt hat, erfährt nicht, was jetzt gilt -->
   <p class="row">
-    <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" aria-label="Zum Light-Modus wechseln">
+    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" aria-label="Zum Light-Modus wechseln">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
     </button>
     <span>Name „Zum Light-Modus wechseln“, kein <code>aria-pressed</code></span>
   </p>
 {:else if example === 'do-symbol'}
   <p class="row">
-    <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" aria-label="Dunkelmodus" aria-pressed="false">
+    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" aria-label="Dunkelmodus" aria-pressed="false">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
     </button>
     <span>Symbol mit Namen</span>
@@ -102,7 +102,7 @@
 {:else if example === 'dont-symbol'}
   <!-- Falsch: nur ein Symbol, kein Name; Sprachsteuerung und Screenreader können den Knopf nicht ansprechen -->
   <p class="row">
-    <button type="button" class="dss-btn dss-btn--secondary dss-btn--icon">
+    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
     </button>
     <span>Symbol ohne Namen</span>

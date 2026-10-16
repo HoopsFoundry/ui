@@ -19,9 +19,9 @@
   // Vanilla-Beispiel: dasselbe Markup wie im Code-Beispiel, gestartet mit initAll
   function vanillaPage(node: HTMLElement) {
     node.replaceChildren(document.createRange().createContextualFragment(pageMarkup.replace('<main ', '<div ').replace('</main>', '</div>').replace(/<h1>[^<]*<\/h1>/, '<h3>Verein Nordhain</h3>').replace(/<h2/g, '<h3').replace(/<\/h2>/g, '</h3>')));
-    const root = node.querySelector<HTMLElement>('[data-dss="pagenav"]');
+    const root = node.querySelector<HTMLElement>('[data-hoops="pagenav"]');
     // Die Beispiel-Seite benutzt h3 statt h2; die Auswahl ist eine Option (am Element als JSON)
-    root?.setAttribute('data-dss-options', JSON.stringify({ label: 'Auf dieser Seite: Vanilla-Beispiel', selector: 'h3:not(:first-child), [data-pagenav]' }));
+    root?.setAttribute('data-hoops-options', JSON.stringify({ label: 'Auf dieser Seite: Vanilla-Beispiel', selector: 'h3:not(:first-child), [data-pagenav]' }));
     const handle = initAll(node, { only: ['pagenav'] });
     return { destroy: () => handle.destroy() };
   }
@@ -47,7 +47,7 @@
     <h3>Statistik</h3><p>Im Schnitt 82,4 Punkte pro Spiel.</p>
   </div>
 {:else if example === 'bereiche'}
-  <div class="page" use:nav={{ selector: 'h3:not(.dss-acc-title), h4', label: 'Auf dieser Seite: Bereiche', syncHash: false }}>
+  <div class="page" use:nav={{ selector: 'h3:not(.hoops-acc-title), h4', label: 'Auf dieser Seite: Bereiche', syncHash: false }}>
     <h3>Übersicht</h3><p>Die Seite hat einen offenen Abschnitt und zwei Bereiche, die geschlossen sind.</p>
     <Accordion syncHash={false}>
       <AccordionItem id="pn-kader" title="Kader">
@@ -64,7 +64,7 @@
   <div class="page" use:nav={{ selector: 'h3', label: 'Auf dieser Seite: Nachladen' }} bind:this={loadHost}>
     <h3>Erster Abschnitt</h3><p>Mit zwei Abschnitten erscheint noch keine Navigation (mindestens drei).</p>
     <h3>Zweiter Abschnitt</h3><p>Ein Klick auf den Knopf fügt Abschnitte hinzu.</p>
-    <p><button type="button" class="dss-btn dss-btn--secondary" onclick={() => loadHost && addSection(loadHost)}>Abschnitt nachladen</button></p>
+    <p><button type="button" class="hoops-btn hoops-btn--secondary" onclick={() => loadHost && addSection(loadHost)}>Abschnitt nachladen</button></p>
   </div>
 {:else if example === 'optionen'}
   <div class="page" use:nav={{ selector: 'h3, [data-pagenav]', label: 'Auf dieser Seite: Optionen' }}>
@@ -83,7 +83,7 @@
     <h3>Statistik der laufenden Saison</h3><p>Im Schnitt 82,4 Punkte.</p>
   </div>
 {:else if example === 'handy-dunkel'}
-  <div class="narrow page" use:nav={{ selector: 'h3:not(.dss-acc-title), h4', label: 'Auf dieser Seite: Handy dunkel', syncHash: false }}>
+  <div class="narrow page" use:nav={{ selector: 'h3:not(.hoops-acc-title), h4', label: 'Auf dieser Seite: Handy dunkel', syncHash: false }}>
     <h3>Übersicht</h3><p>Zwei geschlossene Bereiche.</p>
     <Accordion syncHash={false}>
       <AccordionItem id="pnd-kader" title="Kader"><h4>Torhüter</h4><p>Zwei Torhüter.</p><h4>Guards</h4><p>Vier Guards.</p></AccordionItem>
@@ -106,14 +106,14 @@
   </div>
 {:else if example === 'do-namen'}
   <div class="narrow">
-    <nav class="dss-pagenav" aria-labelledby="pn-do-1"><p class="dss-eyebrow" id="pn-do-1">Im Bereich Verein</p><ul class="dss-pagenav-list"><li><a class="dss-pagenav-link" href="#pn-do-a">Tabelle</a></li><li><a class="dss-pagenav-link" href="#pn-do-b">Kader</a></li></ul></nav>
-    <nav class="dss-pagenav" aria-labelledby="pn-do-2"><p class="dss-eyebrow" id="pn-do-2">Im Bereich Mannschaft</p><ul class="dss-pagenav-list"><li><a class="dss-pagenav-link" href="#pn-do-c">Torhüter</a></li><li><a class="dss-pagenav-link" href="#pn-do-d">Guards</a></li></ul></nav>
+    <nav class="hoops-pagenav" aria-labelledby="pn-do-1"><p class="hoops-eyebrow" id="pn-do-1">Im Bereich Verein</p><ul class="hoops-pagenav-list"><li><a class="hoops-pagenav-link" href="#pn-do-a">Tabelle</a></li><li><a class="hoops-pagenav-link" href="#pn-do-b">Kader</a></li></ul></nav>
+    <nav class="hoops-pagenav" aria-labelledby="pn-do-2"><p class="hoops-eyebrow" id="pn-do-2">Im Bereich Mannschaft</p><ul class="hoops-pagenav-list"><li><a class="hoops-pagenav-link" href="#pn-do-c">Torhüter</a></li><li><a class="hoops-pagenav-link" href="#pn-do-d">Guards</a></li></ul></nav>
   </div>
 {:else if example === 'dont-namen'}
   <!-- Falsch: zwei Navigationen mit demselben Namen; die Landmarken-Liste des Screenreaders zeigt zweimal „Auf dieser Seite“ (axe: landmark-unique) -->
   <div class="narrow">
-    <nav class="dss-pagenav" aria-labelledby="pn-dont-1"><p class="dss-eyebrow" id="pn-dont-1">Auf dieser Seite</p><ul class="dss-pagenav-list"><li><a class="dss-pagenav-link" href="#pn-dont-a">Tabelle</a></li><li><a class="dss-pagenav-link" href="#pn-dont-b">Kader</a></li></ul></nav>
-    <nav class="dss-pagenav" aria-labelledby="pn-dont-2"><p class="dss-eyebrow" id="pn-dont-2">Auf dieser Seite</p><ul class="dss-pagenav-list"><li><a class="dss-pagenav-link" href="#pn-dont-c">Torhüter</a></li><li><a class="dss-pagenav-link" href="#pn-dont-d">Guards</a></li></ul></nav>
+    <nav class="hoops-pagenav" aria-labelledby="pn-dont-1"><p class="hoops-eyebrow" id="pn-dont-1">Auf dieser Seite</p><ul class="hoops-pagenav-list"><li><a class="hoops-pagenav-link" href="#pn-dont-a">Tabelle</a></li><li><a class="hoops-pagenav-link" href="#pn-dont-b">Kader</a></li></ul></nav>
+    <nav class="hoops-pagenav" aria-labelledby="pn-dont-2"><p class="hoops-eyebrow" id="pn-dont-2">Auf dieser Seite</p><ul class="hoops-pagenav-list"><li><a class="hoops-pagenav-link" href="#pn-dont-c">Torhüter</a></li><li><a class="hoops-pagenav-link" href="#pn-dont-d">Guards</a></li></ul></nav>
   </div>
 {:else if example === 'do-ueberschrift'}
   <div class="narrow page" use:nav={{ selector: 'h3', label: 'Auf dieser Seite: Überschriften' }}>
@@ -132,8 +132,8 @@
   .page :global(h3:first-child) { margin-top: 0; }
   .page :global(h4) { margin: 12px 0 4px; font-size: var(--hoops-fs-body); }
   .page :global(p) { margin: 0 0 8px; font-size: var(--hoops-fs-body-md); color: var(--hoops-fg-soft); }
-  .page :global(.dss-pagenav) { margin: 0 0 14px; }
-  .page :global(.dss-acc-title) { font-size: var(--hoops-fs-body); }
+  .page :global(.hoops-pagenav) { margin: 0 0 14px; }
+  .page :global(.hoops-acc-title) { font-size: var(--hoops-fs-body); }
   .narrow { width: 100%; max-width: 380px; }
   .mehr { margin-top: 12px; padding: 8px 12px; border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-md); font-size: var(--hoops-fs-body-md); color: var(--hoops-fg); }
   .mehr summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; }

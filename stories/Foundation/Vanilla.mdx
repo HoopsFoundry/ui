@@ -12,48 +12,48 @@ import '../docs/blocks/blocks.css';
 
 # Vanilla
 
-Das Design System läuft auch ohne Svelte, React und Build-Schritt: ein Stylesheet, eine JavaScript-Datei, HTML mit `dss-*`-Klassen. Das passt für statische Seiten, zum Beispiel ein Portal auf GitHub Pages. Diese Seite zeigt, wie du das Paket einbindest, was `data-dss` startet, wie die Bausteine aufgebaut sind, was sie für die Sicherheit tun und wie du die Dateien in dein Projekt bekommst.
+Das Design System läuft auch ohne Svelte, React und Build-Schritt: ein Stylesheet, eine JavaScript-Datei, HTML mit `hoops-*`-Klassen. Das passt für statische Seiten, zum Beispiel ein Portal auf GitHub Pages. Diese Seite zeigt, wie du das Paket einbindest, was `data-hoops` startet, wie die Bausteine aufgebaut sind, was sie für die Sicherheit tun und wie du die Dateien in dein Projekt bekommst.
 
 ## Überblick
 
 Jeder Baustein mit Verhalten ist eine Funktion `initX(element, options)`, die vorhandenes HTML bedienbar macht und `{ destroy() }` zurückgibt. Es gibt sie in zwei Formen:
 
-- **Gebündelt:** `dss.js` (ES-Modul), `dss.min.js`, Quellkarten, `dss.d.ts` und `dss.css` (Tokens plus Komponenten) im Ordner `dist/vanilla` des Pakets (Export `@bbv/dss-design-system/vanilla`). Eine Datei, keine Abhängigkeiten.
-- **Einzelmodule:** `@bbv/dss-design-system/tabs.js`, `…/modal.js`, `…/pagenav.js`, `…/backtop.js`, `…/theme.js`, `…/accordion.js`, `…/vanilla-core.js` (`initAll`) mit Typen. Für Projekte mit eigenem Bundler.
-- **Markup aus Daten:** `dss-render.js` (und `dss-render.min.js`) im selben Ordner, Export `@bbv/dss-design-system/vanilla-render`; die Einzelmodule heißen `…/render.js` und `…/render/league-card.js` usw. (Abschnitt „Markup erzeugen“).
-- **Karte:** `dss-map.js` (und `dss-map.min.js`) im selben Ordner, Export `@bbv/dss-design-system/vanilla-map`; das Einzelmodul heißt `…/map-vanilla.js` (Abschnitt „Karte“). Leaflet gehört nicht dazu.
+- **Gebündelt:** `hoops.js` (ES-Modul), `hoops.min.js`, Quellkarten, `hoops.d.ts` und `hoops.css` (Tokens plus Komponenten) im Ordner `dist/vanilla` des Pakets (Export `@hoopsfoundry/ui/vanilla`). Eine Datei, keine Abhängigkeiten.
+- **Einzelmodule:** `@hoopsfoundry/ui/tabs.js`, `…/modal.js`, `…/pagenav.js`, `…/backtop.js`, `…/theme.js`, `…/accordion.js`, `…/vanilla-core.js` (`initAll`) mit Typen. Für Projekte mit eigenem Bundler.
+- **Markup aus Daten:** `hoops-render.js` (und `hoops-render.min.js`) im selben Ordner, Export `@hoopsfoundry/ui/vanilla-render`; die Einzelmodule heißen `…/render.js` und `…/render/league-card.js` usw. (Abschnitt „Markup erzeugen“).
+- **Karte:** `hoops-map.js` (und `hoops-map.min.js`) im selben Ordner, Export `@hoopsfoundry/ui/vanilla-map`; das Einzelmodul heißt `…/map-vanilla.js` (Abschnitt „Karte“). Leaflet gehört nicht dazu.
 
 Bausteine ohne Framework: [Accordion](?path=/docs/components-accordion--docs), [PageNav und Nach oben](?path=/docs/components-pagenav--docs), [Dunkelmodus-Umschalter](?path=/docs/foundation-dark-mode--docs), [Tabs](?path=/docs/components-tabs--docs) und [Modal](?path=/docs/components-modal--docs). Die Karte ([Map](?path=/docs/components-map--docs)) lädt Leaflet erst nach Einwilligung; `mountMap` und `initMap` aus dem Karten-Bündel bedienen sie ohne Framework, Leaflet liefert die Seite lokal aus (Abschnitt „Karte“).
 
 ## Einbindung ohne Build
 
-Kopiere `dist/vanilla` (und optional `fonts/`) in dein Projekt (Abschnitt „Kopieren ins Projekt“), binde das Stylesheet ein und rufe `initAll` einmal auf. ES-Module laufen nur über `http(s)`: eine Seite, die per Doppelklick als `file://` geöffnet wird, lädt `dss.js` nicht (der Browser blockiert Modul-Skripte von `file://`); nimm einen lokalen Server (`npx serve _site`). Eine vollständige Seite:
+Kopiere `dist/vanilla` (und optional `fonts/`) in dein Projekt (Abschnitt „Kopieren ins Projekt“), binde das Stylesheet ein und rufe `initAll` einmal auf. ES-Module laufen nur über `http(s)`: eine Seite, die per Doppelklick als `file://` geöffnet wird, lädt `hoops.js` nicht (der Browser blockiert Modul-Skripte von `file://`); nimm einen lokalen Server (`npx serve _site`). Eine vollständige Seite:
 
 <CodeBlock label="Eine Seite ohne Build" language="HTML" code={vanilla} />
 
-Die Seite aus diesem Beispiel im Kleinen, mit Tabs, Dialog und Accordion; alles läuft über `data-dss`:
+Die Seite aus diesem Beispiel im Kleinen, mit Tabs, Dialog und Accordion; alles läuft über `data-hoops`:
 
 <Canvas of={VanillaStories.Seite} />
 
-## data-dss: was initAll startet
+## data-hoops: was initAll startet
 
-`initAll(scope, options)` findet unterhalb von `scope` (Standard: das Dokument; ein passendes `scope` selbst zählt mit) jedes Element mit `data-dss` und startet den Baustein darauf. Es gibt sieben, die Karte braucht das Karten-Bündel (Abschnitt „Karte“):
+`initAll(scope, options)` findet unterhalb von `scope` (Standard: das Dokument; ein passendes `scope` selbst zählt mit) jedes Element mit `data-hoops` und startet den Baustein darauf. Es gibt sieben, die Karte braucht das Karten-Bündel (Abschnitt „Karte“):
 
 <DocTable
   label="Bausteine von initAll"
-  head={['data-dss', 'Element', 'Funktion', 'Seite']}
+  head={['data-hoops', 'Element', 'Funktion', 'Seite']}
   rows={[
-    ['accordion', <>die Gruppe <code>dss-acc</code> (ältere Schreibweise <code>data-dss-acc</code> gilt weiter)</>, 'initAccordion', 'Accordion'],
+    ['accordion', <>die Gruppe <code>hoops-acc</code> (ältere Schreibweise <code>data-hoops-acc</code> gilt weiter)</>, 'initAccordion', 'Accordion'],
     ['pagenav', <>der Bereich, dessen Überschriften die Navigation bilden</>, 'initPageNav', 'PageNav'],
     ['backtop', <>der Knopf selbst oder ein Container für ihn</>, 'initBackToTop', 'PageNav'],
     ['theme', <>ein <code>&lt;button&gt;</code></>, 'initTheme', 'Dark Mode'],
     ['tabs', <>die Leiste (<code>role="tablist"</code> oder <code>role="group"</code>)</>, 'initTabs', 'Tabs'],
     ['modal', <>das <code>&lt;dialog&gt;</code> oder das Element mit <code>hidden</code></>, 'initModal', 'Modal'],
-    ['map', <>ein leerer Behälter (wird zur Karte) oder Markup von <code>renderMap</code></>, 'initMapBlock (aus dss-map.js, über options.map.start)', 'Map'],
+    ['map', <>ein leerer Behälter (wird zur Karte) oder Markup von <code>renderMap</code></>, 'initMapBlock (aus hoops-map.js, über options.map.start)', 'Map'],
   ]}
 />
 
-Mehrere Elemente je Baustein sind der Normalfall: jede Leiste, jedes Modal und jedes Accordion der Seite wird einzeln gestartet. Optionen stehen für alle Elemente eines Bausteins in `initAll(document, { tabs: { … } })`, für ein Element als JSON in `data-dss-options` (das Element gewinnt); `only: ['tabs', 'modal']` startet nur diese. Der Rückgabewert hat `count` und `destroy()`.
+Mehrere Elemente je Baustein sind der Normalfall: jede Leiste, jedes Modal und jedes Accordion der Seite wird einzeln gestartet. Optionen stehen für alle Elemente eines Bausteins in `initAll(document, { tabs: { … } })`, für ein Element als JSON in `data-hoops-options` (das Element gewinnt); `only: ['tabs', 'modal']` startet nur diese. Der Rückgabewert hat `count` und `destroy()`.
 
 <CodeBlock label="Optionen und Einzelaufrufe" language="HTML und JavaScript" code={options} />
 
@@ -62,7 +62,7 @@ Mehrere Elemente je Baustein sind der Normalfall: jede Leiste, jedes Modal und j
 Alle Bausteine folgen derselben Regel (js/lifecycle.js):
 
 - **Nur `element` und seine Nachfahren:** kein globaler Zustand. Ausnahmen sind benannt: Das Modal sperrt das Scrollen von `<html>` und macht die Seite dahinter inert, solange es offen ist; der Dunkelmodus setzt ein Attribut auf `<html>`.
-- **Idempotent:** ein zweiter Aufruf für dasselbe Element baut die erste Fassung ab und ersetzt sie. Es gibt nie doppelte Listener oder doppelte Ereignisse, auch wenn zwei Kopien des Bündels (oder Bündel und Einzelmodul) auf der Seite laufen: die Kopien teilen sich ein Register unter `Symbol.for('dss.registry')`. Zwei Kopien bleiben trotzdem unnötig; lade eine.
+- **Idempotent:** ein zweiter Aufruf für dasselbe Element baut die erste Fassung ab und ersetzt sie. Es gibt nie doppelte Listener oder doppelte Ereignisse, auch wenn zwei Kopien des Bündels (oder Bündel und Einzelmodul) auf der Seite laufen: die Kopien teilen sich ein Register unter `Symbol.for('hoops.registry')`. Zwei Kopien bleiben trotzdem unnötig; lade eine.
 - **`destroy()`** entfernt Listener, Beobachter, Zeitgeber und alles, was der Baustein erzeugt hat, und stellt Attribute wieder her, die er geändert hat (ein Test vergleicht das Markup vor `initAll` und nach `destroy()`). Er ist mehrfach aufrufbar.
 - **Beim Import passiert nichts:** kein Auto-Start, kein Zugriff auf `window` oder `document`. Das Bündel lässt sich in Node laden (für Tests und Server), die Init-Funktionen tun dort nichts.
 - **Bewegung:** sanftes Scrollen und Höhenanimationen entfallen bei „Bewegung reduzieren“ und `data-motion="reduce"` auf `<html>`.
@@ -104,7 +104,7 @@ Das Ergebnis aus erfundenen Daten, jede Karte aus einem `mountX`-Aufruf:
 - **`update(props)`** ersetzt den Inhalt zu den neuen Eigenschaften. Der Fokus bleibt, wenn der Knoten wieder auftaucht (über seine `id`, sonst über seine Lage und Klasse); eine einklappbare Karte behält ihren Zustand offen/zu, solange `open` in den Eigenschaften gleich bleibt.
 - **`destroy()`** entfernt Listener und Markup und stellt den früheren Inhalt des Elements wieder her (ein serverseitig gerenderter Text bleibt so als Rückfall). Es ist mehrfach aufrufbar, `update` danach tut nichts.
 - **Idempotent:** ein zweites `mountX` auf demselben Element ersetzt das erste.
-- **`collapsible`:** `mountX` startet das Accordion-Verhalten (`initAccordion`) selbst. Steht das Element schon in einer Gruppe (`dss-acc`), bedient diese den Rahmen; steht es im Panel eines Bereichs dieser Gruppe, bekommt der Rahmen eine eigene Gruppe (ein einzelner Rahmen im Panel zählt nicht zur äußeren Gruppe).
+- **`collapsible`:** `mountX` startet das Accordion-Verhalten (`initAccordion`) selbst. Steht das Element schon in einer Gruppe (`hoops-acc`), bedient diese den Rahmen; steht es im Panel eines Bereichs dieser Gruppe, bekommt der Rahmen eine eigene Gruppe (ein einzelner Rahmen im Panel zählt nicht zur äußeren Gruppe).
 - **Scrollposition:** `update` erhält die Scrollposition der Tabellenbereiche; bei gleichem Markup ändert es nichts.
 - **ids:** ohne `id` entsteht die Kennung des Rahmens aus einem Hash der Eingabe (gleiche Eingabe, gleiche Kennung); zwei Bausteine mit genau gleichen Eigenschaften auf einer Seite brauchen verschiedene `id`-Werte oder `options.uid` (von `options.uid` bleiben nur Buchstaben, Ziffern, `_` und `-`). `mountX` vergibt je Element eine eigene, seitenweit eindeutige Kennung.
 
@@ -124,34 +124,34 @@ Die Render-Funktionen brauchen kein DOM: der Import hat keine Nebenwirkung, `mou
 
 ### Bündel und Größe
 
-Das Render-Bündel ist eine eigene Datei: `dss-render.js` importiert das Accordion-Verhalten aus `dss.js` im selben Ordner (`dss-render.min.js` aus `dss.min.js`), damit es genau eine Kopie gibt. Es hat ein eigenes Budget, getrennt vom Kern:
+Das Render-Bündel ist eine eigene Datei: `hoops-render.js` importiert das Accordion-Verhalten aus `hoops.js` im selben Ordner (`hoops-render.min.js` aus `hoops.min.js`), damit es genau eine Kopie gibt. Es hat ein eigenes Budget, getrennt vom Kern:
 
 <DocTable
   label="Größen des Render-Bündels"
   head={['Datei', 'Größe', 'Budget']}
   rows={[
-    ['dss-render.js', `${(renderSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte'],
-    ['dss-render.min.js', `${(renderSizes.min / 1024).toFixed(1)} KiB`, `höchstens ${renderBudget.minKB} KiB`],
-    ['dss-render.min.js (gzip)', `${(renderSizes.gzip / 1024).toFixed(1)} KiB`, `höchstens ${renderBudget.gzipKB} KiB`],
+    ['hoops-render.js', `${(renderSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte'],
+    ['hoops-render.min.js', `${(renderSizes.min / 1024).toFixed(1)} KiB`, `höchstens ${renderBudget.minKB} KiB`],
+    ['hoops-render.min.js (gzip)', `${(renderSizes.gzip / 1024).toFixed(1)} KiB`, `höchstens ${renderBudget.gzipKB} KiB`],
   ]}
 />
 
-Wer nur den Kern braucht, lädt nur `dss.js`; wer Markup erzeugt, lädt beide aus derselben Version. `VERSION` gibt es in beiden Bündeln (und `--hoops-version` in `dss.css`); sie müssen übereinstimmen, `checkVersion()` des Kerns prüft nur `dss.js` gegen `dss.css`, ein Vergleich mit `VERSION` aus `dss-render.js` gehört in dein Start-Skript. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code>, <code>VERSION</code> und die `render…`/`mount…`-Paare der Tabelle.
+Wer nur den Kern braucht, lädt nur `hoops.js`; wer Markup erzeugt, lädt beide aus derselben Version. `VERSION` gibt es in beiden Bündeln (und `--hoops-version` in `hoops.css`); sie müssen übereinstimmen, `checkVersion()` des Kerns prüft nur `hoops.js` gegen `hoops.css`, ein Vergleich mit `VERSION` aus `hoops-render.js` gehört in dein Start-Skript. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code>, <code>VERSION</code> und die `render…`/`mount…`-Paare der Tabelle.
 
 ### Markup auf dem Handy · 390 px Breite
 
 Zwei eingebettete Seiten aus Daten: links Ligencard, Spielkarte und Kennzahlen (hell), rechts Teamkarte, Hallenkarte und Leerzustand (dunkel).
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">Markup erzeugen · hell</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">Markup erzeugen · hell</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen hell">
       <iframe title="Handy-Vorschau: Markup aus Daten hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-vanilla--markup-handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">Markup erzeugen · dunkel</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen dunkel">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">Markup erzeugen · dunkel</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen dunkel">
       <iframe title="Handy-Vorschau: Markup aus Daten dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:dbb;theme:Dark&id=foundation-vanilla--markup-handy-dunkel" loading="lazy" />
     </div>
   </div>
@@ -159,7 +159,7 @@ Zwei eingebettete Seiten aus Daten: links Ligencard, Spielkarte und Kennzahlen (
 
 ## Karte
 
-Die Karte ist ein eigenes Bündel, weil sie Leaflet anbindet und eigene Zustände hat: `dss-map.js` (`dss-map.min.js`, Quellkarte, `dss-map.d.ts`) im selben Ordner wie `dss.js`, Export `@bbv/dss-design-system/vanilla-map`. Es enthält **kein Leaflet**: die Seite liefert Leaflet aus dem eigenen Projekt aus, die Karte lädt es erst nach dem Klick auf „Karte laden“ (oder bei `load: 'auto'`). Vor dem Klick gibt es keinen Netzverkehr: keine Anfrage an den Kartendienst, kein Leaflet, kein Prefetch, keine Cookies, keinen Speicher.
+Die Karte ist ein eigenes Bündel, weil sie Leaflet anbindet und eigene Zustände hat: `hoops-map.js` (`hoops-map.min.js`, Quellkarte, `hoops-map.d.ts`) im selben Ordner wie `hoops.js`, Export `@hoopsfoundry/ui/vanilla-map`. Es enthält **kein Leaflet**: die Seite liefert Leaflet aus dem eigenen Projekt aus, die Karte lädt es erst nach dem Klick auf „Karte laden“ (oder bei `load: 'auto'`). Vor dem Klick gibt es keinen Netzverkehr: keine Anfrage an den Kartendienst, kein Leaflet, kein Prefetch, keine Cookies, keinen Speicher.
 
 <DocTable
   label="Exporte des Karten-Bündels"
@@ -168,8 +168,8 @@ Die Karte ist ein eigenes Bündel, weil sie Leaflet anbindet und eigene Zuständ
     [<code>renderMap</code>, 'Markup der Karte als Zeichenkette (wie MapView im Server-Rendering); läuft auch in Node'],
     [<code>mountMap</code>, 'renderMap einsetzen (Styles über das CSSOM) und die Karte starten; liefert update und destroy'],
     [<code>initMap</code>, 'vorhandenes Markup (renderMap, renderVenueCard) lebendig machen; liefert update und destroy'],
-    [<code>initMapBlock</code>, 'Anbindung für initAll (data-dss="map"): vorhandenes Markup per initMap, leerer Behälter per mountMap'],
-    [<code>VERSION</code>, 'Version des Pakets (muss zu dss.js und dss.css passen)'],
+    [<code>initMapBlock</code>, 'Anbindung für initAll (data-hoops="map"): vorhandenes Markup per initMap, leerer Behälter per mountMap'],
+    [<code>VERSION</code>, 'Version des Pakets (muss zu hoops.js und hoops.css passen)'],
   ]}
 />
 
@@ -179,20 +179,20 @@ Die Option `loadLeaflet` (Funktion, die ein Promise mit Leaflet liefert) ersetzt
   label="Größen des Karten-Bündels"
   head={['Datei', 'Größe', 'Budget']}
   rows={[
-    ['dss-map.js', `${(mapSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte'],
-    ['dss-map.min.js', `${(mapSizes.min / 1024).toFixed(1)} KiB`, `höchstens ${mapBudget.minKB} KiB`],
-    ['dss-map.min.js (gzip)', `${(mapSizes.gzip / 1024).toFixed(1)} KiB`, `höchstens ${mapBudget.gzipKB} KiB`],
+    ['hoops-map.js', `${(mapSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte'],
+    ['hoops-map.min.js', `${(mapSizes.min / 1024).toFixed(1)} KiB`, `höchstens ${mapBudget.minKB} KiB`],
+    ['hoops-map.min.js (gzip)', `${(mapSizes.gzip / 1024).toFixed(1)} KiB`, `höchstens ${mapBudget.gzipKB} KiB`],
   ]}
 />
 
-Das Bündel steht allein (es braucht weder `dss.js` noch `dss-render.js`); umgekehrt importiert `dss-render.min.js` statisch `./dss.min.js` (und `dss-render.js` das `./dss.js`), also gehören beide Dateien in denselben Ordner; `mountVenueCard` aus `dss-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
+Das Bündel steht allein (es braucht weder `hoops.js` noch `hoops-render.js`); umgekehrt importiert `hoops-render.min.js` statisch `./hoops.min.js` (und `hoops-render.js` das `./hoops.js`), also gehören beide Dateien in denselben Ordner; `mountVenueCard` aus `hoops-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
 
 ## Sicherheit
 
 - **Kein `innerHTML`:** Texte setzt das Paket als Text, Symbole als SVG per `createElementNS`, Markup per `createContextualFragment`. Ein Test prüft die Quelltexte und das Bündel auf `innerHTML`, `outerHTML`, `insertAdjacentHTML`, `document.write`, `eval` und `new Function`.
 - **Texte aus Daten** gehören in `textContent`. Wer HTML aus Daten baut, escaped jeden Wert und prüft Adressen mit `safeHref`, das nur `http(s)`, `mailto`, `tel`, relative Adressen und Anker durchlässt (nie `javascript:` oder `data:`).
-- **`data-dss-options` ist Daten, kein Code:** es wird als JSON gelesen; ungültiges JSON, Listen und Schlüssel wie `__proto__` fallen weg.
-- **Fremde ids und Anker** (Deep-Link, `data-dss-modal-open`) werden nur mit Elementen auf der Seite verglichen, nie als Selektor oder HTML ausgewertet.
+- **`data-hoops-options` ist Daten, kein Code:** es wird als JSON gelesen; ungültiges JSON, Listen und Schlüssel wie `__proto__` fallen weg.
+- **Fremde ids und Anker** (Deep-Link, `data-hoops-modal-open`) werden nur mit Elementen auf der Seite verglichen, nie als Selektor oder HTML ausgewertet.
 
 ### CSP und Boot-Skript
 
@@ -202,37 +202,37 @@ Das Bündel kommt mit `script-src 'self'` aus: eine Datei von der eigenen Domain
 
 ## Bundle-Größen
 
-Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, hält das Budget ein (`dss.min.js` höchstens {budget.minKB} KiB, gzip höchstens {budget.gzipKB} KiB) und prüft, dass diese Tabelle stimmt.
+Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, hält das Budget ein (`hoops.min.js` höchstens {budget.minKB} KiB, gzip höchstens {budget.gzipKB} KiB) und prüft, dass diese Tabelle stimmt.
 
 <DocTable
   label="Größen von dist/vanilla"
   head={['Datei', 'Größe', 'Hinweis']}
   rows={[
-    ['dss.js', `${(bundleSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte (dss.js.map)'],
-    ['dss.min.js', `${(bundleSizes.min / 1024).toFixed(1)} KiB`, 'minifiziert, mit Quellkarte (dss.min.js.map)'],
-    ['dss.min.js (gzip)', `${(bundleSizes.gzip / 1024).toFixed(1)} KiB`, 'so kommt es über das Netz, wenn der Server komprimiert'],
-    ['dss.css', `${(bundleSizes.css / 1024).toFixed(1)} KiB`, 'tokens.css plus components.css, enthält --hoops-version; courtlines/ liegt daneben'],
+    ['hoops.js', `${(bundleSizes.js / 1024).toFixed(1)} KiB`, 'ungebündelt lesbar, mit Quellkarte (hoops.js.map)'],
+    ['hoops.min.js', `${(bundleSizes.min / 1024).toFixed(1)} KiB`, 'minifiziert, mit Quellkarte (hoops.min.js.map)'],
+    ['hoops.min.js (gzip)', `${(bundleSizes.gzip / 1024).toFixed(1)} KiB`, 'so kommt es über das Netz, wenn der Server komprimiert'],
+    ['hoops.css', `${(bundleSizes.css / 1024).toFixed(1)} KiB`, 'tokens.css plus components.css, enthält --hoops-version; courtlines/ liegt daneben'],
   ]}
 />
 
-Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `dss-render.js`, die Karte in `dss-map.js`, jede mit eigenem Budget (siehe „Markup erzeugen“ und „Karte“); der Kern bleibt, was er war.
+Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `hoops-render.js`, die Karte in `hoops-map.js`, jede mit eigenem Budget (siehe „Markup erzeugen“ und „Karte“); der Kern bleibt, was er war.
 
 ## Kopieren ins Projekt
 
-Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript legt `dist/vanilla` nach `_site/dss` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript ist Teil des Produkts und kommt auf zwei Wegen zu dir:
+Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript legt `dist/vanilla` nach `_site/hoops` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript ist Teil des Produkts und kommt auf zwei Wegen zu dir:
 
-- **Als Release-Anhang `dss-sync.mjs`** (eine Datei ohne Abhängigkeiten, mit eigener Prüfsumme `dss-sync.mjs.sha256`): in das Projekt legen und mit `node dss-sync.mjs` aufrufen.
-- **Im npm-Paket** als Befehl `dss-sync` (`npx dss-sync …`; die Datei liegt als `scripts/portal-sync.mjs` im Paket, der Export heißt `@bbv/dss-design-system/portal-sync.mjs`). Derselbe Code, nur mit den Hilfen unter `scripts/lib/` statt gebündelt.
+- **Als Release-Anhang `hoops-sync.mjs`** (eine Datei ohne Abhängigkeiten, mit eigener Prüfsumme `hoops-sync.mjs.sha256`): in das Projekt legen und mit `node hoops-sync.mjs` aufrufen.
+- **Im npm-Paket** als Befehl `hoops-sync` (`npx hoops-sync …`; die Datei liegt als `scripts/portal-sync.mjs` im Paket, der Export heißt `@hoopsfoundry/ui/portal-sync.mjs`). Derselbe Code, nur mit den Hilfen unter `scripts/lib/` statt gebündelt.
 
-<CodeBlock label="dss-sync.mjs holen und prüfen" language="Shell" code={getSync} />
+<CodeBlock label="hoops-sync.mjs holen und prüfen" language="Shell" code={getSync} />
 
-Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `dss-sync.mjs` (mit `--from-dir` und mit `--from-release` gegen einen lokalen Server) mit Node {nodeVersions.join(', ')}; die Test-Suite läuft mit Node 22. Beim Start prüft das Skript die Version und meldet eine zu alte auf Deutsch. Es hat drei austauschbare Quellen für denselben Aufbau von `dist/vanilla`:
+Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `hoops-sync.mjs` (mit `--from-dir` und mit `--from-release` gegen einen lokalen Server) mit Node {nodeVersions.join(', ')}; die Test-Suite läuft mit Node 22. Beim Start prüft das Skript die Version und meldet eine zu alte auf Deutsch. Es hat drei austauschbare Quellen für denselben Aufbau von `dist/vanilla`:
 
 <DocTable
-  label="Quellen von dss-sync"
+  label="Quellen von hoops-sync"
   head={['Aufruf', 'Quelle', 'Wann']}
   rows={[
-    [<code>--from-release 0.9.0</code>, <>Release-Anhang <code>dss-vanilla-0.9.0.tgz</code> auf GitHub, geprüft gegen <code>.sha256</code></>, 'bis Version 1.0 (Entscheidung zur Auslieferung)'],
+    [<code>--from-release 0.10.0</code>, <>Release-Anhang <code>hoops-ui-0.10.0.tgz</code> auf GitHub, geprüft gegen <code>.sha256</code></>, 'bis Version 1.0 (Entscheidung zur Auslieferung)'],
     [<code>--from-package</code>, <>das installierte Paket in <code>node_modules</code></>, 'ab Version 1.0 über npm; schon jetzt für Projekte mit eigenem Paketlauf'],
     [<code>--from-dir pfad</code>, 'ein entpackter Release-Ordner oder ein Paketordner', 'offline, in der Pipeline, nach manuellem Download'],
   ]}
@@ -240,13 +240,13 @@ Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `dss-
 
 <CodeBlock label="portal-sync.mjs (Quelltext im Paket)" language="JavaScript" code={syncSource} />
 
-**Das Zielverzeichnis gehört dem Paket:** das Skript ersetzt `_site/dss` bei jedem Lauf vollständig. Es holt und prüft die Quelle zuerst vollständig, baut dann in einem Nachbarordner, verschiebt das alte Ziel nach `<ziel>.old-<pid>`, benennt das neue um und löscht das alte; scheitert das Einsetzen, kommt das alte Ziel zurück, und temporäre Ordner verschwinden in jedem Fall. Eine Sperrdatei `.dss-sync.lock` im Elternordner verhindert, dass zwei Läufe gleichzeitig arbeiten (der zweite bricht mit einem Hinweis ab; eine Sperre eines nicht mehr laufenden Prozesses gilt als verwaist). Das Skript schreibt die Marker-Datei `.dss-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`, Schalter `--leaflet` verlangt es). Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `dss.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
+**Das Zielverzeichnis gehört dem Paket:** das Skript ersetzt `_site/hoops` bei jedem Lauf vollständig. Es holt und prüft die Quelle zuerst vollständig, baut dann in einem Nachbarordner, verschiebt das alte Ziel nach `<ziel>.old-<pid>`, benennt das neue um und löscht das alte; scheitert das Einsetzen, kommt das alte Ziel zurück, und temporäre Ordner verschwinden in jedem Fall. Eine Sperrdatei `.hoops-sync.lock` im Elternordner verhindert, dass zwei Läufe gleichzeitig arbeiten (der zweite bricht mit einem Hinweis ab; eine Sperre eines nicht mehr laufenden Prozesses gilt als verwaist). Das Skript schreibt die Marker-Datei `.hoops-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`, Schalter `--leaflet` verlangt es). Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `hoops.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
 
 **Netzwerk:** `--from-release` lädt nur über https (http nur an Loopback, sonst mit `--allow-insecure-http`). Weiterleitungen folgt es nur auf denselben Host über https (für github.com zusätzlich auf `*.githubusercontent.com`, wohin GitHub die Anhänge umleitet); weitere Hosts gibst du mit `--allow-redirect-host` frei, nie führt eine Weiterleitung von https nach http. Die Antwort wird als Strom gezählt und ab 32 MiB abgebrochen (auch ohne `Content-Length`), nach 10 s ohne Daten oder 30 s insgesamt gilt der Download als gescheitert. Systemfehler (Datei fehlt, keine Rechte, kein Speicherplatz …) erscheinen auf Deutsch ohne Stack; `--debug` zeigt ihn.
 
 ## Einbinden aus dem Release
 
-Jedes Release hat sechs Anhänge: den Tarball `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball, bequem für `sha256sum -c`), `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Hinweis zu Leaflet, das Hilfsskript) sowie `dss-sync.mjs` und `dss-sync.mjs.sha256`. Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `dss.css` dieselbe Version tragen und jedes Bündel sein Größenbudget einhält (sonst bricht es ab). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 und Zeitstempel 0 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist deshalb die veröffentlichte `.sha256`. Das Skript schreibt nach `release/` (nicht im Git; ein vorhandenes Ziel wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.dss-release` trägt) und braucht weder Netz noch Git-Schreibrechte.
+Jedes Release hat sechs Anhänge: den Tarball `hoops-ui-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `hoops-ui-<version>/`), `hoops-ui-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball), `hoops-ui-<version>.tgz.sha256` (nur der Tarball, bequem für `sha256sum -c`), `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Hinweis zu Leaflet, das Hilfsskript) sowie `hoops-sync.mjs` und `hoops-sync.mjs.sha256`. Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `hoops.css` dieselbe Version tragen und jedes Bündel sein Größenbudget einhält (sonst bricht es ab). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 und Zeitstempel 0 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist deshalb die veröffentlichte `.sha256`. Das Skript schreibt nach `release/` (nicht im Git; ein vorhandenes Ziel wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.hoops-release` trägt) und braucht weder Netz noch Git-Schreibrechte.
 
 <CodeBlock label="Holen, prüfen, einsetzen" language="Shell" code={releaseSync} />
 
@@ -254,15 +254,15 @@ Ohne das Skript prüfst du von Hand:
 
 <CodeBlock label="Prüfsumme von Hand" language="Shell" code={manualCheck} />
 
-Der Tarball enthält nur das Bündel; Leaflet gehört nicht dazu (`manifest.json` nennt den Bereich `^1.9.0` aus den Peer-Abhängigkeiten, die Karte braucht es nur nach dem Klick). Eine komplette Seite aus genau diesen Dateien steht im Repository unter `stories/examples/portal-seite/` (Vereinsseite `index.html`, Teamseite `team.html`, Daten in `data.json`): Seitenkopf mit Theme-Umschalter, Seitennavigation, Ligakarten, Teamkarten, Spielplan mit Tabs, Hallenkarte mit Karte, einklappbare Tabellen, Dialog „Fehler melden“ und Nach-oben; alle Bausteine entstehen aus den Daten per `mountX`, Tabs und Dialog aus den kleinen Hilfen am Anfang von `portal.js`. Die Seite benutzt **relative Pfade** (`dss/dss.css`, `./dss/dss.min.js`): auf einer GitHub-Pages-Projektseite unter `/<repo>/` würde ein Pfad mit führendem `/` ins Leere zeigen (die Prüfung lädt die Seite deshalb auch unter `/projekt/`). Ohne JavaScript zeigt sie einen Hinweis (`noscript`), der Meldeknopf und der Theme-Umschalter bleiben verborgen (das Attribut `hidden` muss gegen `display` aus Klassen gewinnen: `[hidden] { display: none !important; }`), und Sprunglink und Menü tragen den gestrichelten Fokusring aus den `--hoops-ring-*`-Tokens.
+Der Tarball enthält nur das Bündel; Leaflet gehört nicht dazu (`manifest.json` nennt den Bereich `^1.9.0` aus den Peer-Abhängigkeiten, die Karte braucht es nur nach dem Klick). Eine komplette Seite aus genau diesen Dateien steht im Repository unter `stories/examples/portal-seite/` (Vereinsseite `index.html`, Teamseite `team.html`, Daten in `data.json`): Seitenkopf mit Theme-Umschalter, Seitennavigation, Ligakarten, Teamkarten, Spielplan mit Tabs, Hallenkarte mit Karte, einklappbare Tabellen, Dialog „Fehler melden“ und Nach-oben; alle Bausteine entstehen aus den Daten per `mountX`, Tabs und Dialog aus den kleinen Hilfen am Anfang von `portal.js`. Die Seite benutzt **relative Pfade** (`hoops/hoops.css`, `./hoops/hoops.min.js`): auf einer GitHub-Pages-Projektseite unter `/<repo>/` würde ein Pfad mit führendem `/` ins Leere zeigen (die Prüfung lädt die Seite deshalb auch unter `/projekt/`). Ohne JavaScript zeigt sie einen Hinweis (`noscript`), der Meldeknopf und der Theme-Umschalter bleiben verborgen (das Attribut `hidden` muss gegen `display` aus Klassen gewinnen: `[hidden] { display: none !important; }`), und Sprunglink und Menü tragen den gestrichelten Fokusring aus den `--hoops-ring-*`-Tokens.
 
 <CodeBlock label="portal.js (Beispiel-Portalseite)" language="JavaScript" code={portalSource} />
 
 ## Aktualisieren
 
-1. **Neue Version holen:** `node dss-sync.mjs --from-release <version>`. Das Skript bricht bei jeder Abweichung ab (Prüfsumme des Tarballs oder einer Datei, falsche Version in `version.json` oder im Ordnernamen, unzulässige Pfade im Archiv, Verknüpfungen, doppelte Einträge, 404, abgebrochener Download); dann ist `_site/dss` unverändert.
-2. **Versionen abgleichen:** `dss.js`, `dss-render.js`, `dss-map.js` und `dss.css` müssen aus derselben Version stammen. Die Beispielseite setzt `data-dss-versions` auf `<html>` (die gemeinsame Version oder die Abweichung) und warnt in der Konsole; in eigenen Seiten vergleichst du `VERSION` aus den drei Bündeln mit `checkVersion().css`.
-3. **Browser-Cache:** statische Hosts liefern `dss.css` und `dss.js` oft mit langem Cache; hänge die Version an die Adresse (`/dss/dss.min.js?v=0.10.0`) oder lege jede Version in einen eigenen Ordner.
+1. **Neue Version holen:** `node hoops-sync.mjs --from-release <version>`. Das Skript bricht bei jeder Abweichung ab (Prüfsumme des Tarballs oder einer Datei, falsche Version in `version.json` oder im Ordnernamen, unzulässige Pfade im Archiv, Verknüpfungen, doppelte Einträge, 404, abgebrochener Download); dann ist `_site/hoops` unverändert.
+2. **Versionen abgleichen:** `hoops.js`, `hoops-render.js`, `hoops-map.js` und `hoops.css` müssen aus derselben Version stammen. Die Beispielseite setzt `data-hoops-versions` auf `<html>` (die gemeinsame Version oder die Abweichung) und warnt in der Konsole; in eigenen Seiten vergleichst du `VERSION` aus den drei Bündeln mit `checkVersion().css`.
+3. **Browser-Cache:** statische Hosts liefern `hoops.css` und `hoops.js` oft mit langem Cache; hänge die Version an die Adresse (`/hoops/hoops.min.js?v=0.10.0`) oder lege jede Version in einen eigenen Ordner.
 4. **Rollback:** dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt, es bleiben keine Dateien der neueren Version liegen.
 
 <CodeBlock label="Aktualisieren und Zurückrollen" language="Shell" code={updateFlow} />
@@ -271,7 +271,7 @@ Der Release-Workflow `.github/workflows/release-vanilla.yml` führt bei einem Ta
 
 ## Kompatibilität
 
-Die Bündel sind ES-Module mit Ziel `es2020`. Die Beispiel-Portalseite läuft in dieser Prüfung (`node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox`) gegen strenge Content-Security-Policy, über den echten Weg Release → `dss-sync.mjs --from-release`:
+Die Bündel sind ES-Module mit Ziel `es2020`. Die Beispiel-Portalseite läuft in dieser Prüfung (`node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox`) gegen strenge Content-Security-Policy, über den echten Weg Release → `hoops-sync.mjs --from-release`:
 
 <DocTable
   label="Ergebnis der Browser-Prüfung"
@@ -281,34 +281,34 @@ Die Bündel sind ES-Module mit Ziel `es2020`. Die Beispiel-Portalseite läuft in
 
 Geprüft werden je Browser: keine Konsolen- und Seitenfehler, keine fremden Anfragen und kein Leaflet vor dem Klick, keine Verletzung der CSP (Karte und Kacheln eingeschlossen), Versionsabgleich, Tab-Reihenfolge und sichtbarer Fokusring, Dialog (Fokus, Escape, Fokus zurück), Accordion, Tabs, kein seitliches Scrollen bei 420, 360 und 320 px (WCAG 1.4.10), Betrieb unter einem Unterpfad, Verhalten ohne JavaScript, Theme-Umschalter mit Merken, Nach-oben, Seitennavigation und axe (WCAG 2.x A/AA/AAA, 2.2, best-practice, Kontrast AAA, Zielgröße). Firefox ist in dieser Umgebung nicht gelaufen. Versucht wurden Playwrights Firefox 155.0 (Neuinstallation, eigenes Profil und Temp-Ordner, ohne die Sandbox-Variablen von Mozilla) und der System-Firefox 138.0.1 mit `--remote-debugging-port`; der erste bricht mit „Could not find profile folder“ ab, der zweite öffnet den Port nicht. Die Ursache ist ungeklärt, ein Lauf auf einem anderen Rechner steht aus.
 
-Segmentierte Tabs (`dss-tabs--segmented`) brechen bei schmalem Raum um und sind höchstens so breit wie ihr Behälter; die Teamseite der Beispiel-Portalseite hatte bei 320 px einen seitlichen Überlauf von 34 px (`scrollWidth` 354 bei 320 px Breite).
+Segmentierte Tabs (`hoops-tabs--segmented`) brechen bei schmalem Raum um und sind höchstens so breit wie ihr Behälter; die Teamseite der Beispiel-Portalseite hatte bei 320 px einen seitlichen Überlauf von 34 px (`scrollWidth` 354 bei 320 px Breite).
 
 ## Wechsel auf npm ab 1.0
 
-Bis Version 1.0 liefert das Release die Dateien, ab 1.0 zusätzlich das npm-Paket `@bbv/dss-design-system` (dasselbe `dist/vanilla`, die Exporte `@bbv/dss-design-system/vanilla`, `…/vanilla-render` und `…/vanilla-map`). Für ein Portal ändert sich nur die Quelle des Skripts:
+Bis Version 1.0 liefert das Release die Dateien, ab 1.0 zusätzlich das npm-Paket `@hoopsfoundry/ui` (dasselbe `dist/vanilla`, die Exporte `@hoopsfoundry/ui/vanilla`, `…/vanilla-render` und `…/vanilla-map`). Für ein Portal ändert sich nur die Quelle des Skripts:
 
 <CodeBlock label="Von Release auf npm" language="Shell" code={npmSwitch} />
 
-Das Paket veröffentlicht `dist/`, `scripts/portal-sync.mjs` und `scripts/lib/` mit (`files` in der `package.json`) und bringt den Befehl `dss-sync` mit; `npm pack --dry-run` zeigt die Liste. Die Veröffentlichung selbst, das Setzen von Tag und Release gehören dem Maintainer und sind nicht Teil dieser Seite.
+Das Paket veröffentlicht `dist/`, `scripts/portal-sync.mjs` und `scripts/lib/` mit (`files` in der `package.json`) und bringt den Befehl `hoops-sync` mit; `npm pack --dry-run` zeigt die Liste. Die Veröffentlichung selbst, das Setzen von Tag und Release gehören dem Maintainer und sind nicht Teil dieser Seite.
 
 ## Versionsabgleich
 
-JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Projekt auseinanderlaufen (neues `dss.js`, altes `dss.css` im Browser-Cache). Das Bündel hilft beim Abgleich:
+JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Projekt auseinanderlaufen (neues `hoops.js`, altes `hoops.css` im Browser-Cache). Das Bündel hilft beim Abgleich:
 
-- `VERSION` ist die Version des Pakets, aus dem `dss.js` gebaut wurde.
-- `dss.css` setzt `--hoops-version` auf `:root`; `cssVersion()` liest sie, `checkVersion()` liefert `{ js, css, match }`. Fehlt `dss.css` (oder kommt es aus einem anderen Paket), ist `css` `null` und `match` falsch.
+- `VERSION` ist die Version des Pakets, aus dem `hoops.js` gebaut wurde.
+- `hoops.css` setzt `--hoops-version` auf `:root`; `cssVersion()` liest sie, `checkVersion()` liefert `{ js, css, match }`. Fehlt `hoops.css` (oder kommt es aus einem anderen Paket), ist `css` `null` und `match` falsch.
 - `checkVersion({ warn: true })` meldet eine Abweichung oder ein fehlendes Stylesheet zusätzlich mit `console.warn` (zum Beispiel einmal beim Start der Seite).
-- `dss-sync.mjs` schreibt zusätzlich `version.json` neben die Dateien, für einen Vergleich im Build oder in der Pipeline.
+- `hoops-sync.mjs` schreibt zusätzlich `version.json` neben die Dateien, für einen Vergleich im Build oder in der Pipeline.
 
 ## Alle Exporte
 
-`@bbv/dss-design-system/vanilla` (die Namen sind die dokumentierte Liste; ein Test vergleicht sie mit dem gebauten Bündel):
+`@hoopsfoundry/ui/vanilla` (die Namen sind die dokumentierte Liste; ein Test vergleicht sie mit dem gebauten Bündel):
 
 <DocTable
   label="Exporte des Bündels"
   head={['Gruppe', 'Namen']}
   rows={[
-    ['Start', <><code>initAll</code>, <code>DSS_BLOCKS</code>, <code>parseOptions</code>, <code>createHandle</code></>],
+    ['Start', <><code>initAll</code>, <code>HOOPS_BLOCKS</code>, <code>parseOptions</code>, <code>createHandle</code></>],
     ['Accordion', <><code>initAccordion</code>, <code>initAccordions</code>, <code>nextHeader</code>, <code>hashTarget</code>, <code>revealAround</code>, <code>scrollToElement</code></>],
     ['PageNav und Nach oben', <><code>initPageNav</code>, <code>slug</code>, <code>initBackToTop</code></>],
     ['Dunkelmodus', <><code>initTheme</code>, <code>themeBootScript</code>, <code>parseTheme</code>, <code>resolveTheme</code>, <code>nextTheme</code>, <code>readTheme</code>, <code>writeTheme</code>, <code>THEME_KEY</code>, <code>THEME_ATTRIBUTE</code>, <code>THEME_LABEL</code></>],
@@ -323,16 +323,16 @@ JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Proj
 
 Zwei eingebettete Seiten mit fester Breite: links das Register mit Tabs (hell), rechts ein Accordion (dunkel). Beide laufen mit `initAll`.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Vanilla · Register · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Register hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Vanilla · Register · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Register hell">
       <iframe title="Handy-Vorschau: Register mit Tabs hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-vanilla--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Vanilla · Accordion · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Accordion dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Vanilla · Accordion · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Accordion dunkel">
       <iframe title="Handy-Vorschau: Accordion dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=foundation-vanilla--handy-dunkel" loading="lazy" />
     </div>
   </div>

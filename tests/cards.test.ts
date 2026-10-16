@@ -28,26 +28,26 @@ describe('Karten, Spielkarte, Spielerkarte, EmptyState, Skeleton im Dunkelmodus'
   }
 
   it('Spielkarte: Zusatztext ohne opacity (3,0:1), Liga und Zusatz mit Textfarben', () => {
-    expect(css).not.toMatch(/\.dss-match-muted\s*\{[^}]*opacity/);
-    expect(css).toMatch(/\.dss-match-muted\s*\{\s*color:\s*var\(--hoops-mute\)/);
+    expect(css).not.toMatch(/\.hoops-match-muted\s*\{[^}]*opacity/);
+    expect(css).toMatch(/\.hoops-match-muted\s*\{\s*color:\s*var\(--hoops-mute\)/);
   });
 
   it('EmptyState: Fokus-Ring des Buttons auf action/error im Dunkelmodus in Chip-Textfarbe', () => {
-    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-empty--action \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-amber-fg\)/);
-    expect(css).toMatch(/:root\[data-theme="dark"\] \.dss-empty--error \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-err-fg\)/);
-    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.dss-empty--error \.dss-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-err-fg\)/);
+    expect(css).toMatch(/:root\[data-theme="dark"\] \.hoops-empty--action \.hoops-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-amber-fg\)/);
+    expect(css).toMatch(/:root\[data-theme="dark"\] \.hoops-empty--error \.hoops-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-err-fg\)/);
+    expect(css).toMatch(/:root:not\(\[data-theme="light"\]\) \.hoops-empty--error \.hoops-btn:focus-visible\s*\{\s*outline-color:\s*var\(--hoops-chip-err-fg\)/);
   });
 
   it('Skeleton: Animation stoppt bei prefers-reduced-motion', () => {
-    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.dss-skel\s*\{\s*animation:\s*none/);
+    expect(css).toMatch(/@media \(prefers-reduced-motion: reduce\)\s*\{\s*\.hoops-skel\s*\{\s*animation:\s*none/);
   });
 
   it('Skeleton-Spielkarte läuft auf schmalen Bildschirmen nicht über', () => {
-    expect(css).toMatch(/\.dss-skel-match\s*\{[^}]*box-sizing: border-box;[^}]*min-width: min\(320px, 100%\)/);
+    expect(css).toMatch(/\.hoops-skel-match\s*\{[^}]*box-sizing: border-box;[^}]*min-width: min\(320px, 100%\)/);
   });
 
   it('Hero-Karte bricht auf schmalen Bildschirmen in eine Spalte', () => {
-    expect(css).toMatch(/@media \(max-width: 560px\)\s*\{\s*\.dss-pc-hero\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\)/);
+    expect(css).toMatch(/@media \(max-width: 560px\)\s*\{\s*\.hoops-pc-hero\s*\{\s*grid-template-columns:\s*minmax\(0, 1fr\)/);
   });
 });
 

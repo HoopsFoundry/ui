@@ -15,7 +15,7 @@ describe('Select', () => {
     render(<Select label="Turniermodus" options={OPTIONS} defaultValue="rr" />);
     const select = screen.getByRole('combobox', { name: 'Turniermodus' });
     expect(select).toBeInstanceOf(HTMLSelectElement);
-    expect(select).toHaveClass('dss-select');
+    expect(select).toHaveClass('hoops-select');
     expect(screen.getAllByRole('option').map((o) => o.textContent)).toEqual([
       'Jeder gegen Jeden',
       'Schweizer System',
@@ -41,9 +41,9 @@ describe('Select', () => {
     expect(onChange).toHaveBeenCalledTimes(1);
   });
 
-  it('compact setzt dss-select--compact', () => {
+  it('compact setzt hoops-select--compact', () => {
     render(<Select label="Modus" options={OPTIONS} density="compact" />);
-    expect(screen.getByRole('combobox')).toHaveClass('dss-select--compact');
+    expect(screen.getByRole('combobox')).toHaveClass('hoops-select--compact');
   });
 
   it('error-Zustand und Hilfetext', () => {
@@ -51,7 +51,7 @@ describe('Select', () => {
     const select = screen.getByRole('combobox');
     expect(select).toHaveAttribute('aria-invalid', 'true');
     expect(select).toHaveAttribute('aria-describedby', screen.getByText('Bitte wählen').id);
-    expect(document.querySelector('.dss-field')).toHaveClass('is-error');
+    expect(document.querySelector('.hoops-field')).toHaveClass('is-error');
   });
 
   it('übernimmt id, disabled und leitet die ref weiter', () => {

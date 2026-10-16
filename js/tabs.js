@@ -1,19 +1,19 @@
 /**
- * DSS Tabs · Tab-Leiste und Panels auf vorhandenem Markup
+ * HoopsFoundry UI Tabs · Tab-Leiste und Panels auf vorhandenem Markup
  * --------------------------------------------------------------
- * `initTabs(root, options)` macht eine `dss-tabs`-Leiste (`role="tablist"`) bedienbar. Es gelten dieselben Regeln wie in svelte/Tabs.svelte und
+ * `initTabs(root, options)` macht eine `hoops-tabs`-Leiste (`role="tablist"`) bedienbar. Es gelten dieselben Regeln wie in svelte/Tabs.svelte und
  * react/Tabs.tsx: Pfeiltasten in Richtung der Leiste (waagerecht links/rechts, bei `vertical` auf/ab) wählen den Nachbarn sofort und
  * fokussieren ihn, gesperrte Tabs werden übersprungen, am Rand geht es von vorn weiter; nur der gewählte Tab ist per Tab-Taste erreichbar
  * (roving tabindex, `aria-selected`). Dazu kommen Pos1/Ende (in den Frameworks nicht belegt), eine Leiste mit `role="group"` und
  * `aria-pressed` (Mehrfachauswahl, Pills als Filter) und optional manuelle Aktivierung, Deep-Link über den URL-Anker und RTL.
- * Panels hängen über `aria-controls` am Tab; das nicht gewählte Panel bekommt `hidden` und `inert`. Wechsel melden `dss:tabchange`.
+ * Panels hängen über `aria-controls` am Tab; das nicht gewählte Panel bekommt `hidden` und `inert`. Wechsel melden `hoops:tabchange`.
  * Rückgabe `{ destroy(), select(), getValue() }` (js/lifecycle.js); `destroy` stellt das Markup wieder her. Kein `innerHTML`,
  * kein Zugriff auf `window` oder `document` beim Import. Typen: js/tabs.d.ts.
  */
 import { currentHash, hashTarget, revealAround, scrollToElement, writeHash } from './accordion.js';
 import { createCleanups, createHandle, createRegistry, listen, snapshotAttributes } from './lifecycle.js';
 
-export const TAB_EVENT = 'dss:tabchange';
+export const TAB_EVENT = 'hoops:tabchange';
 const registry = createRegistry('tabs');
 let uid = 0;
 
@@ -65,7 +65,7 @@ const valueOf = (tab) => tab.getAttribute('data-tab') || tab.id || '';
 
 /**
  * Macht die Leiste `root` bedienbar. Optionen: `activation` (`auto`: Pfeiltasten wählen sofort, wie in den Frameworks, Standard; `manual`: Pfeiltasten
- * bewegen nur den Fokus, Enter/Leertaste wählt), `vertical` (sonst aus `aria-orientation` oder `dss-tabs--vertical`), `multi` (sonst `role="group"`),
+ * bewegen nur den Fokus, Enter/Leertaste wählt), `vertical` (sonst aus `aria-orientation` oder `hoops-tabs--vertical`), `multi` (sonst `role="group"`),
  * `value` (Anfangstab: `data-tab`, `id` oder Index), `hash` (Deep-Link: `#id` eines Tabs oder Panels, oder eines Elements in einem Panel, wählt den Tab;
  * eine Wahl schreibt den Anker; Standard `false`), `onChange(detail)`.
  */
@@ -78,12 +78,12 @@ export function initTabs(root, options = {}) {
   const win = doc.defaultView ?? window;
   const opts = options && typeof options === 'object' ? options : {};
   // Tabs dieser Leiste: Nachfahren, deren nächste Leiste `root` ist (eine verschachtelte Leiste im Panel gehört nicht dazu)
-  const barOf = (el) => el.parentElement?.closest('[role="tablist"], [role="group"], .dss-tabs') ?? null;
-  const tabs = [...root.querySelectorAll('[role="tab"], .dss-tab')].filter((tab) => barOf(tab) === root);
+  const barOf = (el) => el.parentElement?.closest('[role="tablist"], [role="group"], .hoops-tabs') ?? null;
+  const tabs = [...root.querySelectorAll('[role="tab"], .hoops-tab')].filter((tab) => barOf(tab) === root);
   if (!tabs.length) return none;
 
   const multi = typeof opts.multi === 'boolean' ? opts.multi : root.getAttribute('role') === 'group';
-  const vertical = typeof opts.vertical === 'boolean' ? opts.vertical : root.getAttribute('aria-orientation') === 'vertical' || root.classList.contains('dss-tabs--vertical');
+  const vertical = typeof opts.vertical === 'boolean' ? opts.vertical : root.getAttribute('aria-orientation') === 'vertical' || root.classList.contains('hoops-tabs--vertical');
   const manual = opts.activation === 'manual';
   const withHash = opts.hash === true && !multi;
   const rtl = () => win.getComputedStyle(root).direction === 'rtl';
@@ -101,7 +101,7 @@ export function initTabs(root, options = {}) {
     cleanups.add(snapshotAttributes(tab, ['role', 'aria-selected', 'aria-pressed', 'tabindex', 'id', 'class']));
     if (multi) return null;
     tab.setAttribute('role', 'tab');
-    if (!tab.id) tab.id = `dss-tab-${++uid}`;
+    if (!tab.id) tab.id = `hoops-tab-${++uid}`;
     const panel = lookup(tab.getAttribute('aria-controls'));
     if (!panel || panel === root || tabs.includes(panel)) return null;
     cleanups.add(snapshotAttributes(panel, ['role', 'aria-labelledby', 'hidden', 'inert']));
@@ -195,12 +195,12 @@ export function initTabs(root, options = {}) {
   }
 
   cleanups.add(listen(root, 'click', (event) => {
-    const tab = event.target instanceof win.Element ? event.target.closest('[role="tab"], .dss-tab') : null;
+    const tab = event.target instanceof win.Element ? event.target.closest('[role="tab"], .hoops-tab') : null;
     const i = tab ? tabs.indexOf(tab) : -1;
     if (i >= 0) select(i, 'user', { write: true });
   }));
   cleanups.add(listen(root, 'keydown', (event) => {
-    const tab = event.target instanceof win.Element ? event.target.closest('[role="tab"], .dss-tab') : null;
+    const tab = event.target instanceof win.Element ? event.target.closest('[role="tab"], .hoops-tab') : null;
     const i = tab ? tabs.indexOf(tab) : -1;
     if (i < 0 || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if ((event.key === 'Enter' || event.key === ' ') && tab.localName !== 'button') {

@@ -1,4 +1,4 @@
-= DSS – Softwarearchitektur
+= HoopsFoundry UI – Softwarearchitektur
 include::_attributes.adoc[]
 
 Stand: 2026-10-13. Status: Architektur-Baseline zur Prüfung. Produktname: HoopsFoundry UI (ADR-008).

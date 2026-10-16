@@ -16,7 +16,7 @@ type BackTopMod = {
 const html = (markup: string) => {
   document.body.replaceChildren(document.createRange().createContextualFragment(markup));
 };
-const links = () => [...document.querySelectorAll<HTMLAnchorElement>('.dss-pagenav-link')];
+const links = () => [...document.querySelectorAll<HTMLAnchorElement>('.hoops-pagenav-link')];
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const safe = async (fn: () => unknown | Promise<unknown>) => {
   try {
@@ -48,7 +48,7 @@ function stubBrowser() {
 }
 
 const PAGE = '<main><h1 id="t">T</h1><section id="c"><h2>Größe</h2><h2>Spielplan</h2><h2>Kader</h2></section></main>';
-const ACC = `<main><h1>L</h1><div class="dss-acc" data-dss-acc><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false" aria-controls="a-p"><span class="dss-acc-label">A</span></button></h3><div class="dss-acc-panel" id="a-p" hidden inert><div class="dss-acc-body"><h2 id="x">Stand</h2></div></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>`;
+const ACC = `<main><h1>L</h1><div class="hoops-acc" data-hoops-acc><div class="hoops-acc-item" id="a"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="a-t" aria-expanded="false" aria-controls="a-p"><span class="hoops-acc-label">A</span></button></h3><div class="hoops-acc-panel" id="a-p" hidden inert><div class="hoops-acc-body"><h2 id="x">Stand</h2></div></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>`;
 
 export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
   const stub = stubBrowser();
@@ -75,11 +75,11 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
     await rule('PageNav: ab drei Einträgen', () => {
       html('<main><h2>A</h2><h2>B</h2></main>');
       const h = mod.initPageNav(document.querySelector('main')!);
-      const two = document.querySelector('.dss-pagenav') === null;
+      const two = document.querySelector('.hoops-pagenav') === null;
       h.destroy();
       html(PAGE);
       const h3 = mod.initPageNav(document.querySelector('main')!);
-      const three = document.querySelector('.dss-pagenav') !== null;
+      const three = document.querySelector('.hoops-pagenav') !== null;
       h3.destroy();
       return two && three;
     });
@@ -114,14 +114,14 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
     await rule('PageNav: Name der Navigation ist der sichtbare Text', () => {
       html(PAGE);
       const h = mod.initPageNav(document.querySelector('main')!, { label: 'Hier' });
-      const nav = document.querySelector('nav.dss-pagenav')!;
+      const nav = document.querySelector('nav.hoops-pagenav')!;
       const ok = document.getElementById(nav.getAttribute('aria-labelledby')!)?.textContent === 'Hier' && !nav.hasAttribute('aria-label');
       h.destroy();
       return ok;
     });
     await rule('PageNav: Sprung öffnet umgebende Bereiche', () => {
       html(ACC);
-      const acc = initAccordion(document.querySelector('[data-dss-acc]')!, { syncHash: false });
+      const acc = initAccordion(document.querySelector('[data-hoops-acc]')!, { syncHash: false });
       const h = mod.initPageNav(document.querySelector('main')!);
       links().find((a) => a.textContent === 'Stand')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
       const ok = document.getElementById('a-t')!.getAttribute('aria-expanded') === 'true';
@@ -139,7 +139,7 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
       return ok;
     });
     await rule('PageNav: der Fokus kommt auch an, wenn sich der Bereich erst nach dem Klick öffnet', async () => {
-      html('<main><h1>L</h1><div class="dss-acc-item" id="sp"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="sp-t" aria-expanded="false"><span class="dss-acc-label">Spät</span></button></h3><div class="dss-acc-panel" id="sp-p" hidden inert><h2 id="drin">Drin</h2></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
+      html('<main><h1>L</h1><div class="hoops-acc-item" id="sp"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="sp-t" aria-expanded="false"><span class="hoops-acc-label">Spät</span></button></h3><div class="hoops-acc-panel" id="sp-p" hidden inert><h2 id="drin">Drin</h2></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
       const queue: FrameRequestCallback[] = [];
       const raf = window.requestAnimationFrame;
       window.requestAnimationFrame = ((cb: FrameRequestCallback) => { queue.push(cb); return 0; }) as never;
@@ -160,7 +160,7 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
       }
     });
     await rule('PageNav: nach der Höhenanimation wird erneut gescrollt', () => {
-      html('<main><h1>L</h1><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false"><span class="dss-acc-label">A</span></button></h3><div class="dss-acc-panel" id="a-p" hidden inert style="transition-duration: 200ms"><div class="dss-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
+      html('<main><h1>L</h1><div class="hoops-acc-item" id="a"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="a-t" aria-expanded="false"><span class="hoops-acc-label">A</span></button></h3><div class="hoops-acc-panel" id="a-p" hidden inert style="transition-duration: 200ms"><div class="hoops-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
       document.getElementById('a-t')!.addEventListener('click', () => { document.getElementById('a-p')!.removeAttribute('hidden'); document.getElementById('a-p')!.removeAttribute('inert'); });
       const h = mod.initPageNav(document.querySelector('main')!);
       links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
@@ -171,7 +171,7 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
       return ok;
     });
     await rule('PageNav: ohne Animation kein zweites Scrollen', async () => {
-      html('<main><h1>L</h1><div class="dss-acc-item" id="a"><h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-t" aria-expanded="false"><span class="dss-acc-label">A</span></button></h3><div class="dss-acc-panel" id="a-p" hidden inert style="transition-duration: 0s"><div class="dss-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
+      html('<main><h1>L</h1><div class="hoops-acc-item" id="a"><h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="a-t" aria-expanded="false"><span class="hoops-acc-label">A</span></button></h3><div class="hoops-acc-panel" id="a-p" hidden inert style="transition-duration: 0s"><div class="hoops-acc-panel-inner"><h2 id="drin">Drin</h2></div></div></div><h2>Zwei</h2><h2>Drei</h2></main>');
       document.getElementById('a-t')!.addEventListener('click', () => { document.getElementById('a-p')!.removeAttribute('hidden'); });
       const h = mod.initPageNav(document.querySelector('main')!);
       links().find((a) => a.textContent === 'Drin')!.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
@@ -203,10 +203,10 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
     await rule('PageNav: die eigene Navigation löst keinen Neuaufbau aus', async () => {
       html(PAGE);
       const h = mod.initPageNav(document.querySelector('main')!);
-      const first = document.querySelector('nav.dss-pagenav');
+      const first = document.querySelector('nav.hoops-pagenav');
       (links()[0].firstChild as Text).data = 'Fremd';
       await wait(300);
-      const ok = document.querySelector('nav.dss-pagenav') === first;
+      const ok = document.querySelector('nav.hoops-pagenav') === first;
       h.destroy();
       return ok;
     });
@@ -262,7 +262,7 @@ export async function pagenavLogicRules(mod: PageNavMod): Promise<Rules> {
       const main = document.querySelector('main')!;
       mod.initPageNav(main);
       const h = mod.initPageNav(main);
-      const ok = document.querySelectorAll('nav.dss-pagenav').length === 1;
+      const ok = document.querySelectorAll('nav.hoops-pagenav').length === 1;
       h.destroy();
       return ok;
     });
@@ -281,7 +281,7 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
     Object.defineProperty(document.documentElement, 'scrollHeight', { value: height, configurable: true });
     window.dispatchEvent(new Event('scroll'));
   };
-  const btn = () => document.querySelector<HTMLButtonElement>('.dss-backtop')!;
+  const btn = () => document.querySelector<HTMLButtonElement>('.hoops-backtop')!;
   const rule = async (name: string, fn: () => unknown | Promise<unknown>) => {
     html('<main id="m"><h1 id="t">T</h1></main>');
     setScroll(0);
@@ -295,7 +295,7 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
     });
     await rule('BackToTop: 44-px-Icon-Button mit Namen, anfangs verborgen', () => {
       const h = mod.initBackToTop();
-      const ok = btn().classList.contains('dss-btn--icon') && btn().getAttribute('aria-label') === 'Nach oben' && btn().hidden && btn().type === 'button';
+      const ok = btn().classList.contains('hoops-btn--icon') && btn().getAttribute('aria-label') === 'Nach oben' && btn().hidden && btn().type === 'button';
       h.destroy();
       return ok;
     });
@@ -355,7 +355,7 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
     });
     await rule('BackToTop: über einer festen unteren Leiste', () => {
       const bar = document.createElement('nav');
-      bar.className = 'dss-bnav';
+      bar.className = 'hoops-bnav';
       bar.style.position = 'fixed';
       bar.getBoundingClientRect = () => ({ height: 64 }) as DOMRect;
       document.body.append(bar);
@@ -366,7 +366,7 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
     });
     await rule('BackToTop: eine nicht feste Leiste zählt nicht', () => {
       const bar = document.createElement('nav');
-      bar.className = 'dss-bnav';
+      bar.className = 'hoops-bnav';
       bar.getBoundingClientRect = () => ({ height: 64 }) as DOMRect;
       document.body.append(bar);
       const h = mod.initBackToTop();
@@ -386,12 +386,12 @@ export async function backtopLogicRules(mod: BackTopMod): Promise<Rules> {
     await rule('BackToTop: destroy entfernt den Knopf', () => {
       const h = mod.initBackToTop();
       h.destroy();
-      return document.querySelector('.dss-backtop') === null;
+      return document.querySelector('.hoops-backtop') === null;
     });
     await rule('BackToTop: ein zweiter Aufruf ersetzt den ersten', () => {
       mod.initBackToTop();
       const h = mod.initBackToTop();
-      const ok = document.querySelectorAll('.dss-backtop').length === 1;
+      const ok = document.querySelectorAll('.hoops-backtop').length === 1;
       h.destroy();
       return ok;
     });
@@ -408,19 +408,19 @@ export function pagenavCssRules(css: string): Rules {
   const print = text.slice(text.indexOf('@media print'));
   return {
     'Abschnitt vorhanden': text.length > 400,
-    'CSS: Ebene über Token': /z-index:\s*var\(--hoops-z-backtop,\s*20\)/.test(body('.dss-backtop')),
-    'CSS: Abstand von unten über Token und Sicherheitsabstand': /bottom:\s*calc\(var\(--hoops-backtop-offset,\s*16px\)\s*\+\s*env\(safe-area-inset-bottom,\s*0px\)\)/.test(body('.dss-backtop')),
-    'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)': /inset-inline-end:\s*calc\(var\(--hoops-backtop-gap,\s*16px\)\s*\+\s*env\(safe-area-inset-right,\s*0px\)\)/.test(body('.dss-backtop')) && !/(^|[;\s])right:/.test(body('.dss-backtop')) && /env\(safe-area-inset-left,\s*0px\)/.test(body('.dss-backtop:dir(rtl)')),
-    'CSS: im Druck ausgeblendet': /\.dss-pagenav, \.dss-backtop \{ display: none; \}/.test(print),
-    'CSS: Knopf fest positioniert und verborgen mit [hidden]': /position:\s*fixed/.test(body('.dss-backtop')) && /display:\s*none/.test(body('.dss-backtop[hidden]')),
-    'CSS: Links mindestens 44 px': /min-height:\s*var\(--hoops-touch-sm\)/.test(body('.dss-pagenav-link')),
+    'CSS: Ebene über Token': /z-index:\s*var\(--hoops-z-backtop,\s*20\)/.test(body('.hoops-backtop')),
+    'CSS: Abstand von unten über Token und Sicherheitsabstand': /bottom:\s*calc\(var\(--hoops-backtop-offset,\s*16px\)\s*\+\s*env\(safe-area-inset-bottom,\s*0px\)\)/.test(body('.hoops-backtop')),
+    'CSS: Abstand vom Rand der Leserichtung mit Sicherheitsabstand (logische Eigenschaft, auch rechts-nach-links)': /inset-inline-end:\s*calc\(var\(--hoops-backtop-gap,\s*16px\)\s*\+\s*env\(safe-area-inset-right,\s*0px\)\)/.test(body('.hoops-backtop')) && !/(^|[;\s])right:/.test(body('.hoops-backtop')) && /env\(safe-area-inset-left,\s*0px\)/.test(body('.hoops-backtop:dir(rtl)')),
+    'CSS: im Druck ausgeblendet': /\.hoops-pagenav, \.hoops-backtop \{ display: none; \}/.test(print),
+    'CSS: Knopf fest positioniert und verborgen mit [hidden]': /position:\s*fixed/.test(body('.hoops-backtop')) && /display:\s*none/.test(body('.hoops-backtop[hidden]')),
+    'CSS: Links mindestens 44 px': /min-height:\s*var\(--hoops-touch-sm\)/.test(body('.hoops-pagenav-link')),
     'CSS: Schrift nur aus Tokens': !/font-size:\s*[\d.]+(px|rem|em)/.test(text),
     'CSS: keine globalen Selektoren für Scrollen': !/(^|\n)\s*html\s*\{/.test(text) && !/h2\[id\]/.test(text) && !/(^|\n)\s*:root\s*\{[^}]*scroll-/.test(text),
-    'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion': /scroll-margin-top:\s*calc\(var\(--hoops-scroll-offset,\s*var\(--hoops-acc-sticky-top,\s*0px\)\)\s*\+\s*1rem\)/.test(body('.dss-pagenav-target')),
-    'CSS: Opt-in-Klasse für scroll-padding': /scroll-padding-top:\s*var\(--hoops-scroll-offset/.test(body('.dss-scroll-pad')) && /scroll-padding-bottom:\s*var\(--hoops-scroll-offset-bottom,\s*4\.5rem\)/.test(body('.dss-scroll-pad')),
-    'CSS: Fokus-Ring der Links': /outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/.test(body('.dss-pagenav-link:focus-visible')),
-    'CSS: Liste bricht um': /flex-wrap:\s*wrap/.test(body('.dss-pagenav-list')),
-    'CSS: lange Links brechen um': /overflow-wrap:\s*anywhere/.test(body('.dss-pagenav-link')) && /max-width:\s*100%/.test(body('.dss-pagenav-link')),
+    'CSS: Scroll-Abstand der Ziele über Token, abgestimmt mit dem Accordion': /scroll-margin-top:\s*calc\(var\(--hoops-scroll-offset,\s*var\(--hoops-acc-sticky-top,\s*0px\)\)\s*\+\s*1rem\)/.test(body('.hoops-pagenav-target')),
+    'CSS: Opt-in-Klasse für scroll-padding': /scroll-padding-top:\s*var\(--hoops-scroll-offset/.test(body('.hoops-scroll-pad')) && /scroll-padding-bottom:\s*var\(--hoops-scroll-offset-bottom,\s*4\.5rem\)/.test(body('.hoops-scroll-pad')),
+    'CSS: Fokus-Ring der Links': /outline:\s*var\(--hoops-ring-w\) var\(--hoops-ring-style\) var\(--hoops-ring-color\)/.test(body('.hoops-pagenav-link:focus-visible')),
+    'CSS: Liste bricht um': /flex-wrap:\s*wrap/.test(body('.hoops-pagenav-list')),
+    'CSS: lange Links brechen um': /overflow-wrap:\s*anywhere/.test(body('.hoops-pagenav-link')) && /max-width:\s*100%/.test(body('.hoops-pagenav-link')),
     'kein festes Hex': !/#[0-9a-fA-F]{3,8}\b/.test(text),
   };
 }

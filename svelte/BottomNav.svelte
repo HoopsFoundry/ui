@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS BottomNav · Svelte 5
+   * HoopsFoundry UI BottomNav · Svelte 5
    * --------------------------------------------------------------
    * Mobile Navigation am unteren Rand (Schiri-App, Coach-App, Zuschauer-Modus),
    * 4–5 Einträge, optional zentraler FAB. Nutzt nur Klassen aus css/components.css.
@@ -53,23 +53,23 @@
 
 {#snippet itemBody(it: Item)}
   {#if it.icon}
-    <svg class="dss-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href={`#${it.icon}`}></use></svg>
+    <svg class="hoops-bnav-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><use href={`#${it.icon}`}></use></svg>
   {/if}
-  <span class="dss-bnav-lbl">{it.label}</span>
-  {#if it.badge !== undefined}<span class="dss-bnav-badge">{it.badge}</span>{/if}
+  <span class="hoops-bnav-lbl">{it.label}</span>
+  {#if it.badge !== undefined}<span class="hoops-bnav-badge">{it.badge}</span>{/if}
 {/snippet}
 
-<nav class="dss-bnav" aria-label={ariaLabel}>
+<nav class="hoops-bnav" aria-label={ariaLabel}>
   {#each items as it (it.id)}
     {#if it.fab}
       {#if it.href}
-        <a class="dss-bnav-fab" href={it.href} aria-label={it.label} onclick={() => onaction?.(it.id)}>{@render fabIcon(it)}</a>
+        <a class="hoops-bnav-fab" href={it.href} aria-label={it.label} onclick={() => onaction?.(it.id)}>{@render fabIcon(it)}</a>
       {:else}
-        <button type="button" class="dss-bnav-fab" aria-label={it.label} onclick={() => onaction?.(it.id)}>{@render fabIcon(it)}</button>
+        <button type="button" class="hoops-bnav-fab" aria-label={it.label} onclick={() => onaction?.(it.id)}>{@render fabIcon(it)}</button>
       {/if}
     {:else if it.href}
       <a
-        class="dss-bnav-item"
+        class="hoops-bnav-item"
         class:is-active={value === it.id}
         href={it.href}
         aria-current={value === it.id ? 'page' : undefined}
@@ -78,7 +78,7 @@
     {:else}
       <button
         type="button"
-        class="dss-bnav-item"
+        class="hoops-bnav-item"
         class:is-active={value === it.id}
         aria-current={value === it.id ? 'page' : undefined}
         onclick={() => pick(it)}

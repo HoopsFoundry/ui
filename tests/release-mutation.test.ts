@@ -10,7 +10,7 @@ import { readTgz } from '../scripts/portal-sync.mjs';
 import { cleanLoaded, copyBundle, loadScript, tmpRoot } from './helpers/release-fixture';
 
 const pkg = JSON.parse(read('package.json'));
-const POINTS = ['dss.js', 'dss.min.js', 'dss-render.js', 'dss-render.min.js', 'dss-map.js', 'dss-map.min.js', 'dss.css'];
+const POINTS = ['hoops.js', 'hoops.min.js', 'hoops-render.js', 'hoops-render.min.js', 'hoops-map.js', 'hoops-map.min.js', 'hoops.css'];
 const sha = (d: Buffer | string) => createHash('sha256').update(d).digest('hex');
 const SOURCE = read('scripts/release-vanilla.mjs');
 const root = `${tmpRoot}-mut`;
@@ -37,7 +37,7 @@ const throws = async (fn: () => Promise<unknown>, pattern: RegExp) => {
 };
 
 const RULES: Record<string, (mod: any) => Promise<boolean>> = {
-  ...Object.fromEntries(POINTS.filter((p) => p !== 'dss.css').map((point) => [
+  ...Object.fromEntries(POINTS.filter((p) => p !== 'hoops.css').map((point) => [
     `Version: ${point} wird einzeln geprüft`,
     async (mod: any) => {
       const dir = await copyBundle(`m-pt-${counter++}`);
@@ -52,7 +52,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   },
   'Budget: ein Bündel über dem Budget bricht ab': async (mod) => {
     const dir = await copyBundle(`m-bud-${counter++}`);
-    await writeFile(`${dir}/dss.min.js`, `${await readFile(`${dir}/dss.min.js`, 'utf8')}\n//${'y'.repeat(41 * 1024)}`);
+    await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'y'.repeat(41 * 1024)}`);
     return throws(() => mod.releaseVanilla({ bundleDir: dir, outDir: outName(), build: false, allowDirty: true }), /Größenbudget überschritten/);
   },
   'Ausgabeordner: ein fremder nicht leerer Ordner bleibt': async (mod) => {
@@ -63,9 +63,9 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     return readFile(`${out}/wichtig.txt`, 'utf8').then((t) => t === 'x', () => false);
   },
   'Ausgabeordner: Projekt-Root ist verboten': (mod) => throws(() => mod.releaseVanilla({ bundleDir, outDir: process.cwd(), build: false, allowDirty: true, dryRun: true }), /nicht erlaubt/),
-  'Manifest: dss-sync.mjs mit Prüfsumme und Mindest-Node': async (mod) => {
+  'Manifest: hoops-sync.mjs mit Prüfsumme und Mindest-Node': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return r.manifest.sync?.name === 'dss-sync.mjs' && r.manifest.sync.sha256 === sha(r.sync) && r.manifest.sync.node === '>=18';
+    return r.manifest.sync?.name === 'hoops-sync.mjs' && r.manifest.sync.sha256 === sha(r.sync) && r.manifest.sync.node === '>=18';
   },
   'gzip-Kopf: Betriebssystem-Byte 3 und Zeitstempel 0': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
@@ -77,10 +77,10 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     await writeFile(`${fake}/package.json`, JSON.stringify({ ...pkg, version: '0.0.1' }));
     return throws(() => mod.checkVersions({ root: fake, bundleDir }), /package\.json 0\.0\.1|0\.9\.0/);
   },
-  'Version: dss.css wird geprüft': async (mod) => {
+  'Version: hoops.css wird geprüft': async (mod) => {
     const dir = await copyBundle(`m-css-${counter++}`);
-    await writeFile(`${dir}/dss.css`, (await readFile(`${dir}/dss.css`, 'utf8')).replace(`"${pkg.version}"`, '"0.0.1"'));
-    return throws(() => mod.checkVersions({ bundleDir: dir }), /dss\.css 0\.0\.1/);
+    await writeFile(`${dir}/hoops.css`, (await readFile(`${dir}/hoops.css`, 'utf8')).replace(`"${pkg.version}"`, '"0.0.1"'));
+    return throws(() => mod.checkVersions({ bundleDir: dir }), /hoops\.css 0\.0\.1/);
   },
   'Version: --expect-version (Tag) wird geprüft': (mod) => throws(() => mod.checkVersions({ bundleDir, expect: '9.9.9' }), /expect-version/),
   'Arbeitsbaum: schmutzig bricht ab': (mod) =>
@@ -92,26 +92,26 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   },
   'Prüfsumme: die erste Zeile gehört dem Tarball': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return r.sums.split('\n')[0] === `${sha(r.tgz)}  dss-vanilla-${pkg.version}.tgz`;
+    return r.sums.split('\n')[0] === `${sha(r.tgz)}  hoops-ui-${pkg.version}.tgz`;
   },
   'Prüfsumme: jede Datei hat eine Zeile mit ihrem Hash': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
     const lines = r.sums.trim().split('\n');
     const files = readTgz(r.tgz) as { path: string; data: Buffer }[];
-    return lines.length === r.files.length + 1 && files.every((f) => lines.includes(`${sha(f.data)}  dss-vanilla-${pkg.version}/${f.path}`));
+    return lines.length === r.files.length + 1 && files.every((f) => lines.includes(`${sha(f.data)}  hoops-ui-${pkg.version}/${f.path}`));
   },
   'Manifest: Budgets stammen aus vanilla-budgets': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return r.manifest.bundles.dss.budget.minBytes === 40 * 1024 && r.manifest.bundles['dss-map'].budget.gzipBytes === 10 * 1024;
+    return r.manifest.bundles.hoops.budget.minBytes === 40 * 1024 && r.manifest.bundles['hoops-map'].budget.gzipBytes === 10 * 1024;
   },
   'Manifest: Abhängigkeit des Render-Bündels aus den Importen': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return JSON.stringify(r.manifest.bundles['dss-render'].requires) === '["dss"]' && r.manifest.bundles.dss.requires.length === 0;
+    return JSON.stringify(r.manifest.bundles['hoops-render'].requires) === '["hoops"]' && r.manifest.bundles.hoops.requires.length === 0;
   },
   'Manifest: Größen aus der minifizierten Datei, gzip Stufe 9': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    const min = await readFile(`${bundleDir}dss.min.js`);
-    return r.manifest.bundles.dss.minBytes === min.length && r.manifest.bundles.dss.minKiB === Math.round((min.length / 1024) * 10) / 10;
+    const min = await readFile(`${bundleDir}hoops.min.js`);
+    return r.manifest.bundles.hoops.minBytes === min.length && r.manifest.bundles.hoops.minKiB === Math.round((min.length / 1024) * 10) / 10;
   },
   'Manifest: Leaflet ist optional und trägt den Bereich aus package.json': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
@@ -121,9 +121,9 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true, sourcemaps: false });
     return r.files.every((f: string) => !f.endsWith('.map'));
   },
-  'Tarball: Dateien liegen unter dss-vanilla-<version>': async (mod) => {
+  'Tarball: Dateien liegen unter hoops-ui-<version>': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return r.files.every((f: string) => f.startsWith(`dss-vanilla-${pkg.version}/`)) && r.files.includes(`dss-vanilla-${pkg.version}/version.json`);
+    return r.files.every((f: string) => f.startsWith(`hoops-ui-${pkg.version}/`)) && r.files.includes(`hoops-ui-${pkg.version}/version.json`);
   },
   'Tarball: Reihenfolge ist sortiert (reproduzierbar)': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
@@ -134,7 +134,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     await mkdir(out, { recursive: true });
     await writeFile(`${out}/alt.txt`, 'alt');
     const bad = await copyBundle(`m-bad-${counter++}`);
-    await rm(`${bad}/dss.css`);
+    await rm(`${bad}/hoops.css`);
     await mod.releaseVanilla({ bundleDir: bad, outDir: out, build: false, allowDirty: true }).catch(() => {});
     return readFile(`${out}/alt.txt`, 'utf8').then((t) => t === 'alt', () => false);
   },
@@ -142,8 +142,8 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
 
 type Mutation = { name: string; rule: string; from: string; to: string; after?: string };
 const MUTATIONS: Mutation[] = [
-  { name: 'package.json nicht verglichen', rule: 'Version: package.json wird mit den Bündeln verglichen', from: "const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);", to: "const wrong = Object.entries(found).filter(([k, v]) => k !== 'package.json' && v !== found['dss.js']);" },
-  { name: 'CSS-Version aus package.json', rule: 'Version: dss.css wird geprüft', from: "'dss.css': cssVersion };", to: "'dss.css': pkg.version };" },
+  { name: 'package.json nicht verglichen', rule: 'Version: package.json wird mit den Bündeln verglichen', from: "const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);", to: "const wrong = Object.entries(found).filter(([k, v]) => k !== 'package.json' && v !== found['hoops.js']);" },
+  { name: 'CSS-Version aus package.json', rule: 'Version: hoops.css wird geprüft', from: "'hoops.css': cssVersion };", to: "'hoops.css': pkg.version };" },
   { name: 'expect ignoriert', rule: 'Version: --expect-version (Tag) wird geprüft', from: 'if (expect !== undefined && expect !== pkg.version)', to: 'if (false)' },
   { name: 'sauberer Baum nicht verlangt', rule: 'Arbeitsbaum: schmutzig bricht ab', from: 'if (status.trim()) throw', to: 'if (false) throw' },
   { name: 'Probelauf schreibt trotzdem', rule: 'Probelauf schreibt nichts', from: 'if (!dryRun) {', to: 'if (true) {' },
@@ -156,10 +156,10 @@ const MUTATIONS: Mutation[] = [
   { name: 'Leaflet als Pflicht', rule: 'Manifest: Leaflet ist optional und trägt den Bereich aus package.json', from: 'required: false,', to: 'required: true,' },
   { name: 'Leaflet-Bereich fest', rule: 'Manifest: Leaflet ist optional und trägt den Bereich aus package.json', from: 'range: leafletRange,', to: "range: '^1.0.0'," },
   { name: 'Quellkarten bleiben', rule: 'Quellkarten: sourcemaps false lässt .map weg', from: "(await listFiles(bundleDir)).filter((n) => sourcemaps || !n.endsWith('.map'))", to: '(await listFiles(bundleDir))' },
-  { name: 'ohne Ordner im Tarball', rule: 'Tarball: Dateien liegen unter dss-vanilla-<version>', from: "files.push({ path: `${prefix}/version.json`,", to: "files.push({ path: `version.json`," },
+  { name: 'ohne Ordner im Tarball', rule: 'Tarball: Dateien liegen unter hoops-ui-<version>', from: "files.push({ path: `${prefix}/version.json`,", to: "files.push({ path: `version.json`," },
   { name: 'Reihenfolge unsortiert', rule: 'Tarball: Reihenfolge ist sortiert (reproduzierbar)', from: 'files.sort((a, b) => (a.path < b.path ? -1 : 1));', to: 'files.reverse();' },
   { name: 'Ausgabeordner vorab geleert', rule: 'Aufräumen: bei einem Fehler bleibt der alte Ausgabeordner unverändert', from: 'const steps = [];', to: 'const steps = [];\n  await rm(outDir, { recursive: true, force: true });' },
-  ...POINTS.filter((p) => p !== 'dss.css').map((point) => ({
+  ...POINTS.filter((p) => p !== 'hoops.css').map((point) => ({
     name: `${point} nicht geprüft`, rule: `Version: ${point} wird einzeln geprüft`,
     from: 'const wrong = Object.entries(found).filter(([, v]) => v !== pkg.version);', to: `const wrong = Object.entries(found).filter(([k, v]) => k !== '${point}' && v !== pkg.version);`,
   })),
@@ -168,8 +168,8 @@ const MUTATIONS: Mutation[] = [
   { name: 'gzip-Budget ignoriert, min-Budget ignoriert', rule: 'Budget: ein Bündel über dem Budget bricht ab', from: 'if (b.minBytes > b.budget.minBytes)', to: 'if (false)' },
   { name: 'Marker nicht verlangt', rule: 'Ausgabeordner: ein fremder nicht leerer Ordner bleibt', from: 'if (entries.length && !entries.includes(MARKER)) {', to: 'if (false) {' },
   { name: 'Root-Schutz entfällt', rule: 'Ausgabeordner: Projekt-Root ist verboten', from: 'if (out === r || r.startsWith(out + sep) || out === parse(out).root) {', to: 'if (false) {' },
-  { name: 'Manifest ohne Hilfsskript', rule: 'Manifest: dss-sync.mjs mit Prüfsumme und Mindest-Node', from: 'sync: sync ?? null,', to: 'sync: null,' },
-  { name: 'Mindest-Node geändert', rule: 'Manifest: dss-sync.mjs mit Prüfsumme und Mindest-Node', from: "node: '>=18'", to: "node: '>=16'" },
+  { name: 'Manifest ohne Hilfsskript', rule: 'Manifest: hoops-sync.mjs mit Prüfsumme und Mindest-Node', from: 'sync: sync ?? null,', to: 'sync: null,' },
+  { name: 'Mindest-Node geändert', rule: 'Manifest: hoops-sync.mjs mit Prüfsumme und Mindest-Node', from: "node: '>=18'", to: "node: '>=16'" },
 ];
 
 describe('Release-Ablauf: Mutationen', () => {

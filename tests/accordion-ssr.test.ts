@@ -122,7 +122,7 @@ describe('Accordion SSR: Svelte und React geben dasselbe Markup aus', () => {
 describe('Accordion SSR: Inhalt des Markups', () => {
   const html = (cfg: GroupCfg) => normalize(render(Host, { props: { cfg } }).body);
   it('Überschrift enthält den Button mit aria-expanded und aria-controls', () => {
-    expect(html({ items: [three[0]] })).toContain('<h3 class="dss-acc-title"><button type="button" class="dss-acc-trigger" id="a-trigger" aria-expanded="false" aria-controls="a-panel">');
+    expect(html({ items: [three[0]] })).toContain('<h3 class="hoops-acc-title"><button type="button" class="hoops-acc-trigger" id="a-trigger" aria-expanded="false" aria-controls="a-panel">');
   });
   it('geschlossen: hidden und inert; offen: beides entfällt', () => {
     const closed = html({ items: [three[0]] });
@@ -141,17 +141,17 @@ describe('Accordion SSR: Inhalt des Markups', () => {
   it('Sprungleiste und Alle-öffnen-Leiste fehlen im Server-Markup, ihr Platz ist als Platzhalter reserviert (kein Sprung nach dem Hydrieren)', () => {
     const out = html({ props: { nav: true, expandAll: true }, items: three });
     expect(out).not.toContain('<nav');
-    expect(out).not.toContain('<button type="button" class="dss-btn');
-    expect(out).toContain('<div class="dss-acc-tools dss-acc-tools--pending" data-parts="both" aria-hidden="true"></div>');
+    expect(out).not.toContain('<button type="button" class="hoops-btn');
+    expect(out).toContain('<div class="hoops-acc-tools hoops-acc-tools--pending" data-parts="both" aria-hidden="true"></div>');
     expect(html({ props: { nav: true }, items: three })).toContain('data-parts="nav"');
     expect(html({ props: { expandAll: true }, items: three })).toContain('data-parts="bar"');
-    expect(html({ props: { expandAll: true, exclusive: true }, items: three })).not.toContain('dss-acc-tools');
-    expect(html({ items: three })).not.toContain('dss-acc-tools');
+    expect(html({ props: { expandAll: true, exclusive: true }, items: three })).not.toContain('hoops-acc-tools');
+    expect(html({ items: three })).not.toContain('hoops-acc-tools');
   });
   it('ein verschachteltes Accordion zählt die Ebene hoch: h3, h4, h5', () => {
-    const tags = [...html(nest()).matchAll(/<(h[1-6]) class="dss-acc-title"/g)].map((m) => m[1]);
+    const tags = [...html(nest()).matchAll(/<(h[1-6]) class="hoops-acc-title"/g)].map((m) => m[1]);
     expect(tags).toEqual(['h3', 'h4', 'h5', 'h4']);
-    expect(html(nest())).toContain('dss-acc--nested');
+    expect(html(nest())).toContain('hoops-acc--nested');
   });
   it('keine h1 und kein window nötig', () => {
     expect(html({ items: three })).not.toContain('<h1');

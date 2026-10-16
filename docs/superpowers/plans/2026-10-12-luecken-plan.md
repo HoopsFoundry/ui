@@ -72,9 +72,9 @@ Das System heißt künftig „HoopsFoundry UI“ (npm-Paket später `@hoopsfound
 | Stufe | Inhalt | Stand |
 |---|---|---|
 | T | Design-Tokens (CSS-Custom-Properties) auf `--hoops-*`; Codemod, Migrationsskript, Verbotstest, Stilparitätsprüfung | umgesetzt |
-| K | CSS-Klassen `.dss-` → `.hoops-` | offen |
-| D | data-Attribute, Ereignisse, JS- und Dateinamen, Speicherschlüssel, Release-Namen | offen |
-| M | Marke und Texte, historische HTMLs nach `docs/entwuerfe/` | offen |
+| K | CSS-Klassen `.dss-` → `.hoops-` | umgesetzt (Version 0.10.0) |
+| D | data-Attribute, Ereignisse, JS- und Dateinamen, Speicherschlüssel, Release-Namen | umgesetzt (Version 0.10.0) |
+| M | Marke und Texte, historische HTMLs nach `docs/entwuerfe/`, LICENSE | umgesetzt (Version 0.10.0) |
 
 **Neue Pakete aus den Entscheidungen** (geplant, nicht umgesetzt)
 1. Paket „Konfiguration“ (nach Stufe T, Teil von Stufe D oder eigenes Paket C): keine fest eingetragenen Repo-Adressen oder Domain mehr. Eine einzige Quelle (`project.config.json` oder Felder in `package.json`) mit Besitzer und Repo, Domain, Release-Basis-URL und Paketname. Build- und Release-Skripte bauen die Werte ins Bündel ein (esbuild `define`, auch in `hoops-sync`); eine Überschreibung zur Laufzeit gibt es nur bei `hoops-sync`: Option `--base-url`, Umgebungsvariable `HOOPS_UI_BASE_URL`, Vorrang Option vor Variable vor eingebautem Wert. Workflows nutzen `${{ github.repository }}` und `github.server_url` statt fester Adresse; Doku-Seiten und Tests lesen aus der Konfiguration. Ein Test verbietet feste Repo-Adressen außerhalb der Konfiguration, des CHANGELOG (Historie) und der Migrationshinweise. Im Browser gibt es keine Umgebungsvariablen, nur Bauzeitwerte und Optionen. Bestand fester Adressen (OliEder/dss-design-system): `README.md`, `package.json`, `stories/Introduction.mdx`, `stories/Foundation/Vanilla.code.ts`, `scripts/portal-sync.mjs`, `.github/workflows/release-vanilla.yml`, `tests/portal-sync-release.test.ts`, `tests/release-docs.test.ts`.

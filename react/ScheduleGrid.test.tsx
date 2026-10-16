@@ -42,44 +42,44 @@ describe('ScheduleGrid', () => {
   it('setzt die Spiele in die richtige Spalte und zeigt leere Zellen als "frei"', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} />);
     const firstRow = container.querySelector('tbody tr') as HTMLElement;
-    const cells = firstRow.querySelectorAll('td.dss-sg-cell');
+    const cells = firstRow.querySelectorAll('td.hoops-sg-cell');
     expect(within(cells[0] as HTMLElement).getByText('TSV Nordhain')).toBeInTheDocument();
     expect(within(cells[1] as HTMLElement).getByText('BG Seeberg')).toBeInTheDocument();
-    const emptyCells = container.querySelectorAll('td.dss-sg-cell.is-empty');
+    const emptyCells = container.querySelectorAll('td.hoops-sg-cell.is-empty');
     expect(emptyCells.length).toBeGreaterThan(0);
-    expect(within(emptyCells[0] as HTMLElement).getByText('frei')).toHaveClass('dss-sg-empty');
+    expect(within(emptyCells[0] as HTMLElement).getByText('frei')).toHaveClass('hoops-sg-empty');
   });
 
   it('trägt den Spaltennamen als data-label für die Handy-Ansicht', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} />);
-    const cells = container.querySelectorAll('tbody tr:first-child td.dss-sg-cell');
+    const cells = container.querySelectorAll('tbody tr:first-child td.hoops-sg-cell');
     expect(cells[0]).toHaveAttribute('data-label', 'Sporthalle Nordhain');
     expect(cells[1]).toHaveAttribute('data-label', 'Feld 2');
   });
 
   it('zeigt Zustände in der Zelle: live, Ergebnis, abgesagt, Platzhalter, Meta', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} />);
-    expect(container.querySelector('.dss-sg-game.is-own')).toBeInTheDocument();
-    expect(container.querySelector('.dss-sg-game.is-live .dss-match-live')).toHaveTextContent('Live');
-    expect(screen.getByText('Heim 42, Gast 31')).toHaveClass('dss-sr-only');
+    expect(container.querySelector('.hoops-sg-game.is-own')).toBeInTheDocument();
+    expect(container.querySelector('.hoops-sg-game.is-live .hoops-match-live')).toHaveTextContent('Live');
+    expect(screen.getByText('Heim 42, Gast 31')).toHaveClass('hoops-sr-only');
     expect(screen.getByText('Heim 12, Gast 10, läuft')).toBeInTheDocument();
-    expect(container.querySelector('.dss-sg-game.is-cancelled')).toBeInTheDocument();
-    expect(screen.getByText('Rückzug TV Elbach')).toHaveClass('dss-sch-note');
-    expect(screen.getByText('Erster Gruppe A')).toHaveClass('dss-sch-ph');
-    expect(screen.getByText('#1 · Gruppe A')).toHaveClass('dss-sg-meta');
+    expect(container.querySelector('.hoops-sg-game.is-cancelled')).toBeInTheDocument();
+    expect(screen.getByText('Rückzug TV Elbach')).toHaveClass('hoops-sch-note');
+    expect(screen.getByText('Erster Gruppe A')).toHaveClass('hoops-sch-ph');
+    expect(screen.getByText('#1 · Gruppe A')).toHaveClass('hoops-sg-meta');
   });
 
   it('zeigt Pausen und Freilose als Zeile über alle Spalten', () => {
     const { container } = render(
       <ScheduleGrid games={GAMES} columns={COLUMNS} breaks={[{ time: '10:00', label: 'Mittagspause' }]} />,
     );
-    const pause = container.querySelector('tr.dss-sg-break td') as HTMLElement;
+    const pause = container.querySelector('tr.hoops-sg-break td') as HTMLElement;
     expect(pause).toHaveAttribute('colspan', '2');
     expect(pause).toHaveTextContent('Mittagspause');
-    const bye = container.querySelector('tr.dss-sg-bye td') as HTMLElement;
+    const bye = container.querySelector('tr.hoops-sg-bye td') as HTMLElement;
     expect(bye).toHaveTextContent('MTV Bergfeld hat Freilos');
     const order = [...container.querySelectorAll('tbody tr')].map((tr) => tr.className || 'slot');
-    expect(order).toEqual(['slot', 'slot', 'dss-sg-bye', 'dss-sg-break', 'slot']);
+    expect(order).toEqual(['slot', 'slot', 'hoops-sg-bye', 'hoops-sg-break', 'slot']);
   });
 
   it('nutzt eigenen Text für leere Zellen und rendert den Slot notice', () => {
@@ -88,11 +88,11 @@ describe('ScheduleGrid', () => {
         games={GAMES}
         columns={COLUMNS}
         emptyLabel="–"
-        renderNotice={(g) => (g.id === 'a' ? <span className="dss-chip dss-chip--warn">Sperrzeit</span> : null)}
+        renderNotice={(g) => (g.id === 'a' ? <span className="hoops-chip hoops-chip--warn">Sperrzeit</span> : null)}
       />,
     );
     expect(screen.getByText('Sperrzeit')).toBeInTheDocument();
-    expect(container.querySelector('.dss-sg-empty')).toHaveTextContent('–');
+    expect(container.querySelector('.hoops-sg-empty')).toHaveTextContent('–');
   });
 
   it('druckt kein "undefined" bei beendetem Spiel mit nur opponent und ownScore', () => {
@@ -102,7 +102,7 @@ describe('ScheduleGrid', () => {
     };
     const { container } = render(<ScheduleGrid games={[perspective]} columns={COLUMNS} />);
     expect(container.textContent).not.toContain('undefined');
-    expect(container.querySelector('.dss-sg-result')).toBeNull();
+    expect(container.querySelector('.hoops-sg-result')).toBeNull();
   });
 
   it('druckt kein "undefined" bei gemischtem Spiel (heim/gast ohne Ergebnis plus Perspektive)', () => {
@@ -113,7 +113,7 @@ describe('ScheduleGrid', () => {
     };
     const { container } = render(<ScheduleGrid games={[mixed]} columns={COLUMNS} />);
     expect(container.textContent).not.toContain('undefined');
-    expect(container.querySelector('.dss-sg-result')).toBeNull();
+    expect(container.querySelector('.hoops-sg-result')).toBeNull();
   });
 
   it('hat keine axe-Verstöße', async () => {
@@ -127,18 +127,18 @@ describe('ScheduleGrid · Zustand als Text', () => {
     id: 's', state: 'scheduled', time: '09:00', column: 'f1', heim: { name: 'A' }, gast: { name: 'B' },
   };
   const srTexts = (container: HTMLElement) =>
-    [...container.querySelectorAll('.dss-sr-only')].map((el) => el.textContent?.trim());
+    [...container.querySelectorAll('.hoops-sr-only')].map((el) => el.textContent?.trim());
 
-  it('macht abgesagte Spiele hörbar, als erstes Kind von dss-sg-teams', () => {
+  it('macht abgesagte Spiele hörbar, als erstes Kind von hoops-sg-teams', () => {
     const { container } = render(<ScheduleGrid games={[{ ...base, state: 'cancelled' }]} columns={COLUMNS} />);
-    const span = container.querySelector('.dss-sg-teams > .dss-sr-only') as HTMLElement;
+    const span = container.querySelector('.hoops-sg-teams > .hoops-sr-only') as HTMLElement;
     expect(span).toHaveTextContent('abgesagt');
-    expect(span).toBe(container.querySelector('.dss-sg-teams')?.firstElementChild);
+    expect(span).toBe(container.querySelector('.hoops-sg-teams')?.firstElementChild);
   });
 
   it('macht verschobene Spiele hörbar', () => {
     const { container } = render(<ScheduleGrid games={[{ ...base, state: 'postponed' }]} columns={COLUMNS} />);
-    expect(container.querySelector('.dss-sg-teams > .dss-sr-only')).toHaveTextContent('verschoben');
+    expect(container.querySelector('.hoops-sg-teams > .hoops-sr-only')).toHaveTextContent('verschoben');
   });
 
   it('sagt bei angesetzten und beendeten Spielen nichts', () => {
@@ -160,15 +160,15 @@ describe('ScheduleGrid · weitere Fälle', () => {
     const { container } = render(
       <ScheduleGrid games={GAMES} columns={COLUMNS} title="Turnier" meta="Stand 08.10." titleAs="h2" />,
     );
-    const head = container.querySelector('.dss-frame-head') as HTMLElement;
+    const head = container.querySelector('.hoops-frame-head') as HTMLElement;
     expect(head).toBeInTheDocument();
     expect(within(head).getByRole('heading', { level: 2 })).toHaveTextContent('Turnier');
-    expect(head.querySelector('.dss-frame-meta')).toHaveTextContent('Stand 08.10.');
+    expect(head.querySelector('.hoops-frame-meta')).toHaveTextContent('Stand 08.10.');
   });
 
   it('hat ohne Titel und Meta keinen Kopf', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} />);
-    expect(container.querySelector('.dss-frame-head')).toBeNull();
+    expect(container.querySelector('.hoops-frame-head')).toBeNull();
   });
 
   it('zeigt bei vorgegebenen slots auch leere Zeilen mit "frei"', () => {
@@ -178,7 +178,7 @@ describe('ScheduleGrid · weitere Fälle', () => {
     const rows = container.querySelectorAll('tbody tr');
     expect(rows).toHaveLength(2);
     expect(rows[1].querySelector('th')).toHaveTextContent('10:00');
-    const cells = rows[1].querySelectorAll('td.dss-sg-cell.is-empty');
+    const cells = rows[1].querySelectorAll('td.hoops-sg-cell.is-empty');
     expect(cells).toHaveLength(2);
     cells.forEach((cell) => expect(cell).toHaveTextContent('frei'));
   });
@@ -197,7 +197,7 @@ describe('ScheduleGrid · weitere Fälle', () => {
     );
     const link = container.querySelector('a[data-router="1"]') as HTMLElement;
     expect(link).toHaveAttribute('href', '/teams/troester');
-    expect(link).toHaveClass('dss-link');
+    expect(link).toHaveClass('hoops-link');
     expect(link).toHaveTextContent('TSV Nordhain');
   });
 
@@ -211,8 +211,8 @@ describe('ScheduleGrid · weitere Fälle', () => {
         columns={COLUMNS}
       />,
     );
-    const cell = container.querySelector('td.dss-sg-cell') as HTMLElement;
-    const games = cell.querySelectorAll('.dss-sg-game');
+    const cell = container.querySelector('td.hoops-sg-cell') as HTMLElement;
+    const games = cell.querySelectorAll('.hoops-sg-game');
     expect(games).toHaveLength(2);
     expect(games[0]).toHaveTextContent('Eins');
     expect(games[1]).toHaveTextContent('Zwei');
@@ -233,12 +233,12 @@ describe('ScheduleGrid · weitere Fälle', () => {
     expect(container).toHaveTextContent('Sichtbar');
     expect(container).not.toHaveTextContent('UnbekannteSpalte');
     expect(container).not.toHaveTextContent('OhneZeit');
-    expect(container.querySelectorAll('.dss-sg-game')).toHaveLength(1);
+    expect(container.querySelectorAll('.hoops-sg-game')).toHaveLength(1);
   });
 
   it('markiert verschobene Spiele', () => {
     const { container } = render(<ScheduleGrid games={[game({ id: 'pp', state: 'postponed' })]} columns={COLUMNS} />);
-    expect(container.querySelector('.dss-sg-game.is-postponed')).toBeInTheDocument();
+    expect(container.querySelector('.hoops-sg-game.is-postponed')).toBeInTheDocument();
   });
 
   it('zeigt "vorläufig" klein und sagt es im gesprochenen Ergebnis', () => {
@@ -248,40 +248,40 @@ describe('ScheduleGrid · weitere Fälle', () => {
         columns={COLUMNS}
       />,
     );
-    const small = container.querySelector('.dss-sg-result small') as HTMLElement;
+    const small = container.querySelector('.hoops-sg-result small') as HTMLElement;
     expect(small).toHaveTextContent('vorläufig');
     expect(small).toHaveAttribute('aria-hidden', 'true');
-    expect(container.querySelector('.dss-sg-result .dss-sr-only')?.textContent).toContain('vorläufig');
+    expect(container.querySelector('.hoops-sg-result .hoops-sr-only')?.textContent).toContain('vorläufig');
   });
 
   it('setzt die Dichte als Klasse', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} density="compact" />);
-    expect(container.querySelector('table')).toHaveClass('dss-tbl--compact');
+    expect(container.querySelector('table')).toHaveClass('hoops-tbl--compact');
   });
 
   it('hat standardmäßig die Dichte "default"', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} />);
-    expect(container.querySelector('table')).toHaveClass('dss-tbl--default');
+    expect(container.querySelector('table')).toHaveClass('hoops-tbl--default');
   });
 
   it('rendert caption als unsichtbare Tabellenbeschriftung', () => {
     const { container } = render(<ScheduleGrid games={GAMES} columns={COLUMNS} caption="Zeitraster Samstag" />);
     const caption = container.querySelector('caption') as HTMLElement;
-    expect(caption).toHaveClass('dss-sr-only');
+    expect(caption).toHaveClass('hoops-sr-only');
     expect(caption).toHaveTextContent('Zeitraster Samstag');
   });
 
   it('nutzt "frei" als Standardtext für leere Zellen', () => {
     const { container } = render(<ScheduleGrid games={[game({ id: 'only' })]} columns={COLUMNS} />);
-    expect(container.querySelector('.dss-sg-empty')).toHaveTextContent(/^frei$/);
+    expect(container.querySelector('.hoops-sg-empty')).toHaveTextContent(/^frei$/);
   });
 
   it('sagt bei einem Freilos ohne Zeit "Zeit offen"', () => {
     const { container } = render(
       <ScheduleGrid games={[game({ id: 'g' }), { id: 'by', state: 'bye', heim: { name: 'MTV Bergfeld' } }]} columns={COLUMNS} />,
     );
-    const head = container.querySelector('tr.dss-sg-bye th') as HTMLElement;
-    expect(head.querySelector('.dss-sr-only')).toHaveTextContent('Zeit offen');
+    const head = container.querySelector('tr.hoops-sg-bye th') as HTMLElement;
+    expect(head.querySelector('.hoops-sr-only')).toHaveTextContent('Zeit offen');
     expect(head.textContent).toBe('Zeit offen');
   });
 
@@ -302,7 +302,7 @@ describe('ScheduleGrid · Scrollbereich', () => {
   it('ist eine fokussierbare Region, benannt nach caption', () => {
     render(<ScheduleGrid games={GAMES} columns={COLUMNS} caption="Zeitraster Samstag" title="Titel" />);
     const region = screen.getByRole('region', { name: 'Zeitraster Samstag' });
-    expect(region).toHaveClass('dss-table-scroll');
+    expect(region).toHaveClass('hoops-table-scroll');
     expect(region).toHaveAttribute('tabindex', '0');
   });
 

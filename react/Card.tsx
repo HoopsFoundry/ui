@@ -40,12 +40,12 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
       onKeyDown={interactiveDiv ? handleKeyDown : onKeyDown}
       role={interactiveDiv ? 'button' : undefined}
       tabIndex={interactiveDiv ? 0 : undefined}
-      className={cn('dss-card', `dss-card--${variant}`, `dss-card--pad-${padding}`, className)}
+      className={cn('hoops-card', `hoops-card--${variant}`, `hoops-card--pad-${padding}`, className)}
       {...rest}
     >
-      {header ? <div className="dss-card-head">{header}</div> : null}
-      <div className="dss-card-body">{children}</div>
-      {footer ? <div className="dss-card-foot">{footer}</div> : null}
+      {header ? <div className="hoops-card-head">{header}</div> : null}
+      <div className="hoops-card-body">{children}</div>
+      {footer ? <div className="hoops-card-foot">{footer}</div> : null}
     </Tag>
   );
 });

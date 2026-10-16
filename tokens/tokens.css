@@ -1,5 +1,5 @@
 /* ──────────────────────────────────────────────────────────────
-   DSS Design System · Token File · v1.0
+   HoopsFoundry UI · Token File · v1.0
    Bayerischer Basketball Verband · Digitaler Spielbericht
    ──────────────────────────────────────────────────────────────
    Identity: Standalone (Ink · Amber · Sky)
@@ -350,7 +350,7 @@
 }
 :root[data-brand="dbb"][data-theme="dark"] { --hoops-indicator: var(--hoops-orange-500); }
 
-/* Type scale · Handy (≤ 640px): Die Klassen .dss-t-display/-clock/-h1/-h2 nutzen diese Größen.
+/* Type scale · Handy (≤ 640px): Die Klassen .hoops-t-display/-clock/-h1/-h2 nutzen diese Größen.
    Komponenten mit fester Kachelgröße (Trikotnummer, Kennzahl) bleiben bei --hoops-fs-*. */
 :root {
   --hoops-fs-display-sm: 56px;

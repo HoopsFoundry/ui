@@ -19,7 +19,7 @@ export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   fieldClassName?: string;
 }
 
-/** Natives <select> im DSS-Look — Tastatur und Screenreader-Verhalten kommen vom Browser. */
+/** Natives <select> im HoopsFoundry-UI-Look — Tastatur und Screenreader-Verhalten kommen vom Browser. */
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   {
     label,
@@ -46,7 +46,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select
       <select
         ref={ref}
         id={selectId}
-        className={cn('dss-select', density === 'compact' && 'dss-select--compact', className)}
+        className={cn('hoops-select', density === 'compact' && 'hoops-select--compact', className)}
         required={required}
         aria-invalid={state === 'error' ? true : undefined}
         aria-describedby={describedBy}

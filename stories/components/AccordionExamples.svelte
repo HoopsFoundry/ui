@@ -22,7 +22,7 @@
 
   // Zustands-Matrix: erzwingt den Zustand auf dem Kopf (die Klassen kommen aus .storybook/pseudo-states.ts)
   function mark(node: HTMLElement, cls: string) {
-    const trigger = node.querySelector<HTMLElement>('.dss-acc-trigger');
+    const trigger = node.querySelector<HTMLElement>('.hoops-acc-trigger');
     if (cls && trigger) trigger.classList.add(...cls.split(' '));
   }
   const cols = ['Standard', 'Hover', 'Fokus', 'Aktiv', 'Offen', 'Gesperrt'] as const;
@@ -40,7 +40,7 @@
   // Vanilla-Beispiele: dasselbe Markup wie im Code-Beispiel; das Skript macht den Button-Weg bedienbar
   function vanillaButton(node: HTMLElement) {
     node.replaceChildren(document.createRange().createContextualFragment(buttonMarkup));
-    const root = node.querySelector<HTMLElement>('.dss-acc');
+    const root = node.querySelector<HTMLElement>('.hoops-acc');
     const destroy = root ? initAccordion(root, { syncHash: false, expandAll: true }) : () => {};
     return { destroy };
   }
@@ -50,9 +50,9 @@
 
 </script>
 
-{#snippet chipOffen()}<span class="dss-chip dss-chip--amber dss-chip--mono">Offen</span>{/snippet}
-{#snippet chipFehler()}<span class="dss-chip dss-chip--err dss-chip--mono">2 Fehler</span>{/snippet}
-{#snippet liveTag()}<span class="dss-live"><span class="dss-live-dot" aria-hidden="true"></span>Live</span>{/snippet}
+{#snippet chipOffen()}<span class="hoops-chip hoops-chip--amber hoops-chip--mono">Offen</span>{/snippet}
+{#snippet chipFehler()}<span class="hoops-chip hoops-chip--err hoops-chip--mono">2 Fehler</span>{/snippet}
+{#snippet liveTag()}<span class="hoops-live"><span class="hoops-live-dot" aria-hidden="true"></span>Live</span>{/snippet}
 
 {#if example === 'aufbau'}
   <Accordion syncHash={false}>
@@ -130,9 +130,9 @@
   <div class="stack">
     <p class="links">
       Direkt springen:
-      <a class="dss-link" href="#dl-spielplan">Termine</a> ·
-      <a class="dss-link" href="#dl-kader">Herrenkader</a> ·
-      <a class="dss-link" href="#dl-torhueter">Torhüter (im Herrenkader)</a>
+      <a class="hoops-link" href="#dl-spielplan">Termine</a> ·
+      <a class="hoops-link" href="#dl-kader">Herrenkader</a> ·
+      <a class="hoops-link" href="#dl-torhueter">Torhüter (im Herrenkader)</a>
     </p>
     <Accordion>
       <AccordionItem id="dl-tabelle" title="Rangliste">{TABELLE}</AccordionItem>

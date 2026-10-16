@@ -1,6 +1,6 @@
 /**
- * DSS Icon-Sprite · gemeinsame Quelle für svelte/Icon.svelte und react/Icon.tsx.
- * Namen und Symbole stammen 1:1 aus der Icons-Spec (DSS Design System - Icons.html).
+ * HoopsFoundry UI Icon-Sprite · gemeinsame Quelle für svelte/Icon.svelte und react/Icon.tsx.
+ * Namen und Symbole stammen 1:1 aus der Icons-Spec (Entwurf Icons.html in docs/entwuerfe).
  */
 export const ICON_NAMES = [
     // Spielaktionen (13)
@@ -24,7 +24,7 @@ export const ICON_NAMES = [
 
 export type IconName = typeof ICON_NAMES[number];
 
-export const SPRITE_ID = 'dss-icon-sprite';
+export const SPRITE_ID = 'hoops-icon-sprite';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 

@@ -11,7 +11,7 @@ import { kennzahlenRender } from './Render.code';
 
 # Kennzahlen und Form
 
-Zwei kleine Bausteine für Zahlen rund um eine Mannschaft: das **Kennzahlen-Gitter** (`dss-stats`) zeigt Werte wie Siege oder Punkte pro Spiel als Kacheln oder, kompakt, in einer Zeile. Die **Form** (`dss-form`) zeigt die letzten Spiele als Reihe kleiner Zeichen. Beide gibt es als Komponente für Svelte (`StatGrid`, `FormChips`) und React und als Vanilla-Markup mit denselben Klassen. Die Form in der Spalte „Form“ der [LeagueCard](?path=/docs/components-leaguecard--docs) ist derselbe Baustein, es gibt keine zweite Darstellung.
+Zwei kleine Bausteine für Zahlen rund um eine Mannschaft: das **Kennzahlen-Gitter** (`hoops-stats`) zeigt Werte wie Siege oder Punkte pro Spiel als Kacheln oder, kompakt, in einer Zeile. Die **Form** (`hoops-form`) zeigt die letzten Spiele als Reihe kleiner Zeichen. Beide gibt es als Komponente für Svelte (`StatGrid`, `FormChips`) und React und als Vanilla-Markup mit denselben Klassen. Die Form in der Spalte „Form“ der [LeagueCard](?path=/docs/components-leaguecard--docs) ist derselbe Baustein, es gibt keine zweite Darstellung.
 
 ## Kennzahlen: Aufbau
 
@@ -63,16 +63,16 @@ Alle Flächen und Texte laufen über die semantischen Tokens (`--hoops-surface`,
 
 Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Inhalte, damit die Beispiele auf der Seite unterscheidbar bleiben). Das Gitter wird zweispaltig, die Form bleibt in einer Zeile, und die Tabelle der Karte blendet die Form aus.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Kennzahlen und Form · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Kennzahlen und Form · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen hell">
       <iframe title="Handy-Vorschau: Kennzahlen und Form hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-kennzahlen--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Kennzahlen und Form · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Kennzahlen und Form · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen dunkel">
       <iframe title="Handy-Vorschau: Kennzahlen und Form dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-kennzahlen--handy-dunkel" loading="lazy" />
     </div>
   </div>
@@ -108,11 +108,11 @@ Props von `FormChips`:
   rows={[
     ['form', "('S' | 'N' | 'U')[] (Pflicht)", 'Ergebnisse, neueste zuletzt. Angezeigt werden höchstens die letzten fünf; ungültige Einträge entfallen. Ohne gültigen Eintrag erscheint nichts.'],
     ['variant', "'dots' | 'letters'", 'Punkte, Quadrat und Ring (Standard) oder Marken mit S, N, U.'],
-    ['class (Svelte) / className (React)', 'string', 'Zusätzliche Klassen an der Hülle `dss-form`.'],
+    ['class (Svelte) / className (React)', 'string', 'Zusätzliche Klassen an der Hülle `hoops-form`.'],
   ]}
 />
 
-Die reinen Funktionen sind `statItems(items)` (`@bbv/dss-design-system/stats.js`) sowie `formEntries(form)` und `formLabel(form)` (`@bbv/dss-design-system/league.js`).
+Die reinen Funktionen sind `statItems(items)` (`@hoopsfoundry/ui/stats.js`) sowie `formEntries(form)` und `formLabel(form)` (`@hoopsfoundry/ui/league.js`).
 
 ### Tokens
 

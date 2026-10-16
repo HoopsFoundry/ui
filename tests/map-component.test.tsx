@@ -16,7 +16,7 @@ const style = (el: Element | null) => (el?.getAttribute('style') ?? '').replace(
 const q = <T extends Element = HTMLElement>(m: Mounted, sel: string) => m.root.querySelector<T>(sel);
 const qa = <T extends Element = HTMLElement>(m: Mounted, sel: string) => [...m.root.querySelectorAll<T>(sel)];
 const click = async (m: Mounted, el: Element | null) => { await m.act(() => (el as HTMLElement).click()); };
-const loadMap = async (m: Mounted) => { await click(m, q(m, '.dss-map-load')); await vi.waitFor(() => expect(state.maps.length).toBeGreaterThan(0)); await m.settle(); };
+const loadMap = async (m: Mounted) => { await click(m, q(m, '.hoops-map-load')); await vi.waitFor(() => expect(state.maps.length).toBeGreaterThan(0)); await m.settle(); };
 
 beforeEach(() => {
   reset();
@@ -36,22 +36,22 @@ describe.each(drivers)('Karte · $name', (driver) => {
     it('zeigt Hinweis und Schaltfläche, lädt weder Leaflet noch Kacheln', async () => {
       const m = open(driver);
       await m.settle();
-      expect(q(m, '.dss-map-load')?.textContent).toBe('Karte laden');
-      expect(q(m, '.dss-map-note')?.textContent).toBe('Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.');
-      expect(q(m, '.dss-map-canvas')).toBeNull();
+      expect(q(m, '.hoops-map-load')?.textContent).toBe('Karte laden');
+      expect(q(m, '.hoops-map-note')?.textContent).toBe('Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.');
+      expect(q(m, '.hoops-map-canvas')).toBeNull();
       expect(state.maps).toHaveLength(0);
       expect(state.layers).toHaveLength(0);
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('idle');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('idle');
     });
     it('privacyNote ersetzt den Hinweis', async () => {
       const m = open(driver, { privacyNote: 'Die Karte kommt über unseren Server.' });
-      expect(q(m, '.dss-map-note')?.textContent).toBe('Die Karte kommt über unseren Server.');
+      expect(q(m, '.hoops-map-note')?.textContent).toBe('Die Karte kommt über unseren Server.');
     });
     it('Region mit Namen, „Karte überspringen“ führt zur Liste, Quellenangabe sichtbar und verlinkt', async () => {
       const m = open(driver);
       const region = q(m, '[role="region"]')!;
       expect(region.getAttribute('aria-label')).toBe('Karte der Sporthalle');
-      const skip = q<HTMLAnchorElement>(m, '.dss-map-skip')!;
+      const skip = q<HTMLAnchorElement>(m, '.hoops-map-skip')!;
       expect(skip.textContent).toBe('Karte überspringen');
       const target = q(m, `[id="${skip.getAttribute('href')!.slice(1)}"]`);
       expect(target).not.toBeNull();
@@ -59,13 +59,13 @@ describe.each(drivers)('Karte · $name', (driver) => {
       // die Sprungmarke steht vor der Karte, das Ziel danach
       expect(skip.compareDocumentPosition(region) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
       expect(region.compareDocumentPosition(target!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-      const attr = q<HTMLAnchorElement>(m, '.dss-map-attr a')!;
+      const attr = q<HTMLAnchorElement>(m, '.hoops-map-attr a')!;
       expect(attr.textContent).toBe('© OpenStreetMap-Mitwirkende');
       expect(attr.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
     });
     it('Pins im Platzhalter sind für Hilfstechnik verborgen', async () => {
       const m = open(driver, { markers: [A, B, C] });
-      const pins = qa(m, '.dss-map-ph-pin');
+      const pins = qa(m, '.hoops-map-ph-pin');
       expect(pins.map((p) => p.textContent)).toEqual(['1', '2', '3']);
       expect(pins.every((p) => p.getAttribute('aria-hidden') === 'true')).toBe(true);
     });
@@ -74,51 +74,51 @@ describe.each(drivers)('Karte · $name', (driver) => {
   describe('Textalternative', () => {
     it('nummerierte Liste mit Name, Koordinaten und Links (Standard osm, route)', async () => {
       const m = open(driver, { markers: [A, B] });
-      const items = qa(m, '.dss-map-item');
+      const items = qa(m, '.hoops-map-item');
       expect(items).toHaveLength(2);
-      expect(items[0].querySelector('.dss-map-name')?.textContent).toContain('Sporthalle Nordhain');
-      expect(items[0].querySelector('.dss-map-coords')?.textContent).toBe('49,4875° N, 8,4660° O');
-      expect(items[0].querySelector('.dss-map-num')?.textContent).toBe('1');
-      const links = [...items[1].querySelectorAll<HTMLAnchorElement>('.dss-map-links a')];
+      expect(items[0].querySelector('.hoops-map-name')?.textContent).toContain('Sporthalle Nordhain');
+      expect(items[0].querySelector('.hoops-map-coords')?.textContent).toBe('49,4875° N, 8,4660° O');
+      expect(items[0].querySelector('.hoops-map-num')?.textContent).toBe('1');
+      const links = [...items[1].querySelectorAll<HTMLAnchorElement>('.hoops-map-links a')];
       expect(links.map((a) => a.firstChild?.textContent)).toEqual(['In OpenStreetMap öffnen', 'Route planen']);
       expect(links[0].getAttribute('href')).toBe('https://www.openstreetmap.org/?mlat=49.5&mlon=8.5#map=17/49.5/8.5');
       expect(links[1].getAttribute('href')).toBe('https://www.openstreetmap.org/directions?route=%3B49.5%2C8.5');
       // der Name enthält den Ort, damit mehrere gleiche Linktexte unterscheidbar sind
       expect(links[1].textContent).toBe('Route planen, Halle Süd & West');
       // href am Marker macht den Namen zum Link
-      expect(items[1].querySelector('.dss-map-name a')?.getAttribute('href')).toBe('/hallen/sued');
-      expect(items[0].querySelector('.dss-map-name a')).toBeNull();
+      expect(items[1].querySelector('.hoops-map-name a')?.getAttribute('href')).toBe('/hallen/sued');
+      expect(items[0].querySelector('.hoops-map-name a')).toBeNull();
     });
     it('appLinks wählt die Links; geo ergibt einen geo:-Link mit kodierter Bezeichnung', async () => {
       const m = open(driver, { markers: [B], appLinks: ['geo', 'route'] });
-      const links = qa<HTMLAnchorElement>(m, '.dss-map-links a');
+      const links = qa<HTMLAnchorElement>(m, '.hoops-map-links a');
       expect(links.map((a) => a.firstChild?.textContent)).toEqual(['In Karten-App öffnen', 'Route planen']);
       expect(links[0].getAttribute('href')).toBe('geo:49.5,8.5?q=49.5,8.5(Halle%20S%C3%BCd%20%26%20West)');
     });
     it('ein Marker hat keine Nummer; eigene Nummer und eigener Ort werden angezeigt', async () => {
       const m = open(driver, { markers: [{ ...A, number: 7 }] });
-      expect(q(m, '.dss-map-num')?.textContent).toBe('7');
-      expect(q(m, '.dss-map-num')?.classList.contains('is-own')).toBe(true);
-      expect(q(m, '.dss-map-name .dss-chip')?.textContent).toBe('Eigener Ort');
+      expect(q(m, '.hoops-map-num')?.textContent).toBe('7');
+      expect(q(m, '.hoops-map-num')?.classList.contains('is-own')).toBe(true);
+      expect(q(m, '.hoops-map-name .hoops-chip')?.textContent).toBe('Eigener Ort');
       await current!.set({ markers: [{ ...A, number: undefined, own: false }] });
-      expect(q(m, '.dss-map-num')).toBeNull();
+      expect(q(m, '.hoops-map-num')).toBeNull();
     });
     it('showList=false: Liste nur für Hilfstechnik (Klasse is-quiet), ohne Links, aber mit Koordinaten', async () => {
       const m = open(driver, { showList: false });
-      expect(q(m, '.dss-map-text')?.classList.contains('is-quiet')).toBe(true);
-      expect(q(m, '.dss-map-coords')?.textContent).toBe('49,4875° N, 8,4660° O');
-      expect(q(m, '.dss-map-links')).toBeNull();
+      expect(q(m, '.hoops-map-text')?.classList.contains('is-quiet')).toBe(true);
+      expect(q(m, '.hoops-map-coords')?.textContent).toBe('49,4875° N, 8,4660° O');
+      expect(q(m, '.hoops-map-links')).toBeNull();
     });
     it('ungültige Marker erscheinen weder in der Liste noch auf der Karte', async () => {
       const m = open(driver, { markers: [A, { id: 'x', lat: 999, lng: 0, label: 'Kaputt' }] });
-      expect(qa(m, '.dss-map-item')).toHaveLength(1);
+      expect(qa(m, '.hoops-map-item')).toHaveLength(1);
       await loadMap(m);
       expect(state.markers).toHaveLength(1);
     });
     it('ohne Marker bleibt eine leere Liste, die Karte zeigt Deutschland', async () => {
       const m = open(driver, { markers: [], load: 'auto' });
       await vi.waitFor(() => expect(state.maps).toHaveLength(1));
-      expect(qa(m, '.dss-map-item')).toHaveLength(0);
+      expect(qa(m, '.hoops-map-item')).toHaveLength(0);
       expect(lastMap().view[0]).toMatchObject({ center: [51.1657, 10.4515], zoom: 5 });
     });
   });
@@ -131,27 +131,27 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const options = lastMap().options;
       expect(options).toMatchObject({ zoomControl: false, attributionControl: false, minZoom: 3, maxZoom: 19, keyboard: true });
       expect(lastLayer().url).toBe('https://tile.openstreetmap.org/{z}/{x}/{y}.png');
-      expect(lastLayer().options.className).toBe('dss-map-tiles');
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('ready');
-      expect(q(m, '.dss-map-ph')).toBeNull();
-      expect(qa(m, '.dss-map-zoom-btn').map((b) => b.getAttribute('aria-label'))).toEqual(['Vergrößern', 'Verkleinern']);
+      expect(lastLayer().options.className).toBe('hoops-map-tiles');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map-ph')).toBeNull();
+      expect(qa(m, '.hoops-map-zoom-btn').map((b) => b.getAttribute('aria-label'))).toEqual(['Vergrößern', 'Verkleinern']);
     });
     it('der Fokus geht nach dem Klick auf die Kartenfläche (die Schaltfläche verschwindet)', async () => {
       const m = open(driver);
       await loadMap(m);
-      expect(document.activeElement).toBe(q(m, '.dss-map-canvas'));
+      expect(document.activeElement).toBe(q(m, '.hoops-map-canvas'));
     });
     it('load="auto" lädt sofort, ohne Schaltfläche', async () => {
       const m = open(driver, { load: 'auto' });
-      expect(q(m, '.dss-map-load')).toBeNull();
+      expect(q(m, '.hoops-map-load')).toBeNull();
       await vi.waitFor(() => expect(state.maps).toHaveLength(1));
       await m.settle();
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
     });
     it('Während des Ladens steht der Hinweis im Status (role=status), die Fläche ist inert', async () => {
       const m = open(driver, { load: 'auto' });
       expect(q(m, '[role="status"]')?.textContent).toBe('Karte wird geladen …');
-      expect(q(m, '.dss-map-canvas')?.hasAttribute('inert') || (q(m, '.dss-map-canvas') as { inert?: boolean } | null)?.inert === true).toBe(true);
+      expect(q(m, '.hoops-map-canvas')?.hasAttribute('inert') || (q(m, '.hoops-map-canvas') as { inert?: boolean } | null)?.inert === true).toBe(true);
       await vi.waitFor(() => expect(state.maps).toHaveLength(1));
       await m.settle();
       expect(q(m, '[role="status"]')?.textContent).toBe('');
@@ -215,7 +215,7 @@ describe.each(drivers)('Karte · $name', (driver) => {
       (window as unknown as { __pwned?: number }).__pwned = 0;
       const m = open(driver, { markers: [A, evil], load: 'auto', ...(driver.name === 'Svelte' ? { onmarkerclick: spy } : { onMarkerClick: spy }) });
       await vi.waitFor(() => expect(state.markers).toHaveLength(2));
-      expect(qa(m, '.dss-map-name a')).toHaveLength(0);
+      expect(qa(m, '.hoops-map-name a')).toHaveLength(0);
       expect(m.root.innerHTML).not.toMatch(/javascript:/i);
       await m.act(() => state.markers[1].fire('keypress', { originalEvent: { keyCode: 13, preventDefault() {} } }));
       await m.act(() => state.markers[1].fire('click'));
@@ -229,19 +229,19 @@ describe.each(drivers)('Karte · $name', (driver) => {
       await vi.waitFor(() => expect(state.markers).toHaveLength(1));
       await m.act(() => state.markers[0].fire('keypress', { originalEvent: { keyCode: 13, preventDefault() {} } }));
       expect(window.location.hash).toBe('#zielhalle');
-      expect(qa(m, '.dss-map-name a').map((a) => a.getAttribute('href'))).toEqual(['#zielhalle']);
+      expect(qa(m, '.hoops-map-name a').map((a) => a.getAttribute('href'))).toEqual(['#zielhalle']);
     });
     it('Listenlinks: unsichere Ziele (auch mit Leerraum und Großschreibung) erscheinen nie als href', async () => {
       const m = open(driver, { markers: [{ ...A, href: ' JavaScript:alert(1)' }, { ...B, id: 'b', href: 'data:text/html,x' }, { ...C, id: 'c', href: 'vbscript:x' }] });
       expect(qa(m, 'a').filter((a) => /^\s*(javascript|data|vbscript):/i.test(a.getAttribute('href') ?? ''))).toHaveLength(0);
-      expect(qa(m, '.dss-map-name a')).toHaveLength(0);
+      expect(qa(m, '.hoops-map-name a')).toHaveLength(0);
     });
     it('doppelte und fehlende Marker-ids: kein Absturz, alle Marker erscheinen in Liste und Karte', async () => {
       const dup = [{ ...A, id: 'x' }, { ...B, id: 'x' }, { ...C, id: undefined as never }, { ...C, id: 'marker-2', label: 'Vierte Halle' }];
       const m = open(driver, { markers: dup, load: 'auto' });
       await vi.waitFor(() => expect(state.markers).toHaveLength(4));
-      expect(qa(m, '.dss-map-item')).toHaveLength(4);
-      expect(qa(m, '.dss-map-name').map((n) => n.textContent?.replace('Eigener Ort', '').trim())).toEqual(['Sporthalle Nordhain', 'Halle Süd & West', 'Gymnasium Lindenberg', 'Vierte Halle']);
+      expect(qa(m, '.hoops-map-item')).toHaveLength(4);
+      expect(qa(m, '.hoops-map-name').map((n) => n.textContent?.replace('Eigener Ort', '').trim())).toEqual(['Sporthalle Nordhain', 'Halle Süd & West', 'Gymnasium Lindenberg', 'Vierte Halle']);
       await m.set({ markers: dup.slice(0, 3) });
       expect(state.markers.filter((x) => !x.isRemoved)).toHaveLength(3);
     });
@@ -272,8 +272,8 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const m = open(driver, { load: 'auto' });
       await vi.waitFor(() => expect(state.maps).toHaveLength(1));
       await m.settle();
-      const [plus, minus] = qa<HTMLButtonElement>(m, '.dss-map-zoom-btn');
-      const canvas = q(m, '.dss-map-canvas')!;
+      const [plus, minus] = qa<HTMLButtonElement>(m, '.hoops-map-zoom-btn');
+      const canvas = q(m, '.hoops-map-canvas')!;
       expect(plus.getAttribute('aria-controls')).toBe(canvas.id);
       expect(minus.getAttribute('aria-controls')).toBe(canvas.id);
       expect(plus.hasAttribute('aria-disabled')).toBe(false);
@@ -334,11 +334,11 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
       const m = open(driver, { tileUrl: 'http://example.org/{z}/{x}/{y}.png' });
       await m.settle();
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
       expect(q(m, '[role="status"]')?.textContent).toBe('Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.');
-      expect(q(m, '.dss-map-load')).toBeNull();
+      expect(q(m, '.hoops-map-load')).toBeNull();
       expect(state.maps).toHaveLength(0);
-      expect(qa(m, '.dss-map-item')).toHaveLength(1);
+      expect(qa(m, '.hoops-map-item')).toHaveLength(1);
       expect(warn.mock.calls.flat().join(' ')).toContain('Ungültige tileUrl');
     });
     it('ungültige tileUrl, auch mit load="auto": Leaflet wird nie geladen', async () => {
@@ -346,7 +346,7 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const m = open(driver, { tileUrl: '/tiles/{z}/{x}.png', load: 'auto' });
       await m.settle();
       expect(state.maps).toHaveLength(0);
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
     });
     it('Aufbau wirft: Fehlerhinweis, onerror meldet den Grund, die Liste bleibt', async () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -355,9 +355,9 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const m = open(driver, { load: 'auto', ...(driver.name === 'Svelte' ? { onerror: spy } : { onError: spy }) });
       await vi.waitFor(() => expect(spy).toHaveBeenCalledWith('init'));
       await m.settle();
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
-      expect(q(m, '.dss-map-canvas')).toBeNull();
-      expect(qa(m, '.dss-map-item')).toHaveLength(1);
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map-canvas')).toBeNull();
+      expect(qa(m, '.hoops-map-item')).toHaveLength(1);
     });
     it('alle sichtbaren Kacheln fehlgeschlagen: Fehlerhinweis, Karte abgebaut', async () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -365,11 +365,11 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const m = open(driver, { load: 'auto', ...(driver.name === 'Svelte' ? { onerror: spy } : { onError: spy }) });
       await vi.waitFor(() => expect(state.layers).toHaveLength(1));
       await m.act(() => finishTiles(lastLayer(), 'fail'));
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
       expect(q(m, '[role="status"]')?.textContent).toContain('konnte nicht geladen werden');
       expect(spy).toHaveBeenCalledWith('tiles');
       expect(state.removed).toBe(1);
-      expect(q(m, '.dss-map-zoom')).toBeNull();
+      expect(q(m, '.hoops-map-zoom')).toBeNull();
     });
     it('eine laufende Karte kippt bei späteren Kachelfehlern (404, 429) nicht in den Fehlerzustand', async () => {
       const m = open(driver, { load: 'auto' });
@@ -377,7 +377,7 @@ describe.each(drivers)('Karte · $name', (driver) => {
       await m.act(() => finishTiles(lastLayer(), 'ok'));
       await m.act(() => finishTiles(lastLayer(), 'fail'));
       await m.act(() => finishTiles(lastLayer(), 'fail'));
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
       expect(state.removed).toBe(0);
     });
     it('Fehler in der Aktualisierung: Fehlerhinweis mit Grund update statt Absturz', async () => {
@@ -389,14 +389,14 @@ describe.each(drivers)('Karte · $name', (driver) => {
       state.throwOnView = true;
       await m.set({ zoom: 12 });
       expect(spy).toHaveBeenCalledWith('update');
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
       expect(state.removed).toBe(1);
     });
     it('einzelne Kachelfehler führen nicht zum Fehlerzustand', async () => {
       const m = open(driver, { load: 'auto' });
       await vi.waitFor(() => expect(state.layers).toHaveLength(1));
       await m.act(() => finishTiles(lastLayer(), 'mixed'));
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
       expect(state.removed).toBe(0);
     });
     it('neue tileUrl nach einem Fehler: neuer Versuch', async () => {
@@ -404,10 +404,10 @@ describe.each(drivers)('Karte · $name', (driver) => {
       const m = open(driver, { load: 'auto' });
       await vi.waitFor(() => expect(state.layers).toHaveLength(1));
       await m.act(() => finishTiles(lastLayer(), 'fail'));
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
       await m.set({ tileUrl: '/tiles/{z}/{x}/{y}.png' });
       await vi.waitFor(() => expect(state.maps).toHaveLength(2));
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
     });
   });
 
@@ -446,7 +446,7 @@ describe.each(drivers)('Karte · $name', (driver) => {
       expect(state.markers.filter((x) => !x.isRemoved)).toHaveLength(1);
       expect(state.maps).toHaveLength(1);
       expect(state.removed).toBe(0);
-      expect(qa(m, '.dss-map-item')).toHaveLength(1);
+      expect(qa(m, '.hoops-map-item')).toHaveLength(1);
     });
     it('neue Kachel-Adresse wird gesetzt, eine ungültige führt zum Fehler und baut die Karte ab', async () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -455,7 +455,7 @@ describe.each(drivers)('Karte · $name', (driver) => {
       await m.set({ tileUrl: '/tiles/{z}/{x}/{y}.png' });
       expect(lastLayer().urls).toEqual(['https://tile.openstreetmap.org/{z}/{x}/{y}.png', '/tiles/{z}/{x}/{y}.png']);
       await m.set({ tileUrl: 'ftp://x/{z}/{x}/{y}' });
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
       expect(state.removed).toBe(1);
     });
     it('mehrere Karten auf einer Seite: eindeutige Ids', async () => {
@@ -472,29 +472,29 @@ describe.each(drivers)('Karte · $name', (driver) => {
   describe('Quellenangabe', () => {
     it('bleibt sichtbar und verlinkt, auch bei leerem oder fehlendem Text; eigener Text ersetzt nur den Wortlaut', async () => {
       const m = open(driver, { attribution: '' });
-      expect(q(m, '.dss-map-attr a')?.textContent).toBe('© OpenStreetMap-Mitwirkende');
+      expect(q(m, '.hoops-map-attr a')?.textContent).toBe('© OpenStreetMap-Mitwirkende');
       await m.set({ attribution: '   ' });
-      expect(q(m, '.dss-map-attr a')?.textContent).toBe('© OpenStreetMap-Mitwirkende');
+      expect(q(m, '.hoops-map-attr a')?.textContent).toBe('© OpenStreetMap-Mitwirkende');
       await m.set({ attribution: '© OpenStreetMap-Mitwirkende, Kacheln: Beispielanbieter' });
-      expect(q(m, '.dss-map-attr a')?.textContent).toBe('© OpenStreetMap-Mitwirkende, Kacheln: Beispielanbieter');
-      expect(q(m, '.dss-map-attr a')?.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
+      expect(q(m, '.hoops-map-attr a')?.textContent).toBe('© OpenStreetMap-Mitwirkende, Kacheln: Beispielanbieter');
+      expect(q(m, '.hoops-map-attr a')?.getAttribute('href')).toBe('https://www.openstreetmap.org/copyright');
     });
     it('steht in jedem Zustand im Markup: Platzhalter, geladen, Fehler', async () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});
       const m = open(driver);
-      expect(q(m, '.dss-map-attr a')).not.toBeNull();
+      expect(q(m, '.hoops-map-attr a')).not.toBeNull();
       await loadMap(m);
-      expect(q(m, '.dss-map-attr a')).not.toBeNull();
+      expect(q(m, '.hoops-map-attr a')).not.toBeNull();
       await m.act(() => finishTiles(lastLayer(), 'fail'));
-      expect(q(m, '.dss-map')?.getAttribute('data-state')).toBe('error');
-      expect(q(m, '.dss-map-attr a')).not.toBeNull();
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map-attr a')).not.toBeNull();
     });
   });
 
   describe('Darstellung', () => {
     it('height setzt die Höhe über die Variable (mindestens 200); dimInDark steuert data-dim; class wird angehängt', async () => {
       const m = open(driver, { height: 400, dimInDark: false, ...(driver.name === 'Svelte' ? { class: 'meine-karte' } : { className: 'meine-karte' }) });
-      const root = q(m, '.dss-map')!;
+      const root = q(m, '.hoops-map')!;
       expect(style(root)).toContain('--hoops-map-h:400px');
       expect(root.getAttribute('data-dim')).toBe('false');
       expect(root.classList.contains('meine-karte')).toBe(true);

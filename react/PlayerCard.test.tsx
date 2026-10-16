@@ -16,11 +16,11 @@ describe('PlayerCard', () => {
       <PlayerCard size="compact" jersey={4} name="J. Tanner" position="PG" captain playerRole="Spielmacher" stat={22} statLabel="PTS" />,
     );
     expect(container.firstElementChild?.tagName).toBe('DIV');
-    expect(container.firstElementChild).toHaveClass('dss-pc-row');
+    expect(container.firstElementChild).toHaveClass('hoops-pc-row');
     expect(screen.getByText('J. Tanner (C)')).toBeInTheDocument();
-    expect(container.querySelector('.dss-tn')).toHaveClass('heim', 'small', 'captain');
-    expect(container.querySelector('.dss-pos')).toHaveClass('pg');
-    expect(container.querySelector('.dss-pos')).toHaveAttribute('aria-hidden', 'true');
+    expect(container.querySelector('.hoops-tn')).toHaveClass('heim', 'small', 'captain');
+    expect(container.querySelector('.hoops-pos')).toHaveClass('pg');
+    expect(container.querySelector('.hoops-pos')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.getByText('22')).toBeInTheDocument();
   });
 
@@ -35,25 +35,25 @@ describe('PlayerCard', () => {
     const { container } = render(
       <PlayerCard size="standard" jersey={13} name="K. Vogler" position="PF" team="gast" captain age="24 J." heightCm="198" vitals={VITALS} />,
     );
-    expect(container.firstElementChild).toHaveClass('dss-pc-card');
+    expect(container.firstElementChild).toHaveClass('hoops-pc-card');
     expect(screen.getByRole('heading', { name: 'K. Vogler', level: 3 })).toBeInTheDocument();
-    expect(screen.getByText('Kapitän')).toHaveClass('dss-pc-cap');
+    expect(screen.getByText('Kapitän')).toHaveClass('hoops-pc-cap');
     expect(screen.getByText('198 cm')).toBeInTheDocument();
-    expect(container.querySelector('.dss-tn')).toHaveClass('gast', 'large');
-    expect(container.querySelectorAll('.dss-pc-vitals .dss-pc-v')).toHaveLength(4);
-    expect(container.querySelector('.dss-pc-v--amber')).toHaveTextContent('22');
+    expect(container.querySelector('.hoops-tn')).toHaveClass('gast', 'large');
+    expect(container.querySelectorAll('.hoops-pc-vitals .hoops-pc-v')).toHaveLength(4);
+    expect(container.querySelector('.hoops-pc-v--amber')).toHaveTextContent('22');
   });
 
   it('rendert hero mit großer Trikotnummer und wählbarer Überschriftenebene', () => {
     const { container } = render(<PlayerCard size="hero" jersey={9} name="H. Lorenz" titleAs="h2" vitals={VITALS} />);
-    expect(container.firstElementChild).toHaveClass('dss-pc-hero');
-    expect(container.querySelector('.dss-tn')).toHaveClass('hero');
+    expect(container.firstElementChild).toHaveClass('hoops-pc-hero');
+    expect(container.querySelector('.hoops-tn')).toHaveClass('hero');
     expect(screen.getByRole('heading', { name: 'H. Lorenz', level: 2 })).toBeInTheDocument();
   });
 
   it('lässt Kennzahlen weg, wenn keine übergeben werden', () => {
     const { container } = render(<PlayerCard jersey={1} name="X" />);
-    expect(container.querySelector('.dss-pc-vitals')).toBeNull();
+    expect(container.querySelector('.hoops-pc-vitals')).toBeNull();
   });
 
   it.each(['compact', 'standard', 'hero'] as const)('hat in %s keine A11y-Verstöße', async (size) => {
@@ -65,8 +65,8 @@ describe('PlayerCard', () => {
     it('ohne photo bleibt das Markup unverändert (Trikotmarke, kein Bild, kein Badge)', () => {
       const { container } = render(<PlayerCard size="compact" jersey={4} name="J. Tanner" />);
       expect(container.querySelector('img')).toBeNull();
-      expect(container.querySelector('.dss-pc-av')).toBeNull();
-      expect(container.querySelector('.dss-tn')).toHaveClass('small');
+      expect(container.querySelector('.hoops-pc-av')).toBeNull();
+      expect(container.querySelector('.hoops-tn')).toHaveClass('small');
     });
 
     it.each(['compact', 'standard', 'hero'] as const)('%s: Foto mit leerem alt (dekorativ), lazy, async, quadratische Maße; Trikotnummer als Badge', (size) => {
@@ -77,8 +77,8 @@ describe('PlayerCard', () => {
       expect(img).toHaveAttribute('loading', 'lazy');
       expect(img).toHaveAttribute('decoding', 'async');
       expect(img.getAttribute('width')).toBe(img.getAttribute('height'));
-      expect(container.querySelector('.dss-tn--badge')).toHaveTextContent('4');
-      expect(container.querySelector('.dss-tn.small, .dss-tn.large, .dss-tn.hero')).toBeNull();
+      expect(container.querySelector('.hoops-tn--badge')).toHaveTextContent('4');
+      expect(container.querySelector('.hoops-tn.small, .hoops-tn.large, .hoops-tn.hero')).toBeNull();
     });
 
     it('photoAlt wird als alt übernommen', () => {
@@ -86,23 +86,23 @@ describe('PlayerCard', () => {
       expect(container.querySelector('img')).toHaveAttribute('alt', 'Porträt von J. Tanner');
     });
 
-    it('hero mit Foto bekommt den Modifikator dss-pc-hero--photo', () => {
+    it('hero mit Foto bekommt den Modifikator hoops-pc-hero--photo', () => {
       const { container } = render(<PlayerCard size="hero" jersey={4} name="J. Tanner" photo="/p.jpg" />);
-      expect(container.firstElementChild).toHaveClass('dss-pc-hero--photo');
+      expect(container.firstElementChild).toHaveClass('hoops-pc-hero--photo');
     });
 
     it.each(['compact', 'standard', 'hero'] as const)('%s: leeres photo zeigt die Trikotmarke', (size) => {
       const { container } = render(<PlayerCard size={size} jersey={4} name="J. Tanner" photo="" />);
       expect(container.querySelector('img')).toBeNull();
-      expect(container.querySelector('.dss-tn--badge')).toBeNull();
+      expect(container.querySelector('.hoops-tn--badge')).toBeNull();
     });
 
     it.each(['compact', 'standard', 'hero'] as const)('%s: Ladefehler fällt auf die Trikotmarke zurück', (size) => {
       const { container } = render(<PlayerCard size={size} jersey={4} name="J. Tanner" photo="/kaputt.jpg" />);
       fireEvent.error(container.querySelector('img')!);
       expect(container.querySelector('img')).toBeNull();
-      expect(container.querySelector('.dss-tn--badge')).toBeNull();
-      expect(container.querySelector('.dss-tn')).toHaveClass(size === 'compact' ? 'small' : size === 'standard' ? 'large' : 'hero');
+      expect(container.querySelector('.hoops-tn--badge')).toBeNull();
+      expect(container.querySelector('.hoops-tn')).toHaveClass(size === 'compact' ? 'small' : size === 'standard' ? 'large' : 'hero');
     });
 
     it('eine neue URL nach einem Fehler wird wieder geladen', () => {

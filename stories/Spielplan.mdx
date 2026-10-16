@@ -19,23 +19,23 @@ Datentabellen für Boxscore, Kader und Kampfgericht stehen auf der Seite [Table]
 
 Die Wahl hängt davon ab, wessen Sicht gezeigt wird und ob Spiele parallel laufen. Ohne Angabe wählt `ScheduleTable` das Layout selbst: `opponent`, sobald ein Spiel einen `opponent` hat, sonst `versus`. `columns` musst du immer ausdrücklich setzen.
 
-<div className="dss-var-grid">
-  <div className="dss-var-card">
+<div className="hoops-var-grid">
+  <div className="hoops-var-card">
     <h3>Liga, Halle</h3>
     <p><b><code>layout="versus"</code></b> · Heim und Gast in einer Zelle, Liga als Unterzeile, Halle unter der Zeit. Für Ligaübersichten und Hallenpläne.</p>
     <Canvas of={SpielplanStories.MiniLiga} />
   </div>
-  <div className="dss-var-card">
+  <div className="hoops-var-card">
     <h3>Mannschaft</h3>
     <p><b><code>layout="opponent"</code></b> · Sicht einer Mannschaft mit vs./@ und Ergebnis eigene : Gegner. Für Mannschaftsseiten im Vereinsregister.</p>
     <Canvas of={SpielplanStories.MiniMannschaft} />
   </div>
-  <div className="dss-var-card">
+  <div className="hoops-var-card">
     <h3>Turnier-Liste</h3>
     <p><b><code>layout="columns"</code></b> · Eine Spalte je Angabe: Nr, Zeit, Feld, Heim, Ergebnis, Gast. Für Turnierlisten, die man durchsucht.</p>
     <Canvas of={SpielplanStories.MiniTurnier} />
   </div>
-  <div className="dss-var-card dss-var-card--wide">
+  <div className="hoops-var-card hoops-var-card--wide">
     <h3>Tagesplan, Hallenbelegung</h3>
     <p><b>ScheduleGrid</b> · Anwurfzeiten als Zeilen, Hallen oder Felder als Spalten. Für parallele Spiele.</p>
     <Canvas of={SpielplanStories.MiniRaster} />
@@ -203,7 +203,7 @@ Lange Vereinsnamen wie „TSV Nordhain 1920“ füllen auf dem Handy eine ganze 
 
 Beide Tabellen zeigen dieselben Daten; oben `names="full"` (Standard), unten `names="short"`. Ein Team ohne `short`, oder mit einem `short`, das dem Namen gleicht, zeigt immer den Namen. Links (`href`) liegen um den sichtbaren Namen.
 
-**Automatisch auf dem Handy:** Bis 640 px Fensterbreite (wie die Handy-Karten) erscheint der Kurzname auch bei `names="full"`, wo ein Team einen hat. Die Regel steckt im CSS, beide Texte stehen im Markup (`dss-name-full`, `dss-name-short`); es ist kein JavaScript nötig und es funktioniert beim Rendern auf dem Server. Ein Team ohne Kurzname ändert sich nicht.
+**Automatisch auf dem Handy:** Bis 640 px Fensterbreite (wie die Handy-Karten) erscheint der Kurzname auch bei `names="full"`, wo ein Team einen hat. Die Regel steckt im CSS, beide Texte stehen im Markup (`hoops-name-full`, `hoops-name-short`); es ist kein JavaScript nötig und es funktioniert beim Rendern auf dem Server. Ein Team ohne Kurzname ändert sich nicht.
 
 ### Logos
 
@@ -255,7 +255,7 @@ Einzeilige Zeilen behalten mit Logos ihre Höhe (gemessen: 60, 48 und 40 px). In
 
 - **Logo:** Das Logo ist für Hilfstechnik verborgen (`aria-hidden`, Bild mit `alt=""`). Ein Alternativtext mit dem Vereinsnamen würde den Namen doppelt ansagen („Logo TSV Nordhain 1920, TSV Nordhain 1920“).
 - **Handy:** Teams mit Logo stehen bis 640 px untereinander, je Team eine Zeile; der Gedankenstrich entfällt dort (er ist für Hilfstechnik ohnehin verborgen, gelesen wird „gegen“).
-- **Kurzname:** Er ist `aria-hidden`. Wo der Kurzname sichtbar ist (mit `names="short"` und bis 640 px), bleibt der volle Name im Dokument (unsichtbar, `dss-sr-only`-Muster) und Screenreader lesen den vollen Namen genau einmal; als Linktext zählt der volle Name. Dafür ist der volle Name nie `display: none`.
+- **Kurzname:** Er ist `aria-hidden`. Wo der Kurzname sichtbar ist (mit `names="short"` und bis 640 px), bleibt der volle Name im Dokument (unsichtbar, `hoops-sr-only`-Muster) und Screenreader lesen den vollen Namen genau einmal; als Linktext zählt der volle Name. Dafür ist der volle Name nie `display: none`.
 - **Markieren und Kopieren:** Wo der Kurzname sichtbar ist, ist der versteckte volle Name nicht markierbar (`user-select: none`); Markieren und Kopieren liefern nur den sichtbaren Namen. Mit der Maus zeigt der Kurzname den vollen Namen als Tooltip (`title`); für Hilfstechnik bleibt er verborgen, es kommt nichts doppelt.
 - **Sprachsteuerung (WCAG 2.5.3, Label im Namen):** Ein abgekürzter Kurzname wie „TSV N.“ steckt nicht im zugänglichen Namen „TSV Nordhain 1920“; „Klick TSV N.“ greift dann nicht. Wähle Kurznamen deshalb so, dass sie Teil des vollen Namens sind („Hawks“, „Seeberg“) oder dessen Anfang bilden.
 
@@ -263,10 +263,10 @@ Einzeilige Zeilen behalten mit Logos ihre Höhe (gemessen: 60, 48 und 40 px). In
 
 Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass `names` gesetzt ist: Der Kurzname erscheint automatisch.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">Gegenüberstellung · logos</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Gegenüberstellung mit Logos">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">Gegenüberstellung · logos</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Gegenüberstellung mit Logos">
       <iframe title="Handy-Vorschau: Spielplan mit Kurznamen und Logos in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan--namen-handy" loading="lazy" />
     </div>
   </div>
@@ -298,22 +298,22 @@ Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass
 
 Unter 640 px Breite werden Zeilen zu Karten und Anwurfzeiten zu Blöcken mit der Spalten-Beschriftung als Überschrift. Im Layout `opponent` steht in der ersten Zeile der Karte das Datum mit der Uhrzeit („Sa, 26.09.2026 · 17:30“), darunter „vs.“ oder „@“ vor Logo und Gegner und rechts das Ergebnis. Für Screenreader bleibt die Reihenfolge Zeit, Heim oder Auswärts, Gegner, Ergebnis. Diese Regeln hängen an der Breite des Fensters, nicht an der des Rahmens. Darum sind die Vorschauen eingebettete Seiten mit fester Breite von 390 px.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">Mannschaft · opponent</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Mannschaft · opponent">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">Mannschaft · opponent</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Mannschaft · opponent">
       <iframe title="Handy-Vorschau: Mannschafts-Spielplan in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan-tabelle--mannschaft" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">Turnier · columns</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Turnier · columns">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">Turnier · columns</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Turnier · columns">
       <iframe title="Handy-Vorschau: Turnier-Spielplan in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan-tabelle--turnier" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h4 className="dss-doc-cap">Zeitraster · ScheduleGrid</h4>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Zeitraster · ScheduleGrid">
+  <div className="hoops-phone">
+    <h4 className="hoops-doc-cap">Zeitraster · ScheduleGrid</h4>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Zeitraster · ScheduleGrid">
       <iframe title="Handy-Vorschau: Zeitraster in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan-zeitraster--zeitraster" loading="lazy" />
     </div>
   </div>
@@ -335,7 +335,7 @@ Mit `id` öffnet ein Anker in der Adresse (`…#sp-turnier`) den Rahmen beim Lad
 
 ## Daten und Snippets
 
-Die Typen stehen in `js/schedule.d.ts` (Export `@bbv/dss-design-system/schedule.js`). Datum und Zeit liefert die App fertig formatiert, die Bausteine formatieren nichts. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
+Die Typen stehen in `js/schedule.d.ts` (Export `@hoopsfoundry/ui/schedule.js`). Datum und Zeit liefert die App fertig formatiert, die Bausteine formatieren nichts. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
 
 ### ScheduleGame
 
@@ -418,7 +418,7 @@ Die Typen stehen in `js/schedule.d.ts` (Export `@bbv/dss-design-system/schedule.
 
 Was optisch durch Chip, Farbe oder Durchstreichung gezeigt wird, steht zusätzlich als unsichtbarer Text im Dokument.
 
-<ul className="dss-hear">
+<ul className="hoops-hear">
   <li>Ergebnis als Text: <q>Eigene 65, Gegner 108, Niederlage</q>. Die sichtbaren Chips und Zahlen sind für Screenreader verborgen, damit nichts doppelt kommt.</li>
   <li>Vorläufig und live hinter dem Ergebnis: <q>vorläufig</q>, <q>läuft</q>.</li>
   <li>Abgesagte und verlegte Spiele: <q>abgesagt</q> bzw. <q>verschoben</q> hinter der Zeit (im Raster vor der Paarung).</li>
@@ -434,8 +434,8 @@ Was optisch durch Chip, Farbe oder Durchstreichung gezeigt wird, steht zusätzli
     ['Tabellensemantik', <>Echte <code>table</code>, <code>th scope</code> und <code>caption</code> (unsichtbar, aus <code>caption</code>). Beim Layout <code>opponent</code> und <code>versus</code> ist der Tabellenkopf nur für Screenreader sichtbar, bei <code>columns</code> sichtbar.</>],
     ['Handy-Karten', <>Die <code>role</code>-Attribute im Markup bleiben bewusst, damit die Tabellensemantik erhalten bleibt, wenn das Handy-CSS Zeilen zu Karten macht.</>],
     ['Farbe', 'Kein Zustand nur über Farbe: Live hat ein Wort-Tag (die grüne Zahl allein genügt nie), abgesagt und verlegt tragen Text, vorläufig steht im Klartext, S/N/U sind Buchstaben.'],
-    ['Fokus', 'Links und Eingaben zeigen den DSS-Fokusring.'],
-    ['Dunkel', <>Der seitenweite Dark Mode wirkt über die <code>--hoops-*</code>-Variablen. Der dunkle Rahmen <code>dss-frame--dark</code> ist für Spielpläne nicht vorgesehen.</>],
+    ['Fokus', 'Links und Eingaben zeigen den HoopsFoundry-UI-Fokusring.'],
+    ['Dunkel', <>Der seitenweite Dark Mode wirkt über die <code>--hoops-*</code>-Variablen. Der dunkle Rahmen <code>hoops-frame--dark</code> ist für Spielpläne nicht vorgesehen.</>],
   ]}
 />
 

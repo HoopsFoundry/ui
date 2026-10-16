@@ -102,14 +102,14 @@ export function AppNav({
   const renderItemLink = (item: AppNavLink): ReactNode => {
     if (item.disabled) {
       return (
-        <span role="link" aria-disabled="true" className="dss-appnav-link is-disabled" title={item.hint}>
+        <span role="link" aria-disabled="true" className="hoops-appnav-link is-disabled" title={item.hint}>
           {item.label}
-          {item.hint ? <span className="dss-sr-only"> – {item.hint}</span> : null}
+          {item.hint ? <span className="hoops-sr-only"> – {item.hint}</span> : null}
         </span>
       );
     }
     const current = isCurrent(item);
-    const linkClass = cn('dss-appnav-link', current && 'is-active');
+    const linkClass = cn('hoops-appnav-link', current && 'is-active');
     const ariaCurrent = current ? 'page' : undefined;
     if (renderLink) {
       return renderLink({ item, className: linkClass, ariaCurrent, onNavigate: closeAll, children: item.label });
@@ -125,7 +125,7 @@ export function AppNav({
     <nav
       ref={rootRef}
       aria-label={ariaLabel}
-      className={cn('dss-appnav', `dss-appnav--${tone}`, contained && 'dss-appnav--contained', menuOpen && 'is-open', className)}
+      className={cn('hoops-appnav', `hoops-appnav--${tone}`, contained && 'hoops-appnav--contained', menuOpen && 'is-open', className)}
       onKeyDown={onKeyDown}
       onBlur={(event) => {
         // Nur schließen, wenn der Fokus auf ein Element außerhalb wandert (relatedTarget null = z. B. Safari-Klick, nicht schließen).
@@ -133,11 +133,11 @@ export function AppNav({
         if (openGroup && next && !event.currentTarget.contains(next)) setOpenGroup(null);
       }}
     >
-      <div className="dss-appnav-bar">
+      <div className="hoops-appnav-bar">
         <button
           ref={toggleRef}
           type="button"
-          className="dss-appnav-toggle"
+          className="hoops-appnav-toggle"
           aria-expanded={menuOpen}
           aria-controls={`${baseId}-list`}
           onClick={() => setMenuOpen((open) => !open)}
@@ -145,21 +145,21 @@ export function AppNav({
           <Icon name={menuOpen ? 'x' : 'menu'} size={20} />
           <span>{menuLabel}</span>
         </button>
-        <ul id={`${baseId}-list`} className="dss-appnav-list">
+        <ul id={`${baseId}-list`} className="hoops-appnav-list">
           {items.map((item) => {
             if (!isGroup(item)) {
               return (
-                <li key={item.id} className="dss-appnav-item">
+                <li key={item.id} className="hoops-appnav-item">
                   {renderItemLink(item)}
                 </li>
               );
             }
             if (item.disabled) {
               return (
-                <li key={item.id} className="dss-appnav-item">
-                  <button type="button" className="dss-appnav-group-btn is-disabled" disabled title={item.hint}>
+                <li key={item.id} className="hoops-appnav-item">
+                  <button type="button" className="hoops-appnav-group-btn is-disabled" disabled title={item.hint}>
                     {item.label}
-                    {item.hint ? <span className="dss-sr-only"> – {item.hint}</span> : null}
+                    {item.hint ? <span className="hoops-sr-only"> – {item.hint}</span> : null}
                   </button>
                 </li>
               );
@@ -167,21 +167,21 @@ export function AppNav({
             const open = openGroup === item.id;
             const panelId = `${baseId}-${slug(item.id)}`;
             return (
-              <li key={item.id} className="dss-appnav-item">
+              <li key={item.id} className="hoops-appnav-item">
                 <button
                   ref={(el) => {
                     triggers.current[item.id] = el;
                   }}
                   type="button"
-                  className={cn('dss-appnav-group-btn', item.items.some(isCurrent) && 'is-active', open && 'is-open')}
+                  className={cn('hoops-appnav-group-btn', item.items.some(isCurrent) && 'is-active', open && 'is-open')}
                   aria-expanded={open}
                   aria-controls={panelId}
                   onClick={() => setOpenGroup(open ? null : item.id)}
                 >
                   {item.label}
-                  <Icon name="chevron-d" size={16} className="dss-appnav-chev" />
+                  <Icon name="chevron-d" size={16} className="hoops-appnav-chev" />
                 </button>
-                <ul id={panelId} className="dss-appnav-panel" hidden={!open}>
+                <ul id={panelId} className="hoops-appnav-panel" hidden={!open}>
                   {item.items.map((child) => (
                     <li key={child.id}>{renderItemLink(child)}</li>
                   ))}
@@ -190,7 +190,7 @@ export function AppNav({
             );
           })}
         </ul>
-        {context ? <div className="dss-appnav-context">{context}</div> : null}
+        {context ? <div className="hoops-appnav-context">{context}</div> : null}
       </div>
     </nav>
   );

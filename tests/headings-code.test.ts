@@ -48,7 +48,7 @@ const EXPECTED: Record<string, string[]> = {
 
 const renderSvelte = async (name: string, source: string) => {
   const file = `${tmpDir}${name}.svelte`;
-  writeFileSync(file, source.replace(/@bbv\/dss-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+  writeFileSync(file, source.replace(/@hoopsfoundry\/ui\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
   const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
   return render(component, { props: {} }).body;
 };
@@ -57,8 +57,8 @@ const renderSvelte = async (name: string, source: string) => {
 function reactModule(source: string, target: 'check' | 'run', name: string): string {
   const map = (line: string) =>
     line
-      .replace('@bbv/dss-design-system/react', target === 'check' ? './index' : `${rootDir}react/index.ts`)
-      .replace('@bbv/dss-design-system/heading.js', target === 'check' ? '../js/heading.js' : `${rootDir}js/heading.js`);
+      .replace('@hoopsfoundry/ui/react', target === 'check' ? './index' : `${rootDir}react/index.ts`)
+      .replace('@hoopsfoundry/ui/heading.js', target === 'check' ? '../js/heading.js' : `${rootDir}js/heading.js`);
   const imports = source.match(/^import [^;]+;$/gm) ?? [];
   const rest = source.replace(/^import [^;]+;$/gm, '').trim();
   if (/^export function/m.test(rest)) return [...imports.map(map), rest].join('\n');
@@ -99,7 +99,7 @@ describe('React-Beispiele bestehen den TypeScript-Compiler', () => {
   }, 60000);
 
   it('Typfehler in einem Beispiel würden auffallen (titleAs h1 ist kein gültiger Typ)', () => {
-    const bad = `import { EmptyState } from '@bbv/dss-design-system/react';\n\n<EmptyState title="x" titleAs="h1" />`;
+    const bad = `import { EmptyState } from '@hoopsfoundry/ui/react';\n\n<EmptyState title="x" titleAs="h1" />`;
     const name = 'bad';
     const file = `${rootDir}react/__code_${name}.tsx`;
     const files = { [file]: reactModule(bad, 'check', name) };
@@ -144,8 +144,8 @@ describe('React-Beispiele rendern mit den erwarteten Ebenen und wie Svelte', () 
     writeFileSync(file, reactModule(code.hookReact, 'run', 'hook'));
     const mod = (await vite.ssrLoadModule(file)) as { SectionTitle: ComponentType<{ children: string }> };
     const { HeadingLevel } = (await vite.ssrLoadModule(`${rootDir}react/index.ts`)) as { HeadingLevel: ComponentType<{ level: number; children: unknown }> };
-    expect(renderToStaticMarkup(createElement(mod.SectionTitle, { children: 'A' }))).toBe('<h3 class="dss-t-h3">A</h3>');
-    expect(renderToStaticMarkup(createElement(HeadingLevel, { level: 5, children: createElement(mod.SectionTitle, { children: 'B' }) }))).toBe('<h5 class="dss-t-h3">B</h5>');
+    expect(renderToStaticMarkup(createElement(mod.SectionTitle, { children: 'A' }))).toBe('<h3 class="hoops-t-h3">A</h3>');
+    expect(renderToStaticMarkup(createElement(HeadingLevel, { level: 5, children: createElement(mod.SectionTitle, { children: 'B' }) }))).toBe('<h5 class="hoops-t-h3">B</h5>');
   });
 });
 

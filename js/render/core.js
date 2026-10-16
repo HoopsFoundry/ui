@@ -1,5 +1,5 @@
 /**
- * DSS Render · gemeinsame Bausteine
+ * HoopsFoundry UI Render · gemeinsame Bausteine
  * --------------------------------------------------------------
  * Teamname mit Kurzform, Logo bzw. Initialen, Form, Live-Hinweise, Überschrift mit Ebene und der einklappbare Rahmen. Die Funktionen geben
  * Markup als Zeichenkette zurück und setzen Daten nur über `esc`/`attr` (js/render/escape.js) und Links nur über `safeHref` (js/url.js) ein.
@@ -79,13 +79,13 @@ export function teamOf(raw) {
 export function nameText(team, names, extra) {
   const short = shortName(team);
   if (!short) return esc(team.name);
-  return `<span class="${klass(extra, 'dss-team-name', names === 'short' && 'dss-team-name--short')}"><span class="dss-name-full">${esc(team.name)}</span><span class="dss-name-short" aria-hidden="true" title="${attr(team.name)}">${esc(short)}</span></span>`;
+  return `<span class="${klass(extra, 'hoops-team-name', names === 'short' && 'hoops-team-name--short')}"><span class="hoops-name-full">${esc(team.name)}</span><span class="hoops-name-short" aria-hidden="true" title="${attr(team.name)}">${esc(short)}</span></span>`;
 }
 
 /** Dekoratives Logo (der Name steht daneben): Bild mit leerem Alternativtext, sonst die Initialen im Kreis. `extra`: Größenklasse. */
 export function logoBadge(team, extra) {
   const inner = team.logo ? `<img src="${attr(team.logo)}" alt="" loading="lazy">` : esc(initials(team.name, 2));
-  return `<span class="${klass('dss-team-logo', extra, !team.logo && 'dss-team-logo--initials')}" aria-hidden="true">${inner}</span>`;
+  return `<span class="${klass('hoops-team-logo', extra, !team.logo && 'hoops-team-logo--initials')}" aria-hidden="true">${inner}</span>`;
 }
 
 // ── Form und Live ────────────────────────────────────────────
@@ -94,36 +94,36 @@ export function logoBadge(team, extra) {
 export function formChips(form, variant, className) {
   const entries = formEntries(form);
   if (!entries.length) return '';
-  const items = entries.map((entry) => `<span class="dss-form-item dss-form-item--${entry.toLowerCase()}"></span>`).join('');
-  return `<span class="${klass('dss-form', variant === 'letters' && 'dss-form--letters', className)}"><span class="dss-form-list" aria-hidden="true">${items}</span><span class="dss-sr-only">${esc(formLabel(form))}</span></span>`;
+  const items = entries.map((entry) => `<span class="hoops-form-item hoops-form-item--${entry.toLowerCase()}"></span>`).join('');
+  return `<span class="${klass('hoops-form', variant === 'letters' && 'hoops-form--letters', className)}"><span class="hoops-form-list" aria-hidden="true">${items}</span><span class="hoops-sr-only">${esc(formLabel(form))}</span></span>`;
 }
 
 /** Grüner Live-Hinweis des Spielplans (wie MatchCard), steht hinter der Uhrzeit. */
-export const liveTag = () => '<span class="dss-match-live dss-sch-live"><span class="dss-match-pulse" aria-hidden="true"></span> Live</span>';
+export const liveTag = () => '<span class="hoops-match-live hoops-sch-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live</span>';
 
 // ── Einklappbarer Rahmen ─────────────────────────────────────
 
-const CHEVRON = '<svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>';
+const CHEVRON = '<svg class="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5"></path></svg>';
 
 /**
  * Der einklappbare Rahmen von Tabelle, Spielplan und Ligencard: Kopf als Überschrift mit Button, Inhalt als Bereich. Das Markup entspricht
  * dem von `CollapsibleFrame` (Svelte und React); das Verhalten startet `initAccordion` (js/accordion.js), `mountX` verbindet beides.
- * `kind`: `frame` (dss-frame) oder `league` (dss-league). `meta` und `content` sind fertiges Markup der Render-Funktion (nie Rohtext von außen).
+ * `kind`: `frame` (hoops-frame) oder `league` (hoops-league). `meta` und `content` sind fertiges Markup der Render-Funktion (nie Rohtext von außen).
  */
 export function collapsibleFrame({ kind, rootClass, id, title, sub, titleAs, open, meta, content, uid }) {
-  const base = kind === 'league' ? 'dss-league' : 'dss-frame';
-  const key = id || `dss-cf-${uid}`;
+  const base = kind === 'league' ? 'hoops-league' : 'hoops-frame';
+  const key = id || `hoops-cf-${uid}`;
   const tag = headingOf(titleAs);
-  const sep = '<span class="dss-acc-sep">,</span>';
+  const sep = '<span class="hoops-acc-sep">,</span>';
   let label = esc(title);
-  if (sub) label += `${sep}<span class="dss-acc-sub">${esc(sub)}${meta ? sep : ''}</span>`;
+  if (sub) label += `${sep}<span class="hoops-acc-sub">${esc(sub)}${meta ? sep : ''}</span>`;
   else if (meta) label += sep;
   return (
     `<div class="${klass(rootClass, 'is-collapsible', open && 'is-open')}"${id ? ` id="${attr(id)}"` : ''}>` +
     `<div class="${base}-head ${base}-head--acc"><${tag} class="${base}-title">` +
-    `<button type="button" class="dss-acc-trigger" id="${attr(key)}-trigger" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${attr(key)}-panel">` +
-    `<span class="dss-acc-label">${label}</span>${meta ?? ''}${CHEVRON}</button></${tag}></div>` +
-    `<div class="dss-acc-panel" id="${attr(key)}-panel"${open ? '' : ' hidden inert'}><div class="dss-acc-panel-inner">${content}</div></div>` +
+    `<button type="button" class="hoops-acc-trigger" id="${attr(key)}-trigger" aria-expanded="${open ? 'true' : 'false'}" aria-controls="${attr(key)}-panel">` +
+    `<span class="hoops-acc-label">${label}</span>${meta ?? ''}${CHEVRON}</button></${tag}></div>` +
+    `<div class="hoops-acc-panel" id="${attr(key)}-panel"${open ? '' : ' hidden inert'}><div class="hoops-acc-panel-inner">${content}</div></div>` +
     '</div>'
   );
 }

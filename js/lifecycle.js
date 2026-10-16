@@ -1,5 +1,5 @@
 /**
- * DSS Lifecycle · das gemeinsame Muster der Vanilla-Bausteine
+ * HoopsFoundry UI Lifecycle · das gemeinsame Muster der Vanilla-Bausteine
  * --------------------------------------------------------------
  * Jeder Baustein hat die Form `initX(root, options) → { destroy() }`:
  *  - nur `root` und seine Nachfahren (und was der Baustein selbst anlegt), kein globaler Zustand;
@@ -48,10 +48,10 @@ export function listen(target, type, handler, options) {
 /**
  * Register je Baustein: `claim(key, handle)` baut eine frühere Fassung für denselben Schlüssel (Wurzel) ab und merkt sich die neue;
  * nach `destroy()` des Handles ist der Schlüssel wieder frei. Mit einem `name` teilen sich alle Kopien dieses Moduls auf der Seite
- * (zwei gebündelte `dss.js`, ein Bündel plus Einzelmodul) ein Register unter `Symbol.for('dss.registry')`; so ersetzt ein zweites `init`
+ * (zwei gebündelte `hoops.js`, ein Bündel plus Einzelmodul) ein Register unter `Symbol.for('hoops.registry')`; so ersetzt ein zweites `init`
  * auch dann das erste, wenn es aus einer anderen Kopie kommt. Ohne `name` ist das Register privat.
  */
-const GLOBAL_KEY = Symbol.for('dss.registry');
+const GLOBAL_KEY = Symbol.for('hoops.registry');
 export function createRegistry(name) {
   let map = null;
   // lazy: beim Import wird nichts auf globalThis geschrieben (sideEffects: false)

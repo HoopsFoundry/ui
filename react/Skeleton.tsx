@@ -17,7 +17,7 @@ export interface SkeletonProps {
 }
 
 function Bar({ style, circle }: { style: CSSProperties; circle?: boolean }) {
-  return <div className={cn('dss-skel', circle ? 'dss-skel--circle' : 'dss-skel--line')} style={style} aria-hidden="true" />;
+  return <div className={cn('hoops-skel', circle ? 'hoops-skel--circle' : 'hoops-skel--line')} style={style} aria-hidden="true" />;
 }
 
 /** Shimmer-Platzhalter für Ladezustände; die Platzhalter sind dekorativ, ein einzelner Status-Text meldet das Laden. */
@@ -32,7 +32,7 @@ export function Skeleton({
 }: SkeletonProps) {
   // label="" lässt den Status-Text weg (mehrere Skeletons auf einer Seite)
   const status = label ? (
-    <span role="status" className="dss-sr-only">
+    <span role="status" className="hoops-sr-only">
       {label}
     </span>
   ) : null;
@@ -41,9 +41,9 @@ export function Skeleton({
     return (
       <>
         {Array.from({ length: count }, (_, i) => (
-          <div key={i} className={cn('dss-skel-row', className)} aria-hidden="true">
+          <div key={i} className={cn('hoops-skel-row', className)} aria-hidden="true">
             <Bar circle style={{ width: 44, height: 44 }} />
-            <div className="dss-skel-who">
+            <div className="hoops-skel-who">
               <Bar style={{ width: '50%', height: 14 }} />
               <Bar style={{ width: '30%', height: 10, marginTop: 4 }} />
             </div>
@@ -58,13 +58,13 @@ export function Skeleton({
   if (variant === 'match') {
     return (
       <>
-        <div className={cn('dss-skel-match', className)} aria-hidden="true">
-          <div className="dss-skel-match-head">
+        <div className={cn('hoops-skel-match', className)} aria-hidden="true">
+          <div className="hoops-skel-match-head">
             <Bar style={{ width: 90, height: 10 }} />
             <Bar style={{ width: 70, height: 10 }} />
           </div>
           {[0, 1].map((row) => (
-            <div key={row} className="dss-skel-match-row">
+            <div key={row} className="hoops-skel-match-row">
               <Bar circle style={{ width: 12, height: 12 }} />
               <Bar style={{ flex: 1, height: 18 }} />
               <Bar style={{ width: 36, height: 22 }} />
@@ -81,7 +81,7 @@ export function Skeleton({
       {Array.from({ length: count }, (_, i) => (
         <div
           key={i}
-          className={cn('dss-skel', `dss-skel--${variant}`, className)}
+          className={cn('hoops-skel', `hoops-skel--${variant}`, className)}
           style={{ width, height, borderRadius: variant === 'circle' ? '50%' : rounded }}
           aria-hidden="true"
         />

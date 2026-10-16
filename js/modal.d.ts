@@ -1,9 +1,9 @@
-import type { DssHandle } from './lifecycle.js';
+import type { HoopsHandle } from './lifecycle.js';
 
 export type ModalCloseReason = 'escape' | 'backdrop' | 'close-button' | 'native' | 'api' | 'destroy' | (string & {});
 
 export interface ModalOpenDetail {
-  /** Das auslösende Element (`data-dss-modal-open`) oder `null` (Aufruf aus dem Code). */
+  /** Das auslösende Element (`data-hoops-modal-open`) oder `null` (Aufruf aus dem Code). */
   trigger: Element | null;
 }
 export interface ModalCloseDetail extends ModalOpenDetail {
@@ -13,9 +13,9 @@ export interface ModalCloseDetail extends ModalOpenDetail {
 export interface ModalOptions {
   /** Ein Klick auf den Hintergrund schließt (Standard `false`, wie in den Svelte-/React-Modals). */
   dismissOnBackdrop?: boolean;
-  /** Escape und Hintergrund schließen (Standard `true`); `data-dss-modal-close` und `.dss-m-close` schließen immer. */
+  /** Escape und Hintergrund schließen (Standard `true`); `data-hoops-modal-close` und `.hoops-m-close` schließen immer. */
   closable?: boolean;
-  /** CSS-Auswahl im Modal für den Anfangsfokus (sonst `[data-dss-modal-focus]`, `[autofocus]`, zuletzt die Fläche). */
+  /** CSS-Auswahl im Modal für den Anfangsfokus (sonst `[data-hoops-modal-focus]`, `[autofocus]`, zuletzt die Fläche). */
   initialFocus?: string;
   /** Element, das beim Schließen den Fokus bekommt, oder `false` (Standard: der Auslöser, sonst das zuvor fokussierte Element). */
   returnFocus?: Element | false;
@@ -25,14 +25,14 @@ export interface ModalOptions {
   onClose?: (detail: ModalCloseDetail) => void;
 }
 
-export interface ModalHandle extends DssHandle {
+export interface ModalHandle extends HoopsHandle {
   open(trigger?: Element | null): void;
   close(reason?: ModalCloseReason): void;
   isOpen(): boolean;
 }
 
-export const MODAL_OPEN_EVENT: 'dss:modalopen';
-export const MODAL_CLOSE_EVENT: 'dss:modalclose';
+export const MODAL_OPEN_EVENT: 'hoops:modalopen';
+export const MODAL_CLOSE_EVENT: 'hoops:modalclose';
 /** Fokussierbare Elemente in `container` in Dokumentreihenfolge (ohne gesperrte, verborgene, inerte, `tabindex="-1"`). */
 export function focusables(container: Element): HTMLElement[];
 /** Macht ein Modal bedienbar (geschlossen): natives `<dialog>` oder Markup mit `role="dialog"`. */

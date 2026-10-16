@@ -14,9 +14,9 @@ const deploy = read('docs/architecture/sections/07-deployment-view.adoc');
 const quality = read('docs/architecture/sections/10-quality-requirements.adoc');
 const pkg = JSON.parse(read('package.json'));
 
-/** Alle `node dss-sync.mjs …`- und `npx dss-sync …`-Zeilen eines Codebeispiels als Argumentlisten. */
+/** Alle `node hoops-sync.mjs …`- und `npx hoops-sync …`-Zeilen eines Codebeispiels als Argumentlisten. */
 const syncCalls = (code: string) =>
-  code.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('node dss-sync.mjs') || l.startsWith('npx dss-sync')).map((l) => l.replace(/\s+#.*$/, '').split(/\s+/).slice(l.startsWith('npx') ? 2 : 2));
+  code.split('\n').map((l) => l.trim()).filter((l) => l.startsWith('node hoops-sync.mjs') || l.startsWith('npx hoops-sync')).map((l) => l.replace(/\s+#.*$/, '').split(/\s+/).slice(l.startsWith('npx') ? 2 : 2));
 
 describe('Aufrufe in der Doku', () => {
   it.each([['releaseSync', releaseSync], ['updateFlow', updateFlow], ['npmSwitch', npmSwitch], ['getSync', getSync]])('%s: jeder portal-sync-Aufruf wird von parseArgs verstanden', (_n, code) => {
@@ -29,26 +29,26 @@ describe('Aufrufe in der Doku', () => {
     for (const flag of ['--from-release', '--from-package', '--from-dir', '--base-url']) expect(all, flag).toContain(flag);
   });
   it('die Adresse im Beispiel ist die Standard-Adresse des Skripts', () => {
-    expect(releaseSync).toContain('https://github.com/OliEder/dss-design-system/releases/download/v0.9.0/');
-    expect(read('scripts/portal-sync.mjs')).toContain("'https://github.com/OliEder/dss-design-system/releases/download'");
-    expect(manualCheck).toContain('shasum -a 256 -c dss-vanilla-0.9.0.sha256');
-    expect(manualCheck).toContain('shasum -a 256 -c dss-vanilla-0.9.0.tgz.sha256');
-    expect(getSync).toContain('shasum -a 256 -c dss-sync.mjs.sha256');
-    expect(getSync).toContain('releases/download/v0.9.0/dss-sync.mjs');
+    expect(releaseSync).toContain('https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/');
+    expect(read('scripts/portal-sync.mjs')).toContain("'https://github.com/HoopsFoundry/ui/releases/download'");
+    expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.10.0.sha256');
+    expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.10.0.tgz.sha256');
+    expect(getSync).toContain('shasum -a 256 -c hoops-sync.mjs.sha256');
+    expect(getSync).toContain('releases/download/v0.10.0/hoops-sync.mjs');
   });
   it('der Rollback nennt dieselbe Zeile mit der alten Version', () => {
-    expect(updateFlow).toMatch(/Rollback[^\n]*\nnode dss-sync\.mjs --from-release 0\.9\.0/);
+    expect(updateFlow).toMatch(/Rollback[^\n]*\nnode hoops-sync\.mjs --from-release 0\.10\.0/);
   });
 });
 
 describe('Zahlen und Stand', () => {
   it('die Budgets der Doku sind die Budgets aus scripts/vanilla-budgets.mjs', () => {
-    expect(budget.minKB * 1024).toBe(BUDGETS.dss.minBytes);
-    expect(budget.gzipKB * 1024).toBe(BUDGETS.dss.gzipBytes);
-    expect(renderBudget.minKB * 1024).toBe(BUDGETS['dss-render'].minBytes);
-    expect(renderBudget.gzipKB * 1024).toBe(BUDGETS['dss-render'].gzipBytes);
-    expect(mapBudget.minKB * 1024).toBe(BUDGETS['dss-map'].minBytes);
-    expect(mapBudget.gzipKB * 1024).toBe(BUDGETS['dss-map'].gzipBytes);
+    expect(budget.minKB * 1024).toBe(BUDGETS.hoops.minBytes);
+    expect(budget.gzipKB * 1024).toBe(BUDGETS.hoops.gzipBytes);
+    expect(renderBudget.minKB * 1024).toBe(BUDGETS['hoops-render'].minBytes);
+    expect(renderBudget.gzipKB * 1024).toBe(BUDGETS['hoops-render'].gzipBytes);
+    expect(mapBudget.minKB * 1024).toBe(BUDGETS['hoops-map'].minBytes);
+    expect(mapBudget.gzipKB * 1024).toBe(BUDGETS['hoops-map'].gzipBytes);
   });
   it('die Browsertabelle summiert sich auf die Gesamtzahl (drei Prüfungen gelten allen Browsern)', () => {
     expect(compat.browsers.reduce((sum, b) => sum + b.checks, 0) + 3).toBe(compat.checks);
@@ -69,16 +69,16 @@ describe('Zahlen und Stand', () => {
 
 describe('Seiten und Verweise', () => {
   it('Foundation/Vanilla hat die vier neuen Abschnitte, das Beispiel und den Workflow', () => {
-    for (const part of ['## Einbinden aus dem Release', '## Aktualisieren', '## Kompatibilität', '## Wechsel auf npm ab 1.0', 'portal-seite', 'release-vanilla.yml', 'dry_run', 'Rollback', 'sha256', 'dss-sync.mjs', 'npx dss-sync', 'Node 18', 'relative Pfade', 'noscript', 'byte-gleich', '--allow-insecure-http', '32 MiB', 'Ausblick', 'attest-build-provenance']) expect(mdx, part).toContain(part);
+    for (const part of ['## Einbinden aus dem Release', '## Aktualisieren', '## Kompatibilität', '## Wechsel auf npm ab 1.0', 'portal-seite', 'release-vanilla.yml', 'dry_run', 'Rollback', 'sha256', 'hoops-sync.mjs', 'npx hoops-sync', 'Node 18', 'relative Pfade', 'noscript', 'byte-gleich', '--allow-insecure-http', '32 MiB', 'Ausblick', 'attest-build-provenance']) expect(mdx, part).toContain(part);
     expect(nodeVersions).toEqual(['18.20.8', '20.20.2', '22.21.0']);
   });
   it('ADR-006 beschreibt Ablauf, Prüfsummen, austauschbare Quelle und die Grenze der Prüfsumme', () => {
     const section = adr.slice(adr.indexOf('=== ADR-006'), adr.indexOf('=== ADR-007'));
-    for (const part of ['scripts/release-vanilla.mjs', '.sha256', '.tgz.sha256', 'manifest.json', 'dss-sync.mjs', '--from-release', '--from-package', '--from-dir', 'vanilla-budgets.mjs', 'keine Signatur', 'release-vanilla.yml', '.dss-release', '.dss-sync.lock', '--allow-insecure-http', '--allow-redirect-host', '32 MiB', 'Betriebssystem-Byte 3', 'Node 18', 'attest-build-provenance', 'byte-gleich', 'zurückrollen']) expect(section, part).toContain(part);
+    for (const part of ['scripts/release-vanilla.mjs', '.sha256', '.tgz.sha256', 'manifest.json', 'hoops-sync.mjs', '--from-release', '--from-package', '--from-dir', 'vanilla-budgets.mjs', 'keine Signatur', 'release-vanilla.yml', '.hoops-release', '.hoops-sync.lock', '--allow-insecure-http', '--allow-redirect-host', '32 MiB', 'Betriebssystem-Byte 3', 'Node 18', 'attest-build-provenance', 'byte-gleich', 'zurückrollen']) expect(section, part).toContain(part);
     expect(section).not.toMatch(/feat\/|Branch|Umsetzung laut Plan/);
   });
   it('die Verteilungssicht nennt den Ablauf und was nicht nachgewiesen ist', () => {
-    for (const part of ['release-vanilla.mjs', 'release-vanilla.yml', 'dss-sync.mjs --from-release', 'Nicht nachgewiesen', 'Node 18.20.8, 20.20.2 und 22.21.0', 'Prüfsummen sind keine Signatur']) expect(deploy, part).toContain(part);
+    for (const part of ['release-vanilla.mjs', 'release-vanilla.yml', 'hoops-sync.mjs --from-release', 'Nicht nachgewiesen', 'Node 18.20.8, 20.20.2 und 22.21.0', 'Prüfsummen sind keine Signatur']) expect(deploy, part).toContain(part);
   });
   it('README, CHANGELOG, Einführung und CLAUDE.md nennen Release und Beispielseite', () => {
     expect(read('README.md')).toContain('--from-release');
@@ -96,7 +96,7 @@ describe('Seiten und Verweise', () => {
     expect(pkg.files).toContain('dist/');
     expect(pkg.files).toEqual(expect.arrayContaining(['scripts/portal-sync.mjs', 'scripts/lib/']));
     expect(pkg.files.filter((f: string) => /scripts/.test(f)).sort()).toEqual(['scripts/lib/', 'scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs', 'scripts/portal-sync.mjs']);
-    expect(pkg.bin).toEqual({ 'dss-sync': 'scripts/portal-sync.mjs', 'hoops-migrate': 'scripts/migrate-from-dss.mjs' });
+    expect(pkg.bin).toEqual({ 'hoops-sync': 'scripts/portal-sync.mjs', 'hoops-migrate': 'scripts/migrate-from-dss.mjs' });
     expect(pkg.exports['./portal-sync.mjs']).toBe('./scripts/portal-sync.mjs');
     expect(pkg.devDependencies.esbuild).toBeTruthy();
     expect(pkg.engines.node).toBe('>=18.0.0');
@@ -109,7 +109,7 @@ describe('Seiten und Verweise', () => {
       // relative Pfade: auf einer GitHub-Pages-Projektseite (Unterpfad) tragen nur sie
       expect(html.match(/(?:src|href)="\/(?!\/)/g) ?? [], file).toEqual([]);
       expect(html).toContain('<noscript>');
-      expect(html).toMatch(/data-dss-modal-open="fehler-melden" hidden>/);
+      expect(html).toMatch(/data-hoops-modal-open="fehler-melden" hidden>/);
       expect(html).not.toMatch(/<style|\sstyle="|\son[a-z]+="/);
     }
     const js = read('stories/examples/portal-seite/portal.js');
@@ -125,10 +125,10 @@ describe('Seiten und Verweise', () => {
 
 describe('Gegenproben', () => {
   it('ein unbekannter Schalter in der Doku wird erkannt', () => {
-    const wrong = mutate(releaseSync, '--from-release 0.9.0\n', '--von-release 0.9.0\n');
+    const wrong = mutate(releaseSync, '--from-release 0.10.0\n', '--von-release 0.10.0\n');
     expect(() => syncCalls(wrong).forEach((a) => parseArgs(a))).toThrow(/unbekannte Option/);
   });
   it('ein anderes Budget in der Doku fällt auf', () => {
-    expect((budget.minKB + 1) * 1024).not.toBe(BUDGETS.dss.minBytes);
+    expect((budget.minKB + 1) * 1024).not.toBe(BUDGETS.hoops.minBytes);
   });
 });

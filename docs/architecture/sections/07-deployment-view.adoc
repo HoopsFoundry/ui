@@ -15,18 +15,18 @@ Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus
 
 Entscheidung und Begründung: ADR-006.
 
-Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält drei Bündel nebeneinander: `dss.js` (Kern), `dss-render.js` (importiert `./dss.js`) und `dss-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
+Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält drei Bündel nebeneinander: `hoops.js` (Kern), `hoops-render.js` (importiert `./hoops.js`) und `hoops-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
 
 [cols="1,2,2",options="header"]
 |===
 |Schritt |Wo |Was
-|Bau und Release-Dateien |Entwicklungsrechner oder Workflow `release-vanilla.yml` |`npm run build`, dann `node scripts/release-vanilla.mjs`: prüft die Version an acht Stellen und die Größenbudgets, schreibt `release/dss-vanilla-<version>.tgz`, `.sha256`, `.tgz.sha256`, `manifest.json`, `dss-sync.mjs` und `dss-sync.mjs.sha256`
+|Bau und Release-Dateien |Entwicklungsrechner oder Workflow `release-vanilla.yml` |`npm run build`, dann `node scripts/release-vanilla.mjs`: prüft die Version an acht Stellen und die Größenbudgets, schreibt `release/hoops-ui-<version>.tgz`, `.sha256`, `.tgz.sha256`, `manifest.json`, `hoops-sync.mjs` und `hoops-sync.mjs.sha256`
 |Veröffentlichung |GitHub-Release `v<version>` |Die sechs Anhänge; angelegt vom Release-Job des Workflows bei einem Tag `v*` (Tag-Commit auf `main`)
-|Übernahme |Projekt des Portals, `dss-sync.mjs --from-release <version>` (npm: `npx dss-sync --from-package`) |Download über https, Prüfung, Ersetzen von `_site/dss` mit Rückrollen und Sperre; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
+|Übernahme |Projekt des Portals, `hoops-sync.mjs --from-release <version>` (npm: `npx hoops-sync --from-package`) |Download über https, Prüfung, Ersetzen von `_site/hoops` mit Rückrollen und Sperre; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
 |Betrieb |Statischer Host (GitHub Pages) |Dateien auf der eigenen Domain, relative Pfade (auch unter `/<repo>/`); strenge CSP (`script-src 'self'` plus Hash des Boot-Skripts, `style-src 'self'`, `img-src 'self'` und Kachel-Host)
 |===
 
-Nachgewiesen ist der Weg durch `scripts/check-portal-seite.mjs`: bauen, Release erzeugen, den Anhang `dss-sync.mjs` in einem fremden Ordner mit `--from-release` von einem lokalen Server laufen lassen und die Beispielseite unter strenger CSP in Chromium und WebKit prüfen (auch unter einem Unterpfad, bei 320 px und ohne JavaScript). Das Hilfsskript und das Release-Skript sind mit Node 18.20.8, 20.20.2 und 22.21.0 gelaufen. Nicht nachgewiesen ist der Lauf des Workflows `release-vanilla.yml` auf GitHub (kein Tag, kein Release erzeugt); ein Test prüft nur seinen Aufbau und führt die Versionsprüfung in bash aus (Auslöser, Rechte, Reihenfolge, Pins). Er lässt sich mit `workflow_dispatch` und `dry_run: true` ohne Release erproben. Die Prüfsummen sind keine Signatur; Build-Provenance ist vorbereitet, aber nicht eingeschaltet.
+Nachgewiesen ist der Weg durch `scripts/check-portal-seite.mjs`: bauen, Release erzeugen, den Anhang `hoops-sync.mjs` in einem fremden Ordner mit `--from-release` von einem lokalen Server laufen lassen und die Beispielseite unter strenger CSP in Chromium und WebKit prüfen (auch unter einem Unterpfad, bei 320 px und ohne JavaScript). Das Hilfsskript und das Release-Skript sind mit Node 18.20.8, 20.20.2 und 22.21.0 gelaufen. Nicht nachgewiesen ist der Lauf des Workflows `release-vanilla.yml` auf GitHub (kein Tag, kein Release erzeugt); ein Test prüft nur seinen Aufbau und führt die Versionsprüfung in bash aus (Auslöser, Rechte, Reihenfolge, Pins). Er lässt sich mit `workflow_dispatch` und `dry_run: true` ohne Release erproben. Die Prüfsummen sind keine Signatur; Build-Provenance ist vorbereitet, aber nicht eingeschaltet.
 
 === Dokumentation und MCP
 

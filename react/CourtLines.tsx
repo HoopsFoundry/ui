@@ -12,8 +12,8 @@ export interface CourtLinesProps {
  */
 export function CourtLines({ position = 'fixed', className }: CourtLinesProps) {
   return (
-    <div className={cn('dss-courtbg', position === 'absolute' && 'dss-courtbg--absolute', className)} aria-hidden="true">
-      <div className="dss-courtlines" />
+    <div className={cn('hoops-courtbg', position === 'absolute' && 'hoops-courtbg--absolute', className)} aria-hidden="true">
+      <div className="hoops-courtlines" />
     </div>
   );
 }

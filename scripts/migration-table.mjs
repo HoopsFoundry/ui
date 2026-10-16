@@ -1,7 +1,8 @@
 /**
  * Ersetzungstabellen der Umbenennung von DSS auf HoopsFoundry UI, je Stufe (alt → neu). Genutzt von scripts/migrate-from-dss.mjs.
  * Stufe T (Design-Tokens) ist mit scripts/codemod-tokens.mjs erzeugt; spätere Stufen (K Klassen, D data-Attribute und Namen) ergänzen
- * eigene Tabellen und tragen sie in STUFEN ein.
+ * eigene Tabellen und tragen sie in STUFEN ein. Die Stufen K (Klassen) und D (data-Attribute, Ereignisse, Speicherschlüssel, Dateinamen, Paketname)
+ * sind Regeln statt Namenslisten (Familienregel `dss-` → `hoops-` usw.) und stehen in scripts/lib/name-rename.mjs.
  * Nicht enthalten sind Namen, die nur in den Stories dieses Repositories vorkommen (zum Beispiel `--d`); Konsumenten kennen sie nicht.
  */
 export const TOKENS = [
@@ -309,5 +310,10 @@ export const TOKENS = [
   ['--warn-text', '--hoops-warn-text'],
 ];
 
-/** Reihenfolge der Anwendung: [Kennung, Beschriftung, Paare]. */
-export const STUFEN = [['T', 'Design-Tokens (CSS-Custom-Properties)', TOKENS]];
+import { REGELSTUFEN } from './lib/name-rename.mjs';
+
+/**
+ * Reihenfolge der Anwendung: [Kennung, Beschriftung, Daten]. Daten sind bei T Paare [alt, neu], bei D und K Regelobjekte
+ * `{ name, muster, ersatz }`. Standard beim Migrationsskript: alle Stufen (T, D, K).
+ */
+export const STUFEN = [['T', 'Design-Tokens (CSS-Custom-Properties)', TOKENS], ...REGELSTUFEN];

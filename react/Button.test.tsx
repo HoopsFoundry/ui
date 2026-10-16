@@ -8,13 +8,13 @@ describe('Button', () => {
   it('rendert primary/md als Standard mit type=button', () => {
     render(<Button>Speichern</Button>);
     const btn = screen.getByRole('button', { name: 'Speichern' });
-    expect(btn).toHaveClass('dss-btn', 'dss-btn--primary', 'dss-btn--md');
+    expect(btn).toHaveClass('hoops-btn', 'hoops-btn--primary', 'hoops-btn--md');
     expect(btn).toHaveAttribute('type', 'button');
   });
 
   it('setzt Variante und Größe als Klassen', () => {
     render(<Button variant="danger" size="lg">Löschen</Button>);
-    expect(screen.getByRole('button')).toHaveClass('dss-btn--danger', 'dss-btn--lg');
+    expect(screen.getByRole('button')).toHaveClass('hoops-btn--danger', 'hoops-btn--lg');
   });
 
   it('touch fügt is-touch hinzu', () => {
@@ -26,7 +26,7 @@ describe('Button', () => {
     render(<Button type="submit" className="extra" aria-label="Senden">OK</Button>);
     const btn = screen.getByRole('button', { name: 'Senden' });
     expect(btn).toHaveAttribute('type', 'submit');
-    expect(btn).toHaveClass('extra', 'dss-btn');
+    expect(btn).toHaveClass('extra', 'hoops-btn');
   });
 
   it('feuert onClick, aber nicht wenn disabled', () => {

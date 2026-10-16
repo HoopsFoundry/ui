@@ -75,14 +75,14 @@ export function MatchCard({
       <>
         {logos ? <TeamLogo name={team.name} logo={team.logo} /> : null}
         {short ? (
-          <span className={cn('dss-match-name', 'dss-team-name', names === 'short' && 'dss-team-name--short')}>
-            <span className="dss-name-full">{team.name}</span>
-            <span className="dss-name-short" aria-hidden="true" title={team.name}>
+          <span className={cn('hoops-match-name', 'hoops-team-name', names === 'short' && 'hoops-team-name--short')}>
+            <span className="hoops-name-full">{team.name}</span>
+            <span className="hoops-name-short" aria-hidden="true" title={team.name}>
               {short}
             </span>
           </span>
         ) : (
-          <span className="dss-match-name">{team.name}</span>
+          <span className="hoops-match-name">{team.name}</span>
         )}
       </>
     );
@@ -90,45 +90,45 @@ export function MatchCard({
 
   const body = (
     <>
-      <span className="dss-match-head">
-        <span className="dss-match-league">
+      <span className="hoops-match-head">
+        <span className="hoops-match-league">
           {league ? <span>{league}</span> : null}
-          {matchday ? <span className="dss-match-muted">· {matchday}</span> : null}
+          {matchday ? <span className="hoops-match-muted">· {matchday}</span> : null}
         </span>
         {state === 'live' ? (
-          <span className="dss-match-live">
-            <span className="dss-match-pulse" aria-hidden="true" /> Live · {liveText}
+          <span className="hoops-match-live">
+            <span className="hoops-match-pulse" aria-hidden="true" /> Live · {liveText}
           </span>
         ) : state === 'finished' ? (
-          <span className="dss-match-final">Endstand</span>
+          <span className="hoops-match-final">Endstand</span>
         ) : date ? (
-          <span className="dss-match-when">
+          <span className="hoops-match-when">
             {date}
             {time ? ` · ${time}` : ''}
           </span>
         ) : null}
       </span>
-      <span className="dss-match-body">
-        <span className={cn('dss-match-team', gastWin && 'is-loser')}>
-          <span className="dss-match-dot" aria-hidden="true" />
+      <span className="hoops-match-body">
+        <span className={cn('hoops-match-team', gastWin && 'is-loser')}>
+          <span className="hoops-match-dot" aria-hidden="true" />
           {teamBlock(heim)}
-          {showScore && heim.score !== undefined ? <span className="dss-match-score">{heim.score}</span> : null}
+          {showScore && heim.score !== undefined ? <span className="hoops-match-score">{heim.score}</span> : null}
         </span>
-        <span className={cn('dss-match-team', 'dss-match-team--gast', heimWin && 'is-loser')}>
-          <span className="dss-match-dot" aria-hidden="true" />
+        <span className={cn('hoops-match-team', 'hoops-match-team--gast', heimWin && 'is-loser')}>
+          <span className="hoops-match-dot" aria-hidden="true" />
           {teamBlock(gast)}
-          {showScore && gast.score !== undefined ? <span className="dss-match-score">{gast.score}</span> : null}
+          {showScore && gast.score !== undefined ? <span className="hoops-match-score">{gast.score}</span> : null}
         </span>
       </span>
       {venue ? (
-        <span className="dss-match-foot">
+        <span className="hoops-match-foot">
           <span>{venue}</span>
         </span>
       ) : null}
     </>
   );
 
-  const cls = cn('dss-match', `dss-match--${state}`, logos && 'dss-match--logos', className);
+  const cls = cn('hoops-match', `hoops-match--${state}`, logos && 'hoops-match--logos', className);
   if (href) {
     return (
       <a className={cls} href={href} onClick={onClick}>

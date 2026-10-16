@@ -1,14 +1,14 @@
 /**
- * DSS Render · VenueCard (Hallenkarte)
+ * HoopsFoundry UI Render · VenueCard (Hallenkarte)
  * --------------------------------------------------------------
  * `renderVenueCard(props, options?)`/`mountVenueCard(el, props, options?)`: dasselbe Markup wie die Komponente VenueCard (Svelte, React),
  * auch die Karte: `renderVenueCard` liefert das Platzhalter-Markup der Karte (Region, Hinweis mit Schaltfläche „Karte laden“, Statuszeile,
  * Quellenangabe, Ortsliste mit Adresse als Text, Links „Größere Karte“ und „Route planen“) ohne Leaflet und ohne Netzverkehr. Lebendig
- * (Kacheln, Zoom, Marker) wird sie mit `initMap` (js/map-vanilla.js) auf `.dss-map` in `.dss-venue-map`: `mountVenueCard(el, props, { initMap })`
+ * (Kacheln, Zoom, Marker) wird sie mit `initMap` (js/map-vanilla.js) auf `.hoops-map` in `.hoops-venue-map`: `mountVenueCard(el, props, { initMap })`
  * startet sie selbst (nicht interaktiv, ohne Liste wie die Komponente), und `update` lässt die laufende Karte stehen, solange Ort und Name gleich bleiben.
  * Ohne `initMap` ist die Schaltfläche „Karte laden“ gesperrt (`disabled`, `aria-disabled`), damit sie nicht tot wirkt; `options.mapActive: true`
- * gibt sie frei (das Markup ist dann das von `MapView`). `options.init: true` markiert die Karte für `initAll` (`data-dss="map"` mit den Optionen
- * als JSON in `data-dss-options`), für Seiten, deren Markup auf dem Server entsteht. Props: `name`, `address`, `lat`, `lng`, `info`, `contact`, `games`, `limit`, `gamesLabel`, `href`, `linkLabel`, `names`,
+ * gibt sie frei (das Markup ist dann das von `MapView`). `options.init: true` markiert die Karte für `initAll` (`data-hoops="map"` mit den Optionen
+ * als JSON in `data-hoops-options`), für Seiten, deren Markup auf dem Server entsteht. Props: `name`, `address`, `lat`, `lng`, `info`, `contact`, `games`, `limit`, `gamesLabel`, `href`, `linkLabel`, `names`,
  * `logos`, `size`, `titleAs`, `load`, `tileUrl`, `privacyNote`, `mapHeight`, `className`. Spiele, Kontakt, Adresse und Links kommen aus
  * js/venue.js (Grenzen: `limit` 1 bis 5, ohne beendete und Spielfrei). Typen: js/render/venue-card.d.ts.
  */
@@ -49,11 +49,11 @@ function venueMapProps(p, title, lat, lng) {
 
 /** Eine Mannschaft der Spielzeile: Trikotpunkt, optional Logo, versteckter Hinweis „Heim“/„Gast“, Name mit Kurzform. */
 const teamLine = (team, side, names, logos) =>
-  `<div class="dss-venue-team"><span class="dss-venue-dot dss-venue-dot--${side}" aria-hidden="true"></span>${logos ? logoBadge(team, 'dss-team-logo--sm') : ''}` +
-  `<span class="dss-sr-only">${esc(side === 'heim' ? venueText.home : venueText.away)}:</span><span class="dss-venue-team-name">${nameText(team, names)}</span></div>`;
+  `<div class="hoops-venue-team"><span class="hoops-venue-dot hoops-venue-dot--${side}" aria-hidden="true"></span>${logos ? logoBadge(team, 'hoops-team-logo--sm') : ''}` +
+  `<span class="hoops-sr-only">${esc(side === 'heim' ? venueText.home : venueText.away)}:</span><span class="hoops-venue-team-name">${nameText(team, names)}</span></div>`;
 
 const contactRow = (label, value) => {
-  const inner = value.href ? `<a class="dss-link" href="${attr(value.href)}">${esc(value.text)}</a>` : esc(value.text);
+  const inner = value.href ? `<a class="hoops-link" href="${attr(value.href)}">${esc(value.text)}</a>` : esc(value.text);
   return `<div><dt>${esc(label)}</dt><dd>${inner}</dd></div>`;
 };
 
@@ -80,27 +80,27 @@ export function renderVenueCard(props, options) {
 
   const mapProps = hasMap ? venueMapProps(p, title, lat, lng) : null;
   const map = hasMap
-    ? `<div class="dss-venue-map"${obj(options).init === true ? ` data-dss="map" data-dss-options="${attr(JSON.stringify(mapProps))}"` : ''}>` +
+    ? `<div class="hoops-venue-map"${obj(options).init === true ? ` data-hoops="map" data-hoops-options="${attr(JSON.stringify(mapProps))}"` : ''}>` +
       renderMapView({ ...mapProps, label: venueMapLabel(title), loadReady: obj(options).mapActive === true }, uid) +
-      `<div class="dss-venue-maplinks">${venueMapLinks({ lat, lng, name: title })
-        .map((link) => `<a class="dss-link" href="${attr(link.href)}">${esc(link.text)}${title ? `<span class="dss-sr-only">, ${esc(title)}</span>` : ''}</a>`)
+      `<div class="hoops-venue-maplinks">${venueMapLinks({ lat, lng, name: title })
+        .map((link) => `<a class="hoops-link" href="${attr(link.href)}">${esc(link.text)}${title ? `<span class="hoops-sr-only">, ${esc(title)}</span>` : ''}</a>`)
         .join('')}</div></div>`
     : '';
 
   const games = rows.length
-    ? `<div class="dss-venue-games"><div class="dss-venue-sec" aria-hidden="true">${esc(gamesLabel)}</div><ul class="dss-venue-game-list" aria-label="${attr(gamesLabel)}">` +
+    ? `<div class="hoops-venue-games"><div class="hoops-venue-sec" aria-hidden="true">${esc(gamesLabel)}</div><ul class="hoops-venue-game-list" aria-label="${attr(gamesLabel)}">` +
       rows
         .map((game, index) => {
           const when = gameWhen(game);
           const meta = gameMeta(game);
           const state = gameState(game);
           return (
-            '<li class="dss-venue-game">' +
+            '<li class="hoops-venue-game">' +
             (when || state
-              ? `<div class="dss-venue-game-head">${when ? `<span class="dss-venue-when">${esc(when)}</span>` : ''}${state ? `<span class="dss-chip dss-chip--${state.tone}">${esc(state.text)}</span>` : ''}</div>`
+              ? `<div class="hoops-venue-game-head">${when ? `<span class="hoops-venue-when">${esc(when)}</span>` : ''}${state ? `<span class="hoops-chip hoops-chip--${state.tone}">${esc(state.text)}</span>` : ''}</div>`
               : '') +
-            (meta ? `<div class="dss-venue-game-meta">${esc(meta)}</div>` : '') +
-            `<div class="dss-venue-teams">${game.heim?.name ? teamLine(game.heim, 'heim', names, logos) : ''}${game.gast?.name ? teamLine(game.gast, 'gast', names, logos) : ''}</div></li>`
+            (meta ? `<div class="hoops-venue-game-meta">${esc(meta)}</div>` : '') +
+            `<div class="hoops-venue-teams">${game.heim?.name ? teamLine(game.heim, 'heim', names, logos) : ''}${game.gast?.name ? teamLine(game.gast, 'gast', names, logos) : ''}</div></li>`
           );
         })
         .join('') +
@@ -108,15 +108,15 @@ export function renderVenueCard(props, options) {
     : '';
 
   return (
-    `<div class="${klass('dss-venue', `dss-venue--${size}`, hasMap && 'dss-venue--map', str(p.className))}"><div class="dss-venue-in">${map}<div class="dss-venue-body">` +
-    (title ? `<${tag} class="dss-venue-title">${esc(title)}</${tag}>` : '') +
-    (lines.length ? `<address class="dss-venue-address">${lines.map((line) => `<span class="dss-venue-line">${esc(line)}</span>`).join('')}</address>` : '') +
-    (info ? `<p class="dss-venue-info">${esc(info)}</p>` : '') +
+    `<div class="${klass('hoops-venue', `hoops-venue--${size}`, hasMap && 'hoops-venue--map', str(p.className))}"><div class="hoops-venue-in">${map}<div class="hoops-venue-body">` +
+    (title ? `<${tag} class="hoops-venue-title">${esc(title)}</${tag}>` : '') +
+    (lines.length ? `<address class="hoops-venue-address">${lines.map((line) => `<span class="hoops-venue-line">${esc(line)}</span>`).join('')}</address>` : '') +
+    (info ? `<p class="hoops-venue-info">${esc(info)}</p>` : '') +
     (person
-      ? `<dl class="dss-venue-contact">${person.name ? `<div><dt>${esc(venueText.contact)}</dt><dd>${esc(person.name)}</dd></div>` : ''}${person.phone ? contactRow(venueText.phone, person.phone) : ''}${person.email ? contactRow(venueText.email, person.email) : ''}</dl>`
+      ? `<dl class="hoops-venue-contact">${person.name ? `<div><dt>${esc(venueText.contact)}</dt><dd>${esc(person.name)}</dd></div>` : ''}${person.phone ? contactRow(venueText.phone, person.phone) : ''}${person.email ? contactRow(venueText.email, person.email) : ''}</dl>`
       : '') +
     games +
-    (target ? `<div class="dss-venue-foot"><a class="dss-link dss-venue-more" href="${attr(target)}">${esc(linkLabel)}${title ? `<span class="dss-sr-only">, ${esc(title)}</span>` : ''}</a></div>` : '') +
+    (target ? `<div class="hoops-venue-foot"><a class="hoops-link hoops-venue-more" href="${attr(target)}">${esc(linkLabel)}${title ? `<span class="hoops-sr-only">, ${esc(title)}</span>` : ''}</a></div>` : '') +
     '</div></div></div>'
   );
 }
@@ -144,7 +144,7 @@ export function mountVenueCard(el, props, options) {
   // `null` nimmt eine frühere Angabe zurück (initMap.update führt Eigenschaften zusammen): fehlt tileUrl oder privacyNote, gilt wieder der Standard
   const optionsOf = (p) => ({ tileUrl: null, privacyNote: null, ...venueMapProps(p, str(p.name).trim(), p.lat, p.lng), ...behavior });
   const start = (p) => {
-    const node = keyOf(p) ? el.querySelector('.dss-venue-map') : null;
+    const node = keyOf(p) ? el.querySelector('.hoops-venue-map') : null;
     live = node ? { node, key: keyOf(p), handle: initMap(node, optionsOf(p)) } : null;
   };
 
@@ -167,7 +167,7 @@ export function mountVenueCard(el, props, options) {
         live = null;
       }
       inner.update(p);
-      const fresh = el.querySelector('.dss-venue-map');
+      const fresh = el.querySelector('.hoops-venue-map');
       // Die laufende Karte bleibt stehen: ein neuer Platzhalter an ihrer Stelle wird durch sie ersetzt
       if (keep && fresh && fresh !== keep.node) fresh.replaceWith(keep.node);
       if (keep && (fresh || keep.node.isConnected)) keep.handle.update(optionsOf(p));

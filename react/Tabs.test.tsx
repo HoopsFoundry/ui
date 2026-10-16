@@ -20,8 +20,8 @@ describe('Tabs (single)', () => {
 
   it('zeigt Count, Icon und deaktiviert Tabs', () => {
     const { container } = render(<Tabs items={ITEMS} />);
-    expect(container.querySelector('.dss-tab-count')).toHaveTextContent('12');
-    expect(container.querySelector('svg.dss-tab-ic')).toBeInTheDocument();
+    expect(container.querySelector('.hoops-tab-count')).toHaveTextContent('12');
+    expect(container.querySelector('svg.hoops-tab-ic')).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Gesperrt' })).toBeDisabled();
   });
 
@@ -68,7 +68,7 @@ describe('Tabs (single)', () => {
 
   it('setzt Variante und Größe als Klassen', () => {
     render(<Tabs items={ITEMS} variant="segmented" size="lg" />);
-    expect(screen.getByRole('tablist')).toHaveClass('dss-tabs', 'dss-tabs--segmented', 'dss-tabs--lg');
+    expect(screen.getByRole('tablist')).toHaveClass('hoops-tabs', 'hoops-tabs--segmented', 'hoops-tabs--lg');
   });
 
   it('hat keine axe-Verstöße', async () => {

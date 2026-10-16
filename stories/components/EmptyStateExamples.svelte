@@ -10,7 +10,7 @@
 
   // Erzwingt einen Zustand auf dem Button der Zelle (EmptyState hat keine class-Prop für den CTA)
   function mark(node: HTMLElement, cls: string) {
-    const target = node.querySelector<HTMLElement>('.dss-btn');
+    const target = node.querySelector<HTMLElement>('.hoops-btn');
     if (cls && target) target.classList.add(...cls.split(' '));
   }
 
@@ -85,7 +85,7 @@
           <div class="rowlabel">{t.id}</div>
           {#each cols as c}
             <!-- Fläche und Rand der Tonalität wie im EmptyState, nur mit kleinerem Innenabstand -->
-            <div class="dss-empty dss-empty--{t.id} cell" use:mark={stateClass[c]}>
+            <div class="hoops-empty hoops-empty--{t.id} cell" use:mark={stateClass[c]}>
               <Button variant={t.variant} onclick={noop}>Aktion</Button>
             </div>
           {/each}

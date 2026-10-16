@@ -1,7 +1,7 @@
 name: Release Vanilla
 
-# Baut das Vanilla-Paket (dist/vanilla) und hängt es als Release-Anhang an (Tarball, Prüfsummen, manifest.json, dss-sync.mjs).
-#  - Tag `v*` (z. B. v0.9.0): Prüfungen, Bau, danach wird ein GitHub-Release mit den Anhängen angelegt.
+# Baut das Vanilla-Paket (dist/vanilla) und hängt es als Release-Anhang an (Tarball, Prüfsummen, manifest.json, hoops-sync.mjs).
+#  - Tag `v*` (z. B. v0.10.0): Prüfungen, Bau, danach wird ein GitHub-Release mit den Anhängen angelegt.
 #  - Manuell (workflow_dispatch): Eingabe `version`. Mit `dry_run: true` (Standard) werden die Dateien nur als Workflow-Artefakt hochgeladen,
 #    es entsteht kein Release. Nur mit `dry_run: false` und einem vorhandenen Tag `v<version>` wird veröffentlicht.
 # Der Tag-Commit muss auf `main` liegen. Der Ablauf selbst (Skript scripts/release-vanilla.mjs) läuft lokal ohne Netz und ohne Git-Schreibzugriff;
@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version ohne v (muss package.json entsprechen, z. B. 0.9.0)'
+        description: 'Version ohne v (muss package.json entsprechen, z. B. 0.10.0)'
         required: true
         type: string
       dry_run:
@@ -69,7 +69,7 @@ jobs:
             version="$INPUT_VERSION"
           fi
           if ! [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
-            echo "Ungültige Version (erwartet z. B. 0.9.0 oder 1.0.0-rc.1)"
+            echo "Ungültige Version (erwartet z. B. 0.10.0 oder 1.0.0-rc.1)"
             exit 1
           fi
           if [ "$EVENT" != "push" ] && [ "$REF_TYPE" = "tag" ] && [ "$REF_NAME" != "v$version" ]; then
@@ -100,7 +100,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Release-Dateien erzeugen (Version, Prüfsummen, Manifest, dss-sync.mjs)
+      - name: Release-Dateien erzeugen (Version, Prüfsummen, Manifest, hoops-sync.mjs)
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: node scripts/release-vanilla.mjs --no-build --expect-version="$VERSION"
@@ -108,7 +108,7 @@ jobs:
       - name: Als Workflow-Artefakt hochladen
         uses: actions/upload-artifact@v7
         with:
-          name: dss-vanilla-${{ steps.version.outputs.version }}
+          name: hoops-ui-${{ steps.version.outputs.version }}
           path: release/
           if-no-files-found: error
           retention-days: 14
@@ -127,7 +127,7 @@ jobs:
       - name: Release-Dateien laden
         uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
-          name: dss-vanilla-${{ needs.build.outputs.version }}
+          name: hoops-ui-${{ needs.build.outputs.version }}
           path: release
 
       # Vorbereitet, nicht aktiv (ungetestet, deshalb nicht eingeschaltet): Build-Provenance nach SLSA für die Anhänge.
@@ -136,9 +136,9 @@ jobs:
       #   uses: actions/attest-build-provenance@<Commit-SHA> # <Version>
       #   with:
       #     subject-path: |
-      #       release/dss-vanilla-*.tgz
-      #       release/dss-sync.mjs
-      # Prüfen lässt sie sich dann mit: gh attestation verify <Datei> --repo OliEder/dss-design-system
+      #       release/hoops-ui-*.tgz
+      #       release/hoops-sync.mjs
+      # Prüfen lässt sie sich dann mit: gh attestation verify <Datei> --repo HoopsFoundry/ui
 
       - name: Release anlegen oder ergänzen
         uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
@@ -146,10 +146,10 @@ jobs:
           tag_name: v${{ needs.build.outputs.version }}
           name: v${{ needs.build.outputs.version }}
           files: |
-            release/dss-vanilla-${{ needs.build.outputs.version }}.tgz
-            release/dss-vanilla-${{ needs.build.outputs.version }}.tgz.sha256
-            release/dss-vanilla-${{ needs.build.outputs.version }}.sha256
+            release/hoops-ui-${{ needs.build.outputs.version }}.tgz
+            release/hoops-ui-${{ needs.build.outputs.version }}.tgz.sha256
+            release/hoops-ui-${{ needs.build.outputs.version }}.sha256
             release/manifest.json
-            release/dss-sync.mjs
-            release/dss-sync.mjs.sha256
+            release/hoops-sync.mjs
+            release/hoops-sync.mjs.sha256
           fail_on_unmatched_files: true

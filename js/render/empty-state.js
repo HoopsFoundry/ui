@@ -1,5 +1,5 @@
 /**
- * DSS Render · EmptyState
+ * HoopsFoundry UI Render · EmptyState
  * --------------------------------------------------------------
  * `renderEmptyState(props)`/`mountEmptyState(el, props, options)`: dasselbe Markup wie die Komponente EmptyState (Svelte, React).
  * Props: `tone` (`neutral`, `action`, `error`), `title`, `body`, `icon` (Sprite-ID mit `i-`, z. B. `i-calendar`), `cta` (Text des Buttons),
@@ -38,17 +38,17 @@ export function renderEmptyState(props) {
       const href = url(item.href);
       const label = str(item.label);
       if (!href || !label) return '';
-      return `<a class="dss-btn dss-btn--${pick(item.variant, VARIANTS, 'ghost')} dss-btn--md" href="${attr(href)}">${esc(label)}</a>`;
+      return `<a class="hoops-btn hoops-btn--${pick(item.variant, VARIANTS, 'ghost')} hoops-btn--md" href="${attr(href)}">${esc(label)}</a>`;
     })
     .join('');
-  const button = cta ? `<button type="button" class="${cls('dss-btn', 'dss-btn--md', `dss-btn--${CTA_VARIANT[tone]}`)}">${esc(cta)}</button>` : '';
+  const button = cta ? `<button type="button" class="${cls('hoops-btn', 'hoops-btn--md', `hoops-btn--${CTA_VARIANT[tone]}`)}">${esc(cta)}</button>` : '';
   return (
-    `<div class="${klass('dss-empty', `dss-empty--${tone}`, str(p.className))}">` +
-    `<div class="dss-empty-icon">${symbol}</div>` +
-    `<${tag} class="dss-empty-title">${esc(title)}</${tag}>` +
-    (body ? `<p class="dss-empty-body">${esc(body)}</p>` : '') +
-    (button || actions ? `<div class="dss-empty-actions">${button}${actions}</div>` : '') +
-    (extra ? `<div class="dss-empty-extra">${esc(extra)}</div>` : '') +
+    `<div class="${klass('hoops-empty', `hoops-empty--${tone}`, str(p.className))}">` +
+    `<div class="hoops-empty-icon">${symbol}</div>` +
+    `<${tag} class="hoops-empty-title">${esc(title)}</${tag}>` +
+    (body ? `<p class="hoops-empty-body">${esc(body)}</p>` : '') +
+    (button || actions ? `<div class="hoops-empty-actions">${button}${actions}</div>` : '') +
+    (extra ? `<div class="hoops-empty-extra">${esc(extra)}</div>` : '') +
     '</div>'
   );
 }
@@ -56,6 +56,6 @@ export function renderEmptyState(props) {
 /** Setzt `renderEmptyState` in `el` ein; `options.onCta(event)` hört auf den Klick des Buttons von `cta`. */
 export function mountEmptyState(el, props, options = {}) {
   const { onCta, ...rest } = options && typeof options === 'object' ? options : {};
-  const on = typeof onCta === 'function' ? [{ type: 'click', selector: '.dss-empty-actions > button', handler: (event) => onCta(event) }] : [];
+  const on = typeof onCta === 'function' ? [{ type: 'click', selector: '.hoops-empty-actions > button', handler: (event) => onCta(event) }] : [];
   return mount(el, renderEmptyState, props, { ...rest, on: [...(Array.isArray(rest.on) ? rest.on : []), ...on] });
 }

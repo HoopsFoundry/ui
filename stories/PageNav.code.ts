@@ -2,7 +2,7 @@
 // rendern das Svelte-Beispiel und führen das Vanilla-Markup mit initAll in jsdom aus.
 
 /** Markup der Seite; die Doku zeigt es und führt es auch aus (`initAll`). */
-export const pageMarkup = `<main data-dss="pagenav" data-dss-options='{"label":"Auf dieser Seite"}'>
+export const pageMarkup = `<main data-hoops="pagenav" data-hoops-options='{"label":"Auf dieser Seite"}'>
   <h1>Verein Nordhain</h1>
   <section>
     <h2>Tabelle</h2>
@@ -27,22 +27,22 @@ export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="css/components.css" />
 
 <!-- Seitennavigation und Nach-oben-Knopf entstehen im Browser aus den Überschriften -->
-<body data-dss="backtop">
+<body data-hoops="backtop">
 ${pageMarkup}
 
 <script type="module">
-  import { initAll } from '@bbv/dss-design-system/vanilla-core.js';
+  import { initAll } from '@hoopsfoundry/ui/vanilla-core.js';
 
-  // Startet alle Elemente mit data-dss="pagenav|backtop|accordion|theme". Optionen je Baustein stehen in
-  // initAll(document, { pagenav: { … } }) oder am Element in data-dss-options.
-  const dss = initAll(document);
-  // dss.destroy() baut alles wieder ab
+  // Startet alle Elemente mit data-hoops="pagenav|backtop|accordion|theme". Optionen je Baustein stehen in
+  // initAll(document, { pagenav: { … } }) oder am Element in data-hoops-options.
+  const hoops = initAll(document);
+  // hoops.destroy() baut alles wieder ab
 </script>
 
-<!-- Oder einzeln, ohne data-dss -->
+<!-- Oder einzeln, ohne data-hoops -->
 <script type="module">
-  import { initPageNav } from '@bbv/dss-design-system/pagenav.js';
-  import { initBackToTop } from '@bbv/dss-design-system/backtop.js';
+  import { initPageNav } from '@hoopsfoundry/ui/pagenav.js';
+  import { initBackToTop } from '@hoopsfoundry/ui/backtop.js';
 
   const nav = initPageNav(document.querySelector('main'), {
     label: 'Auf dieser Seite',   // sichtbarer Text und Name der Navigation
@@ -58,8 +58,8 @@ ${pageMarkup}
 
 export const svelte = `<script>
   import { onMount } from 'svelte';
-  import { initPageNav } from '@bbv/dss-design-system/pagenav.js';
-  import { initBackToTop } from '@bbv/dss-design-system/backtop.js';
+  import { initPageNav } from '@hoopsfoundry/ui/pagenav.js';
+  import { initBackToTop } from '@hoopsfoundry/ui/backtop.js';
 
   // Es gibt keine Svelte-Komponente: die Navigation ist die Vanilla-Funktion. Sie legt Markup um den Inhalt
   // und beobachtet ihn, deshalb bekommt sie einen leeren Platz (container), den Svelte nicht anfasst.
@@ -82,8 +82,8 @@ export const svelte = `<script>
 </main>`;
 
 export const react = `import { useEffect, useRef } from 'react';
-import { initPageNav } from '@bbv/dss-design-system/pagenav.js';
-import { initBackToTop } from '@bbv/dss-design-system/backtop.js';
+import { initPageNav } from '@hoopsfoundry/ui/pagenav.js';
+import { initBackToTop } from '@hoopsfoundry/ui/backtop.js';
 
 // Es gibt keine React-Komponente: die Navigation ist die Vanilla-Funktion. Sie legt Markup um den Inhalt
 // und beobachtet ihn, deshalb bekommt sie einen leeren Platz (container), den React nicht anfasst.
@@ -121,10 +121,10 @@ export const tokensCss = `/* Scrollen und Nach-oben-Knopf laufen über Tokens un
 }
 
 /* Opt-in-Klasse: scroll-padding oben (Token) und unten (4,5rem), damit Fokus nicht unter Leiste oder Knopf endet.
-   Setze sie auf <html> oder auf einen Scrollbereich: <html class="dss-scroll-pad"> */`;
+   Setze sie auf <html> oder auf einen Scrollbereich: <html class="hoops-scroll-pad"> */`;
 
-export const funktionenJs = `import { slug, entries, signature } from '@bbv/dss-design-system/pagenav.js';
-import { revealAround, scrollToElement } from '@bbv/dss-design-system/accordion.js';
+export const funktionenJs = `import { slug, entries, signature } from '@hoopsfoundry/ui/pagenav.js';
+import { revealAround, scrollToElement } from '@hoopsfoundry/ui/accordion.js';
 
 slug('Größe & Ärger');                 // 'groesse-aerger'
 

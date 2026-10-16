@@ -14,7 +14,7 @@ function ReactPage({ names }: { names: string[] }) {
   }, []);
   return <main ref={ref}>{names.map((n, i) => <h2 key={i}>{n}</h2>)}</main>;
 }
-const links = () => [...document.querySelectorAll('.dss-pagenav-link')].map((a) => a.textContent);
+const links = () => [...document.querySelectorAll('.hoops-pagenav-link')].map((a) => a.textContent);
 
 afterEach(() => {
   cleanup();

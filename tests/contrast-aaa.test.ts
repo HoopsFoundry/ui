@@ -74,7 +74,7 @@ const dbbScope = blockOf(tokens, ':root[data-brand="dbb"] {') + '\n' + tokens;
 
 describe('AAA-Kontrast (≥ 7:1) der nachgezogenen Farbpaare', () => {
   it('Topbar „Live“-Text: ≥ 7:1 auf Schwarz und auf DBB-Anthrazit #191919 (grün, --hoops-live-fg-on-dark)', () => {
-    const rule = css.match(/\.dss-topbar-live\s*\{[^}]*?color:\s*(var\(--hoops-live-fg-on-dark\))/);
+    const rule = css.match(/\.hoops-topbar-live\s*\{[^}]*?color:\s*(var\(--hoops-live-fg-on-dark\))/);
     expect(rule).not.toBeNull();
     const fg = color(rule![1], root);
     expect(ratio(fg, color(defOf(tokens, '--hoops-ink-1000'), tokens))).toBeGreaterThanOrEqual(AAA);
@@ -82,17 +82,17 @@ describe('AAA-Kontrast (≥ 7:1) der nachgezogenen Farbpaare', () => {
   });
 
   it('Topbar-Lampe ist grün (--hoops-live-fill), nicht mehr rot', () => {
-    expect(css).toMatch(/\.dss-topbar-live::before\s*\{[^}]*background:\s*var\(--hoops-live-fill\)/);
-    expect(css).not.toMatch(/\.dss-topbar-live[^{]*\{[^}]*--hoops-err-fill/);
+    expect(css).toMatch(/\.hoops-topbar-live::before\s*\{[^}]*background:\s*var\(--hoops-live-fill\)/);
+    expect(css).not.toMatch(/\.hoops-topbar-live[^{]*\{[^}]*--hoops-err-fill/);
   });
 
   it('Topbar-Avatar: weiß auf --hoops-cool-700 ≥ 7:1', () => {
-    expect(css).toMatch(/\.dss-topbar-av\s*\{[^}]*background:\s*var\(--hoops-cool-700\)/);
+    expect(css).toMatch(/\.hoops-topbar-av\s*\{[^}]*background:\s*var\(--hoops-cool-700\)/);
     expect(ratio([1, 1, 1], color('var(--hoops-cool-700)', tokens))).toBeGreaterThanOrEqual(AAA);
   });
 
   it('Amber-Button: Hover-Hintergrund bleibt dunkler als normal, Text ≥ 7:1 (DBB Schwarz)', () => {
-    expect(css).toMatch(/\.dss-btn--amber:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--hoops-cta-bg-hover\)[^}]*color:\s*var\(--hoops-cta-fg-hover\)/);
+    expect(css).toMatch(/\.hoops-btn--amber:hover:not\(:disabled\)\s*\{[^}]*background:\s*var\(--hoops-cta-bg-hover\)[^}]*color:\s*var\(--hoops-cta-fg-hover\)/);
     expect(css).toMatch(/:root\[data-brand="dbb"\]\s*\{\s*--hoops-cta-fg-hover:\s*oklch\(0 0 0\)/);
     const normal = color('var(--hoops-gold-400)', dbbScope);
     const hover = color('var(--hoops-gold-500)', dbbScope);
@@ -105,7 +105,7 @@ describe('AAA-Kontrast (≥ 7:1) der nachgezogenen Farbpaare', () => {
   });
 
   it('Eigene Spielplan-Zeile im Dunkelmodus: gedämpfter Text ≥ 7:1 auf --hoops-selected-bg', () => {
-    expect(css).toMatch(/\.dss-tbl--schedule tr\.is-own,\s*\.dss-sg-game\.is-own\s*\{\s*--hoops-mute:\s*var\(--hoops-mute-on-selected\)/);
+    expect(css).toMatch(/\.hoops-tbl--schedule tr\.is-own,\s*\.hoops-sg-game\.is-own\s*\{\s*--hoops-mute:\s*var\(--hoops-mute-on-selected\)/);
     // Dunkelmodus-Blöcke (Media-Query und data-theme) setzen das Token auf --hoops-n-300
     const dunkel = css.match(/--hoops-mute-on-selected:\s*var\(--hoops-n-300\)/g) ?? [];
     expect(dunkel).toHaveLength(2);
@@ -120,7 +120,7 @@ describe('AAA-Kontrast (≥ 7:1) der nachgezogenen Farbpaare', () => {
   });
 
   it('Gast-Trikotmarke: weiß auf abgedunkeltem Rot ≥ 7:1', () => {
-    expect(css).toMatch(/\.dss-tn\.gast\s*\{[^}]*color-mix\(in oklab, var\(--hoops-team-gast[^}]*90%, black\)/);
+    expect(css).toMatch(/\.hoops-tn\.gast\s*\{[^}]*color-mix\(in oklab, var\(--hoops-team-gast[^}]*90%, black\)/);
     // Näherung: 10 % Schwarz im Oklab-Raum entspricht L × 0,9
     const [, c, h] = defOf(tokens, '--hoops-team-gast').match(/oklch\(\s*[\d.]+\s+([\d.]+)\s+([\d.]+)\s*\)/)!.slice(0, 3);
     const l = Number(defOf(tokens, '--hoops-team-gast').match(/oklch\(\s*([\d.]+)/)![1]) * 0.9;
@@ -134,7 +134,7 @@ describe('AAA-Kontrast (≥ 7:1) der nachgezogenen Farbpaare', () => {
     const scope = '--hoops-h-signal: var(--hoops-h-amber);\n' + tokens;
     const bg = color('oklch(0.30 0.06 var(--hoops-h-signal))', scope);
     expect(ratio(color('var(--hoops-signal-300)', scope), bg)).toBeGreaterThanOrEqual(AAA);
-    expect(css).toMatch(/\.dss-pill-s\.cap\s*\{[^}]*color:\s*var\(--hoops-accent-text\)/);
+    expect(css).toMatch(/\.hoops-pill-s\.cap\s*\{[^}]*color:\s*var\(--hoops-accent-text\)/);
   });
 
   it('Hilfsfunktion: bekannte Werte', () => {

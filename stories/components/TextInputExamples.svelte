@@ -14,10 +14,10 @@
 </script>
 
 {#snippet cell(row, col)}
-  <div class="dss-field {row.tone ? `is-${row.tone}` : ''}">
-    <div class="dss-input-group {col === 'Fokus' ? 'pseudo-focus-within' : ''}">
+  <div class="hoops-field {row.tone ? `is-${row.tone}` : ''}">
+    <div class="hoops-input-group {col === 'Fokus' ? 'pseudo-focus-within' : ''}">
       <input
-        class="dss-input dss-input--{row.compact ? 'compact' : 'default'}"
+        class="hoops-input hoops-input--{row.compact ? 'compact' : 'default'}"
         type="text"
         value={row.value}
         disabled={col === 'Gesperrt'}
@@ -55,9 +55,9 @@
   <div class="grid2">
     <div>
       <div class="cap">Touch · 56 px</div>
-      <div class="dss-field">
-        <label class="dss-field-label" for="ti-touch">Spielstand Heim</label>
-        <div class="dss-input-group"><input id="ti-touch" class="dss-input" type="text" inputmode="numeric" value="68" /></div>
+      <div class="hoops-field">
+        <label class="hoops-field-label" for="ti-touch">Spielstand Heim</label>
+        <div class="hoops-input-group"><input id="ti-touch" class="hoops-input" type="text" inputmode="numeric" value="68" /></div>
       </div>
     </div>
     <div>
@@ -97,7 +97,7 @@
 {:else if example === 'dont-label'}
   <!-- Platzhalter ohne Label: verschwindet beim Tippen, kein Klickziel, kein Name für Screenreader -->
   <div class="narrow">
-    <div class="dss-field"><div class="dss-input-group"><input class="dss-input dss-input--default" type="text" placeholder="Trikotnummer" aria-label="Trikotnummer" /></div></div>
+    <div class="hoops-field"><div class="hoops-input-group"><input class="hoops-input hoops-input--default" type="text" placeholder="Trikotnummer" aria-label="Trikotnummer" /></div></div>
   </div>
 {:else if example === 'do-fehler'}
   <div class="narrow"><TextInput label="Trikotnummer" value="107" state="error" help="Ungültig: Nummern müssen FIBA-konform sein (max. 99)." /></div>

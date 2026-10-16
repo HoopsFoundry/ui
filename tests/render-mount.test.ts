@@ -51,26 +51,26 @@ describe('mount: einsetzen', () => {
     mountLeagueCard(host, { title: 'Oberliga', teams: TEAMS });
     expect(create).toHaveBeenCalledTimes(1);
     expect(setter).not.toHaveBeenCalled();
-    expect(host.querySelector('h3.dss-league-title')?.textContent).toBe('Oberliga');
+    expect(host.querySelector('h3.hoops-league-title')?.textContent).toBe('Oberliga');
   });
   it('ersetzt den früheren Inhalt und stellt ihn bei destroy wieder her', () => {
     host.append(document.createRange().createContextualFragment('<p id="alt">Serverseitig gerendert</p>'));
     const handle = mountStats(host, { items: [{ label: 'Siege', value: 3 }] });
     expect(host.querySelector('#alt')).toBeNull();
-    expect(host.querySelector('.dss-stat-value')?.textContent).toBe('3');
+    expect(host.querySelector('.hoops-stat-value')?.textContent).toBe('3');
     handle.destroy();
     expect(host.querySelector('#alt')?.textContent).toBe('Serverseitig gerendert');
-    expect(host.querySelector('.dss-stats')).toBeNull();
+    expect(host.querySelector('.hoops-stats')).toBeNull();
   });
   it('ein zweites mount auf demselben Element ersetzt das erste (ein Handler, keine Dopplung)', () => {
     const first = vi.fn();
     const second = vi.fn();
     mountEmptyState(host, { title: 'A', cta: 'Los' }, { onCta: first });
     mountEmptyState(host, { title: 'B', cta: 'Los' }, { onCta: second });
-    click(host.querySelector('.dss-empty-actions button')!);
+    click(host.querySelector('.hoops-empty-actions button')!);
     expect(first).not.toHaveBeenCalled();
     expect(second).toHaveBeenCalledTimes(1);
-    expect(host.querySelector('.dss-empty-title')?.textContent).toBe('B');
+    expect(host.querySelector('.hoops-empty-title')?.textContent).toBe('B');
   });
   it('ohne Element, ohne document oder mit falscher Render-Funktion: ein Handle ohne Wirkung', () => {
     for (const handle of [mountStats(null as never, { items: [] }), mount(host, 'x' as never, {})]) {
@@ -85,17 +85,17 @@ describe('update', () => {
   it('ersetzt den Inhalt zu den neuen Eigenschaften', () => {
     const handle = mountStats(host, { items: [{ label: 'Siege', value: 1 }] });
     handle.update({ items: [{ label: 'Siege', value: 2 }, { label: 'Niederlagen', value: 0 }] });
-    expect([...host.querySelectorAll('.dss-stat-value')].map((el) => el.textContent)).toEqual(['2', '0']);
+    expect([...host.querySelectorAll('.hoops-stat-value')].map((el) => el.textContent)).toEqual(['2', '0']);
     handle.update({ items: [] });
     expect(host.childNodes).toHaveLength(0);
   });
   it('hält den Fokus: ein Link in der Tabelle behält ihn über die Lage, der Rahmenkopf über seine id', () => {
     const handle = mountLeagueCard(host, { title: 'Oberliga', teams: TEAMS });
-    const link = host.querySelectorAll<HTMLAnchorElement>('a.dss-league-link')[1];
+    const link = host.querySelectorAll<HTMLAnchorElement>('a.hoops-league-link')[1];
     link.focus();
     expect(document.activeElement).toBe(link);
     handle.update({ title: 'Oberliga', teams: TEAMS.map((t) => ({ ...t, played: 12 })) });
-    const now = host.querySelectorAll<HTMLAnchorElement>('a.dss-league-link')[1];
+    const now = host.querySelectorAll<HTMLAnchorElement>('a.hoops-league-link')[1];
     expect(now).not.toBe(link);
     expect(document.activeElement).toBe(now);
     expect(now.getAttribute('href')).toBe('/teams/seeberg');
@@ -112,14 +112,14 @@ describe('update', () => {
     const inner = document.createElement('div');
     shadow.append(inner);
     const handle = mountLeagueCard(inner, { title: 'Oberliga', teams: TEAMS });
-    shadow.querySelectorAll<HTMLAnchorElement>('a.dss-league-link')[1].focus();
+    shadow.querySelectorAll<HTMLAnchorElement>('a.hoops-league-link')[1].focus();
     expect(shadow.activeElement?.getAttribute('href')).toBe('/teams/seeberg');
     handle.update({ title: 'Oberliga', teams: TEAMS.map((t) => ({ ...t, points: 1 })) });
     expect(shadow.activeElement?.getAttribute('href')).toBe('/teams/seeberg');
   });
   it('verschwindet der fokussierte Knoten, bekommt der Rahmen den Fokus, nicht <body>', () => {
     const handle = mountLeagueCard(host, { title: 'Oberliga', teams: TEAMS, collapsible: true, id: 'o', open: true });
-    host.querySelectorAll<HTMLAnchorElement>('a.dss-league-link')[1].focus();
+    host.querySelectorAll<HTMLAnchorElement>('a.hoops-league-link')[1].focus();
     handle.update({ title: 'Oberliga', teams: TEAMS.slice(0, 1), collapsible: true, id: 'o', open: true });
     expect(document.activeElement).not.toBe(document.body);
     expect(document.activeElement?.id).toBe('o-trigger');
@@ -137,7 +137,7 @@ describe('einklappbarer Rahmen: Accordion-Anbindung', () => {
   const props = { title: 'Oberliga', teams: TEAMS, collapsible: true, id: 'oberliga' };
   it('legt eine Gruppe an, öffnet und schließt per Klick und hält den Zustand bei update', () => {
     const handle = mountLeagueCard(host, props);
-    const group = host.querySelector('.dss-acc');
+    const group = host.querySelector('.hoops-acc');
     expect(group).not.toBeNull();
     const trigger = () => host.querySelector<HTMLButtonElement>('#oberliga-trigger')!;
     const panel = () => host.querySelector<HTMLElement>('#oberliga-panel')!;
@@ -147,7 +147,7 @@ describe('einklappbarer Rahmen: Accordion-Anbindung', () => {
     click(trigger());
     expect(trigger().getAttribute('aria-expanded')).toBe('true');
     expect(panel().hidden).toBe(false);
-    expect(host.querySelector('.dss-league')?.classList.contains('is-open')).toBe(true);
+    expect(host.querySelector('.hoops-league')?.classList.contains('is-open')).toBe(true);
     // gleiche `open`-Eingabe: der Zustand im Dokument bleibt
     handle.update({ ...props, played: 5 } as never);
     expect(trigger().getAttribute('aria-expanded')).toBe('true');
@@ -158,21 +158,21 @@ describe('einklappbarer Rahmen: Accordion-Anbindung', () => {
     expect(trigger().getAttribute('aria-expanded')).toBe('true');
   });
   it('steht el in einer Gruppe des Aufrufers, legt mount keine eigene an', () => {
-    host.className = 'dss-acc';
+    host.className = 'hoops-acc';
     const a = document.createElement('div');
     const b = document.createElement('div');
     host.append(a, b);
     const one = mountTable(a, { title: 'Eins', collapsible: true, id: 'eins', rows: [['x']] });
     const two = mountTable(b, { title: 'Zwei', collapsible: true, id: 'zwei', rows: [['y']] });
-    expect(host.querySelectorAll('.dss-acc')).toHaveLength(0); // keine zusätzliche Gruppe: el ist selbst eine
-    expect(a.querySelector('.dss-acc')).toBeNull();
+    expect(host.querySelectorAll('.hoops-acc')).toHaveLength(0); // keine zusätzliche Gruppe: el ist selbst eine
+    expect(a.querySelector('.hoops-acc')).toBeNull();
     one.destroy();
     two.destroy();
   });
   it('nicht einklappbar: keine Gruppe, kein Accordion-Zustand', () => {
     mountLeagueCard(host, { title: 'Oberliga', teams: TEAMS });
-    expect(host.querySelector('.dss-acc')).toBeNull();
-    expect(host.querySelector('.dss-acc-trigger')).toBeNull();
+    expect(host.querySelector('.hoops-acc')).toBeNull();
+    expect(host.querySelector('.hoops-acc-trigger')).toBeNull();
   });
   it('destroy räumt Gruppe und Listener auf', () => {
     const ledger = listenerLedger();
@@ -181,7 +181,7 @@ describe('einklappbarer Rahmen: Accordion-Anbindung', () => {
     expect(ledger.open().length).toBeGreaterThan(0); // das Verhalten hängt Listener an (Klick, Taste, hashchange)
     handle.destroy();
     expect(ledger.open()).toEqual([]);
-    expect(host.querySelector('.dss-acc')).toBeNull();
+    expect(host.querySelector('.hoops-acc')).toBeNull();
   });
 });
 
@@ -199,20 +199,20 @@ describe('Ereignisse', () => {
   it('MatchCard: onClick macht die Karte zum Button; mit href bleibt es ein Link mit Handler', () => {
     const onClick = vi.fn();
     mountMatchCard(host, { heim: { name: 'A' }, gast: { name: 'B' } }, { onClick });
-    const card = host.querySelector('.dss-match')!;
+    const card = host.querySelector('.hoops-match')!;
     expect(card.tagName).toBe('BUTTON');
     click(card);
     expect(onClick).toHaveBeenCalledTimes(1);
     mountMatchCard(host, { heim: { name: 'A' }, gast: { name: 'B' }, href: '/spiele/1' }, { onClick });
     host.addEventListener('click', (event) => event.preventDefault()); // jsdom navigiert nicht
-    expect(host.querySelector('.dss-match')?.tagName).toBe('A');
-    click(host.querySelector('.dss-match')!);
+    expect(host.querySelector('.hoops-match')?.tagName).toBe('A');
+    click(host.querySelector('.hoops-match')!);
     expect(onClick).toHaveBeenCalledTimes(2);
   });
   it('TeamCard: onClick macht den Namen zum Button', () => {
     const onClick = vi.fn();
     mountTeamCard(host, { name: 'Hawks' }, { onClick });
-    const button = host.querySelector<HTMLButtonElement>('button.dss-team-link')!;
+    const button = host.querySelector<HTMLButtonElement>('button.hoops-team-link')!;
     expect(button.type).toBe('button');
     click(button);
     expect(onClick).toHaveBeenCalledTimes(1);
@@ -224,14 +224,14 @@ describe('weitere Funktionen', () => {
     mountScheduleTable(host, { games: [{ id: 'a', state: 'scheduled', time: '17:30', heim: { name: 'A' }, gast: { name: 'B' } }], layout: 'columns' }, {
       time: (g: { time?: string }) => `ab ${g.time}`, notice: () => 'Konflikt',
     } as never);
-    expect(host.querySelector('.dss-sch-time')?.textContent).toBe('ab 17:30');
-    expect(host.querySelector('.dss-sch-notice')?.textContent).toBe('Konflikt');
+    expect(host.querySelector('.hoops-sch-time')?.textContent).toBe('ab 17:30');
+    expect(host.querySelector('.hoops-sch-notice')?.textContent).toBe('Konflikt');
   });
   it('mountVenueCard zeigt den Platzhalter der Karte ohne Netz: kein img, kein Kachelbild, Schaltfläche bleibt', () => {
     mountVenueCard(host, { name: 'Halle', lat: 49.3, lng: 7.9, address: { street: 'Weg 1', city: 'Ort' } });
-    expect(host.querySelector('.dss-map[data-state="idle"] .dss-map-load')?.textContent).toBe('Karte laden');
-    expect(host.querySelector('.dss-map-canvas')).toBeNull();
-    expect(host.querySelector('.dss-map img')).toBeNull();
+    expect(host.querySelector('.hoops-map[data-state="idle"] .hoops-map-load')?.textContent).toBe('Karte laden');
+    expect(host.querySelector('.hoops-map-canvas')).toBeNull();
+    expect(host.querySelector('.hoops-map img')).toBeNull();
     expect(host.querySelector('address')?.textContent).toBe('Weg 1Ort');
   });
 });

@@ -15,7 +15,7 @@ import { acquireLock } from '../scripts/lib/fsutil.mjs';
 // @ts-expect-error reines ES-Modul ohne Typen
 import { assertNode, MIN_NODE_MAJOR } from '../scripts/lib/runtime.mjs';
 // @ts-expect-error reines ES-Modul ohne Typen
-import { replaceDir, syncDss } from '../scripts/portal-sync.mjs';
+import { replaceDir, syncHoops } from '../scripts/portal-sync.mjs';
 import { startServer, type Route } from './helpers/release-server';
 import { tmpRoot, writeFakeRelease } from './helpers/release-fixture';
 
@@ -52,12 +52,12 @@ const node = (args: string[], options: { cwd?: string; env?: NodeJS.ProcessEnv }
 describe('Download: Strom, Grenze, Zeit', () => {
   it('ein Strom ohne Content-Length über 32 MiB wird abgebrochen, der Speicher des Prozesses wächst nur begrenzt', async () => {
     expect(MAX_DOWNLOAD_BYTES).toBe(32 * 1024 * 1024);
-    routes.set('/v0.9.0/dss-vanilla-0.9.0.tgz', { stream: 100 * 1024 * 1024 });
+    routes.set('/v0.9.0/hoops-ui-0.9.0.tgz', { stream: 100 * 1024 * 1024 });
     const code = `
-      import { syncDss } from ${JSON.stringify(pathToFileURL(sync).href)};
+      import { syncHoops } from ${JSON.stringify(pathToFileURL(sync).href)};
       const before = process.memoryUsage().rss;
       let message = 'kein Fehler';
-      try { await syncDss({ root: ${JSON.stringify(root)}, to: ${JSON.stringify(`${root}/rss/dss`)}, source: { type: 'release', version: '0.9.0', baseUrl: ${JSON.stringify(server.baseUrl)}, timeoutMs: 20000 } }); } catch (e) { message = e.message; }
+      try { await syncHoops({ root: ${JSON.stringify(root)}, to: ${JSON.stringify(`${root}/rss/hoops`)}, source: { type: 'release', version: '0.9.0', baseUrl: ${JSON.stringify(server.baseUrl)}, timeoutMs: 20000 } }); } catch (e) { message = e.message; }
       console.log(JSON.stringify({ message, grewMiB: Math.round((process.memoryUsage().rss - before) / 1048576) }));`;
     const run = await node(['--input-type=module', '-e', code]);
     const result = JSON.parse(run.stdout);
@@ -135,39 +135,39 @@ describe('Adressen und Weiterleitungen', () => {
 describe('Sperre und Ersetzen', () => {
   it('zweiter Lauf im selben Ordner bricht mit deutscher Meldung ab, erster darf weiter', async () => {
     const dir = `${root}/lock1`;
-    const release = await acquireLock(dir, '.dss-sync.lock', 'portal-sync');
-    await expect(acquireLock(dir, '.dss-sync.lock', 'portal-sync')).rejects.toThrow(/Ein anderer Lauf \(Prozess \d+\) arbeitet gerade/);
+    const release = await acquireLock(dir, '.hoops-sync.lock', 'portal-sync');
+    await expect(acquireLock(dir, '.hoops-sync.lock', 'portal-sync')).rejects.toThrow(/Ein anderer Lauf \(Prozess \d+\) arbeitet gerade/);
     await release();
-    expect(existsSync(`${dir}/.dss-sync.lock`)).toBe(false);
-    const again = await acquireLock(dir, '.dss-sync.lock', 'portal-sync');
+    expect(existsSync(`${dir}/.hoops-sync.lock`)).toBe(false);
+    const again = await acquireLock(dir, '.hoops-sync.lock', 'portal-sync');
     await again();
   });
   it('eine verwaiste Sperre (Prozess läuft nicht mehr) wird übernommen', async () => {
     const dir = `${root}/lock2`;
     await mkdir(dir, { recursive: true });
-    await writeFile(`${dir}/.dss-sync.lock`, '99999999\n');
-    const release = await acquireLock(dir, '.dss-sync.lock', 'portal-sync');
-    expect((await readFile(`${dir}/.dss-sync.lock`, 'utf8')).trim()).toBe(String(process.pid));
+    await writeFile(`${dir}/.hoops-sync.lock`, '99999999\n');
+    const release = await acquireLock(dir, '.hoops-sync.lock', 'portal-sync');
+    expect((await readFile(`${dir}/.hoops-sync.lock`, 'utf8')).trim()).toBe(String(process.pid));
     await release();
   });
   it('zwei Prozesse gleichzeitig: nie ein kaputtes Ziel, höchstens ein klarer Abbruch, keine Reste', async () => {
-    const fake = await writeFakeRelease(`${root}/rel`, '0.9.0', { 'dss.js': 'a'.repeat(200000), 'version.json': JSON.stringify({ name: '@bbv/dss-design-system', version: '0.9.0' }) });
+    const fake = await writeFakeRelease(`${root}/rel`, '0.9.0', { 'hoops.js': 'a'.repeat(200000), 'version.json': JSON.stringify({ name: '@hoopsfoundry/ui', version: '0.9.0' }) });
     const dir = `${root}/rel/entpackt`;
     await mkdir(dir, { recursive: true });
-    await writeFile(`${dir}/dss.js`, 'a'.repeat(200000));
-    await writeFile(`${dir}/version.json`, JSON.stringify({ name: '@bbv/dss-design-system', version: '0.9.0' }));
+    await writeFile(`${dir}/hoops.js`, 'a'.repeat(200000));
+    await writeFile(`${dir}/version.json`, JSON.stringify({ name: '@hoopsfoundry/ui', version: '0.9.0' }));
     void fake;
     const project = `${root}/parallel`;
-    await mkdir(`${project}/_site/dss`, { recursive: true });
-    await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-    await writeFile(`${project}/_site/dss/.dss-sync`, '');
+    await mkdir(`${project}/_site/hoops`, { recursive: true });
+    await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+    await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
     const outcomes: { code: number | null; stderr: string }[] = [];
     for (let round = 0; round < 6; round++) {
       const runs = await Promise.all([1, 2].map(() => node([sync, '--from-dir', dir, '--no-fonts'], { cwd: project })));
       outcomes.push(...runs);
       // nach jeder Runde: Ziel vollständig, keine Reste
-      expect((await readdir(`${project}/_site/dss`)).sort()).toEqual(['.dss-sync', 'dss.js', 'version.json']);
-      expect((await readdir(`${project}/_site`)).sort()).toEqual(['dss']);
+      expect((await readdir(`${project}/_site/hoops`)).sort()).toEqual(['.hoops-sync', 'hoops.js', 'version.json']);
+      expect((await readdir(`${project}/_site`)).sort()).toEqual(['hoops']);
     }
     for (const o of outcomes) {
       expect(o.code === 0 || /Ein anderer Lauf( \(Prozess \d+\))? arbeitet gerade/.test(o.stderr), o.stderr).toBe(true);
@@ -178,34 +178,34 @@ describe('Sperre und Ersetzen', () => {
   });
   it('scheitert das Einsetzen, kommt das alte Ziel zurück; temporäre Ordner verschwinden', async () => {
     const project = `${root}/rollback`;
-    await mkdir(`${project}/_site/dss`, { recursive: true });
-    await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-    await writeFile(`${project}/_site/dss/.dss-sync`, '');
+    await mkdir(`${project}/_site/hoops`, { recursive: true });
+    await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+    await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
     await expect(
-      replaceDir(`${project}/_site/dss`, project, async (tmp: string) => writeFile(`${tmp}/neu.js`, 'neu'), { beforeInstall: (tmp: string) => rm(tmp, { recursive: true, force: true }) }),
+      replaceDir(`${project}/_site/hoops`, project, async (tmp: string) => writeFile(`${tmp}/neu.js`, 'neu'), { beforeInstall: (tmp: string) => rm(tmp, { recursive: true, force: true }) }),
     ).rejects.toThrow();
-    expect(await readFile(`${project}/_site/dss/alt.js`, 'utf8')).toBe('alt');
-    expect((await readdir(`${project}/_site`)).sort()).toEqual(['dss']);
+    expect(await readFile(`${project}/_site/hoops/alt.js`, 'utf8')).toBe('alt');
+    expect((await readdir(`${project}/_site`)).sort()).toEqual(['hoops']);
   });
   it('scheitert das Füllen, bleibt das alte Ziel unberührt', async () => {
     const project = `${root}/fillfail`;
-    await mkdir(`${project}/_site/dss`, { recursive: true });
-    await writeFile(`${project}/_site/dss/alt.js`, 'alt');
-    await writeFile(`${project}/_site/dss/.dss-sync`, '');
-    await expect(replaceDir(`${project}/_site/dss`, project, async () => { throw new Error('boom'); })).rejects.toThrow('boom');
-    expect(await readFile(`${project}/_site/dss/alt.js`, 'utf8')).toBe('alt');
-    expect((await readdir(`${project}/_site`)).sort()).toEqual(['dss']);
+    await mkdir(`${project}/_site/hoops`, { recursive: true });
+    await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
+    await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
+    await expect(replaceDir(`${project}/_site/hoops`, project, async () => { throw new Error('boom'); })).rejects.toThrow('boom');
+    expect(await readFile(`${project}/_site/hoops/alt.js`, 'utf8')).toBe('alt');
+    expect((await readdir(`${project}/_site`)).sort()).toEqual(['hoops']);
   });
   it('der Erfolgsfall hinterlässt weder .old- noch .tmp-Ordner noch die Sperre', async () => {
     const dir = `${root}/ok-dir`;
     await mkdir(dir, { recursive: true });
-    await writeFile(`${dir}/version.json`, JSON.stringify({ name: '@bbv/dss-design-system', version: '1.0.0' }));
-    await writeFile(`${dir}/dss.js`, 'x');
+    await writeFile(`${dir}/version.json`, JSON.stringify({ name: '@hoopsfoundry/ui', version: '1.0.0' }));
+    await writeFile(`${dir}/hoops.js`, 'x');
     const project = `${root}/ok-proj`;
-    await mkdir(`${project}/_site/dss`, { recursive: true });
-    await writeFile(`${project}/_site/dss/.dss-sync`, '');
-    await syncDss({ root: project, source: { type: 'dir', path: dir } });
-    expect(readdirSync(`${project}/_site`)).toEqual(['dss']);
+    await mkdir(`${project}/_site/hoops`, { recursive: true });
+    await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
+    await syncHoops({ root: project, source: { type: 'dir', path: dir } });
+    expect(readdirSync(`${project}/_site`)).toEqual(['hoops']);
   });
 });
 
@@ -237,14 +237,14 @@ describe('Deutsche Fehlermeldungen und Startprüfung', () => {
   it('das Programm: Ziel unter einer Datei → deutsche Meldung, Exit 1, kein Stack; mit --debug der Stack', async () => {
     const dir = `${root}/enotdir`;
     await mkdir(`${dir}/quelle`, { recursive: true });
-    await writeFile(`${dir}/quelle/dss.js`, 'x');
-    await writeFile(`${dir}/quelle/version.json`, JSON.stringify({ name: '@bbv/dss-design-system', version: '1.0.0' }));
+    await writeFile(`${dir}/quelle/hoops.js`, 'x');
+    await writeFile(`${dir}/quelle/version.json`, JSON.stringify({ name: '@hoopsfoundry/ui', version: '1.0.0' }));
     await writeFile(`${dir}/datei`, 'ich bin eine Datei');
-    const plain = await node([sync, '--from-dir', `${dir}/quelle`, '--to', `${dir}/datei/unter/dss`], { cwd: dir });
+    const plain = await node([sync, '--from-dir', `${dir}/quelle`, '--to', `${dir}/datei/unter/hoops`], { cwd: dir });
     expect(plain.code).toBe(1);
     expect(plain.stderr).toMatch(/^portal-sync: .*(kein Ordner|nicht gefunden|Existiert bereits)/m);
     expect(plain.stderr).not.toMatch(/\n\s+at /);
-    const debug = await node([sync, '--from-dir', `${dir}/quelle`, '--to', `${dir}/datei/unter/dss`, '--debug'], { cwd: dir });
+    const debug = await node([sync, '--from-dir', `${dir}/quelle`, '--to', `${dir}/datei/unter/hoops`, '--debug'], { cwd: dir });
     expect(debug.code).toBe(1);
     expect(debug.stderr).toMatch(/Technisch: [A-Z]+: /);
     expect(await readdir(dir)).not.toContain('datei.old-1');

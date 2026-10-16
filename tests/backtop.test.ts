@@ -9,7 +9,7 @@ const setScroll = (y: number, height = 3000, inner = 800) => {
   Object.defineProperty(document.documentElement, 'scrollHeight', { value: height, configurable: true });
   window.dispatchEvent(new Event('scroll'));
 };
-const btn = () => document.querySelector<HTMLButtonElement>('.dss-backtop')!;
+const btn = () => document.querySelector<HTMLButtonElement>('.hoops-backtop')!;
 const page = (html = '<main id="m"><h1 id="t">Titel</h1><p>x</p></main>') => document.body.replaceChildren(document.createRange().createContextualFragment(html));
 
 beforeEach(() => {
@@ -41,7 +41,7 @@ describe('Knopf', () => {
     expect(btn().tagName).toBe('BUTTON');
     expect(btn().type).toBe('button');
     expect(btn().getAttribute('aria-label')).toBe('Nach oben');
-    expect(btn().className).toBe('dss-btn dss-btn--secondary dss-btn--icon dss-backtop');
+    expect(btn().className).toBe('hoops-btn hoops-btn--secondary hoops-btn--icon hoops-backtop');
     expect(btn().hidden).toBe(true);
     const svg = btn().querySelector('svg')!;
     expect(svg.namespaceURI).toBe('http://www.w3.org/2000/svg');
@@ -154,10 +154,10 @@ describe('Klick', () => {
 
 describe('feste untere Leiste', () => {
   const bar = (style: string, height = 64) => {
-    page(`<main><h1 id="t">T</h1></main><nav class="dss-bnav" style="${style}"></nav>`);
-    document.querySelector('.dss-bnav')!.getBoundingClientRect = () => ({ height }) as DOMRect;
+    page(`<main><h1 id="t">T</h1></main><nav class="hoops-bnav" style="${style}"></nav>`);
+    document.querySelector('.hoops-bnav')!.getBoundingClientRect = () => ({ height }) as DOMRect;
   };
-  it('eine feste dss-bnav: der Knopf sitzt darüber (Höhe plus 16 px)', () => {
+  it('eine feste hoops-bnav: der Knopf sitzt darüber (Höhe plus 16 px)', () => {
     bar('position:fixed;bottom:0');
     handle = initBackToTop();
     expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('80px');
@@ -184,7 +184,7 @@ describe('feste untere Leiste', () => {
     handle = initBackToTop();
     expect(btn().style.getPropertyValue('--hoops-backtop-offset')).toBe('');
     const later = document.createElement('nav');
-    later.className = 'dss-bnav';
+    later.className = 'hoops-bnav';
     later.style.position = 'fixed';
     later.getBoundingClientRect = () => ({ height: 60 }) as DOMRect;
     document.body.append(later);
@@ -201,21 +201,21 @@ describe('Aufräumen und Idempotenz', () => {
     handle = initBackToTop();
     handle.destroy();
     handle.destroy();
-    expect(document.querySelector('.dss-backtop')).toBeNull();
+    expect(document.querySelector('.hoops-backtop')).toBeNull();
     setScroll(900);
-    expect(document.querySelector('.dss-backtop')).toBeNull();
+    expect(document.querySelector('.hoops-backtop')).toBeNull();
   });
   it('ein zweiter Aufruf für denselben Container ersetzt den ersten', () => {
     initBackToTop();
     handle = initBackToTop({ label: 'Neu' });
-    expect(document.querySelectorAll('.dss-backtop')).toHaveLength(1);
+    expect(document.querySelectorAll('.hoops-backtop')).toHaveLength(1);
     expect(btn().getAttribute('aria-label')).toBe('Neu');
   });
   it('einen vorhandenen Knopf übernehmen und beim Aufräumen zurückgeben', () => {
     page('<main><h1 id="t">T</h1></main><button id="b" type="button" class="mein" aria-label="Alt">x</button>');
     const own = document.getElementById('b') as HTMLButtonElement;
     handle = initBackToTop({ button: own });
-    expect(own.classList.contains('dss-backtop')).toBe(true);
+    expect(own.classList.contains('hoops-backtop')).toBe(true);
     expect(own.hidden).toBe(true);
     expect(own.querySelector('svg')).not.toBeNull();
     setScroll(900);

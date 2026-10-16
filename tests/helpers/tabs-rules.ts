@@ -19,7 +19,7 @@ export function tabsLogicRules(mod: Tabs): Rules {
     let handle: { destroy(): void } | undefined;
     const trap = trapErrors();
     try {
-      handle = mod.initTabs(document.getElementById('r-bar') ?? document.querySelector('.dss-tabs')!, options);
+      handle = mod.initTabs(document.getElementById('r-bar') ?? document.querySelector('.hoops-tabs')!, options);
       out[name] = fn() === true;
     } catch {
       out[name] = false;
@@ -66,13 +66,13 @@ export function tabsLogicRules(mod: Tabs): Rules {
   }, tabsMarkup().replace(' disabled>', ' aria-disabled="true">'));
   rule('Tabs: ein Klick auf den gewählten Tab meldet nichts', () => {
     let n = 0;
-    document.getElementById('r-bar')!.addEventListener('dss:tabchange', () => n++);
+    document.getElementById('r-bar')!.addEventListener('hoops:tabchange', () => n++);
     document.getElementById('r-alle')!.click();
     return n === 0;
   });
-  rule('Tabs: Ereignis dss:tabchange mit Detail, nicht beim Start', () => {
+  rule('Tabs: Ereignis hoops:tabchange mit Detail, nicht beim Start', () => {
     const seen: Array<{ index: number; source: string }> = [];
-    document.getElementById('r-bar')!.addEventListener('dss:tabchange', (e) => seen.push((e as CustomEvent).detail));
+    document.getElementById('r-bar')!.addEventListener('hoops:tabchange', (e) => seen.push((e as CustomEvent).detail));
     key('r-alle', 'ArrowRight');
     return seen.length === 1 && seen[0].index === 1 && seen[0].source === 'user';
   });
@@ -93,20 +93,20 @@ export function tabsLogicRules(mod: Tabs): Rules {
     const both = attr('m-pokal', 'aria-pressed') === 'true' && attr('m-liga', 'aria-pressed') === 'true';
     document.getElementById('m-liga')!.click();
     return both && attr('m-liga', 'aria-pressed') === 'false' && !document.getElementById('m-liga')!.hasAttribute('role') && document.activeElement !== document.getElementById('m-pokal');
-  }, `<div class="dss-tabs" role="group" id="r-bar"><button class="dss-tab is-active" id="m-liga" aria-pressed="true">L</button><button class="dss-tab" id="m-pokal" aria-pressed="false">P</button></div>`);
+  }, `<div class="hoops-tabs" role="group" id="r-bar"><button class="hoops-tab is-active" id="m-liga" aria-pressed="true">L</button><button class="hoops-tab" id="m-pokal" aria-pressed="false">P</button></div>`);
   rule('Tabs: eine verschachtelte Leiste gehört nicht zur äußeren', () => {
     key('o2', 'ArrowRight');
     return attr('o1', 'aria-selected') === 'true' && !document.getElementById('i1')!.hasAttribute('role') && !document.getElementById('i1')!.hasAttribute('aria-selected');
-  }, `<div class="dss-tabs" id="r-bar"><button class="dss-tab" id="o1">1</button><button class="dss-tab" id="o2">2</button><div class="dss-tabs" id="i-bar"><button class="dss-tab" id="i1">a</button><button class="dss-tab" id="i2">b</button></div></div>`);
+  }, `<div class="hoops-tabs" id="r-bar"><button class="hoops-tab" id="o1">1</button><button class="hoops-tab" id="o2">2</button><div class="hoops-tabs" id="i-bar"><button class="hoops-tab" id="i1">a</button><button class="hoops-tab" id="i2">b</button></div></div>`);
   rule('Tabs: fehlende Rollen und ids werden ergänzt', () => attr('a', 'role') === 'tab' && document.getElementById('x')!.getAttribute('role') === 'tablist',
-    `<div class="dss-tabs" id="x"><button class="dss-tab" id="a">A</button><button class="dss-tab" id="b">B</button></div>`);
+    `<div class="hoops-tabs" id="x"><button class="hoops-tab" id="a">A</button><button class="hoops-tab" id="b">B</button></div>`);
   pure('Tabs: ohne id vergibt der Baustein eine', () => {
-    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="dss-tabs" id="x"><button class="dss-tab">A</button><button class="dss-tab">B</button></div>`));
+    document.body.replaceChildren(document.createRange().createContextualFragment(`<div class="hoops-tabs" id="x"><button class="hoops-tab">A</button><button class="hoops-tab">B</button></div>`));
     const h = mod.initTabs(document.getElementById('x')!);
     const ids = [...document.querySelectorAll('button')].map((b) => b.id);
     h.destroy();
     document.body.replaceChildren();
-    return ids.every((id) => /^dss-tab-\d+$/.test(id)) && new Set(ids).size === 2;
+    return ids.every((id) => /^hoops-tab-\d+$/.test(id)) && new Set(ids).size === 2;
   });
   rule('Tabs: select() wählt per Index, id oder Element und ignoriert gesperrte', () => {
     const h = mod.initTabs(document.getElementById('r-bar')!);
@@ -127,7 +127,7 @@ export function tabsLogicRules(mod: Tabs): Rules {
     const second = mod.initTabs(document.getElementById('r-bar')!);
     try {
       let n = 0;
-      document.getElementById('r-bar')!.addEventListener('dss:tabchange', () => n++);
+      document.getElementById('r-bar')!.addEventListener('hoops:tabchange', () => n++);
       key('r-alle', 'ArrowRight');
       return n === 1;
     } finally {

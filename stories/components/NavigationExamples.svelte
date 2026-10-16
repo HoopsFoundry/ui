@@ -62,7 +62,7 @@
   <div class="stack">
     <div>
       <div class="cap">Live · Schiri- und Coach-App</div>
-      <div class="frame"><TopBar brand="DSS" mark="D" context="live" matchLabel="BBL · 17. Spieltag" score="87 : 64" clock="Q4 · 02:14" user="Sven R." userInitials="SR" /></div>
+      <div class="frame"><TopBar brand="HoopsFoundry UI" mark="D" context="live" matchLabel="BBL · 17. Spieltag" score="87 : 64" clock="Q4 · 02:14" user="Sven R." userInitials="SR" /></div>
     </div>
     <div>
       <div class="cap">Admin · Vereinsregister</div>
@@ -70,7 +70,7 @@
     </div>
     <div>
       <div class="cap">Default · ruhig</div>
-      <div class="frame"><TopBar brand="DSS Coach" mark="C" user="Timo B." userInitials="TB" /></div>
+      <div class="frame"><TopBar brand="HoopsFoundry UI Coach" mark="C" user="Timo B." userInitials="TB" /></div>
     </div>
   </div>
 {:else if example === 'topbar-eigene'}
@@ -78,9 +78,9 @@
     <div>
       <div class="cap">center und actions</div>
       <div class="frame">
-        <TopBar brand="DSS" mark="D" user="Timo B." userInitials="TB">
+        <TopBar brand="HoopsFoundry UI" mark="D" user="Timo B." userInitials="TB">
           {#snippet center()}<span class="mid">Turnier-Manager</span>{/snippet}
-          {#snippet actions()}<button type="button" class="dss-btn dss-btn--secondary dss-btn--sm">Hilfe</button>{/snippet}
+          {#snippet actions()}<button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm">Hilfe</button>{/snippet}
         </TopBar>
       </div>
     </div>
@@ -146,9 +146,9 @@
         {#each cols as c}
           <div class="cell">
             {#if c === 'Gesperrt'}<span class="none">nicht vorgesehen</span>{:else}
-              <nav class="dss-bnav" aria-label="Beispiel {c}">
-                <button type="button" class="dss-bnav-item {c === 'Aktuell' ? 'is-active' : ''} {stateClass[c]}" aria-current={c === 'Aktuell' ? 'page' : undefined}>
-                  <span class="dss-bnav-lbl">Roster</span>
+              <nav class="hoops-bnav" aria-label="Beispiel {c}">
+                <button type="button" class="hoops-bnav-item {c === 'Aktuell' ? 'is-active' : ''} {stateClass[c]}" aria-current={c === 'Aktuell' ? 'page' : undefined}>
+                  <span class="hoops-bnav-lbl">Roster</span>
                 </button>
               </nav>
             {/if}
@@ -159,7 +159,7 @@
         {#each cols as c}
           <div class="cell fabcell">
             {#if c === 'Aktuell' || c === 'Gesperrt'}<span class="none">nicht vorgesehen</span>{:else}
-              <button type="button" class="dss-bnav-fab {stateClass[c]}" aria-label="Erfassen"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+              <button type="button" class="hoops-bnav-fab {stateClass[c]}" aria-label="Erfassen"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
             {/if}
           </div>
         {/each}
@@ -168,8 +168,8 @@
         {#each cols as c}
           <div class="cell">
             {#if c === 'Gesperrt'}<span class="none">nicht vorgesehen</span>
-            {:else if c === 'Aktuell'}<span class="dss-crumbs-item is-current" aria-current="page">Roster</span>
-            {:else}<a href="#zustaende" class="dss-crumbs-item {stateClass[c]}">Bayernliga</a>{/if}
+            {:else if c === 'Aktuell'}<span class="hoops-crumbs-item is-current" aria-current="page">Roster</span>
+            {:else}<a href="#zustaende" class="hoops-crumbs-item {stateClass[c]}">Bayernliga</a>{/if}
           </div>
         {/each}
 
@@ -177,19 +177,19 @@
         {#each cols as c}
           <div class="cell">
             {#if c === 'Gesperrt'}<span class="none">nicht vorgesehen</span>
-            {:else if c === 'Aktuell'}<span class="dss-crumbs-chip is-current" aria-current="page">Roster</span>
-            {:else}<a href="#zustaende" class="dss-crumbs-chip {stateClass[c]}">Bayernliga</a>{/if}
+            {:else if c === 'Aktuell'}<span class="hoops-crumbs-chip is-current" aria-current="page">Roster</span>
+            {:else}<a href="#zustaende" class="hoops-crumbs-chip {stateClass[c]}">Bayernliga</a>{/if}
           </div>
         {/each}
 
         <div class="rowlabel">{rows[4]}</div>
         {#each cols as c}
           <div class="cell">
-            <div class="dss-step-item {c === 'Aktuell' ? 'is-current' : c === 'Gesperrt' ? 'is-pending' : 'is-done'}">
+            <div class="hoops-step-item {c === 'Aktuell' ? 'is-current' : c === 'Gesperrt' ? 'is-pending' : 'is-done'}">
               {#if c === 'Gesperrt'}
-                <span class="dss-step-dot" style="width: 30px; height: 30px" aria-hidden="true"><span>4</span></span>
+                <span class="hoops-step-dot" style="width: 30px; height: 30px" aria-hidden="true"><span>4</span></span>
               {:else}
-                <button type="button" class="dss-step-dot {stateClass[c]}" style="width: 30px; height: 30px" aria-label="Schritt {c === 'Aktuell' ? 3 : 1}">
+                <button type="button" class="hoops-step-dot {stateClass[c]}" style="width: 30px; height: 30px" aria-label="Schritt {c === 'Aktuell' ? 3 : 1}">
                   {#if c === 'Aktuell'}<span aria-hidden="true">3</span>{:else}<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>{/if}
                 </button>
               {/if}
@@ -200,9 +200,9 @@
         <div class="rowlabel">{rows[5]}</div>
         {#each cols as c}
           <div class="cell dark">
-            <div class="dss-topbar dss-topbar--dark tb">
+            <div class="hoops-topbar hoops-topbar--dark tb">
               {#if c === 'Aktuell'}<span class="none-dark">nicht vorgesehen</span>
-              {:else}<button type="button" class="dss-btn dss-btn--secondary dss-btn--sm {stateClass[c]}" disabled={c === 'Gesperrt'}>Hilfe</button>{/if}
+              {:else}<button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm {stateClass[c]}" disabled={c === 'Gesperrt'}>Hilfe</button>{/if}
             </div>
           </div>
         {/each}
@@ -229,9 +229,9 @@
     { id: 'd', label: 'Druck & Export', state: 'pending' },
   ]} variant="vertical" /></div>
 {:else if example === 'do-live'}
-  <div class="frame wide100"><TopBar brand="DSS" mark="D" context="live" matchLabel="BBL · 17. Spieltag" score="87 : 64" clock="Q4 · 02:14" /></div>
+  <div class="frame wide100"><TopBar brand="HoopsFoundry UI" mark="D" context="live" matchLabel="BBL · 17. Spieltag" score="87 : 64" clock="Q4 · 02:14" /></div>
 {:else if example === 'dont-live'}
-  <div class="frame wide100"><TopBar brand="DSS" mark="D" context="live" /></div>
+  <div class="frame wide100"><TopBar brand="HoopsFoundry UI" mark="D" context="live" /></div>
 {/if}
 
 <style>
@@ -249,7 +249,7 @@
   .phone-top { height: 160px; background: linear-gradient(0deg, var(--hoops-page-surface-2), var(--hoops-page-bg)); border-bottom: 1px solid var(--hoops-page-line); }
   /* Horizontal braucht etwa 480 px, sonst überlappen die Beschriftungen: in schmalen Rahmen scrollt der Stepper seitlich */
   .hscroll { overflow-x: auto; padding: 6px; margin: -6px; }
-  .hscroll > :global(.dss-step--h) { min-width: 480px; }
+  .hscroll > :global(.hoops-step--h) { min-width: 480px; }
   .narrow { width: 100%; max-width: 380px; }
   .mid { font-family: var(--hoops-font-display); font-weight: 600; color: var(--hoops-n-100); }
   .note { margin: 18px 0 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
@@ -258,7 +258,7 @@
   .states { display: grid; grid-template-columns: 130px repeat(6, minmax(130px, 1fr)); gap: 10px 12px; align-items: center; }
   .cell { display: flex; align-items: center; justify-content: center; min-height: 72px; padding: 8px; border-radius: var(--hoops-radius-md); min-width: 0; }
   .cell.fabcell { min-height: 96px; padding-top: 24px; }
-  .cell :global(.dss-bnav) { width: 100%; }
+  .cell :global(.hoops-bnav) { width: 100%; }
   .cell.dark { padding: 0; }
   .tb { height: auto; width: 100%; box-sizing: border-box; justify-content: center; padding: 14px 10px; border-radius: var(--hoops-radius-md); }
   .none { font-size: var(--hoops-fs-caption); color: var(--hoops-page-mute); }

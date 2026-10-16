@@ -4,12 +4,13 @@
  *
  *   node scripts/migrate-from-dss.mjs <projektordner>                  # Probelauf (Standard): meldet Treffer je Datei, schreibt nichts
  *   node scripts/migrate-from-dss.mjs <projektordner> --write          # schreibt die Dateien um
- *   node scripts/migrate-from-dss.mjs <projektordner> --stufen=T       # nur bestimmte Stufen (Standard: alle vorhandenen)
+ *   node scripts/migrate-from-dss.mjs <projektordner> --stufen=T,K,D   # nur bestimmte Stufen (Standard: alle, Reihenfolge T, D, K)
  *   node scripts/migrate-from-dss.mjs <projektordner> --ext=.css,.vue  # eigene Endungsliste statt der Standardliste
  *   node scripts/migrate-from-dss.mjs <projektordner> --json           # Ergebnis als JSON
  *
- * Aktuell umgesetzt: Stufe T (Design-Tokens, CSS-Custom-Properties). Die Ersetzungstabellen stehen in scripts/migration-table.mjs; spätere
- * Stufen (Klassen, data-Attribute, Ereignisse, Dateinamen) ergänzen dort weitere Tabellen.
+ * Umgesetzt: Stufe T (Design-Tokens), Stufe D (data-Attribute `data-dss-*`, Ereignisse `dss:*`, Speicherschlüssel, Dateinamen wie `dss.css`,
+ * `dss.min.js`, `dss-render…`, `dss-map…`, Paketname) und Stufe K (CSS-Klassen, Familienregel `dss-` → `hoops-`; Fremdklassen mit Teilwort wie
+ * `xdss-a` bleiben). Die Tabellen stehen in scripts/migration-table.mjs, die Regeln in scripts/lib/name-rename.mjs. Standard: alle Stufen.
  *
  * Vor `--write` den Git-Stand sichern (committen oder `git stash`). Zurücknehmen: `git restore .` (bzw. `git checkout -- .`) im Projekt.
  * Idempotent: ein zweiter Lauf findet nichts mehr. Ignoriert node_modules, .git, dist, build und weitere erzeugte Ordner.
@@ -20,6 +21,7 @@ import { join, relative, sep, extname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { STUFEN } from './migration-table.mjs';
 import { buildRegexes, tableFromPairs, transformText } from './lib/token-rename.mjs';
+import { applyRules } from './lib/name-rename.mjs';
 
 export const STANDARD_ENDUNGEN = ['.css', '.scss', '.sass', '.less', '.html', '.htm', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.svelte', '.vue', '.mdx', '.md', '.svg'];
 export const IGNORIERT = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', '.svelte-kit', '.output', '.turbo', '.cache', 'coverage', 'storybook-static']);
@@ -49,7 +51,11 @@ export async function migrateProject(root, { write = false, stufen = null, endun
   if (!info?.isDirectory()) throw new Error(`Kein Ordner: ${root}`);
   const gewaehlt = STUFEN.filter(([id]) => !stufen || stufen.includes(id));
   if (gewaehlt.length === 0) throw new Error(`Keine passende Stufe (vorhanden: ${STUFEN.map(([id]) => id).join(', ')})`);
-  const tables = gewaehlt.map(([, , pairs]) => { const t = tableFromPairs(pairs); return [t, buildRegexes(t)]; });
+  // T arbeitet mit Namenspaaren, D und K mit Regeln; jede Stufe wird als Funktion text → { text, hits } vorbereitet
+  const stufenFn = gewaehlt.map(([, , daten]) => {
+    if (daten.length && Array.isArray(daten[0])) { const t = tableFromPairs(daten); const re = buildRegexes(t); return (text) => transformText(text, t, re); }
+    return (text) => applyRules(text, daten);
+  });
   const files = [];
   const skipped = [];
   const rel = (f) => relative(base, f).split(sep).join('/');
@@ -66,8 +72,8 @@ export async function migrateProject(root, { write = false, stufen = null, endun
     try { text = UTF8.decode(bytes); } catch { skipped.push({ file: rel(file), grund: 'kein gültiges UTF-8 (zum Beispiel Latin-1); nicht verändert' }); continue; }
     let current = text;
     const hits = {};
-    for (const [table, regexes] of tables) {
-      const r = transformText(current, table, regexes);
+    for (const fn of stufenFn) {
+      const r = fn(current);
       current = r.text;
       for (const [k, v] of r.hits) hits[k] = (hits[k] ?? 0) + v;
     }
@@ -86,13 +92,13 @@ async function main() {
   const bekannt = /^--(dry-run|write|json|stufen=.*|ext=.*)$/;
   const unbekannt = argv.filter((a) => a.startsWith('--') && !bekannt.test(a));
   if (unbekannt.length) {
-    console.error(`Unbekannte Option: ${unbekannt.join(', ')}\nAufruf: migrate-from-dss.mjs <projektordner> [--dry-run | --write] [--stufen=T] [--ext=.css,.vue] [--json]`);
+    console.error(`Unbekannte Option: ${unbekannt.join(', ')}\nAufruf: migrate-from-dss.mjs <projektordner> [--dry-run | --write] [--stufen=T,D,K] [--ext=.css,.vue] [--json]`);
     process.exit(2);
   }
   const opt = (k) => argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3);
   const write = argv.includes('--write');
   if (pos.length !== 1 || (write && argv.includes('--dry-run'))) {
-    console.error('Aufruf: migrate-from-dss.mjs <projektordner> [--dry-run | --write] [--stufen=T] [--ext=.css,.vue] [--json]');
+    console.error('Aufruf: migrate-from-dss.mjs <projektordner> [--dry-run | --write] [--stufen=T,D,K] [--ext=.css,.vue] [--json]');
     process.exit(2);
   }
   const stufen = opt('stufen')?.split(',').map((s) => s.trim().toUpperCase());

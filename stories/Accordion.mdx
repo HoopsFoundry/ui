@@ -30,13 +30,13 @@ Der Pfeil im Kopf ist ein SVG (`aria-hidden`) und dreht sich beim Öffnen um 180
 
 ## Kopf mit Zusatzinfo
 
-Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht hinter dem Titel ein unsichtbares Komma (`dss-acc-sep`, Schriftgröße 0), das Name und Zusatz trennt (Chromium und WebKit lesen „Kader, 14 Spieler“; auch Leerraum im Markup zwischen Titel und Zusatz stört nicht); die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
+Mit `meta` steht rechts vor dem Pfeil eine Zusatzinfo: ein Zähler, ein Chip oder ein Live-Tag. Sie bleibt Teil des zugänglichen Namens des Buttons („Kader, 14 Spieler“) und wird nur einmal gelesen. Dazu steht hinter dem Titel ein unsichtbares Komma (`hoops-acc-sep`, Schriftgröße 0), das Name und Zusatz trennt (Chromium und WebKit lesen „Kader, 14 Spieler“; auch Leerraum im Markup zwischen Titel und Zusatz stört nicht); die Zusatzinfo selbst ist nicht `aria-hidden`, weil dann ein Chip oder Live-Tag aus dem Namen fiele. Wichtiges wie Fehler gehört nicht nur in einen geschlossenen Bereich: der Chip im Kopf macht es sichtbar, ohne zu öffnen.
 
 <Canvas of={AccordionStories.Zusatzinfo} />
 
 ## Verschachtelt
 
-Eine Gruppe im Inhalt eines Bereichs ist automatisch verschachtelt: kleinere Titel, eingerückt, mit Linien statt Karten und ohne Schatten (`dss-acc--nested`). Technisch sind beliebig viele Ebenen möglich; mehr als zwei sind schwer zu überblicken (siehe Dos und Don'ts).
+Eine Gruppe im Inhalt eines Bereichs ist automatisch verschachtelt: kleinere Titel, eingerückt, mit Linien statt Karten und ohne Schatten (`hoops-acc--nested`). Technisch sind beliebig viele Ebenen möglich; mehr als zwei sind schwer zu überblicken (siehe Dos und Don'ts).
 
 <Canvas of={AccordionStories.Verschachtelt} />
 
@@ -91,11 +91,11 @@ Mit `sticky` bleibt der Kopf des geöffneten Bereichs oben stehen, solange sein 
 
 ## Natives `<details>` (Vanilla)
 
-Im Vanilla-CSS gibt es zusätzlich einen Weg ohne Skript: `<details class="dss-acc-item">` mit `<summary class="dss-acc-trigger">`. Aussehen und Zustände sind dieselben; der Pfeil kommt per CSS. Mit demselben `name` an allen `details` einer Gruppe ist immer nur einer offen (nativ, in allen aktuellen Browsern). Das Skript ist optional und ergänzt Deep-Link, Sprungleiste, „Alle öffnen/schließen“ und die Pfeiltasten.
+Im Vanilla-CSS gibt es zusätzlich einen Weg ohne Skript: `<details class="hoops-acc-item">` mit `<summary class="hoops-acc-trigger">`. Aussehen und Zustände sind dieselben; der Pfeil kommt per CSS. Mit demselben `name` an allen `details` einer Gruppe ist immer nur einer offen (nativ, in allen aktuellen Browsern). Das Skript ist optional und ergänzt Deep-Link, Sprungleiste, „Alle öffnen/schließen“ und die Pfeiltasten.
 
 **Hinweis zur Auffindbarkeit:** `<summary>` ist selbst keine Überschrift. HTML erlaubt aber Überschriften im `summary`; das Beispiel hier nutzt sie nicht und bleibt bei der einfachsten Form. Ohne Überschrift im Kopf führen die Überschriften-Navigation und die Überschriftenliste der Screenreader nicht zu den Bereichen, und bei älterer Hilfstechnik wird der Zustand (auf/zu) nicht überall angesagt. Für Inhaltsseiten, auf denen die Bereiche auffindbar sein sollen, nimm den Button-Weg (Überschrift mit Button). Die Höhenanimation gibt es beim `details`-Weg nicht.
 
-**Zusatzinfo im `summary`:** Das Komma zwischen Titel und Zusatzinfo steht nicht von selbst da. Setze es wie im Beispiel als `<span class="dss-acc-sep">,</span>` ans Ende des Titels (Schriftgröße 0, unsichtbar, im Namen); ohne dieses Komma liest Chromium „Spielplan 12 Spiele“, andere Browser unter Umständen „Spielplan12 Spiele“.
+**Zusatzinfo im `summary`:** Das Komma zwischen Titel und Zusatzinfo steht nicht von selbst da. Setze es wie im Beispiel als `<span class="hoops-acc-sep">,</span>` ans Ende des Titels (Schriftgröße 0, unsichtbar, im Namen); ohne dieses Komma liest Chromium „Spielplan 12 Spiele“, andere Browser unter Umständen „Spielplan12 Spiele“.
 
 <Canvas of={AccordionStories.VanillaDetails} />
 
@@ -153,7 +153,7 @@ Die Gruppe hat in React zusätzlich `className`, in Svelte `class`; `navLabel` (
 
 ### Vanilla-Skript
 
-`initAccordion(root, options)` mit den Optionen `exclusive`, `syncHash`, `expandAll`, `nav` und `sticky` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-dss-acc]`. **Bereiche nachträglich hinzufügen oder entfernen:** Rufe `initAccordion` erneut auf (die frühere Fassung wird ersetzt); Sprungleiste und `aria-controls` von „Alle öffnen“ aktualisieren sich nicht von selbst. **Verschachtelte Gruppen** brauchen `data-dss-acc` am inneren Wurzelelement (`initAccordions` startet jede `[data-dss-acc]`-Gruppe einzeln). Dieselben Hilfsfunktionen nutzen die Komponenten:
+`initAccordion(root, options)` mit den Optionen `exclusive`, `syncHash`, `expandAll`, `nav` und `sticky` macht ein Accordion im Vanilla-Markup bedienbar (Button-Weg und `details`), ohne Abhängigkeiten, als ES-Modul und ohne Zugriff auf `window` oder `document` beim Import. Es gibt `destroy()` zurück. `initAccordions(scope, options)` startet alle `[data-hoops-acc]`. **Bereiche nachträglich hinzufügen oder entfernen:** Rufe `initAccordion` erneut auf (die frühere Fassung wird ersetzt); Sprungleiste und `aria-controls` von „Alle öffnen“ aktualisieren sich nicht von selbst. **Verschachtelte Gruppen** brauchen `data-hoops-acc` am inneren Wurzelelement (`initAccordions` startet jede `[data-hoops-acc]`-Gruppe einzeln). Dieselben Hilfsfunktionen nutzen die Komponenten:
 
 <FrameworkCode label="Hilfsfunktionen (JavaScript, für alle Fassungen)" vanilla={funktionenJs} svelte={funktionenJs} react={funktionenJs} />
 
@@ -167,10 +167,10 @@ Die Gruppe hat in React zusätzlich `className`, in Svelte `class`; `navLabel` (
 
 Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px: Die Sprungleiste ist selbst einklappbar, die Köpfe sind mindestens 44 px hoch und die Zusatzinfo bleibt neben dem Titel.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Accordion · Sprungleiste und Zusatzinfo</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Accordion auf dem Handy">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Accordion · Sprungleiste und Zusatzinfo</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Accordion auf dem Handy">
       <iframe title="Handy-Vorschau: Accordion mit Sprungleiste in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-accordion--handy" loading="lazy" />
     </div>
   </div>

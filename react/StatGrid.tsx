@@ -13,22 +13,22 @@ export interface StatGridProps {
 }
 
 /**
- * Kennzahlen als Gitter (`dss-stats`). Beschreibungsliste: Beschriftung zuerst, optisch steht der Wert darüber. Ein fehlender Wert zeigt
+ * Kennzahlen als Gitter (`hoops-stats`). Beschreibungsliste: Beschriftung zuerst, optisch steht der Wert darüber. Ein fehlender Wert zeigt
  * einen Gedankenstrich mit verstecktem Text „keine Angabe“.
  */
 export function StatGrid({ items, compact = false, className }: StatGridProps) {
   const list = statItems(items);
   if (!list.length) return null;
   return (
-    <dl className={cn('dss-stats', compact && 'dss-stats--compact', className)}>
+    <dl className={cn('hoops-stats', compact && 'hoops-stats--compact', className)}>
       {list.map((s, i) => (
-        <div key={i} className="dss-stat">
-          <dt className="dss-stat-label">{s.label}</dt>
-          <dd className="dss-stat-value">
+        <div key={i} className="hoops-stat">
+          <dt className="hoops-stat-label">{s.label}</dt>
+          <dd className="hoops-stat-value">
             {s.empty ? (
               <>
                 <span aria-hidden="true">{s.value}</span>
-                <span className="dss-sr-only">{statEmptyText}</span>
+                <span className="hoops-sr-only">{statEmptyText}</span>
               </>
             ) : (
               s.value

@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS MatchCard · Svelte 5
+   * HoopsFoundry UI MatchCard · Svelte 5
    * --------------------------------------------------------------
    * Drei Spielzustände, eine Kartengrammatik. Nutzt nur Klassen aus css/components.css.
    *
@@ -67,47 +67,47 @@
 </script>
 
 {#snippet teamBlock(t: Team)}
-  {#if logos}<span class="dss-team-logo" class:dss-team-logo--initials={!t.logo} aria-hidden="true">{#if t.logo}<img src={t.logo} alt="" loading="lazy" />{:else}{initials(t.name, 2)}{/if}</span>{/if}
-  {#if shortName(t)}<span class="dss-match-name dss-team-name" class:dss-team-name--short={names === 'short'}><span class="dss-name-full">{t.name}</span><span class="dss-name-short" aria-hidden="true" title={t.name}>{shortName(t)}</span></span>{:else}<span class="dss-match-name">{t.name}</span>{/if}
+  {#if logos}<span class="hoops-team-logo" class:hoops-team-logo--initials={!t.logo} aria-hidden="true">{#if t.logo}<img src={t.logo} alt="" loading="lazy" />{:else}{initials(t.name, 2)}{/if}</span>{/if}
+  {#if shortName(t)}<span class="hoops-match-name hoops-team-name" class:hoops-team-name--short={names === 'short'}><span class="hoops-name-full">{t.name}</span><span class="hoops-name-short" aria-hidden="true" title={t.name}>{shortName(t)}</span></span>{:else}<span class="hoops-match-name">{t.name}</span>{/if}
 {/snippet}
 
 <!-- Der Handler hängt nur an <a>/<button> (nie am <div>); Svelte kann das bei svelte:element nicht erkennen. -->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <svelte:element
   this={tag}
-  class={`dss-match dss-match--${state}${logos ? ' dss-match--logos' : ''}`}
+  class={`hoops-match hoops-match--${state}${logos ? ' hoops-match--logos' : ''}`}
   href={tag === 'a' ? href : undefined}
   type={tag === 'button' ? 'button' : undefined}
   onclick={tag === 'div' ? undefined : onclick}
 >
-  <span class="dss-match-head">
-    <span class="dss-match-league">
+  <span class="hoops-match-head">
+    <span class="hoops-match-league">
       {#if league}<span>{league}</span>{/if}
-      {#if matchday}<span class="dss-match-muted">· {matchday}</span>{/if}
+      {#if matchday}<span class="hoops-match-muted">· {matchday}</span>{/if}
     </span>
     {#if state === 'live'}
-      <span class="dss-match-live"><span class="dss-match-pulse" aria-hidden="true"></span> Live · {liveText}</span>
+      <span class="hoops-match-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live · {liveText}</span>
     {:else if state === 'finished'}
-      <span class="dss-match-final">Endstand</span>
+      <span class="hoops-match-final">Endstand</span>
     {:else if date}
-      <span class="dss-match-when">{date}{time ? ` · ${time}` : ''}</span>
+      <span class="hoops-match-when">{date}{time ? ` · ${time}` : ''}</span>
     {/if}
   </span>
 
-  <span class="dss-match-body">
-    <span class={`dss-match-team ${gastWin ? 'is-loser' : ''}`}>
-      <span class="dss-match-dot" aria-hidden="true"></span>
+  <span class="hoops-match-body">
+    <span class={`hoops-match-team ${gastWin ? 'is-loser' : ''}`}>
+      <span class="hoops-match-dot" aria-hidden="true"></span>
       {@render teamBlock(heim)}
-      {#if state !== 'scheduled' && heim.score !== undefined}<span class="dss-match-score">{heim.score}</span>{/if}
+      {#if state !== 'scheduled' && heim.score !== undefined}<span class="hoops-match-score">{heim.score}</span>{/if}
     </span>
-    <span class={`dss-match-team dss-match-team--gast ${heimWin ? 'is-loser' : ''}`}>
-      <span class="dss-match-dot" aria-hidden="true"></span>
+    <span class={`hoops-match-team hoops-match-team--gast ${heimWin ? 'is-loser' : ''}`}>
+      <span class="hoops-match-dot" aria-hidden="true"></span>
       {@render teamBlock(gast)}
-      {#if state !== 'scheduled' && gast.score !== undefined}<span class="dss-match-score">{gast.score}</span>{/if}
+      {#if state !== 'scheduled' && gast.score !== undefined}<span class="hoops-match-score">{gast.score}</span>{/if}
     </span>
   </span>
 
   {#if venue}
-    <span class="dss-match-foot"><span>{venue}</span></span>
+    <span class="hoops-match-foot"><span>{venue}</span></span>
   {/if}
 </svelte:element>

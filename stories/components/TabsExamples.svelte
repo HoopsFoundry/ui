@@ -71,7 +71,7 @@
     const handle = initAll(node, { only: ['tabs'] });
     return { destroy: () => handle.destroy() };
   }
-  // Filter: die Seite reagiert auf dss:tabchange
+  // Filter: die Seite reagiert auf hoops:tabchange
   let filterText = $state('Bayernliga Süd, Pokal');
   function vanillaFilter(node: HTMLElement) {
     const handle = vanillaMarkup(node, filterMarkup);
@@ -79,8 +79,8 @@
       const ids = (event as CustomEvent<{ ids: string[] }>).detail.ids;
       filterText = ids.length ? ids.map((id) => node.querySelector(`[id="${id}"]`)?.textContent?.trim()).join(', ') : 'keine';
     };
-    node.addEventListener('dss:tabchange', onChange);
-    return { destroy: () => { node.removeEventListener('dss:tabchange', onChange); handle.destroy(); } };
+    node.addEventListener('hoops:tabchange', onChange);
+    return { destroy: () => { node.removeEventListener('hoops:tabchange', onChange); handle.destroy(); } };
   }
   // Einzelne Leiste mit Optionen (Handy-Beispiel dunkel)
   function bar(node: HTMLElement, options: Parameters<typeof initTabs>[1]) {
@@ -160,8 +160,8 @@
           <div class="rowlabel">{v.name}</div>
           {#each cols as c}
             <div class="cell">
-              <div class="dss-tabs dss-tabs--{v.id} dss-tabs--md">
-                <button type="button" class="dss-tab {stateClass[c]}" disabled={c === 'Gesperrt'}>Boxscore</button>
+              <div class="hoops-tabs hoops-tabs--{v.id} hoops-tabs--md">
+                <button type="button" class="hoops-tab {stateClass[c]}" disabled={c === 'Gesperrt'}>Boxscore</button>
               </div>
             </div>
           {/each}
@@ -181,10 +181,10 @@
   </div>
 {:else if example === 'handy-dunkel'}
   <div class="narrow">
-    <div class="dss-tabs dss-tabs--underline dss-tabs--md" role="tablist" aria-label="Vereinsseite" use:bar={{ activation: 'manual' }}>
-      <button type="button" class="dss-tab is-active" role="tab" id="hv-team" aria-selected="true" aria-controls="hv-team-panel" tabindex="0"><span class="dss-tab-label">Mannschaften</span><span class="dss-tab-count">7</span></button>
-      <button type="button" class="dss-tab" role="tab" id="hv-halle" aria-selected="false" aria-controls="hv-halle-panel" tabindex="-1"><span class="dss-tab-label">Halle</span></button>
-      <button type="button" class="dss-tab is-disabled" role="tab" id="hv-presse" aria-selected="false" aria-controls="hv-presse-panel" tabindex="-1" disabled><span class="dss-tab-label">Presse</span></button>
+    <div class="hoops-tabs hoops-tabs--underline hoops-tabs--md" role="tablist" aria-label="Vereinsseite" use:bar={{ activation: 'manual' }}>
+      <button type="button" class="hoops-tab is-active" role="tab" id="hv-team" aria-selected="true" aria-controls="hv-team-panel" tabindex="0"><span class="hoops-tab-label">Mannschaften</span><span class="hoops-tab-count">7</span></button>
+      <button type="button" class="hoops-tab" role="tab" id="hv-halle" aria-selected="false" aria-controls="hv-halle-panel" tabindex="-1"><span class="hoops-tab-label">Halle</span></button>
+      <button type="button" class="hoops-tab is-disabled" role="tab" id="hv-presse" aria-selected="false" aria-controls="hv-presse-panel" tabindex="-1" disabled><span class="hoops-tab-label">Presse</span></button>
     </div>
     <div id="hv-team-panel" role="tabpanel" aria-labelledby="hv-team" tabindex="0"><p class="panel">Sieben Mannschaften, von U12 bis Herren. Pfeiltasten bewegen nur den Fokus, Enter wählt (activation: manual).</p></div>
     <div id="hv-halle-panel" role="tabpanel" aria-labelledby="hv-halle" tabindex="0" hidden inert><p class="panel">Nordhain-Halle am Sportpark, 420 Plätze.</p></div>
@@ -194,17 +194,17 @@
 <!-- Dos und Don'ts -->
 {:else if example === 'do-panels'}
   <!-- Richtig: Inaktive Panels sind im Markup hidden, vor dem Skript ist nur der erste Inhalt sichtbar -->
-  <div class="dss-tabs dss-tabs--underline dss-tabs--md" role="tablist" aria-label="Richtig: Panels verborgen" use:bar>
-    <button type="button" class="dss-tab is-active" role="tab" id="dp-a" aria-selected="true" aria-controls="dp-a-panel" tabindex="0"><span class="dss-tab-label">Übersicht</span></button>
-    <button type="button" class="dss-tab" role="tab" id="dp-b" aria-selected="false" aria-controls="dp-b-panel" tabindex="-1"><span class="dss-tab-label">Boxscore</span></button>
+  <div class="hoops-tabs hoops-tabs--underline hoops-tabs--md" role="tablist" aria-label="Richtig: Panels verborgen" use:bar>
+    <button type="button" class="hoops-tab is-active" role="tab" id="dp-a" aria-selected="true" aria-controls="dp-a-panel" tabindex="0"><span class="hoops-tab-label">Übersicht</span></button>
+    <button type="button" class="hoops-tab" role="tab" id="dp-b" aria-selected="false" aria-controls="dp-b-panel" tabindex="-1"><span class="hoops-tab-label">Boxscore</span></button>
   </div>
   <div id="dp-a-panel" role="tabpanel" aria-labelledby="dp-a" tabindex="0"><p class="panel">Zusammenfassung des Spiels.</p></div>
   <div id="dp-b-panel" role="tabpanel" aria-labelledby="dp-b" tabindex="0" hidden inert><p class="panel">Boxscore mit allen Werten.</p></div>
 {:else if example === 'dont-panels'}
   <!-- Falsch: alle Panels sind im Markup sichtbar; ohne Skript (oder davor) stehen alle Ansichten untereinander. Die Leiste ist nicht gestartet. -->
-  <div class="dss-tabs dss-tabs--underline dss-tabs--md" role="tablist" aria-label="Falsch: Panels sichtbar">
-    <button type="button" class="dss-tab is-active" role="tab" id="dq-a" aria-selected="true" aria-controls="dq-a-panel" tabindex="0"><span class="dss-tab-label">Übersicht</span></button>
-    <button type="button" class="dss-tab" role="tab" id="dq-b" aria-selected="false" aria-controls="dq-b-panel" tabindex="-1"><span class="dss-tab-label">Boxscore</span></button>
+  <div class="hoops-tabs hoops-tabs--underline hoops-tabs--md" role="tablist" aria-label="Falsch: Panels sichtbar">
+    <button type="button" class="hoops-tab is-active" role="tab" id="dq-a" aria-selected="true" aria-controls="dq-a-panel" tabindex="0"><span class="hoops-tab-label">Übersicht</span></button>
+    <button type="button" class="hoops-tab" role="tab" id="dq-b" aria-selected="false" aria-controls="dq-b-panel" tabindex="-1"><span class="hoops-tab-label">Boxscore</span></button>
   </div>
   <div id="dq-a-panel" role="tabpanel" aria-labelledby="dq-a"><p class="panel">Zusammenfassung des Spiels.</p></div>
   <div id="dq-b-panel" role="tabpanel" aria-labelledby="dq-b"><p class="panel">Boxscore mit allen Werten.</p></div>
@@ -241,7 +241,7 @@
   .clip { width: 100%; overflow: hidden; }
   .narrow { box-sizing: border-box; max-width: 390px; padding: 14px; }
   .vanilla :global([role='tabpanel']) { margin: 14px 0 0; padding: 0 2px; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
-  .vanilla :global(.dss-tabs + [role='tabpanel']), .vanilla :global([role='tabpanel'] + .dss-tabs) { margin-top: 14px; }
+  .vanilla :global(.hoops-tabs + [role='tabpanel']), .vanilla :global([role='tabpanel'] + .hoops-tabs) { margin-top: 14px; }
   .vanilla :global([role='tabpanel'] p) { margin: 0; }
   /* Underline und Segmented brechen nicht um: in schmalen Bereichen scrollt die Leiste hier seitlich (Innenabstand für den Fokus-Ring) */
   .scroll { overflow-x: auto; max-width: 100%; padding: 6px; margin: -6px; }
@@ -249,5 +249,5 @@
   .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 90px repeat(6, minmax(130px, 1fr)); gap: 10px 12px; align-items: center; }
   .cell { display: flex; align-items: center; justify-content: center; min-height: 64px; padding: 8px; }
-  .cell :global(.dss-tabs--vertical) { min-width: 0; }
+  .cell :global(.hoops-tabs--vertical) { min-width: 0; }
 </style>

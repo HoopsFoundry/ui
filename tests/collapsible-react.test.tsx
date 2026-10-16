@@ -90,7 +90,7 @@ describe.each(FRAMES)('%s einklappbar', (name, Frame) => {
   });
   it('ohne id: kein Anker, kein id-Attribut, ids von Kopf und Bereich bleiben verbunden', () => {
     const { container } = render(<Frame title="Titel" />);
-    const t = container.querySelector<HTMLButtonElement>('.dss-acc-trigger')!;
+    const t = container.querySelector<HTMLButtonElement>('.hoops-acc-trigger')!;
     fireEvent.click(t);
     expect(window.location.hash).toBe('');
     expect(container.querySelector('.is-collapsible')!.hasAttribute('id')).toBe(false);
@@ -99,7 +99,7 @@ describe.each(FRAMES)('%s einklappbar', (name, Frame) => {
   it('ohne title: wirkungslos mit Warnung nur in der Entwicklung (einmal)', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const { container } = render(<Frame id="x" />);
-    expect(container.querySelector('.dss-acc-trigger')).toBeNull();
+    expect(container.querySelector('.hoops-acc-trigger')).toBeNull();
     expect(container.querySelector('.is-collapsible')).toBeNull();
     expect(warn.mock.calls.length).toBeLessThanOrEqual(1);
   });
@@ -155,7 +155,7 @@ describe('Rahmen in einer Accordion-Gruppe', () => {
   it('Sprungleiste: Links nur für Rahmen und Bereiche mit id; Klick öffnet und fokussiert den Kopf', async () => {
     const { container } = render(<Group nav />);
     await wait(10);
-    const links = [...container.querySelectorAll('.dss-acc-nav-link')].map((a) => a.textContent);
+    const links = [...container.querySelectorAll('.hoops-acc-nav-link')].map((a) => a.textContent);
     expect(links).toEqual(['Eins', 'Zwei', 'Drei']);
     fireEvent.click(container.querySelector<HTMLAnchorElement>('a[href="#t2"]')!);
     await wait(10);
@@ -171,16 +171,16 @@ describe('Rahmen in einer Accordion-Gruppe', () => {
       </Accordion>,
     );
     await wait(10);
-    expect([...container.querySelectorAll('.dss-acc-nav-link')].map((a) => a.textContent)).toEqual(['Text']);
+    expect([...container.querySelectorAll('.hoops-acc-nav-link')].map((a) => a.textContent)).toEqual(['Text']);
   });
   it('Alle öffnen und Alle schließen betreffen Rahmen und Bereiche (auch ohne id)', async () => {
     const { container, getByText } = render(<Group expandAll />);
     await wait(10);
     fireEvent.click(getByText('Alle öffnen'));
     expect(open(container, 't1') && open(container, 't2') && open(container, 't3')).toBe(true);
-    expect([...container.querySelectorAll('.dss-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'true')).toBe(true);
+    expect([...container.querySelectorAll('.hoops-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'true')).toBe(true);
     fireEvent.click(getByText('Alle schließen'));
-    expect([...container.querySelectorAll('.dss-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'false')).toBe(true);
+    expect([...container.querySelectorAll('.hoops-acc-trigger')].every((b) => b.getAttribute('aria-expanded') === 'false')).toBe(true);
   });
   it('exclusive: ein Öffnen schließt die anderen, gemischt mit AccordionItem', async () => {
     const { container } = render(<Group exclusive />);
@@ -202,7 +202,7 @@ describe('Rahmen in einer Accordion-Gruppe', () => {
   it('Tastatur: Pfeile, Pos1 und Ende springen zwischen Rahmen- und Bereichsköpfen', async () => {
     const { container } = render(<Group />);
     await wait(10);
-    const heads = [...container.querySelectorAll<HTMLButtonElement>('.dss-acc-trigger')];
+    const heads = [...container.querySelectorAll<HTMLButtonElement>('.hoops-acc-trigger')];
     expect(heads).toHaveLength(4);
     heads[0].focus();
     fireEvent.keyDown(heads[0], { key: 'ArrowDown' });
@@ -235,7 +235,7 @@ describe('Rahmen in einer Accordion-Gruppe', () => {
     expect(open(container, 'k')).toBe(true);
     expect(open(container, 'p')).toBe(true);
     // Pfeil im Kind springt nicht in die Gruppe der Eltern
-    const heads = [...container.querySelectorAll('.dss-acc-trigger')].filter((b) => b.id.startsWith('p') || b.id.startsWith('q'));
+    const heads = [...container.querySelectorAll('.hoops-acc-trigger')].filter((b) => b.id.startsWith('p') || b.id.startsWith('q'));
     expect(heads.map((b) => b.id)).toEqual(['p-trigger', 'q-trigger']);
   });
   it('Anker auf einen Rahmen im geschlossenen Bereich öffnet die Eltern', async () => {
@@ -255,7 +255,7 @@ describe('Rahmen in einer Accordion-Gruppe', () => {
         <tr><td><Accordion syncHash={false}><AccordionItem id="n1" title="Innen">x</AccordionItem></Accordion></td></tr>
       </Table>,
     );
-    expect(container.querySelector('.dss-acc--nested')).not.toBeNull();
+    expect(container.querySelector('.hoops-acc--nested')).not.toBeNull();
   });
 });
 

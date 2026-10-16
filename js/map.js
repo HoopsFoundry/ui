@@ -1,5 +1,5 @@
 /**
- * DSS Map · reine Funktionen für die Karten-Komponente (Map / MapView)
+ * HoopsFoundry UI Map · reine Funktionen für die Karten-Komponente (Map / MapView)
  * --------------------------------------------------------------
  * Ohne DOM, ohne Intl und ohne Leaflet (feste Formatierung, SSR-stabil). Svelte, React und eigene Seiten nutzen dieselbe Logik.
  * Typen: js/map.d.ts.

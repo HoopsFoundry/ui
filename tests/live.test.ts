@@ -77,31 +77,31 @@ const ruleBody = (selector: string) => {
 
 describe('Live-Stellen sprechen Grün, Rot bleibt Fehlern vorbehalten', () => {
   const LIVE_RULES = [
-    '.dss-live', '.dss-live-dot', '.dss-match-live', '.dss-match-pulse', '.dss-match--live', '.dss-match--live::before',
-    '.dss-pbp-live', '.dss-pbp-dot', '.dss-topbar-live', '.dss-topbar-live::before', '.dss-crumb-dot', '.dss-sch-live',
+    '.hoops-live', '.hoops-live-dot', '.hoops-match-live', '.hoops-match-pulse', '.hoops-match--live', '.hoops-match--live::before',
+    '.hoops-pbp-live', '.hoops-pbp-dot', '.hoops-topbar-live', '.hoops-topbar-live::before', '.hoops-crumb-dot', '.hoops-sch-live',
   ];
   it.each(LIVE_RULES)('%s nutzt weder --hoops-err-fill noch --hoops-err-text noch Chip-Rot', (selector) => {
     expect(ruleBody(selector)).not.toMatch(/--hoops-err-|--hoops-chip-err|oklch\([\d.]+ [\d.]+ 27\)/);
   });
 
   it('Text nutzt --hoops-live-fg (auf immer dunklen Flächen --hoops-live-fg-on-dark), Punkte --hoops-live-fill', () => {
-    expect(ruleBody('.dss-match-live')).toMatch(/color:\s*var\(--hoops-live-fg\)/);
-    expect(ruleBody('.dss-pbp-live')).toMatch(/color:\s*var\(--hoops-live-fg\)/);
-    expect(ruleBody('.dss-pbp-frame--dark .dss-pbp-live')).toMatch(/color:\s*var\(--hoops-live-fg-on-dark\)/);
-    expect(ruleBody('.dss-topbar-live')).toMatch(/color:\s*var\(--hoops-live-fg-on-dark\)/);
-    for (const dot of ['.dss-match-pulse', '.dss-pbp-dot', '.dss-topbar-live::before', '.dss-crumb-dot', '.dss-live-dot']) {
+    expect(ruleBody('.hoops-match-live')).toMatch(/color:\s*var\(--hoops-live-fg\)/);
+    expect(ruleBody('.hoops-pbp-live')).toMatch(/color:\s*var\(--hoops-live-fg\)/);
+    expect(ruleBody('.hoops-pbp-frame--dark .hoops-pbp-live')).toMatch(/color:\s*var\(--hoops-live-fg-on-dark\)/);
+    expect(ruleBody('.hoops-topbar-live')).toMatch(/color:\s*var\(--hoops-live-fg-on-dark\)/);
+    for (const dot of ['.hoops-match-pulse', '.hoops-pbp-dot', '.hoops-topbar-live::before', '.hoops-crumb-dot', '.hoops-live-dot']) {
       expect(ruleBody(dot)).toMatch(/background:\s*var\(--hoops-live-fill\)/);
     }
   });
 
   it('laufende Ergebniszahlen sind grün (Spielplan-Zeile, Raster-Zelle, Spielkarte)', () => {
-    const rule = css.match(/\.dss-sch-row\.is-live \.dss-sch-score,\s*\.dss-sg-game\.is-live \.dss-sch-score,\s*\.dss-match--live \.dss-match-score\s*\{\s*color:\s*var\(--hoops-live-fg\)/);
+    const rule = css.match(/\.hoops-sch-row\.is-live \.hoops-sch-score,\s*\.hoops-sg-game\.is-live \.hoops-sch-score,\s*\.hoops-match--live \.hoops-match-score\s*\{\s*color:\s*var\(--hoops-live-fg\)/);
     expect(rule).not.toBeNull();
   });
 
   it('Rahmen und Balken der Live-Spielkarte nutzen --hoops-live-fill', () => {
-    expect(ruleBody('.dss-match--live')).toMatch(/border-color:\s*var\(--hoops-live-fill\)/);
-    expect(ruleBody('.dss-match--live::before')).toMatch(/background:\s*var\(--hoops-live-fill\)/);
+    expect(ruleBody('.hoops-match--live')).toMatch(/border-color:\s*var\(--hoops-live-fill\)/);
+    expect(ruleBody('.hoops-match--live::before')).toMatch(/background:\s*var\(--hoops-live-fill\)/);
   });
 });
 
@@ -114,25 +114,25 @@ describe('Zwei Animationen für alles Live: Punkt und Text', () => {
     expect(m, animation).not.toBeNull();
     return { selectors: m![1].split(',').map((x) => x.trim()).filter(Boolean), seconds: Number(m![2]) };
   };
-  const dot = groupFor('dss-live-pulse');
-  const text = groupFor('dss-live-pulse-text');
+  const dot = groupFor('hoops-live-pulse');
+  const text = groupFor('hoops-live-pulse-text');
 
   it('genau zwei Keyframes (Punkt und Text), die alten Einzel-Animationen sind weg', () => {
-    expect(keyframes.filter((n) => n.startsWith('dss-live-pulse')).sort()).toEqual(['dss-live-pulse', 'dss-live-pulse-text']);
-    for (const old of ['dss-mc-pulse', 'dss-pbp-pulse', 'dss-tb-pulse', 'dss-pulse']) {
+    expect(keyframes.filter((n) => n.startsWith('hoops-live-pulse')).sort()).toEqual(['hoops-live-pulse', 'hoops-live-pulse-text']);
+    for (const old of ['hoops-mc-pulse', 'hoops-pbp-pulse', 'hoops-tb-pulse', 'hoops-pulse']) {
       expect(keyframes).not.toContain(old);
       expect(css).not.toContain(old);
     }
   });
 
   it('nur die Deckkraft ändert sich, mit Untergrenze je Typ: Punkt 0,35, Text 0,8', () => {
-    for (const name of ['dss-live-pulse', 'dss-live-pulse-text']) {
+    for (const name of ['hoops-live-pulse', 'hoops-live-pulse-text']) {
       const body = keyframeBody(name);
       expect(body).toMatch(/0%,\s*100%\s*\{\s*opacity:\s*1;\s*\}/);
       expect(body).not.toMatch(/transform|box-shadow|scale|translate|color|background/);
     }
-    expect(minOpacity('dss-live-pulse')).toBe(0.35);
-    expect(minOpacity('dss-live-pulse-text')).toBe(0.8);
+    expect(minOpacity('hoops-live-pulse')).toBe(0.35);
+    expect(minOpacity('hoops-live-pulse-text')).toBe(0.8);
   });
 
   it('Dauer je Durchlauf aus dem CSS: 1,6 s, also unter 1 Hz (WCAG 2.3.1)', () => {
@@ -143,11 +143,11 @@ describe('Zwei Animationen für alles Live: Punkt und Text', () => {
   });
 
   it('Punkt-Selektoren und Text-Selektoren sind getrennt, Text nutzt nie die Punkt-Keyframe', () => {
-    for (const selector of ['.dss-live-pulse', '.dss-live-dot', '.dss-match-pulse', '.dss-pbp-dot', '.dss-crumb-dot', '.dss-topbar-live::before']) {
+    for (const selector of ['.hoops-live-pulse', '.hoops-live-dot', '.hoops-match-pulse', '.hoops-pbp-dot', '.hoops-crumb-dot', '.hoops-topbar-live::before']) {
       expect(dot.selectors).toContain(selector);
       expect(text.selectors).not.toContain(selector);
     }
-    const textSelectors = ['.dss-sch-row.is-live .dss-sch-score', '.dss-sg-game.is-live .dss-sch-score', '.dss-match--live .dss-match-score'];
+    const textSelectors = ['.hoops-sch-row.is-live .hoops-sch-score', '.hoops-sg-game.is-live .hoops-sch-score', '.hoops-match--live .hoops-match-score'];
     for (const selector of textSelectors) {
       expect(text.selectors).toContain(selector);
       expect(dot.selectors).not.toContain(selector);
@@ -156,7 +156,7 @@ describe('Zwei Animationen für alles Live: Punkt und Text', () => {
 
   it('keine andere Regel gibt Live-Elementen eine eigene Animation', () => {
     const decls = [...css.matchAll(/animation:\s*([^;}]+)/g)].map((m) => m[1].trim()).filter((d) => /pulse/.test(d));
-    expect(decls.sort()).toEqual(['dss-live-pulse 1.6s ease-in-out infinite', 'dss-live-pulse-text 1.6s ease-in-out infinite']);
+    expect(decls.sort()).toEqual(['hoops-live-pulse 1.6s ease-in-out infinite', 'hoops-live-pulse-text 1.6s ease-in-out infinite']);
   });
 
   const reduced = () => {
@@ -181,7 +181,7 @@ describe('Zwei Animationen für alles Live: Punkt und Text', () => {
 
 describe('Kontrast im Puls-Tal (Text bei Deckkraft 0,8 ≥ 4,5:1)', () => {
   const surfaces = ['--hoops-surface', '--hoops-surface-2', '--hoops-hover-bg', '--hoops-selected-bg'];
-  const valley = Number(css.match(/@keyframes dss-live-pulse-text\s*\{[^@]*?50%\s*\{\s*opacity:\s*([\d.]+)/)![1]);
+  const valley = Number(css.match(/@keyframes hoops-live-pulse-text\s*\{[^@]*?50%\s*\{\s*opacity:\s*([\d.]+)/)![1]);
   for (const [name, block] of Object.entries(blocks)) {
     for (const brand of ['BBV', 'DBB'] as const) {
       it(`${name}, ${brand}: --hoops-live-fg gemischt mit der Fläche bleibt ≥ 4,5:1`, () => {

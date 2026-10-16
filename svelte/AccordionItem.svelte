@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS AccordionItem · Svelte 5 (ein Bereich)
+   * HoopsFoundry UI AccordionItem · Svelte 5 (ein Bereich)
    * --------------------------------------------------------------
    * Kopf als Überschrift mit Button (`<h3><button aria-expanded aria-controls>`), darunter der Bereich. Die Ebene der Überschrift:
    * `titleAs` > `titleAs` der Gruppe > `HeadingLevel` > h3. Der Inhalt bekommt die Ebene darunter (Titelkomponenten und verschachtelte
@@ -91,14 +91,14 @@
     return () => window.removeEventListener('hashchange', collapsible.checkHash);
   });
 
-  const itemClass = $derived(['dss-acc-item', open && 'is-open', disabled && 'is-disabled'].filter(Boolean).join(' '));
+  const itemClass = $derived(['hoops-acc-item', open && 'is-open', disabled && 'is-disabled'].filter(Boolean).join(' '));
 </script>
 
 <div class={itemClass} {id} bind:this={el}>
-  <svelte:element this={heading.tag} class="dss-acc-title">
+  <svelte:element this={heading.tag} class="hoops-acc-title">
     <button
       type="button"
-      class="dss-acc-trigger"
+      class="hoops-acc-trigger"
       id={triggerId}
       aria-expanded={open}
       aria-controls={panelId}
@@ -107,15 +107,15 @@
       onclick={() => setOpen(!open, true)}
       onkeydown={(event) => group?.onKey(event)}
     >
-      <!-- Das Komma (.dss-acc-sep, Schriftgröße 0) hängt am Titel: der Name lautet „Titel, 14 Spieler“, auch wenn zwischen den Elementen Leerraum steht -->
-      <span class="dss-acc-label">{title}{#if meta}<span class="dss-acc-sep">,</span>{/if}</span>
-      {#if meta}<span class="dss-acc-meta">{@render meta()}</span>{/if}
-      <svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5" /></svg>
+      <!-- Das Komma (.hoops-acc-sep, Schriftgröße 0) hängt am Titel: der Name lautet „Titel, 14 Spieler“, auch wenn zwischen den Elementen Leerraum steht -->
+      <span class="hoops-acc-label">{title}{#if meta}<span class="hoops-acc-sep">,</span>{/if}</span>
+      {#if meta}<span class="hoops-acc-meta">{@render meta()}</span>{/if}
+      <svg class="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5" /></svg>
     </button>
   </svelte:element>
-  <div class="dss-acc-panel" id={panelId} bind:this={panel} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} inert={!open}>
-    <div class="dss-acc-panel-inner">
-      <div class="dss-acc-body">{@render children?.()}</div>
+  <div class="hoops-acc-panel" id={panelId} bind:this={panel} role={region ? 'region' : undefined} aria-labelledby={region ? triggerId : undefined} hidden={!open} inert={!open}>
+    <div class="hoops-acc-panel-inner">
+      <div class="hoops-acc-body">{@render children?.()}</div>
     </div>
   </div>
 </div>

@@ -20,7 +20,7 @@
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
   /**
-   * DSS PlayByPlay · Svelte 5
+   * HoopsFoundry UI PlayByPlay · Svelte 5
    * --------------------------------------------------------------
    * Live-Scoring-Ereignisstrom, chronologisch. Je Ereignis: Zeit (M:SS + Spielabschnitt),
    * 4 px Teamstreifen, Aktion (+ Detail), kumulierter Spielstand. Nutzt nur Klassen
@@ -55,37 +55,37 @@
   const teamText = { heim: 'Heim:', gast: 'Gast:' } as const;
 </script>
 
-<div class={`dss-pbp-frame ${dark ? 'dss-pbp-frame--dark' : ''}`}>
-  <div class="dss-pbp-head">
-    <svelte:element this={heading.tag} class="dss-pbp-title">{title}</svelte:element>
-    <div class="dss-pbp-meta">
+<div class={`hoops-pbp-frame ${dark ? 'hoops-pbp-frame--dark' : ''}`}>
+  <div class="hoops-pbp-head">
+    <svelte:element this={heading.tag} class="hoops-pbp-title">{title}</svelte:element>
+    <div class="hoops-pbp-meta">
       {#if meta}<span>{meta}</span>{/if}
-      {#if live}<span class="dss-pbp-live"><span class="dss-pbp-dot" aria-hidden="true"></span> Live</span>{/if}
+      {#if live}<span class="hoops-pbp-live"><span class="hoops-pbp-dot" aria-hidden="true"></span> Live</span>{/if}
     </div>
   </div>
 
-  <div class="dss-pbp-feed" role="log" aria-label={title} tabindex="0">
+  <div class="hoops-pbp-feed" role="log" aria-label={title} tabindex="0">
     {#each events as e (e.id)}
       {@const abschnitt = resolvePeriod({ period: e.period, periods, quarter: e.quarter })}
-      <div class={`dss-pbp-event dss-pbp-event--${e.kind ?? 'default'}`}>
-        <div class="dss-pbp-time">
+      <div class={`hoops-pbp-event hoops-pbp-event--${e.kind ?? 'default'}`}>
+        <div class="hoops-pbp-time">
           {e.time}
           {#if abschnitt.short}
-            <span class="dss-pbp-q">{#if abschnitt.alias}{abschnitt.label}{:else}<span aria-hidden="true">{abschnitt.short}</span><span class="dss-sr-only">{abschnitt.label}</span>{/if}</span>
+            <span class="hoops-pbp-q">{#if abschnitt.alias}{abschnitt.label}{:else}<span aria-hidden="true">{abschnitt.short}</span><span class="hoops-sr-only">{abschnitt.label}</span>{/if}</span>
           {/if}
         </div>
-        <div class={`dss-pbp-strip dss-pbp-strip--${e.team ?? 'none'}`} aria-hidden="true"></div>
-        <div class="dss-pbp-body">
-          <div class="dss-pbp-action">
-            {#if e.team && e.team !== 'none'}<span class="dss-sr-only">{teamText[e.team]} </span>{/if}
+        <div class={`hoops-pbp-strip hoops-pbp-strip--${e.team ?? 'none'}`} aria-hidden="true"></div>
+        <div class="hoops-pbp-body">
+          <div class="hoops-pbp-action">
+            {#if e.team && e.team !== 'none'}<span class="hoops-sr-only">{teamText[e.team]} </span>{/if}
             {#if e.titleBold}<b>{e.titleBold}</b> · {/if}{e.title}
           </div>
           {#if e.detail}
-            <div class="dss-pbp-detail">{e.detail}</div>
+            <div class="hoops-pbp-detail">{e.detail}</div>
           {/if}
         </div>
         {#if e.score}
-          <div class="dss-pbp-score"><span aria-hidden="true">{e.score.heim}<span class="dss-pbp-sep">:</span>{e.score.gast}</span><span class="dss-sr-only">{`Spielstand ${e.score.heim} zu ${e.score.gast}`}</span></div>
+          <div class="hoops-pbp-score"><span aria-hidden="true">{e.score.heim}<span class="hoops-pbp-sep">:</span>{e.score.gast}</span><span class="hoops-sr-only">{`Spielstand ${e.score.heim} zu ${e.score.gast}`}</span></div>
         {/if}
       </div>
     {/each}

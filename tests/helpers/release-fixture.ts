@@ -52,12 +52,12 @@ export async function writeFakeRelease(dir: string, version: string, files: Reco
   const { createTar, gzipNormalized } = await import(/* @vite-ignore */ pathToFileURL(resolve(process.cwd(), 'scripts/lib/tar.mjs')).href);
   const { createHash } = await import('node:crypto');
   const sha = (d: Buffer) => createHash('sha256').update(d).digest('hex');
-  const top = options.top ?? `dss-vanilla-${version}`;
+  const top = options.top ?? `hoops-ui-${version}`;
   const entries = Object.entries(files).sort().map(([name, text]) => ({ path: `${top}/${name}`, data: Buffer.from(text) }));
   const tgz = gzipNormalized(createTar(entries));
   await mkdir(dir, { recursive: true });
-  const sums = [`${sha(tgz)}  dss-vanilla-${version}.tgz`, ...entries.map((e) => `${sha(e.data)}  ${e.path}`)].join('\n') + '\n';
-  await writeFile(`${dir}/dss-vanilla-${version}.tgz`, tgz);
-  await writeFile(`${dir}/dss-vanilla-${version}.sha256`, sums);
+  const sums = [`${sha(tgz)}  hoops-ui-${version}.tgz`, ...entries.map((e) => `${sha(e.data)}  ${e.path}`)].join('\n') + '\n';
+  await writeFile(`${dir}/hoops-ui-${version}.tgz`, tgz);
+  await writeFile(`${dir}/hoops-ui-${version}.sha256`, sums);
   return { tgz, sums, entries };
 }

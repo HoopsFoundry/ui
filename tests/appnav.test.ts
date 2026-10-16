@@ -3,17 +3,17 @@ import { fireEvent } from '@testing-library/react';
 import { initAppNav } from '../js/appnav.js';
 
 const MARKUP = `
-<nav class="dss-appnav dss-appnav--light" data-dss-appnav aria-label="Hauptnavigation">
-  <div class="dss-appnav-bar">
-    <button type="button" class="dss-appnav-toggle" data-appnav-toggle aria-expanded="false" aria-controls="n-list">Menü</button>
-    <ul class="dss-appnav-list" id="n-list">
-      <li class="dss-appnav-item">
-        <button type="button" class="dss-appnav-group-btn" data-appnav-group aria-expanded="false" aria-controls="n-g1">Vorbereiten</button>
-        <ul class="dss-appnav-panel" id="n-g1" hidden><li><a class="dss-appnav-link" href="/teams">Teams</a></li></ul>
+<nav class="hoops-appnav hoops-appnav--light" data-hoops-appnav aria-label="Hauptnavigation">
+  <div class="hoops-appnav-bar">
+    <button type="button" class="hoops-appnav-toggle" data-appnav-toggle aria-expanded="false" aria-controls="n-list">Menü</button>
+    <ul class="hoops-appnav-list" id="n-list">
+      <li class="hoops-appnav-item">
+        <button type="button" class="hoops-appnav-group-btn" data-appnav-group aria-expanded="false" aria-controls="n-g1">Vorbereiten</button>
+        <ul class="hoops-appnav-panel" id="n-g1" hidden><li><a class="hoops-appnav-link" href="/teams">Teams</a></li></ul>
       </li>
-      <li class="dss-appnav-item">
-        <button type="button" class="dss-appnav-group-btn" data-appnav-group aria-expanded="false" aria-controls="n-g2">Ansehen</button>
-        <ul class="dss-appnav-panel" id="n-g2" hidden><li><a class="dss-appnav-link" href="/zeitplan">Zeitplan</a></li></ul>
+      <li class="hoops-appnav-item">
+        <button type="button" class="hoops-appnav-group-btn" data-appnav-group aria-expanded="false" aria-controls="n-g2">Ansehen</button>
+        <ul class="hoops-appnav-panel" id="n-g2" hidden><li><a class="hoops-appnav-link" href="/zeitplan">Zeitplan</a></li></ul>
       </li>
     </ul>
   </div>
@@ -25,7 +25,7 @@ let cleanup: () => void = () => {};
 function mount() {
   const doc = new DOMParser().parseFromString(MARKUP, 'text/html');
   document.body.replaceChildren(...Array.from(doc.body.childNodes).map((node) => document.importNode(node, true)));
-  const root = document.querySelector<HTMLElement>('[data-dss-appnav]')!;
+  const root = document.querySelector<HTMLElement>('[data-hoops-appnav]')!;
   cleanup = initAppNav(root);
   return {
     root,

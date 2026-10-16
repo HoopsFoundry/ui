@@ -1,37 +1,37 @@
 /* Optik der MDX-Doku-Bausteine (nur Storybook). Farben über Tokens, damit Marke und Hell/Dunkel greifen. */
-.dss-doc-cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin: 0 0 8px; }
-.dss-doc-code { border: 1px solid var(--hoops-page-line); border-radius: 14px; background: var(--hoops-base-1000); color: var(--hoops-n-100); padding: 16px 24px 22px; overflow-x: auto; margin: 0 0 16px; }
-.dss-doc-code pre { margin: 0; font-family: var(--hoops-font-mono); font-size: 13px; line-height: 1.6; font-variant-ligatures: none; white-space: pre; background: none; border: 0; padding: 0; color: inherit; }
-.dss-doc-chip { display: inline-block; margin-bottom: 12px; padding: 2px 8px; border-radius: 4px; background: var(--hoops-amber-800); color: var(--hoops-n-0); font-family: var(--hoops-font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+.hoops-doc-cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin: 0 0 8px; }
+.hoops-doc-code { border: 1px solid var(--hoops-page-line); border-radius: 14px; background: var(--hoops-base-1000); color: var(--hoops-n-100); padding: 16px 24px 22px; overflow-x: auto; margin: 0 0 16px; }
+.hoops-doc-code pre { margin: 0; font-family: var(--hoops-font-mono); font-size: 13px; line-height: 1.6; font-variant-ligatures: none; white-space: pre; background: none; border: 0; padding: 0; color: inherit; }
+.hoops-doc-chip { display: inline-block; margin-bottom: 12px; padding: 2px 8px; border-radius: 4px; background: var(--hoops-amber-800); color: var(--hoops-n-0); font-family: var(--hoops-font-mono); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
 :not(pre) > code { white-space: normal !important; overflow-wrap: anywhere; word-break: break-word; } /* lange Befehle im Fließtext brechen um (kein horizontales Scrollen der Seite bei 420 px) */
-.dss-doc-code p { margin: 0; color: var(--hoops-n-100); font-style: italic; }
+.hoops-doc-code p { margin: 0; color: var(--hoops-n-100); font-style: italic; }
 
-.dss-dd { display: flex; flex-direction: column; gap: 32px; }
-.dss-dd-title { margin: 0 0 12px; font-size: 1.1rem; }
-.dss-dd-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
-.dss-dd-col { margin: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
-.dss-dd-stage { border: 2px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 24px; background: var(--hoops-page-surface-0); min-height: 96px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-.dss-dd-do .dss-dd-stage { border-color: var(--hoops-ok-fill); }
-.dss-dd-dont .dss-dd-stage { border-color: var(--hoops-err-fill); }
-.dss-dd figcaption { font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
-.dss-dd-badge { display: inline-block; font-weight: 700; margin-right: 4px; }
-.dss-dd-do .dss-dd-badge { color: var(--hoops-ok-text); }
-.dss-dd-dont .dss-dd-badge { color: var(--hoops-err-text); }
-@media (max-width: 640px) { .dss-dd-cols { grid-template-columns: minmax(0, 1fr); } }
+.hoops-dd { display: flex; flex-direction: column; gap: 32px; }
+.hoops-dd-title { margin: 0 0 12px; font-size: 1.1rem; }
+.hoops-dd-cols { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+.hoops-dd-col { margin: 0; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.hoops-dd-stage { border: 2px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 24px; background: var(--hoops-page-surface-0); min-height: 96px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.hoops-dd-do .hoops-dd-stage { border-color: var(--hoops-ok-fill); }
+.hoops-dd-dont .hoops-dd-stage { border-color: var(--hoops-err-fill); }
+.hoops-dd figcaption { font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
+.hoops-dd-badge { display: inline-block; font-weight: 700; margin-right: 4px; }
+.hoops-dd-do .hoops-dd-badge { color: var(--hoops-ok-text); }
+.hoops-dd-dont .hoops-dd-badge { color: var(--hoops-err-text); }
+@media (max-width: 640px) { .hoops-dd-cols { grid-template-columns: minmax(0, 1fr); } }
 /* Breite Beispiele (Tabellen, Raster) bleiben in der Bühne und scrollen dort */
-.dss-dd-stage > * { min-width: 0; max-width: 100%; }
+.hoops-dd-stage > * { min-width: 0; max-width: 100%; }
 /* Modal-Beispiele (position: fixed) bleiben in der Bühne: transform macht sie zum Bezugsrahmen */
-.dss-dd-stage:has(.dss-modal-wrap) { transform: translateZ(0); overflow: hidden; }
+.hoops-dd-stage:has(.hoops-modal-wrap) { transform: translateZ(0); overflow: hidden; }
 /* Storybook setzt um Inline-Stories ein .sb-story (mit transform): das ist der eigentliche Bezugsrahmen, es muss die Bühne füllen */
-.dss-dd-stage:has(.dss-modal-wrap) > .sb-story { flex: 1 1 100%; align-self: stretch; padding: 0; min-height: 420px; }
+.hoops-dd-stage:has(.hoops-modal-wrap) > .sb-story { flex: 1 1 100%; align-self: stretch; padding: 0; min-height: 420px; }
 
 /* Fließtext-Tabellen in MDX (z. B. Größen): Marke und Hell/Dunkel statt Storybook-Zebra */
-.sbdocs table:not(.docblock-argstable, .dss-tbl) { width: 100%; border-collapse: collapse; background: transparent; color: var(--hoops-page-fg); font-family: var(--hoops-font-body); }
-.sbdocs table:not(.docblock-argstable, .dss-tbl) tr,
-.sbdocs table:not(.docblock-argstable, .dss-tbl) tr:nth-of-type(2n) { background: transparent; border-top: 1px solid var(--hoops-page-line); }
-.sbdocs table:not(.docblock-argstable, .dss-tbl) th,
-.sbdocs table:not(.docblock-argstable, .dss-tbl) td { background: transparent; border: 0; color: var(--hoops-page-fg); padding: 8px 12px; text-align: left; }
-.sbdocs table:not(.docblock-argstable, .dss-tbl) th { color: var(--hoops-page-mute); }
+.sbdocs table:not(.docblock-argstable, .hoops-tbl) { width: 100%; border-collapse: collapse; background: transparent; color: var(--hoops-page-fg); font-family: var(--hoops-font-body); }
+.sbdocs table:not(.docblock-argstable, .hoops-tbl) tr,
+.sbdocs table:not(.docblock-argstable, .hoops-tbl) tr:nth-of-type(2n) { background: transparent; border-top: 1px solid var(--hoops-page-line); }
+.sbdocs table:not(.docblock-argstable, .hoops-tbl) th,
+.sbdocs table:not(.docblock-argstable, .hoops-tbl) td { background: transparent; border: 0; color: var(--hoops-page-fg); padding: 8px 12px; text-align: left; }
+.sbdocs table:not(.docblock-argstable, .hoops-tbl) th { color: var(--hoops-page-mute); }
 
 /* Schmale Viewports: Controls-Tabelle scrollt in sich, nicht die Seite */
 @media (max-width: 640px) {
@@ -39,39 +39,39 @@
 }
 
 /* --hoops-ok-text und --hoops-err-text haben keinen Dunkelmodus (dunkle Töne, 2.3:1 auf Schwarz); hier hellere Töne für die Badges */
-:root[data-theme="dark"] .dss-dd-do .dss-dd-badge { color: oklch(0.8 0.15 150); }
-:root[data-theme="dark"] .dss-dd-dont .dss-dd-badge { color: oklch(0.78 0.16 27); }
+:root[data-theme="dark"] .hoops-dd-do .hoops-dd-badge { color: oklch(0.8 0.15 150); }
+:root[data-theme="dark"] .hoops-dd-dont .hoops-dd-badge { color: oklch(0.78 0.16 27); }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .dss-dd-do .dss-dd-badge { color: oklch(0.8 0.15 150); }
-  :root:not([data-theme="light"]) .dss-dd-dont .dss-dd-badge { color: oklch(0.78 0.16 27); }
+  :root:not([data-theme="light"]) .hoops-dd-do .hoops-dd-badge { color: oklch(0.8 0.15 150); }
+  :root:not([data-theme="light"]) .hoops-dd-dont .hoops-dd-badge { color: oklch(0.78 0.16 27); }
 }
 
-.dss-doc-table-wrap { overflow-x: auto; margin: 0 0 24px; }
-.dss-doc-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: var(--hoops-fs-body-sm); }
-.dss-doc-table th, .dss-doc-table td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--hoops-page-line); background: transparent; color: var(--hoops-page-fg); }
-.dss-doc-table thead th { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
-.dss-doc-k { font-family: var(--hoops-font-mono); font-weight: 600; white-space: nowrap; }
-.dss-doc-v { font-family: var(--hoops-font-mono); font-size: 12.5px; }
+.hoops-doc-table-wrap { overflow-x: auto; margin: 0 0 24px; }
+.hoops-doc-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: var(--hoops-fs-body-sm); }
+.hoops-doc-table th, .hoops-doc-table td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--hoops-page-line); background: transparent; color: var(--hoops-page-fg); }
+.hoops-doc-table thead th { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
+.hoops-doc-k { font-family: var(--hoops-font-mono); font-weight: 600; white-space: nowrap; }
+.hoops-doc-v { font-family: var(--hoops-font-mono); font-size: 12.5px; }
 
 /* Handy-Vorschauen (eingebettete Seiten mit fester Breite) */
-.dss-phones { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; margin: 16px 0 24px; }
-.dss-phone { max-width: 100%; min-width: 0; }
-.dss-phone-scroll { max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
-.dss-phone iframe { display: block; width: 390px; height: 560px; max-width: none; border: 1px solid var(--hoops-page-line); border-radius: 18px; background: var(--hoops-n-0); }
+.hoops-phones { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; margin: 16px 0 24px; }
+.hoops-phone { max-width: 100%; min-width: 0; }
+.hoops-phone-scroll { max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
+.hoops-phone iframe { display: block; width: 390px; height: 560px; max-width: none; border: 1px solid var(--hoops-page-line); border-radius: 18px; background: var(--hoops-n-0); }
 
 /* Variantenkarten (Abschnitt Auswahl) und Hör-Liste (Barrierefreiheit) */
-.dss-var-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
-.dss-var-card { min-width: 0; }
-.dss-var-card--wide { grid-column: 1 / -1; }
-.dss-hear { margin: 0 0 24px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
-.dss-hear li { font-size: var(--hoops-fs-body-sm); line-height: 1.5; border-left: 3px solid var(--hoops-page-line); padding-left: 12px; }
-@media (max-width: 760px) { .dss-hear { grid-template-columns: minmax(0, 1fr); } }
+.hoops-var-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+.hoops-var-card { min-width: 0; }
+.hoops-var-card--wide { grid-column: 1 / -1; }
+.hoops-hear { margin: 0 0 24px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+.hoops-hear li { font-size: var(--hoops-fs-body-sm); line-height: 1.5; border-left: 3px solid var(--hoops-page-line); padding-left: 12px; }
+@media (max-width: 760px) { .hoops-hear { grid-template-columns: minmax(0, 1fr); } }
 
 /* Überschrift als Beschriftung (Handy-Vorschau): Storybook färbt h4 fest dunkel, hier folgt sie dem Theme */
-.sbdocs h4.dss-doc-cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin: 0 0 8px; }
+.sbdocs h4.hoops-doc-cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin: 0 0 8px; }
 
 /* Inline-Code in Tabellenzellen: Storybook färbt code fest dunkelgrau, im Dunkelmodus unlesbar */
-.sbdocs .dss-doc-table code { color: inherit; }
+.sbdocs .hoops-doc-table code { color: inherit; }
 
 /* Inline-Code in der Controls-Tabelle: Storybook färbt code fest dunkelgrau auf transparentem Grund, im Dunkelmodus unlesbar */
 .sbdocs .docblock-argstable code { color: inherit; }

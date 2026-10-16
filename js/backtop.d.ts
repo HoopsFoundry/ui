@@ -1,4 +1,4 @@
-import type { DssHandle } from './lifecycle.js';
+import type { HoopsHandle } from './lifecycle.js';
 
 export interface BackToTopOptions {
   /** Name des Knopfes (Standard „Nach oben“). */
@@ -13,7 +13,7 @@ export interface BackToTopOptions {
   showAfter?: number;
   /** Auswahl des Fokusziels nach dem Klick (Standard `h1`; Rückfall `main`). */
   target?: string;
-  /** Auswahl einer festen unteren Leiste, über der der Knopf sitzt (Standard `.dss-bnav`); `null` schaltet das ab. */
+  /** Auswahl einer festen unteren Leiste, über der der Knopf sitzt (Standard `.hoops-bnav`); `null` schaltet das ab. */
   avoid?: string | null;
   /** Zusätzlicher Abstand von unten als CSS-Länge; setzt `--hoops-backtop-offset` am Knopf. */
   offset?: string;
@@ -21,4 +21,4 @@ export interface BackToTopOptions {
 
 export function backTopVisible(state: { scrollY: number; innerHeight: number; scrollHeight: number; showAfter?: number }): boolean;
 /** Legt den Nach-oben-Knopf an; `destroy()` entfernt ihn samt Listenern. Ein zweiter Aufruf für denselben Container ersetzt den ersten. */
-export function initBackToTop(options?: BackToTopOptions): DssHandle;
+export function initBackToTop(options?: BackToTopOptions): HoopsHandle;

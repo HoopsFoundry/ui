@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS Breadcrumbs · Svelte 5
+   * HoopsFoundry UI Breadcrumbs · Svelte 5
    * --------------------------------------------------------------
    * Drei Varianten, nutzt nur Klassen aus css/components.css:
    *   plain  — Pfad mit Chevron-Trennern (Seitenkopf)
@@ -26,30 +26,30 @@
     ariaLabel?: string;
   } = $props();
 
-  const base = $derived(variant === 'chip' ? 'dss-crumbs-chip' : 'dss-crumbs-item');
+  const base = $derived(variant === 'chip' ? 'hoops-crumbs-chip' : 'hoops-crumbs-item');
 </script>
 
-<nav class={`dss-crumbs dss-crumbs--${variant}`} aria-label={ariaLabel}>
+<nav class={`hoops-crumbs hoops-crumbs--${variant}`} aria-label={ariaLabel}>
   {#each items as it, i}
     {@const isLast = i === items.length - 1}
     {#if isLast}
       <span class={`${base} is-current`} aria-current="page">
-        {#if variant === 'tagged' && it.tag}<span class="dss-crumbs-tag">{it.tag}</span>{/if}
+        {#if variant === 'tagged' && it.tag}<span class="hoops-crumbs-tag">{it.tag}</span>{/if}
         {it.label}
       </span>
     {:else}
       {#if it.href}
         <a class={base} href={it.href}>
-          {#if variant === 'tagged' && it.tag}<span class="dss-crumbs-tag">{it.tag}</span>{/if}
+          {#if variant === 'tagged' && it.tag}<span class="hoops-crumbs-tag">{it.tag}</span>{/if}
           {it.label}
         </a>
       {:else}
         <span class={base}>
-          {#if variant === 'tagged' && it.tag}<span class="dss-crumbs-tag">{it.tag}</span>{/if}
+          {#if variant === 'tagged' && it.tag}<span class="hoops-crumbs-tag">{it.tag}</span>{/if}
           {it.label}
         </span>
       {/if}
-      <svg class="dss-crumbs-sep" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>
+      <svg class="hoops-crumbs-sep" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m9 6 6 6-6 6"/></svg>
     {/if}
   {/each}
 </nav>

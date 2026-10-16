@@ -1,7 +1,7 @@
 [[context-and-scope]]
 == Kontext und Abgrenzung
 
-DSS ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
+HoopsFoundry UI ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
 
 === Fachlicher Kontext
 
@@ -11,21 +11,21 @@ flowchart LR
   VR["Vereinsregister-Portal<br/>(statisch, Vanilla-JS)"]
   TM["Turnier-Manager"]
   APP["Weitere Basketball-Apps"]
-  DSS(["DSS Design System<br/>@bbv/dss-design-system"])
+  HF(["HoopsFoundry UI<br/>@hoopsfoundry/ui"])
   SB["Storybook<br/>(GitHub Pages)"]
   MAP["Kachelserver / Proxy<br/>(OSM)"]
-  VR -- "CSS, Tokens, Vanilla init/render" --> DSS
-  TM -- "Komponenten, ScheduleGame" --> DSS
-  APP -- "Svelte/React, CSS, js/" --> DSS
-  DSS -- "Stories, MDX" --> SB
-  DSS -. "tileUrl, erst nach Freigabe" .-> MAP
+  VR -- "CSS, Tokens, Vanilla init/render" --> HF
+  TM -- "Komponenten, ScheduleGame" --> HF
+  APP -- "Svelte/React, CSS, js/" --> HF
+  HF -- "Stories, MDX" --> SB
+  HF -. "tileUrl, erst nach Freigabe" .-> MAP
 ----
 
 [cols="1,2,2",options="header"]
 |===
-|Partner |Verantwortung des Partners |DSS-Schnittstelle
+|Partner |Verantwortung des Partners |HoopsFoundry-UI-Schnittstelle
 |Vereinsregister-Portal (Hauptnutzer) |Statisches Portal (Vanilla-JS, GitHub Pages), eigene Datenbeschaffung; Seiten entstehen im Browser und im Node-Crawler |`tokens.css`/`components.css`, Vanilla-Module (`init*`, geplant `render*`/`mount*`), Synchronisation per `portal-sync` aus Release (Spec `2026-10-11-vanilla-paket-design.md`, Plan `2026-10-12-vanilla-v2-plan.md`). Auslöser des Vanilla-Pakets
-|Turnier-Manager |Turnierplanung und Spiele; rendert PDFs (Angabe des Auftraggebers, 2026-10-13; die PDF-Erzeugung liegt außerhalb des DSS) |Komponenten wie `ScheduleTable`/`ScheduleGrid`, `TopBar`; Zuordnung `Game` → `ScheduleGame` laut README (Spec `2026-10-08-spielplan-design.md`)
+|Turnier-Manager |Turnierplanung und Spiele; rendert PDFs (Angabe des Auftraggebers, 2026-10-13; die PDF-Erzeugung liegt außerhalb des HoopsFoundry UI) |Komponenten wie `ScheduleTable`/`ScheduleGrid`, `TopBar`; Zuordnung `Game` → `ScheduleGame` laut README (Spec `2026-10-08-spielplan-design.md`)
 |Weitere Anwendungen |Datenbeschaffung, Authentifizierung, Speicherung und Fachprozesse |Props, öffentliche Hilfsfunktionen, CSS und Lifecycle-APIs
 |Datenanbieter |Bereitstellung von Spiel-, Team- oder Vereinsdaten |Keine direkte Integration; die Anwendung normalisiert Daten
 |Karteninfrastruktur |Leaflet-Auslieferung, Kachelzugriff, Proxy und Betriebsregeln |`tileUrl`, `load`, `privacyNote`; Proxy-Rezepte nur als Doku (Spec `2026-10-11-map-hallenkarte-design.md`)
@@ -40,4 +40,4 @@ WordPress-Plugin/-Theme und Drupal-Modul/-Theme wurden als mögliche Adapter dis
 
 === Live-Daten
 
-DSS darf einen gelieferten Live-Zustand darstellen. Abrufintervalle, Quellenvalidierung und Saisonumschaltung sind Anwendungsverantwortung. Verfügbarkeit echter Live-Daten ist keine Eigenschaft der UI-Bibliothek.
+HoopsFoundry UI darf einen gelieferten Live-Zustand darstellen. Abrufintervalle, Quellenvalidierung und Saisonumschaltung sind Anwendungsverantwortung. Verfügbarkeit echter Live-Daten ist keine Eigenschaft der UI-Bibliothek.

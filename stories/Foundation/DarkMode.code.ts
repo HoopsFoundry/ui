@@ -6,7 +6,7 @@ import { themeBootScript } from '../../js/theme.js';
 export const bootScript = themeBootScript();
 
 /** Markup des Umschalters; die Doku zeigt es und führt es auch aus (`initAll`). Leer, mit hidden: Das Skript legt die Symbole an und zeigt den Button. */
-export const buttonMarkup = `<button type="button" class="dss-btn dss-btn--secondary dss-btn--icon" data-dss="theme" hidden></button>`;
+export const buttonMarkup = `<button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" data-hoops="theme" hidden></button>`;
 
 export const vanilla = `<!doctype html>
 <html lang="de">
@@ -23,7 +23,7 @@ export const vanilla = `<!doctype html>
   ${buttonMarkup}
 
   <script type="module">
-    import { initAll } from '@bbv/dss-design-system/vanilla-core.js';
+    import { initAll } from '@hoopsfoundry/ui/vanilla-core.js';
 
     initAll(document);
   </script>
@@ -32,10 +32,10 @@ export const vanilla = `<!doctype html>
 
 <!-- Oder einzeln, mit Optionen -->
 <script type="module">
-  import { initTheme } from '@bbv/dss-design-system/theme.js';
+  import { initTheme } from '@hoopsfoundry/ui/theme.js';
 
-  const theme = initTheme(document.querySelector('[data-dss="theme"]'), {
-    storageKey: 'dss-theme',   // Standard; bei mehreren Apps auf einer Domain je App einen eigenen
+  const theme = initTheme(document.querySelector('[data-hoops="theme"]'), {
+    storageKey: 'hoops-theme',   // Standard; bei mehreren Apps auf einer Domain je App einen eigenen
     onChange: (mode, state) => console.log(mode, state),  // 'dark' 'dark' nach einem Klick
   });
 
@@ -46,7 +46,7 @@ export const vanilla = `<!doctype html>
 
 export const svelte = `<script>
   import { onMount } from 'svelte';
-  import { initTheme } from '@bbv/dss-design-system/theme.js';
+  import { initTheme } from '@hoopsfoundry/ui/theme.js';
 
   // Es gibt keine Svelte-Komponente: der Umschalter ist die Vanilla-Funktion auf einem Button.
   // Das Boot-Skript (themeBootScript) gehört in den <head> der HTML-Vorlage (app.html), nicht in die Komponente.
@@ -58,10 +58,10 @@ export const svelte = `<script>
   });
 </script>
 
-<button bind:this={knopf} type="button" class="dss-btn dss-btn--secondary dss-btn--icon" hidden></button>`;
+<button bind:this={knopf} type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button>`;
 
 export const react = `import { useEffect, useRef } from 'react';
-import { initTheme } from '@bbv/dss-design-system/theme.js';
+import { initTheme } from '@hoopsfoundry/ui/theme.js';
 
 // Es gibt keine React-Komponente: der Umschalter ist die Vanilla-Funktion auf einem Button.
 // Das Boot-Skript (themeBootScript) gehört in den <head> der HTML-Vorlage, nicht in die Komponente.
@@ -74,11 +74,11 @@ export function ThemeToggle() {
     return () => theme.destroy();
   }, []);
 
-  return <button ref={knopf} type="button" className="dss-btn dss-btn--secondary dss-btn--icon" hidden />;
+  return <button ref={knopf} type="button" className="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden />;
 }`;
 
 export const cspHeader = `# Hash des Boot-Skripts (der Text zwischen <script> und </script>, ohne Änderung):
-printf '%s' "$(node -e "import('@bbv/dss-design-system/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
+printf '%s' "$(node -e "import('@hoopsfoundry/ui/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
   | openssl dgst -sha256 -binary | openssl base64
 
 # Content-Security-Policy (Header oder meta): der Hash erlaubt genau dieses Skript, nichts anderes Inline

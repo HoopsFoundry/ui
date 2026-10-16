@@ -25,7 +25,7 @@ Drei Fälle, in dieser Reihenfolge:
 
 ## Der Umschalter
 
-`initTheme(button, options)` macht einen `<button>` zum Umschalter. Drei Modi gibt es: **hell**, **dunkel** und **System**. Ein Klick wechselt zwischen hell und dunkel (aus „System“ in das Gegenteil dessen, was gerade gilt) und merkt sich die Wahl in `localStorage` (Schlüssel `dss-theme`, mit `storageKey` änderbar). Zurück zu „System“ führt `theme.setMode('system')`; dann entfallen Attribut und Eintrag. Im Modus „System“ folgt der Umschalter der Einstellung des Geräts auch dann, wenn sie sich ändert, während die Seite offen ist. Ein anderer Tab, der die Wahl ändert, wirkt auf alle offenen Tabs (`storage`-Ereignis).
+`initTheme(button, options)` macht einen `<button>` zum Umschalter. Drei Modi gibt es: **hell**, **dunkel** und **System**. Ein Klick wechselt zwischen hell und dunkel (aus „System“ in das Gegenteil dessen, was gerade gilt) und merkt sich die Wahl in `localStorage` (Schlüssel `hoops-theme`, mit `storageKey` änderbar). Zurück zu „System“ führt `theme.setMode('system')`; dann entfallen Attribut und Eintrag. Im Modus „System“ folgt der Umschalter der Einstellung des Geräts auch dann, wenn sie sich ändert, während die Seite offen ist. Ein anderer Tab, der die Wahl ändert, wirkt auf alle offenen Tabs (`storage`-Ereignis).
 
 - **Feste Beschriftung** („Dunkelmodus“) und **`aria-pressed`** (gedrückt = Dunkelmodus ist aktiv). Der Name wechselt nie; der Zustand steht im Attribut und im Symbol.
 - **Symbole über den Zustand:** Sonne im hellen, Mond im dunklen Modus. Das Skript setzt `data-theme-state="light|dark"` (der tatsächliche Zustand) und `data-theme-mode="light|dark|system"` am Button; das CSS blendet das passende Symbol ein. Ist der Button leer, legt das Skript beide Symbole an (SVG, `aria-hidden`).
@@ -35,10 +35,10 @@ Drei Fälle, in dieser Reihenfolge:
 
 Probiere ihn in der eigenen Vorschau aus (der Modus wechselt hier nur im Rahmen):
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Umschalter</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Umschalter ausprobieren">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Umschalter</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Umschalter ausprobieren">
       <iframe style={{ height: '300px', width: '390px' }} title="Vorschau: Umschalter für den Dunkelmodus zum Ausprobieren" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-dark-mode--demo" loading="lazy" />
     </div>
   </div>
@@ -50,7 +50,7 @@ Das Skript des Umschalters läuft erst nach dem Laden der Seite. Wer die Wahl �
 
 <CodeBlock label="themeBootScript()" language="JavaScript" code={bootScript} />
 
-Optionen: `storageKey` (Standard `dss-theme`), `attribute` (Standard `data-theme`), `defaultMode` (`light`, `dark` oder `system`, Standard `system`). **`defaultMode` an beiden Stellen gleich setzen:** `themeBootScript({ defaultMode: 'dark' })` und `initTheme(button, { defaultMode: 'dark' })`. Dann gilt immer: gemerkte Wahl vor `defaultMode` vor „System“; das Skript entfernt kein vom Boot-Skript gesetztes Attribut, und die Wahl „System“ wird bei einem anderen Standard als `system` ausdrücklich gemerkt (Eintrag `system`), damit sie den nächsten Besuch übersteht. Die Werte werden als Zeichenketten eingebettet und so maskiert, dass `</script>` und Zeilentrenner darin nichts ausrichten; das Skript ist ES5 und unter 300 Zeichen lang. Erzeuge es zur Bauzeit (Server, Template) und füge es als Text ein, nie aus Nutzereingaben zusammen.
+Optionen: `storageKey` (Standard `hoops-theme`), `attribute` (Standard `data-theme`), `defaultMode` (`light`, `dark` oder `system`, Standard `system`). **`defaultMode` an beiden Stellen gleich setzen:** `themeBootScript({ defaultMode: 'dark' })` und `initTheme(button, { defaultMode: 'dark' })`. Dann gilt immer: gemerkte Wahl vor `defaultMode` vor „System“; das Skript entfernt kein vom Boot-Skript gesetztes Attribut, und die Wahl „System“ wird bei einem anderen Standard als `system` ausdrücklich gemerkt (Eintrag `system`), damit sie den nächsten Besuch übersteht. Die Werte werden als Zeichenketten eingebettet und so maskiert, dass `</script>` und Zeilentrenner darin nichts ausrichten; das Skript ist ES5 und unter 300 Zeichen lang. Erzeuge es zur Bauzeit (Server, Template) und füge es als Text ein, nie aus Nutzereingaben zusammen.
 
 ### Content-Security-Policy
 
@@ -87,7 +87,7 @@ Das Beispiel führt das Markup aus dem Code unten mit `initAll` aus (mit einem E
 
 - **Name und Zustand getrennt:** Der Name bleibt „Dunkelmodus“, der Zustand steht in `aria-pressed` („gedrückt“ = an). Ein wechselnder Name („Zum Light-Modus wechseln“) liest sich nach dem Klick falsch.
 - **Nie nur das Symbol:** Der Button hat immer einen Namen (`aria-label` oder sichtbarer Text); die Symbole sind `aria-hidden`.
-- **Zielgröße:** 44 × 44 px (`dss-btn--icon`, WCAG 2.5.5).
+- **Zielgröße:** 44 × 44 px (`hoops-btn--icon`, WCAG 2.5.5).
 - **Kontrast:** Alle Text-Paare liegen in beiden Modi und beiden Marken (BBV, DBB) über 7:1 (Tests); der Fokus-Ring ist im Dunkelmodus dezenter und hat mindestens 3:1.
 - **Systemeinstellung respektieren:** Wer nichts wählt, bekommt, was das Gerät eingestellt hat; die Wahl wird erst durch einen Klick gespeichert.
 
@@ -95,16 +95,16 @@ Das Beispiel führt das Markup aus dem Code unten mit `initAll` aus (mit einem E
 
 Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Inhalte). In beiden funktioniert der Umschalter.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Dark Mode · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Dark Mode hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Dark Mode · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Dark Mode hell">
       <iframe style={{ height: '320px' }} title="Handy-Vorschau: Umschalter hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-dark-mode--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Dark Mode · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Dark Mode dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Dark Mode · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Dark Mode dunkel">
       <iframe style={{ height: '320px' }} title="Handy-Vorschau: Umschalter dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=foundation-dark-mode--handy-dunkel" loading="lazy" />
     </div>
   </div>
@@ -112,7 +112,7 @@ Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell
 
 ## Verwendung: Import und Optionen
 
-Importiere `initTheme` und `themeBootScript` aus `@bbv/dss-design-system/theme.js` (mit Typen). Es gibt keine Svelte- und keine React-Komponente, die Beispiele zeigen den Aufruf in `onMount` bzw. `useEffect`. Das Boot-Skript gehört in die HTML-Vorlage (zum Beispiel `app.html`, `index.html`), nicht in eine Komponente. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
+Importiere `initTheme` und `themeBootScript` aus `@hoopsfoundry/ui/theme.js` (mit Typen). Es gibt keine Svelte- und keine React-Komponente, die Beispiele zeigen den Aufruf in `onMount` bzw. `useEffect`. Das Boot-Skript gehört in die HTML-Vorlage (zum Beispiel `app.html`, `index.html`), nicht in eine Komponente. Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste.
 
 <FrameworkCode vanilla={vanilla} svelte={svelte} react={react} />
 
@@ -122,7 +122,7 @@ Optionen von `initTheme(button, options)`; es gibt `{ destroy(), getMode(), setM
   label="Optionen von initTheme"
   head={['Option', 'Typ', 'Beschreibung']}
   rows={[
-    ['storageKey', 'string', 'Schlüssel im Speicher (Standard dss-theme).'],
+    ['storageKey', 'string', 'Schlüssel im Speicher (Standard hoops-theme).'],
     ['storage', 'ThemeStorage | null', 'Speicher mit getItem, setItem, removeItem (Standard localStorage); null schaltet das Merken ab.'],
     ['defaultMode', "'light' | 'dark' | 'system'", 'Modus ohne gemerkte Wahl (Standard system); derselbe Wert wie bei themeBootScript.'],
     ['mode', "'light' | 'dark' | 'system'", 'Anfangsmodus; sonst der gemerkte, sonst defaultMode. Wird nicht gemerkt.'],

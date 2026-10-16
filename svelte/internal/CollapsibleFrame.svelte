@@ -1,10 +1,10 @@
 <script lang="ts">
   /**
-   * DSS CollapsibleFrame · Svelte 5 (intern, nicht Teil der öffentlichen Exporte)
+   * HoopsFoundry UI CollapsibleFrame · Svelte 5 (intern, nicht Teil der öffentlichen Exporte)
    * --------------------------------------------------------------
    * Der einklappbare Rahmen von `Table`, `ScheduleTable`, `ScheduleGrid` (`kind="frame"`) und `LeagueCard` (`kind="league"`):
    * Der Kopf ist eine Überschrift mit Button (`<h3><button aria-expanded aria-controls>`), der Inhalt das Panel. Titel, Untertitel
-   * und Zusatzinfo stehen im Button (Teil des Namens, getrennt durch das unsichtbare Komma `.dss-acc-sep`). Der Inhalt bekommt die
+   * und Zusatzinfo stehen im Button (Teil des Namens, getrennt durch das unsichtbare Komma `.hoops-acc-sep`). Der Inhalt bekommt die
    * Ebene unter dem Titel. Im Kontext einer `Accordion`-Gruppe meldet sich der Rahmen an (Sprungleiste, „Alle öffnen“, `exclusive`,
    * Deep-Link, Tastatur); steht er direkt im Panel eines `AccordionItem`, bleibt er einzeln. Ohne `id` gibt es keinen Anker.
    * Das Panel trägt keine eigene Region: Der Inhalt bringt schon eine benannte Region mit (der Scrollbereich der Tabelle).
@@ -27,7 +27,7 @@
     meta = undefined,
     children,
   }: {
-    /** `frame`: Rahmen der Tabellen (`dss-frame`); `league`: Karte der Liga (`dss-league`). */
+    /** `frame`: Rahmen der Tabellen (`hoops-frame`); `league`: Karte der Liga (`hoops-league`). */
     kind?: 'frame' | 'league';
     /** Alle Klassen des äußeren Elements (ohne `is-collapsible`/`is-open`). */
     rootClass: string;
@@ -51,7 +51,7 @@
   provideHeadingLevel(() => nextLevel(levelOfTag(heading.tag)));
 
   const uid = $props.id();
-  const key = $derived(id ?? `dss-cf-${uid}`);
+  const key = $derived(id ?? `hoops-cf-${uid}`);
   const triggerId = $derived(`${key}-trigger`);
   const panelId = $derived(`${key}-panel`);
 
@@ -94,7 +94,7 @@
     return () => window.removeEventListener('hashchange', collapsible.checkHash);
   });
 
-  const base = $derived(kind === 'league' ? 'dss-league' : 'dss-frame');
+  const base = $derived(kind === 'league' ? 'hoops-league' : 'hoops-frame');
   const rootClasses = $derived(`${rootClass} is-collapsible${open ? ' is-open' : ''}`);
 </script>
 
@@ -103,7 +103,7 @@
     <svelte:element this={heading.tag} class="{base}-title">
       <button
         type="button"
-        class="dss-acc-trigger"
+        class="hoops-acc-trigger"
         id={triggerId}
         aria-expanded={open}
         aria-controls={panelId}
@@ -111,14 +111,14 @@
         onclick={() => setOpen(!open, true)}
         onkeydown={(event) => group?.onKey(event)}
       >
-        <!-- Das Komma (.dss-acc-sep, Schriftgröße 0) hängt am Titel bzw. Untertitel: der Name lautet „Titel, Untertitel, Zusatz“ -->
-        <span class="dss-acc-label">{title}{#if sub}<span class="dss-acc-sep">,</span><span class="dss-acc-sub">{sub}{#if meta}<span class="dss-acc-sep">,</span>{/if}</span>{:else if meta}<span class="dss-acc-sep">,</span>{/if}</span>
+        <!-- Das Komma (.hoops-acc-sep, Schriftgröße 0) hängt am Titel bzw. Untertitel: der Name lautet „Titel, Untertitel, Zusatz“ -->
+        <span class="hoops-acc-label">{title}{#if sub}<span class="hoops-acc-sep">,</span><span class="hoops-acc-sub">{sub}{#if meta}<span class="hoops-acc-sep">,</span>{/if}</span>{:else if meta}<span class="hoops-acc-sep">,</span>{/if}</span>
         {#if meta}{@render meta()}{/if}
-        <svg class="dss-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5" /></svg>
+        <svg class="hoops-acc-chevron" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M5 7.5l5 5 5-5" /></svg>
       </button>
     </svelte:element>
   </div>
-  <div class="dss-acc-panel" id={panelId} bind:this={panel} hidden={!open} inert={!open}>
-    <div class="dss-acc-panel-inner">{@render children?.()}</div>
+  <div class="hoops-acc-panel" id={panelId} bind:this={panel} hidden={!open} inert={!open}>
+    <div class="hoops-acc-panel-inner">{@render children?.()}</div>
   </div>
 </div>

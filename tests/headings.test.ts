@@ -36,8 +36,8 @@ describe('Überschriftenebenen der Komponenten', () => {
   it('Svelte ScheduleTable und ScheduleGrid setzen die Ebene über titleAs (keine feste h3)', () => {
     for (const name of ['ScheduleTable', 'ScheduleGrid']) {
       const src = read(`../svelte/${name}.svelte`);
-      expect(src).toMatch(/<svelte:element this=\{heading\.tag\} class="dss-frame-title">/);
-      expect(src).not.toMatch(/<h3 class="dss-frame-title">/);
+      expect(src).toMatch(/<svelte:element this=\{heading\.tag\} class="hoops-frame-title">/);
+      expect(src).not.toMatch(/<h3 class="hoops-frame-title">/);
     }
   });
 
@@ -47,7 +47,7 @@ describe('Überschriftenebenen der Komponenten', () => {
     expect(svelte).toMatch(/titleAs\?: HeadingTag;/);
     expect(svelte).toMatch(/resolveHeading\(titleAs, 2\)/);
     expect(svelte).toMatch(/provideHeadingLevel\(\(\) => nextLevel\(levelOfTag\(titleTag\)\)\)/);
-    expect(svelte).toMatch(/<svelte:element this=\{titleTag\} class="dss-m-title"/);
+    expect(svelte).toMatch(/<svelte:element this=\{titleTag\} class="hoops-m-title"/);
     expect(react).toMatch(/titleAs = 'h2'/);
     expect(react).toMatch(/resolveHeading\(titleAs, 2\)/);
     expect(react).toMatch(/HeadingLevelContext\.Provider value=\{contentLevel\}/);

@@ -210,7 +210,7 @@
 {/snippet}
 
 {#snippet sperrzeit(game: ScheduleGame)}
-  {#if game.id === 'test'}<span class="dss-chip dss-chip--warn">Sperrzeit</span>{/if}
+  {#if game.id === 'test'}<span class="hoops-chip hoops-chip--warn">Sperrzeit</span>{/if}
 {/snippet}
 
 <div style="padding: 24px; max-width: 1100px;">

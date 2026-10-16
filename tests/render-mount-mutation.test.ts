@@ -60,30 +60,30 @@ function rules(mount: MountFn): Rules {
   run('mount: ohne Gruppe legt mount eine an und bedient den Rahmen', (host) => {
     mount(host, renderTable as never, props);
     click(host.querySelector('#tab-trigger')!);
-    return host.querySelector(':scope > .dss-acc') !== null && host.querySelector<HTMLElement>('#tab-panel')!.hidden === false;
+    return host.querySelector(':scope > .hoops-acc') !== null && host.querySelector<HTMLElement>('#tab-panel')!.hidden === false;
   });
   run('mount: im Panel eines fremden Bereichs bekommt der Rahmen eine eigene Gruppe', (host) => {
-    host.className = 'dss-acc';
-    host.append(document.createRange().createContextualFragment('<div class="dss-acc-item"><div class="dss-acc-panel"><div id="inner"></div></div></div>'));
+    host.className = 'hoops-acc';
+    host.append(document.createRange().createContextualFragment('<div class="hoops-acc-item"><div class="hoops-acc-panel"><div id="inner"></div></div></div>'));
     const inner = host.querySelector<HTMLElement>('#inner')!;
     mount(inner, renderTable as never, props);
     click(inner.querySelector('#tab-trigger')!);
-    return inner.querySelector(':scope > .dss-acc') !== null && inner.querySelector('#tab-trigger')!.getAttribute('aria-expanded') === 'true';
+    return inner.querySelector(':scope > .hoops-acc') !== null && inner.querySelector('#tab-trigger')!.getAttribute('aria-expanded') === 'true';
   });
   run('mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', (host) => {
     const h = mount(host, renderTable as never, { title: 'T', rows: [['a']] });
     const before = host.querySelector('table');
     h.update({ title: 'T', rows: [['a']] });
     const same = host.querySelector('table') === before;
-    host.querySelector<HTMLElement>('.dss-table-scroll')!.scrollLeft = 40;
+    host.querySelector<HTMLElement>('.hoops-table-scroll')!.scrollLeft = 40;
     h.update({ title: 'T', rows: [['b']] });
-    return same && host.querySelector('table') !== before && host.querySelector<HTMLElement>('.dss-table-scroll')!.scrollLeft === 40;
+    return same && host.querySelector('table') !== before && host.querySelector<HTMLElement>('.hoops-table-scroll')!.scrollLeft === 40;
   });
   run('mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', (host) => {
     mount(host, ((p: object) => `<div id="d" style="left:10%;top:20%"></div><div id="e" style="color:red;left:1px"></div>${JSON.stringify(p) ? '' : ''}`) as never, {});
     const d = host.querySelector<HTMLElement>('#d')!;
     const e = host.querySelector<HTMLElement>('#e')!;
-    return d.style.left === '10%' && d.style.top === '20%' && !d.hasAttribute('data-dss-style') && e.style.color === '' && e.style.left === '1px';
+    return d.style.left === '10%' && d.style.top === '20%' && !d.hasAttribute('data-hoops-style') && e.style.color === '' && e.style.left === '1px';
   });
   run('mount: ein Ereignis außerhalb von el (Vorfahr passt zum Selektor) löst den Handler nicht aus', (host) => {
     host.className = 'x';
@@ -95,20 +95,20 @@ function rules(mount: MountFn): Rules {
     return calls === 0;
   });
   run('mount: in einer vorhandenen Gruppe keine zweite', (host) => {
-    host.className = 'dss-acc';
+    host.className = 'hoops-acc';
     mount(host, renderTable as never, props);
-    return host.querySelector('.dss-acc') === null;
+    return host.querySelector('.hoops-acc') === null;
   });
   run('mount: destroy stellt den früheren Inhalt wieder her', (host) => {
     host.append(document.createRange().createContextualFragment('<p id="alt">alt</p>'));
     const h = mount(host, renderTable as never, props);
     const gone = host.querySelector('#alt') === null;
     h.destroy();
-    return gone && host.querySelector('#alt') !== null && host.querySelector('.dss-frame') === null;
+    return gone && host.querySelector('#alt') !== null && host.querySelector('.hoops-frame') === null;
   });
   run('mount: destroy baut das Accordion ab (Klick bleibt ohne Wirkung)', (host) => {
     const h = mount(host, renderTable as never, props);
-    const group = host.querySelector<HTMLElement>('.dss-acc')!;
+    const group = host.querySelector<HTMLElement>('.hoops-acc')!;
     h.destroy();
     host.append(group); // die abgeräumte Gruppe wieder einsetzen: ohne Verhalten bleibt der Klick wirkungslos
     click(group.querySelector('#tab-trigger')!);
@@ -143,9 +143,9 @@ function rules(mount: MountFn): Rules {
   run('mount: uid gleich bei update (ids bleiben stabil)', (host) => {
     const noId = { title: 'T', collapsible: true, rows: [] };
     const h = mount(host, renderTable as never, noId);
-    const before = host.querySelector('.dss-acc-trigger')!.id;
+    const before = host.querySelector('.hoops-acc-trigger')!.id;
     h.update({ ...noId, title: 'Anderer Titel' });
-    return before !== '' && host.querySelector('.dss-acc-trigger')!.id === before;
+    return before !== '' && host.querySelector('.hoops-acc-trigger')!.id === before;
   });
   return R;
 }
@@ -162,7 +162,7 @@ const MUTATIONS: { name: string; rule: string; from: string; to: string; file?: 
   { name: 'Panel ignoriert', rule: 'mount: im Panel eines fremden Bereichs bekommt der Rahmen eine eigene Gruppe', from: 'return Boolean(panel) && panel.closest(`.${GROUP}`) === group && group !== el;', to: 'return false;' },
   { name: 'identisches Markup wird ersetzt', rule: 'mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', from: 'if (previous && html === lastHtml && wantsGroup === Boolean(wrapper)) {', to: 'if (false) {' },
   { name: 'Scrollposition geht verloren', rule: 'mount: gleiches Markup bei update ersetzt nichts, die Scrollposition bleibt bei geändertem', from: 'restoreScrolls(wrapper ?? el, scrolls);', to: '' },
-  { name: 'style bleibt Attribut', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', file: 'dom', from: "export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-dss-style=\"$1\"');", to: 'export const deferStyles = (html) => html;' },
+  { name: 'style bleibt Attribut', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', file: 'dom', from: "export const deferStyles = (html) => html.replace(STYLE_ATTR, ' data-hoops-style=\"$1\"');", to: 'export const deferStyles = (html) => html;' },
   { name: 'beliebige Eigenschaften', rule: 'mount: style-Attribute werden über das CSSOM gesetzt, nicht als Attribut', file: 'dom', from: 'if (STYLE_PROPS.has(name) && ', to: 'if (' },
   { name: 'Handler ohne el.contains', rule: 'mount: ein Ereignis außerhalb von el (Vorfahr passt zum Selektor) löst den Handler nicht aus', from: 'if (target && el.contains(target)) rule.handler(event, target);', to: 'if (target) rule.handler(event, target);' },
   { name: 'Accordion nicht gestartet', rule: 'mount: ohne Gruppe legt mount eine an und bedient den Rahmen', from: 'if (wantsGroup && !accordion) accordion = initAccordion(wrapper);', to: '' },

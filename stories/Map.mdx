@@ -166,7 +166,7 @@ Je Ort bietet die Liste Links an, die der Besucher in einer Karten-App öffnen k
   ]}
 />
 
-Jeder Linkname hängt den Ort als versteckte Ergänzung an („Route planen, Sporthalle Nordhain“), damit mehrere gleiche Linktexte unterscheidbar bleiben. Der Name wird **kodiert** (Umlaute, Leerzeichen, `&`, Klammern); die Funktion `mapLinks` aus `@bbv/dss-design-system/map.js` liefert dieselben Adressen für eigene Darstellungen.
+Jeder Linkname hängt den Ort als versteckte Ergänzung an („Route planen, Sporthalle Nordhain“), damit mehrere gleiche Linktexte unterscheidbar bleiben. Der Name wird **kodiert** (Umlaute, Leerzeichen, `&`, Klammern); die Funktion `mapLinks` aus `@hoopsfoundry/ui/map.js` liefert dieselben Adressen für eigene Darstellungen.
 
 <Canvas of={MapStories.KartenApp} />
 
@@ -203,10 +203,10 @@ OpenStreetMap kennt keinen Dunkelmodus. Zwei Verfahren stehen zur Wahl, beide wi
 
 Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau rechts zeigt beide im Dunkelmodus (der Rahmen ist dunkel geschaltet):
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">darkTiles · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kacheln im Dunkelmodus">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">darkTiles · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kacheln im Dunkelmodus">
       <iframe style={{ height: '560px' }} title="Vorschau: Karten mit abgedunkelten und invertierten Kacheln im Dunkelmodus" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--dunkle-kacheln" loading="lazy" />
     </div>
   </div>
@@ -232,16 +232,16 @@ Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeuglei
 
 Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel: Platzhalter und geladene Karte, Pins als Pins, die Liste darunter, die Seite scrollt nicht seitlich.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Map · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Map · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte hell">
       <iframe title="Handy-Vorschau: Karte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-map--handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Map · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Map · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte dunkel">
       <iframe title="Handy-Vorschau: Karte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--handy" loading="lazy" />
     </div>
   </div>
@@ -265,19 +265,19 @@ Leaflet ist eine **optionale Peer-Abhängigkeit** (`peerDependencies` mit `peerD
 
 ### Warum `MapView` in React und `Map.svelte` in Svelte
 
-Das JavaScript-Global `Map` (die Datenstruktur) bliebe in jeder Datei verdeckt, die eine Komponente `Map` importiert. Deshalb heißt der React-Export **`MapView`**; die Svelte-Datei heißt `Map.svelte` (Export `@bbv/dss-design-system/svelte/Map`) und wird beim Import ebenfalls `MapView` genannt. Die Doku-Seite heißt „Map“, die CSS-Klassen `dss-map*`.
+Das JavaScript-Global `Map` (die Datenstruktur) bliebe in jeder Datei verdeckt, die eine Komponente `Map` importiert. Deshalb heißt der React-Export **`MapView`**; die Svelte-Datei heißt `Map.svelte` (Export `@hoopsfoundry/ui/svelte/Map`) und wird beim Import ebenfalls `MapView` genannt. Die Doku-Seite heißt „Map“, die CSS-Klassen `hoops-map*`.
 
 ## Ohne Build einbinden
 
-Eine Seite ohne Bundler und ohne Framework kann die Karte vollständig betreiben: eine HTML-Datei, `<script type="module">`, die Dateien des Pakets und Leaflet **aus dem eigenen Projekt** (nicht von unpkg: sonst bekäme ein Fremdserver die IP-Adresse schon beim Laden der Seite, nicht erst nach dem Klick). Das Karten-Bündel `dss-map.min.js` enthält die Karte ohne Leaflet; es lädt Leaflet erst nach „Karte laden“ (oder bei `load="auto"`) und braucht dafür eine der drei Varianten unten. Vor dem Klick gibt es **keinen Netzverkehr**: keine Anfrage an den Kartendienst, kein Leaflet, kein Prefetch, keine Cookies, keinen Speicher.
+Eine Seite ohne Bundler und ohne Framework kann die Karte vollständig betreiben: eine HTML-Datei, `<script type="module">`, die Dateien des Pakets und Leaflet **aus dem eigenen Projekt** (nicht von unpkg: sonst bekäme ein Fremdserver die IP-Adresse schon beim Laden der Seite, nicht erst nach dem Klick). Das Karten-Bündel `hoops-map.min.js` enthält die Karte ohne Leaflet; es lädt Leaflet erst nach „Karte laden“ (oder bei `load="auto"`) und braucht dafür eine der drei Varianten unten. Vor dem Klick gibt es **keinen Netzverkehr**: keine Anfrage an den Kartendienst, kein Leaflet, kein Prefetch, keine Cookies, keinen Speicher.
 
 ### Dateien kopieren
 
 <CodeBlock label="Dateien ins Projekt kopieren" language="Shell" code={kopieren} />
 
-**Abhängigkeiten der Bündel:** `dss-map.min.js` steht allein (Leaflet kommt zur Laufzeit über `loadLeaflet`). `dss-render.min.js` importiert statisch `./dss.min.js` aus demselben Ordner: wer die Hallenkarte aus Daten nutzt, kopiert beide, sonst meldet der Browser einen 404 und das Modul lädt nicht. Ein Test gleicht die Liste gegen die statischen Importe aller Bündel ab.
+**Abhängigkeiten der Bündel:** `hoops-map.min.js` steht allein (Leaflet kommt zur Laufzeit über `loadLeaflet`). `hoops-render.min.js` importiert statisch `./hoops.min.js` aus demselben Ordner: wer die Hallenkarte aus Daten nutzt, kopiert beide, sonst meldet der Browser einen 404 und das Modul lädt nicht. Ein Test gleicht die Liste gegen die statischen Importe aller Bündel ab.
 
-Die Dateien kommen aus `@bbv/dss-design-system/vanilla-map` (`dist/vanilla/dss-map.min.js`, Quellkarte daneben) und aus dem Leaflet-Paket (BSD-2-Clause, siehe oben). `dss.css` und `leaflet.css` binden die Seiten per `<link>` ein; die Optik von Zoom, Marker, Quellenangabe und Platzhalter liefert `dss.css`, Layout und Gesten liefert `leaflet.css`.
+Die Dateien kommen aus `@hoopsfoundry/ui/vanilla-map` (`dist/vanilla/hoops-map.min.js`, Quellkarte daneben) und aus dem Leaflet-Paket (BSD-2-Clause, siehe oben). `hoops.css` und `leaflet.css` binden die Seiten per `<link>` ein; die Optik von Zoom, Marker, Quellenangabe und Platzhalter liefert `hoops.css`, Layout und Gesten liefert `leaflet.css`.
 
 ### Drei Wege, Leaflet zu laden
 
@@ -315,11 +315,11 @@ Mit `load: 'auto'`, Vereinssitz und `darkTiles: 'invert'`:
 
 <Canvas of={MapStories.VanillaGeladen} />
 
-### `initMap`, `data-dss="map"` und Zeichenketten
+### `initMap`, `data-hoops="map"` und Zeichenketten
 
 <FrameworkCode label="initMap auf vorhandenem Markup" vanilla={initMapBeispiel} />
 
-<FrameworkCode label="Karte per data-dss und initAll" vanilla={initAllKarte} />
+<FrameworkCode label="Karte per data-hoops und initAll" vanilla={initAllKarte} />
 
 `mountMap` und `initMap` sind idempotent (ein zweiter Aufruf für dasselbe Element ersetzt den ersten); `destroy()` räumt die Leaflet-Karte (`map.remove()`), den Klick-Listener und den `ResizeObserver` ab. Styles setzt `mountMap` über das CSSOM, sodass `style-src 'self'` genügt. Beim Import des Bündels passiert nichts: kein Zugriff auf `window` oder `document`, es lädt auch in Node (`renderMap` für Crawler und Seitengenerierung).
 
@@ -331,16 +331,16 @@ Ohne eigenen Proxy holt jede Kachel das Bild von `tile.openstreetmap.org` und gi
 
 Die Vorschauen zeigen die Vanilla-Karte mit anderen Hallen als die Svelte-Vorschau oben: links der Platzhalter mit Seeberg und Kiefernau, rechts die geladene Karte mit der Geschäftsstelle und Kiefernau.
 
-<div className="dss-phones">
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Vanilla · hell</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte hell">
+<div className="hoops-phones">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Vanilla · hell</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte hell">
       <iframe title="Handy-Vorschau: Vanilla-Karte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-map--vanilla-handy" loading="lazy" />
     </div>
   </div>
-  <div className="dss-phone">
-    <h3 className="dss-doc-cap">Vanilla · dunkel</h3>
-    <div className="dss-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte dunkel">
+  <div className="hoops-phone">
+    <h3 className="hoops-doc-cap">Vanilla · dunkel</h3>
+    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte dunkel">
       <iframe title="Handy-Vorschau: Vanilla-Karte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--vanilla-handy-dunkel" loading="lazy" />
     </div>
   </div>
@@ -354,7 +354,7 @@ Wer die Karte ganz selbst steuert, nutzt Leaflet und die reinen Funktionen aus `
 
 ## Verwendung: Import und Props
 
-Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. **Vanilla:** `mountMap(el, props, options)` aus dem Karten-Bündel (`dss-map.min.js`) setzt dasselbe Markup wie `MapView` ein und startet das Verhalten; `renderMap(props)` liefert es als Zeichenkette, `initMap(el, props)` macht vorhandenes Markup lebendig. Wer die Karte ganz selbst steuern will, nutzt Leaflet direkt (unten, „Leaflet direkt“).
+Die Code-Beispiele folgen dem Umschalter „Fassung“ in der Werkzeugleiste. **Vanilla:** `mountMap(el, props, options)` aus dem Karten-Bündel (`hoops-map.min.js`) setzt dasselbe Markup wie `MapView` ein und startet das Verhalten; `renderMap(props)` liefert es als Zeichenkette, `initMap(el, props)` macht vorhandenes Markup lebendig. Wer die Karte ganz selbst steuern will, nutzt Leaflet direkt (unten, „Leaflet direkt“).
 
 <FrameworkCode label="Map" vanilla={vanilla} svelte={svelte} react={react} />
 
@@ -394,7 +394,7 @@ Die Spielwiese zeigt die echte Komponente mit den erfundenen Hallen und dem loka
 
 ### Reine Funktionen: `map.js`
 
-Die Logik der Karte steckt in reinen Funktionen (`@bbv/dss-design-system/map.js`, mit Typen), die auch für eigene Darstellungen taugen: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord` (dazu `safeHref` für Marker-Ziele). Die Aufrufe im Beispiel werden in den Tests ausgewertet und liefern die kommentierten Werte.
+Die Logik der Karte steckt in reinen Funktionen (`@hoopsfoundry/ui/map.js`, mit Typen), die auch für eigene Darstellungen taugen: `mapLinks`, `formatCoords`, `validTileUrl`, `boundsOf`, `isCoord` (dazu `safeHref` für Marker-Ziele). Die Aufrufe im Beispiel werden in den Tests ausgewertet und liefern die kommentierten Werte.
 
 <CodeBlock label="Funktionen aus map.js" language="JavaScript" code={funktionenJs} />
 

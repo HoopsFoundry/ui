@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DSS HeadingLevel · Svelte 5
+   * HoopsFoundry UI HeadingLevel · Svelte 5
    * --------------------------------------------------------------
    * Gibt den Komponentenüberschriften im Inhalt eine Ebene vor (nur h2 bis h6, nie h1). Ein `titleAs` an der Komponente
    * gewinnt. `level` ist absolut, `by` relativ zum übergeordneten HeadingLevel (Standard 1; ohne Vorfahr zählt die
