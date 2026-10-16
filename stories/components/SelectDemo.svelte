@@ -3,7 +3,8 @@
 
   let {
     label = 'Turniermodus',
-    state = 'default',
+    // Nicht `state` nennen: ein Name `state` macht aus `$state(...)` unten einen Store-Zugriff („state is not a store with a subscribe method“)
+    state: fieldState = 'default',
     density = 'default',
     disabled = false,
     required = false,
@@ -19,5 +20,5 @@
 </script>
 
 <div style="max-width: 360px">
-  <Select {label} {options} {state} {density} {disabled} {required} {help} bind:value />
+  <Select {label} {options} state={fieldState} {density} {disabled} {required} {help} bind:value />
 </div>
