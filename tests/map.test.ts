@@ -235,7 +235,7 @@ describe('placeholderPins', () => {
 describe('safeHref', () => {
   it.each([
     'https://example.org/halle', 'http://example.org', 'HTTPS://EXAMPLE.ORG', 'HtTp://example.org', 'mailto:halle@example.org', 'tel:+4912345', 'TEL:123', 'MAILTO:a@b.de',
-    '/hallen/sued', './sued', '../sued', 'hallen/sued', 'sued', '?seite=2', '#halle-seeberg', '#', '/a:b', 'a/b:c', '?x=javascript:alert(1)', '#javascript:alert(1)',
+    '/hallen/sued', './sued', '../sued', 'hallen/sued', 'sued', '?seite=2', '#halle-seeberg', '#', '/a:b', 'a/b:c', '?x=javascript:alert(1)', '#javascript:alert(1)', '/a//b', 'a//b', '?u=//x',
   ])('erlaubt: %s', (href) => expect(safeHref(href)).toBe(href));
   it.each([
     ['javascript:alert(1)', 'javascript:'], ['JavaScript:alert(1)', 'JavaScript:'], ['JAVASCRIPT:alert(1)', 'groß'], ['jAvAsCrIpT:alert(1)', 'gemischt'],
@@ -244,6 +244,7 @@ describe('safeHref', () => {
     ['java\tscript:alert(1)', 'Tabulator im Schema'], ['java\nscript:alert(1)', 'Zeilenumbruch im Schema'], ['java\rscript:alert(1)', 'CR im Schema'], ['jav&#x61;script:alert(1)', 'Zeichenverweis'],
     ['data:text/html,<script>alert(1)</script>', 'data:'], ['DATA:text/html,x', 'DATA:'], ['vbscript:msgbox(1)', 'vbscript:'], ['file:///etc/passwd', 'file:'], ['ftp://example.org', 'ftp:'], ['blob:https://example.org/x', 'blob:'],
     ['about:blank', 'about:'], ['x:y', 'unbekanntes Schema'], ['javascript&colon;alert(1)', 'Doppelpunkt als Zeichenverweis ohne Schema-Trenner'],
+    ['//evil.example/x', 'protokollrelativ'], ['///evil.example', 'drei Schrägstriche'], ['/\\evil.example', 'Schrägstrich und Rückwärtsstrich'], ['\\\\evil.example', 'zwei Rückwärtsstriche'], ['/\t/evil.example', 'Tabulator zwischen den Schrägstrichen'],
     ['', 'leer'],
   ])('verworfen: %j (%s)', (href) => {
     // Zeichenverweise werden in Markup-Kontexten zu Zeichen aufgelöst: sie dürfen nie als Schema durchgehen

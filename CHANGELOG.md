@@ -12,6 +12,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 
 ### Behoben
 
+- `safeHref` lehnt protokoll-relative Ziele ab (`//host`, `/\\host`); sie führten auf einen fremden Host. Wer so ein Ziel braucht, gibt den vollen `https://`-Link an.
 - `package-lock.json` ergänzt um `@emnapi/core` und `@emnapi/runtime` (npm lässt sie auf macOS aus, `npm ci` auf Linux brach in GitHub Actions ab).
 
 ### Geändert (Bruch)

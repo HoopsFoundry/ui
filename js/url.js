@@ -7,7 +7,7 @@
 
 /**
  * Prüft ein Ziel (`href`) eines Markers: erlaubt sind `http:`, `https:`, `mailto:`, `tel:` (Schema in beliebiger Schreibweise), Pfade
- * (`/…`, `./…`, `../…`, `ort/seite`, `?…`) und `#`-Ziele. Alles mit anderem Schema (`javascript:`, `data:`, `vbscript:` …) und alles mit
+ * (`/…`, `./…`, `../…`, `ort/seite`, `?…`) und `#`-Ziele, aber keine protokoll-relativen Ziele (`//host`). Alles mit anderem Schema (`javascript:`, `data:`, `vbscript:` …) und alles mit
  * Steuerzeichen oder Leerraum am Anfang ergibt `undefined`. Steuerzeichen und Leerzeichen innerhalb entfernen Browser vor der Auswertung
  * des Schemas, deshalb zählt die Funktion sie vorher mit.
  */
@@ -22,5 +22,7 @@ export function safeHref(href) {
   if (/^[^/?#]*:/.test(flat)) return undefined;
   // Zeichenverweise (&colon;, &#58;) ergäben in Markup-Kontexten ein Schema: vor dem ersten / ? # nicht zulassen
   if (/^[^/?#]*&/.test(flat)) return undefined;
+  // protokoll-relative Ziele (`//host`, auch mit Rückwärtsstrichen wie `/\\host`) führen die Seite auf einen fremden Host: nicht zulassen
+  if (/^[/\\]{2}/.test(flat)) return undefined;
   return href;
 }
