@@ -1,4 +1,4 @@
-= DSS – Softwarearchitektur
+= HoopsFoundry UI – Softwarearchitektur
 :lang: de
 :doctype: book
 :toc: left
@@ -21,13 +21,13 @@ Das Designsystem stellt Design-Tokens, gemeinsames CSS, Framework-Komponenten (S
 
 === Name
 
-Das System heißt HoopsFoundry UI (ADR-008). Die Design-Tokens tragen das Präfix `--hoops-`. Klassen (`dss-*`), data-Attribute, Dateinamen, Paketname (`@bbv/dss-design-system`) und Repository-Name tragen noch das alte Kürzel; für diese Teile verwendet die Dokumentation die Kurzform „DSS“.
+Das System heißt HoopsFoundry UI (ADR-008). Alle Bezeichner tragen das Präfix `hoops-`: Klassen (`hoops-btn`), Design-Tokens (`--hoops-*`), Attribute (`data-hoops`), Ereignisse (`hoops:…`) und Dateien (`hoops.js`, `hoops.css`). Das Paket heißt `@hoopsfoundry/ui`, das Repository `HoopsFoundry/ui`.
 
-Hintergrund: Das Kürzel DSS stammt aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
+Hintergrund: Der frühere Arbeitsname stammte aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
 
 === Stakeholder
 
-* Anwendungsentwickler integrieren DSS in Basketball-Anwendungen und Vereinsportale.
+* Anwendungsentwickler integrieren HoopsFoundry UI in Basketball-Anwendungen und Vereinsportale.
 * Maintainer entwickeln Komponenten und erhalten Implementierungsparität.
 * Gestalter definieren konsistente Marken-, Typografie- und Interaktionsregeln.
 * Nutzer benötigen zugängliche und verständliche Oberflächen.
@@ -48,7 +48,7 @@ Qualitätsziele sind Anforderungen, keine pauschalen Konformitätsnachweise. Kon
 
 === Beobachteter Repository-Stand
 
-* Das Paket heißt `@bbv/dss-design-system`; die gelesene Paketversion ist `0.9.0`.
+* Das Paket heißt `@hoopsfoundry/ui`; die gelesene Paketversion ist `0.10.0`.
 * JavaScript-Module verwenden ESM.
 * Komponentenimplementierungen liegen in `react/` und `svelte/`.
 * Storybook verwendet `@storybook/svelte-vite`.
@@ -70,7 +70,7 @@ Weitere Framework-Versionen (Peer-Abhängigkeiten) werden in `package.json` gepf
 [[context-and-scope]]
 == Kontext und Abgrenzung
 
-DSS ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
+HoopsFoundry UI ist eine Bibliothek, keine vollständige Vereinsanwendung und kein Backend.
 
 === Fachlicher Kontext
 
@@ -80,21 +80,21 @@ flowchart LR
   VR["Vereinsregister-Portal<br/>(statisch, Vanilla-JS)"]
   TM["Turnier-Manager"]
   APP["Weitere Basketball-Apps"]
-  DSS(["DSS Design System<br/>@bbv/dss-design-system"])
+  HF(["HoopsFoundry UI<br/>@hoopsfoundry/ui"])
   SB["Storybook<br/>(GitHub Pages)"]
   MAP["Kachelserver / Proxy<br/>(OSM)"]
-  VR -- "CSS, Tokens, Vanilla init/render" --> DSS
-  TM -- "Komponenten, ScheduleGame" --> DSS
-  APP -- "Svelte/React, CSS, js/" --> DSS
-  DSS -- "Stories, MDX" --> SB
-  DSS -. "tileUrl, erst nach Freigabe" .-> MAP
+  VR -- "CSS, Tokens, Vanilla init/render" --> HF
+  TM -- "Komponenten, ScheduleGame" --> HF
+  APP -- "Svelte/React, CSS, js/" --> HF
+  HF -- "Stories, MDX" --> SB
+  HF -. "tileUrl, erst nach Freigabe" .-> MAP
 ----
 
 [cols="1,2,2",options="header"]
 |===
-|Partner |Verantwortung des Partners |DSS-Schnittstelle
+|Partner |Verantwortung des Partners |HoopsFoundry-UI-Schnittstelle
 |Vereinsregister-Portal (Hauptnutzer) |Statisches Portal (Vanilla-JS, GitHub Pages), eigene Datenbeschaffung; Seiten entstehen im Browser und im Node-Crawler |`tokens.css`/`components.css`, Vanilla-Module (`init*`, geplant `render*`/`mount*`), Synchronisation per `portal-sync` aus Release (Spec `2026-10-11-vanilla-paket-design.md`, Plan `2026-10-12-vanilla-v2-plan.md`). Auslöser des Vanilla-Pakets
-|Turnier-Manager |Turnierplanung und Spiele; rendert PDFs (Angabe des Auftraggebers, 2026-10-13; die PDF-Erzeugung liegt außerhalb des DSS) |Komponenten wie `ScheduleTable`/`ScheduleGrid`, `TopBar`; Zuordnung `Game` → `ScheduleGame` laut README (Spec `2026-10-08-spielplan-design.md`)
+|Turnier-Manager |Turnierplanung und Spiele; rendert PDFs (Angabe des Auftraggebers, 2026-10-13; die PDF-Erzeugung liegt außerhalb des HoopsFoundry UI) |Komponenten wie `ScheduleTable`/`ScheduleGrid`, `TopBar`; Zuordnung `Game` → `ScheduleGame` laut README (Spec `2026-10-08-spielplan-design.md`)
 |Weitere Anwendungen |Datenbeschaffung, Authentifizierung, Speicherung und Fachprozesse |Props, öffentliche Hilfsfunktionen, CSS und Lifecycle-APIs
 |Datenanbieter |Bereitstellung von Spiel-, Team- oder Vereinsdaten |Keine direkte Integration; die Anwendung normalisiert Daten
 |Karteninfrastruktur |Leaflet-Auslieferung, Kachelzugriff, Proxy und Betriebsregeln |`tileUrl`, `load`, `privacyNote`; Proxy-Rezepte nur als Doku (Spec `2026-10-11-map-hallenkarte-design.md`)
@@ -109,7 +109,7 @@ WordPress-Plugin/-Theme und Drupal-Modul/-Theme wurden als mögliche Adapter dis
 
 === Live-Daten
 
-DSS darf einen gelieferten Live-Zustand darstellen. Abrufintervalle, Quellenvalidierung und Saisonumschaltung sind Anwendungsverantwortung. Verfügbarkeit echter Live-Daten ist keine Eigenschaft der UI-Bibliothek.
+HoopsFoundry UI darf einen gelieferten Live-Zustand darstellen. Abrufintervalle, Quellenvalidierung und Saisonumschaltung sind Anwendungsverantwortung. Verfügbarkeit echter Live-Daten ist keine Eigenschaft der UI-Bibliothek.
 
 [[solution-strategy]]
 == Lösungsstrategie
@@ -141,13 +141,13 @@ Ein zentraler Agent-Einstieg, ein generierter Komponentenkatalog und Textdokumen
 flowchart TB
   subgraph Grundlage
     T["tokens/<br/>tokens.css, tokens.json, Tailwind-Preset"]
-    C["css/components.css<br/>einzige CSS-Quelle (dss-*)"]
+    C["css/components.css<br/>einzige CSS-Quelle (hoops-*)"]
     F["fonts/, icons/"]
   end
   J["js/<br/>reine Logik + Vanilla initX"]
   JR["js/render/<br/>renderX / mountX (Markup aus Daten)"]
-  B["dist/vanilla/<br/>dss.js (Kern) + dss-render.js + dss-map.js"]
-  SY["scripts/portal-sync.mjs + lib/<br/>dss-sync (Verbraucher der Auslieferung)"]
+  B["dist/vanilla/<br/>hoops.js (Kern) + hoops-render.js + hoops-map.js"]
+  SY["scripts/portal-sync.mjs + lib/<br/>hoops-sync (Verbraucher der Auslieferung)"]
   RL["scripts/release-vanilla.mjs<br/>Release: Tarball, Prüfsummen, Manifest"]
   S["svelte/*.svelte"]
   R["react/*.tsx → dist/react"]
@@ -179,15 +179,15 @@ flowchart TB
 |`fonts/`, `icons/` |Gestaltungsassets
 |`js/` |Gemeinsame Logik und Vanilla-Verhalten
 |`js/render/` |Vanilla-Render-Funktionen `renderX(props, options?) → string` und `mountX(el, props, options?) → { update, destroy }` für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips; `escape.js` (`esc`, `attr`), `core.js` (Teamname, Logo, Form, einklappbarer Rahmen), `mount.js` (`createContextualFragment`, Fokus, Accordion), `map-view.js` (Karten-Markup und Teilstücke, intern), `dom.js` (Einsetzen per `createContextualFragment`, Styles über das CSSOM, ids; ohne Abhängigkeit vom Accordion); die Logik kommt aus `js/*.js`
-|`js/map-vanilla.js` |Die Karte ohne Framework: `renderMap(props, options?)`, `initMap(el, options)`, `mountMap(el, props, options?)`, `initMapBlock` (Anbindung für `initAll`); nutzt `createMapController` (`js/map-leaflet.js`), `mapItems` (das seinerseits `mapLinks` und `safeHref` aufruft), `validTileUrl` und das Markup aus `js/render/map-view.js`; Leaflet über `import('leaflet')` oder die Option `loadLeaflet`; Einstieg des Bündels `dss-map.js` ist `js/map-bundle.js`
+|`js/map-vanilla.js` |Die Karte ohne Framework: `renderMap(props, options?)`, `initMap(el, options)`, `mountMap(el, props, options?)`, `initMapBlock` (Anbindung für `initAll`); nutzt `createMapController` (`js/map-leaflet.js`), `mapItems` (das seinerseits `mapLinks` und `safeHref` aufruft), `validTileUrl` und das Markup aus `js/render/map-view.js`; Leaflet über `import('leaflet')` oder die Option `loadLeaflet`; Einstieg des Bündels `hoops-map.js` ist `js/map-bundle.js`
 |`react/` |React-Komponenten und Typen
 |`svelte/` |Svelte-Komponenten
 |`stories/` |Stories, MDX und Framework-Codebeispiele
 |`.storybook/` |Storybook-Konfiguration (`main.ts`, `preview.ts` mit `storySort` und Toolbar-Globals, Zustands-Umschalter, `storybook.css`)
 |`docs/` |`architecture/` (diese arc42), `superpowers/specs/` und `superpowers/plans/` (Entwürfe und Umsetzungspläne)
-|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (`dss.js` als Kern, `dss-render.js` als Render-Bündel und `dss-map.js` als Karten-Bündel, je mit eigenem Budget, siehe ADR-007; ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
+|`dist/` |Build-Ausgabe, nicht versioniert (`.gitignore`): `dist/react` aus `npm run build:react`; zusätzlich `dist/vanilla` aus `npm run build:vanilla` (`hoops.js` als Kern, `hoops-render.js` als Render-Bündel und `hoops-map.js` als Karten-Bündel, je mit eigenem Budget, siehe ADR-007; ausgeliefert per Release, siehe ADR-006); `npm run build` erzeugt beides
 |`tests/` |Automatisierte Prüfungen
-|`scripts/` |Entwicklungs- und Prüfwerkzeuge sowie die ausgelieferten Werkzeuge: `portal-sync.mjs` (Befehl `dss-sync`, mit den Hilfen unter `scripts/lib/`: Tarball und Prüfsummen, Download, Dateihilfen und Sperre, Fehlertexte, Node-Prüfung) ist im npm-Paket und als gebündelter Release-Anhang `dss-sync.mjs` enthalten; `release-vanilla.mjs` erzeugt das Release (Tarball, Prüfsummen, Manifest, `dss-sync.mjs`) und `vanilla-budgets.mjs` hält die Größenbudgets der Bündel
+|`scripts/` |Entwicklungs- und Prüfwerkzeuge sowie die ausgelieferten Werkzeuge: `portal-sync.mjs` (Befehl `hoops-sync`, mit den Hilfen unter `scripts/lib/`: Tarball und Prüfsummen, Download, Dateihilfen und Sperre, Fehlertexte, Node-Prüfung) ist im npm-Paket und als gebündelter Release-Anhang `hoops-sync.mjs` enthalten; `release-vanilla.mjs` erzeugt das Release (Tarball, Prüfsummen, Manifest, `hoops-sync.mjs`) und `vanilla-budgets.mjs` hält die Größenbudgets der Bündel
 |`parity.manifest.json` |Zuordnung von Implementierungsdateien und CSS-Klassen
 |`package.json` |Öffentliche Exports, Build-Kommandos und Abhängigkeiten
 |===
@@ -210,7 +210,7 @@ Neue gemeinsame Logik gehört nicht in mehrere Framework-Komponenten kopiert. Ob
 . Die Anwendung beschafft und normalisiert Daten.
 . Eine native Komponente erhält dokumentierte Eingaben.
 . Gemeinsame Hilfen berechnen darstellungsrelevante Werte.
-. Die Komponente gibt semantisches Markup mit DSS-Klassen aus.
+. Die Komponente gibt semantisches Markup mit HoopsFoundry-UI-Klassen aus.
 . Die Anwendung aktualisiert Eingaben bei Änderungen.
 
 === Vanilla-Lifecycle als Architekturziel
@@ -246,18 +246,18 @@ Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus
 
 Entscheidung und Begründung: ADR-006.
 
-Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält drei Bündel nebeneinander: `dss.js` (Kern), `dss-render.js` (importiert `./dss.js`) und `dss-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
+Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält drei Bündel nebeneinander: `hoops.js` (Kern), `hoops-render.js` (importiert `./hoops.js`) und `hoops-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
 
 [cols="1,2,2",options="header"]
 |===
 |Schritt |Wo |Was
-|Bau und Release-Dateien |Entwicklungsrechner oder Workflow `release-vanilla.yml` |`npm run build`, dann `node scripts/release-vanilla.mjs`: prüft die Version an acht Stellen und die Größenbudgets, schreibt `release/dss-vanilla-<version>.tgz`, `.sha256`, `.tgz.sha256`, `manifest.json`, `dss-sync.mjs` und `dss-sync.mjs.sha256`
+|Bau und Release-Dateien |Entwicklungsrechner oder Workflow `release-vanilla.yml` |`npm run build`, dann `node scripts/release-vanilla.mjs`: prüft die Version an acht Stellen und die Größenbudgets, schreibt `release/hoops-ui-<version>.tgz`, `.sha256`, `.tgz.sha256`, `manifest.json`, `hoops-sync.mjs` und `hoops-sync.mjs.sha256`
 |Veröffentlichung |GitHub-Release `v<version>` |Die sechs Anhänge; angelegt vom Release-Job des Workflows bei einem Tag `v*` (Tag-Commit auf `main`)
-|Übernahme |Projekt des Portals, `dss-sync.mjs --from-release <version>` (npm: `npx dss-sync --from-package`) |Download über https, Prüfung, Ersetzen von `_site/dss` mit Rückrollen und Sperre; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
+|Übernahme |Projekt des Portals, `hoops-sync.mjs --from-release <version>` (npm: `npx hoops-sync --from-package`) |Download über https, Prüfung, Ersetzen von `_site/hoops` mit Rückrollen und Sperre; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
 |Betrieb |Statischer Host (GitHub Pages) |Dateien auf der eigenen Domain, relative Pfade (auch unter `/<repo>/`); strenge CSP (`script-src 'self'` plus Hash des Boot-Skripts, `style-src 'self'`, `img-src 'self'` und Kachel-Host)
 |===
 
-Nachgewiesen ist der Weg durch `scripts/check-portal-seite.mjs`: bauen, Release erzeugen, den Anhang `dss-sync.mjs` in einem fremden Ordner mit `--from-release` von einem lokalen Server laufen lassen und die Beispielseite unter strenger CSP in Chromium und WebKit prüfen (auch unter einem Unterpfad, bei 320 px und ohne JavaScript). Das Hilfsskript und das Release-Skript sind mit Node 18.20.8, 20.20.2 und 22.21.0 gelaufen. Nicht nachgewiesen ist der Lauf des Workflows `release-vanilla.yml` auf GitHub (kein Tag, kein Release erzeugt); ein Test prüft nur seinen Aufbau und führt die Versionsprüfung in bash aus (Auslöser, Rechte, Reihenfolge, Pins). Er lässt sich mit `workflow_dispatch` und `dry_run: true` ohne Release erproben. Die Prüfsummen sind keine Signatur; Build-Provenance ist vorbereitet, aber nicht eingeschaltet.
+Nachgewiesen ist der Weg durch `scripts/check-portal-seite.mjs`: bauen, Release erzeugen, den Anhang `hoops-sync.mjs` in einem fremden Ordner mit `--from-release` von einem lokalen Server laufen lassen und die Beispielseite unter strenger CSP in Chromium und WebKit prüfen (auch unter einem Unterpfad, bei 320 px und ohne JavaScript). Das Hilfsskript und das Release-Skript sind mit Node 18.20.8, 20.20.2 und 22.21.0 gelaufen. Nicht nachgewiesen ist der Lauf des Workflows `release-vanilla.yml` auf GitHub (kein Tag, kein Release erzeugt); ein Test prüft nur seinen Aufbau und führt die Versionsprüfung in bash aus (Auslöser, Rechte, Reihenfolge, Pins). Er lässt sich mit `workflow_dispatch` und `dry_run: true` ohne Release erproben. Die Prüfsummen sind keine Signatur; Build-Provenance ist vorbereitet, aber nicht eingeschaltet.
 
 === Dokumentation und MCP
 
@@ -301,7 +301,7 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 
 * Status: angenommen, umgesetzt.
 * Kontext: Komponenten existieren als Vanilla-CSS-Klassen, Svelte und React und sollen gleich aussehen.
-* Entscheidung: Das Aussehen steht ausschließlich in `css/components.css` (Klassen `dss-*`, Tokens aus `tokens/`). Svelte-Dateien haben keinen `<style>`-Block. `parity.manifest.json` ordnet je Komponente Dateien und Klassen zu; `tests/parity.test.ts` prüft die Vollständigkeit. Die Vanilla-Fassung wird als dritte Fassung im Manifest geführt (für Tabs und Modal bereits vorhanden); für die Render-Funktionen steht dort der Eintrag `vanilla`.
+* Entscheidung: Das Aussehen steht ausschließlich in `css/components.css` (Klassen `hoops-*`, Tokens aus `tokens/`). Svelte-Dateien haben keinen `<style>`-Block. `parity.manifest.json` ordnet je Komponente Dateien und Klassen zu; `tests/parity.test.ts` prüft die Vollständigkeit. Die Vanilla-Fassung wird als dritte Fassung im Manifest geführt (für Tabs und Modal bereits vorhanden); für die Render-Funktionen steht dort der Eintrag `vanilla`.
 * Konsequenzen: Neue Komponenten brauchen Manifest-Eintrag, Exporte und CSS an einer Stelle; Abweichungen werden über Paritätstests sichtbar.
 * Quellen: `2026-10-08-spielplan-design.md` (kein `<style>`, Manifest), `2026-10-11-vanilla-paket-design.md` (Teil 2, dritte Fassung), README (`components.css` „einzige CSS-Quelle"), `CLAUDE.md`.
 
@@ -318,7 +318,7 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 * Status: angenommen, umgesetzt.
 * Kontext: Jede Kachel wird vom Kartenserver geladen, der die IP der Besucher sieht.
 * Entscheidung: Leaflet ist optionale Peer-Abhängigkeit und wird per `import('leaflet')` erst bei Bedarf geladen. Standard ist `load="click"` (Platzhalter mit Hinweis, erst nach Klick Leaflet und Kacheln); `load="auto"` ist für Apps mit Einwilligung oder eigenem Proxy vorgesehen. `tileUrl` erlaubt einen Kachel-Proxy der App; der Standard-OSM-Server gilt nur als Demo/Entwicklung. Das Paket enthält keinen Serverteil; Proxy-Rezepte (nginx, Node/SvelteKit) stehen nur in der Doku.
-* Vanilla-Fassung: `js/map-vanilla.js` (`renderMap`, `initMap`, `mountMap`, `initMapBlock`) nutzt denselben Controller und dieselben reinen Funktionen (`mapItems`, `mapLinks`, `validTileUrl`, `safeHref`). Leaflet bleibt außerhalb des Bündels `dss-map.js`: die Option `loadLeaflet: () => Promise<Leaflet>` ersetzt den Standardimport `import('leaflet')`, der in einem Browser ohne Bundler eine importmap braucht; eine Seite liefert Leaflet und `leaflet.css` aus dem eigenen Projekt aus (kein CDN), geladen wird erst nach dem Klick. Der Zustand (Platzhalter, Laden, Karte, Fehler mit den Gründen `tile-url`, `import`, `init`, `update`, `tiles`) folgt der Komponente; eine neue `tileUrl` versucht es erneut.
+* Vanilla-Fassung: `js/map-vanilla.js` (`renderMap`, `initMap`, `mountMap`, `initMapBlock`) nutzt denselben Controller und dieselben reinen Funktionen (`mapItems`, `mapLinks`, `validTileUrl`, `safeHref`). Leaflet bleibt außerhalb des Bündels `hoops-map.js`: die Option `loadLeaflet: () => Promise<Leaflet>` ersetzt den Standardimport `import('leaflet')`, der in einem Browser ohne Bundler eine importmap braucht; eine Seite liefert Leaflet und `leaflet.css` aus dem eigenen Projekt aus (kein CDN), geladen wird erst nach dem Klick. Der Zustand (Platzhalter, Laden, Karte, Fehler mit den Gründen `tile-url`, `import`, `init`, `update`, `tiles`) folgt der Komponente; eine neue `tileUrl` versucht es erneut.
 * Konsequenzen: Datenschutzaussagen hängen vom Lademodus und von `tileUrl` ab. Svelte, React und Vanilla teilen den Controller `js/map-leaflet.js`. Vor dem Klick gibt es auch in Vanilla keinen Netzverkehr (kein Leaflet, keine Kachel, kein Prefetch, keine Cookies oder Speicher), ein Browsertest mit Netzwerkbeobachtung belegt es in Chromium und WebKit. Ein Kachel-Proxy bleibt Sache des Betreibers (Rezepte nur in der Doku).
 * Quellen: `2026-10-11-map-hallenkarte-design.md`, Plan `2026-10-11-map.md`, Plan `2026-10-12-vanilla-v2-plan.md`.
 
@@ -332,47 +332,48 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 
 === ADR-005: Vanilla-Verhalten nach dem Muster `initX(root, options) → { destroy() }`
 
-* Status: angenommen und umgesetzt. Vorhanden sind das Muster `initX`/`destroy`, `initAll`, `initTabs`, `initModal`, `initPageNav`, `initBackToTop`, `initTheme` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`); die Render-Funktionen `renderX`/`mountX` für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips in `js/render/` mit `esc()`/`attr()`, `safeHref` und `createContextualFragment`; die Karte (`renderMap`, `initMap`, `mountMap` in `js/map-vanilla.js`, siehe ADR-003); die Bündel `dist/vanilla/dss.js` (Kern), `dss-render.js` (Render) und `dss-map.js` (Karte) entstehen mit `npm run build:vanilla`, jedes mit eigenem Größenbudget als Test (siehe ADR-007). Das Register der Instanzen wird über `Symbol.for('dss.registry')` zwischen Kopien des Bündels geteilt. Die Auslieferung regelt ADR-006.
+* Status: angenommen und umgesetzt. Vorhanden sind das Muster `initX`/`destroy`, `initAll`, `initTabs`, `initModal`, `initPageNav`, `initBackToTop`, `initTheme` und die gemeinsamen Hilfen (`lifecycle`, `motion`, `url`); die Render-Funktionen `renderX`/`mountX` für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchCard, EmptyState, StatGrid und FormChips in `js/render/` mit `esc()`/`attr()`, `safeHref` und `createContextualFragment`; die Karte (`renderMap`, `initMap`, `mountMap` in `js/map-vanilla.js`, siehe ADR-003); die Bündel `dist/vanilla/hoops.js` (Kern), `hoops-render.js` (Render) und `hoops-map.js` (Karte) entstehen mit `npm run build:vanilla`, jedes mit eigenem Größenbudget als Test (siehe ADR-007). Das Register der Instanzen wird über `Symbol.for('hoops.registry')` zwischen Kopien des Bündels geteilt. Die Auslieferung regelt ADR-006.
 * Kontext: Das Vereinsregister ist ein statisches Vanilla-JS-Portal; Mittelweg statt Wechsel auf Svelte/React.
-* Entscheidung: Einheitliches Muster `initX(root, options)` → `{ destroy() }`, idempotent, nur `root` und Nachfahren, kein globaler Zustand, respektiert reduzierte Bewegung. `initAll(scope)` findet Bausteine über `data-dss`. Render-Funktionen escapen Texte zentral (`esc()`), URLs laufen durch `safeHref`; Einfügen per `createContextualFragment`.
-* Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping. Die Render-Funktionen nehmen dieselben Eigenschaften wie die Komponenten und erzeugen dasselbe Markup (Parität gegen Svelte-SSR und React-SSR als Test); die Logik (Fenster, Kurznamen, Zustände, Grenzen) bleibt in den gemeinsamen Modulen und wird nicht kopiert. Bewusste Abweichungen: `esc` entfernt Steuerzeichen (NUL und Co.) aus Texten, die Komponenten nicht; der Paritätstest vergleicht Leerraum normalisiert; kein `HeadingLevel`-Kontext (`titleAs`, Standard h3), Zeilen und Zellen der Tabelle als Daten statt Snippets, `time`/`notice`/`actions`/`extra` als Text oder Daten (kein Rohmarkup), ungültige Zahlen entfallen statt „NaN“ zu zeigen, unbekannte Aufzählungswerte fallen auf den Standard. `mountX` startet bei `collapsible` das Accordion-Verhalten selbst, hält Fokus, Scrollposition und Zustand bei `update` und stellt bei `destroy` den früheren Inhalt wieder her; es wendet die wenigen `style`-Attribute über das CSSOM an (CSP `style-src 'self'`), das Markup von `renderX` selbst braucht `style-src-attr`. Die Instanzen von `initAccordion` laufen über `createRegistry('accordion')`, damit Kern, Render-Bündel und Einzelmodul dieselbe Wurzel nie doppelt schalten; die Karte ebenso über `createRegistry('map')`. Die Karte gehört nicht zum Kern: `initAll` kennt `data-dss="map"`, startet sie aber nur über `options.map.start` (`initMapBlock` aus dem Karten-Bündel), damit der Kern ohne Karten-Code bleibt. Eingaben der Karte (Aufzählungen `load`, `darkTiles`, `kind`, `appLinks`) laufen gegen feste Listen, Texte als `textContent` oder durch `esc`/`attr`, Ziele durch `safeHref`; `mountMap` setzt Styles über das CSSOM.
+* Entscheidung: Einheitliches Muster `initX(root, options)` → `{ destroy() }`, idempotent, nur `root` und Nachfahren, kein globaler Zustand, respektiert reduzierte Bewegung. `initAll(scope)` findet Bausteine über `data-hoops`. Render-Funktionen escapen Texte zentral (`esc()`), URLs laufen durch `safeHref`; Einfügen per `createContextualFragment`.
+* Konsequenzen: Gemeinsame Hilfen liegen in `js/lifecycle.js`, `js/motion.js`, `js/url.js`; Tests prüfen Init, Aufräumen und Escaping. Die Render-Funktionen nehmen dieselben Eigenschaften wie die Komponenten und erzeugen dasselbe Markup (Parität gegen Svelte-SSR und React-SSR als Test); die Logik (Fenster, Kurznamen, Zustände, Grenzen) bleibt in den gemeinsamen Modulen und wird nicht kopiert. Bewusste Abweichungen: `esc` entfernt Steuerzeichen (NUL und Co.) aus Texten, die Komponenten nicht; der Paritätstest vergleicht Leerraum normalisiert; kein `HeadingLevel`-Kontext (`titleAs`, Standard h3), Zeilen und Zellen der Tabelle als Daten statt Snippets, `time`/`notice`/`actions`/`extra` als Text oder Daten (kein Rohmarkup), ungültige Zahlen entfallen statt „NaN“ zu zeigen, unbekannte Aufzählungswerte fallen auf den Standard. `mountX` startet bei `collapsible` das Accordion-Verhalten selbst, hält Fokus, Scrollposition und Zustand bei `update` und stellt bei `destroy` den früheren Inhalt wieder her; es wendet die wenigen `style`-Attribute über das CSSOM an (CSP `style-src 'self'`), das Markup von `renderX` selbst braucht `style-src-attr`. Die Instanzen von `initAccordion` laufen über `createRegistry('accordion')`, damit Kern, Render-Bündel und Einzelmodul dieselbe Wurzel nie doppelt schalten; die Karte ebenso über `createRegistry('map')`. Die Karte gehört nicht zum Kern: `initAll` kennt `data-hoops="map"`, startet sie aber nur über `options.map.start` (`initMapBlock` aus dem Karten-Bündel), damit der Kern ohne Karten-Code bleibt. Eingaben der Karte (Aufzählungen `load`, `darkTiles`, `kind`, `appLinks`) laufen gegen feste Listen, Texte als `textContent` oder durch `esc`/`attr`, Ziele durch `safeHref`; `mountMap` setzt Styles über das CSSOM.
 * Quellen: `2026-10-11-vanilla-paket-design.md` (Teil 1 und 2), `2026-10-11-portal-bausteine-review.md`, Plan `2026-10-12-vanilla-v2-plan.md`.
 
 === ADR-006: Auslieferung per GitHub-Release, ab 1.0 per npm
 
-* Status: angenommen am 2026-10-12 und umgesetzt (Release-Skript, Workflow, `dss-sync`, Beispielseite); der Workflow ist bis zum ersten Tag nicht real ausgeführt.
+* Status: angenommen am 2026-10-12 und umgesetzt (Release-Skript, Workflow, `hoops-sync`, Beispielseite); der Workflow ist bis zum ersten Tag nicht real ausgeführt.
 * Kontext: Optionen waren A (GitHub-Release mit `dist/vanilla`), B (npm-Paket), C (Git-Dependency mit `prepare`). Das Portal ist ein statisches Projekt ohne Bundler; es braucht feste, prüfbare Dateien einer Version und ein Werkzeug, das sie sicher einsetzt.
 * Entscheidung: A bis Version 1.0, danach B. Jede Quelle liefert denselben Aufbau von `dist/vanilla`.
-** Release-Anhänge: `dss-vanilla-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `dss-vanilla-<version>/`), `dss-vanilla-<version>.sha256` (Format von `sha256sum`, erste Zeile der Tarball, danach jede Datei), `dss-vanilla-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Name, Version, Dateien mit Größe und SHA-256, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Leaflet-Hinweis, Hilfsskript) sowie `dss-sync.mjs` mit `dss-sync.mjs.sha256`.
-** `scripts/release-vanilla.mjs` erzeugt sie in `release/` (nicht im Git; ein vorhandenes Ziel nur, wenn es leer ist oder die Marker-Datei `.dss-release` trägt) in den Schritten `clean`, `build`, `version`, `budget`, `pack`, `verify`. `version` verlangt, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `dss.css` übereinstimmen; `budget` bricht ab, wenn ein Bündel sein Größenbudget (`scripts/vanilla-budgets.mjs`) überschreitet. Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist die veröffentlichte `.sha256`. `verify` liest den Tarball mit dem Leser von `dss-sync` zurück und prüft, dass `dss-sync.mjs` keinen relativen Import enthält. Das Skript braucht weder Netz noch Git-Schreibrechte und erzeugt keinen Tag.
+** Release-Anhänge: `hoops-ui-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `hoops-ui-<version>/`), `hoops-ui-<version>.sha256` (Format von `sha256sum`, erste Zeile der Tarball, danach jede Datei), `hoops-ui-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Name, Version, Dateien mit Größe und SHA-256, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Leaflet-Hinweis, Hilfsskript) sowie `hoops-sync.mjs` mit `hoops-sync.mjs.sha256`.
+** `scripts/release-vanilla.mjs` erzeugt sie in `release/` (nicht im Git; ein vorhandenes Ziel nur, wenn es leer ist oder die Marker-Datei `.hoops-release` trägt) in den Schritten `clean`, `build`, `version`, `budget`, `pack`, `verify`. `version` verlangt, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `hoops.css` übereinstimmen; `budget` bricht ab, wenn ein Bündel sein Größenbudget (`scripts/vanilla-budgets.mjs`) überschreitet. Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist die veröffentlichte `.sha256`. `verify` liest den Tarball mit dem Leser von `hoops-sync` zurück und prüft, dass `hoops-sync.mjs` keinen relativen Import enthält. Das Skript braucht weder Netz noch Git-Schreibrechte und erzeugt keinen Tag.
 ** `.github/workflows/release-vanilla.yml` führt Tests, Typprüfung, Bau und Skript aus (Tag `v*`, manuell mit `dry_run`). Die Version wird mit einem strengen Regex geprüft und nur über `env` verwendet, der Tag-Commit muss auf `main` liegen, nur der Release-Job hat `contents: write` und seine Aktionen sind auf Commits festgelegt, jeder Job hat ein Zeitlimit, der Checkout behält keine Zugangsdaten.
-** `scripts/portal-sync.mjs` (Befehl `dss-sync` im npm-Paket, Release-Anhang `dss-sync.mjs` als gebündelte Einzeldatei) ist die Verbraucher-Seite mit austauschbarer Quelle: `--from-release <version>` (Download von `<Basis>/v<version>/`, Basis konfigurierbar), `--from-package` (node_modules) und `--from-dir <pfad>`. Vor jedem Eingriff in das Ziel müssen Prüfsumme des Tarballs und jeder Datei, Ordnername und `version.json` stimmen, und das Archiv darf nur reguläre Dateien unter einem Ordner enthalten (kein `..`, keine absoluten oder Windows-Pfade, keine Verknüpfungen, keine doppelten Namen, begrenzte Größe). Der Download läuft über https (http nur an Loopback oder mit `--allow-insecure-http`), folgt Weiterleitungen nur auf denselben Host über https (für GitHub zusätzlich `*.githubusercontent.com`, weitere Hosts nur mit `--allow-redirect-host`), zählt den Strom und bricht ab 32 MiB sowie nach 10 s ohne Daten oder 30 s insgesamt ab. Das Ziel wird erst danach ersetzt: Nachbarordner, altes Ziel nach `<ziel>.old-<pid>`, neues einsetzen, altes löschen, bei einem Fehler zurückrollen; eine Sperrdatei `.dss-sync.lock` verhindert gleichzeitige Läufe; Marker `.dss-sync`, kein Löschen fremder Ordner. Systemfehler erscheinen auf Deutsch ohne Stack (`--debug` zeigt ihn). Voraussetzung ist Node 18 oder neuer (geprüft mit 18.20.8, 20.20.2 und 22.21.0); `package.json` `engines` bleibt unverändert, weil nur die Skripte Node 18 brauchen, nicht der Bibliothekscode.
-* Konsequenzen: Kein npm-Konto bis 1.0 nötig, `dist/` bleibt außerhalb von Git; das Portal lädt eine feste, geprüfte Version und kann mit derselben Zeile zurückrollen. Der Wechsel auf npm ersetzt `--from-release` durch `--from-package` (`npx dss-sync`); das Paket veröffentlicht `dist/` und die Skripte bereits (`files`, `bin`, Export `./portal-sync.mjs`). `esbuild` ist direkte Entwicklungsabhängigkeit (Bündeln von `dss-sync.mjs`). Die Prüfsummen schützen vor Übertragungsfehlern und vertauschten Anhängen, nicht vor einem manipulierten Release: beide Dateien kommen von derselben Stelle, es gibt keine Signatur. Als nächster Schritt sind Build-Provenance (`actions/attest-build-provenance`, im Workflow als Kommentar vorbereitet, nicht aktiv) und signierte Tags vorgesehen. Tag und Release anzulegen ist ein Schritt des Maintainers.
+** `scripts/portal-sync.mjs` (Befehl `hoops-sync` im npm-Paket, Release-Anhang `hoops-sync.mjs` als gebündelte Einzeldatei) ist die Verbraucher-Seite mit austauschbarer Quelle: `--from-release <version>` (Download von `<Basis>/v<version>/`, Basis konfigurierbar), `--from-package` (node_modules) und `--from-dir <pfad>`. Vor jedem Eingriff in das Ziel müssen Prüfsumme des Tarballs und jeder Datei, Ordnername und `version.json` stimmen, und das Archiv darf nur reguläre Dateien unter einem Ordner enthalten (kein `..`, keine absoluten oder Windows-Pfade, keine Verknüpfungen, keine doppelten Namen, begrenzte Größe). Der Download läuft über https (http nur an Loopback oder mit `--allow-insecure-http`), folgt Weiterleitungen nur auf denselben Host über https (für GitHub zusätzlich `*.githubusercontent.com`, weitere Hosts nur mit `--allow-redirect-host`), zählt den Strom und bricht ab 32 MiB sowie nach 10 s ohne Daten oder 30 s insgesamt ab. Das Ziel wird erst danach ersetzt: Nachbarordner, altes Ziel nach `<ziel>.old-<pid>`, neues einsetzen, altes löschen, bei einem Fehler zurückrollen; eine Sperrdatei `.hoops-sync.lock` verhindert gleichzeitige Läufe; Marker `.hoops-sync`, kein Löschen fremder Ordner. Systemfehler erscheinen auf Deutsch ohne Stack (`--debug` zeigt ihn). Voraussetzung ist Node 18 oder neuer (geprüft mit 18.20.8, 20.20.2 und 22.21.0); `package.json` `engines` bleibt unverändert, weil nur die Skripte Node 18 brauchen, nicht der Bibliothekscode.
+* Konsequenzen: Kein npm-Konto bis 1.0 nötig, `dist/` bleibt außerhalb von Git; das Portal lädt eine feste, geprüfte Version und kann mit derselben Zeile zurückrollen. Der Wechsel auf npm ersetzt `--from-release` durch `--from-package` (`npx hoops-sync`); das Paket veröffentlicht `dist/` und die Skripte bereits (`files`, `bin`, Export `./portal-sync.mjs`). `esbuild` ist direkte Entwicklungsabhängigkeit (Bündeln von `hoops-sync.mjs`). Die Prüfsummen schützen vor Übertragungsfehlern und vertauschten Anhängen, nicht vor einem manipulierten Release: beide Dateien kommen von derselben Stelle, es gibt keine Signatur. Als nächster Schritt sind Build-Provenance (`actions/attest-build-provenance`, im Workflow als Kommentar vorbereitet, nicht aktiv) und signierte Tags vorgesehen. Tag und Release anzulegen ist ein Schritt des Maintainers.
 * Quellen: Plan `2026-10-12-vanilla-v2-plan.md`, Abschnitt „Auslieferung und Abschluss“.
 
 === ADR-007: Render-Bündel und Karten-Bündel getrennt vom Kern, je mit eigenem Budget
 
 * Status: angenommen und umgesetzt.
-* Kontext: Der Kern `dss.min.js` liegt bei 36 KiB (Budget 40 KiB min, 15 KiB gzip als Test). Die Render-Funktionen allein brauchen rund 45 KiB min zusätzlich zum Accordion (Logik aus `league`, `schedule`, `team`, `venue`, `map`, Markup von zehn Komponenten); ein gemeinsames Bündel hätte das Budget mehr als verdoppelt und jede Seite mit Verhalten belastet, die kein Markup erzeugt. Die Karte (Leaflet-Anbindung, Zustände, Markup, Fehlerfälle) bringt rund 22 KiB min und hätte das Budget des Render-Bündels (52 KiB) überschritten; viele Seiten haben keine Karte.
-* Entscheidung: Drei Dateien im selben Ordner `dist/vanilla`: `dss.js` (Kern, unverändert bis auf den Eintrag `map` in `initAll`), `dss-render.js` (Render) und `dss-map.js` (Karte). Das Render-Bündel importiert das Accordion-Verhalten aus dem Kern (`./dss.js` bzw. `./dss.min.js`), sodass es genau eine Kopie des Verhaltens und eine Instanzenverwaltung gibt; alles andere ist gebündelt. Das Karten-Bündel steht allein und enthält kein Leaflet (`import('leaflet')` bleibt ein dynamischer Import, den die Option `loadLeaflet` ersetzen kann); die Hallenkarte verbindet beide über die Option `initMap` an `mountVenueCard` (kein statischer Import zwischen Render- und Karten-Bündel). Budgets getrennt: Kern 40 KiB min und 15 KiB gzip (gemessen 36,3 und 12,9), Render 52 KiB min und 18 KiB gzip (gemessen 50,2 und 17,1), Karte 24 KiB min und 10 KiB gzip (gemessen 21,7 und 8,9), jeweils als Test. Einzelmodule bleiben über `package.json` erreichbar (`./render.js`, `./render/*.js`, `./map-vanilla.js`), die Bündel über `./vanilla`, `./vanilla-render` und `./vanilla-map`.
-* Konsequenzen: Wer Markup erzeugt, lädt Kern und Render-Bündel aus derselben Version, wer eine Karte braucht, zusätzlich `dss-map.js`; Tests prüfen, dass das Render-Bündel nur den Kern importiert, das Karten-Bündel außer dem dynamischen `import('leaflet')` nichts importiert und beide weder Framework noch Leaflet enthalten. Beim Wechsel der Auslieferung (ADR-006) bleibt der Aufbau von `dist/vanilla` gleich.
+* Kontext: Der Kern `hoops.min.js` liegt bei 36 KiB (Budget 40 KiB min, 15 KiB gzip als Test). Die Render-Funktionen allein brauchen rund 45 KiB min zusätzlich zum Accordion (Logik aus `league`, `schedule`, `team`, `venue`, `map`, Markup von zehn Komponenten); ein gemeinsames Bündel hätte das Budget mehr als verdoppelt und jede Seite mit Verhalten belastet, die kein Markup erzeugt. Die Karte (Leaflet-Anbindung, Zustände, Markup, Fehlerfälle) bringt rund 22 KiB min und hätte das Budget des Render-Bündels (52 KiB) überschritten; viele Seiten haben keine Karte.
+* Entscheidung: Drei Dateien im selben Ordner `dist/vanilla`: `hoops.js` (Kern, unverändert bis auf den Eintrag `map` in `initAll`), `hoops-render.js` (Render) und `hoops-map.js` (Karte). Das Render-Bündel importiert das Accordion-Verhalten aus dem Kern (`./hoops.js` bzw. `./hoops.min.js`), sodass es genau eine Kopie des Verhaltens und eine Instanzenverwaltung gibt; alles andere ist gebündelt. Das Karten-Bündel steht allein und enthält kein Leaflet (`import('leaflet')` bleibt ein dynamischer Import, den die Option `loadLeaflet` ersetzen kann); die Hallenkarte verbindet beide über die Option `initMap` an `mountVenueCard` (kein statischer Import zwischen Render- und Karten-Bündel). Budgets getrennt: Kern 40 KiB min und 15 KiB gzip (gemessen 36,8 und 13,1), Render 52 KiB min und 18 KiB gzip (gemessen 50,9 und 17,1), Karte 24 KiB min und 10 KiB gzip (gemessen 21,8 und 8,9), jeweils als Test. Einzelmodule bleiben über `package.json` erreichbar (`./render.js`, `./render/*.js`, `./map-vanilla.js`), die Bündel über `./vanilla`, `./vanilla-render` und `./vanilla-map`.
+* Konsequenzen: Wer Markup erzeugt, lädt Kern und Render-Bündel aus derselben Version, wer eine Karte braucht, zusätzlich `hoops-map.js`; Tests prüfen, dass das Render-Bündel nur den Kern importiert, das Karten-Bündel außer dem dynamischen `import('leaflet')` nichts importiert und beide weder Framework noch Leaflet enthalten. Beim Wechsel der Auslieferung (ADR-006) bleibt der Aufbau von `dist/vanilla` gleich.
 * Quellen: Plan `2026-10-12-vanilla-v2-plan.md` (Aufgabe „Bündel“ und Risiken), Spec `2026-10-11-vanilla-paket-design.md` (Teil 3).
 
 === ADR-008: Marke HoopsFoundry UI und Präfix `hoops-`
 
-* Status: angenommen; für die Design-Tokens (CSS-Custom-Properties) umgesetzt. Klassen (`dss-*`), data-Attribute, Dateinamen, Paketname und Texte tragen weiterhin das alte Kürzel.
-* Kontext: Das Kürzel DSS steht für „Digitaler Spielbericht“, den Ursprung des Systems. Heute nutzen es auch das Vereinsregister-Portal und der Turnier-Manager, und es ist themenfähig (Marken BBV und DBB). Die Konsumenten sind intern und werden gemeinsam umgestellt, deshalb ist eine Kompatibilitätsschicht nicht nötig. Ein Teil der Tokens war nie präfixiert (`--n-0`, `--ring-w`, `--radius-md`, `--fs-h3`, `--font-display`, `--amber-500` …); solche Namen kollidieren leicht mit Variablen der Seite oder fremder Bibliotheken und gehören nicht in einen gemeinsamen Namensraum.
+* Status: angenommen und umgesetzt (Design-Tokens, Klassen, Attribute, Ereignisse, Schlüssel, Dateinamen, Paketname, Texte).
+* Kontext: Das frühere Kürzel stand für „Digitaler Spielbericht“, den Ursprung des Systems. Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System, und es ist themenfähig (Marken BBV und DBB). Die Konsumenten sind intern und werden gemeinsam umgestellt, deshalb ist eine Kompatibilitätsschicht nicht nötig. Ein Teil der Tokens war nie präfixiert (`--n-0`, `--ring-w`, `--radius-md`, `--fs-h3`, `--font-display`, `--amber-500` …); solche Namen kollidieren leicht mit Variablen der Seite oder fremder Bibliotheken und gehören nicht in einen gemeinsamen Namensraum.
 * Entscheidung:
-** Das System heißt HoopsFoundry UI, das Präfix ist `hoops-` (Klassen `.hoops-btn`, Tokens `--hoops-*`, `data-hoops`, Ereignisse `hoops:…`, Dateien `hoops.js` und `hoops.css`, Speicherschlüssel `hoops-theme`, Symbol `hoops.registry`). Das Kürzel DSS gilt nicht mehr.
-** Die Umbenennung geschieht in getrennten, einzeln prüfbaren Schritten (Tokens, Klassen, data-Attribute und Namen, Marke und Texte). Für die Tokens gilt: Alle eigenen CSS-Custom-Properties tragen `--hoops-`: `--dss-foo` wird `--hoops-foo`, `--_dss-foo` wird `--_hoops-foo`, bisher unpräfixierte `--foo` werden `--hoops-foo`. Fremde Variablen (Leaflet, Storybook, Tailwind) bleiben unverändert. Die Kollision von `--surface-2` (Seitenfläche) und `--dss-surface-2` (Komponentenfläche, im Dunkelmodus anderer Wert) ist aufgelöst: Die Seitenflächen heißen `--hoops-page-surface-0` bis `-2`.
-** Die Umsetzung ist mechanisch und prüfbar: `scripts/codemod-tokens.mjs` (einmalig, deterministisch, mit Probelauf) erkennt Kontexte (CSS-Definitionen, `var()` mit Fallbackketten, `setProperty`, Inline-Style, Objektschlüssel, Svelte-Direktiven, Schablonen wie `--fs-${id}`, Platzhalter wie `--ring-*`, Tailwind-Zuordnungen, Doku) mit Wortgrenzen. Der Test `tests/token-prefix.test.ts` verbietet unpräfixierte und alte Namen in CSS, Svelte, React, JS, Doku und Tests; eine fest eingetragene, begründete Allowlist nennt die Ausnahmen. `scripts/check-style-parity.mjs` vergleicht vor und nach einem mechanischen Umbau die berechneten Stile und Rechtecke aller Stories und Docs-Seiten (Marken, hell und dunkel, 1280 und 420 px); bei Stories zählen auch Größen, bei Docs-Seiten mit geändertem Text nur Stil und Struktur.
-** Konsumenten migrieren mit `scripts/migrate-from-dss.mjs` (im npm-Paket als Befehl `hoops-migrate`): Probelauf als Standard, `--write` schreibt, keine Veränderung von Nicht-UTF-8-Dateien, Symlinks und großen Dateien. Die Ersetzungstabellen stehen in `scripts/migration-table.mjs` (302 Token-Namen).
-** Marke und Hosting: Die führende Domain ist hoopsfoundry.com, weil das System nicht deutschspezifisch ist: Schwerpunkt ist der deutsche Basketball (BBV, DBB), internationale Vereine und Verbände können es mit eigenem Theme nutzen. hoopsfoundry.de und hoopsfoundry.org leiten per 301 auf hoopsfoundry.com weiter (auch mit `www.`). Dokumentation, Storybook und Releases gehören auf ui.hoopsfoundry.com. Ziel-Hosting ist ein Webspace bei All-Inkl in Deutschland (Übertragung per rsync über SSH), GitHub Pages dient als Rückfall. Das Repository gehört zur GitHub-Organisation HoopsFoundry.
+** Das System heißt HoopsFoundry UI, das Präfix ist `hoops-`: Klassen (`.hoops-btn`, Zustandsklassen `is-…` bleiben), Tokens (`--hoops-*`, private `--_hoops-*`), `data-hoops` und `data-hoops-*`, Ereignisse `hoops:…`, Speicherschlüssel `hoops-theme`, Symbole `hoops.registry`, Marker- und Sperrdateien `.hoops-sync`, `.hoops-release`. Eine Abkürzung gibt es nicht mehr.
+** Paket `@hoopsfoundry/ui`, Repository `HoopsFoundry/ui`, ein Paket mit mehreren Einstiegen (keine Pakete je Framework). Bündel `hoops.js`, `hoops.min.js`, `hoops.d.ts`, `hoops.css`, `hoops-render.*`, `hoops-map.*`; Befehle `hoops-sync` und `hoops-migrate`; Release-Anhänge `hoops-ui-<version>.tgz`, `hoops-ui-<version>.sha256`, `hoops-sync.mjs`. Die Version dieser Umbenennung ist 0.10.0. Die historischen Design-Entwürfe liegen unverändert in `docs/entwuerfe/`.
+** Tokens: Alle eigenen CSS-Custom-Properties tragen `--hoops-`; bisher unpräfixierte werden `--hoops-<name>`. Fremde Variablen (Leaflet, Storybook, Tailwind) bleiben unverändert. Die Kollision von `--surface-2` (Seitenfläche) und der Komponentenfläche `--hoops-surface-2` (im Dunkelmodus anderer Wert) ist aufgelöst: Die Seitenflächen heißen `--hoops-page-surface-0` bis `-2`.
+** Die Umsetzung ist mechanisch und prüfbar: `scripts/codemod-tokens.mjs` (Tokens) und `scripts/codemod-names.mjs` (Klassen, Attribute, Ereignisse, Schlüssel, Dateinamen, Marke) sind einmalig, deterministisch und haben einen Probelauf; die Regeln stehen in `scripts/lib/token-rename.mjs` und `scripts/lib/name-rename.mjs` und erkennen Kontexte (CSS-Selektoren, `class`, `className`, `classList`, Schablonen, Verkettungen, `querySelector`, Attributselektoren, Ereignisnamen, Importe, JSON, Markdown) mit Wortgrenzen, sodass Fremdklassen mit zufälligem Teilwort unberührt bleiben. Die Tests `tests/token-prefix.test.ts` und `tests/no-dss.test.ts` verbieten den alten Namen im ganzen Bestand (`git ls-files`) mit einer fest eingetragenen, begründeten Allowlist (Änderungsverlauf, historische Pläne und Entwürfe, Migrationswerkzeuge samt Tests, erzeugte Dateien); `tests/codemod-names.test.ts` sichert die Regeln mit Mutationstests. `scripts/check-style-parity.mjs` vergleicht vor und nach einem mechanischen Umbau die berechneten Stile und Rechtecke aller Stories und Docs-Seiten (Marken, hell und dunkel, 1280 und 420 px).
+** Migration: Konsumenten stellen mit `scripts/migrate-from-dss.mjs` (im npm-Paket als Befehl `hoops-migrate`) um, in den Stufen T (Tokens), D (Attribute `data-dss-*`, Ereignisse `dss:*`, Schlüssel, Dateinamen, Paketname) und K (Klassen, Familienregel `dss-` → `hoops-`). Probelauf als Standard, `--write` schreibt, `--stufen=T,D,K` wählt, keine Veränderung von Nicht-UTF-8-Dateien, Symlinks und großen Dateien. Die Ersetzungstabellen stehen in `scripts/migration-table.mjs` (302 Token-Namen) und `scripts/lib/name-rename.mjs`.
+** Marke und Hosting: Die führende Domain ist hoopsfoundry.com, weil das System nicht deutschspezifisch ist: Schwerpunkt ist der deutsche Basketball (BBV, DBB), internationale Vereine und Verbände können es mit eigenem Theme nutzen. hoopsfoundry.de und hoopsfoundry.org leiten per 301 auf hoopsfoundry.com weiter (auch mit `www.`). Dokumentation, Storybook und Releases gehören auf ui.hoopsfoundry.com. Ziel-Hosting ist ein Webspace bei All-Inkl in Deutschland (Übertragung per rsync über SSH), GitHub Pages dient als Rückfall. Das Repository gehört zur GitHub-Organisation HoopsFoundry. Die festen Adressen stehen noch an mehreren Stellen (README, `package.json`, Doku, `scripts/portal-sync.mjs`, Workflow); eine zentrale Quelle ist ein eigenes Paket.
 * Konsequenzen:
-** Bruch für alle Konsumenten: jede Verwendung eines Tokens in eigenem CSS, Inline-Style oder Skript ändert sich (Ersetzungstabelle im CHANGELOG, vollständig in `scripts/migration-table.mjs`). Namen von Konsumenten, die zufällig genauso heißen wie unsere (`--fs-h1`, `--space-4`), werden vom Skript mit umbenannt; der Probelauf ist deshalb vor `--write` Pflicht.
-** Größen (gemessen, roh und gzip): `dss.css` wächst um 8,7 KiB roh und 0,3 KiB gzip (183,8 / 36,0 KiB), davon `tokens.css` 24,0 / 5,6 KiB (vorher 21,1 / 5,5) und `components.css` 159,6 / 30,7 KiB (vorher 153,8 / 30,5). Die JS-Bündel bleiben unverändert (Kern 36,5 KiB, Render 50,2 KiB, Karte 21,7 KiB min, alle innerhalb der Budgets).
+** Bruch für alle Konsumenten: jede Verwendung eines Tokens, einer Klasse, eines Attributs, Ereignisses, Schlüssels oder einer Datei in eigenem Markup, CSS oder Skript ändert sich (Ersetzungstabelle im CHANGELOG). Namen von Konsumenten, die zufällig genauso heißen wie unsere (`--fs-h1`, `--space-4`), werden vom Skript mit umbenannt; der Probelauf ist deshalb vor `--write` Pflicht.
+** Größen (gemessen, roh und gzip): `hoops.css` 187,2 KiB roh; die Klassennamen sind drei Zeichen länger, die Bündel wachsen entsprechend (Kern 36,8 KiB min, Render 50,9 KiB min, Karte 21,8 KiB min, alle innerhalb der Budgets aus ADR-007).
 ** Tailwind-Projekte lesen die Tokens über `var(--hoops-…)`; die Tailwind-Farbnamen (`ink`, `amber` …) im Preset bleiben.
-* Quellen: Lückenplan `docs/superpowers/plans/2026-10-12-luecken-plan.md`, Abschnitt „Umbenennung auf HoopsFoundry UI“ (Stufen, Reihenfolge, Planstand).
+* Quellen: Lückenplan `docs/superpowers/plans/2026-10-12-luecken-plan.md`, Abschnitt „Umbenennung auf HoopsFoundry UI“.
 
 === Offene Punkte (keine ADRs)
 
@@ -380,7 +381,7 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 |===
 |Thema |Status |Quelle
 |Protokollrelative URLs |Offen |Lückenplan; nicht eigenmächtig entscheiden
-|Favoriten als DSS-Komponente |Offen |Portal-Review und Lückenplan
+|Favoriten als HoopsFoundry-UI-Komponente |Offen |Portal-Review und Lückenplan
 |PageHeader/Hero |Bedarfsabhängiger Vorschlag |Lückenplan
 |CMS-Adapter |Vorgeschlagene Erweiterung |Separater Entwurf erforderlich
 |Produktname |Entschieden: HoopsFoundry UI |Kapitel 1, ADR-008
@@ -400,7 +401,7 @@ Die folgenden Szenarien sind Anforderungen beziehungsweise Prüfziele. Sie sind 
 |Q-04 |Zwei-Klick-Karten verursachen vor Freigabe keine externen Kartenanfragen |Browsertest mit Netzwerkbeobachtung
 |Q-05 |Unvertrauenswürdige Texte und URLs können keine ausführbare Ausgabe einschleusen |Gezielte Eingabe- und Sicherheitstests
 |Q-06 |Kernfunktionen laufen in Chromium, Firefox und WebKit |Browsermatrix: `scripts/check-portal-seite.mjs` (Beispiel-Portalseite) und `scripts/check-map-browser.mjs` (Karte). Stand: Chromium 153 und WebKit 26.6 bestehen alle Prüfungen der Portalseite (50 und 36 Prüfungen, darunter 320 px, Unterpfad, ohne JavaScript, axe); Firefox ist nicht gelaufen. Versucht wurden Playwrights Firefox 155.0 („Could not find profile folder“) und der System-Firefox 138.0.1 (öffnet den Debug-Port nicht); die Ursache ist ungeklärt
-|Q-07 |Dokumentierte Imports und Beispiele entsprechen öffentlichen APIs |Export- und Beispielprüfung. Stand: Die Exportliste der drei Bündel steht als Schnappschuss in den Bündeltests und in `Foundation/Vanilla`; die Typen (`dss.d.ts`, `dss-render.d.ts`, `dss-map.d.ts`) decken jeden Laufzeitexport ab und übersetzen mit `tsc --strict` in einem fremden Projekt; die Installation aus dem Tarball gelingt mit npm 11 ohne React, mit React 18 und mit React 19; die Code-Beispiele der Docs-Seiten laufen als Tests (`*-code.test.ts`, `vanilla-docs*.test.ts`); die Befehlszeilen der Auslieferung in der Doku werden von `parseArgs` gelesen
+|Q-07 |Dokumentierte Imports und Beispiele entsprechen öffentlichen APIs |Export- und Beispielprüfung. Stand: Die Exportliste der drei Bündel steht als Schnappschuss in den Bündeltests und in `Foundation/Vanilla`; die Typen (`hoops.d.ts`, `hoops-render.d.ts`, `hoops-map.d.ts`) decken jeden Laufzeitexport ab und übersetzen mit `tsc --strict` in einem fremden Projekt; die Installation aus dem Tarball gelingt mit npm 11 ohne React, mit React 18 und mit React 19; die Code-Beispiele der Docs-Seiten laufen als Tests (`*-code.test.ts`, `vanilla-docs*.test.ts`); die Befehlszeilen der Auslieferung in der Doku werden von `parseArgs` gelesen
 |Q-08 |Ein Agent findet Komponente, API und Architekturregel ohne erfundene Imports |Referenzaufgabe mit dokumentiertem Ergebnis; Katalog noch aufzubauen
 |===
 
@@ -447,8 +448,8 @@ Diese Seite ist kein zweites Aufgabenboard. Detaillierte Aufgaben bleiben in den
 [cols="1,3",options="header"]
 |===
 |Begriff |Bedeutung in dieser Dokumentation
-|DSS |Kurzform des Systems. Arbeitsname, Entscheidung offen: „HoopsFoundry DSS" (DSS = Digital Sports System) oder „HoopsFoundry UI". Ursprünglich aus dem Kontext „Digitaler Spielbericht"
-|HoopsFoundry |Arbeitsname der Produktfamilie, Entscheidung offen; Paket- und Repository-Name bleiben bis dahin unverändert
+|HoopsFoundry UI |Name des Systems (ADR-008). Präfix `hoops-`, Paket `@hoopsfoundry/ui`. Früher als Kürzel geführt, das aus dem Kontext „Digitaler Spielbericht“ stammte.
+|HoopsFoundry |Name der Organisation und Produktfamilie (GitHub-Organisation `HoopsFoundry`, Domain hoopsfoundry.com); das System heißt HoopsFoundry UI
 |Vereinsregister-Portal |Statisches Portal (Vanilla-JS, GitHub Pages) im Repository `basketball-vereinsregister-deutschland`; Hauptnutzer und Auslöser des Vanilla-Pakets
 |Turnier-Manager |Anwendung im Repository `basketball-turnier-manager` (Name laut Auftraggeber); rendert PDFs und nutzt u. a. die Spielplan-Bausteine
 |Token |Benannter Gestaltungswert beziehungsweise Verweis auf einen Wert
@@ -459,7 +460,7 @@ Diese Seite ist kein zweites Aufgabenboard. Detaillierte Aufgaben bleiben in den
 |Lifecycle |Initialisierung, Aktualisierung und Aufräumen einer Instanz
 |Renderfunktion |Erzeugt Ausgabe aus Eingaben; in Vanilla `renderX` (Zeichenkette) und `mountX` (Einsetzen mit `update`/`destroy`), siehe ADR-005
 |Mount |Bindet Ausgabe und gegebenenfalls Verhalten an ein DOM-Element
-|Karten-Bündel |`dist/vanilla/dss-map.js`: `renderMap`, `initMap`, `mountMap`, `initMapBlock` ohne Leaflet; Leaflet liefert die Seite über die Option `loadLeaflet` (ADR-003, ADR-007)
+|Karten-Bündel |`dist/vanilla/hoops-map.js`: `renderMap`, `initMap`, `mountMap`, `initMapBlock` ohne Leaflet; Leaflet liefert die Seite über die Option `loadLeaflet` (ADR-003, ADR-007)
 |ADR |Architecture Decision Record mit Kontext, Entscheidung, Status und Konsequenzen
 |MCP |Model Context Protocol; Zugriffsschicht für Agent-Werkzeuge und Kontext
 |Baseline |Erste prüfbare Architekturfassung, kein vollständiger Implementierungsnachweis
