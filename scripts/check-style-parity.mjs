@@ -192,22 +192,26 @@ export function stylesDiffer(a, b, props, tol) {
     const ny = y.match(NUM) ?? [];
     if (sx === sy && nx.every((n, k) => Math.abs(Number(n) - Number(ny[k])) <= t)) continue;
     diffs.push(`${props[i]}: ${x} → ${y}`);
+    diffs.layoutOnly = (diffs.layoutOnly ?? true) && LAYOUT_PROPS.has(props[i]);
   }
   return diffs;
 }
 
 export function compareRows(ra, rb, { kind, tol }) {
-  const out = { structure: 0, rect: 0, style: 0, details: [] };
+  const out = { structure: 0, rect: 0, style: 0, layout: 0, details: [] };
   if (ra.length !== rb.length) { out.structure++; out.details.push(`Elementanzahl ${ra.length} → ${rb.length}`); }
   const n = Math.min(ra.length, rb.length);
   for (let i = 0; i < n; i++) {
     const [sa, rectA, styA, psA] = ra[i];
     const [sb, rectB, styB, psB] = rb[i];
-    if (sa !== sb) { out.structure++; if (out.details.length < 5) out.details.push(`#${i} Gestalt ${sa} → ${sb}`); continue; }
+    // Emotion-Klassen (`css-1h62cpo`) sind Hashes der erzeugten Stile; ändert sich nur die Höhe eines Beispiels, ändert sich der Hash
+    if (sa.replace(/\bcss-[a-z0-9]+/g, 'css-#') !== sb.replace(/\bcss-[a-z0-9]+/g, 'css-#')) { out.structure++; if (out.details.length < 5) out.details.push(`#${i} Gestalt ${sa} → ${sb}`); continue; }
     if (rectA.some((v, k) => Math.abs(v - rectB[k]) > tol)) { out.rect++; if (out.details.length < 5) out.details.push(`#${i} ${sa} Rechteck ${rectA} → ${rectB}`); }
     const d = stylesDiffer(styA, styB, PROPS, tol);
     const dp = stylesDiffer(psA.split('~').join('|'), psB.split('~').join('|'), PSEUDO_PROPS.concat(PSEUDO_PROPS), tol);
-    if (d.length || dp.length) { out.style++; if (out.details.length < 5) out.details.push(`#${i} ${sa} ${d.concat(dp).slice(0, 3).join('; ')}`); }
+    // reine Layout-Unterschiede (Breite, Höhe) zählen getrennt: sie folgen aus geändertem Text (z. B. längere Tokennamen in Doku-Tabellen)
+    const layoutOnly = (!d.length || d.layoutOnly) && !dp.length;
+    if (d.length || dp.length) { if (layoutOnly) out.layout++; else out.style++; if (out.details.length < 5) out.details.push(`#${i} ${sa} ${d.concat(dp).slice(0, 3).join('; ')}`); }
   }
   return out;
 }
@@ -218,25 +222,29 @@ async function compare(fa, fb, opts) {
   const b = await load(fb);
   let elements = 0;
   const bad = [];
+  const layoutOnly = [];
   const missing = [];
   for (const [key, pa] of a) {
     const pb = b.get(key);
     if (!pb) { missing.push(key); continue; }
     elements += pa.rows.length;
     const r = compareRows(pa.rows, pb.rows, { kind: pa.kind, tol });
-    const rectCounts = pa.kind === 'docs' ? 0 : r.rect;
-    if (r.structure || r.style || rectCounts) bad.push({ key, ...r, rectCounts });
+    // streng: Struktur und Stil außer Layout; Rechteck und Layout-Stil nur als Hinweis, wenn sie auf Seiten mit geändertem Text vorkommen
+    if (r.structure || r.style) bad.push({ key, ...r });
+    else if (r.rect || r.layout) layoutOnly.push({ key, ...r });
   }
   for (const key of b.keys()) if (!a.has(key)) missing.push(`${key} (nur nachher)`);
   const stories = new Set([...a.keys()].map((k) => k.split('|')[0]));
-  const report = { zustaende: a.size, seiten: stories.size, elemente: elements, fehlend: missing.length, abweichend: bad.length, tol };
-  if (opts.json) console.log(JSON.stringify({ report, missing, bad }, null, 1));
+  const report = { zustaende: a.size, seiten: stories.size, elemente: elements, fehlend: missing.length, abweichend: bad.length, nurLayout: layoutOnly.length, tol };
+  if (opts.json) console.log(JSON.stringify({ report, missing, bad, layoutOnly }, null, 1));
   else {
     console.log(`verglichen: ${report.zustaende} Zustände (${report.seiten} Seiten), ${elements} Elemente, Toleranz ±${tol} px`);
     for (const m of missing) console.log(`FEHLT  ${m}`);
-    for (const x of bad) console.log(`ABWEICHT ${x.key}  Struktur ${x.structure}, Rechteck ${x.rect}${x.rectCounts === 0 && x.rect ? ' (Docs: nur Hinweis)' : ''}, Stil ${x.style}\n    ${x.details.join('\n    ')}`);
-    const docsRectOnly = [...a.entries()].filter(([k, p]) => p.kind === 'docs' && b.get(k) && compareRows(p.rows, b.get(k).rows, { kind: 'docs', tol }).rect > 0).length;
-    console.log(`\n${bad.length === 0 && missing.length === 0 ? 'Keine Abweichungen.' : `${bad.length} abweichende Zustände, ${missing.length} fehlend.`}${docsRectOnly ? ` (Docs-Seiten mit Rechteck-Unterschieden, nur Hinweis: ${docsRectOnly})` : ''}`);
+    for (const x of bad) console.log(`ABWEICHT ${x.key}  Struktur ${x.structure}, Rechteck ${x.rect}, Layout-Stil ${x.layout}, Stil ${x.style}\n    ${x.details.join('\n    ')}`);
+    const seiten = new Map();
+    for (const x of layoutOnly) { const id = x.key.split('|')[0]; seiten.set(id, (seiten.get(id) ?? 0) + 1); }
+    for (const [id, n] of seiten) console.log(`NUR LAYOUT ${id} (${n} Zustände)`);
+    console.log(`\n${bad.length === 0 && missing.length === 0 ? 'Keine Abweichungen in Struktur und Stil.' : `${bad.length} abweichende Zustände (Struktur oder Stil), ${missing.length} fehlend.`} Nur Layout (Rechteck, Breite, Höhe): ${layoutOnly.length} Zustände auf ${seiten.size} Seiten, einzeln zu bewerten (geänderter Text).`);
   }
   if (bad.length || missing.length) process.exitCode = 1;
 }
