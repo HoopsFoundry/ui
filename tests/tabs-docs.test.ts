@@ -117,8 +117,8 @@ describe('Doku-Seite', () => {
     expect(read('stories/docs/blocks/DosDonts.tsx')).toContain('{...INERT}');
     expect(mdx).toContain('TabsStories.DontPanels');
   });
-  it('die Doku nennt Optionen, Ereignis, Home/End-Abweichung und die Garantie ohne innerHTML', () => {
-    for (const part of ['activation', 'hoops:tabchange', 'Pos1 / Ende', 'Nicht belegt in Svelte und React', 'destroy()', 'innerHTML', 'initTabs']) expect(mdx, part).toContain(part);
+  it('die Doku nennt Optionen, Ereignis, Pos1/Ende und die Garantie ohne innerHTML', () => {
+    for (const part of ['activation', 'hoops:tabchange', 'Pos1 / Ende', 'ersten bzw. letzten nicht gesperrten Tab', 'destroy()', 'innerHTML', 'initTabs']) expect(mdx, part).toContain(part);
   });
   it('die Beispielseite im Code verwendet kein innerHTML', () => {
     const script = examples.slice(0, examples.indexOf('{#if example'));

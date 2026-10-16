@@ -22,6 +22,8 @@
    * loaded in the page (or use the Icon.svelte component to inline).
    */
 
+  import { nextTab } from '../js/tabs.js';
+
   type TabItem = {
     id: string;
     label: string;
@@ -76,22 +78,14 @@
 
   function onKey(e: KeyboardEvent, idx: number) {
     if (multi) return; // Mehrfachauswahl: jeder Schalter ist per Tab erreichbar, keine Pfeiltasten
-    const isHoriz = variant !== 'vertical';
-    const nextKey = isHoriz ? 'ArrowRight' : 'ArrowDown';
-    const prevKey = isHoriz ? 'ArrowLeft'  : 'ArrowUp';
-    if (e.key === nextKey || e.key === prevKey) {
-      e.preventDefault();
-      const dir = e.key === nextKey ? 1 : -1;
-      let n = idx;
-      for (let i = 0; i < items.length; i++) {
-        n = (n + dir + items.length) % items.length;
-        if (!items[n].disabled) break;
-      }
-      select(items[n]);
-      // refocus
-      const btns = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('button.hoops-tab');
-      btns?.[n]?.focus();
-    }
+    const axis = variant === 'vertical' ? ['ArrowUp', 'ArrowDown'] : ['ArrowLeft', 'ArrowRight'];
+    if (!['Home', 'End', ...axis].includes(e.key)) return; // Pfeile der anderen Achse bleiben unberührt
+    const n = nextTab(idx, e.key, items, { vertical: variant === 'vertical' });
+    e.preventDefault();
+    if (n === idx) return;
+    select(items[n]);
+    const btns = (e.currentTarget as HTMLElement).parentElement?.querySelectorAll<HTMLButtonElement>('button.hoops-tab');
+    btns?.[n]?.focus();
   }
 </script>
 
