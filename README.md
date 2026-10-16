@@ -67,13 +67,7 @@ css/
 .storybook/             ← v0.6 · Storybook config
 stories/                ← v0.6 · Stories für alle Komponenten + Foundation
 docs/
-  HoopsFoundry UI - Identity Overview v0.3.html
-  HoopsFoundry UI - Tables.html
-  HoopsFoundry UI - Forms.html
-  HoopsFoundry UI - Modals.html
-  HoopsFoundry UI - Navigation.html       ← v0.6
-  HoopsFoundry UI - Cards & Lists.html    ← v0.6
-  HoopsFoundry UI - Icons.html            ← v0.6
+  entwuerfe/            ← historische Design-Entwürfe (HTML, tweaks-panel.jsx); nicht gepflegt
 ```
 
 ---
@@ -142,12 +136,21 @@ Svelte-Komponenten (`hoops-btn`, `hoops-card`, `hoops-tabs`, `hoops-tbl`, `hoops
 Farben laufen über die semantischen Variablen `--hoops-*`; Dark schaltet `data-theme="dark"` oder die
 OS-Präferenz.
 
-**Umbenennung der Tokens (Bruch):** Alle Design-Tokens heißen jetzt `--hoops-*` (vorher `--dss-*` und unpräfixierte wie `--n-0`,
-`--ring-w`, `--radius-md`). Ein eigenes Projekt stellt man mit dem Migrationsskript um: im Repository-Checkout
+### Migration von den alten Namen (Bruch in 0.10.0)
+
+Das System heißt jetzt HoopsFoundry UI (Paket `@hoopsfoundry/ui`, Präfix `hoops-`). Alles, was vorher `dss` hieß, ändert sich:
+
+- Design-Tokens: `--dss-fg` → `--hoops-fg`; unpräfixierte wie `--n-0`, `--ring-w`, `--radius-md` → `--hoops-n-0` usw.
+- CSS-Klassen: `dss-btn--sm` → `hoops-btn--sm` (Zustandsklassen wie `is-open` bleiben).
+- Attribute und Ereignisse: `data-dss`, `data-dss-options` → `data-hoops`, `data-hoops-options`; `dss:tabchange` → `hoops:tabchange`.
+- Speicherschlüssel `dss-theme` → `hoops-theme`; Dateien `dss.css`, `dss.min.js`, `dss-render.js`, `dss-map.js` → `hoops.css`, `hoops.min.js`, `hoops-render.js`, `hoops-map.js`; Paket `@bbv/dss-design-system` → `@hoopsfoundry/ui`; Befehl `dss-sync` → `hoops-sync`; Release `dss-vanilla-<version>.tgz` → `hoops-ui-<version>.tgz`.
+
+Ein eigenes Projekt stellt man mit dem Migrationsskript um: im Repository-Checkout
 `node scripts/migrate-from-dss.mjs <projektordner>`, mit dem installierten npm-Paket `npx hoops-migrate <projektordner>`. Der Probelauf ist
-der Standard und schreibt nichts, `--write` schreibt (vorher Git-Stand sichern). Die Ersetzungstabelle steht im CHANGELOG und in
-`scripts/migration-table.mjs`. Achtung: Die Tabelle gilt für alle Dateien des Projekts; Namen, die zufällig genauso heißen wie unsere
-(zum Beispiel eine eigene `--fs-h1` oder `--space-4`), werden mit umbenannt. Immer zuerst den Probelauf prüfen.
+der Standard und schreibt nichts, `--write` schreibt (vorher Git-Stand sichern); `--stufen=T,D,K` wählt Stufen (T Tokens, D Attribute, Ereignisse,
+Schlüssel und Dateinamen, K Klassen). Die Ersetzungstabelle steht im CHANGELOG und in `scripts/migration-table.mjs`, die Regeln in
+`scripts/lib/name-rename.mjs`. Achtung: Die Regeln gelten für alle Dateien des Projekts; Namen, die zufällig genauso heißen wie unsere
+(zum Beispiel eine eigene `--fs-h1` oder `--space-4`), werden mit umbenannt, Klassen mit fremdem Teilwort (`xdss-a`) nicht. Immer zuerst den Probelauf prüfen.
 
 ## React
 
@@ -563,7 +566,7 @@ Stories liegen unter `stories/`, geschrieben in [Svelte CSF](https://github.com/
 
 ### Variante A · Einfach (privates Repo)
 
-1. **Auf github.com:** Neues Repo erstellen, z. B. `hoops-design-system` — privat oder public
+1. **Auf github.com:** Neues Repo erstellen, z. B. `hoopsfoundry-ui` — privat oder public
 2. **Lokal:** Projekt herunterladen (alle Dateien aus diesem Workspace)
 3. Terminal im Projekt-Ordner:
    ```bash
@@ -571,7 +574,7 @@ Stories liegen unter `stories/`, geschrieben in [Svelte CSF](https://github.com/
    git add .
    git commit -m "HoopsFoundry UI v1.0"
    git branch -M main
-   git remote add origin https://github.com/<dein-user>/hoops-design-system.git
+   git remote add origin https://github.com/<dein-user>/hoopsfoundry-ui.git
    git push -u origin main
    ```
 
@@ -614,7 +617,7 @@ Die HTML-Dokumente werden automatisch öffentlich anschaubar:
 2. Source: `main` Branch, Ordner `/` (root) oder `/docs`
 3. Save → nach ~2 Minuten ist die Library erreichbar unter:
    ```
-   https://<user>.github.io/<repo>/HoopsFoundry UI%20Design%20System%20-%20Identity%20Overview%20v0.3.html
+   https://<user>.github.io/<repo>/
    ```
 
 ### GitHub-Setup-Checkliste

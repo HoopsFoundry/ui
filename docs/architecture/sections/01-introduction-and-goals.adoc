@@ -5,9 +5,9 @@ Das Designsystem stellt Design-Tokens, gemeinsames CSS, Framework-Komponenten (S
 
 === Name
 
-Das System heißt HoopsFoundry UI (ADR-008). Die Design-Tokens tragen das Präfix `--hoops-`. Klassen (`hoops-*`), data-Attribute, Dateinamen, Paketname (`@hoopsfoundry/ui`) und Repository-Name tragen noch das alte Kürzel; für diese Teile verwendet die Dokumentation die Kurzform „HoopsFoundry UI“.
+Das System heißt HoopsFoundry UI (ADR-008). Alle Bezeichner tragen das Präfix `hoops-`: Klassen (`hoops-btn`), Design-Tokens (`--hoops-*`), Attribute (`data-hoops`), Ereignisse (`hoops:…`) und Dateien (`hoops.js`, `hoops.css`). Das Paket heißt `@hoopsfoundry/ui`, das Repository `HoopsFoundry/ui`.
 
-Hintergrund: Das Kürzel HoopsFoundry UI stammt aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
+Hintergrund: Der frühere Arbeitsname stammte aus der Zeit, in der der Fokus auf dem digitalen Spielbericht und der zugehörigen App lag (README: „Digitaler Spielbericht · Komponenten-Library für Basketball-Apps"). Heute nutzen auch das Vereinsregister-Portal und der Turnier-Manager das System (siehe Kapitel 3), und es ist themenfähig: Marken BBV und DBB über `data-brand`, Dunkelmodus über `data-theme="dark"` (README, Abschnitt Marken-Rollen).
 
 === Stakeholder
 

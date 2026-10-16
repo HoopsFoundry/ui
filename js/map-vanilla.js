@@ -88,7 +88,7 @@ function attach(root, options, { restore }) {
   const heightBefore = root.style.getPropertyValue('--hoops-map-h');
 
   const textId = root.querySelector('.hoops-map-text')?.id ?? '';
-  const canvasId = root.querySelector('.hoops-map-canvas')?.id || (textId.startsWith('hoops-map-text-') ? `hoops-map-canvas-${textId.slice(13)}` : `hoops-map-canvas-${nextUid()}`);
+  const canvasId = root.querySelector('.hoops-map-canvas')?.id || (textId.startsWith('hoops-map-text-') ? `hoops-map-canvas-${textId.slice('hoops-map-text-'.length)}` : `hoops-map-canvas-${nextUid()}`);
 
   const markupState = root.getAttribute('data-state');
   let phase = props.load === 'auto' || (props.load === undefined && markupState === 'loading') ? 'loading' : 'idle';

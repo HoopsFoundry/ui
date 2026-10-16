@@ -89,7 +89,7 @@ describe.each(Object.entries(DOCS))('Beispiel %s', (_name, doc) => {
     }
   });
   it('das Beispiel nutzt die Pfade des Pakets und kein innerHTML', () => {
-    expect(doc.code).toMatch(/from '(@bbv\/hoops-design-system\/render\.js|\/hoops\/hoops-render\.min\.js)'/);
+    expect(doc.code).toMatch(/from '(@hoopsfoundry\/ui\/render\.js|\/hoops\/hoops-render\.min\.js)'/);
     expect(doc.code).not.toMatch(/innerHTML\s*=/);
     expect(doc.code).toContain('document.querySelector(');
   });

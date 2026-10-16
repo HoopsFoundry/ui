@@ -21,7 +21,7 @@ npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```
 
-Es gibt keinen Linter. CI (`.github/workflows/deploy-storybook.yaml`) baut nur Storybook und deployt auf GitHub Pages bei jedem Push auf `main`; Tests laufen dort nicht, deshalb vor dem Push lokal `npm test`, `typecheck`, `build` und `build-storybook` ausführen.
+Es gibt keinen Linter. `tests/no-dss.test.ts` verbietet den alten Namen (Präfix vor 0.10.0) im ganzen Bestand; erlaubt sind nur die begründete Allowlist (Migrationswerkzeuge, Historie). CI (`.github/workflows/deploy-storybook.yaml`) baut nur Storybook und deployt auf GitHub Pages bei jedem Push auf `main`; Tests laufen dort nicht, deshalb vor dem Push lokal `npm test`, `typecheck`, `build` und `build-storybook` ausführen.
 
 ## Architektur
 
@@ -54,4 +54,4 @@ Text mindestens 7:1 (`color-contrast-enhanced`), Zielgrößen ≥ 24 px (AA) bzw
 - `images/` (Stockfotos) ist gitignored und wird nie referenziert; Demo-Fotos sind verkleinerte Kopien in `stories/assets/players/` (mit `CREDITS.md`). Demo-Daten sind erfunden (keine echten Personen, Adressen, Telefonnummern).
 - Vitest-Dateien, die Dateien über `new URL(...)` lesen, brauchen `// @vitest-environment node` in der ersten Zeile.
 - Ein Editor-Hook blockiert Dateiinhalte, in denen HTML-Zuweisung per Element-Eigenschaft oder die Regex-Methode zum Ausführen vorkommen: stattdessen `createContextualFragment`, `String.match` und DOM-APIs verwenden, auch in Kommentaren und Plänen.
-- Die statischen Design-HTMLs im Wurzelordner (`HoopsFoundry UI - *.html`, `tweaks-panel.jsx`) sind historisch und werden nicht gepflegt.
+- Die statischen Design-HTMLs und `tweaks-panel.jsx` unter `docs/entwuerfe/` sind historische Entwürfe (Ideen für später) und werden nicht gepflegt.

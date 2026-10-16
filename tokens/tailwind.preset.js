@@ -1,5 +1,5 @@
 /** HoopsFoundry UI · Tailwind v3 / v4 preset
- *  Usage: import hoopsPreset from '@bbv/hoops/tailwind.preset.js';
+ *  Usage: import hoopsPreset from '@hoopsfoundry/ui/tailwind';
  *         export default { presets: [hoopsPreset], ... }
  */
 

@@ -32,8 +32,8 @@ const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', 'storybook-static', '
 /** Pfade (relativ, mit /), die nicht angefasst werden: Geschichte, Erzeugtes, Historisches. */
 const SKIP_PATHS = [
   /^package-lock\.json$/, /^CHANGELOG\.md$/, /^docs\/superpowers\//, /^docs\/architecture\/README\.adoc$/,
-  /^(DSS|BBV)[^/]*\.html$/, /^tweaks-panel\.jsx$/, /^stories\/assets\//, /^scripts\/(codemod-tokens|migrate-from-dss|migration-table)\.mjs$/, /^scripts\/lib\/token-rename\.mjs$/,
-  /^tests\/(codemod-tokens|migrate-from-dss|token-prefix)\.test\.ts$/, /^tests\/fixtures\/migrate\//,
+  /^docs\/entwuerfe\//, /^stories\/assets\//, /^scripts\/(codemod-tokens|migrate-from-dss|migration-table|codemod-names)\.mjs$/, /^scripts\/lib\/(token|name)-rename\.mjs$/,
+  /^tests\/(codemod-tokens|migrate-from-dss|token-prefix|codemod-names|no-dss)\.test\.ts$/, /^tests\/fixtures\/migrate\//,
 ];
 
 /** Temporäre Arbeitsordner der Tests (tests/.release-tmp-*, .bundle-tmp-* und andere Punkt-Ordner unter tests/) gehören nie zum Bestand. */

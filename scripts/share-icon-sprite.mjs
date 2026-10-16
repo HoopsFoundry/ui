@@ -17,7 +17,7 @@ writeFileSync(
   'icons/sprite.ts',
   `/**
  * HoopsFoundry UI Icon-Sprite · gemeinsame Quelle für svelte/Icon.svelte und react/Icon.tsx.
- * Namen und Symbole stammen 1:1 aus der Icons-Spec (HoopsFoundry UI - Icons.html).
+ * Namen und Symbole stammen 1:1 aus der Icons-Spec (Entwurf Icons.html in docs/entwuerfe).
  */
 export const ICON_NAMES = ${names[1]} as const;
 

@@ -37,7 +37,7 @@ describe('Aufrufe in der Doku', () => {
     expect(getSync).toContain('releases/download/v0.10.0/hoops-sync.mjs');
   });
   it('der Rollback nennt dieselbe Zeile mit der alten Version', () => {
-    expect(updateFlow).toMatch(/Rollback[^\n]*\nnode hoops-sync\.mjs --from-release 0\.9\.0/);
+    expect(updateFlow).toMatch(/Rollback[^\n]*\nnode hoops-sync\.mjs --from-release 0\.10\.0/);
   });
 });
 

@@ -11,14 +11,14 @@ flowchart LR
   VR["Vereinsregister-Portal<br/>(statisch, Vanilla-JS)"]
   TM["Turnier-Manager"]
   APP["Weitere Basketball-Apps"]
-  HoopsFoundry UI(["HoopsFoundry UI<br/>@hoopsfoundry/ui"])
+  HF(["HoopsFoundry UI<br/>@hoopsfoundry/ui"])
   SB["Storybook<br/>(GitHub Pages)"]
   MAP["Kachelserver / Proxy<br/>(OSM)"]
-  VR -- "CSS, Tokens, Vanilla init/render" --> HoopsFoundry UI
-  TM -- "Komponenten, ScheduleGame" --> HoopsFoundry UI
-  APP -- "Svelte/React, CSS, js/" --> HoopsFoundry UI
-  HoopsFoundry UI -- "Stories, MDX" --> SB
-  HoopsFoundry UI -. "tileUrl, erst nach Freigabe" .-> MAP
+  VR -- "CSS, Tokens, Vanilla init/render" --> HF
+  TM -- "Komponenten, ScheduleGame" --> HF
+  APP -- "Svelte/React, CSS, js/" --> HF
+  HF -- "Stories, MDX" --> SB
+  HF -. "tileUrl, erst nach Freigabe" .-> MAP
 ----
 
 [cols="1,2,2",options="header"]

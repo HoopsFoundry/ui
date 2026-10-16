@@ -36,7 +36,7 @@ const titles = (html: string) => [...html.matchAll(/<h[2-6] class="hoops-venue-t
 describe('Svelte-Code-Beispiele rendern (SSR)', () => {
   it.each(Object.entries({ svelte: venue.svelte, ebeneSvelte: venue.ebeneSvelte }))('%s', async (name, source) => {
     const file = `${tmpDir}${name}.svelte`;
-    writeFileSync(file, source.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+    writeFileSync(file, source.replace(/@hoopsfoundry\/ui\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
     const html = render(component, { props: {} }).body;
     expect(html).not.toContain('undefined');

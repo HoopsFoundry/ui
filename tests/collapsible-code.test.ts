@@ -47,7 +47,7 @@ const ids = (html: string) => [...html.matchAll(/ id="([^"]+)"/g)].map((m) => m[
 
 const renderSvelte = async (name: string, source: string) => {
   const file = `${tmpDir}${name}.svelte`;
-  writeFileSync(file, source.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+  writeFileSync(file, source.replace(/@hoopsfoundry\/ui\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
   const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
   return render(component, { props: {} }).body;
 };

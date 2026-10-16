@@ -164,14 +164,14 @@ safeHref('/ligen/oberliga');            // → '/ligen/oberliga'
 renderEmptyState({ title: '<script>alert(1)</script>', actions: [{ label: 'Los', href: 'javascript:alert(1)' }] });`;
 
 /** Gemessene Größen des Bündels (Bytes); der Test misst neu und verlangt, dass die Angaben um höchstens 5 % abweichen. */
-export const bundleSizes = { js: 65891, min: 37164, gzip: 13241, css: 179156 };
+export const bundleSizes = { js: 66556, min: 37632, gzip: 13366, css: 191684 };
 /** Budgets in KiB (1 KiB = 1024 Byte); die Namen behalten das alte Kürzel. */
 export const budget = { minKB: 40, gzipKB: 15 };
 /** Das Render-Bündel (hoops-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
-export const renderSizes = { js: 81145, min: 51395, gzip: 17474 };
+export const renderSizes = { js: 81838, min: 52088, gzip: 17549 };
 export const renderBudget = { minKB: 52, gzipKB: 18 };
 /** Das Karten-Bündel (hoops-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
-export const mapSizes = { js: 38745, min: 22173, gzip: 9104 };
+export const mapSizes = { js: 38932, min: 22360, gzip: 9140 };
 export const mapBudget = { minKB: 24, gzipKB: 10 };
 
 /** Das Hilfsskript holen und prüfen: Release-Anhang `hoops-sync.mjs` mit eigener Prüfsumme. */
@@ -212,7 +212,7 @@ shasum -a 256 -c hoops-ui-0.10.0.sha256      # Tarball und jede Datei darin; jed
 
 /** Aktualisieren und Zurückrollen im Portal. */
 export const updateFlow = `# 1. Neue Version holen und prüfen
-node hoops-sync.mjs --from-release 0.10.0
+node hoops-sync.mjs --from-release 0.10.1
 
 # 2. Versionen im Browser abgleichen (data-hoops-versions am html-Element der Beispielseite, oder checkVersion() im Start-Skript)
 # 3. Portal veröffentlichen

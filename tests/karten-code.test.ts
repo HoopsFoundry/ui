@@ -49,7 +49,7 @@ describe('Svelte-Code-Beispiele rendern (SSR)', () => {
   it.each(Object.entries(SVELTE))('%s', async (name, source) => {
     const file = `${tmpDir}${name}.svelte`;
     const fixed = source
-      .replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`)
+      .replace(/@hoopsfoundry\/ui\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`)
       .replace('<script>', '<script>\n  const openSpieler = () => {};');
     writeFileSync(file, fixed);
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;

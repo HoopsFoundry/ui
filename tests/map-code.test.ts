@@ -32,7 +32,7 @@ const read = (p: string) => readFileSync(`${rootDir}${p}`, 'utf8');
 describe('Svelte-Code-Beispiel rendert (SSR)', () => {
   it('svelte: zwei Karten mit eigenem Namen, Platzhalter des Auto-Ladens, Liste mit Links', async () => {
     const file = `${tmpDir}svelte.svelte`;
-    writeFileSync(file, map.svelte.replace(/@bbv\/hoops-design-system\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
+    writeFileSync(file, map.svelte.replace(/@hoopsfoundry\/ui\/svelte\/(\w+)/g, (_m, comp: string) => `${rootDir}svelte/${comp}.svelte`));
     const component = ((await vite.ssrLoadModule(file)) as { default: unknown }).default;
     const html = render(component, { props: {} }).body;
     expect(html).not.toContain('undefined');
@@ -108,7 +108,7 @@ describe('Funktionen aus map.js: die Aufrufe im Beispiel werden ausgewertet und 
 describe('Beispiel „Leaflet direkt“ (leafletDirekt)', () => {
   const script = map.leafletDirekt.match(/<script type="module">([\s\S]*?)<\/script>/)![1];
   it('der Skriptteil importiert nur vorhandene Exporte aus map.js', () => {
-    const named = script.match(/import \{([^}]+)\} from '@bbv\/hoops-design-system\/map\.js'/)![1].split(',').map((s) => s.trim());
+    const named = script.match(/import \{([^}]+)\} from '@hoopsfoundry\/ui\/map\.js'/)![1].split(',').map((s) => s.trim());
     for (const name of named) expect(mapjs, name).toHaveProperty(name);
   });
   it('der Pin im Beispiel hat dieselbe Form wie der Pin der Komponente', () => {
@@ -127,7 +127,7 @@ describe('Beispiel „Leaflet direkt“ (leafletDirekt)', () => {
     const mock = await import('./helpers/leaflet-mock');
     mock.reset();
     // Das Skript ist ein ES-Modul: Import-Zeilen durch die lokalen Module ersetzen und im DOM von jsdom ausführen
-    const body = script.replace(/import L from 'leaflet';/, '').replace(/import \{([^}]+)\} from '@bbv\/hoops-design-system\/map\.js';/, '');
+    const body = script.replace(/import L from 'leaflet';/, '').replace(/import \{([^}]+)\} from '@hoopsfoundry\/ui\/map\.js';/, '');
     const { formatCoords, mapLinks, validTileUrl } = mapjs;
     const L = mock.L;
     const run = new dom.window.Function('L', 'formatCoords', 'mapLinks', 'validTileUrl', 'document', body);

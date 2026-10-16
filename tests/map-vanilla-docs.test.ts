@@ -129,7 +129,7 @@ describe('Beispielseite ohne Build', () => {
     const refs = [...page.matchAll(/(?:href|src)="([^"]+)"|from '([^']+)'|import\('([^']+)'\)/g)].map((m) => m[1] ?? m[2] ?? m[3]).filter((r) => r.startsWith('/'));
     expect(refs.length).toBeGreaterThanOrEqual(6);
     for (const ref of refs) {
-      if (ref.startsWith('/hoops/')) expect(existsSync(`${bundleDir}${ref.slice(5)}`), ref).toBe(true);
+      if (ref.startsWith('/hoops/')) expect(existsSync(`${bundleDir}${ref.slice('/hoops/'.length)}`), ref).toBe(true);
       else if (ref.startsWith('/vendor/leaflet/')) expect(existsSync(resolve(root, 'node_modules/leaflet/dist', ref.slice(16))), ref).toBe(true);
       else expect(ref, ref).toMatch(/^\/tiles\//);
     }
