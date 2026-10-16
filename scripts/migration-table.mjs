@@ -2,6 +2,7 @@
  * Ersetzungstabellen der Umbenennung von DSS auf HoopsFoundry UI, je Stufe (alt → neu). Genutzt von scripts/migrate-from-dss.mjs.
  * Stufe T (Design-Tokens) ist mit scripts/codemod-tokens.mjs erzeugt; spätere Stufen (K Klassen, D data-Attribute und Namen) ergänzen
  * eigene Tabellen und tragen sie in STUFEN ein.
+ * Nicht enthalten sind Namen, die nur in den Stories dieses Repositories vorkommen (zum Beispiel `--d`); Konsumenten kennen sie nicht.
  */
 export const TOKENS = [
   ['--_dss-acc-chev', '--_hoops-acc-chev'],
@@ -48,7 +49,6 @@ export const TOKENS = [
   ['--cool-700', '--hoops-cool-700'],
   ['--cool-800', '--hoops-cool-800'],
   ['--cool-900', '--hoops-cool-900'],
-  ['--d', '--hoops-d'],
   ['--dss-acc-gap', '--hoops-acc-gap'],
   ['--dss-acc-nested-title-size', '--hoops-acc-nested-title-size'],
   ['--dss-acc-pad', '--hoops-acc-pad'],

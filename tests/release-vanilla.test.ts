@@ -1,6 +1,6 @@
 // @vitest-environment node
 // Release-Ablauf des Vanilla-Pakets (scripts/release-vanilla.mjs): Version-Abgleich, Schritte, Tarball, Prüfsummen, Manifest, Aufräumen.
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { readdir, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -322,7 +322,10 @@ describe('Programm: deutsche Fehler, Paketinhalt', () => {
     expect(pack.status).toBe(0);
     const files: string[] = JSON.parse(pack.stdout)[0].files.map((f: { path: string }) => f.path);
     for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/dss.js']) expect(files, f).toContain(f);
-    expect(files.filter((f) => f.startsWith('scripts/')).every((f) => f === 'scripts/portal-sync.mjs' || f.startsWith('scripts/lib/'))).toBe(true);
+    expect(files.filter((f) => f.startsWith('scripts/')).every((f) => ['scripts/portal-sync.mjs', 'scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs'].includes(f) || f.startsWith('scripts/lib/'))).toBe(true);
+    // Migrationsskript der Umbenennung: Befehl hoops-migrate, mit Tabelle und Ersetzungslogik
+    for (const f of ['scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs', 'scripts/lib/token-rename.mjs']) expect(files, f).toContain(f);
+    expect(JSON.parse(readFileSync('package.json', 'utf8')).bin['hoops-migrate']).toBe('scripts/migrate-from-dss.mjs');
     expect(files.some((f) => /release|check-|tests\/|\.worktrees/.test(f))).toBe(false);
   });
 });

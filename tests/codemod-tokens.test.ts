@@ -43,6 +43,20 @@ describe('Umbenennungsregel', () => {
   });
 });
 
+describe('Tabelle für Konsumenten', () => {
+  it('enthält nur Namen, die in der Bibliothek vorkommen (css, tokens, svelte, react, js), keine storyinternen', async () => {
+    const lib = (await listFiles(process.cwd())).filter((f) => /^(css|tokens|svelte|react|js)\//.test(f)).map((f) => readFileSync(f, 'utf8')).join('\n');
+    const nurStories = (TOKENS as [string, string][]).filter(([, neu]) => !lib.includes(neu)).map(([alt]) => alt);
+    expect(nurStories).toEqual([]);
+    expect((TOKENS as [string, string][]).some(([alt]) => alt === '--d')).toBe(false);
+  });
+  it('Mutation: ein storyinterner Name in der Tabelle wird erkannt', async () => {
+    const lib = (await listFiles(process.cwd())).filter((f) => /^(css|tokens|svelte|react|js)\//.test(f)).map((f) => readFileSync(f, 'utf8')).join('\n');
+    const mit: [string, string][] = [...(TOKENS as [string, string][]), ['--d', '--hoops-d']];
+    expect(mit.filter(([, neu]) => !lib.includes(neu)).map(([alt]) => alt)).toEqual(['--d']);
+  });
+});
+
 describe('Ersetzung nach Kontext', () => {
   it('CSS: Definition, var(), Fallbackkette', () => {
     expect(run('a { --dss-fg: var(--n-0); color: var(--dss-fg, var(--ink-0, red)); }')).toBe('a { --hoops-fg: var(--hoops-n-0); color: var(--hoops-fg, var(--hoops-ink-0, red)); }');

@@ -143,8 +143,11 @@ Farben laufen über die semantischen Variablen `--hoops-*`; Dark schaltet `data-
 OS-Präferenz.
 
 **Umbenennung der Tokens (Bruch):** Alle Design-Tokens heißen jetzt `--hoops-*` (vorher `--dss-*` und unpräfixierte wie `--n-0`,
-`--ring-w`, `--radius-md`). Ein eigenes Projekt stellt man mit `node scripts/migrate-from-dss.mjs <projektordner>` um (Probelauf
-als Standard, `--write` schreibt; vorher Git-Stand sichern). Die Ersetzungstabelle steht im CHANGELOG und in `scripts/migration-table.mjs`.
+`--ring-w`, `--radius-md`). Ein eigenes Projekt stellt man mit dem Migrationsskript um: im Repository-Checkout
+`node scripts/migrate-from-dss.mjs <projektordner>`, mit dem installierten npm-Paket `npx hoops-migrate <projektordner>`. Der Probelauf ist
+der Standard und schreibt nichts, `--write` schreibt (vorher Git-Stand sichern). Die Ersetzungstabelle steht im CHANGELOG und in
+`scripts/migration-table.mjs`. Achtung: Die Tabelle gilt für alle Dateien des Projekts; Namen, die zufällig genauso heißen wie unsere
+(zum Beispiel eine eigene `--fs-h1` oder `--space-4`), werden mit umbenannt. Immer zuerst den Probelauf prüfen.
 
 ## React
 

@@ -18,6 +18,9 @@ import { join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { buildTable, buildRegexes, transformText } from './lib/token-rename.mjs';
 
+/** Im Repository umbenannt, aber nicht in der Tabelle für Konsumenten: Namen, die nur in den Stories vorkommen. */
+export const NUR_STORIES = new Set(['--d']);
+
 /** Namen, die NICHT umbenannt werden – mit Begründung. */
 export const AUSNAHMEN = new Map([
   ['--evil', 'Testeingabe: absichtlich fremde Eigenschaft, die die Bereinigung der Karte verwerfen muss'],
@@ -132,7 +135,7 @@ async function main() {
 
   const out = opt('write-table');
   if (out) {
-    const lines = [...table.names].map(([o, n]) => `  ['${o}', '${n}'],`).join('\n');
+    const lines = [...table.names].filter(([o]) => !NUR_STORIES.has(o)).map(([o, n]) => `  ['${o}', '${n}'],`).join('\n');
     const body = `/**
  * Ersetzungstabellen der Umbenennung von DSS auf HoopsFoundry UI, je Stufe (alt → neu). Genutzt von scripts/migrate-from-dss.mjs.
  * Stufe T (Design-Tokens) ist mit scripts/codemod-tokens.mjs erzeugt; spätere Stufen (K Klassen, D data-Attribute und Namen) ergänzen
