@@ -208,12 +208,13 @@ export function stylesDiffer(a, b, props, tol) {
   return diffs;
 }
 
-export function compareRows(ra, rb, { tol = 0.6 } = {}) {
+export function compareRows(ra, rb, { tol = 0.6, umbenennen = (x) => x } = {}) {
   const out = { structure: 0, rect: 0, style: 0, layout: 0, details: [] };
   if (ra.length !== rb.length) { out.structure++; out.details.push(`Elementanzahl ${ra.length} → ${rb.length}`); }
   const n = Math.min(ra.length, rb.length);
   for (let i = 0; i < n; i++) {
-    const [sa, rectA, styA, psA] = ra[i];
+    const [sa0, rectA, styA, psA] = ra[i];
+    const sa = umbenennen(sa0);
     const [sb, rectB, styB, psB] = rb[i];
     // Emotion-Klassen (`css-1h62cpo`) sind Hashes der erzeugten Stile; ändert sich nur die Höhe eines Beispiels, ändert sich der Hash
     if (sa.replace(/\bcss-[a-z0-9]+/g, 'css-#') !== sb.replace(/\bcss-[a-z0-9]+/g, 'css-#')) { out.structure++; if (out.details.length < 5) out.details.push(`#${i} Gestalt ${sa} → ${sb}`); continue; }
@@ -236,6 +237,10 @@ export function classify(r, { kind, erlaubtLayout = false }) {
 
 async function compare(fa, fb, opts) {
   const tol = Number(opts.tol ?? 0.6);
+  // --klassen-alt=<alt>:<neu>[,<alt>:<neu>]: Umbenennung der Klassennamen in der Elementgestalt der VORHER-Aufnahme (Präfix an Wortgrenzen), z. B. dss-:hoops-
+  const paare = String(opts['klassen-alt'] ?? '').split(',').filter(Boolean).map((x) => x.split(':'));
+  const maskiere = (x) => x.replace(/[.*+?^$()|\\[\]{}]/g, (c) => `\\${c}`);
+  const umbenennen = (sig) => paare.reduce((t, [alt, neu]) => t.replace(new RegExp(`(?<![\\w-])${maskiere(alt)}`, 'g'), neu), sig);
   const erlaubt = new Set(String(opts['erlaubt-layout'] ?? '').split(',').filter(Boolean));
   for (const f of [fa, fb]) if (!existsSync(f)) { console.error(`Datei nicht gefunden: ${f}`); process.exit(2); }
   let a;
@@ -249,7 +254,7 @@ async function compare(fa, fb, opts) {
     const pb = b.get(key);
     if (!pb) { missing.push(key); continue; }
     elements += pa.rows.length;
-    const r = compareRows(pa.rows, pb.rows, { tol });
+    const r = compareRows(pa.rows, pb.rows, { tol, umbenennen });
     if (Boolean(pa.error) !== Boolean(pb.error)) { r.structure++; r.details.unshift(`Fehleranzeige ${Boolean(pa.error)} → ${Boolean(pb.error)}`); }
     const id = key.split('|')[0];
     const verdict = classify(r, { kind: pa.kind, erlaubtLayout: erlaubt.has(id.replace(/^story:/, '')) });
