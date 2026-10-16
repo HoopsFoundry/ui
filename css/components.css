@@ -911,7 +911,7 @@ button.hoops-match:focus-visible, a.hoops-match:focus-visible { outline: var(--h
 .hoops-match-team { display: grid; grid-template-columns: 16px 1fr auto; gap: 14px; align-items: center; }
 /* Mit Logos (names/logos-Prop): zusätzliche Spalte zwischen Trikotpunkt und Name */
 .hoops-match--logos .hoops-match-team { grid-template-columns: 16px 28px 1fr auto; gap: 10px; }
-.hoops-match-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--hoops-team-heim, oklch(0.55 0.20 27)); }
+.hoops-match-dot { box-sizing: border-box; width: 12px; height: 12px; border: 1px solid var(--hoops-mute); border-radius: 50%; background: var(--hoops-team-heim, oklch(0.55 0.20 27)); }
 .hoops-match-team--gast .hoops-match-dot { background: var(--hoops-team-gast, oklch(0.55 0.18 245)); }
 .hoops-match-name {
   font-family: var(--hoops-font-display); font-weight: 600; font-size: var(--hoops-fs-body-lg); letter-spacing: -0.01em; color: var(--hoops-fg);
