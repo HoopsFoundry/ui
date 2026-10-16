@@ -1661,7 +1661,7 @@ details[open].hoops-acc-item > summary.hoops-acc-trigger { border-bottom-left-ra
   background: var(--hoops-surface); border: 1px solid var(--hoops-line-strong); border-radius: var(--hoops-radius-lg); box-shadow: var(--hoops-shadow-sm);
 }
 .hoops-map-note { margin: 0; font-size: var(--hoops-fs-body-sm); line-height: var(--hoops-lh-body-sm); color: var(--hoops-fg-soft); }
-.hoops-map-load { min-width: 44px; }
+.hoops-map-load, .hoops-map-retry { min-width: 44px; }
 
 /* Status: leer unsichtbar (aber vorhanden, damit Änderungen angesagt werden); Ladehinweis oben, Fehler in der Mitte */
 .hoops-map-status:empty {

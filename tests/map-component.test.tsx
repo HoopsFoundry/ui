@@ -289,6 +289,18 @@ describe.each(drivers)('Karte · $name', (driver) => {
       expect(minus.getAttribute('aria-disabled')).toBe('true');
       expect(plus.hasAttribute('aria-disabled')).toBe(false);
     });
+    it('interactive=false blendet die Zoom-Schaltflächen aus, die Tastatur zoomt weiter; Umschalten blendet sie wieder ein', async () => {
+      const m = open(driver, { load: 'auto', interactive: false });
+      await vi.waitFor(() => expect(state.maps).toHaveLength(1));
+      await m.settle();
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map-zoom')).toBeNull();
+      expect(lastMap().options.keyboard).toBe(true);
+      await m.set({ interactive: true });
+      expect(qa(m, '.hoops-map-zoom-btn')).toHaveLength(2);
+      await m.set({ interactive: false });
+      expect(q(m, '.hoops-map-zoom')).toBeNull();
+    });
     it('interactive=false schaltet Gesten aus, Umschalten wirkt ohne Neuaufbau', async () => {
       const m = open(driver, { load: 'auto', interactive: false });
       await vi.waitFor(() => expect(state.maps).toHaveLength(1));
@@ -379,6 +391,41 @@ describe.each(drivers)('Karte · $name', (driver) => {
       await m.act(() => finishTiles(lastLayer(), 'fail'));
       expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
       expect(state.removed).toBe(0);
+    });
+    it('nach einem Ladefehler bietet der Platzhalter „Erneut versuchen“ an; ein Klick baut die Karte neu auf, die Statuszeile bleibt role=status', async () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      state.throwOnMap = true;
+      const m = open(driver, { load: 'auto' });
+      await vi.waitFor(() => expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error'));
+      await m.settle();
+      const retry = q<HTMLButtonElement>(m, '.hoops-map-retry')!;
+      expect(retry.textContent).toBe('Erneut versuchen');
+      expect(retry.closest('.hoops-map-ph')).not.toBeNull();
+      expect(q(m, '[role="status"]')?.textContent).toContain('konnte nicht geladen werden');
+      state.throwOnMap = false;
+      await click(m, retry);
+      await vi.waitFor(() => expect(state.maps.length).toBeGreaterThan(0));
+      await m.settle();
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('ready');
+      expect(q(m, '.hoops-map-retry')).toBeNull();
+      expect(q(m, '[role="status"]')?.textContent).toBe('');
+      expect(document.activeElement).toBe(q(m, '.hoops-map-canvas'));
+    });
+    it('scheitert der Neuversuch, steht die Schaltfläche wieder da', async () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      state.throwOnMap = true;
+      const m = open(driver, { load: 'auto' });
+      await vi.waitFor(() => expect(q(m, '.hoops-map-retry')).not.toBeNull());
+      await click(m, q(m, '.hoops-map-retry'));
+      await vi.waitFor(() => expect(q(m, '.hoops-map-retry')).not.toBeNull());
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
+    });
+    it('bei ungültiger tileUrl gibt es kein „Erneut versuchen“ (ein Neuversuch ändert nichts)', async () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const m = open(driver, { tileUrl: 'http://example.org/{z}/{x}/{y}.png' });
+      await m.settle();
+      expect(q(m, '.hoops-map')?.getAttribute('data-state')).toBe('error');
+      expect(q(m, '.hoops-map-retry')).toBeNull();
     });
     it('Fehler in der Aktualisierung: Fehlerhinweis mit Grund update statt Absturz', async () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {});

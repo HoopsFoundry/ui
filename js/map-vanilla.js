@@ -19,7 +19,7 @@ import { createMapController, devWarn } from './map-leaflet.js';
 import { createRegistry } from './lifecycle.js';
 import { attr } from './render/escape.js';
 import { insertMarkup, nextUid, fragmentOf, reapplyStyles } from './render/dom.js';
-import { mapCardMarkup, mapHeightPx, mapListMarkup, mapPinsMarkup, renderMapView } from './render/map-view.js';
+import { mapCardMarkup, mapRetryMarkup, mapHeightPx, mapListMarkup, mapPinsMarkup, renderMapView } from './render/map-view.js';
 import { list, obj, str, uidFor } from './render/core.js';
 
 // Je Wurzelelement `.hoops-map` (initMap) und je Behälter (mountMap) höchstens eine Fassung; zwei Kopien des Moduls teilen sich das Register
@@ -252,6 +252,12 @@ function attach(root, options, { restore }) {
         const button = card.querySelector('.hoops-map-load');
         button?.removeAttribute('disabled');
         button?.removeAttribute('aria-disabled');
+      } else if (state === 'error' && urlOk && failure !== null) {
+        // Nach einem Ladefehler: „Erneut versuchen“ (nicht bei ungültiger tileUrl, die ein Neuversuch nicht heilt)
+        if (!card?.querySelector('.hoops-map-retry')) {
+          card?.remove();
+          ph.append(fragmentOf(doc, mapRetryMarkup()));
+        }
       } else {
         card?.remove();
       }
@@ -259,7 +265,7 @@ function attach(root, options, { restore }) {
 
     // Zoom-Schaltflächen: nur mit der Karte, aria-disabled an den Grenzen (nie `disabled`: der Fokus bleibt)
     let zoom = stage.querySelector('.hoops-map-zoom');
-    if (state === 'ready') {
+    if (state === 'ready' && props.interactive !== false) {
       if (!zoom) {
         const fragment = fragmentOf(doc, zoomMarkup(canvasId));
         zoom = fragment.firstChild;
@@ -313,11 +319,19 @@ function attach(root, options, { restore }) {
   };
 
   const onClick = (event) => {
-    const target = event.target && typeof event.target.closest === 'function' ? event.target.closest('.hoops-map-load, .hoops-map-zoom-btn') : null;
+    const target = event.target && typeof event.target.closest === 'function' ? event.target.closest('.hoops-map-load, .hoops-map-retry, .hoops-map-zoom-btn') : null;
     if (!target || !root.contains(target)) return;
     if (target.classList.contains('hoops-map-load')) {
       if (phase !== 'idle' || failure || !validTileUrl(tileUrlOf(props))) return;
       userStarted = true;
+      phase = 'loading';
+      sync();
+      return;
+    }
+    if (target.classList.contains('hoops-map-retry')) {
+      if (!failure) return;
+      userStarted = true;
+      failure = null;
       phase = 'loading';
       sync();
       return;

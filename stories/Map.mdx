@@ -121,7 +121,7 @@ Die Pins im Detail, auf heller und dunkler Kachel (das Haus ist eine Zeichnung i
 
 ### Ohne Gesten
 
-`interactive={false}` schaltet Ziehen, Scrollzoom, Doppelklick, Pinch und Kastenzoom ab: die Karte zeigt nur, sie hält die Seite beim Scrollen nicht fest (der Scrollzoom nimmt das Mausrad, solange `interactive` an ist). **Tasten und Zoom-Schaltflächen bleiben.** Das passt für kleine Karten in Karten und Listen, etwa die Hallenkarte.
+`interactive={false}` schaltet Ziehen, Scrollzoom, Doppelklick, Pinch und Kastenzoom ab: die Karte zeigt nur, sie hält die Seite beim Scrollen nicht fest (der Scrollzoom nimmt das Mausrad, solange `interactive` an ist). **Die Tasten bleiben** (Pfeile verschieben, Plus und Minus zoomen, solange die Kartenfläche den Fokus hat); die **Zoom-Schaltflächen entfallen**, damit eine kleine Karte keine zusätzlichen Tab-Stopps bringt. Das passt für kleine Karten in Karten und Listen, etwa die Hallenkarte.
 
 <Canvas of={MapStories.Statisch} />
 
@@ -186,7 +186,7 @@ Schlägt das Laden fehl, bleibt die Seite benutzbar: statt der Karte steht der H
   ]}
 />
 
-Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es erneut. Es gibt **keine Schaltfläche „Erneut versuchen“**; wer eine braucht, baut sie in der App (zum Beispiel `{#key}` bzw. ein neues `key` an der Karte). Der Fehlerzustand tritt nur ein, **solange noch nie eine Kachel ankam**: eine laufende Karte bleibt auch bei späteren Kachelfehlern (404, 429) stehen und zeigt die fehlenden Kacheln als Lücken. `load` wird **nur beim Start gelesen**: ein späterer Wechsel von `click` auf `auto` löst nichts aus.
+Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es erneut. Nach einem Ladefehler (Grund `import`, `init`, `update` oder `tiles`) zeigt der Platzhalter außerdem die Schaltfläche **„Erneut versuchen“** (Klasse `hoops-map-retry`): sie startet den Ablauf von „Karte laden“ noch einmal und setzt den Fokus nach dem Aufbau auf die Kartenfläche; die Statusmeldung (`role="status"`) bleibt unverändert. Bei ungültiger `tileUrl` (Grund `tile-url`) gibt es keine Schaltfläche, weil ein Neuversuch daran nichts ändert. Der Fehlerzustand tritt nur ein, **solange noch nie eine Kachel ankam**: eine laufende Karte bleibt auch bei späteren Kachelfehlern (404, 429) stehen und zeigt die fehlenden Kacheln als Lücken. `load` wird **nur beim Start gelesen**: ein späterer Wechsel von `click` auf `auto` löst nichts aus.
 
 <Canvas of={MapStories.Fehler} />
 

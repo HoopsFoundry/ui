@@ -18,7 +18,7 @@ export interface MapProps {
   zoom?: number;
   /** Höhe in Pixeln (Standard 320, 200 bis 2000). */
   height?: number;
-  /** `false`: kein Ziehen, Scrollzoom und Doppelklick; Tasten und Zoom-Schaltflächen bleiben. */
+  /** `false`: kein Ziehen, Scrollzoom und Doppelklick, keine Zoom-Schaltflächen; der Tastaturzoom auf der Kartenfläche bleibt. */
   interactive?: boolean;
   /** `click`: Platzhalter, Kacheln erst nach „Karte laden“ (Standard). `auto`: sofort laden. */
   load?: MapLoad;

@@ -19,7 +19,7 @@ export interface MapViewProps {
   zoom?: number;
   /** Höhe der Karte in Pixeln (Standard 320, 200 bis 2000). */
   height?: number;
-  /** `false`: kein Ziehen, Scrollzoom und Doppelklick; Tasten und Zoom-Schaltflächen bleiben. */
+  /** `false`: kein Ziehen, Scrollzoom und Doppelklick, keine Zoom-Schaltflächen; der Tastaturzoom auf der Kartenfläche bleibt. */
   interactive?: boolean;
   /** `click`: Platzhalter, Kacheln erst nach „Karte laden“ (Standard). `auto`: sofort laden. */
   load?: MapLoad;
@@ -104,6 +104,8 @@ export function MapView({
   const urlOk = validTileUrl(tileUrl);
   const state = !urlOk || failure ? 'error' : phase;
   const running = state === 'loading' || state === 'ready';
+  // Nach einem Ladefehler (nicht bei ungültiger tileUrl) bietet der Platzhalter „Erneut versuchen“ an
+  const canRetry = state === 'error' && urlOk && failure !== null;
   const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';
   const source = attribution && attribution.trim() ? attribution : mapText.attribution;
   const options = { markers, appLinks, center, zoom, interactive, tileUrl, seatLabel };
@@ -181,6 +183,21 @@ export function MapView({
                   {pin.number ?? ''}
                 </span>
               ))}
+              {canRetry ? (
+                <div className="hoops-map-ph-card">
+                  <button
+                    type="button"
+                    className="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-retry"
+                    onClick={() => {
+                      userStarted.current = true;
+                      setFailure(null);
+                      setPhase('loading');
+                    }}
+                  >
+                    {mapText.retry}
+                  </button>
+                </div>
+              ) : null}
               {state === 'idle' ? (
                 <div className="hoops-map-ph-card">
                   <p className="hoops-map-note">{privacyNote}</p>
@@ -198,7 +215,7 @@ export function MapView({
               ) : null}
             </div>
           ) : null}
-          {state === 'ready' ? (
+          {state === 'ready' && interactive !== false ? (
             <div className="hoops-map-zoom" role="group" aria-label={mapText.zoomGroup}>
               <button type="button" className="hoops-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onClick={() => canIn && controller.current?.zoomIn()}>
                 <Plus />
