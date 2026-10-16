@@ -34,12 +34,12 @@ describe('Version-Abgleich', () => {
   it('eine abweichende CSS-Version bricht ab und nennt die Datei', async () => {
     const dir = await copyBundle('css');
     await writeFile(`${dir}/hoops.css`, (await readFile(`${dir}/hoops.css`, 'utf8')).replace(`--hoops-version: "${pkg.version}"`, '--hoops-version: "0.0.1"'));
-    await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/dss\.css 0\.0\.1/);
+    await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/hoops\.css 0\.0\.1/);
   });
   it('eine fehlende CSS-Version gilt als Abweichung', async () => {
     const dir = await copyBundle('css-fehlt');
     await writeFile(`${dir}/hoops.css`, ':root{}');
-    await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/dss\.css null/);
+    await expect(checkVersions({ bundleDir: dir })).rejects.toThrow(/hoops\.css null/);
   });
   it.each(BUNDLE_FILES)('eine abweichende VERSION in %s bricht ab', async (file: string) => {
     const dir = await copyBundle(`js-${file}`);
@@ -167,11 +167,11 @@ describe('Tarball, Prüfsummen, Manifest', () => {
       expect(bundle.css).toBe('hoops.css');
     }
     expect(manifest.bundles.hoops.requires).toEqual([]);
-    expect(manifest.bundles['hoops-render'].requires).toEqual(['dss']);
+    expect(manifest.bundles['hoops-render'].requires).toEqual(['hoops']);
     expect(manifest.bundles['hoops-map'].requires).toEqual([]);
     expect(manifest.leaflet).toMatchObject({ required: false, range: pkg.peerDependencies.leaflet });
     expect(manifest.leaflet.note).toMatch(/Klick/);
-    expect(manifest.pairing).toMatch(/dss\.css/);
+    expect(manifest.pairing).toMatch(/hoops\.css/);
   });
   it('ist reproduzierbar: zwei Läufe ergeben dieselben Bytes', async () => {
     const again = await releaseVanilla({ bundleDir, outDir: `${tmpRoot}/zweiter`, build: false, allowDirty: true });
@@ -246,7 +246,7 @@ describe('Budgets, Ausgabeordner, Hilfsskript', () => {
     const out = `${tmpRoot}/budget-out`;
     // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von hoops.min.js liegt bei 40 KiB
     await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'y'.repeat(BUDGETS.hoops.minBytes)}`);
-    await expect(releaseVanilla({ bundleDir: dir, outDir: out, build: false, allowDirty: true })).rejects.toThrow(/Größenbudget überschritten: dss\.min\.js/);
+    await expect(releaseVanilla({ bundleDir: dir, outDir: out, build: false, allowDirty: true })).rejects.toThrow(/Größenbudget überschritten: hoops\.min\.js/);
     expect(existsSync(out)).toBe(false);
   });
   it('assertBudgets nennt min und gzip getrennt', () => {

@@ -71,7 +71,7 @@ ${divMarkup}
   import { initAll } from '@hoopsfoundry/ui/vanilla-core.js';
 
   // Startet jedes Element mit data-hoops="modal" (geschlossen). Optionen je Element in data-hoops-options='{"dismissOnBackdrop":true}'
-  const dss = initAll(document);
+  const hoops = initAll(document);
 </script>
 
 <!-- Oder einzeln, mit Optionen und aus dem Code -->

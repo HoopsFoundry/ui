@@ -36,7 +36,7 @@ afterAll(async () => {
 beforeEach(async () => {
   routes.clear();
   await rm(project, { recursive: true, force: true });
-  await mkdir(`${project}/_site/dss`, { recursive: true });
+  await mkdir(`${project}/_site/hoops`, { recursive: true });
   await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
   await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
 });
@@ -84,7 +84,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   'Prüfsumme jeder Datei wird geprüft': async (mod) => {
     const fake = await serveFake('datei');
     routes.set(`/v${V}/hoops-ui-${V}.sha256`, { body: fake.sums.replace(sha('a'), sha('x')) });
-    return rejected(() => run(mod), /Datei dss\.js stimmt nicht/);
+    return rejected(() => run(mod), /Datei hoops\.js stimmt nicht/);
   },
   'Prüfsummen-Datei und Archiv nennen dieselben Dateien': async (mod) => {
     const fake = await serveFake('liste');
@@ -212,10 +212,10 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     return throws(() => fsu.acquireLock(dir, '.l', 'portal-sync'), /Ein anderer Lauf/);
   },
   'Rollback: scheitert das Einsetzen, kommt das alte Ziel zurück': async (mod) => {
-    await mkdir(`${project}/_site/dss`, { recursive: true });
+    await mkdir(`${project}/_site/hoops`, { recursive: true });
     await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
     await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
-    await mod.replaceDir(`${project}/_site/dss`, project, async (tmp: string) => writeFile(`${tmp}/neu.js`, 'n'), { beforeInstall: (tmp: string) => rm(tmp, { recursive: true, force: true }) }).catch(() => {});
+    await mod.replaceDir(`${project}/_site/hoops`, project, async (tmp: string) => writeFile(`${tmp}/neu.js`, 'n'), { beforeInstall: (tmp: string) => rm(tmp, { recursive: true, force: true }) }).catch(() => {});
     return readFile(`${project}/_site/hoops/alt.js`, 'utf8').then((t) => t === 'alt', () => false);
   },
   'Startprüfung: zu altes Node wird abgelehnt': async (mod) => {
@@ -269,7 +269,7 @@ describe('portal-sync --from-release: Mutationen', () => {
   it('der unverfälschte Quelltext erfüllt alle Regeln', async () => {
     const mod = await loadScript(SOURCE, 'portal-sync.mjs');
     for (const [name, rule] of Object.entries(RULES)) {
-      await mkdir(`${project}/_site/dss`, { recursive: true });
+      await mkdir(`${project}/_site/hoops`, { recursive: true });
       await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
       await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
       routes.clear();

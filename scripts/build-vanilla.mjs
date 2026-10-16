@@ -17,9 +17,9 @@ export async function buildVanilla({ outDir = `${root}dist/vanilla` } = {}) {
     outDir, sourcemap: true, tsconfig: `${root}react/tsconfig.json`, define: { __HOOPS_VERSION__: JSON.stringify(pkg.version) },
   };
   const entry = `${root}js/vanilla.js`;
-  await build({ ...common, entry: { dss: entry }, minify: false });
-  await build({ ...common, entry: { 'dss.min': entry }, minify: true });
-  await build({ ...common, entry: { dss: `${root}js/vanilla.d.ts` }, dts: { only: true }, sourcemap: false });
+  await build({ ...common, entry: { hoops: entry }, minify: false });
+  await build({ ...common, entry: { 'hoops.min': entry }, minify: true });
+  await build({ ...common, entry: { hoops: `${root}js/vanilla.d.ts` }, dts: { only: true }, sourcemap: false });
 
   // Render-Bündel: das Accordion kommt aus dem Kern (externer Import desselben Ordners), alles andere ist gebündelt
   const coreAs = (file) => ({

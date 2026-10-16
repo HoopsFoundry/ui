@@ -1,5 +1,5 @@
 // @vitest-environment node
-// Das Beispiel scripts/portal-sync.mjs kopiert dist/vanilla (und optional Schriften, Leaflet) aus node_modules nach _site/dss.
+// Das Beispiel scripts/portal-sync.mjs kopiert dist/vanilla (und optional Schriften, Leaflet) aus node_modules nach _site/hoops.
 import { cp, mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { existsSync } from 'node:fs';
@@ -18,14 +18,14 @@ beforeAll(async () => {
   await writeFile(`${pkgDir}/package.json`, JSON.stringify({ name: '@hoopsfoundry/ui', version: '9.9.9' }));
   await writeFile(`${pkgDir}/fonts/fonts.css`, '/* f */');
   await writeFile(`${project}/node_modules/leaflet/dist/leaflet.js`, '//l');
-  await mkdir(`${project}/_site/dss`, { recursive: true });
+  await mkdir(`${project}/_site/hoops`, { recursive: true });
   await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
   await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
 });
 afterAll(() => rm(project, { recursive: true, force: true }));
 
 describe('portal-sync.mjs', () => {
-  it('kopiert dist/vanilla nach _site/dss, ersetzt Altes und schreibt version.json', async () => {
+  it('kopiert dist/vanilla nach _site/hoops, ersetzt Altes und schreibt version.json', async () => {
     const version = await syncHoops({ root: project });
     expect(version).toEqual({ version: '9.9.9', leaflet: false });
     for (const name of ['hoops.js', 'hoops.min.js', 'hoops.css', 'hoops.d.ts', 'hoops.min.js.map', 'courtlines/court.svg']) expect(existsSync(`${project}/_site/hoops/${name}`), name).toBe(true);
@@ -41,7 +41,7 @@ describe('portal-sync.mjs', () => {
     expect(existsSync(`${project}/_site/vendor/leaflet/leaflet.js`)).toBe(true);
   });
   it('ein Zielordner außerhalb ist möglich; ohne installiertes Paket gibt es einen klaren Fehler', async () => {
-    await syncHoops({ root: project, to: `${project}/out/dss` });
+    await syncHoops({ root: project, to: `${project}/out/hoops` });
     expect(existsSync(`${project}/out/hoops/hoops.js`)).toBe(true);
     await expect(syncHoops({ root: `${project}/leer` })).rejects.toThrow();
   });
@@ -72,7 +72,7 @@ describe('portal-sync.mjs', () => {
     expect(result.leaflet).toBe(false);
   });
   it('version.json steht im Ziel, bevor es das Ziel gibt (Marker und Dateien kommen mit dem Umbenennen)', async () => {
-    const out = `${project}/neu/dss`;
+    const out = `${project}/neu/hoops`;
     await syncHoops({ root: project, to: out });
     expect(existsSync(`${out}/version.json`)).toBe(true);
     expect(existsSync(`${out}/.hoops-sync`)).toBe(true);

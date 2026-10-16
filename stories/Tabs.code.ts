@@ -54,8 +54,8 @@ ${barMarkup}
   import { initAll } from '@hoopsfoundry/ui/vanilla-core.js';
 
   // Startet jede Leiste mit data-hoops="tabs" (und alle anderen Bausteine mit data-hoops)
-  const dss = initAll(document);
-  // dss.destroy() baut alles wieder ab; das Markup ist danach wie vorher
+  const hoops = initAll(document);
+  // hoops.destroy() baut alles wieder ab; das Markup ist danach wie vorher
 </script>
 
 <!-- Oder einzeln, mit Optionen -->

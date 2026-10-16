@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Das Repository ist ein Design System für Basketball-Apps (`@hoopsfoundry/ui`, Version 0.9, Marken BBV und DBB). Sprache für Doku, Kommentare, Commit-Messages und Gespräche: **Deutsch** (Code-Bezeichner englisch/deutsch gemischt wie im Bestand).
+Das Repository ist ein Design System für Basketball-Apps (`@hoopsfoundry/ui`, Version 0.10, Marken BBV und DBB). Sprache für Doku, Kommentare, Commit-Messages und Gespräche: **Deutsch** (Code-Bezeichner englisch/deutsch gemischt wie im Bestand).
 
 ## Befehle
 

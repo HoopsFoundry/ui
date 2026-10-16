@@ -35,8 +35,8 @@ ${pageMarkup}
 
   // Startet alle Elemente mit data-hoops="pagenav|backtop|accordion|theme". Optionen je Baustein stehen in
   // initAll(document, { pagenav: { … } }) oder am Element in data-hoops-options.
-  const dss = initAll(document);
-  // dss.destroy() baut alles wieder ab
+  const hoops = initAll(document);
+  // hoops.destroy() baut alles wieder ab
 </script>
 
 <!-- Oder einzeln, ohne data-hoops -->

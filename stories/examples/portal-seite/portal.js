@@ -114,12 +114,12 @@ async function main() {
   for (const button of document.querySelectorAll('[data-hoops-modal-open]')) button.hidden = false;
 
   // Danach das Verhalten: Seitennavigation, Tabs, Dialog, Theme-Umschalter, Nach oben, Accordion der einklappbaren Karten
-  const dss = initAll(document);
+  const hoops = initAll(document);
   const versions = { core: CORE_VERSION, render: RENDER_VERSION, map: MAP_VERSION, css: checkVersion().css };
   const same = new Set(Object.values(versions)).size === 1;
   document.documentElement.setAttribute('data-hoops-versions', same ? versions.core : `abweichend: ${JSON.stringify(versions)}`);
   if (!same) console.warn('HoopsFoundry UI: Versionen passen nicht zusammen', versions);
-  window.__portal = { dss, versions };
+  window.__portal = { hoops, versions };
   document.documentElement.setAttribute('data-portal', 'ready');
 }
 

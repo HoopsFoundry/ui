@@ -29,12 +29,12 @@ describe('Aufrufe in der Doku', () => {
     for (const flag of ['--from-release', '--from-package', '--from-dir', '--base-url']) expect(all, flag).toContain(flag);
   });
   it('die Adresse im Beispiel ist die Standard-Adresse des Skripts', () => {
-    expect(releaseSync).toContain('https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/');
+    expect(releaseSync).toContain('https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/');
     expect(read('scripts/portal-sync.mjs')).toContain("'https://github.com/HoopsFoundry/ui/releases/download'");
-    expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.9.0.sha256');
-    expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.9.0.tgz.sha256');
+    expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.10.0.sha256');
+    expect(manualCheck).toContain('shasum -a 256 -c hoops-ui-0.10.0.tgz.sha256');
     expect(getSync).toContain('shasum -a 256 -c hoops-sync.mjs.sha256');
-    expect(getSync).toContain('releases/download/v0.9.0/hoops-sync.mjs');
+    expect(getSync).toContain('releases/download/v0.10.0/hoops-sync.mjs');
   });
   it('der Rollback nennt dieselbe Zeile mit der alten Version', () => {
     expect(updateFlow).toMatch(/Rollback[^\n]*\nnode hoops-sync\.mjs --from-release 0\.9\.0/);
@@ -125,7 +125,7 @@ describe('Seiten und Verweise', () => {
 
 describe('Gegenproben', () => {
   it('ein unbekannter Schalter in der Doku wird erkannt', () => {
-    const wrong = mutate(releaseSync, '--from-release 0.9.0\n', '--von-release 0.9.0\n');
+    const wrong = mutate(releaseSync, '--from-release 0.10.0\n', '--von-release 0.10.0\n');
     expect(() => syncCalls(wrong).forEach((a) => parseArgs(a))).toThrow(/unbekannte Option/);
   });
   it('ein anderes Budget in der Doku fällt auf', () => {

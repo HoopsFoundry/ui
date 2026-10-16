@@ -1,7 +1,7 @@
 # HoopsFoundry UI
 
 **Digitaler Spielbericht · Komponenten-Library für Basketball-Apps**
-Version 0.9 · WCAG 2.1 AAA · Framework-agnostisch · *Pre-release*
+Version 0.10 · WCAG 2.1 AAA · Framework-agnostisch · *Pre-release*
 
 ---
 
@@ -152,7 +152,7 @@ der Standard und schreibt nichts, `--write` schreibt (vorher Git-Stand sichern).
 ## React
 
 ```bash
-npm install github:HoopsFoundry/ui#v0.9.0 react react-dom @radix-ui/react-dialog
+npm install github:HoopsFoundry/ui#v0.10.0 react react-dom @radix-ui/react-dialog
 ```
 
 ```tsx
@@ -241,7 +241,7 @@ Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchC
 </script>
 ```
 
-`scripts/portal-sync.mjs` (Befehl `hoops-sync`) zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet, falls installiert) aus `node_modules` nach `_site/dss` kopiert; das Ziel gehört dem Skript (Marker `.hoops-sync`, Ersetzen über einen temporären Ordner). Die Peer-Abhängigkeiten sind optional, React `^18 || ^19`; `npm install` im leeren Projekt braucht kein `--legacy-peer-deps`. ES-Module brauchen `http(s)`, nicht `file://`. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
+`scripts/portal-sync.mjs` (Befehl `hoops-sync`) zeigt, wie ein Vanilla-Projekt `dist/vanilla` (und Leaflet, falls installiert) aus `node_modules` nach `_site/hoops` kopiert; das Ziel gehört dem Skript (Marker `.hoops-sync`, Ersetzen über einen temporären Ordner). Die Peer-Abhängigkeiten sind optional, React `^18 || ^19`; `npm install` im leeren Projekt braucht kein `--legacy-peer-deps`. ES-Module brauchen `http(s)`, nicht `file://`. `VERSION`, `cssVersion()` und `checkVersion()` vergleichen JavaScript und CSS. Alles Weitere (Liste der Exporte, CSP, Sicherheit, Größen, Versionsabgleich): Storybook `Foundation/Vanilla`.
 
 **Auslieferung bis Version 1.0: GitHub-Release.** `npm run build` und `node scripts/release-vanilla.mjs` erzeugen in `release/` (nicht im Git) `hoops-ui-<version>.tgz` (`dist/vanilla`, `fonts/`, `version.json` unter `hoops-ui-<version>/`), `hoops-ui-<version>.sha256` (Format von `sha256sum`), `hoops-ui-<version>.tgz.sha256` (nur der Tarball), `manifest.json` (Dateien, Größen in KiB, Budgets, Abhängigkeiten, Leaflet-Hinweis) sowie `hoops-sync.mjs` mit `hoops-sync.mjs.sha256`; vorher prüft das Skript, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `hoops.css` übereinstimmen und jedes Bündel sein Größenbudget einhält (`--dry-run`, `--allow-dirty`, `--no-build`, `--no-sourcemaps`, `--expect-version=`, `--debug`). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (gzip-Kopf normiert); maßgeblich ist die veröffentlichte `.sha256`. Der Workflow `.github/workflows/release-vanilla.yml` macht dasselbe bei einem Tag `v*` und legt das Release an (bis zum ersten Tag ungetestet; `workflow_dispatch` mit `dry_run` lädt nur ein Artefakt hoch). Das Portal holt und prüft das Release mit `node hoops-sync.mjs --from-release 0.9.0` (Anhang `hoops-sync.mjs`, eine Datei, Node 18 oder neuer; im npm-Paket als Befehl `hoops-sync`; Alternativen `--from-package`, `--from-dir`); ab 1.0 ist `--from-package` mit dem npm-Paket die Quelle, der Aufbau von `dist/vanilla` bleibt. Eine komplette Beispielseite ohne Build (Vereins- und Teamseite aus einem JSON-Datensatz, relative Pfade): `stories/examples/portal-seite/`, geprüft mit `node scripts/check-portal-seite.mjs --browsers=chromium,webkit,firefox` (Chromium und WebKit bestanden; Firefox ist in der Entwicklungsumgebung nicht gelaufen, Ursache ungeklärt). Einbinden, Aktualisieren, Rollback und Kompatibilität: Storybook `Foundation/Vanilla`.
 

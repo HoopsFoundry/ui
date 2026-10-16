@@ -1,6 +1,6 @@
 {
   "name": "@hoopsfoundry/ui",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "HoopsFoundry UI — Komponenten-Library für Basketball-Apps (Digitaler Spielbericht, Scoreboard, Vereinsregister)",
   "type": "module",
   "main": "tokens/tokens.css",
@@ -203,7 +203,8 @@
     "scripts/migrate-from-dss.mjs",
     "scripts/migration-table.mjs",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ],
   "scripts": {
     "visual:before": "node scripts/visual-compare.mjs capture before",
@@ -221,7 +222,8 @@
   "keywords": [
     "design-system",
     "basketball",
-    "dss",
+    "hoopsfoundry",
+    "ui",
     "spielbericht",
     "dbb",
     "tokens",
@@ -231,6 +233,10 @@
     "react"
   ],
   "license": "MIT",
+  "homepage": "https://ui.hoopsfoundry.com",
+  "bugs": {
+    "url": "https://github.com/HoopsFoundry/ui/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/HoopsFoundry/ui.git"

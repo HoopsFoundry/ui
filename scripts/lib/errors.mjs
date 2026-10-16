@@ -23,7 +23,7 @@ const TEXT = {
 /**
  * Deutsche Meldung zu einem Fehler. Mit `debug` folgt der Stack. Gibt immer eine Zeichenkette zurück, nie den Fehler selbst.
  */
-export function describeError(error, { debug = false, name = 'dss' } = {}) {
+export function describeError(error, { debug = false, name = 'hoops' } = {}) {
   const message = String(error?.message ?? error);
   let text;
   if (OWN.test(message)) {

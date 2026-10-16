@@ -3,7 +3,7 @@
 import { getContext, setContext } from 'svelte';
 import { resolveHeading } from '../js/heading.js';
 
-const KEY = Symbol.for('dss.headingLevel');
+const KEY = Symbol.for('hoops.headingLevel');
 
 /**
  * Gibt dem Teilbaum eine Ebene vor. `getLevel` wird bei jedem Lesen aufgerufen, so bleibt die Ebene

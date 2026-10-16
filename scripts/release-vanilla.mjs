@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Release-Ablauf des Vanilla-Pakets (Auslieferung per Release-Anhang, ab 1.0 zusätzlich npm). Kein Netz, kein Git-Push, kein Tag.
 //
-//   node scripts/release-vanilla.mjs [--dry-run] [--allow-dirty] [--no-build] [--no-sourcemaps] [--out=release] [--expect-version=0.9.0]
+//   node scripts/release-vanilla.mjs [--dry-run] [--allow-dirty] [--no-build] [--no-sourcemaps] [--out=release] [--expect-version=0.10.0]
 //
 // Schritte (in dieser Reihenfolge, STEPS):
 //   clean    der Arbeitsbaum ist sauber (git status --porcelain); mit --allow-dirty übersprungen

@@ -3,8 +3,8 @@
 // erst beim Lesen aufgelöst (kein Schnappschuss): so folgen die Bereiche einem Wechsel von `exclusive`, `titleAs` usw.
 import { getContext, setContext } from 'svelte';
 
-const GROUP = Symbol.for('dss.accordionGroup');
-const ITEM = Symbol.for('dss.accordionItem');
+const GROUP = Symbol.for('hoops.accordionGroup');
+const ITEM = Symbol.for('hoops.accordionItem');
 
 /**
  * @typedef {object} AccordionEntry Ein registrierter Bereich (Getter, damit die Werte aktuell bleiben).

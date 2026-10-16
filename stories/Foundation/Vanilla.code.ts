@@ -19,7 +19,7 @@ export const vanilla = `<!doctype html>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Vereinsregister</title>
-  <!-- Aus node_modules nach _site/dss kopiert (siehe unten): hoops.css = tokens.css + components.css -->
+  <!-- Aus node_modules nach _site/hoops kopiert (siehe unten): hoops.css = tokens.css + components.css -->
   <link rel="stylesheet" href="/hoops/hoops.css" />
   <!-- optional: <link rel="stylesheet" href="/hoops/fonts/fonts.css" /> -->
 
@@ -38,8 +38,8 @@ ${pageMarkup.split('\n').map((line) => (line ? `    ${line}` : line)).join('\n')
   <script type="module">
     import { initAll, VERSION, checkVersion } from '/hoops/hoops.min.js';
 
-    const dss = initAll(document);           // startet alles mit data-hoops; dss.count, dss.destroy()
-    console.log(VERSION, checkVersion());   // { js: '0.9.0', css: '0.9.0', match: true }
+    const hoops = initAll(document);           // startet alles mit data-hoops; hoops.count, hoops.destroy()
+    console.log(VERSION, checkVersion());   // { js: '0.10.0', css: '0.10.0', match: true }
   </script>
 </body>
 </html>`;
@@ -52,7 +52,7 @@ export const options = `<!-- Optionen je Element als JSON (ungültiges JSON, Lis
   import { initAll, initTabs, initModal, openModal, closeModal } from '/hoops/hoops.min.js';
 
   // Optionen für alle Elemente eines Bausteins; das JSON am Element gewinnt gegen options
-  const dss = initAll(document, { tabs: { hash: true }, modal: { dismissOnBackdrop: false }, only: ['tabs', 'modal'] });
+  const hoops = initAll(document, { tabs: { hash: true }, modal: { dismissOnBackdrop: false }, only: ['tabs', 'modal'] });
 
   // Oder einzeln, auf einem Element, das du selbst wählst (auch nachträglich eingefügt)
   const leiste = initTabs(document.querySelector('.hoops-tabs'), { onChange: ({ id }) => console.log(id) });
@@ -60,7 +60,7 @@ export const options = `<!-- Optionen je Element als JSON (ungültiges JSON, Lis
   // Ein zweiter Aufruf für dasselbe Element ersetzt den ersten (kein doppelter Listener)
   // destroy() ist mehrfach aufrufbar und stellt das Markup wieder her
   leiste.destroy();
-  dss.destroy();
+  hoops.destroy();
 </script>`;
 
 /** Lebenszyklus bei dynamisch eingefügtem Inhalt */
@@ -68,15 +68,15 @@ export const dynamic = `<script type="module">
   import { initAll } from '/hoops/hoops.min.js';
 
   const bereich = document.querySelector('#inhalt');
-  let dss = null;
+  let hoops = null;
 
   async function laden(url) {
-    dss?.destroy();                                   // alte Instanzen abbauen, bevor der Inhalt verschwindet
+    hoops?.destroy();                                   // alte Instanzen abbauen, bevor der Inhalt verschwindet
     const antwort = await fetch(url);
     const html = await antwort.text();
     // Kein innerHTML: das Markup wird geparst und als Fragment eingesetzt (geprüftes Markup, Texte aus Daten gehören in textContent)
     bereich.replaceChildren(document.createRange().createContextualFragment(html));
-    dss = initAll(bereich);                           // nur unterhalb von #inhalt
+    hoops = initAll(bereich);                           // nur unterhalb von #inhalt
   }
 </script>`;
 
@@ -176,8 +176,8 @@ export const mapBudget = { minKB: 24, gzipKB: 10 };
 
 /** Das Hilfsskript holen und prüfen: Release-Anhang `hoops-sync.mjs` mit eigener Prüfsumme. */
 export const getSync = `# Im Projekt des Portals (neben der package.json): das Skript und seine Prüfsumme aus demselben Release laden und prüfen
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-sync.mjs
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-sync.mjs.sha256
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-sync.mjs
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-sync.mjs.sha256
 shasum -a 256 -c hoops-sync.mjs.sha256        # muss "hoops-sync.mjs: OK" melden (Linux: sha256sum -c)
 node --version                              # Node 18 oder neuer
 
@@ -185,30 +185,30 @@ node --version                              # Node 18 oder neuer
 npm install --save-dev @hoopsfoundry/ui
 npx hoops-sync --from-package`;
 
-/** Auslieferung bis Version 1.0: Release-Anhänge auf GitHub. Der Befehl holt, prüft und ersetzt `_site/dss` in einem Schritt. */
+/** Auslieferung bis Version 1.0: Release-Anhänge auf GitHub. Der Befehl holt, prüft und ersetzt `_site/hoops` in einem Schritt. */
 export const releaseSync = `# Im Projekt (nicht im Paket): hoops-sync.mjs liegt neben der package.json des Portals
-node hoops-sync.mjs --from-release 0.9.0
-# → lädt hoops-ui-0.9.0.tgz und hoops-ui-0.9.0.sha256 von
-#   https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/
+node hoops-sync.mjs --from-release 0.10.0
+# → lädt hoops-ui-0.10.0.tgz und hoops-ui-0.10.0.sha256 von
+#   https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/
 # → prüft die SHA-256 des Tarballs und jeder Datei darin, die Version in version.json und den Ordnernamen
-# → ersetzt erst danach _site/dss (bei einer Abweichung bleibt das alte Ziel unverändert, Exit-Code 1)
+# → ersetzt erst danach _site/hoops (bei einer Abweichung bleibt das alte Ziel unverändert, Exit-Code 1)
 
 # Weitere Quellen (derselbe Aufbau von dist/vanilla):
 node hoops-sync.mjs --from-package                 # installiertes npm-Paket aus node_modules (Standard)
-node hoops-sync.mjs --from-dir ./hoops-ui-0.9.0 # entpackter Release-Ordner, offline
-node hoops-sync.mjs --from-release 0.9.0 --base-url https://intern.example/dss   # eigener Spiegel (https; Weiterleitungen nur auf denselben Host)
-node hoops-sync.mjs --from-release 0.9.0 --base-url http://spiegel.lan/dss --allow-insecure-http   # unverschlüsselt nur mit ausdrücklicher Freigabe
-node hoops-sync.mjs --from-release 0.9.0 --debug   # bei einem Fehler zusätzlich der Stack`;
+node hoops-sync.mjs --from-dir ./hoops-ui-0.10.0 # entpackter Release-Ordner, offline
+node hoops-sync.mjs --from-release 0.10.0 --base-url https://intern.example/hoops   # eigener Spiegel (https; Weiterleitungen nur auf denselben Host)
+node hoops-sync.mjs --from-release 0.10.0 --base-url http://spiegel.lan/hoops --allow-insecure-http   # unverschlüsselt nur mit ausdrücklicher Freigabe
+node hoops-sync.mjs --from-release 0.10.0 --debug   # bei einem Fehler zusätzlich der Stack`;
 
 /** Prüfsumme von Hand, ohne das Skript. */
 export const manualCheck = `# Beide Dateien eines Releases in einen leeren Ordner laden, den Tarball daneben entpacken, dann prüfen
-mkdir hoops-0.9.0 && cd hoops-0.9.0
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-ui-0.9.0.tgz
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-ui-0.9.0.sha256
-curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.9.0/hoops-ui-0.9.0.tgz.sha256
-shasum -a 256 -c hoops-ui-0.9.0.tgz.sha256   # nur der Tarball (Linux: sha256sum -c)
-tar xzf hoops-ui-0.9.0.tgz
-shasum -a 256 -c hoops-ui-0.9.0.sha256      # Tarball und jede Datei darin; jede Zeile muss "OK" sein`;
+mkdir hoops-0.10.0 && cd hoops-0.10.0
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-ui-0.10.0.tgz
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-ui-0.10.0.sha256
+curl -LO https://github.com/HoopsFoundry/ui/releases/download/v0.10.0/hoops-ui-0.10.0.tgz.sha256
+shasum -a 256 -c hoops-ui-0.10.0.tgz.sha256   # nur der Tarball (Linux: sha256sum -c)
+tar xzf hoops-ui-0.10.0.tgz
+shasum -a 256 -c hoops-ui-0.10.0.sha256      # Tarball und jede Datei darin; jede Zeile muss "OK" sein`;
 
 /** Aktualisieren und Zurückrollen im Portal. */
 export const updateFlow = `# 1. Neue Version holen und prüfen
@@ -218,11 +218,11 @@ node hoops-sync.mjs --from-release 0.10.0
 # 3. Portal veröffentlichen
 
 # Rollback: dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt
-node hoops-sync.mjs --from-release 0.9.0`;
+node hoops-sync.mjs --from-release 0.10.0`;
 
 /** Wechsel auf npm ab 1.0: nur die Quelle ändert sich. */
 export const npmSwitch = `# bis 1.0 (Release-Anhang)
-node hoops-sync.mjs --from-release 0.9.0
+node hoops-sync.mjs --from-release 0.10.0
 
 # ab 1.0 (npm, Paketname und Aufbau von dist/vanilla bleiben)
 npm install @hoopsfoundry/ui@1.0.0

@@ -22,7 +22,7 @@ Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; d
 |Schritt |Wo |Was
 |Bau und Release-Dateien |Entwicklungsrechner oder Workflow `release-vanilla.yml` |`npm run build`, dann `node scripts/release-vanilla.mjs`: prüft die Version an acht Stellen und die Größenbudgets, schreibt `release/hoops-ui-<version>.tgz`, `.sha256`, `.tgz.sha256`, `manifest.json`, `hoops-sync.mjs` und `hoops-sync.mjs.sha256`
 |Veröffentlichung |GitHub-Release `v<version>` |Die sechs Anhänge; angelegt vom Release-Job des Workflows bei einem Tag `v*` (Tag-Commit auf `main`)
-|Übernahme |Projekt des Portals, `hoops-sync.mjs --from-release <version>` (npm: `npx hoops-sync --from-package`) |Download über https, Prüfung, Ersetzen von `_site/dss` mit Rückrollen und Sperre; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
+|Übernahme |Projekt des Portals, `hoops-sync.mjs --from-release <version>` (npm: `npx hoops-sync --from-package`) |Download über https, Prüfung, Ersetzen von `_site/hoops` mit Rückrollen und Sperre; Leaflet aus `node_modules` nach `_site/vendor/leaflet`
 |Betrieb |Statischer Host (GitHub Pages) |Dateien auf der eigenen Domain, relative Pfade (auch unter `/<repo>/`); strenge CSP (`script-src 'self'` plus Hash des Boot-Skripts, `style-src 'self'`, `img-src 'self'` und Kachel-Host)
 |===
 

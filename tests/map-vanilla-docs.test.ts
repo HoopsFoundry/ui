@@ -153,7 +153,7 @@ describe('Kopierliste gegen die statischen Importe der Bündel', () => {
   it('jede statisch importierte Datei der kopierten Bündel steht in der Liste (kein 404 beim Laden)', () => {
     const bundles = ['hoops-map.min.js', 'hoops-render.min.js'].filter((name) => copied.has(name));
     expect(bundles).toEqual(['hoops-map.min.js', 'hoops-render.min.js']);
-    for (const name of ['hoops-map', 'hoops-render', 'dss'].flatMap((n) => [`${n}.js`, `${n}.min.js`])) {
+    for (const name of ['hoops-map', 'hoops-render', 'hoops'].flatMap((n) => [`${n}.js`, `${n}.min.js`])) {
       const text = readFileSync(`${bundleDir}${name}`, 'utf8');
       const imports = [...text.matchAll(/(?:^|[;}\s])(?:import|export)\s*(?:[^'";]*?\s*from\s*)?["'](\.{1,2}\/[^"']+)["']/g)].map((m) => m[1].replace(/^\.\//, ''));
       for (const file of imports) {

@@ -33,7 +33,7 @@ const serve = (version: string, tgz: Buffer, sums: string) => {
 };
 const sync = (options: Record<string, unknown> = {}, version = V) =>
   syncHoops({ root: project, source: { type: 'release', version, baseUrl: server.baseUrl }, ...options });
-const snapshot = async () => (existsSync(`${project}/_site/dss`) ? (await readdir(`${project}/_site/dss`)).sort() : null);
+const snapshot = async () => (existsSync(`${project}/_site/hoops`) ? (await readdir(`${project}/_site/hoops`)).sort() : null);
 
 beforeAll(async () => {
   await rm(`${tmpRoot}-sync`, { recursive: true, force: true });
@@ -49,7 +49,7 @@ beforeEach(async () => {
   routes.clear();
   server.requests.length = 0;
   await rm(project, { recursive: true, force: true });
-  await mkdir(`${project}/_site/dss`, { recursive: true });
+  await mkdir(`${project}/_site/hoops`, { recursive: true });
   await writeFile(`${project}/_site/hoops/alt.js`, 'alt');
   await writeFile(`${project}/_site/hoops/.hoops-sync`, '');
   await mkdir(`${project}/node_modules/leaflet/dist`, { recursive: true });
@@ -135,7 +135,7 @@ describe('--from-release: Abbruch lässt das Ziel unverändert', () => {
     const fake = await writeFakeRelease(`${dirs}/datei`, V, FILES);
     const wrong = fake.sums.replace(sha(FILES['hoops.js']), sha('anders'));
     serve(V, fake.tgz, wrong);
-    await expect(sync()).rejects.toThrow(/Datei dss\.js stimmt nicht/);
+    await expect(sync()).rejects.toThrow(/Datei hoops\.js stimmt nicht/);
     await unchanged();
   });
   it('Prüfsummen-Datei ohne Zeile für den Tarball oder unlesbar', async () => {
@@ -225,7 +225,7 @@ describe('--from-release: Zielschutz und Schreibrechte', () => {
     await chmod(`${project}/_site`, 0o555);
     await expect(sync()).rejects.toThrow();
     await chmod(`${project}/_site`, 0o755);
-    expect(await readdir(`${project}/_site/dss`)).toContain('alt.js');
+    expect(await readdir(`${project}/_site/hoops`)).toContain('alt.js');
     expect((await readdir(`${project}/_site`)).filter((n) => n.includes('.tmp-'))).toEqual([]);
   });
 });

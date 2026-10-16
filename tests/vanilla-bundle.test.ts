@@ -13,7 +13,7 @@ const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
 // Größenbudget (gemessen: 36,3 KiB min, 12,9 KiB gzip; Reserve für kleine Ergänzungen; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
-export const BUDGET = BUDGETS['dss'];
+export const BUDGET = BUDGETS['hoops'];
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
 export const EXPORTS = [

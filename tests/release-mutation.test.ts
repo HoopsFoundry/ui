@@ -80,7 +80,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   'Version: hoops.css wird geprüft': async (mod) => {
     const dir = await copyBundle(`m-css-${counter++}`);
     await writeFile(`${dir}/hoops.css`, (await readFile(`${dir}/hoops.css`, 'utf8')).replace(`"${pkg.version}"`, '"0.0.1"'));
-    return throws(() => mod.checkVersions({ bundleDir: dir }), /dss\.css 0\.0\.1/);
+    return throws(() => mod.checkVersions({ bundleDir: dir }), /hoops\.css 0\.0\.1/);
   },
   'Version: --expect-version (Tag) wird geprüft': (mod) => throws(() => mod.checkVersions({ bundleDir, expect: '9.9.9' }), /expect-version/),
   'Arbeitsbaum: schmutzig bricht ab': (mod) =>
@@ -106,7 +106,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   },
   'Manifest: Abhängigkeit des Render-Bündels aus den Importen': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return JSON.stringify(r.manifest.bundles['hoops-render'].requires) === '["dss"]' && r.manifest.bundles.hoops.requires.length === 0;
+    return JSON.stringify(r.manifest.bundles['hoops-render'].requires) === '["hoops"]' && r.manifest.bundles.hoops.requires.length === 0;
   },
   'Manifest: Größen aus der minifizierten Datei, gzip Stufe 9': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });

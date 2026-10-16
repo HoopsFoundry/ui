@@ -219,7 +219,7 @@ Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Z
 
 ## Kopieren ins Projekt
 
-Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript legt `dist/vanilla` nach `_site/dss` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript ist Teil des Produkts und kommt auf zwei Wegen zu dir:
+Ein Vanilla-Projekt hat keinen Bundler, der `node_modules` auflöst: Ein kleines Skript legt `dist/vanilla` nach `_site/hoops` (und, wenn du die Karte nutzt, Leaflet nach `_site/vendor/leaflet`, statt es von einer Fremd-Adresse zu laden). Das Skript ist Teil des Produkts und kommt auf zwei Wegen zu dir:
 
 - **Als Release-Anhang `hoops-sync.mjs`** (eine Datei ohne Abhängigkeiten, mit eigener Prüfsumme `hoops-sync.mjs.sha256`): in das Projekt legen und mit `node hoops-sync.mjs` aufrufen.
 - **Im npm-Paket** als Befehl `hoops-sync` (`npx hoops-sync …`; die Datei liegt als `scripts/portal-sync.mjs` im Paket, der Export heißt `@hoopsfoundry/ui/portal-sync.mjs`). Derselbe Code, nur mit den Hilfen unter `scripts/lib/` statt gebündelt.
@@ -232,7 +232,7 @@ Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `hoop
   label="Quellen von hoops-sync"
   head={['Aufruf', 'Quelle', 'Wann']}
   rows={[
-    [<code>--from-release 0.9.0</code>, <>Release-Anhang <code>hoops-ui-0.9.0.tgz</code> auf GitHub, geprüft gegen <code>.sha256</code></>, 'bis Version 1.0 (Entscheidung zur Auslieferung)'],
+    [<code>--from-release 0.10.0</code>, <>Release-Anhang <code>hoops-ui-0.10.0.tgz</code> auf GitHub, geprüft gegen <code>.sha256</code></>, 'bis Version 1.0 (Entscheidung zur Auslieferung)'],
     [<code>--from-package</code>, <>das installierte Paket in <code>node_modules</code></>, 'ab Version 1.0 über npm; schon jetzt für Projekte mit eigenem Paketlauf'],
     [<code>--from-dir pfad</code>, 'ein entpackter Release-Ordner oder ein Paketordner', 'offline, in der Pipeline, nach manuellem Download'],
   ]}
@@ -240,7 +240,7 @@ Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `hoop
 
 <CodeBlock label="portal-sync.mjs (Quelltext im Paket)" language="JavaScript" code={syncSource} />
 
-**Das Zielverzeichnis gehört dem Paket:** das Skript ersetzt `_site/dss` bei jedem Lauf vollständig. Es holt und prüft die Quelle zuerst vollständig, baut dann in einem Nachbarordner, verschiebt das alte Ziel nach `<ziel>.old-<pid>`, benennt das neue um und löscht das alte; scheitert das Einsetzen, kommt das alte Ziel zurück, und temporäre Ordner verschwinden in jedem Fall. Eine Sperrdatei `.hoops-sync.lock` im Elternordner verhindert, dass zwei Läufe gleichzeitig arbeiten (der zweite bricht mit einem Hinweis ab; eine Sperre eines nicht mehr laufenden Prozesses gilt als verwaist). Das Skript schreibt die Marker-Datei `.hoops-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`, Schalter `--leaflet` verlangt es). Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `hoops.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
+**Das Zielverzeichnis gehört dem Paket:** das Skript ersetzt `_site/hoops` bei jedem Lauf vollständig. Es holt und prüft die Quelle zuerst vollständig, baut dann in einem Nachbarordner, verschiebt das alte Ziel nach `<ziel>.old-<pid>`, benennt das neue um und löscht das alte; scheitert das Einsetzen, kommt das alte Ziel zurück, und temporäre Ordner verschwinden in jedem Fall. Eine Sperrdatei `.hoops-sync.lock` im Elternordner verhindert, dass zwei Läufe gleichzeitig arbeiten (der zweite bricht mit einem Hinweis ab; eine Sperre eines nicht mehr laufenden Prozesses gilt als verwaist). Das Skript schreibt die Marker-Datei `.hoops-sync` und löscht nie einen nicht leeren Ordner ohne diese Marker-Datei, nie das Projekt-Root, einen Elternordner oder `node_modules`. Leaflet wird nur kopiert, wenn es installiert ist (Option `leaflet: 'auto'`, Schalter `--leaflet` verlangt es). Ein altes Projekt mit eigener Kopie von `tokens.css` und `components.css` ersetzt diese Dateien durch `hoops.css`. Die Peer-Abhängigkeiten sind optional und für React `^18 || ^19` freigegeben (ein Rauchtest mit React 19.3, Radix Dialog, `Tabs`, `Modal` und `Button` läuft; die Test-Suite selbst läuft mit React 18); in einem leeren Projekt gelingt die Installation ohne `--legacy-peer-deps`.
 
 **Netzwerk:** `--from-release` lädt nur über https (http nur an Loopback, sonst mit `--allow-insecure-http`). Weiterleitungen folgt es nur auf denselben Host über https (für github.com zusätzlich auf `*.githubusercontent.com`, wohin GitHub die Anhänge umleitet); weitere Hosts gibst du mit `--allow-redirect-host` frei, nie führt eine Weiterleitung von https nach http. Die Antwort wird als Strom gezählt und ab 32 MiB abgebrochen (auch ohne `Content-Length`), nach 10 s ohne Daten oder 30 s insgesamt gilt der Download als gescheitert. Systemfehler (Datei fehlt, keine Rechte, kein Speicherplatz …) erscheinen auf Deutsch ohne Stack; `--debug` zeigt ihn.
 
@@ -260,7 +260,7 @@ Der Tarball enthält nur das Bündel; Leaflet gehört nicht dazu (`manifest.json
 
 ## Aktualisieren
 
-1. **Neue Version holen:** `node hoops-sync.mjs --from-release <version>`. Das Skript bricht bei jeder Abweichung ab (Prüfsumme des Tarballs oder einer Datei, falsche Version in `version.json` oder im Ordnernamen, unzulässige Pfade im Archiv, Verknüpfungen, doppelte Einträge, 404, abgebrochener Download); dann ist `_site/dss` unverändert.
+1. **Neue Version holen:** `node hoops-sync.mjs --from-release <version>`. Das Skript bricht bei jeder Abweichung ab (Prüfsumme des Tarballs oder einer Datei, falsche Version in `version.json` oder im Ordnernamen, unzulässige Pfade im Archiv, Verknüpfungen, doppelte Einträge, 404, abgebrochener Download); dann ist `_site/hoops` unverändert.
 2. **Versionen abgleichen:** `hoops.js`, `hoops-render.js`, `hoops-map.js` und `hoops.css` müssen aus derselben Version stammen. Die Beispielseite setzt `data-hoops-versions` auf `<html>` (die gemeinsame Version oder die Abweichung) und warnt in der Konsole; in eigenen Seiten vergleichst du `VERSION` aus den drei Bündeln mit `checkVersion().css`.
 3. **Browser-Cache:** statische Hosts liefern `hoops.css` und `hoops.js` oft mit langem Cache; hänge die Version an die Adresse (`/hoops/hoops.min.js?v=0.10.0`) oder lege jede Version in einen eigenen Ordner.
 4. **Rollback:** dieselbe Zeile mit der letzten guten Version; das Ziel wird vollständig ersetzt, es bleiben keine Dateien der neueren Version liegen.
