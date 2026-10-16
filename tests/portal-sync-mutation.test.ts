@@ -78,7 +78,8 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   'Tarball-Prüfsumme wird geprüft': async (mod) => {
     const fake = await serveFake('tgz');
     routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: Buffer.concat([fake.tgz.subarray(0, -1), Buffer.from([fake.tgz.at(-1)! ^ 1])]) });
-    return rejected(() => run(mod), /Prüfsumme|kein gültiges|beschädigt/) && (await rejected(() => run(mod), /Prüfsumme von/));
+    const first = await rejected(() => run(mod), /Prüfsumme|kein gültiges|beschädigt/);
+    return first && (await rejected(() => run(mod), /Prüfsumme von/));
   },
   'Prüfsumme jeder Datei wird geprüft': async (mod) => {
     const fake = await serveFake('datei');
@@ -119,7 +120,8 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
     const tgz = gzipSync(tar);
     routes.set(`/v${V}/dss-vanilla-${V}.tgz`, { body: tgz });
     routes.set(`/v${V}/dss-vanilla-${V}.sha256`, { body: fake.sums.replace(sha(fake.tgz), sha(tgz)) });
-    return rejected(() => run(mod), /Eintragstyp|Prüfsumme/) && (await rejected(() => run(mod), /Eintragstyp/));
+    const first = await rejected(() => run(mod), /Eintragstyp|Prüfsumme/);
+    return first && (await rejected(() => run(mod), /Eintragstyp/));
   },
   'doppelte Einträge sind verboten': async (mod) => {
     const { createTar } = await import(/* @vite-ignore */ '../scripts/release-vanilla.mjs');

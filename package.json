@@ -184,7 +184,8 @@
       "types": "./dist/vanilla/dss-map.d.ts",
       "import": "./dist/vanilla/dss-map.js"
     },
-    "./vanilla/*": "./dist/vanilla/*"
+    "./vanilla/*": "./dist/vanilla/*",
+    "./portal-sync.mjs": "./scripts/portal-sync.mjs"
   },
   "sideEffects": [
     "**/*.css"
@@ -197,6 +198,8 @@
     "js/",
     "svelte/",
     "dist/",
+    "scripts/lib/",
+    "scripts/portal-sync.mjs",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -271,6 +274,7 @@
     "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.7",
     "axe-core": "^4.14.0",
+    "esbuild": "^0.25.0",
     "jsdom": "^29.1.1",
     "leaflet": "^1.9.4",
     "playwright": "^1.63.0",
@@ -288,7 +292,10 @@
   },
   "overrides": {
     "cookie": "^0.7.0",
-    "esbuild": "^0.25.0",
+    "esbuild": "$esbuild",
     "vite": "^7.0.0"
+  },
+  "bin": {
+    "dss-sync": "scripts/portal-sync.mjs"
   }
 }
