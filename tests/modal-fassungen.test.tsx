@@ -1,6 +1,6 @@
 // Vergleich der Fassungen (Tabelle „Verhalten je Fassung“ in stories/Modal.mdx): Fokus beim Öffnen und Schließen, Seite dahinter, Scroll-Sperre.
 // Alle drei Fassungen verhalten sich gleich (Welle 1, Punkte 1.1 und 1.2 im Lückenplan); Svelte nutzt initModal aus js/modal.js.
-import { act, cleanup, fireEvent, render } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import { flushSync, mount, unmount } from 'svelte';
 import { useState } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -39,7 +39,8 @@ describe('React (Radix Dialog)', () => {
     expect(document.body.hasAttribute('data-scroll-locked')).toBe(true);
     await act(async () => { fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    // Radix gibt den Fokus erst im nächsten Zeitschlitz zurück (setTimeout 0 beim Abbau der Fokusfalle)
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 
   it('Fokusrückgabe auch beim Schließen über die Fußzeile (open per Zustand)', async () => {
@@ -49,15 +50,15 @@ describe('React (Radix Dialog)', () => {
     await act(async () => { fireEvent.click(trigger); });
     await act(async () => { fireEvent.click(document.querySelector<HTMLElement>('.hoops-m-footer button')!); });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).toBe(trigger);
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
   });
 });
 
 describe('Svelte (initModal aus js/modal.js)', () => {
-  const setup = () => {
+  const setup = (props: { dismissOnBackdrop?: boolean } = {}) => {
     const target = document.createElement('div');
     document.body.append(target);
-    const instance = mount(SvelteHost, { target });
+    const instance = mount(SvelteHost, { target, props });
     flushSync();
     const trigger = document.getElementById('auf')!;
     trigger.focus();
@@ -93,6 +94,18 @@ describe('Svelte (initModal aus js/modal.js)', () => {
     expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
     unmount(instance);
+  });
+  it('ein Klick auf den Hintergrund schließt nur mit dismissOnBackdrop (Standard aus)', () => {
+    const first = setup();
+    const click = () => { const b = document.querySelector<HTMLElement>('.hoops-backdrop')!; fireEvent.mouseDown(b); fireEvent.click(b); flushSync(); };
+    click();
+    expect(document.querySelector('[role="dialog"]')).not.toBeNull();
+    unmount(first.instance);
+    document.body.replaceChildren();
+    const second = setup({ dismissOnBackdrop: true });
+    click();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    unmount(second.instance);
   });
   it('wird das Modal mit der Komponente abgeräumt, bleibt weder inert noch eine Scroll-Sperre zurück', () => {
     const { instance } = setup();
