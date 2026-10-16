@@ -1,0 +1,1 @@
+--dss-fg bleibt, weil .txt nicht in der Endungsliste steht
