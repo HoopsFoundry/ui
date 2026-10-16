@@ -1,13 +1,13 @@
 // @vitest-environment node
 // Migrationsskript für Konsumenten (scripts/migrate-from-dss.mjs), Stufe T: Beispielprojekt aus tests/fixtures/migrate/projekt.
 import { afterAll, describe, expect, it } from 'vitest';
-import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, statSync, symlinkSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { migrateProject } from '../scripts/migrate-from-dss.mjs';
-import { loadMutated } from './helpers/script-mutation';
+import { loadMutated, mutateScripts } from './helpers/script-mutation';
 
 const FIXTURE = resolve(process.cwd(), 'tests/fixtures/migrate/projekt');
 const made: string[] = [];
@@ -149,5 +149,90 @@ describe('Mutationstests des Migrationsskripts', () => {
     const m = await import('../scripts/migrate-from-dss.mjs');
     expect(m.STANDARD_ENDUNGEN).not.toContain('.txt');
     expect(m.STANDARD_ENDUNGEN).toEqual(expect.arrayContaining(['.css', '.html', '.js', '.svelte', '.tsx', '.jsx', '.vue']));
+  });
+});
+
+describe('Schutz vor Beschädigung (Kodierung, Symlinks, Größe, Optionen)', () => {
+  const ALT = '.x { color: var(--dss-fg); } /* ';
+  const latin1 = () => Buffer.concat([Buffer.from(ALT, 'utf8'), Buffer.from([0xe4, 0xf6, 0xfc]), Buffer.from(' */\n', 'utf8')]);
+  const mitProblemen = () => {
+    const d = projekt();
+    writeFileSync(join(d, 'styles/latin1.css'), latin1());
+    writeFileSync(join(d, 'styles/binaer.css'), Buffer.concat([Buffer.from(ALT), Buffer.from([0, 1, 2]), Buffer.from(' */')]));
+    writeFileSync(join(d, 'styles/bom.css'), Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('.x { color: var(--dss-fg); }\n')]));
+    writeFileSync(join(d, 'styles/gross.css'), Buffer.from(`.x { color: var(--dss-fg); }\n${'/* x */\n'.repeat(5 * 1024 * 1024 / 8 + 10)}`));
+    symlinkSync(join(d, 'styles/app.css'), join(d, 'styles/link.css'));
+    return d;
+  };
+  it('Latin-1 und Binärdateien bleiben Byte für Byte unverändert und werden genannt', async () => {
+    const d = mitProblemen();
+    const l1 = readFileSync(join(d, 'styles/latin1.css'));
+    const bin = readFileSync(join(d, 'styles/binaer.css'));
+    const r = await migrateProject(d, { write: true });
+    expect(readFileSync(join(d, 'styles/latin1.css')).equals(l1)).toBe(true);
+    expect(readFileSync(join(d, 'styles/binaer.css')).equals(bin)).toBe(true);
+    const grund = (f: string) => r.skipped.find((k: { file: string }) => k.file === f)?.grund ?? '';
+    expect(grund('styles/latin1.css')).toContain('UTF-8');
+    expect(grund('styles/binaer.css')).toContain('binär');
+    expect(r.files.some((f: Datei) => f.file === 'styles/latin1.css')).toBe(false);
+  });
+  it('UTF-8 mit BOM wird umgeschrieben, das BOM bleibt', async () => {
+    const d = mitProblemen();
+    await migrateProject(d, { write: true });
+    const bytes = readFileSync(join(d, 'styles/bom.css'));
+    expect([...bytes.subarray(0, 3)]).toEqual([0xef, 0xbb, 0xbf]);
+    expect(bytes.toString('utf8')).toContain('var(--hoops-fg)');
+  });
+  it('Symlinks und zu große Dateien werden nicht verändert, aber in der Ausgabe genannt', async () => {
+    const d = mitProblemen();
+    const r = await migrateProject(d, { write: true });
+    const grund = (f: string) => r.skipped.find((k: { file: string }) => k.file === f)?.grund ?? '';
+    expect(grund('styles/link.css')).toContain('Symlink');
+    expect(grund('styles/gross.css')).toContain('MiB');
+    expect(read(d, 'styles/gross.css')).toContain('var(--dss-fg)');
+    expect(read(d, 'styles/app.css')).toContain('var(--hoops-fg)');
+  });
+  it('Aufruf: Übersprungenes steht in der Ausgabe; unbekannte Option ergibt Exit 2', () => {
+    const d = mitProblemen();
+    const script = resolve(process.cwd(), 'scripts/migrate-from-dss.mjs');
+    const out = spawnSync(process.execPath, [script, d], { encoding: 'utf8' });
+    expect(out.status).toBe(0);
+    expect(out.stdout).toContain('übersprungen: styles/latin1.css');
+    expect(out.stdout).toContain('übersprungen: styles/link.css');
+    const bad = spawnSync(process.execPath, [script, d, '--wirte'], { encoding: 'utf8' });
+    expect(bad.status).toBe(2);
+    expect(bad.stderr).toContain('Unbekannte Option: --wirte');
+  });
+  it('Mutation: ohne strenge UTF-8-Prüfung würde Latin-1 beschädigt', async () => {
+    const m = await loadMutated('migrate-from-dss.mjs', 'migrate-from-dss.mjs', 'fatal: true', 'fatal: false');
+    const d = mitProblemen();
+    const l1 = readFileSync(join(d, 'styles/latin1.css'));
+    await m.migrateProject(d, { write: true });
+    expect(readFileSync(join(d, 'styles/latin1.css')).equals(l1)).toBe(false);
+  });
+  it('Mutation: ohne Nullbyte-Prüfung wird die Binärdatei verändert', async () => {
+    const m = await loadMutated('migrate-from-dss.mjs', 'migrate-from-dss.mjs', 'if (bytes.includes(0))', 'if (false)');
+    const d = mitProblemen();
+    const bin = readFileSync(join(d, 'styles/binaer.css'));
+    await m.migrateProject(d, { write: true });
+    expect(readFileSync(join(d, 'styles/binaer.css')).equals(bin)).toBe(false);
+  });
+  it('Mutation: ohne Größengrenze wird die große Datei bearbeitet', async () => {
+    const m = await loadMutated('migrate-from-dss.mjs', 'migrate-from-dss.mjs', 'if (st.size > MAX_BYTES)', 'if (false)');
+    const d = mitProblemen();
+    await m.migrateProject(d, { write: true });
+    expect(read(d, 'styles/gross.css')).toContain('var(--hoops-fg)');
+  });
+  it('Mutation: ohne Symlink-Behandlung wird nichts genannt', async () => {
+    const m = await loadMutated('migrate-from-dss.mjs', 'migrate-from-dss.mjs', "if (e.isSymbolicLink()) { yield", 'if (false) { yield');
+    const d = mitProblemen();
+    const r = await m.migrateProject(d);
+    expect(r.skipped.some((k: { file: string }) => k.file === 'styles/link.css')).toBe(false);
+  });
+  it('Mutation: unbekannte Optionen werden still hingenommen', () => {
+    const dir = mutateScripts('migrate-from-dss.mjs', 'if (unbekannt.length) {', 'if (false) {');
+    const d = projekt();
+    const r = spawnSync(process.execPath, [join(dir, 'migrate-from-dss.mjs'), d, '--wirte'], { encoding: 'utf8' });
+    expect(r.status).toBe(0);
   });
 });

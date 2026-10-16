@@ -21,22 +21,27 @@ import { pathToFileURL } from 'node:url';
 import { STUFEN } from './migration-table.mjs';
 import { buildRegexes, tableFromPairs, transformText } from './lib/token-rename.mjs';
 
-export const STANDARD_ENDUNGEN = ['.css', '.scss', '.sass', '.less', '.html', '.htm', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.svelte', '.vue', '.mdx', '.md'];
+export const STANDARD_ENDUNGEN = ['.css', '.scss', '.sass', '.less', '.html', '.htm', '.js', '.mjs', '.cjs', '.ts', '.tsx', '.jsx', '.svelte', '.vue', '.mdx', '.md', '.svg'];
 export const IGNORIERT = new Set(['node_modules', '.git', 'dist', 'build', '.next', '.nuxt', '.svelte-kit', '.output', '.turbo', '.cache', 'coverage', 'storybook-static']);
 const MAX_BYTES = 5 * 1024 * 1024;
 
+/** Liefert Dateien `{ file }` und Übersprungenes `{ skip, grund }` (Symlinks werden nie verfolgt, aber genannt). */
 async function* walk(dir, root, endungen) {
   for (const e of (await readdir(dir, { withFileTypes: true })).sort((a, b) => a.name.localeCompare(b.name))) {
     const full = join(dir, e.name);
-    if (e.isSymbolicLink()) continue;
+    if (e.isSymbolicLink()) { yield { skip: full, grund: 'Symlink (wird nicht verfolgt)' }; continue; }
     if (e.isDirectory()) { if (!IGNORIERT.has(e.name)) yield* walk(full, root, endungen); continue; }
-    if (e.isFile() && endungen.has(extname(e.name).toLowerCase())) yield full;
+    if (e.isFile() && endungen.has(extname(e.name).toLowerCase())) yield { file: full };
   }
 }
 
+const UTF8 = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true });
+
 /**
  * Wendet die gewählten Stufen auf ein Projekt an. `write: false` (Standard) schreibt nichts.
- * Rückgabe: { files: [{ file, hits: { alt: Anzahl }, total }], total, written }
+ * Rückgabe: { files: [{ file, hits: { alt: Anzahl }, total }], total, written, skipped: [{ file, grund }] }.
+ * Nie überschrieben werden Dateien, die kein gültiges UTF-8 sind (zum Beispiel Latin-1) oder Nullbytes enthalten, Symlinks und Dateien über 5 MiB;
+ * sie stehen in `skipped`.
  */
 export async function migrateProject(root, { write = false, stufen = null, endungen = STANDARD_ENDUNGEN } = {}) {
   const base = resolve(root);
@@ -46,13 +51,19 @@ export async function migrateProject(root, { write = false, stufen = null, endun
   if (gewaehlt.length === 0) throw new Error(`Keine passende Stufe (vorhanden: ${STUFEN.map(([id]) => id).join(', ')})`);
   const tables = gewaehlt.map(([, , pairs]) => { const t = tableFromPairs(pairs); return [t, buildRegexes(t)]; });
   const files = [];
+  const skipped = [];
+  const rel = (f) => relative(base, f).split(sep).join('/');
   let total = 0;
   let written = 0;
-  for await (const file of walk(base, base, new Set(endungen))) {
+  for await (const entry of walk(base, base, new Set(endungen))) {
+    if (entry.skip) { skipped.push({ file: rel(entry.skip), grund: entry.grund }); continue; }
+    const file = entry.file;
     const st = await lstat(file);
-    if (st.size > MAX_BYTES) continue;
-    const text = await readFile(file, 'utf8');
-    if (text.includes('\u0000')) continue;
+    if (st.size > MAX_BYTES) { skipped.push({ file: rel(file), grund: `größer als ${MAX_BYTES / 1024 / 1024} MiB` }); continue; }
+    const bytes = await readFile(file);
+    if (bytes.includes(0)) { skipped.push({ file: rel(file), grund: 'binär (enthält Nullbytes)' }); continue; }
+    let text;
+    try { text = UTF8.decode(bytes); } catch { skipped.push({ file: rel(file), grund: 'kein gültiges UTF-8 (zum Beispiel Latin-1); nicht verändert' }); continue; }
     let current = text;
     const hits = {};
     for (const [table, regexes] of tables) {
@@ -62,16 +73,22 @@ export async function migrateProject(root, { write = false, stufen = null, endun
     }
     if (current === text) continue;
     const n = Object.values(hits).reduce((a, b) => a + b, 0);
-    files.push({ file: relative(base, file).split(sep).join('/'), hits, total: n });
+    files.push({ file: rel(file), hits, total: n });
     total += n;
     if (write) { await writeFile(file, current); written++; }
   }
-  return { files, total, written };
+  return { files, total, written, skipped };
 }
 
 async function main() {
   const argv = process.argv.slice(2);
   const pos = argv.filter((a) => !a.startsWith('--'));
+  const bekannt = /^--(dry-run|write|json|stufen=.*|ext=.*)$/;
+  const unbekannt = argv.filter((a) => a.startsWith('--') && !bekannt.test(a));
+  if (unbekannt.length) {
+    console.error(`Unbekannte Option: ${unbekannt.join(', ')}\nAufruf: migrate-from-dss.mjs <projektordner> [--dry-run | --write] [--stufen=T] [--ext=.css,.vue] [--json]`);
+    process.exit(2);
+  }
   const opt = (k) => argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3);
   const write = argv.includes('--write');
   if (pos.length !== 1 || (write && argv.includes('--dry-run'))) {
@@ -88,6 +105,7 @@ async function main() {
     console.log(`${write ? 'geändert' : 'würde ändern'}: ${f.file} (${f.total})`);
     for (const [alt, n] of Object.entries(f.hits)) console.log(`    ${alt} ×${n}`);
   }
+  for (const k of result.skipped) console.log(`übersprungen: ${k.file} (${k.grund})`);
   console.log(`\n${result.files.length} Dateien, ${result.total} Treffer${write ? `, ${result.written} Dateien geschrieben` : ' (Probelauf, nichts geschrieben; zum Schreiben --write)'}.`);
   if (write) console.log('Rückgängig machen: im Projekt `git restore .` (vorher den Git-Stand gesichert haben).');
   else if (result.files.length) console.log('Vor --write den Git-Stand sichern (committen oder `git stash`); zurücknehmen mit `git restore .`.');
