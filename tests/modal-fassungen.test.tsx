@@ -1,5 +1,5 @@
 // Vergleich der Fassungen (Tabelle „Verhalten je Fassung“ in stories/Modal.mdx): Fokus beim Öffnen und Schließen, Seite dahinter, Scroll-Sperre.
-// Svelte und React haben bekannte Lücken; die Vanilla-Fassung schließt sie. Die Komponenten werden hier nicht geändert.
+// Alle drei Fassungen verhalten sich gleich (Welle 1, Punkte 1.1 und 1.2 im Lückenplan); Svelte nutzt initModal aus js/modal.js.
 import { act, cleanup, fireEvent, render } from '@testing-library/react';
 import { flushSync, mount, unmount } from 'svelte';
 import { useState } from 'react';
@@ -29,7 +29,7 @@ function ReactPage() {
 }
 
 describe('React (Radix Dialog)', () => {
-  it('Fokus ins Modal, Seite abgeschaltet, Scrollen gesperrt; beim Schließen fällt der Fokus nicht an den Auslöser zurück', async () => {
+  it('Fokus ins Modal, Seite abgeschaltet, Scrollen gesperrt; beim Schließen kehrt der Fokus zum Auslöser zurück', async () => {
     render(<ReactPage />);
     const trigger = document.getElementById('auf')!;
     trigger.focus();
@@ -39,12 +39,22 @@ describe('React (Radix Dialog)', () => {
     expect(document.body.hasAttribute('data-scroll-locked')).toBe(true);
     await act(async () => { fireEvent.keyDown(document.activeElement!, { key: 'Escape' }); });
     expect(document.querySelector('[role="dialog"]')).toBeNull();
-    expect(document.activeElement).not.toBe(trigger);
+    expect(document.activeElement).toBe(trigger);
+  });
+
+  it('Fokusrückgabe auch beim Schließen über die Fußzeile (open per Zustand)', async () => {
+    render(<ReactPage />);
+    const trigger = document.getElementById('auf')!;
+    trigger.focus();
+    await act(async () => { fireEvent.click(trigger); });
+    await act(async () => { fireEvent.click(document.querySelector<HTMLElement>('.hoops-m-footer button')!); });
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
   });
 });
 
-describe('Svelte', () => {
-  it('der Fokus bleibt auf dem Auslöser, die Seite bleibt bedienbar, das Scrollen ist nicht gesperrt, nach dem Schließen bleibt der Fokus unberührt', () => {
+describe('Svelte (initModal aus js/modal.js)', () => {
+  const setup = () => {
     const target = document.createElement('div');
     document.body.append(target);
     const instance = mount(SvelteHost, { target });
@@ -53,14 +63,42 @@ describe('Svelte', () => {
     trigger.focus();
     fireEvent.click(trigger);
     flushSync();
+    return { instance, trigger };
+  };
+  it('Fokus ins Modal, Seite inert, Scrollen gesperrt; beim Schließen zurück an den Auslöser', () => {
+    const { instance, trigger } = setup();
     const dialog = document.querySelector('[role="dialog"]')!;
-    expect(dialog).not.toBeNull();
-    expect(dialog.contains(document.activeElement)).toBe(false);
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    expect(document.getElementById('seite')!.hasAttribute('inert')).toBe(true);
+    expect(trigger.hasAttribute('inert')).toBe(true);
+    expect(document.documentElement.style.overflow).toBe('hidden');
+    fireEvent.keyDown(document.activeElement!, { key: 'Escape' });
+    flushSync();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
     expect(document.activeElement).toBe(trigger);
     expect(document.getElementById('seite')!.hasAttribute('inert')).toBe(false);
     expect(document.documentElement.style.overflow).toBe('');
-    expect(document.body.hasAttribute('data-scroll-locked')).toBe(false);
     unmount(instance);
+  });
+  it('Tab bleibt im Modal (Falle) und der Schließen-Knopf schließt, das Symbol ist aria-hidden', () => {
+    const { instance, trigger } = setup();
+    const dialog = document.querySelector('[role="dialog"]')!;
+    const close = dialog.querySelector<HTMLElement>('.hoops-m-close')!;
+    expect(close.querySelector('svg')!.getAttribute('aria-hidden')).toBe('true');
+    close.focus();
+    fireEvent.keyDown(close, { key: 'Tab' });
+    expect(dialog.contains(document.activeElement)).toBe(true);
+    fireEvent.click(close);
+    flushSync();
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(trigger);
+    unmount(instance);
+  });
+  it('wird das Modal mit der Komponente abgeräumt, bleibt weder inert noch eine Scroll-Sperre zurück', () => {
+    const { instance } = setup();
+    unmount(instance);
+    expect(document.querySelector('[inert]')).toBeNull();
+    expect(document.documentElement.style.overflow).toBe('');
   });
 });
 

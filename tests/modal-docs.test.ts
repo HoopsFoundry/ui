@@ -112,8 +112,8 @@ describe('Doku-Seite', () => {
     expect(mdx).toContain('ModalStories.DontFokus');
     expect(read('stories/docs/blocks/DosDonts.tsx')).toContain('{...INERT}');
   });
-  it('die Tabelle „Verhalten je Fassung“ hat die Vanilla-Spalte; die Lücken von Svelte und React sind benannt', () => {
-    for (const part of ['Vanilla (initModal)', 'Fokus beim Schließen', 'Ja, an den Auslöser', 'Scrollen der Seite', 'bekannte Lücken', 'Gesperrt, beim Schließen zurückgebaut']) expect(mdx, part).toContain(part);
+  it('die Tabelle „Verhalten je Fassung“ hat die Vanilla-Spalte; Svelte, React und Vanilla verhalten sich gleich', () => {
+    for (const part of ['Vanilla (initModal)', 'Fokus beim Schließen', 'Ja, an den Auslöser', 'Scrollen der Seite', 'Alle drei Fassungen verhalten sich gleich', 'Gesperrt, beim Schließen zurückgebaut']) expect(mdx, part).toContain(part);
   });
   it('die Überschriftenebene im Markup ist beschrieben (Rangfolge, h2 bis h6, Inhalt eine Ebene tiefer)', () => {
     for (const part of ['Überschriftenebene im Markup', 'HeadingLevel', 'Die Rangfolge', 'h2` bis `h6', 'Titel `h2`, darin `h3`']) expect(mdx, part).toContain(part);

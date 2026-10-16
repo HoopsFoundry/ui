@@ -1,5 +1,5 @@
 import * as Dialog from '@radix-ui/react-dialog';
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { SeverityIcon, type Severity } from './SeverityIcon';
 import { cn } from './cn';
 import { HeadingLevelContext, type HeadingTag } from './HeadingLevel';
@@ -45,6 +45,13 @@ export function Modal({
   className,
   children,
 }: ModalProps) {
+  // Radix gibt den Fokus nur an einen Dialog.Trigger zurück; die Komponente hat keinen, also merken wir uns das Element, das beim Öffnen den Fokus hatte
+  const returnTo = useRef<HTMLElement | null>(null);
+  useLayoutEffect(() => {
+    if (!open) return;
+    const active = document.activeElement;
+    returnTo.current = active instanceof HTMLElement && active !== document.body ? active : null;
+  }, [open]);
   const blockOutsideDismiss = !closable || !dismissOnBackdrop;
   const TitleTag = resolveHeading(titleAs, 2);
   const contentLevel = nextLevel(levelOfTag(TitleTag));
@@ -59,6 +66,14 @@ export function Modal({
             className={cn('hoops-modal', size !== 'md' && `hoops-modal--${size}`, className)}
             onInteractOutside={(event) => {
               if (blockOutsideDismiss) event.preventDefault();
+            }}
+            onCloseAutoFocus={(event) => {
+              const target = returnTo.current;
+              returnTo.current = null;
+              if (target?.isConnected) {
+                event.preventDefault();
+                target.focus();
+              }
             }}
             onEscapeKeyDown={(event) => {
               if (!closable) event.preventDefault();

@@ -69,15 +69,15 @@ Wie viel Fokusverhalten das Modal selbst übernimmt, hängt von der Fassung ab. 
   rows={[
     ['Escape schließt', 'Ja, nur mit closable', 'Ja, nur mit closable', 'Ja, außer closable: false'],
     ['Klick auf den Hintergrund schließt', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit closable und dismissOnBackdrop ja', 'Nein (Standard); mit dismissOnBackdrop ja, nicht bei Mausdruck im Modal und Loslassen außen'],
-    ['Fokus beim Öffnen', 'Nein: der Fokus bleibt auf dem Auslöser hinter dem Modal', 'Ja, in das Modal', 'Ja: data-hoops-modal-focus, sonst die Fläche'],
-    ['Tab bleibt im Modal', 'Nein: Tab erreicht auch die Seite dahinter', 'Ja (Fokusfalle)', 'Ja (Fokusfalle, auch Umschalt+Tab; Tab läuft in jedem Browser über das Modal)'],
-    ['Fokus beim Schließen', 'Nein: du setzt ihn selbst zurück', 'Nein: die Komponente hat keinen Radix-Trigger, der Fokus fällt auf body, du setzt ihn selbst zurück', 'Ja, an den Auslöser (oder das zuvor fokussierte Element)'],
-    ['Seite dahinter', 'Bleibt bedienbar und lesbar', 'Wird abgeschaltet (Radix)', 'Abgeschaltet: natives dialog oder inert'],
-    ['Scrollen der Seite', 'Nicht gesperrt', 'Gesperrt (Radix)', 'Gesperrt, beim Schließen zurückgebaut'],
+    ['Fokus beim Öffnen', 'Ja: data-hoops-modal-focus, sonst die Fläche', 'Ja, in das Modal', 'Ja: data-hoops-modal-focus, sonst die Fläche'],
+    ['Tab bleibt im Modal', 'Ja (Fokusfalle, auch Umschalt+Tab)', 'Ja (Fokusfalle)', 'Ja (Fokusfalle, auch Umschalt+Tab; Tab läuft in jedem Browser über das Modal)'],
+    ['Fokus beim Schließen', 'Ja, an den Auslöser (oder das zuvor fokussierte Element)', 'Ja, an den Auslöser (oder das zuvor fokussierte Element)', 'Ja, an den Auslöser (oder das zuvor fokussierte Element)'],
+    ['Seite dahinter', 'Abgeschaltet (inert, beim Schließen zurückgebaut)', 'Wird abgeschaltet (Radix)', 'Abgeschaltet: natives dialog oder inert'],
+    ['Scrollen der Seite', 'Gesperrt, beim Schließen zurückgebaut', 'Gesperrt (Radix)', 'Gesperrt, beim Schließen zurückgebaut'],
   ]}
 />
 
-Die Svelte-Fassung und die React-Fassung geben den Fokus beim Schließen nicht zurück: Merke dir den Auslöser und fokussiere ihn nach dem Schließen selbst. In der Svelte-Fassung setzt du außerdem den Fokus beim Öffnen in das Modal (z. B. auf die Hauptaktion). Das sind bekannte Lücken dieser Fassungen, kein Verhalten, das für Vanilla gilt; sie bleiben vorerst, wie sie sind (siehe CHANGELOG).
+Alle drei Fassungen verhalten sich gleich: Der Fokus geht beim Öffnen ins Modal und beim Schließen an den Auslöser zurück, Tab bleibt im Modal, die Seite dahinter ist abgeschaltet und scrollt nicht. Die Svelte-Fassung startet dafür `initModal` auf ihrem Markup, die React-Fassung merkt sich das Element, das beim Öffnen den Fokus hatte (Radix kennt ohne `Dialog.Trigger` keinen Auslöser). Ist der Auslöser beim Schließen nicht mehr da, bleibt der Fokus unberührt.
 
 ## Zustände: Schließen und Aktionen
 

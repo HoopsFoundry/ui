@@ -69,7 +69,7 @@ Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeuglei
 
 ## Ohne Framework: initTabs
 
-Für statische Seiten gibt es denselben Baustein als Funktion: `initTabs(leiste, options)` macht eine vorhandene `hoops-tabs`-Leiste bedienbar, `initAll` startet jede Leiste mit `data-hoops="tabs"`. Es gelten dieselben Regeln wie in Svelte und React (Pfeiltasten wählen sofort, gesperrte Tabs werden übersprungen, am Rand geht es von vorn weiter, roving `tabindex`; ein Test vergleicht die Tastenfolgen aller drei Fassungen), dazu Pos1/Ende, die Panels (`aria-controls`, `hidden` und `inert` am nicht gewählten) und das Ereignis `hoops:tabchange`. Das Beispiel zeigt zwei Leisten des Vereinsregisters mit Panels: Alle/Heim/Auswärts und Liga/Pokal.
+Für statische Seiten gibt es denselben Baustein als Funktion: `initTabs(leiste, options)` macht eine vorhandene `hoops-tabs`-Leiste bedienbar, `initAll` startet jede Leiste mit `data-hoops="tabs"`. Es gelten dieselben Regeln wie in Svelte und React (Pfeiltasten wählen sofort, gesperrte Tabs werden übersprungen, am Rand geht es von vorn weiter, roving `tabindex`; Pos1/Ende springen an den Rand; ein Test vergleicht die Tastenfolgen aller drei Fassungen), dazu die Panels (`aria-controls`, `hidden` und `inert` am nicht gewählten) und das Ereignis `hoops:tabchange`. Das Beispiel zeigt zwei Leisten des Vereinsregisters mit Panels: Alle/Heim/Auswärts und Liga/Pokal.
 
 <Canvas of={TabsStories.VanillaRegister} />
 

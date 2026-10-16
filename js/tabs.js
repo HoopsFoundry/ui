@@ -4,7 +4,7 @@
  * `initTabs(root, options)` macht eine `hoops-tabs`-Leiste (`role="tablist"`) bedienbar. Es gelten dieselben Regeln wie in svelte/Tabs.svelte und
  * react/Tabs.tsx: Pfeiltasten in Richtung der Leiste (waagerecht links/rechts, bei `vertical` auf/ab) wählen den Nachbarn sofort und
  * fokussieren ihn, gesperrte Tabs werden übersprungen, am Rand geht es von vorn weiter; nur der gewählte Tab ist per Tab-Taste erreichbar
- * (roving tabindex, `aria-selected`). Dazu kommen Pos1/Ende (in den Frameworks nicht belegt), eine Leiste mit `role="group"` und
+ * (roving tabindex, `aria-selected`). Pos1/Ende springen an den ersten bzw. letzten Tab. Dazu kommen eine Leiste mit `role="group"` und
  * `aria-pressed` (Mehrfachauswahl, Pills als Filter) und optional manuelle Aktivierung, Deep-Link über den URL-Anker und RTL.
  * Panels hängen über `aria-controls` am Tab; das nicht gewählte Panel bekommt `hidden` und `inert`. Wechsel melden `hoops:tabchange`.
  * Rückgabe `{ destroy(), select(), getValue() }` (js/lifecycle.js); `destroy` stellt das Markup wieder her. Kein `innerHTML`,
