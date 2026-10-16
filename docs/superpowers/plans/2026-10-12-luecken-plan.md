@@ -12,7 +12,7 @@ Stand 2026-10-16: erledigt (✓) sind 1.1, 1.2, 1.4, 1.5, 1.7, 1.8, 1.9 (Branch 
 |---|---|---|---|---|
 | 1.1 ✓ | Svelte-Modal: kein Fokus ins Modal, keine Falle, keine Fokusrückgabe, Seite nicht abgeschaltet, Scrollen nicht gesperrt, Schließen-Symbol ohne `aria-hidden` | `svelte/Modal.svelte` | Verhalten aus `js/modal.js` (V1b) als gemeinsame Logik nutzen oder nachbauen; Tests wie beim Vanilla-Modal; Parität mit React | M |
 | 1.2 ✓ | React-Modal (Radix): Fokus geht beim Schließen nicht an den Auslöser zurück | `react/Modal.tsx` | `onCloseAutoFocus` bzw. Auslöser merken; Test | S |
-| 1.3 | `safeHref` lässt protokoll-relative Ziele (`//evil.example/x`) durch | `js/url.js` | Entscheidung: ablehnen (Standard) oder Option `allowProtocolRelative`; Tabellentest; Map, Venue, PageNav prüfen | S |
+| 1.3 ✓ | `safeHref` lässt protokoll-relative Ziele (`//evil.example/x`) durch | `js/url.js` | Entscheidung: ablehnen (Standard) oder Option `allowProtocolRelative`; Tabellentest; Map, Venue, PageNav prüfen | S |
 | 1.4 ✓ | Tabs: Pos1/Ende nur in Vanilla, Svelte/React „nicht belegt" | `svelte/Tabs.svelte`, `react/Tabs.tsx` | Home/End nachrüsten (gemeinsame `nextTab`-Logik); Paritätstest erweitern; Doku-Tabelle aktualisieren | S |
 | 1.5 ✓ | MatchCard: Trikotpunkt im Dunkelmodus kaum sichtbar (`--team-heim`, 1,57:1 bis 2,66:1) | `css/components.css` (MatchCard, ggf. ScheduleGrid) | gleicher Rand in `--dss-mute` wie bei VenueCard; Kontrasttest hell/dunkel × BBV/DBB | S |
 | 1.6 | Map: Speicherzuwachs beim Ein-/Aushängen (Reviewer ja, Entwickler nein) | `js/map-leaflet.js`, Komponenten | Gegenprobe mit dem Messaufbau des Reviewers (Storybook-Seite, CDP-Metriken, 5→45 Zyklen); Ergebnis dokumentieren, ggf. Ursache beheben | M |
