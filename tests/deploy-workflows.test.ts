@@ -72,8 +72,10 @@ describe('Rückfall und .htaccess', () => {
     expect(pages).not.toMatch(/\n {2}push:/);
     expect(pages).toContain('workflow_dispatch:');
   });
-  it('.htaccess setzt HTTPS, Header und eine Report-Only-CSP', () => {
-    for (const part of ['RewriteCond %{HTTPS} !=on', 'X-Content-Type-Options "nosniff"', 'Referrer-Policy', 'Content-Security-Policy-Report-Only', 'Strict-Transport-Security']) expect(htaccess, part).toContain(part);
-    expect(htaccess).not.toMatch(/\bContent-Security-Policy "/);
+  it('.htaccess setzt HTTPS, Header und eine scharfe CSP', () => {
+    for (const part of ['RewriteCond %{HTTPS} !=on', 'X-Content-Type-Options "nosniff"', 'Referrer-Policy', 'Content-Security-Policy "default-src \'self\'', 'Strict-Transport-Security']) expect(htaccess, part).toContain(part);
+    expect(htaccess).not.toMatch(/^\s*Header .*Report-Only/m);
+    // Mutation: wieder als Bericht gesetzt → die Regel würde kippen
+    expect(htaccess.replace('Content-Security-Policy "', 'Content-Security-Policy-Report-Only "')).toMatch(/^\s*Header .*Report-Only/m);
   });
 });
