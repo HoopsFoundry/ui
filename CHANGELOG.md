@@ -7,7 +7,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 
 ### Hinzugefügt
 
-- **Auslieferung:** Workflow `deploy-webspace.yml` (Storybook per rsync auf den Webspace, bei Push auf `main`, manuell mit Probelauf als Standard), `deploy/htaccess` (HTTPS, Header, CSP als Report-Only), Workflow `publish-npm.yml` (npm per Trusted Publishing, nur manuell, ohne Token). GitHub Pages (`deploy-storybook.yaml`) ist nur noch der manuelle Rückfall. Siehe ADR-009.
+- **Auslieferung:** Workflow `deploy-webspace.yml` (Storybook per rsync auf den Webspace, bei Push auf `main`, manuell mit Probelauf als Standard), `deploy/htaccess` (HTTPS, Header, CSP als Report-Only), Workflow `publish-npm.yml` (npm per Trusted Publishing beim Push eines Tags `v*`, ohne Token). GitHub Pages (`deploy-storybook.yaml`) ist nur noch der manuelle Rückfall. Siehe ADR-009.
 - **Projektkonfiguration:** `project.config.json` als eine Quelle für Repo, Domain, Release-Adresse und Paketname; `hoops-sync` liest die Release-Adresse aus `--base-url`, der Variablen `HOOPS_UI_BASE_URL` oder dem eingebauten Wert. Siehe ADR-010.
 
 ### Behoben

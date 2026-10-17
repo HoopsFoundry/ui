@@ -6,7 +6,7 @@
 * Storybook wird lokal mit `npm run storybook` betrieben.
 * `npm run build-storybook` erzeugt die statische Veröffentlichung.
 * `.github/workflows/deploy-webspace.yml` baut das Storybook und überträgt es per rsync über SSH auf den All-Inkl-Webspace (ui.hoopsfoundry.com); `deploy/htaccess` liefert HTTPS-Umleitung und Sicherheits-Header. `.github/workflows/deploy-storybook.yaml` (GitHub Pages) ist nur noch der manuelle Rückfall.
-* `.github/workflows/publish-npm.yml` veröffentlicht manuell per Trusted Publishing (OIDC) auf npm.
+* `.github/workflows/publish-npm.yml` veröffentlicht beim Push eines Tags `v*` per Trusted Publishing (OIDC) auf npm.
 * React-Artefakte werden über `npm run build:react` erzeugt.
 * `package.json` definiert die Inhalte und öffentlichen Exports des Pakets.
 
@@ -15,7 +15,7 @@ Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus
 === Webspace und npm
 
 * Webspace: Gebaut wird auf GitHub (kein Node auf dem Webspace). Zugangsdaten sind Repository-Secrets (`DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_PATH`); der Schlüssel gehört einem eingeschränkten Benutzer, der Host-Schlüssel wird geprüft (`StrictHostKeyChecking=yes`). Der Workflow läuft bei jedem Push auf `main`; manuell startet er mit `dry_run: true` (Standard) und zeigt mit `rsync -n` nur die Änderungen. Probelauf und erster echter Lauf sind auf GitHub durchgelaufen. `--delete` entfernt Altdateien, der Ordner `releases/` bleibt. Die Tests prüfen Aufbau und Regeln (`tests/deploy-workflows.test.ts`).
-* npm: `publish-npm.yml` läuft nur manuell, mit `id-token: write` und ohne Token. Voraussetzung ist ein Trusted Publisher bei npm mit genau diesem Dateinamen. Ein echter Lauf (`dry_run: false`) geht nur auf dem Tag `v<version>` (Version aus `package.json`, Commit auf `main`). Das Secret `NPM_ATOKEN` wird nicht verwendet.
+* npm: `publish-npm.yml` läuft beim Push eines Tags `v*` (zum Wiederholen manuell mit dem Tag als Ref), mit `id-token: write` und ohne Token. Voraussetzung ist ein Trusted Publisher bei npm mit genau diesem Dateinamen. Der Tag muss `v<version>` aus `package.json` heißen, sonst bricht der Lauf ab. Das Secret `NPM_ATOKEN` wird nicht verwendet. Der Aufbau folgt dem Release-Workflow von Open Coaching Format.
 
 === Vanilla-Auslieferung
 

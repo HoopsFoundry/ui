@@ -3,17 +3,14 @@ name: Publish to npm
 # Veröffentlicht @hoopsfoundry/ui auf npm per Trusted Publishing (OIDC, kein Token).
 # Voraussetzung bei npm: Trusted Publisher für dieses Paket mit Organisation HoopsFoundry, Repository ui,
 # Workflow-Datei `publish-npm.yml` (Dateiname muss exakt stimmen).
-# Nur manuell. `dry_run: true` (Standard) prüft und baut und führt `npm publish --dry-run` aus, es wird nichts veröffentlicht.
-# Ein echter Lauf (`dry_run: false`) ist nur auf einem Tag `v<version>` möglich, dessen Version package.json entspricht.
+# Läuft beim Push eines Tags `v*`; zum Wiederholen manuell starten, dabei den Tag als Ref wählen.
+# Der Tag muss zur Version in package.json passen.
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Nur prüfen (npm publish --dry-run), nichts veröffentlichen'
-        required: true
-        default: true
-        type: boolean
 
 permissions:
   contents: read
@@ -37,18 +34,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v7
         with:
-          fetch-depth: 0
           persist-credentials: false
 
       - name: Set up Node.js
         uses: actions/setup-node@v7
         with:
           node-version: '22'
-          cache: npm
           registry-url: 'https://registry.npmjs.org'
 
-      - name: npm aktualisieren (Trusted Publishing braucht npm 11.5.1 oder neuer)
-        run: npm install -g npm@^11.5.1
+      # Trusted Publishing braucht npm 11.5.1 oder neuer; das npm von Node 22 ist älter.
+      - name: npm aktualisieren
+        run: npm install -g npm@latest
+
+      - name: Tag und Version prüfen
+        env:
+          REF_NAME: ${{ github.ref_name }}
+          REF_TYPE: ${{ github.ref_type }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./package.json').version")"
+          if [ "$REF_TYPE" != "tag" ] || [ "$REF_NAME" != "v$version" ]; then
+            echo "::error::Der Lauf braucht den Tag v$version (aktuell: $REF_TYPE $REF_NAME)"
+            exit 1
+          fi
 
       - name: Install dependencies
         run: npm ci
@@ -62,31 +70,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Version und Tag prüfen
-        if: inputs.dry_run == false
-        env:
-          REF_NAME: ${{ github.ref_name }}
-          REF_TYPE: ${{ github.ref_type }}
-        run: |
-          set -euo pipefail
-          version="$(node -p "require('./package.json').version")"
-          if [ "$REF_TYPE" != "tag" ] || [ "$REF_NAME" != "v$version" ]; then
-            echo "Ein echter Lauf braucht den Tag v$version (aktuell: $REF_TYPE $REF_NAME)"
-            exit 1
-          fi
-          git fetch --no-tags origin main
-          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
-            echo "Der Commit des Tags liegt nicht auf main"
-            exit 1
-          fi
-
       - name: Veröffentlichen
-        env:
-          DRY_RUN: ${{ inputs.dry_run }}
-        run: |
-          set -euo pipefail
-          if [ "$DRY_RUN" = "true" ]; then
-            npm publish --access public --dry-run
-          else
-            npm publish --access public
-          fi
+        run: npm publish --access public
