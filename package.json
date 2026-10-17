@@ -204,7 +204,8 @@
     "./portal-sync.mjs": "./scripts/portal-sync.mjs"
   },
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./js/i18n/de-register.js"
   ],
   "files": [
     "tokens/",
