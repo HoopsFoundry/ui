@@ -10,6 +10,8 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 - **Auslieferung:** Workflow `deploy-webspace.yml` (Storybook per rsync auf den Webspace, bei Push auf `main`, manuell mit Probelauf als Standard), `deploy/htaccess` (HTTPS, Header, CSP als Report-Only), Workflow `publish-npm.yml` (npm per Trusted Publishing beim Push eines Tags `v*`: gestuft bereitstellen, Freigabe mit 2FA auf npmjs.com, ohne Token). GitHub Pages (`deploy-storybook.yaml`) ist nur noch der manuelle Rückfall. Siehe ADR-009.
 - **Projektkonfiguration:** `project.config.json` als eine Quelle für Repo, Domain, Release-Adresse und Paketname; `hoops-sync` liest die Release-Adresse aus `--base-url`, der Variablen `HOOPS_UI_BASE_URL` oder dem eingebauten Wert. Siehe ADR-010.
 
+- **Internationalisierung, Infrastruktur (noch ohne Wirkung auf die Komponenten):** `@hoopsfoundry/ui/i18n` (Kern mit `t`, `setLocale`, `registerLocale`, `setTexts`, `subscribe`), `@hoopsfoundry/ui/i18n/format` (`formatNumber`, `formatCoords`), die Kataloge `@hoopsfoundry/ui/i18n/en` und `@hoopsfoundry/ui/i18n/de` (168 Schlüssel je Sprache; `de` registriert sich beim Import), das Prüfskript `scripts/check-i18n.mjs` und das Inventar der festen Texte. Die Komponenten bleiben in dieser Fassung deutsch und unverändert; die Verdrahtung und der Wechsel der Standardsprache auf Englisch folgen später. Siehe ADR-012.
+
 ### Behoben
 
 - `safeHref` lehnt protokoll-relative Ziele ab (`//host`, `/\\host`); sie führten auf einen fremden Host. Wer so ein Ziel braucht, gibt den vollen `https://`-Link an.

@@ -172,6 +172,22 @@
       "types": "./js/render/venue-card.d.ts",
       "import": "./js/render/venue-card.js"
     },
+    "./i18n": {
+      "types": "./js/i18n/index.d.ts",
+      "import": "./js/i18n/index.js"
+    },
+    "./i18n/format": {
+      "types": "./js/i18n/format.d.ts",
+      "import": "./js/i18n/format.js"
+    },
+    "./i18n/en": {
+      "types": "./js/i18n/catalog.d.ts",
+      "import": "./js/i18n/en.js"
+    },
+    "./i18n/de": {
+      "types": "./js/i18n/catalog.d.ts",
+      "import": "./js/i18n/de-register.js"
+    },
     "./vanilla": {
       "types": "./dist/vanilla/hoops.d.ts",
       "import": "./dist/vanilla/hoops.js"
@@ -188,7 +204,8 @@
     "./portal-sync.mjs": "./scripts/portal-sync.mjs"
   },
   "sideEffects": [
-    "**/*.css"
+    "**/*.css",
+    "./js/i18n/de-register.js"
   ],
   "files": [
     "tokens/",

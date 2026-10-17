@@ -8,9 +8,9 @@ import { describe, expect, it } from 'vitest';
 const dir = resolve(process.cwd(), 'js');
 const modules = readdirSync(dir).filter((f) => f.endsWith('.js') && f !== 'map-leaflet.js'); // map-leaflet.js importiert Leaflet erst bei Bedarf, ist aber kein Teil der Vanilla-Bausteine
 describe('sideEffects: false (außer CSS)', () => {
-  it('package.json nennt nur CSS als Datei mit Nebenwirkung', () => {
+  it('package.json nennt nur CSS und das deutsche Sprachmodul (registriert sich beim Import) als Dateien mit Nebenwirkung', () => {
     const pkg = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'));
-    expect(pkg.sideEffects).toEqual(['**/*.css']);
+    expect(pkg.sideEffects).toEqual(['**/*.css', './js/i18n/de-register.js']);
   });
   it.each(modules)('%s: Import ändert globalThis nicht und wirft in Node nicht', async (file) => {
     const before = [...Object.getOwnPropertyNames(globalThis), ...Object.getOwnPropertySymbols(globalThis).map(String)].sort();
