@@ -21,7 +21,7 @@ Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus
 
 Entscheidung und Begründung: ADR-006.
 
-Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält drei Bündel nebeneinander: `hoops.js` (Kern), `hoops-render.js` (importiert `./hoops.js`) und `hoops-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
+Bis Version 1.0 ist das GitHub-Release mit `dist/vanilla` der Weg, ab 1.0 npm; der Aufbau von `dist/vanilla` bleibt. `dist/vanilla` enthält vier Bündel nebeneinander (`hoops-i18n-de.js`, der deutsche Katalog, registriert sich beim Import; `hoops-render.js`, `hoops-map.js` und `hoops-i18n-de.js` importieren den Sprachkern aus `hoops.js` und brauchen es daneben): `hoops.js` (Kern), `hoops-render.js` (importiert `./hoops.js`) und `hoops-map.js` (Karte, steht allein, siehe ADR-007); die Dateien einer Version gehören zusammen kopiert, die Karte dazu Leaflet aus dem Projekt (`leaflet.css`, `leaflet-src.esm.js`).
 
 [cols="1,2,2",options="header"]
 |===
