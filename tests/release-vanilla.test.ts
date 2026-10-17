@@ -320,7 +320,10 @@ describe('Programm: deutsche Fehler, Paketinhalt', () => {
   it('npm pack enthält portal-sync.mjs und lib/, aber weder das Release-Skript noch Browser-Prüfungen', () => {
     const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: process.cwd(), encoding: 'utf8' });
     expect(pack.status).toBe(0);
-    const files: string[] = JSON.parse(pack.stdout)[0].files.map((f: { path: string }) => f.path);
+    // npm bis 11 liefert eine Liste, ab npm 12 ein Objekt je Paketname
+    const parsed = JSON.parse(pack.stdout);
+    const info = Array.isArray(parsed) ? parsed[0] : Object.values(parsed)[0];
+    const files: string[] = (info as { files: { path: string }[] }).files.map((f) => f.path);
     for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/hoops.js']) expect(files, f).toContain(f);
     expect(files.filter((f) => f.startsWith('scripts/')).every((f) => ['scripts/portal-sync.mjs', 'scripts/migrate-from-dss.mjs', 'scripts/migration-table.mjs'].includes(f) || f.startsWith('scripts/lib/'))).toBe(true);
     // Migrationsskript der Umbenennung: Befehl hoops-migrate, mit Tabelle und Ersetzungslogik
