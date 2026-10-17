@@ -52,6 +52,15 @@ describe('Kataloge', () => {
     expect(en['team.record.draws']).toEqual({ one: '{count} draw', other: '{count} draws' });
     expect(de['team.record.draws']).toEqual({ one: '{count} Unentschieden', other: '{count} Unentschieden' });
   });
+  it('Englisch: amerikanische Schreibweise und Basketball-Kürzel', () => {
+    expect(en['venue.cancelled']).toBe('Canceled');
+    expect(en['schedule.state.cancelled']).toBe('canceled');
+    expect(JSON.stringify(Object.values(en))).not.toMatch(/[Cc]ancell/);
+    expect(en['periods.label.eighth']).toBe('Period {number}');
+    expect(en['periods.short.eighth']).toBe('P{number}');
+    expect(en['league.col.played-short']).toBe('GP');
+    expect(de['league.col.played-short']).toBe('SP');
+  });
   it('Himmelsrichtungen: deutsch Osten ist O', () => {
     expect(cats.de['common.direction.e']).toBe('O');
     expect(cats.en['common.direction.e']).toBe('E');
