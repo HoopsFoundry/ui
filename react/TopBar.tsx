@@ -25,7 +25,7 @@ export interface TopBarProps {
 
 /** Dunkle App-Leiste (56 px): Marke links, optionaler Spielkontext, Aktionen rechts. */
 export function TopBar({
-  brand = 'HoopsFoundry UI',
+  brand = 'Hoops',
   mark = 'D',
   context = 'default',
   matchLabel = '',

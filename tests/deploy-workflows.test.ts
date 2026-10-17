@@ -15,6 +15,7 @@ const deployRules = (y: string) => ({
   'Rechte nur lesen': /\npermissions:\n  contents: read\n/.test(y) && !/id-token|contents: write/.test(y),
   'Secrets nur über env, nicht in run': runBlocks(y).every((b) => !b.includes('${{')),
   'Host-Schlüssel werden geprüft': y.includes('StrictHostKeyChecking=yes') && y.includes('UserKnownHostsFile'),
+  'geänderter Host-Schlüssel wird erklärt': y.includes('Host key verification failed') && y.includes('DEPLOY_KNOWN_HOSTS mit der Ausgabe von ssh-keyscan') && y.includes('exit "$status"'),
   'Zielpfad wird auf Allgemeinheit geprüft': y.includes('DEPLOY_PATH ist zu allgemein'),
   'releases/ bleibt erhalten': y.includes("--exclude='/releases/'"),
   'Build vor Übertragung geprüft': y.includes('storybook-static/index.html'),
@@ -46,6 +47,7 @@ describe('deploy-webspace.yml', () => {
     ['Host-Schlüssel nicht geprüft', 'Host-Schlüssel werden geprüft', 'StrictHostKeyChecking=yes', 'StrictHostKeyChecking=no'],
     ['releases/ wird gelöscht', 'releases/ bleibt erhalten', "--exclude='/releases/'", ''],
     ['Schreibrecht', 'Rechte nur lesen', 'permissions:\n  contents: read', 'permissions:\n  contents: write'],
+    ['Hinweis zum Host-Schlüssel entfällt', 'geänderter Host-Schlüssel wird erklärt', 'DEPLOY_KNOWN_HOSTS mit der Ausgabe von ssh-keyscan', 'DEPLOY_KNOWN_HOSTS erneuern'],
     ['Zielpfad-Prüfung entfällt', 'Zielpfad wird auf Allgemeinheit geprüft', 'DEPLOY_PATH ist zu allgemein', 'x']
   ];
   for (const [name, rule, from, to] of M) it(`${name} → „${rule}“ kippt`, () => expect(deployRules(mutate(deploy, from, to))[rule as keyof ReturnType<typeof deployRules>]).toBe(false));

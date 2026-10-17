@@ -82,7 +82,14 @@ jobs:
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$known"
           flags=(-az --delete --exclude='/releases/' --itemize-changes)
           if [ "$DRY_RUN" = "true" ]; then flags+=(-n); echo "Probelauf: es wird nichts übertragen"; fi
+          err="$RUNNER_TEMP/rsync_err"
+          status=0
           rsync "${flags[@]}" \
             -e "ssh -i $key -o UserKnownHostsFile=$known -o StrictHostKeyChecking=yes -o IdentitiesOnly=yes" \
-            storybook-static/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/"
-          rm -f "$key" "$known"
+            storybook-static/ "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/" 2> "$err" || status=$?
+          cat "$err" >&2
+          if [ "$status" -ne 0 ] && grep -q "Host key verification failed" "$err"; then
+            echo "::error::Der SSH-Host-Schlüssel des Servers hat sich geändert (Host key verification failed). Fingerprint mit der Anzeige beim Hoster vergleichen, dann das Secret DEPLOY_KNOWN_HOSTS mit der Ausgabe von ssh-keyscan -t ed25519 <Host> erneuern. Die Prüfung bleibt absichtlich streng."
+          fi
+          rm -f "$key" "$known" "$err"
+          exit "$status"

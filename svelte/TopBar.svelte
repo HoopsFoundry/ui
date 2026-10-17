@@ -14,7 +14,7 @@
   import type { Snippet } from 'svelte';
 
   let {
-    brand = 'HoopsFoundry UI',
+    brand = 'Hoops',
     mark = 'D',
     context = 'default',
     matchLabel = '',

@@ -58,7 +58,7 @@ export const SOURCE_DIRS = ['svelte', 'svelte/internal', 'react', 'react/interna
 // Kleingeschriebene deutsche Einzelwörter lassen sich nicht an der Schreibweise erkennen; sie stehen hier ausdrücklich.
 const LOWER_WORDS = new Set(['abgesagt', 'verschoben', 'frei', 'gegen', 'aktuell', 'erledigt', 'ausstehend', 'gespielt', 'insgesamt', 'von', 'bis', 'zu', 'vs.']);
 // Tastennamen, Markennamen und Ereignisse sind keine Texte
-const NOT_TEXT = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape', 'Enter', 'Home', 'End', 'Tab', 'BUTTON', 'DETAILS', 'DOMContentLoaded', 'HoopsFoundry UI']);
+const NOT_TEXT = new Set(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Escape', 'Enter', 'Home', 'End', 'Tab', 'BUTTON', 'DETAILS', 'DOMContentLoaded', 'HoopsFoundry UI', 'Hoops']);
 // Entwickler-Warnungen bleiben deutsch und sind keine Texte für Endnutzer
 const DEV_PREFIX = /^(\[(hoops-map|HoopsFoundry UI)\]|HoopsFoundry UI(:| Modal)|Leaflet fehlt)/;
 
