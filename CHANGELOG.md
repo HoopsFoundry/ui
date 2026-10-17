@@ -13,7 +13,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 ### Geändert
 
 - **TopBar:** Der Standardtext der Marke (`brand`) ist jetzt „Hoops“ statt „HoopsFoundry UI“ (Svelte und React); die TopBar bleibt schmaler. Wer den alten Text will, übergibt `brand="HoopsFoundry UI"`.
-- **Deploy:** Die Content-Security-Policy der Doku-Seite ist scharf (`Content-Security-Policy` statt `Report-Only`, gleicher Inhalt); alle 588 Storybook-Einträge laden in Chromium ohne Verstoß.
+- **Deploy:** Die Content-Security-Policy der Doku-Seite ist scharf (`Content-Security-Policy` statt `Report-Only`, gleicher Inhalt); alle 588 Storybook-Einträge laden in Chromium ohne Verstoß. Die Kartenkacheln (`tile.openstreetmap.org`) sind in `img-src` ausdrücklich erlaubt, weil der Platzhalter `*.tile…` den Host ohne Unterdomäne nicht abdeckt.
 - Doku: Beschreibende Sätze in Button, Tabelle und Kartenbibliothek sprechen nicht mehr vom „Spielbericht“.
 
 ## [0.10.0] — 2026-10-17 — Umbenennung auf HoopsFoundry UI, Marken-Rollen und DBB-Marke

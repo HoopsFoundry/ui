@@ -74,6 +74,8 @@ describe('Rückfall und .htaccess', () => {
   });
   it('.htaccess setzt HTTPS, Header und eine scharfe CSP', () => {
     for (const part of ['RewriteCond %{HTTPS} !=on', 'X-Content-Type-Options "nosniff"', 'Referrer-Policy', 'Content-Security-Policy "default-src \'self\'', 'Strict-Transport-Security']) expect(htaccess, part).toContain(part);
+    // der Platzhalter *.tile… passt nicht auf den Host ohne Unterdomäne, von dem die Karte ihre Kacheln lädt
+    expect(htaccess).toContain('img-src \'self\' data: blob: https://tile.openstreetmap.org https://*.tile.openstreetmap.org;');
     expect(htaccess).not.toMatch(/^\s*Header .*Report-Only/m);
     // Mutation: wieder als Bericht gesetzt → die Regel würde kippen
     expect(htaccess.replace('Content-Security-Policy "', 'Content-Security-Policy-Report-Only "')).toMatch(/^\s*Header .*Report-Only/m);
