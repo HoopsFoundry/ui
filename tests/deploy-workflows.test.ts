@@ -30,7 +30,7 @@ const npmRules = (y: string) => {
     'kein Token, kein NPM_ATOKEN': !/NPM_ATOKEN|NODE_AUTH_TOKEN|NPM_TOKEN/.test(withoutComments(y)),
     'npm wird aktualisiert': y.includes('npm install -g npm@latest'),
     'Tag muss zur Version passen': y.includes('"$REF_NAME" != "v$version"') && y.includes('"$REF_TYPE" != "tag"'),
-    'Tests und Build vor dem Veröffentlichen': ['npm test', 'npm run typecheck', 'npm run build'].map((s) => y.indexOf(s)).every((i, k, a) => i > 0 && (k === 0 || i > a[k - 1])) && y.lastIndexOf('npm publish') > y.indexOf('npm run build'),
+    'Tests und Build vor dem Veröffentlichen': ['npm test', 'npm run typecheck', 'npm run build'].map((s) => y.indexOf(s)).every((i, k, a) => i > 0 && (k === 0 || i > a[k - 1])) && y.lastIndexOf('npm stage publish') > y.indexOf('npm run build'),
     'Workflow-Datei heißt wie im Trusted Publisher': y.includes('Workflow-Datei `publish-npm.yml`'),
     'keine ${{ }} in run': runBlocks(y).every((b) => !b.includes('${{'))
   } as Record<string, boolean>;
