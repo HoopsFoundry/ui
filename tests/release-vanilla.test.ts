@@ -321,7 +321,8 @@ describe('Programm: deutsche Fehler, Paketinhalt', () => {
     const pack = spawnSync('npm', ['pack', '--dry-run', '--json', '--ignore-scripts'], { cwd: process.cwd(), encoding: 'utf8' });
     expect(pack.status).toBe(0);
     // npm bis 11 liefert eine Liste, ab npm 12 ein Objekt je Paketname
-    const parsed = JSON.parse(pack.stdout);
+    // npm 10 führt `prepare` trotz --ignore-scripts aus: die Build-Ausgabe steht dann vor dem JSON, das in einer eigenen Zeile mit [ oder { beginnt
+    const parsed = JSON.parse(pack.stdout.slice(Math.max(0, pack.stdout.search(/^[[{]\s*$/m))));
     const info = Array.isArray(parsed) ? parsed[0] : Object.values(parsed)[0];
     const files: string[] = (info as { files: { path: string }[] }).files.map((f) => f.path);
     for (const f of ['scripts/portal-sync.mjs', 'scripts/lib/tar.mjs', 'scripts/lib/download.mjs', 'scripts/lib/fsutil.mjs', 'scripts/lib/errors.mjs', 'scripts/lib/runtime.mjs', 'dist/vanilla/hoops.js']) expect(files, f).toContain(f);
