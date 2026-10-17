@@ -24,6 +24,12 @@ import { chromium, firefox, webkit } from 'playwright';
 import { buildVanilla } from './build-vanilla.mjs';
 import { renderVenueCard } from '../js/render/venue-card.js';
 import { renderMap } from '../js/map-vanilla.js';
+import { registerLocale, setLocale } from '../js/i18n/index.js';
+import de from '../js/i18n/de.js';
+
+// Die Prüfungen erwarten deutsche Texte: Node-Seite (Markup aus den Quellmodulen) und Seiten (Bündel) setzen Deutsch
+registerLocale('de', de);
+setLocale('de');
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const args = Object.fromEntries(process.argv.slice(2).map((a) => a.replace(/^--/, '').split('=')));
@@ -71,7 +77,7 @@ const pageMany = () => `${head()}<main><h1>Mehrere Karten</h1>
 <div class="hoops-m-body"><div id="k5"></div></div></div></dialog></section></main>
 <script type="module">
 import { initAll } from '/hoops/hoops.min.js';
-import { mountMap } from '/hoops/hoops-map.min.js';
+import { mountMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 const tileUrl = '/tiles/{z}/{x}/{y}.png';
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
 window.__maps = {};
@@ -95,7 +101,7 @@ const pageLoader = (variant) => {
     : variant === 'kachel404' ? `() => import('/vendor/leaflet/leaflet-src.esm.js')`
     : `() => import('/vendor/leaflet/fehlt.js')`;
   return `${head(importmap)}<main><h1>Lader ${variant}</h1><div id="k"></div></main><script type="module">
-import { mountMap } from '/hoops/hoops-map.min.js';
+import { mountMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 window.__errors = [];
 mountMap(document.getElementById('k'), { label: 'Karte', markers: ${JSON.stringify(HALLEN)}, tileUrl: '${variant === 'kachel404' ? '/tiles-fehlt/{z}/{x}/{y}.png' : '/tiles/{z}/{x}/{y}.png'}' }, { loadLeaflet: ${loader}, onError: (r) => window.__errors.push(r), onLoad: (m) => { window.__map = m; } });
 </script></body></html>`;
@@ -103,7 +109,7 @@ mountMap(document.getElementById('k'), { label: 'Karte', markers: ${JSON.stringi
 
 /** Aufbau und Abbau in Schleife (Speicher). */
 const pageCycle = () => `${head()}<main><div id="k"></div><div id="v"></div></main><script type="module">
-import { mountMap, initMap } from '/hoops/hoops-map.min.js';
+import { mountMap, initMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 import { mountVenueCard } from '/hoops/hoops-render.min.js';
 const tileUrl = '/tiles/{z}/{x}/{y}.png';
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
@@ -133,7 +139,7 @@ const pageInitAll = () => `${head('<script>window.__csp = []; document.addEventL
 <section aria-labelledby="hm"><h2 id="hm">Karte aus Markup</h2><div id="m">${renderMap({ label: 'Karte aus renderMap', markers: [HALLEN[1]], tileUrl: '/tiles/{z}/{x}/{y}.png', height: 260 }, { uid: 'srv2' })}</div></section></main>
 <script type="module" src="/t/initall.js"></script></body></html>`;
 const initAllScript = `import { initAll } from '/hoops/hoops.min.js';
-import { initMapBlock, initMap, mountMap } from '/hoops/hoops-map.min.js';
+import { initMapBlock, initMap, mountMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 import { mountVenueCard } from '/hoops/hoops-render.min.js';
 window.__maps = [];
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
@@ -153,8 +159,8 @@ window.__ready = true;
 /** Nur mountMap und mountVenueCard, strenge Content-Security-Policy: es darf keine Verletzung gemeldet werden. */
 const pageCsp = () => `${head('<script>window.__csp = []; document.addEventListener("securitypolicyviolation", (e) => window.__csp.push(e.violatedDirective + " " + e.blockedURI));</script>')}<main><h1>Strenge CSP</h1><div id="k"></div><div id="v"></div></main>
 <script type="module" src="/t/csp.js"></script></body></html>`;
-const cspScript = `import { mountMap } from '/hoops/hoops-map.min.js';
-import { initMap } from '/hoops/hoops-map.min.js';
+const cspScript = `import { mountMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
+import { initMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 import { mountVenueCard } from '/hoops/hoops-render.min.js';
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
 window.__maps = [];
@@ -167,7 +173,7 @@ const pageTwice = () => `${head()}<main><h1>Zweimal init</h1><section aria-label
 <section aria-labelledby="a2"><h2 id="a2">Hallenkarte</h2><div id="v">${renderVenueCard(HALLE, { init: true, uid: 'tw2' })}</div></section></main>
 <script type="module" src="/t/twice.js"></script></body></html>`;
 const twiceScript = `import { initAll } from '/hoops/hoops.min.js';
-import { initMap, initMapBlock } from '/hoops/hoops-map.min.js';
+import { initMap, initMapBlock } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
 const opts = { markers: ${JSON.stringify([HALLEN[1]])}, tileUrl: '/tiles/{z}/{x}/{y}.png', loadLeaflet };
 initMap(document.getElementById('m'), opts);
@@ -177,7 +183,7 @@ initAll(document, { map: { start: initMapBlock, loadLeaflet } });
 window.__ready = true;
 `;
 const pagePartial = () => `${head()}<main><h1>update mit Teilen</h1><div id="k"></div></main><script type="module" src="/t/partial.js"></script></body></html>`;
-const partialScript = `import { mountMap } from '/hoops/hoops-map.min.js';
+const partialScript = `import { mountMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 const loadLeaflet = () => import('/vendor/leaflet/leaflet-src.esm.js');
 const handle = mountMap(document.getElementById('k'), { label: 'Karte', markers: ${JSON.stringify(HALLEN)}, tileUrl: '/tiles/{z}/{x}/{y}.png', load: 'auto' }, { loadLeaflet });
 window.__update = (partial) => handle.update(partial);
@@ -187,7 +193,7 @@ window.__ready = true;
 /** React-Fassung derselben Karte (Vergleich der Rechtecke und Stile). */
 const pageReact = () => `${head()}<main><h1>React</h1><div id="root"></div></main><script type="module" src="/react-map.js"></script></body></html>`;
 const pageVanillaSame = (extra = '') => `${head()}<main><h1>Vanilla</h1><div id="root"></div></main><script type="module">
-import { mountMap } from '/hoops/hoops-map.min.js';
+import { mountMap } from '/hoops/hoops-map.min.js';\nimport '/hoops/hoops-i18n-de.min.js';\n(await import('/hoops/hoops.min.js')).setLocale('de');
 window.__done = false;
 mountMap(document.getElementById('root'), { label: 'Karte der Hallen', markers: [${JSON.stringify(SITZ)}, ...${JSON.stringify(HALLEN)}], tileUrl: '/tiles/{z}/{x}/{y}.png', load: 'auto', height: 320${extra} }, { loadLeaflet: () => import('/vendor/leaflet/leaflet-src.esm.js'), onLoad: () => { window.__done = true; } });
 </script></body></html>`;
@@ -248,6 +254,10 @@ async function buildReact(dir) {
   await writeFile(entry, `import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MapView } from '${ROOT}react/Map.tsx';
+import { registerLocale, setLocale } from '${ROOT}js/i18n/index.js';
+import de from '${ROOT}js/i18n/de.js';
+registerLocale('de', de);
+setLocale('de');
 const markers = ${JSON.stringify([SITZ, ...HALLEN])};
 window.__done = false;
 createRoot(document.getElementById('root')).render(createElement(MapView, { label: 'Karte der Hallen', markers, tileUrl: '/tiles/{z}/{x}/{y}.png', load: 'auto', height: 320, onLoad: () => { window.__done = true; } }));
