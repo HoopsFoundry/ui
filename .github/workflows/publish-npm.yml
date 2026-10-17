@@ -70,5 +70,17 @@ jobs:
       - name: Build
         run: npm run build
 
+      # Diagnose: zeigt die Angaben, die GitHub an npm schickt (nur die Nutzdaten des Tokens, nie der Token selbst).
+      # Wird entfernt, sobald das Veröffentlichen funktioniert.
+      - name: OIDC-Angaben anzeigen
+        run: |
+          set -euo pipefail
+          resp="$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org")"
+          jwt="$(printf '%s' "$resp" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).value")"
+          echo "::add-mask::$jwt"
+          payload="$(printf '%s' "$jwt" | cut -d. -f2 | tr '_-' '/+')"
+          while [ $(( ${#payload} % 4 )) -ne 0 ]; do payload="$payload="; done
+          printf '%s' "$payload" | base64 -d | node -e "const c=JSON.parse(require('fs').readFileSync(0,'utf8'));for(const k of ['iss','aud','sub','repository','repository_owner','repository_id','repository_owner_id','workflow','workflow_ref','job_workflow_ref','ref','ref_type','event_name','environment','runner_environment'])console.log(k+': '+c[k])"
+
       - name: Veröffentlichen
         run: npm publish --access public
