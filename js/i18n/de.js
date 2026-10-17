@@ -162,7 +162,7 @@ export default {
   // ── team
   'team.record.wins': { one: '{count} Sieg', other: '{count} Siege' },
   'team.record.losses': { one: '{count} Niederlage', other: '{count} Niederlagen' },
-  'team.record.draws': '{count} Unentschieden',
+  'team.record.draws': { one: '{count} Unentschieden', other: '{count} Unentschieden' },
   'team.record.aria': 'Bilanz: {parts}',
   'team.record.label': 'S–N',
   'team.record.label-draws': 'S–U–N',

@@ -162,7 +162,7 @@ export default {
   // ── team
   'team.record.wins': { one: '{count} win', other: '{count} wins' },
   'team.record.losses': { one: '{count} loss', other: '{count} losses' },
-  'team.record.draws': '{count} draws',
+  'team.record.draws': { one: '{count} draw', other: '{count} draws' },
   'team.record.aria': 'Record: {parts}',
   'team.record.label': 'W–L',
   'team.record.label-draws': 'W–D–L',

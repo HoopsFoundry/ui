@@ -48,6 +48,10 @@ describe('Kataloge', () => {
       expect(holders(forms(cats.de[k])[0]), k).toBe(holders(forms(cats.en[k])[0]));
     }
   });
+  it('Unentschieden hat in beiden Sprachen eine Mehrzahlform', () => {
+    expect(en['team.record.draws']).toEqual({ one: '{count} draw', other: '{count} draws' });
+    expect(de['team.record.draws']).toEqual({ one: '{count} Unentschieden', other: '{count} Unentschieden' });
+  });
   it('Himmelsrichtungen: deutsch Osten ist O', () => {
     expect(cats.de['common.direction.e']).toBe('O');
     expect(cats.en['common.direction.e']).toBe('E');
