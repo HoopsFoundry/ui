@@ -105,6 +105,14 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 * Konsequenzen: Das Svelte-Modal hängt von `js/modal.js` ab (Bündelgröße der Svelte-Anwendung wächst um dieses Modul; die Vanilla-Bündel ändern sich nur durch die Karten-Schaltfläche). Die Tabelle „Verhalten je Fassung“ in der Modal-Doku und die Paritätstests (`tests/modal-fassungen.test.tsx`, `tests/tabs-parity.test.tsx`, `tests/map-component.test.tsx`) belegen die Gleichheit. Das Modal-Markup der Svelte-Fassung hat einen zusätzlichen umschließenden `div` ohne Klasse.
 * Quellen: `docs/superpowers/plans/2026-10-12-luecken-plan.md` (Welle 1), ADR-003, ADR-007.
 
+=== ADR-012: Internationalisierung der eingebauten Texte
+
+* Status: angenommen. Der Kern, die Kataloge `en` und `de` und das Prüfskript sind umgesetzt (Paket I1); die Verdrahtung in Vanilla und Render-Funktionen (I2) sowie Svelte und React (I3) steht aus, bis dahin liefern alle Komponenten unverändert deutsche Texte.
+* Kontext: Die Texte der Komponenten waren fest deutsch (Svelte, React, `js/*`, `js/render/*`, Vanilla-Module), einzelne ließen sich über Eigenschaften überschreiben (`mapText`, `seatLabel`, `label`, `linkLabel`, `gamesLabel`). Internationale Vereine und Verbände sollen das System mit eigener Sprache nutzen können.
+* Entscheidung: Ein framework-freier Kern `js/i18n/index.js` mit Modul-Singleton (Sprache, Kataloge, globale Überschreibungen, `subscribe`). Die Sprache ist global; die Vanilla-`render*`-Funktionen nehmen zusätzlich `options.locale` (laufen auch in Node). Rückfallkette: Überschreibung je Aufruf, globale Überschreibung, Katalog der Sprache, Basissprache, `en`. Englisch ist Standardsprache und liegt im Kern; `de` ist ein eigenes Modul (`@hoopsfoundry/ui/i18n/de`, registriert sich beim Import), damit der Kern nicht wächst; weitere Sprachen folgen demselben Muster. Schlüsselschema `<baustein>.<bedeutung>`, Werte mit `{name}`, Mehrzahl über `Intl.PluralRules`, keine Auszeichnung in Werten. Zahlen und Koordinaten über `Intl` (`js/i18n/format.js`). Verbindende Satzzeichen (`, `, ` · `) bleiben im Code. Entwickler-Warnungen bleiben deutsch.
+* Konsequenzen: Der Wechsel der Standardsprache auf Englisch ist ein Bruch für bestehende Anwendungen (einmal `setLocale('de')` plus Import von `@hoopsfoundry/ui/i18n/de`); er tritt erst mit I2 und I3 ein, nicht mit I1. Das Vanilla-Bündel `hoops-i18n-de.js` entsteht in I2; in I1 ändert sich kein Bündel. Stellen, die ein Schlüssel nicht abdeckt (Sätze mit Markup-Platzhalter, CSS-`content`, Ordnungszahlen), sind im Inventar mit Lösungsvorschlag geführt. Ein Verbotstest gegen neue feste Texte wird erzwingend, wenn die Texte verdrahtet sind.
+* Quellen: `docs/superpowers/specs/2026-10-16-internationalisierung-design.md`, `docs/superpowers/plans/2026-10-17-i18n-i1-infrastruktur.md`, `docs/superpowers/specs/2026-10-17-i18n-inventar.md`.
+
 === Offene Punkte (keine ADRs)
 
 [cols="1,1,2",options="header"]
