@@ -237,7 +237,7 @@ Wiederholtes Ein-/Aushängen darf keine komponenteneigenen Ressourcen dauerhaft 
 * Storybook wird lokal mit `npm run storybook` betrieben.
 * `npm run build-storybook` erzeugt die statische Veröffentlichung.
 * `.github/workflows/deploy-webspace.yml` baut das Storybook und überträgt es per rsync über SSH auf den All-Inkl-Webspace (ui.hoopsfoundry.com); `deploy/htaccess` liefert HTTPS-Umleitung und Sicherheits-Header. `.github/workflows/deploy-storybook.yaml` (GitHub Pages) ist nur noch der manuelle Rückfall.
-* `.github/workflows/publish-npm.yml` veröffentlicht manuell per Trusted Publishing (OIDC) auf npm.
+* `.github/workflows/publish-npm.yml` veröffentlicht beim Push eines Tags `v*` per Trusted Publishing (OIDC) auf npm.
 * React-Artefakte werden über `npm run build:react` erzeugt.
 * `package.json` definiert die Inhalte und öffentlichen Exports des Pakets.
 
@@ -246,7 +246,7 @@ Der gelesene Deployment-Workflow führt Tests und Typprüfung nicht explizit aus
 === Webspace und npm
 
 * Webspace: Gebaut wird auf GitHub (kein Node auf dem Webspace). Zugangsdaten sind Repository-Secrets (`DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`, `DEPLOY_KNOWN_HOSTS`, `DEPLOY_PATH`); der Schlüssel gehört einem eingeschränkten Benutzer, der Host-Schlüssel wird geprüft (`StrictHostKeyChecking=yes`). Der Workflow läuft bei jedem Push auf `main`; manuell startet er mit `dry_run: true` (Standard) und zeigt mit `rsync -n` nur die Änderungen. Probelauf und erster echter Lauf sind auf GitHub durchgelaufen. `--delete` entfernt Altdateien, der Ordner `releases/` bleibt. Die Tests prüfen Aufbau und Regeln (`tests/deploy-workflows.test.ts`).
-* npm: `publish-npm.yml` läuft nur manuell, mit `id-token: write` und ohne Token. Voraussetzung ist ein Trusted Publisher bei npm mit genau diesem Dateinamen. Ein echter Lauf (`dry_run: false`) geht nur auf dem Tag `v<version>` (Version aus `package.json`, Commit auf `main`). Das Secret `NPM_ATOKEN` wird nicht verwendet.
+* npm: `publish-npm.yml` läuft beim Push eines Tags `v*` (zum Wiederholen manuell mit dem Tag als Ref), mit `id-token: write` und ohne Token. Voraussetzung ist ein Trusted Publisher bei npm mit genau diesem Dateinamen. Der Tag muss `v<version>` aus `package.json` heißen, sonst bricht der Lauf ab. Das Secret `NPM_ATOKEN` wird nicht verwendet. Der Aufbau folgt dem Release-Workflow von Open Coaching Format.
 
 === Vanilla-Auslieferung
 
@@ -383,9 +383,9 @@ Die ADRs geben Entscheidungen wieder, die in `docs/superpowers/specs/` beziehung
 
 === ADR-009: Doku auf dem Webspace per rsync, npm per Trusted Publishing
 
-* Status: angenommen; Webspace-Deployment auf GitHub erprobt (Probelauf und echter Lauf); der npm-Probelauf ist erfolgreich, eine echte Veröffentlichung steht aus.
+* Status: angenommen; Webspace-Deployment auf GitHub erprobt (Probelauf und echter Lauf); eine echte npm-Veröffentlichung steht aus (der erste Versuch scheiterte bei npm mit 403 trotz passendem Trusted Publisher).
 * Kontext: Die Dokumentation soll auf ui.hoopsfoundry.com in Deutschland liegen (Datenschutz, eigene HTTP-Header). Der Webspace ist statisch, hat SSH mit rsync und `.htaccess`. Für npm soll kein langlebiges Token in den Secrets liegen.
-* Entscheidung: `deploy-webspace.yml` baut auf GitHub und überträgt per rsync über SSH mit einem eingeschränkten Benutzer, Host-Schlüssel-Prüfung und Probelauf-Standard; bei Push auf `main` echt, manuell mit Probelauf als Standard. `deploy/htaccess` im Repo enthält HTTPS-Umleitung, Header und eine Content-Security-Policy zunächst nur als Report-Only (Storybook braucht Inline-Skripte). GitHub Pages bleibt als manueller Rückfall. `publish-npm.yml` veröffentlicht nur manuell per OIDC (Trusted Publishing), nur auf einem Tag, der zur Version passt.
+* Entscheidung: `deploy-webspace.yml` baut auf GitHub und überträgt per rsync über SSH mit einem eingeschränkten Benutzer, Host-Schlüssel-Prüfung und Probelauf-Standard; bei Push auf `main` echt, manuell mit Probelauf als Standard. `deploy/htaccess` im Repo enthält HTTPS-Umleitung, Header und eine Content-Security-Policy zunächst nur als Report-Only (Storybook braucht Inline-Skripte). GitHub Pages bleibt als manueller Rückfall. `publish-npm.yml` veröffentlicht beim Push eines Tags `v*` per OIDC (Trusted Publishing); der Tag muss zur Version passen. Kein Probelauf-Schalter: Tests, Typprüfung und Build laufen vor dem Veröffentlichen.
 * Konsequenzen: Ohne die fünf Deploy-Secrets bricht der Lauf ab. `--delete` kann Dateien auf dem Webspace entfernen, deshalb Probelauf vor dem ersten echten Lauf und Ausnahme für `releases/`. Der Dateiname `publish-npm.yml` ist Teil der npm-Konfiguration und darf nicht ohne Anpassung dort umbenannt werden. `NPM_ATOKEN` kann nach dem ersten erfolgreichen OIDC-Lauf gelöscht werden.
 * Quellen: ADR-006, ADR-008.
 
