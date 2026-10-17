@@ -1,6 +1,7 @@
 name: Publish to npm
 
-# Veröffentlicht @hoopsfoundry/ui auf npm per Trusted Publishing (OIDC, kein Token).
+# Stellt @hoopsfoundry/ui auf npm per Trusted Publishing (OIDC, kein Token) zur Freigabe bereit (`npm stage publish`).
+# Öffentlich wird die Version erst, wenn ein Mensch sie auf npmjs.com mit 2FA freigibt.
 # Voraussetzung bei npm: Trusted Publisher für dieses Paket mit Organisation HoopsFoundry, Repository ui,
 # Workflow-Datei `publish-npm.yml` (Dateiname muss exakt stimmen).
 # Läuft beim Push eines Tags `v*`; zum Wiederholen manuell starten, dabei den Tag als Ref wählen.
@@ -70,17 +71,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      # Diagnose: zeigt die Angaben, die GitHub an npm schickt (nur die Nutzdaten des Tokens, nie der Token selbst).
-      # Wird entfernt, sobald das Veröffentlichen funktioniert.
-      - name: OIDC-Angaben anzeigen
-        run: |
-          set -euo pipefail
-          resp="$(curl -sS -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=npm:registry.npmjs.org")"
-          jwt="$(printf '%s' "$resp" | node -p "JSON.parse(require('fs').readFileSync(0,'utf8')).value")"
-          echo "::add-mask::$jwt"
-          payload="$(printf '%s' "$jwt" | cut -d. -f2 | tr '_-' '/+')"
-          while [ $(( ${#payload} % 4 )) -ne 0 ]; do payload="$payload="; done
-          printf '%s' "$payload" | base64 -d | node -e "const c=JSON.parse(require('fs').readFileSync(0,'utf8'));for(const k of ['iss','aud','sub','repository','repository_owner','repository_id','repository_owner_id','workflow','workflow_ref','job_workflow_ref','ref','ref_type','event_name','environment','runner_environment'])console.log(k+': '+c[k])"
-
-      - name: Veröffentlichen
-        run: npm stage publish --access public --loglevel verbose
+      # Gestuft: das Paket wird hochgeladen, aber erst nach Freigabe mit 2FA (Passkey) auf npmjs.com öffentlich.
+      - name: Zur Freigabe bereitstellen
+        run: npm stage publish --access public
