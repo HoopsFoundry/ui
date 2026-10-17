@@ -14,6 +14,9 @@ export { initTheme, themeBootScript, parseTheme, resolveTheme, nextTheme, readTh
 export type { ThemeOptions, ThemeHandle, ThemeMode, ThemeState } from './theme.js';
 export { initTabs, nextTab, initialTab, TAB_EVENT } from './tabs.js';
 export type { TabsOptions, TabsHandle, TabChangeDetail } from './tabs.js';
+export { setLocale, getLocale, registerLocale, setTexts, t, availableLocales, localeOf } from './i18n/index.js';
+export type { Catalog, CatalogValue, PluralObject, Params, TOptions } from './i18n/index.js';
+export { onLocaleChange, LOCALE_EVENT } from './i18n-events.js';
 export { initModal, openModal, closeModal, focusables, MODAL_OPEN_EVENT, MODAL_CLOSE_EVENT } from './modal.js';
 export type { ModalOptions, ModalHandle, ModalOpenDetail, ModalCloseDetail, ModalCloseReason } from './modal.js';
 

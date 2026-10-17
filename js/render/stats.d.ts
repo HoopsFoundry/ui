@@ -1,9 +1,10 @@
 import type { LeagueFormEntry } from '../league.js';
 import type { StatInput } from '../stats.js';
+import type { RenderOptions } from './core.js';
 import type { MountHandle, MountOptions } from './mount.js';
 
 export interface StatsProps {
-  /** Kennzahlen: `{ label, value }`; Zahlen bekommen das Dezimalkomma, ein fehlender Wert zeigt einen Gedankenstrich. */
+  /** Kennzahlen: `{ label, value }`; Zahlen bekommen das Dezimaltrennzeichen der Sprache, ein fehlender Wert zeigt einen Gedankenstrich. */
   items: StatInput[];
   /** Ohne Kacheln, in einer Zeile. */
   compact?: boolean;
@@ -16,7 +17,7 @@ export interface FormChipsProps {
   className?: string;
 }
 
-export function renderStats(props: StatsProps): string;
-export function renderFormChips(props: FormChipsProps): string;
+export function renderStats(props: StatsProps, options?: RenderOptions): string;
+export function renderFormChips(props: FormChipsProps, options?: RenderOptions): string;
 export function mountStats(el: Element, props: StatsProps, options?: MountOptions): MountHandle<StatsProps>;
 export function mountFormChips(el: Element, props: FormChipsProps, options?: MountOptions): MountHandle<FormChipsProps>;

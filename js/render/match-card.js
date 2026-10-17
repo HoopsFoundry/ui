@@ -7,9 +7,10 @@
  * `options.button` (`mountMatchCard`: `options.onClick`) ein Button, sonst ein `div`. Spielabschnitt und Namen aus js/periods.js und
  * js/schedule.js. Typen: js/render/match-card.d.ts.
  */
+import { t as tr } from '../i18n/index.js';
 import { resolvePeriod } from '../periods.js';
 import { attr, esc } from './escape.js';
-import { klass, logoBadge, nameText, num, obj, pick, str, teamOf, url } from './core.js';
+import { klass, logoBadge, nameText, num, obj, pick, str, teamOf, url, withLang } from './core.js';
 import { mount } from './mount.js';
 
 /** Eine Mannschaft der Karte: Logo bzw. Initialen, Name mit Kurzform. */
@@ -33,12 +34,12 @@ export function renderMatchCard(props, options) {
   const heimWin = state === 'finished' && (heim.score ?? 0) > (gast.score ?? 0);
   const gastWin = state === 'finished' && (gast.score ?? 0) > (heim.score ?? 0);
   const showScore = state !== 'scheduled';
-  const label = resolvePeriod({ period: num(p.period), periods: p.periods, quarter: str(p.quarter) }).label;
+  const label = resolvePeriod({ period: num(p.period), periods: p.periods, quarter: str(p.quarter) }, options).label;
   const liveText = [label, clock].filter(Boolean).join(' ');
 
   let status = '';
-  if (state === 'live') status = `<span class="hoops-match-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live · ${esc(liveText)}</span>`;
-  else if (state === 'finished') status = '<span class="hoops-match-final">Endstand</span>';
+  if (state === 'live') status = `<span class="hoops-match-live"><span class="hoops-match-pulse" aria-hidden="true"></span> ${esc(tr('common.live', undefined, options))} · ${esc(liveText)}</span>`;
+  else if (state === 'finished') status = `<span class="hoops-match-final">${esc(tr('match.final', undefined, options))}</span>`;
   else if (date) status = `<span class="hoops-match-when">${esc(date)}${time ? ` · ${esc(time)}` : ''}</span>`;
 
   const side = (team, loser, gastSide) =>
@@ -51,9 +52,9 @@ export function renderMatchCard(props, options) {
     (venue ? `<span class="hoops-match-foot"><span>${esc(venue)}</span></span>` : '');
 
   const cls = klass('hoops-match', `hoops-match--${state}`, logos && 'hoops-match--logos', str(p.className));
-  if (href) return `<a class="${cls}" href="${attr(href)}">${body}</a>`;
-  if (obj(options).button === true) return `<button type="button" class="${cls}">${body}</button>`;
-  return `<div class="${cls}">${body}</div>`;
+  if (href) return withLang(`<a class="${cls}" href="${attr(href)}">${body}</a>`, options);
+  if (obj(options).button === true) return withLang(`<button type="button" class="${cls}">${body}</button>`, options);
+  return withLang(`<div class="${cls}">${body}</div>`, options);
 }
 
 /** Setzt `renderMatchCard` in `el` ein; `options.onClick(event)` macht die Karte zum Button (mit `href`: zusätzlicher Handler am Link). */

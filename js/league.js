@@ -4,6 +4,8 @@
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte und React nutzen dieselbe Logik.
  * Typen: js/league.d.ts.
  */
+import { formatPlain } from './i18n/format.js';
+import { t } from './i18n/index.js';
 
 const isNum = (value) => typeof value === 'number' && Number.isFinite(value);
 /** Anzahl (Teams, Spiele): ganze Zahl ab 0; negative, gebrochene und nicht-numerische Werte gelten als ungültig. */
@@ -42,17 +44,21 @@ export function leagueWindow(teams, options = {}) {
   return sorted.slice(start, start + size);
 }
 
-/** "12 Teams · 15 von 132 Spielen gespielt". Fehlende oder ungültige Teile entfallen; "1 Team", "1 Spiel"; keine Tausenderpunkte; leer ohne gültige Angabe. */
-export function leagueSummary({ teamCount, played, total } = {}) {
+/**
+ * "12 Teams · 15 von 132 Spielen gespielt" (deutsch). Fehlende oder ungültige Teile entfallen; Einzahl und Mehrzahl wählt die Sprache; keine
+ * Tausenderpunkte; leer ohne gültige Angabe. `options`: `locale`, `texts`.
+ */
+export function leagueSummary({ teamCount, played, total } = {}, options) {
   const parts = [];
-  if (isCount(teamCount)) parts.push(`${teamCount} ${teamCount === 1 ? 'Team' : 'Teams'}`);
-  if (isCount(played) && isCount(total)) parts.push(`${played} von ${total} ${total === 1 ? 'Spiel' : 'Spielen'} gespielt`);
-  else if (isCount(played)) parts.push(`${played} ${played === 1 ? 'Spiel' : 'Spiele'} gespielt`);
-  else if (isCount(total)) parts.push(`${total} ${total === 1 ? 'Spiel' : 'Spiele'} insgesamt`);
+  if (isCount(teamCount)) parts.push(t('league.summary.teams', { count: teamCount }, options));
+  // `count` ist die Gesamtzahl der Spiele: sie bestimmt die Mehrzahlform
+  if (isCount(played) && isCount(total)) parts.push(t('league.summary.played-of', { played, count: total }, options));
+  else if (isCount(played)) parts.push(t('league.summary.played', { count: played }, options));
+  else if (isCount(total)) parts.push(t('league.summary.total', { count: total }, options));
   return parts.join(' · ');
 }
 
-const FORM_WORD = { S: 'Sieg', N: 'Niederlage', U: 'Unentschieden' };
+const FORM_WORD = { S: 'common.outcome.win', N: 'common.outcome.loss', U: 'common.outcome.draw' };
 
 /** Die gültigen Einträge der Form (S, N, U), höchstens die letzten fünf, neueste zuletzt. Alles andere wird ignoriert. */
 export function formEntries(form) {
@@ -61,28 +67,29 @@ export function formEntries(form) {
 }
 
 /** Screenreader-Text der Form: "Form: Sieg, Sieg, Niederlage"; leer ohne gültigen Eintrag. */
-export function formLabel(form) {
+export function formLabel(form, options) {
   const entries = formEntries(form);
-  return entries.length ? `Form: ${entries.map((entry) => FORM_WORD[entry]).join(', ')}` : '';
+  return entries.length ? t('league.form', { entries: entries.map((entry) => t(FORM_WORD[entry], undefined, options)).join(', ') }, options) : '';
 }
 
 /**
  * Beschriftung für die `caption`: "Plätze 5 bis 8 von 12" bzw. "Platz 1 von 12" bei einer Zeile; ohne gültige Gesamtzahl
  * (`teamCount`, ganze Zahl ab 1) ohne "von …"; leer ohne Zeilen oder ohne gültige Plätze. Maßgeblich sind die Plätze (`rank`) der ersten und letzten Zeile.
  */
-export function windowLabel(window, teamCount) {
+export function windowLabel(window, teamCount, options) {
   if (!Array.isArray(window) || window.length === 0) return '';
   const first = window[0]?.rank;
   const last = window[window.length - 1]?.rank;
   if (!(Number.isInteger(first) && first >= 1 && Number.isInteger(last) && last >= first)) return '';
-  const of = Number.isInteger(teamCount) && teamCount >= last ? ` von ${teamCount}` : '';
-  return first === last ? `Platz ${first}${of}` : `Plätze ${first} bis ${last}${of}`;
+  const total = Number.isInteger(teamCount) && teamCount >= last ? teamCount : undefined;
+  if (first === last) return total === undefined ? t('league.window.single', { rank: first }, options) : t('league.window.single-of', { rank: first, total }, options);
+  return total === undefined ? t('league.window.range', { first, last }, options) : t('league.window.range-of', { first, last, total }, options);
 }
 
-/** Korbdifferenz mit Vorzeichen als Text: "+12", "−5" (Minuszeichen U+2212), "0"; leer, wenn keine endliche Zahl. Dezimalkomma. */
-export function diffText(value) {
+/** Korbdifferenz mit Vorzeichen als Text: "+12", "−5" (Minuszeichen U+2212), "0"; leer, wenn keine endliche Zahl. Dezimaltrennzeichen der Sprache. */
+export function diffText(value, options) {
   if (!isNum(value)) return '';
-  const text = String(Math.abs(value)).replace('.', ',');
+  const text = formatPlain(Math.abs(value), options);
   if (value > 0) return `+${text}`;
   if (value < 0) return `−${text}`;
   return '0';
@@ -94,9 +101,9 @@ export function diffSign(value) {
   return value > 0 ? 'plus' : 'minus';
 }
 
-/** Zahl für eine Tabellenzelle: endliche Zahl mit Dezimalkomma, sonst leer. */
-export function cellNumber(value) {
-  return isNum(value) ? String(value).replace('.', ',') : '';
+/** Zahl für eine Tabellenzelle: endliche Zahl mit dem Dezimaltrennzeichen der Sprache, sonst leer. */
+export function cellNumber(value, options) {
+  return isNum(value) ? formatPlain(value, options) : '';
 }
 
 /** Platz für die Spalte `#`: ganze Zahl ab 1, sonst leer. */
@@ -104,32 +111,34 @@ export function rankText(rank) {
   return Number.isInteger(rank) && rank >= 1 ? String(rank) : '';
 }
 
+// Schlüssel der Zonentexte (ausgeschrieben, damit die Verwendungsprüfung sie erkennt)
 const ZONES = {
-  up: { zone: 'up', row: 'Aufstiegsplatz', legend: 'Aufstieg' },
-  playoff: { zone: 'playoff', row: 'Relegation', legend: 'Relegation' },
-  down: { zone: 'down', row: 'Abstiegsplatz', legend: 'Abstieg' },
+  up: { row: 'league.zone.up.row', legend: 'league.zone.up.legend' },
+  playoff: { row: 'league.zone.playoff.row', legend: 'league.zone.playoff.legend' },
+  down: { row: 'league.zone.down.row', legend: 'league.zone.down.legend' },
 };
 const ZONE_ORDER = ['up', 'playoff', 'down'];
+const zoneOf = (zone, options) => ({ zone, row: t(ZONES[zone].row, undefined, options), legend: t(ZONES[zone].legend, undefined, options) });
 
 /** Texte einer Zone: `row` (versteckter Text in der Zeile) und `legend` (Legende); `undefined` bei unbekannter Zone. */
-export function zoneInfo(zone) {
-  return typeof zone === 'string' && Object.hasOwn(ZONES, zone) ? ZONES[zone] : undefined;
+export function zoneInfo(zone, options) {
+  return typeof zone === 'string' && Object.hasOwn(ZONES, zone) ? zoneOf(zone, options) : undefined;
 }
 
 /** Legende für die angezeigten Zeilen: die vorkommenden Zonen in fester Reihenfolge (Aufstieg, Relegation, Abstieg); leer ohne Zone. */
-export function zoneLegend(rows) {
+export function zoneLegend(rows, options) {
   if (!Array.isArray(rows)) return [];
   const used = new Set(rows.map((row) => row?.zone));
-  return ZONE_ORDER.filter((zone) => used.has(zone)).map((zone) => ZONES[zone]);
+  return ZONE_ORDER.filter((zone) => used.has(zone)).map((zone) => zoneOf(zone, options));
 }
 
 /**
  * Live-Hinweis im Kopf: `undefined`, wenn nichts läuft (`false`, `0`, ungültig). `true` ergibt `{ text: '' }` (nur das Wort "Live"),
  * eine Zahl ab 1 ergibt `{ count, text }` mit "1 Spiel läuft" bzw. "3 Spiele laufen".
  */
-export function liveInfo(live) {
+export function liveInfo(live, options) {
   if (live === true) return { text: '' };
-  if (Number.isInteger(live) && live >= 1) return { count: live, text: live === 1 ? '1 Spiel läuft' : `${live} Spiele laufen` };
+  if (Number.isInteger(live) && live >= 1) return { count: live, text: t('league.live', { count: live }, options) };
   return undefined;
 }
 

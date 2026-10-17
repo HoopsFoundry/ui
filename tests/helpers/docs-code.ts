@@ -16,6 +16,7 @@ export async function startServer(): Promise<{ vite: ViteDevServer; render: Rend
     esbuild: { jsx: 'automatic' }, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error',
   });
   const render = ((await vite.ssrLoadModule('svelte/server')) as { render: Render }).render;
+  await vite.ssrLoadModule('/tests/setup-i18n.ts'); // Standardsprache der Tests (Deutsch) auch im Modulgraphen dieses Servers
   return { vite, render };
 }
 

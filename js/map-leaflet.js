@@ -68,6 +68,8 @@ export function pinElement(item) {
  */
 export function createMapController(el, opts, hooks = {}) {
   let current = opts;
+  // Sprache und Texte der Marker-Namen (`locale`, `texts` in den Optionen; sonst die globale Sprache)
+  const textOptions = () => ({ locale: current.locale, texts: current.texts });
   let destroyed = false;
   let map = null;
   let layer = null;
@@ -102,14 +104,21 @@ export function createMapController(el, opts, hooks = {}) {
     for (const item of items) {
       const sig = JSON.stringify([item.label, item.number, item.own, item.kind, item.seatText, item.href ?? '']);
       const entry = entries.get(item.id);
+      const name = markerName(item, textOptions());
       if (entry && entry.sig === sig) {
         entry.item = item;
+        // Sprachwechsel: der Name für Hilfstechnik ändert sich, der Marker bleibt stehen
+        if (entry.name !== name) {
+          entry.name = name;
+          const el = entry.marker.getElement?.();
+          if (el) { el.setAttribute('aria-label', name); el.setAttribute('title', name); el.setAttribute('alt', name); }
+        }
         if (entry.lat !== item.lat || entry.lng !== item.lng) { entry.marker.setLatLng([item.lat, item.lng]); entry.lat = item.lat; entry.lng = item.lng; }
         continue;
       }
       if (entry) entry.marker.remove();
-      const marker = L.marker([item.lat, item.lng], { icon: markerIcon(item), title: markerName(item), alt: markerName(item), keyboard: true, riseOnHover: true });
-      const next = { marker, sig, item, lat: item.lat, lng: item.lng };
+      const marker = L.marker([item.lat, item.lng], { icon: markerIcon(item), title: name, alt: name, keyboard: true, riseOnHover: true });
+      const next = { marker, sig, item, name, lat: item.lat, lng: item.lng };
       const activate = () => {
         hooks.onMarkerClick?.(next.item);
         // mapItems filtert schon; hier gilt dieselbe Regel noch einmal, damit nie ein javascript:-Ziel an location geht
@@ -125,10 +134,10 @@ export function createMapController(el, opts, hooks = {}) {
         activate();
       });
       // Das Icon entsteht erst, wenn die Karte einen Ausschnitt hat: Name für Hilfstechnik beim Hinzufügen setzen
-      const name = () => marker.getElement?.()?.setAttribute('aria-label', markerName(next.item));
-      marker.on('add', name);
+      const label = () => marker.getElement?.()?.setAttribute('aria-label', next.name);
+      marker.on('add', label);
       marker.addTo(map);
-      name();
+      label();
       entries.set(item.id, next);
     }
   };
@@ -145,7 +154,7 @@ export function createMapController(el, opts, hooks = {}) {
   };
 
   const apply = (first) => {
-    const items = mapItems(current.markers, current.appLinks, { seat: current.seatLabel });
+    const items = mapItems(current.markers, current.appLinks, { seat: current.seatLabel }, textOptions());
     setGestures(current.interactive !== false);
     const url = current.tileUrl ?? DEFAULT_TILE_URL;
     if (layer && layerUrl !== url) { tileOk = 0; tileBad = 0; everLoaded = false; layerUrl = url; layer.setUrl(url); }

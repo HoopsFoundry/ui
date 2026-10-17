@@ -1,6 +1,9 @@
 // Accordion: reine Funktionen (React, Svelte und Vanilla nutzen dieselben) und das Vanilla-Skript `initAccordion`.
 // ESM; einzige Abhängigkeit ist das Register in lifecycle.js. Beim Import wird nichts ausgeführt und weder `window` noch `document` gelesen (SSR-sicher).
 
+import { langFor } from './i18n/lang.js';
+import { t as translate } from './i18n/index.js';
+import { onLocaleChange } from './i18n-events.js';
 import { createRegistry } from './lifecycle.js';
 
 // ── Reine Funktionen ─────────────────────────────────────────
@@ -83,13 +86,17 @@ export function labelWithMeta(title, meta) {
   return `${t}, ${m}`;
 }
 
-/** Ansage nach „Alle öffnen/schließen“: „Alle Bereiche geöffnet“, „Alle Bereiche geschlossen“ oder „3 von 5 Bereichen geöffnet“; ohne Bereiche leer. */
-export function summaryText(open, total) {
+/**
+ * Ansage nach „Alle öffnen/schließen“ (deutsch): „Alle Bereiche geöffnet“, „Alle Bereiche geschlossen“ oder „3 von 5 Bereichen geöffnet“; ohne Bereiche leer.
+ * Die Wörter kommen aus dem Katalog (`options`: `locale`, `texts`).
+ */
+export function summaryText(open, total, options) {
   if (!Number.isInteger(total) || total < 1) return '';
   const n = Math.min(total, Math.max(0, Number.isInteger(open) ? open : 0));
-  if (n === total) return total === 1 ? 'Der Bereich ist geöffnet' : 'Alle Bereiche geöffnet';
-  if (n === 0) return total === 1 ? 'Der Bereich ist geschlossen' : 'Alle Bereiche geschlossen';
-  return `${n} von ${total} ${total === 1 ? 'Bereich' : 'Bereichen'} geöffnet`;
+  if (n === total) return total === 1 ? translate('accordion.summary.one-open', undefined, options) : translate('accordion.summary.all-open', undefined, options);
+  if (n === 0) return total === 1 ? translate('accordion.summary.one-closed', undefined, options) : translate('accordion.summary.all-closed', undefined, options);
+  // `count` ist die Gesamtzahl der Bereiche: sie bestimmt die Mehrzahlform
+  return translate('accordion.summary.partial', { open: n, count: total }, options);
 }
 
 // ── Hilfen für Deep-Link und Scrollen (SSR-sicher: ohne Browser tun sie nichts) ──
@@ -287,8 +294,6 @@ const DETAILS = 'details.hoops-acc-item';
 const registry = createRegistry('accordion');
 let uid = 0;
 
-const TEXT = { all: 'Alle öffnen', none: 'Alle schließen', nav: 'Bereiche' };
-
 function triggerOf(item) {
   return item.querySelector(
     ':scope > summary, :scope > .hoops-acc-title > .hoops-acc-trigger, :scope > .hoops-frame-head > .hoops-frame-title > .hoops-acc-trigger, :scope > .hoops-league-head > .hoops-league-title > .hoops-acc-trigger',
@@ -348,14 +353,17 @@ function make(tag, className, attrs = {}) {
  * (1) `div.hoops-acc-item` mit `h3.hoops-acc-title > button.hoops-acc-trigger[aria-expanded][aria-controls]` und `div.hoops-acc-panel[hidden]`;
  * (2) natives `details.hoops-acc-item` mit `summary.hoops-acc-trigger` (zeigt auch ohne Skript; das Skript ergänzt die Funktionen).
  * Optionen: `exclusive` (nur ein Bereich offen), `syncHash` (Deep-Link, Standard `true`), `expandAll` („Alle öffnen/schließen“ mit Ansage),
- * `nav` (Sprungleiste, Name über `navLabel`, Standard „Bereiche“), `sticky` (Kopf des offenen Bereichs klebt). Gibt eine Funktion zum Aufräumen zurück, die auch als `.destroy()` aufrufbar ist (Muster `{ destroy() }`); mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
+ * `nav` (Sprungleiste, Name über `navLabel`, Standard der Katalogtext `accordion.nav`, deutsch „Bereiche“), `locale` und `texts` (Sprache und Texte; Standard die globale Sprache, ein Sprachwechsel führt die Texte nach), `sticky` (Kopf des offenen Bereichs klebt). Gibt eine Funktion zum Aufräumen zurück, die auch als `.destroy()` aufrufbar ist (Muster `{ destroy() }`); mehrfaches Aufrufen für dieselbe Wurzel ersetzt die frühere Fassung.
  */
 export function initAccordion(root, options = {}) {
   const noop = handle(() => {});
   if (typeof document === 'undefined' || !root || typeof root.querySelectorAll !== 'function') return noop;
   registry.release(root);
 
-  const { exclusive = false, syncHash = true, expandAll = false, nav = false, sticky = false, navLabel = TEXT.nav } = options;
+  const { exclusive = false, syncHash = true, expandAll = false, nav = false, sticky = false, navLabel } = options;
+  // Texte: `navLabel` (Option) vor `texts` vor dem Katalog; der Sprachwechsel führt die Katalogtexte nach
+  const say = (key) => translate(key, undefined, { locale: options.locale, texts: options.texts });
+  const navText = () => (navLabel === undefined ? say('accordion.nav') : navLabel);
   const cleanups = [];
   const created = [];
   const expected = new Set(); // Bereiche, die das Skript selbst umgeschaltet hat (kein Anker-Schreiben beim späteren toggle-Ereignis)
@@ -363,6 +371,8 @@ export function initAccordion(root, options = {}) {
   let current = null;
   let announce = null;
   let navLinks = new Map();
+  let buttons = null; // „Alle öffnen“ und „Alle schließen“, falls angelegt
+  let navParts = null; // Sprungleiste und ihr Schalter, falls angelegt
 
   const items = () => itemsOf(root);
   const apply = (item, open) => {
@@ -475,8 +485,9 @@ export function initAccordion(root, options = {}) {
     const wrap = make('div', 'hoops-acc-bar');
     const open = make('button', 'hoops-btn hoops-btn--secondary hoops-btn--sm', { type: 'button' });
     const close = make('button', 'hoops-btn hoops-btn--secondary hoops-btn--sm', { type: 'button' });
-    open.textContent = TEXT.all;
-    close.textContent = TEXT.none;
+    open.textContent = say('accordion.expand-all');
+    close.textContent = say('accordion.collapse-all');
+    buttons = { open, close };
     announce = make('span', 'hoops-sr-only', { 'aria-live': 'polite', 'aria-atomic': 'true' });
     wrap.append(open, close, announce);
     tools.append(wrap);
@@ -487,7 +498,7 @@ export function initAccordion(root, options = {}) {
       const list = items();
       for (const item of list) if (!isLocked(item)) apply(item, flag);
       const count = list.filter((item) => isOpen(item)).length;
-      announce.textContent = summaryText(count, list.length);
+      announce.textContent = summaryText(count, list.length, { locale: options.locale, texts: options.texts });
       if (!flag) current = null;
       refreshCurrent();
     };
@@ -496,10 +507,11 @@ export function initAccordion(root, options = {}) {
   }
 
   if (nav) {
-    const navEl = make('nav', 'hoops-acc-nav', { 'aria-label': navLabel });
+    const navEl = make('nav', 'hoops-acc-nav', { 'aria-label': navText() });
     const listId = `hoops-acc-nav-${++uid}`;
     const toggle = make('button', 'hoops-acc-nav-toggle', { type: 'button', 'aria-expanded': 'false', 'aria-controls': listId });
-    toggle.textContent = navLabel;
+    toggle.textContent = navText();
+    navParts = { navEl, toggle };
     const list = make('ul', 'hoops-acc-nav-list', { id: listId });
     navLinks = new Map();
     for (const item of items()) {
@@ -535,6 +547,26 @@ export function initAccordion(root, options = {}) {
   if (!tools.firstChild) {
     tools.remove();
     created.pop();
+  } else {
+    // Sprachwechsel: die eingebauten Beschriftungen folgen (ohne Neuaufbau; Fokus und Zustand bleiben); `lang` an der Werkzeugleiste, wenn die Sprache abweicht
+    const setLang = () => {
+      const lang = langFor({ locale: options.locale });
+      if (lang) tools.setAttribute('lang', lang);
+      else tools.removeAttribute('lang');
+    };
+    setLang();
+    cleanups.push(onLocaleChange(() => {
+      if (buttons) {
+        buttons.open.textContent = say('accordion.expand-all');
+        buttons.close.textContent = say('accordion.collapse-all');
+        if (announce) announce.textContent = '';
+      }
+      if (navParts && navLabel === undefined) {
+        navParts.navEl.setAttribute('aria-label', navText());
+        navParts.toggle.textContent = navText();
+      }
+      setLang();
+    }));
   }
 
   const fromHash = () => {

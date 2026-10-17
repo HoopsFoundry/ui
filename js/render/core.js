@@ -6,6 +6,8 @@
  * Die Logik (Fenster, Kurznamen, Zustände, Formen) kommt aus den gemeinsamen Modulen (js/schedule.js, js/league.js, js/heading.js …),
  * dieselben, die Svelte und React nutzen. Typen: js/render/core.d.ts.
  */
+import { langFor } from '../i18n/lang.js';
+import { t as tr } from '../i18n/index.js';
 import { formEntries, formLabel } from '../league.js';
 import { resolveHeading } from '../heading.js';
 import { initials, shortName } from '../schedule.js';
@@ -30,6 +32,26 @@ export const url = (value) => (typeof value === 'string' ? safeHref(value) : und
 export const cls = (...parts) => parts.filter(Boolean).join(' ');
 /** Wert für `class="…"`: die Klassenliste, maskiert. */
 export const klass = (...parts) => attr(cls(...parts));
+
+// ── Sprache ──────────────────────────────────────────────────
+
+/**
+ * Setzt `lang="…"` an das Wurzelelement des Markups, wenn die Sprache des Bausteins von der Sprache der Seite abweicht (siehe js/i18n/lang.js).
+ * In Node setzt nur `options.documentLang` den Vergleichswert; ohne Abweichung bleibt das Markup unverändert.
+ */
+export function withLang(html, options) {
+  const lang = langFor(options);
+  return lang ? html.replace(/^<([A-Za-z][A-Za-z0-9-]*)/, (_, name) => `<${name} lang="${attr(lang)}"`) : html;
+}
+
+/**
+ * Satz aus dem Katalog, in dessen Platzhalter `{name}` fertiges Markup gehört (zum Beispiel „{team} hat Freilos“ mit Logo und Kurzname):
+ * der Text um den Platzhalter wird maskiert, an die Stelle des Platzhalters tritt `markup`. So bleibt die Wortstellung Sache der Sprache.
+ */
+export function sentenceWith(key, name, markup, options) {
+  const marker = '\u0001';
+  return tr(key, { [name]: marker }, options).split(marker).map(esc).join(markup);
+}
 
 // ── Kennung ──────────────────────────────────────────────────
 
@@ -91,15 +113,15 @@ export function logoBadge(team, extra) {
 // ── Form und Live ────────────────────────────────────────────
 
 /** Form (letzte Spiele): Zeichen sind `aria-hidden`, der Text kommt aus `formLabel`; ohne gültigen Eintrag leer. */
-export function formChips(form, variant, className) {
+export function formChips(form, variant, className, options) {
   const entries = formEntries(form);
   if (!entries.length) return '';
   const items = entries.map((entry) => `<span class="hoops-form-item hoops-form-item--${entry.toLowerCase()}"></span>`).join('');
-  return `<span class="${klass('hoops-form', variant === 'letters' && 'hoops-form--letters', className)}"><span class="hoops-form-list" aria-hidden="true">${items}</span><span class="hoops-sr-only">${esc(formLabel(form))}</span></span>`;
+  return `<span class="${klass('hoops-form', variant === 'letters' && 'hoops-form--letters', className)}"><span class="hoops-form-list" aria-hidden="true">${items}</span><span class="hoops-sr-only">${esc(formLabel(form, options))}</span></span>`;
 }
 
 /** Grüner Live-Hinweis des Spielplans (wie MatchCard), steht hinter der Uhrzeit. */
-export const liveTag = () => '<span class="hoops-match-live hoops-sch-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live</span>';
+export const liveTag = (options) => `<span class="hoops-match-live hoops-sch-live"><span class="hoops-match-pulse" aria-hidden="true"></span> ${esc(tr('common.live', undefined, options))}</span>`;
 
 // ── Einklappbarer Rahmen ─────────────────────────────────────
 

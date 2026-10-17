@@ -1,4 +1,5 @@
 import type { ScheduleTeam } from './schedule.js';
+import type { TOptions } from './i18n/index.js';
 
 /** Zone einer Mannschaft: Aufstieg, Relegation (Aufstiegsspiele bzw. Abstiegsrunde) oder Abstieg. */
 export type LeagueZone = 'up' | 'playoff' | 'down';
@@ -56,15 +57,15 @@ export interface LeagueLiveInfo {
 }
 
 export function leagueWindow<T extends { rank: number; own?: boolean }>(teams: readonly T[], options?: LeagueWindowOptions): T[];
-export function leagueSummary(input?: LeagueSummaryInput): string;
+export function leagueSummary(input?: LeagueSummaryInput, options?: TOptions): string;
 export function formEntries(form: unknown): LeagueFormEntry[];
-export function formLabel(form: unknown): string;
-export function windowLabel(window: readonly { rank: number }[], teamCount?: number): string;
-export function diffText(value: unknown): string;
+export function formLabel(form: unknown, options?: TOptions): string;
+export function windowLabel(window: readonly { rank: number }[], teamCount?: number, options?: TOptions): string;
+export function diffText(value: unknown, options?: TOptions): string;
 export function diffSign(value: unknown): 'plus' | 'minus' | undefined;
-export function cellNumber(value: unknown): string;
+export function cellNumber(value: unknown, options?: TOptions): string;
 export function rankText(rank: unknown): string;
-export function zoneInfo(zone: unknown): LeagueZoneInfo | undefined;
-export function zoneLegend(rows: readonly { zone?: unknown }[]): LeagueZoneInfo[];
-export function liveInfo(live: unknown): LeagueLiveInfo | undefined;
+export function zoneInfo(zone: unknown, options?: TOptions): LeagueZoneInfo | undefined;
+export function zoneLegend(rows: readonly { zone?: unknown }[], options?: TOptions): LeagueZoneInfo[];
+export function liveInfo(live: unknown, options?: TOptions): LeagueLiveInfo | undefined;
 export function teamTotal(teamCount: unknown, teams: readonly unknown[] | undefined): number | undefined;

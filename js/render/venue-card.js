@@ -13,10 +13,11 @@
  * js/venue.js (Grenzen: `limit` 1 bis 5, ohne beendete und Spielfrei). Typen: js/render/venue-card.d.ts.
  */
 import {
-  addressLines, contactInfo, gameMeta, gameState, gameWhen, isCoord, venueGames, venueHref, venueMapLabel, venueMapLinks, venueText,
+  addressLines, contactInfo, gameMeta, gameState, gameWhen, isCoord, venueGames, venueHref, venueMapLabel, venueMapLinks, venueString,
 } from '../venue.js';
 import { attr, esc } from './escape.js';
-import { headingOf, klass, list, logoBadge, nameText, obj, pick, str, teamOf, uidFor } from './core.js';
+import { headingOf, klass, list, logoBadge, nameText, obj, pick, str, teamOf, uidFor, withLang } from './core.js';
+import { onLocaleChange } from '../i18n-events.js';
 import { createRegistry } from '../lifecycle.js';
 import { mount } from './mount.js';
 import { renderMapView } from './map-view.js';
@@ -48,9 +49,9 @@ function venueMapProps(p, title, lat, lng) {
 }
 
 /** Eine Mannschaft der Spielzeile: Trikotpunkt, optional Logo, versteckter Hinweis „Heim“/„Gast“, Name mit Kurzform. */
-const teamLine = (team, side, names, logos) =>
+const teamLine = (team, side, names, logos, options) =>
   `<div class="hoops-venue-team"><span class="hoops-venue-dot hoops-venue-dot--${side}" aria-hidden="true"></span>${logos ? logoBadge(team, 'hoops-team-logo--sm') : ''}` +
-  `<span class="hoops-sr-only">${esc(side === 'heim' ? venueText.home : venueText.away)}:</span><span class="hoops-venue-team-name">${nameText(team, names)}</span></div>`;
+  `<span class="hoops-sr-only">${esc(venueString(side === 'heim' ? 'home' : 'away', options))}:</span><span class="hoops-venue-team-name">${nameText(team, names)}</span></div>`;
 
 const contactRow = (label, value) => {
   const inner = value.href ? `<a class="hoops-link" href="${attr(value.href)}">${esc(value.text)}</a>` : esc(value.text);
@@ -73,16 +74,16 @@ export function renderVenueCard(props, options) {
   const rows = size === 'compact' ? [] : venueGames(list(p.games).filter((g) => g && typeof g === 'object').map(gameOf), p.limit);
   const target = venueHref(typeof p.href === 'string' ? p.href : undefined);
   const info = str(p.info).trim();
-  const gamesLabel = typeof p.gamesLabel === 'string' ? p.gamesLabel : venueText.gamesLabel;
-  const linkLabel = typeof p.linkLabel === 'string' ? p.linkLabel : venueText.linkLabel;
+  const gamesLabel = typeof p.gamesLabel === 'string' ? p.gamesLabel : venueString('gamesLabel', options);
+  const linkLabel = typeof p.linkLabel === 'string' ? p.linkLabel : venueString('linkLabel', options);
   const tag = headingOf(p.titleAs);
   const uid = uidFor(p, options);
 
   const mapProps = hasMap ? venueMapProps(p, title, lat, lng) : null;
   const map = hasMap
     ? `<div class="hoops-venue-map"${obj(options).init === true ? ` data-hoops="map" data-hoops-options="${attr(JSON.stringify(mapProps))}"` : ''}>` +
-      renderMapView({ ...mapProps, label: venueMapLabel(title), loadReady: obj(options).mapActive === true }, uid) +
-      `<div class="hoops-venue-maplinks">${venueMapLinks({ lat, lng, name: title })
+      renderMapView({ ...mapProps, label: venueMapLabel(title, options), loadReady: obj(options).mapActive === true }, uid, options) +
+      `<div class="hoops-venue-maplinks">${venueMapLinks({ lat, lng, name: title }, options)
         .map((link) => `<a class="hoops-link" href="${attr(link.href)}">${esc(link.text)}${title ? `<span class="hoops-sr-only">, ${esc(title)}</span>` : ''}</a>`)
         .join('')}</div></div>`
     : '';
@@ -93,31 +94,32 @@ export function renderVenueCard(props, options) {
         .map((game, index) => {
           const when = gameWhen(game);
           const meta = gameMeta(game);
-          const state = gameState(game);
+          const state = gameState(game, options);
           return (
             '<li class="hoops-venue-game">' +
             (when || state
               ? `<div class="hoops-venue-game-head">${when ? `<span class="hoops-venue-when">${esc(when)}</span>` : ''}${state ? `<span class="hoops-chip hoops-chip--${state.tone}">${esc(state.text)}</span>` : ''}</div>`
               : '') +
             (meta ? `<div class="hoops-venue-game-meta">${esc(meta)}</div>` : '') +
-            `<div class="hoops-venue-teams">${game.heim?.name ? teamLine(game.heim, 'heim', names, logos) : ''}${game.gast?.name ? teamLine(game.gast, 'gast', names, logos) : ''}</div></li>`
+            `<div class="hoops-venue-teams">${game.heim?.name ? teamLine(game.heim, 'heim', names, logos, options) : ''}${game.gast?.name ? teamLine(game.gast, 'gast', names, logos, options) : ''}</div></li>`
           );
         })
         .join('') +
       '</ul></div>'
     : '';
 
-  return (
+  return withLang(
     `<div class="${klass('hoops-venue', `hoops-venue--${size}`, hasMap && 'hoops-venue--map', str(p.className))}"><div class="hoops-venue-in">${map}<div class="hoops-venue-body">` +
     (title ? `<${tag} class="hoops-venue-title">${esc(title)}</${tag}>` : '') +
     (lines.length ? `<address class="hoops-venue-address">${lines.map((line) => `<span class="hoops-venue-line">${esc(line)}</span>`).join('')}</address>` : '') +
     (info ? `<p class="hoops-venue-info">${esc(info)}</p>` : '') +
     (person
-      ? `<dl class="hoops-venue-contact">${person.name ? `<div><dt>${esc(venueText.contact)}</dt><dd>${esc(person.name)}</dd></div>` : ''}${person.phone ? contactRow(venueText.phone, person.phone) : ''}${person.email ? contactRow(venueText.email, person.email) : ''}</dl>`
+      ? `<dl class="hoops-venue-contact">${person.name ? `<div><dt>${esc(venueString('contact', options))}</dt><dd>${esc(person.name)}</dd></div>` : ''}${person.phone ? contactRow(venueString('phone', options), person.phone) : ''}${person.email ? contactRow(venueString('email', options), person.email) : ''}</dl>`
       : '') +
     games +
     (target ? `<div class="hoops-venue-foot"><a class="hoops-link hoops-venue-more" href="${attr(target)}">${esc(linkLabel)}${title ? `<span class="hoops-sr-only">, ${esc(title)}</span>` : ''}</a></div>` : '') +
-    '</div></div></div>'
+    '</div></div></div>',
+    options,
   );
 }
 
@@ -134,6 +136,9 @@ export function mountVenueCard(el, props, options) {
 
   const behavior = {};
   for (const [name, fn] of Object.entries({ loadLeaflet, onLoad, onError, onMarkerClick })) if (typeof fn === 'function') behavior[name] = fn;
+  // Sprache und Texte gehen auch an die Karte
+  if (typeof rest.locale === 'string') behavior.locale = rest.locale;
+  if (rest.texts && typeof rest.texts === 'object') behavior.texts = rest.texts;
   let live = null;
   let done = false;
   const keyOf = (p) => {
@@ -148,19 +153,23 @@ export function mountVenueCard(el, props, options) {
     live = node ? { node, key: keyOf(p), handle: initMap(node, optionsOf(p)) } : null;
   };
 
-  const inner = mount(el, renderVenueCard, props, { ...rest, mapActive: true });
+  // Die laufende Karte darf bei einem Sprachwechsel nicht ersetzt werden: die Hallenkarte rendert dann selbst neu (siehe unten) und lässt sie stehen
+  const inner = mount(el, renderVenueCard, props, { ...rest, mapActive: true, followLocale: false });
   start(obj(props));
+  let latest = obj(props);
 
   const handle = registry.claim(el, () => {
     done = true;
+    stopLocale();
     live?.handle.destroy();
     live = null;
     inner.destroy();
   });
-  return {
+  const api = {
     update(next) {
       if (done) return;
       const p = obj(next);
+      latest = p;
       const keep = live && live.key === keyOf(p) ? live : null;
       if (live && !keep) {
         live.handle.destroy();
@@ -178,4 +187,6 @@ export function mountVenueCard(el, props, options) {
     },
     destroy: handle.destroy,
   };
+  const stopLocale = onLocaleChange(() => api.update(latest));
+  return api;
 }

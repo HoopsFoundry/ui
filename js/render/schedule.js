@@ -11,15 +11,20 @@
 import {
   ariaForResult, buildGrid, columnsFor, densityFor, groupBySection, hasScore, initials, layoutFor, resolveOutcome, stateLabel, winnerSide,
 } from '../schedule.js';
+import { t as tr } from '../i18n/index.js';
 import { attr, esc } from './escape.js';
 import {
-  collapsibleFrame, cls, headingOf, klass, list, liveTag, logoBadge, nameText, num, obj, pick, str, teamOf, uidFor, url,
+  collapsibleFrame, cls, headingOf, klass, list, liveTag, logoBadge, nameText, num, obj, pick, sentenceWith, str, teamOf, uidFor, url, withLang,
 } from './core.js';
 import { mount } from './mount.js';
 
 const STATES = ['scheduled', 'live', 'finished', 'cancelled', 'postponed', 'bye'];
 const OUTCOMES = ['S', 'N', 'U'];
 const OUTCOME_CHIP = { S: 'hoops-chip--ok', N: 'hoops-chip--err', U: '' };
+// Kennbuchstabe im Chip: die Daten (`S`, `N`, `U`) bleiben, die Anzeige geht über den Katalog
+const OUTCOME_LETTER = { S: 'common.outcome-letter.win', N: 'common.outcome-letter.loss', U: 'common.outcome-letter.draw' };
+// Kennzeichen „Heimspiel“ und „Auswärtsspiel“ im Chip
+const AT_KEY = { heim: 'schedule.chip.home', gast: 'schedule.chip.away' };
 
 /** Ein Spiel aus unvertrauten Daten: Texte als Text, Punkte nur endlich, Teams und Ziele geprüft. */
 function gameOf(raw, index) {
@@ -52,9 +57,11 @@ function teamName(team, { loser = false, names, logo = false }) {
 }
 
 /** Sichtbares Ergebnis (für Screenreader versteckt) plus gesprochener Text; „vorläufig“ steht klein unter der Zahl. */
-const resultText = (visible, spoken, provisional, chip = '') =>
+const resultText = (visible, spoken, provisional, chip = '', options) =>
   `<span class="hoops-sch-resbox">${chip}<span class="hoops-sch-score" aria-hidden="true">${esc(visible)}</span><span class="hoops-sr-only">${esc(spoken)}</span>` +
-  `${provisional ? '<small class="hoops-sch-prov" aria-hidden="true">vorläufig</small>' : ''}</span>`;
+  `${provisional ? `<small class="hoops-sch-prov" aria-hidden="true">${esc(tr('schedule.provisional', undefined, options))}</small>` : ''}</span>`;
+
+const byeText = (markup, options) => sentenceWith('schedule.bye', 'team', markup, options);
 
 const extraOf = (fn, game) => {
   if (typeof fn !== 'function') return '';
@@ -71,18 +78,21 @@ function framed(p, region, options) {
   const meta = str(p.meta);
   const rootClass = cls('hoops-frame', str(p.className));
   if (p.collapsible === true && title) {
-    return collapsibleFrame({
-      kind: 'frame', rootClass, id: str(p.id), title, titleAs: p.titleAs, open: p.open === true,
-      meta: meta ? `<span class="hoops-frame-meta"><span>${esc(meta)}</span></span>` : undefined,
-      content: region, uid: uidFor(p, options),
-    });
+    return withLang(
+      collapsibleFrame({
+        kind: 'frame', rootClass, id: str(p.id), title, titleAs: p.titleAs, open: p.open === true,
+        meta: meta ? `<span class="hoops-frame-meta"><span>${esc(meta)}</span></span>` : undefined,
+        content: region, uid: uidFor(p, options),
+      }),
+      options,
+    );
   }
   const tag = headingOf(p.titleAs);
   const head =
     title || meta
       ? `<div class="hoops-frame-head">${title ? `<${tag} class="hoops-frame-title">${esc(title)}</${tag}>` : '<span></span>'}<div class="hoops-frame-meta">${meta ? `<span>${esc(meta)}</span>` : ''}</div></div>`
       : '';
-  return `<div class="${klass(rootClass)}">${head}${region}</div>`;
+  return withLang(`<div class="${klass(rootClass)}">${head}${region}</div>`, options);
 }
 
 /** Spielplan als Tabelle: Gegenüberstellung, Perspektive einer Mannschaft oder Turnier-Spalten. `options.time`/`options.notice`: Text je Spiel. */
@@ -93,7 +103,7 @@ export function renderScheduleTable(props, options) {
   const mode = pick(p.layout, ['versus', 'opponent', 'columns'], undefined) ?? layoutFor(games);
   const dens = pick(p.density, ['touch', 'default', 'compact'], undefined) ?? densityFor(games, mode);
   const hasNotice = typeof opts.notice === 'function';
-  const cols = columnsFor(mode, games, hasNotice);
+  const cols = columnsFor(mode, games, hasNotice, options);
   const names = pick(p.names, ['full', 'short'], 'full');
   const logos = p.logos;
   const title = str(p.title);
@@ -119,14 +129,14 @@ export function renderScheduleTable(props, options) {
           '<td role="cell" class="hoops-sch-when">' +
           (game.date ? `<span class="hoops-sch-date">${esc(game.date)}</span>` : '') +
           (hasTime ? `<span class="hoops-sch-time">${timeText}</span>` : '') +
-          (stateLabel(game.state) ? `<span class="hoops-sr-only"> ${esc(stateLabel(game.state))}</span>` : '') +
-          (game.state === 'live' ? liveTag() : '') +
+          (stateLabel(game.state, options) ? `<span class="hoops-sr-only"> ${esc(stateLabel(game.state, options))}</span>` : '') +
+          (game.state === 'live' ? liveTag(options) : '') +
           (mode !== 'columns' && game.venue ? `<span class="hoops-sch-venue">${esc(game.venue)}</span>` : '') +
           '</td>'
         );
       }
       case 'ha':
-        return `<td role="cell" class="hoops-sch-ha"><span class="hoops-chip hoops-chip--mono ${game.at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}">${game.at === 'gast' ? '@' : 'vs.'}</span></td>`;
+        return `<td role="cell" class="hoops-sch-ha"><span class="hoops-chip hoops-chip--mono ${game.at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}">${esc(tr(game.at === 'gast' ? AT_KEY.gast : AT_KEY.heim, undefined, options))}</span></td>`;
       case 'match': {
         let inner;
         if (mode === 'opponent' && game.opponent) {
@@ -134,7 +144,7 @@ export function renderScheduleTable(props, options) {
           inner = `<span class="hoops-sch-opp">${logo}${tn(game.opponent, false, false)}</span>`;
         } else {
           inner =
-            tn(game.heim, winner === 'gast', logos === true) + '<span class="hoops-sch-sep" aria-hidden="true"> – </span><span class="hoops-sr-only"> gegen </span>' +
+            tn(game.heim, winner === 'gast', logos === true) + `<span class="hoops-sch-sep" aria-hidden="true"> – </span><span class="hoops-sr-only"> ${esc(tr('schedule.versus', undefined, options))} </span>` +
             tn(game.gast, winner === 'heim', logos === true);
         }
         return `<td role="cell" class="hoops-sch-match">${inner}${league(game)}${note(game)}</td>`;
@@ -152,8 +162,8 @@ export function renderScheduleTable(props, options) {
         if (!scored) return '<td role="cell" class="hoops-sch-res"><span class="hoops-sch-none">–</span></td>';
         const result = mode === 'opponent' ? resolveOutcome(game) : undefined;
         const visible = mode === 'opponent' && game.opponent ? `${game.ownScore} : ${game.opponent.score}` : `${game.heim?.score} : ${game.gast?.score}`;
-        const chip = OUTCOMES.includes(result) ? `<span class="hoops-chip hoops-chip--mono${OUTCOME_CHIP[result] ? ` ${OUTCOME_CHIP[result]}` : ''}" aria-hidden="true">${esc(result)}</span>` : '';
-        return `<td role="cell" class="hoops-sch-res">${resultText(visible, ariaForResult(game, mode), game.provisional, chip)}</td>`;
+        const chip = OUTCOMES.includes(result) ? `<span class="hoops-chip hoops-chip--mono${OUTCOME_CHIP[result] ? ` ${OUTCOME_CHIP[result]}` : ''}" aria-hidden="true">${esc(tr(OUTCOME_LETTER[result], undefined, options))}</span>` : '';
+        return `<td role="cell" class="hoops-sch-res">${resultText(visible, ariaForResult(game, mode, options), game.provisional, chip, options)}</td>`;
       }
       case 'notice':
         return `<td role="cell" class="hoops-sch-notice">${extraOf(opts.notice, game)}</td>`;
@@ -166,7 +176,7 @@ export function renderScheduleTable(props, options) {
     const own = game.heim?.own || game.gast?.own;
     const classes = klass('hoops-sch-row', own && mode !== 'opponent' && 'is-own', game.state === 'live' && 'is-live', game.state === 'cancelled' && 'is-cancelled', game.state === 'postponed' && 'is-postponed', game.state === 'bye' && 'is-bye');
     if (game.state === 'bye') {
-      const who = game.heim ? `${tn(game.heim, false, logos === true)} hat Freilos` : esc(game.note || 'Spielfrei');
+      const who = game.heim ? byeText(tn(game.heim, false, logos === true), options) : esc(game.note || tr('schedule.bye-none', undefined, options));
       return `<tr role="row" class="${classes}"><td role="cell" class="hoops-sch-bye" colspan="${cols.length}">${game.time ? `<span class="hoops-sch-time">${esc(game.time)} · </span>` : ''}${who}</td></tr>`;
     }
     return `<tr role="row" class="${classes}">${cols.map((col) => cell(col.key, game)).join('')}</tr>`;
@@ -176,7 +186,7 @@ export function renderScheduleTable(props, options) {
     .map((group) => (group.section ? `<tr role="row" class="hoops-sch-group"><th scope="colgroup" colspan="${cols.length}">${esc(group.section)}</th></tr>` : '') + group.games.map(row).join(''))
     .join('');
   const region =
-    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || 'Spielplan')}">` +
+    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || tr('schedule.table-label', undefined, options))}">` +
     `<table role="table" class="${klass('hoops-tbl hoops-tbl--schedule', `hoops-tbl--${dens}`, `hoops-sch--${mode}`)}">` +
     (caption ? `<caption class="hoops-sr-only">${esc(caption)}</caption>` : '') +
     `<thead role="rowgroup"${mode === 'columns' ? '' : ' class="hoops-sr-only"'}><tr role="row">${cols.map((col) => `<th scope="col" role="columnheader">${esc(col.label)}</th>`).join('')}</tr></thead>` +
@@ -192,7 +202,7 @@ export function renderScheduleGrid(props, options) {
   const columns = list(p.columns).map((raw) => ({ id: str(obj(raw).id), label: str(obj(raw).label) }));
   const slots = Array.isArray(p.slots) ? p.slots.map(str) : undefined;
   const breaks = list(p.breaks).map((raw) => ({ time: str(obj(raw).time), label: str(obj(raw).label) }));
-  const emptyLabel = typeof p.emptyLabel === 'string' ? p.emptyLabel : 'frei';
+  const emptyLabel = typeof p.emptyLabel === 'string' ? p.emptyLabel : tr('schedule.grid-empty', undefined, options);
   const density = pick(p.density, ['touch', 'default', 'compact'], 'default');
   const names = pick(p.names, ['full', 'short'], 'full');
   const logos = Boolean(p.logos);
@@ -209,12 +219,12 @@ export function renderScheduleGrid(props, options) {
     return (
       `<div class="${klass('hoops-sg-game', own && 'is-own', game.state === 'live' && 'is-live', game.state === 'cancelled' && 'is-cancelled', game.state === 'postponed' && 'is-postponed')}">` +
       '<div class="hoops-sg-teams">' +
-      (stateLabel(game.state) ? `<span class="hoops-sr-only">${esc(stateLabel(game.state))} </span>` : '') +
-      tn(game.heim, winner === 'gast', logos) + '<span class="hoops-sch-sep" aria-hidden="true"> – </span><span class="hoops-sr-only"> gegen </span>' + tn(game.gast, winner === 'heim', logos) +
-      (game.state === 'live' && !scored ? liveTag() : '') +
+      (stateLabel(game.state, options) ? `<span class="hoops-sr-only">${esc(stateLabel(game.state, options))} </span>` : '') +
+      tn(game.heim, winner === 'gast', logos) + `<span class="hoops-sch-sep" aria-hidden="true"> – </span><span class="hoops-sr-only"> ${esc(tr('schedule.versus', undefined, options))} </span>` + tn(game.gast, winner === 'heim', logos) +
+      (game.state === 'live' && !scored ? liveTag(options) : '') +
       '</div>' +
       ((game.state === 'finished' || game.state === 'live') && scored
-        ? `<div class="hoops-sg-result">${resultText(`${game.heim?.score} : ${game.gast?.score}`, ariaForResult(game, 'versus'), game.provisional)}${game.state === 'live' ? liveTag() : ''}</div>`
+        ? `<div class="hoops-sg-result">${resultText(`${game.heim?.score} : ${game.gast?.score}`, ariaForResult(game, 'versus', options), game.provisional, '', options)}${game.state === 'live' ? liveTag(options) : ''}</div>`
         : '') +
       (meta ? `<div class="hoops-sg-meta">${esc(meta)}</div>` : '') +
       (game.note ? `<div class="hoops-sch-note">${esc(game.note)}</div>` : '') +
@@ -229,8 +239,8 @@ export function renderScheduleGrid(props, options) {
         return `<tr role="row" class="hoops-sg-break"><th scope="row" role="rowheader" class="hoops-sg-time">${esc(row.time)}</th><td role="cell" colspan="${columns.length}">${esc(row.label)}</td></tr>`;
       }
       if (row.kind === 'bye') {
-        const who = row.game.heim ? `${tn(row.game.heim, false, logos)} hat Freilos` : esc(row.game.note || 'Spielfrei');
-        return `<tr role="row" class="hoops-sg-bye"><th scope="row" role="rowheader" class="hoops-sg-time">${row.time ? esc(row.time) : '<span class="hoops-sr-only">Zeit offen</span>'}</th><td role="cell" colspan="${columns.length}">${who}</td></tr>`;
+        const who = row.game.heim ? byeText(tn(row.game.heim, false, logos), options) : esc(row.game.note || tr('schedule.bye-none', undefined, options));
+        return `<tr role="row" class="hoops-sg-bye"><th scope="row" role="rowheader" class="hoops-sg-time">${row.time ? esc(row.time) : `<span class="hoops-sr-only">${esc(tr('schedule.time-open', undefined, options))}</span>`}</th><td role="cell" colspan="${columns.length}">${who}</td></tr>`;
       }
       const cells = row.cells
         .map((games, index) =>
@@ -242,10 +252,10 @@ export function renderScheduleGrid(props, options) {
     })
     .join('');
   const region =
-    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || 'Zeitraster')}">` +
+    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || tr('schedule.grid-label', undefined, options))}">` +
     `<table role="table" class="${klass('hoops-tbl hoops-sgrid', `hoops-tbl--${density}`)}">` +
     (caption ? `<caption class="hoops-sr-only">${esc(caption)}</caption>` : '') +
-    `<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader" class="hoops-sg-time">Zeit</th>${columns.map((c) => `<th scope="col" role="columnheader">${esc(c.label)}</th>`).join('')}</tr></thead>` +
+    `<thead role="rowgroup"><tr role="row"><th scope="col" role="columnheader" class="hoops-sg-time">${esc(tr('schedule.col.time', undefined, options))}</th>${columns.map((c) => `<th scope="col" role="columnheader">${esc(c.label)}</th>`).join('')}</tr></thead>` +
     `<tbody role="rowgroup">${body}</tbody></table></div>`;
   return framed(p, region, options);
 }

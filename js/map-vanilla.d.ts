@@ -55,12 +55,22 @@ export interface MapBehavior {
   onError?: (reason: MapErrorReason) => void;
   /** Ein Marker wurde angeklickt (vor der Navigation zu `href`). */
   onMarkerClick?: (item: MapItem) => void;
+  /** Sprache nur für diese Karte (sonst die globale Sprache; ein Sprachwechsel führt die Texte nach, ohne Leaflet neu zu laden). */
+  locale?: string;
+  /** Eigene Texte nach Katalogschlüssel (`map.*`); `mapText` und die Eigenschaften der Karte (`privacyNote`, `seatLabel` …) gehen vor. */
+  texts?: Record<string, string | { one: string; other: string; [form: string]: string }>;
 }
 
 /** Optionen von `renderMap`. */
 export interface MapRenderOptions {
   /** Basis der erzeugten ids (Kartenfläche, Liste); nur Buchstaben, Ziffern, `_` und `-`. Ohne Angabe ein Hash der Eingaben. */
   uid?: string;
+  /** Sprache nur für diesen Aufruf (sonst die globale Sprache). */
+  locale?: string;
+  /** Eigene Texte nach Katalogschlüssel (`map.*`); `mapText` und die Eigenschaften der Karte gehen vor. */
+  texts?: Record<string, string | { one: string; other: string; [form: string]: string }>;
+  /** Sprache der Seite, wenn kein `document` da ist (Node): weicht die Sprache der Karte ab, bekommt die Wurzel `lang`. */
+  documentLang?: string;
 }
 
 export interface MapMountHandle extends HoopsHandle {

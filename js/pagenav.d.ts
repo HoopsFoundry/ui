@@ -1,6 +1,10 @@
 import type { HoopsHandle } from './lifecycle.js';
 
 export interface PageNavOptions {
+  /** Sprache nur für diesen Baustein (sonst die globale Sprache, ein Sprachwechsel führt die Texte nach). */
+  locale?: string;
+  /** Eigene Texte nach Katalogschlüssel (Vorrang vor den globalen Überschreibungen und dem Katalog; die Option des Bausteins, zum Beispiel `label`, geht vor). */
+  texts?: Record<string, string | { one: string; other: string; [form: string]: string }>;
   /** CSS-Auswahl der Ziele in `root` (Standard `'h2, [data-pagenav]'`). Eine ungültige Auswahl fällt auf den Standard zurück. */
   selector?: string;
   /** Element oder Auswahl, in das die Navigation vor den ersten Block mit einem Ziel gesetzt wird (Standard `root`). */

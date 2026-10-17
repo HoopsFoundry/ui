@@ -7,12 +7,15 @@
  * entfernt Listener und Markup und stellt den früheren Inhalt von `el` wieder her. `update` ersetzt den Inhalt (bei gleichem Markup passiert
  * nichts) und hält den Fokus (über `id` oder die Lage im Baum, auch im Shadow DOM), die Scrollposition der Tabellenbereiche und den Zustand
  * offen/zu eines einklappbaren Rahmens, solange `props.open` sich nicht ändert.
+ * Sprache: Ändern sich Sprache, Katalog oder Überschreibungen (Ereignis `hoops:localechange`, js/i18n-events.js), rendert `mount` mit demselben Zustand
+ * neu (Fokus, Scrollposition und offen/zu bleiben wie bei `update`); `options.followLocale: false` schaltet das ab (`mountVenueCard` mit Karte macht es selbst).
  * Styles: Die Render-Funktionen schreiben wenige `style`-Attribute (Pins, Kartenhöhe, Spaltenbreite). `mount` setzt sie nach dem Einsetzen
  * über das CSSOM (`style.setProperty`), sodass eine Seite mit `style-src 'self'` sie nicht blockiert; wer das Markup einer Render-Funktion selbst
  * einsetzt, braucht `style-src-attr 'unsafe-inline'` (oder `mountX`).
  * Typen: js/render/mount.d.ts.
  */
 import { initAccordion } from '../accordion.js';
+import { onLocaleChange } from '../i18n-events.js';
 import { createRegistry } from '../lifecycle.js';
 import { insertMarkup, nextUid } from './dom.js';
 
@@ -78,7 +81,7 @@ export function mount(el, render, props, options = {}) {
   if (typeof document === 'undefined' || !el || typeof el.replaceChildren !== 'function' || typeof render !== 'function') return { ...noop };
   registry.release(el);
 
-  const { on = [], ...renderOptions } = options && typeof options === 'object' ? options : {};
+  const { on = [], followLocale = true, ...renderOptions } = options && typeof options === 'object' ? options : {};
   const doc = el.ownerDocument;
   const uid = typeof renderOptions.uid === 'string' && renderOptions.uid ? renderOptions.uid : nextUid();
   const original = [...el.childNodes];
@@ -150,6 +153,8 @@ export function mount(el, render, props, options = {}) {
   }
 
   paint(current, null);
+  // Sprachwechsel: gleicher Zustand, neue Texte (bei gleichem Markup passiert nichts)
+  if (followLocale !== false) cleanups.push(onLocaleChange(() => { if (!done) paint(current, current); }));
 
   const handle = registry.claim(el, () => {
     done = true;

@@ -2,31 +2,32 @@
  * HoopsFoundry UI Render · Kennzahlen (StatGrid) und Form (FormChips)
  * --------------------------------------------------------------
  * `renderStats(props)`/`mountStats(el, props)` und `renderFormChips(props)`/`mountFormChips(el, props)`: dasselbe Markup wie die Komponenten
- * StatGrid und FormChips (Svelte, React). Logik aus js/stats.js und js/league.js. Typen: js/render/stats.d.ts.
+ * StatGrid und FormChips (Svelte, React). Logik aus js/stats.js und js/league.js. `options.locale` und `options.texts` wählen Sprache und
+ * Texte (Standard: die globale Sprache). Typen: js/render/stats.d.ts.
  */
-import { statEmptyText, statItems } from '../stats.js';
+import { statEmptyLabel, statItems } from '../stats.js';
 import { esc } from './escape.js';
-import { formChips, klass, obj, pick, str } from './core.js';
+import { formChips, klass, obj, pick, str, withLang } from './core.js';
 import { mount } from './mount.js';
 
 /** Kennzahlen als Beschreibungsliste (`hoops-stats`); ohne gültigen Eintrag leer. Props: `items`, `compact`, `className`. */
-export function renderStats(props) {
+export function renderStats(props, options) {
   const p = obj(props);
-  const items = statItems(p.items);
+  const items = statItems(p.items, options);
   if (!items.length) return '';
   const cells = items
     .map((item) => {
-      const value = item.empty ? `<span aria-hidden="true">${esc(item.value)}</span><span class="hoops-sr-only">${esc(statEmptyText)}</span>` : esc(item.value);
+      const value = item.empty ? `<span aria-hidden="true">${esc(item.value)}</span><span class="hoops-sr-only">${esc(statEmptyLabel(options))}</span>` : esc(item.value);
       return `<div class="hoops-stat"><dt class="hoops-stat-label">${esc(item.label)}</dt><dd class="hoops-stat-value">${value}</dd></div>`;
     })
     .join('');
-  return `<dl class="${klass('hoops-stats', p.compact === true && 'hoops-stats--compact', str(p.className))}">${cells}</dl>`;
+  return withLang(`<dl class="${klass('hoops-stats', p.compact === true && 'hoops-stats--compact', str(p.className))}">${cells}</dl>`, options);
 }
 
 /** Form (letzte Spiele) als Zeichenreihe mit versteckter Beschreibung. Props: `form`, `variant` (`dots` oder `letters`), `className`. */
-export function renderFormChips(props) {
+export function renderFormChips(props, options) {
   const p = obj(props);
-  return formChips(p.form, pick(p.variant, ['dots', 'letters'], 'dots'), str(p.className));
+  return withLang(formChips(p.form, pick(p.variant, ['dots', 'letters'], 'dots'), str(p.className), options), options);
 }
 
 /** Setzt `renderStats` in `el` ein. Gibt `{ update(props), destroy() }` zurück. */

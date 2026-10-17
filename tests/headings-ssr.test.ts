@@ -37,6 +37,7 @@ beforeAll(async () => {
     esbuild: { jsx: 'automatic' }, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error',
   });
   render = ((await vite.ssrLoadModule('svelte/server')) as { render: Render }).render;
+  await vite.ssrLoadModule('/tests/setup-i18n.ts'); // Standardsprache der Tests (Deutsch) auch im Modulgraphen dieses Servers
   const { createRawSnippet } = (await vite.ssrLoadModule('svelte')) as { createRawSnippet: (fn: () => { render: () => string }) => unknown };
   snip = (html) => createRawSnippet(() => ({ render: () => html })) as never;
   HeadingLevelReact = (await load('react/HeadingLevel.tsx', 'HeadingLevel')) as typeof HeadingLevelReact;

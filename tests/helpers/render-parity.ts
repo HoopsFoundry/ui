@@ -22,6 +22,7 @@ export function useParity() {
       esbuild: { jsx: 'automatic' }, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error',
     });
     render = ((await vite.ssrLoadModule('svelte/server')) as { render: typeof render }).render;
+    await vite.ssrLoadModule('/tests/setup-i18n.ts'); // Standardsprache der Tests (Deutsch) auch im Modulgraphen dieses Servers
     createRawSnippet = ((await vite.ssrLoadModule('svelte')) as { createRawSnippet: typeof createRawSnippet }).createRawSnippet;
   }, 60000);
   afterAll(async () => {

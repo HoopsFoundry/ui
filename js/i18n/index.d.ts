@@ -35,3 +35,5 @@ export function localeOf(options?: { locale?: string }): string;
 export function availableLocales(): string[];
 /** Nur für Tests: Zustand auf Werkseinstellung zurücksetzen. */
 export function __resetForTests(): void;
+/** Nur für Tests: Zahl der Abonnenten (Prüfung auf Lecks). */
+export function __subscriberCount(): number;
