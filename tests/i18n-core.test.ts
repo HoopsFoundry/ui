@@ -192,3 +192,86 @@ describe('Formatierung', () => {
     expect(formatCoords(NaN, 0)).toBe('');
   });
 });
+
+describe('nicht-textförmige Überschreibungen', () => {
+  it('werden übersprungen, die Rückfallkette läuft weiter', () => {
+    for (const bad of [null, 5, [], true, {}, { one: 'x' }, { other: 3 }]) {
+      setTexts({ 'x.hello': bad as never });
+      expect(t('x.hello'), JSON.stringify(bad)).toBe('Hello');
+      expect(t('x.hello', undefined, { texts: { 'x.hello': bad as never } }), JSON.stringify(bad)).toBe('Hello');
+      expect(t('x.items', { count: 2 }, { texts: { 'x.items': bad as never } })).toBe('2 items');
+    }
+    setTexts({});
+  });
+  it('eine ungültige Überschreibung je Aufruf fällt auf die globale zurück', () => {
+    setTexts({ 'x.hello': 'global' });
+    expect(t('x.hello', undefined, { texts: { 'x.hello': null as never } })).toBe('global');
+  });
+  it('ein ungültiger Katalogwert wird übersprungen', () => {
+    registerLocale('de', { 'x.hello': 7 as never });
+    setLocale('de');
+    expect(t('x.hello')).toBe('Hello');
+  });
+});
+
+describe('werfende Abonnenten', () => {
+  it('A wirft, B wird trotzdem gerufen, der Aufrufer bekommt keine Ausnahme', () => {
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const b = vi.fn();
+    subscribe(() => {
+      throw new Error('kaputt');
+    });
+    subscribe(b);
+    expect(() => setLocale('de')).not.toThrow();
+    expect(() => registerLocale('fr', {})).not.toThrow();
+    expect(() => setTexts({})).not.toThrow();
+    expect(b).toHaveBeenCalledTimes(3);
+    expect(err).toHaveBeenCalled();
+    expect(String(err.mock.calls[0][0])).toMatch(/Abonnent/);
+  });
+});
+
+describe('ungültige Sprachcodes', () => {
+  const bad = ['x', 'a'.repeat(5000), '', 'de--AT', '12', '!!'];
+  it('setLocale fällt auf en zurück und warnt einmal', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    for (const code of bad) {
+      expect(() => setLocale(code)).not.toThrow();
+      expect(getLocale(), code).toBe('en');
+      expect(t('x.hello')).toBe('Hello');
+    }
+    setLocale('x');
+    setLocale('x');
+    expect(warn.mock.calls.filter((c) => String(c[0]).includes("'x'")).length).toBe(1);
+  });
+  it('options.locale, Mehrzahl und Formatierung stürzen nicht ab', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    registerLocale('en', { 'x.items': { one: '{count} item', other: '{count} items' }, 'common.direction.n': 'N', 'common.direction.e': 'E', 'common.direction.s': 'S', 'common.direction.w': 'W' });
+    for (const code of bad) {
+      expect(localeOf({ locale: code })).toBe('en');
+      expect(t('x.items', { count: 1 }, { locale: code })).toBe('1 item');
+      expect(formatNumber(1234.5, undefined, { locale: code })).toBe('1,234.5');
+      expect(formatCoords(49.4875, 8.466, { locale: code })).toBe('49.4875° N, 8.4660° E');
+    }
+  });
+  it('registerLocale mit ungültigem Code ändert nichts (kein Überschreiben von en)', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+    registerLocale('x', { 'x.hello': 'kaputt' });
+    expect(availableLocales().sort()).toEqual(['de', 'de-AT', 'en']);
+    expect(t('x.hello')).toBe('Hello');
+  });
+  it('Schreibweisen werden vereinheitlicht', () => {
+    setLocale('de_at');
+    expect(getLocale()).toBe('de-AT');
+    setLocale('DE-at');
+    expect(getLocale()).toBe('de-AT');
+  });
+});
+
+describe('Platzhalter und Prototyp', () => {
+  it('Eigenschaften der Prototypkette sind keine Parameter', () => {
+    registerLocale('en', { 'x.proto': 'Hallo {constructor} {toString} {__proto__} {hasOwnProperty}' });
+    expect(t('x.proto', {})).toBe('Hallo {constructor} {toString} {__proto__} {hasOwnProperty}');
+    expect(t('x.proto', { constructor: 'C' } as never)).toBe('Hallo C {toString} {__proto__} {hasOwnProperty}');
+  });
+});

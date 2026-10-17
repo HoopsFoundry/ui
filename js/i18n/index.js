@@ -11,12 +11,29 @@ import en from './en.js';
 
 const DEFAULT_LOCALE = 'en';
 
-/** Sprachcode vereinheitlichen: `de_at` → `de-AT`. */
-function normalize(code) {
-  const parts = String(code ?? '').trim().replace(/_/g, '-').split('-').filter(Boolean);
-  if (!parts.length) return DEFAULT_LOCALE;
-  return parts.map((p, i) => (i === 0 ? p.toLowerCase() : p.length === 2 ? p.toUpperCase() : p)).join('-');
+/** Sprachcode vereinheitlichen und prüfen: `de_at` wird `de-AT`; ein ungültiger Code ergibt `null`. */
+function canonical(code) {
+  try {
+    const text = String(code ?? '').trim().replace(/_/g, '-');
+    return text.length > 0 && text.length <= 64 ? Intl.getCanonicalLocales(text)[0] ?? null : null;
+  } catch {
+    return null;
+  }
 }
+
+/** Wie `canonical`, aber mit Rückfall auf `en` und einer einmaligen deutschen Warnung je ungültigem Code. */
+function normalize(code) {
+  const result = canonical(code);
+  if (result) return result;
+  const shown = String(code).slice(0, 40);
+  if (!warned.has(`locale:${shown}`)) {
+    warned.add(`locale:${shown}`);
+    if (!production()) console.warn(`[hoops-i18n] Ungültiger Sprachcode '${shown}', es gilt ${DEFAULT_LOCALE}.`);
+  }
+  return DEFAULT_LOCALE;
+}
+
+const production = () => typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production';
 
 let locale = DEFAULT_LOCALE;
 let catalogs = new Map([[DEFAULT_LOCALE, en]]);
@@ -25,7 +42,13 @@ let listeners = new Set();
 let warned = new Set();
 
 function notify() {
-  for (const fn of [...listeners]) fn(locale);
+  for (const fn of [...listeners]) {
+    try {
+      fn(locale);
+    } catch (error) {
+      console.error('[hoops-i18n] Ein Abonnent hat beim Sprachwechsel einen Fehler geworfen.', error);
+    }
+  }
 }
 
 /** Setzt die globale Sprache (Schreibweise wie `de-AT` bleibt erhalten, die Auflösung fällt auf `de` und `en` zurück). */
@@ -41,7 +64,12 @@ export function getLocale() {
 
 /** Fügt einen Katalog hinzu oder ersetzt den der Sprache. */
 export function registerLocale(code, catalog) {
-  catalogs.set(normalize(code), catalog && typeof catalog === 'object' ? catalog : {});
+  const key = canonical(code);
+  if (!key) {
+    normalize(code);
+    return;
+  }
+  catalogs.set(key, catalog && typeof catalog === 'object' ? catalog : {});
   notify();
 }
 
@@ -83,19 +111,21 @@ export function __resetForTests() {
   warned = new Set();
 }
 
+const has = (object, key) => object !== null && typeof object === 'object' && Object.prototype.hasOwnProperty.call(object, key);
+const isPlural = (value) => value !== null && typeof value === 'object' && !Array.isArray(value) && typeof value.other === 'string';
+/** Nur Zeichenketten und Mehrzahlobjekte (mit `other` als Zeichenkette) sind gültige Werte. */
+const usable = (value) => typeof value === 'string' || isPlural(value);
+
 function lookup(key, code, options) {
-  const own = options && options.texts && Object.prototype.hasOwnProperty.call(options.texts, key) ? options.texts[key] : undefined;
-  if (own !== undefined) return own;
-  if (Object.prototype.hasOwnProperty.call(overrides, key)) return overrides[key];
+  if (has(options && options.texts, key) && usable(options.texts[key])) return options.texts[key];
+  if (has(overrides, key) && usable(overrides[key])) return overrides[key];
   const chain = [code, code.split('-')[0], DEFAULT_LOCALE];
   for (const c of chain) {
     const catalog = catalogs.get(c);
-    if (catalog && Object.prototype.hasOwnProperty.call(catalog, key)) return catalog[key];
+    if (has(catalog, key) && usable(catalog[key])) return catalog[key];
   }
   return undefined;
 }
-
-const isPlural = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 function pick(value, code, params) {
   if (!isPlural(value)) return value;
@@ -108,8 +138,8 @@ function pick(value, code, params) {
       category = new Intl.PluralRules(DEFAULT_LOCALE).select(count);
     }
   }
-  const text = value[category] ?? value.other;
-  return typeof text === 'string' ? text : '';
+  const text = value[category];
+  return typeof text === 'string' ? text : value.other;
 }
 
 /** Übersetzt `key`; `params` füllt `{name}`-Platzhalter, `params.count` wählt die Mehrzahlform. */
@@ -119,7 +149,7 @@ export function t(key, params, options) {
   if (found === undefined) {
     if (!warned.has(key)) {
       warned.add(key);
-      if (!(typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production')) {
+      if (!production()) {
         console.warn(`[hoops-i18n] Schlüssel fehlt in allen Katalogen: ${key}`);
       }
     }
@@ -127,7 +157,7 @@ export function t(key, params, options) {
   }
   const text = pick(found, code, params);
   return text.replace(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g, (whole, name) => {
-    const value = params ? params[name] : undefined;
+    const value = has(params, name) ? params[name] : undefined;
     return value === undefined || value === null ? whole : String(value);
   });
 }
