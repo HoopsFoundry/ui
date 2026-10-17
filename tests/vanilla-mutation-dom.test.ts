@@ -101,7 +101,7 @@ const THEME: ThemeMutation[] = [
   { name: 'Rückfall hell statt system', rule: 'Theme: ein ungültiger gemerkter Wert gilt als system', from: "parseTheme(opts.defaultMode) ?? 'system';", to: "parseTheme(opts.defaultMode) ?? 'light';" },
   { name: 'aria-pressed bleibt falsch', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('aria-pressed', String(theme === 'dark'));", to: "button.setAttribute('aria-pressed', 'false');" },
   { name: 'kein Zustand am Button', rule: 'Theme: Klick setzt Attribut, aria-pressed und Zustand', from: "button.setAttribute('data-theme-state', theme);", to: '' },
-  { name: 'Beschriftung folgt dem Modus', rule: 'Theme: feste Beschriftung „Dunkelmodus“, auch nach dem Umschalten', from: "button.setAttribute('aria-label', label);\n  button.hidden", to: "button.setAttribute('aria-label', mode);\n  button.hidden" },
+  { name: 'Beschriftung folgt dem Modus', rule: 'Theme: feste Beschriftung „Dunkelmodus“, auch nach dem Umschalten', from: "button.setAttribute('aria-label', labelNow());\n  const langBefore", to: "button.setAttribute('aria-label', mode);\n  const langBefore" },
   { name: 'Button mit Text bekommt aria-label', rule: 'Theme: ein Button mit eigenem Text behält seinen Namen', from: '!button.textContent.trim() && ', to: '' },
   { name: 'system setzt ein Attribut', rule: 'Theme: system setzt kein Attribut, auch bei dunklem System', from: "if (mode === 'system') target.removeAttribute(attribute);", to: "if (mode === 'system') target.setAttribute(attribute, resolveTheme(mode, prefersDark()));" },
   { name: 'Systemeinstellung wird nicht gehört', rule: 'Theme: Änderungen der Systemeinstellung werden gehört (nur im Modus system)', from: "cleanups.add(listen(query, 'change', onScheme))", to: "cleanups.add(listen(query, 'changex', onScheme))" },
@@ -221,9 +221,9 @@ const MAP_LOGIC: Mutation[] = [
   { name: 'Einzelner Ort bekommt neben dem Sitz eine Nummer', rule: 'Sitz: ein einzelner Ort neben dem Sitz bleibt ohne Nummer', from: 'const places = valid.filter((m) => m.kind !== \'seat\').length;', to: 'const places = valid.length;' },
   { name: 'Platzhalter ohne Art', rule: 'Sitz: der Platzhalter kennt die Art', from: "kind: m.kind === 'seat' ? 'seat' : 'place',\n        x: Math.round", to: "kind: 'place',\n        x: Math.round" },
   { name: 'Name ohne Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "if (item?.kind === 'seat') {", to: 'if (false) {' },
-  { name: 'anderer Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "seat: 'Vereinssitz',", to: "seat: 'Sitz',", },
+  { name: 'anderer Zusatz', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapString('seat', options);", to: "const seat = 'Sitz';", },
   { name: 'Nummer fehlt im Namen', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: 'return Number.isInteger(number) && number >= 0 ?', to: 'return false ?' },
-  { name: 'eigener Sitztext wird ignoriert', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapText.seat;", to: 'const seat = mapText.seat;' },
+  { name: 'eigener Sitztext wird ignoriert', rule: 'Sitz: Name für Hilfstechnik mit Zusatz „Vereinssitz“', from: "const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapString('seat', options);", to: "const seat = mapString('seat', options);" },
   { name: 'jeder Wert ist ein Verfahren', rule: 'darkTiles: nur invert ändert den Standard dim', from: "return value === 'invert' ? 'invert' : 'dim';", to: "return value ? value : 'dim';" },
 ];
 const LEAFLET_LOGIC: Mutation[] = [
@@ -248,7 +248,7 @@ const MAP_SRC: { name: string; rule: string; file: 'svelte' | 'react' | 'leaflet
   { name: 'Haus-Badge fehlt (Svelte)', rule: 'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl', file: 'svelte', from: 'hoops-map-num is-seat', to: 'hoops-map-num' },
   { name: 'Chip fehlt (React)', rule: 'Quelle: Chip Vereinssitz in der Liste', file: 'react', from: '{item.seatText}', to: '' },
   { name: 'Platzhalter-Pin ohne is-seat (Svelte)', rule: 'Quelle: Platzhalter-Pin trägt is-seat', file: 'svelte', from: "pin.kind === 'seat' ? ' is-seat'", to: "false ? ' is-seat'" },
-  { name: 'Marker ohne markerName', rule: 'Quelle: Marker nutzt markerName für Titel, Alt und aria-label', file: 'leaflet', from: "title: markerName(item), alt: markerName(item)", to: 'title: item.label, alt: item.label' },
+  { name: 'Marker ohne markerName', rule: 'Quelle: Marker nutzt markerName für Titel, Alt und aria-label', file: 'leaflet', from: "title: name, alt: name", to: 'title: item.label, alt: item.label' },
   { name: 'Art nicht in der Signatur', rule: 'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)', file: 'leaflet', from: 'item.own, item.kind, item.seatText, item.href', to: 'item.own, item.href' },
   { name: 'style in der Svelte-Datei', rule: 'Quelle: kein style in der Svelte-Datei', file: 'svelte', from: '<script lang="ts">', to: '<style>.x{}</style>\n<script lang="ts">' },
 ];

@@ -1,7 +1,9 @@
 // Beispiel-Portalseite ohne Build: Vereinsseite (index.html) und Teamseite (team.html) aus einem JSON-Datensatz.
 // Das Seitenlayout steht im HTML, alle Bausteine kommen aus den Funktionen des Pakets (mountX, initAll). Tabs und Dialog haben keine
 // Render-Funktion im Paket; die kleinen Hilfen dafür unten setzen ihre Texte über esc/attr aus den Daten zusammen.
-import { initAll, checkVersion, VERSION as CORE_VERSION } from './hoops/hoops.min.js';
+import { initAll, checkVersion, setLocale, VERSION as CORE_VERSION } from './hoops/hoops.min.js';
+// Die Standardsprache ist Englisch; diese Seite ist deutsch: das deutsche Bündel registriert `de`, danach gilt es für alle Bausteine
+import './hoops/hoops-i18n-de.min.js';
 import { esc, attr, mountLeagueCard, mountTeamCard, mountScheduleTable, mountTable, mountVenueCard, VERSION as RENDER_VERSION } from './hoops/hoops-render.min.js';
 import { initMap, VERSION as MAP_VERSION } from './hoops/hoops-map.min.js';
 
@@ -9,6 +11,7 @@ const meta = (name) => document.querySelector(`meta[name="${name}"]`)?.getAttrib
 const tileUrl = meta('hoops-tile-url');
 const page = meta('hoops-page');
 // Leaflet kommt aus einer lokalen Datei und wird erst nach dem Klick auf „Karte laden“ geladen (vorher kein Netzverkehr)
+setLocale('de');
 const loadLeaflet = () => import('./vendor/leaflet/leaflet-src.esm.js');
 
 /** Setzt geprüftes Markup ein (als Fragment geparst); alle Werte darin laufen durch esc oder attr. */

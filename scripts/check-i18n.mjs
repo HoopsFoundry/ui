@@ -8,7 +8,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const NOT_CATALOG = new Set(['index.js', 'format.js', 'de-register.js']);
+// Dateien unter js/i18n/, die keine Kataloge sind (Kern, Hilfen, Registrierung)
+const NOT_CATALOG = new Set(['index.js', 'format.js', 'lang.js', 'text-table.js', 'de-register.js']);
 
 const forms = (value) => (typeof value === 'string' ? [value] : Object.values(value));
 const holders = (text) => [...String(text).matchAll(/\{([A-Za-z_][A-Za-z0-9_]*)\}/g)].map((m) => m[1]).sort().join(',');
@@ -82,6 +83,9 @@ export function usageSources(root = ROOT) {
     }
   };
   for (const dir of ['svelte', 'react', 'js']) walk(dir);
+  // js/i18n/format.js bildet die Himmelsrichtungen (common.direction.*) mit ausgeschriebenen Schlüsseln und gehört deshalb zu den Quellen (die übrigen Dateien
+  // unter js/i18n/ sind Kern und Kataloge, in denen jeder Schlüssel steht)
+  out.push(readFileSync(join(root, 'js/i18n/format.js'), 'utf8'));
   return out;
 }
 

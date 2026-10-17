@@ -200,12 +200,18 @@
       "types": "./dist/vanilla/hoops-map.d.ts",
       "import": "./dist/vanilla/hoops-map.js"
     },
+    "./vanilla-i18n-de": {
+      "types": "./dist/vanilla/hoops-i18n-de.d.ts",
+      "import": "./dist/vanilla/hoops-i18n-de.js"
+    },
     "./vanilla/*": "./dist/vanilla/*",
     "./portal-sync.mjs": "./scripts/portal-sync.mjs"
   },
   "sideEffects": [
     "**/*.css",
-    "./js/i18n/de-register.js"
+    "./js/i18n/de-register.js",
+    "./dist/vanilla/hoops-i18n-de.js",
+    "./dist/vanilla/hoops-i18n-de.min.js"
   ],
   "files": [
     "tokens/",

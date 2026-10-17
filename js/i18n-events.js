@@ -44,7 +44,7 @@ export function onLocaleChange(fn) {
     try {
       fn(event && event.detail && event.detail.locale);
     } catch (error) {
-      console.error('[hoops-i18n] Ein Baustein hat den Sprachwechsel nicht verarbeitet.', error);
+      console.error(error);
     }
   };
   document.addEventListener(LOCALE_EVENT, listener);

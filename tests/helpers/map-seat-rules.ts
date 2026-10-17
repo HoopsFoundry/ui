@@ -71,7 +71,7 @@ export function mapSeatSourceRules(f: { svelte: string; react: string; leaflet: 
     'Quelle: Sitz in der Liste als Haus-Badge ohne Zahl': svelte.includes('hoops-map-num is-seat') && react.includes("'is-seat'") && /kind === 'seat'/.test(svelte) && /kind === 'seat'/.test(react),
     'Quelle: Chip Vereinssitz in der Liste': svelte.includes('{item.seatText}') && react.includes('{item.seatText}'),
     'Quelle: Platzhalter-Pin trägt is-seat': svelte.includes("pin.kind === 'seat' ? ' is-seat'") && react.includes("pin.kind === 'seat' && 'is-seat'"),
-    'Quelle: Marker nutzt markerName für Titel, Alt und aria-label': (leaflet.match(/markerName\(/g) ?? []).length === 3 && leaflet.includes("className: `hoops-map-marker${item.own ? ' is-own' : ''}${item.kind === 'seat' ? ' is-seat' : ''}`"),
+    'Quelle: Marker nutzt markerName für Titel, Alt und aria-label': (leaflet.match(/markerName\(/g) ?? []).length === 1 && leaflet.includes('title: name, alt: name') && leaflet.includes("className: `hoops-map-marker${item.own ? ' is-own' : ''}${item.kind === 'seat' ? ' is-seat' : ''}`"),
     'Quelle: Art ist Teil der Signatur des Markers (Neuaufbau bei Wechsel)': leaflet.includes('item.own, item.kind, item.seatText, item.href'),
     'Quelle: kein style in der Svelte-Datei': !/<style[\s>]/.test(svelte),
   };

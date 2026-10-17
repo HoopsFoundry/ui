@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { DOCS } from '../stories/Render.code';
 import { renderEscape, renderNode, renderPage } from '../stories/Foundation/Vanilla.code';
 import { bundleDir } from './helpers/bundle-dir';
+import { deSetupImport } from './helpers/i18n-de';
 import { normalize, useParity } from './helpers/render-parity';
 
 const p = useParity();
@@ -36,7 +37,7 @@ async function run(code: string, names: string[]) {
   // Die Seitenpfade (/hoops/…) zeigen im Test auf die Quellmodule; Leaflet kommt aus dem gespielten Modul (der Lader wird erst nach dem Klick gerufen)
   const mapUrl = pathToFileURL(resolve(process.cwd(), 'js/map-bundle.js')).href;
   const source = `${script.replace('@hoopsfoundry/ui/render.js', indexUrl).replace('/hoops/hoops-render.min.js', indexUrl).replace('/hoops/hoops-map.min.js', mapUrl)}\nexport { ${names.join(', ')} };\n// Lauf ${++runs}`; // jeder Lauf ein eigenes Modul (gleicher Text wäre zwischengespeichert)
-  return (await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(source).toString('base64')}`)) as Record<string, unknown>;
+  return (await import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(deSetupImport + source).toString('base64')}`)) as Record<string, unknown>;
 }
 
 type Row = string | number | { text: string | number; className?: string; href?: string; header?: boolean } | { cells: Row[]; className?: string };
@@ -116,7 +117,7 @@ describe('Beispiele: Aktualisieren und Aufräumen', () => {
 });
 
 describe('Beispiele der Seite Foundation/Vanilla (Markup erzeugen)', () => {
-  const load = async (source: string) => import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(`${source}\n// Lauf ${++runs}`).toString('base64')}`) as Promise<Record<string, unknown>>;
+  const load = async (source: string) => import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(`${deSetupImport}${source}\n// Lauf ${++runs}`).toString('base64')}`) as Promise<Record<string, unknown>>;
 
   it('Seite aus Daten: mountX füllt die Container, initAll folgt', async () => {
     const vanillaUrl = pathToFileURL(resolve(process.cwd(), 'js/vanilla.js')).href;

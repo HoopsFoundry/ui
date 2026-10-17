@@ -1,14 +1,15 @@
 // @vitest-environment node
-// Messung fester Texte (noch nicht erzwingend): Die Funde im Quelltext (Syntaxbaum) müssen vom Inventar gedeckt sein.
-// Die Erzwingung ("keine festen Texte außer Ausnahmen") kommt, wenn I2 und I3 die Texte verdrahtet haben.
-import { readFileSync } from 'node:fs';
+// Feste Texte im Quelltext (Syntaxbaum). Erzwungen seit I2 für js/ und js/render/: dort steht kein fester deutscher Text mehr (außer den Entwickler-Warnungen,
+// die ausdrücklich deutsch bleiben und gezählt sind); für svelte/ und react/ bleibt es bei der Messung gegen das Inventar (bis I3).
+import { cpSync, mkdtempSync, mkdirSync, readFileSync as readText, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error JavaScript-Modul ohne Typen
 import { scanTree, cleanText, isTextLike } from '../scripts/i18n-scan.mjs';
 
 const root = process.cwd();
-const inventory = readFileSync(resolve(root, 'docs/superpowers/specs/2026-10-17-i18n-inventar.md'), 'utf8');
+const inventory = readText(resolve(root, 'docs/superpowers/specs/2026-10-17-i18n-inventar.md'), 'utf8');
 const norm = (s: string) => s.replace(/^[\s,:·–—-]+|[\s,:·–—-]+$/g, '').replace(/\s+/g, ' ');
 
 /** Tabellenzeilen des Abschnitts "Einträge": Schlüssel, deutsche Formen, Quelltext-Formen. */
@@ -43,8 +44,22 @@ describe('feste Texte im Quelltext (Messung)', () => {
     expect(open, 'Texte ohne Inventareintrag').toEqual([]);
   });
   it('die Zahl der Funde ist plausibel und steht im Inventar', () => {
-    expect(texts.length).toBeGreaterThan(250);
+    expect(texts.length).toBeGreaterThan(100);
     expect(inventory).toContain(`**${texts.length} feste Textstücke**`);
+  });
+  it('js/ und js/render/: kein fester Text mehr (erzwungen)', () => {
+    const open = texts.filter((t: { file: string }) => /^js\//.test(t.file)).map((t: { file: string; line: number; text: string }) => `${t.file}:${t.line} ${t.text}`);
+    expect(open, 'feste Texte in js/ (über t() aus dem Katalog lesen)').toEqual([]);
+  });
+  it('Mutation: ein neuer fester Text in js/stats.js lässt die Erzwingung kippen', () => {
+    const dir = mkdtempSync(resolve(tmpdir(), 'hoops-scan-'));
+    for (const sub of ['svelte', 'svelte/internal', 'react', 'react/internal']) mkdirSync(resolve(dir, sub), { recursive: true });
+    cpSync(resolve(root, 'js'), resolve(dir, 'js'), { recursive: true });
+    expect(scanTree(dir).texts.filter((t: { file: string }) => /^js\//.test(t.file))).toEqual([]);
+    const file = resolve(dir, 'js/stats.js');
+    writeFileSync(file, `${readText(file, 'utf8')}\nexport const neu = 'Keine Angabe möglich';\n`);
+    const found = scanTree(dir).texts.filter((t: { file: string }) => /^js\//.test(t.file));
+    expect(found.map((t: { file: string }) => t.file)).toContain('js/stats.js');
   });
   it('Entwickler-Warnungen sind gezählt und bleiben deutsch (ausgenommen)', () => {
     expect(warnings.length).toBe(19);

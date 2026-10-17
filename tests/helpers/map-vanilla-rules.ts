@@ -1,5 +1,6 @@
 // Regeln der Karte in Vanilla (V2b) als prüfbare Aussagen. tests/map-vanilla-mutation.test.ts lädt die Module aus dem echten Quelltext (alle
 // Regeln gelten) und aus verfälschtem (die zugehörige Regel muss kippen). Läuft unter jsdom; Leaflet ist gespielt (globalThis.__L).
+import { deSetupImport } from './i18n-de';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { vi } from 'vitest';
@@ -39,7 +40,7 @@ export async function loadMap(override?: { file: MapFile; source: string }): Pro
     const code = source
       .replace(/from '(\.{1,2}\/[\w/-]+\.js)'/g, (_m, spec: string) => `from '${urlOf(target(spec))}'`)
       .replaceAll("import('leaflet')", 'Promise.resolve(globalThis.__L)');
-    const url = `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`;
+    const url = `data:text/javascript;base64,${Buffer.from(deSetupImport + code).toString('base64')}`; // deutsche Standardsprache auch in dieser Instanz des Sprachkerns
     urls.set(path, url);
     return url;
   };

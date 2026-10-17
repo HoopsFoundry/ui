@@ -168,7 +168,9 @@ describe('Tarball, Prüfsummen, Manifest', () => {
     }
     expect(manifest.bundles.hoops.requires).toEqual([]);
     expect(manifest.bundles['hoops-render'].requires).toEqual(['hoops']);
-    expect(manifest.bundles['hoops-map'].requires).toEqual([]);
+    // Karte und deutsches Sprachbündel importieren den Sprachkern aus dem Kern desselben Ordners
+    expect(manifest.bundles['hoops-map'].requires).toEqual(['hoops']);
+    expect(manifest.bundles['hoops-i18n-de'].requires).toEqual(['hoops']);
     expect(manifest.leaflet).toMatchObject({ required: false, range: pkg.peerDependencies.leaflet });
     expect(manifest.leaflet.note).toMatch(/Klick/);
     expect(manifest.pairing).toMatch(/hoops\.css/);

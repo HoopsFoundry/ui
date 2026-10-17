@@ -2,6 +2,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { expect } from 'vitest';
+import { deSetupImport } from './i18n-de';
 
 export type Rules = Record<string, boolean>;
 
@@ -17,10 +18,11 @@ export function mutate(text: string, from: string, to: string, after = 0) {
   return result;
 }
 
-/** Lädt Quelltext als ES-Modul; relative Importe (`from './x.js'`) werden auf Dateien in js/ umgebogen. */
+/** Lädt Quelltext als ES-Modul; relative Importe (`from './x.js'`, `from '../i18n/index.js'`) werden auf Dateien unter `dir` (Standard js/) umgebogen. */
 export async function loadModule(source: string, dir = 'js') {
-  const code = source.replace(/from '\.\/([\w-]+\.js)'/g, (_m, file: string) => `from '${resolve(process.cwd(), dir, file).replace(/^/, 'file://')}'`);
-  return import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`);
+  const code = source.replace(/from '(\.{1,2}\/[\w./-]+\.js)'/g, (_m, file: string) => `from '${resolve(process.cwd(), dir, file).replace(/^/, 'file://')}'`);
+  // die deutsche Standardsprache auch in diesem Modulgraphen (data:-URL, eigene Instanz des Sprachkerns)
+  return import(/* @vite-ignore */ `data:text/javascript;base64,${Buffer.from(deSetupImport + code).toString('base64')}`);
 }
 
 /** Text eines CSS-Abschnitts: ab dem Kopf `/* ── <name>` bis zum nächsten Abschnittskopf. */

@@ -205,7 +205,7 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
   it('die Zahlen der Doku stimmen mit dem Bündel überein (KiB)', () => {
     const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
     expect(adr).toMatch(/gemessen 21,8 und 8,9/);
-    expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 24, gzipKB: 10 };');
+    expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 25, gzipKB: 10 };');
   });
 });
 

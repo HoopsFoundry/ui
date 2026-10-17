@@ -13,7 +13,7 @@ const css = read('css/components.css');
 const sectionStart = css.indexOf('/* ── Kennzahlen-Gitter und Form');
 
 const STATS_LOGIC: Mutation[] = [
-  { name: 'Dezimalpunkt bleibt', rule: 'Kennzahlen: Zahl mit Dezimalkomma', from: ".replace('.', ',')", to: '' },
+  { name: 'Dezimalpunkt bleibt', rule: 'Kennzahlen: Zahl mit Dezimalkomma', from: 'formatPlain(item.value, options)', to: 'String(item.value)' },
   { name: 'Text nicht getrimmt', rule: 'Kennzahlen: Text wird getrimmt', from: 'item.value.trim()', to: 'item.value' },
   { name: 'NaN gilt als Wert', rule: 'Kennzahlen: fehlender Wert ergibt Gedankenstrich und empty', from: 'Number.isFinite(item.value)', to: "typeof item.value === 'number'" },
   { name: 'Einträge ohne Beschriftung bleiben', rule: 'Kennzahlen: ohne Beschriftung entfällt der Eintrag', from: 'if (!label) continue;', to: '' },

@@ -24,6 +24,10 @@ export const RENDER_EXPORTS = [
 
 beforeAll(async () => {
   mod = await import(/* @vite-ignore */ pathToFileURL(`${out}hoops-render.js`).href);
+  // Das Bündel teilt den Kern mit hoops.js; das deutsche Bündel registriert `de` dort (derselbe Ordner, dieselbe Instanz), die Quellmodule kennen die Testeinstellung `de`
+  const core = (await import(/* @vite-ignore */ pathToFileURL(`${out}hoops.js`).href)) as { setLocale: (code: string) => void };
+  await import(/* @vite-ignore */ pathToFileURL(`${out}hoops-i18n-de.js`).href);
+  core.setLocale('de');
 });
 
 describe('Render-Bündel dist/vanilla/hoops-render', () => {
@@ -39,7 +43,7 @@ describe('Render-Bündel dist/vanilla/hoops-render', () => {
     for (const [name, core] of [['hoops-render.js', './hoops.js'], ['hoops-render.min.js', './hoops.min.js']] as const) {
       const code = text(name);
       const imports = [...code.matchAll(/(?:^|[;}\s])import\s*(?:\{[^}]*\}\s*from\s*)?["']([^"']+)["']/g)].map((m) => m[1]);
-      expect(imports, name).toEqual([core]);
+      expect([...new Set(imports)], name).toEqual([core]);
       expect(code, name).not.toMatch(/\brequire\(/);
       expect(code, name).not.toMatch(/import\(/);
       for (const word of ['react', 'svelte', 'radix']) expect(code.toLowerCase(), `${name}: ${word}`).not.toContain(word);
