@@ -10,7 +10,7 @@ export { initPageNav, slug } from './pagenav.js';
 export type { PageNavOptions } from './pagenav.js';
 export { initBackToTop } from './backtop.js';
 export type { BackToTopOptions } from './backtop.js';
-export { initTheme, themeBootScript, parseTheme, resolveTheme, nextTheme, readTheme, writeTheme, THEME_KEY, THEME_ATTRIBUTE, THEME_LABEL } from './theme.js';
+export { initTheme, themeBootScript, parseTheme, resolveTheme, nextTheme, readTheme, writeTheme, THEME_KEY, THEME_ATTRIBUTE } from './theme.js';
 export type { ThemeOptions, ThemeHandle, ThemeMode, ThemeState } from './theme.js';
 export { initTabs, nextTab, initialTab, TAB_EVENT } from './tabs.js';
 export type { TabsOptions, TabsHandle, TabChangeDetail } from './tabs.js';

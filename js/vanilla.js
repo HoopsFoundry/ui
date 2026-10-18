@@ -13,7 +13,7 @@ export { reducedMotion } from './motion.js';
 export { initAccordion, initAccordions, nextHeader, hashTarget, revealAround, scrollToElement } from './accordion.js';
 export { initPageNav, slug } from './pagenav.js';
 export { initBackToTop } from './backtop.js';
-export { initTheme, themeBootScript, parseTheme, resolveTheme, nextTheme, readTheme, writeTheme, THEME_KEY, THEME_ATTRIBUTE, THEME_LABEL } from './theme.js';
+export { initTheme, themeBootScript, parseTheme, resolveTheme, nextTheme, readTheme, writeTheme, THEME_KEY, THEME_ATTRIBUTE } from './theme.js';
 export { initTabs, nextTab, initialTab, TAB_EVENT } from './tabs.js';
 export { initModal, openModal, closeModal, focusables, MODAL_OPEN_EVENT, MODAL_CLOSE_EVENT } from './modal.js';
 // Sprache und Texte (siehe js/i18n/index.js). Der Kern liegt nur in diesem Bündel: hoops-render.js, hoops-map.js und hoops-i18n-de.js importieren ihn von hier

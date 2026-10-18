@@ -22,6 +22,8 @@ export interface CollapsibleFrameProps {
   onOpenChange?: (open: boolean) => void;
   /** Zusatzinfo rechts im Kopf (mit eigenem Wrapper des Aufrufers); Teil des zugänglichen Namens. */
   meta?: ReactNode;
+  /** `lang` des Rahmens, wenn seine Sprache von der Seite abweicht (siehe `useT`). */
+  lang?: string;
   children?: ReactNode;
 }
 
@@ -43,6 +45,7 @@ export function CollapsibleFrame({
   defaultOpen = false,
   onOpenChange,
   meta,
+  lang,
   children,
 }: CollapsibleFrameProps) {
   const outer = useContext(GroupContext);
@@ -116,7 +119,7 @@ export function CollapsibleFrame({
   const inert = open ? {} : ({ inert: '' } as Record<string, string>);
 
   return (
-    <div ref={el} className={cn(rootClass, 'is-collapsible', open && 'is-open')} id={id}>
+    <div ref={el} className={cn(rootClass, 'is-collapsible', open && 'is-open')} id={id} lang={lang}>
       <div className={`${base}-head ${base}-head--acc`}>
         <Tag className={`${base}-title`}>
           <button

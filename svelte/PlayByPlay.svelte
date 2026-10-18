@@ -19,6 +19,7 @@
   import { resolvePeriod } from '../js/periods.js';
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
+  import { useI18n } from './i18n.js';
   /**
    * HoopsFoundry UI PlayByPlay · Svelte 5
    * --------------------------------------------------------------
@@ -32,7 +33,7 @@
    * Ereignisarten: default · score-2p · score-3p · ft · foul · timeout · sub · turnover
    */
   let {
-    title = 'Play-by-Play · neueste oben',
+    title,
     titleAs = undefined,
     meta = '',
     live = true,
@@ -40,6 +41,7 @@
     periods = 4,
     events,
   }: {
+    /** Titel; Standard aus dem Katalog (`playbyplay.title`). */
     title?: string;
     /** Überschriftenebene, h2 bis h6. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor h3. */
     titleAs?: HeadingTag;
@@ -52,21 +54,23 @@
 
   const heading = useHeadingTag(() => titleAs);
 
-  const teamText = { heim: 'Heim:', gast: 'Gast:' } as const;
+  const i18n = useI18n();
+  const headline = $derived(title ?? i18n.t('playbyplay.title'));
+  const TEAM_KEY = { heim: 'playbyplay.team.home', gast: 'playbyplay.team.away' } as const;
 </script>
 
-<div class={`hoops-pbp-frame ${dark ? 'hoops-pbp-frame--dark' : ''}`}>
+<div class={`hoops-pbp-frame ${dark ? 'hoops-pbp-frame--dark' : ''}`} lang={i18n.lang}>
   <div class="hoops-pbp-head">
-    <svelte:element this={heading.tag} class="hoops-pbp-title">{title}</svelte:element>
+    <svelte:element this={heading.tag} class="hoops-pbp-title">{headline}</svelte:element>
     <div class="hoops-pbp-meta">
       {#if meta}<span>{meta}</span>{/if}
-      {#if live}<span class="hoops-pbp-live"><span class="hoops-pbp-dot" aria-hidden="true"></span> Live</span>{/if}
+      {#if live}<span class="hoops-pbp-live"><span class="hoops-pbp-dot" aria-hidden="true"></span> {i18n.t('common.live')}</span>{/if}
     </div>
   </div>
 
-  <div class="hoops-pbp-feed" role="log" aria-label={title} tabindex="0">
+  <div class="hoops-pbp-feed" role="log" aria-label={headline} tabindex="0">
     {#each events as e (e.id)}
-      {@const abschnitt = resolvePeriod({ period: e.period, periods, quarter: e.quarter })}
+      {@const abschnitt = resolvePeriod({ period: e.period, periods, quarter: e.quarter }, i18n.options)}
       <div class={`hoops-pbp-event hoops-pbp-event--${e.kind ?? 'default'}`}>
         <div class="hoops-pbp-time">
           {e.time}
@@ -77,7 +81,7 @@
         <div class={`hoops-pbp-strip hoops-pbp-strip--${e.team ?? 'none'}`} aria-hidden="true"></div>
         <div class="hoops-pbp-body">
           <div class="hoops-pbp-action">
-            {#if e.team && e.team !== 'none'}<span class="hoops-sr-only">{teamText[e.team]} </span>{/if}
+            {#if e.team && e.team !== 'none'}<span class="hoops-sr-only">{i18n.t(TEAM_KEY[e.team])} </span>{/if}
             {#if e.titleBold}<b>{e.titleBold}</b> · {/if}{e.title}
           </div>
           {#if e.detail}
@@ -85,7 +89,7 @@
           {/if}
         </div>
         {#if e.score}
-          <div class="hoops-pbp-score"><span aria-hidden="true">{e.score.heim}<span class="hoops-pbp-sep">:</span>{e.score.gast}</span><span class="hoops-sr-only">{`Spielstand ${e.score.heim} zu ${e.score.gast}`}</span></div>
+          <div class="hoops-pbp-score"><span aria-hidden="true">{e.score.heim}<span class="hoops-pbp-sep">:</span>{e.score.gast}</span><span class="hoops-sr-only">{i18n.t('playbyplay.score', { home: e.score.heim, away: e.score.gast })}</span></div>
         {/if}
       </div>
     {/each}

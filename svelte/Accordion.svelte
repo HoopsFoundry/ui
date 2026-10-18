@@ -12,6 +12,7 @@
   import type { HeadingTag } from '../js/heading.js';
   import { moveFocus, scrollToElement, summaryText, writeHash } from '../js/accordion.js';
   import { provideGroup, useParentItem, type AccordionEntry } from './accordion-context.js';
+  import { useI18n } from './i18n.js';
 
   let {
     exclusive = false,
@@ -20,7 +21,7 @@
     nav = false,
     syncHash = true,
     sticky = false,
-    navLabel = 'Bereiche',
+    navLabel = undefined,
     titleAs = undefined,
     class: klass = '',
     children,
@@ -37,7 +38,7 @@
     syncHash?: boolean;
     /** Kopf des offenen Bereichs klebt oben (Abstand: `--hoops-acc-sticky-top`). */
     sticky?: boolean;
-    /** Name der Sprungleiste (`aria-label` der Navigation und Text des Handy-Schalters), Standard „Bereiche“. Mehrere Sprungleisten auf einer Seite brauchen verschiedene Namen. */
+    /** Name der Sprungleiste (`aria-label` der Navigation und Text des Handy-Schalters), Standard aus dem Katalog (`accordion.nav`, deutsch „Bereiche“). Mehrere Sprungleisten auf einer Seite brauchen verschiedene Namen. */
     navLabel?: string;
     /** Ebene der Bereichsüberschriften, h2 bis h6; ein `titleAs` am Bereich gewinnt. Ohne Angabe gilt `HeadingLevel`, sonst h3. */
     titleAs?: HeadingTag;
@@ -45,6 +46,8 @@
     children?: Snippet;
   } = $props();
 
+  const i18n = useI18n();
+  const navName = $derived(navLabel ?? i18n.t('accordion.nav'));
   const uid = $props.id();
   const listId = `hoops-acc-nav-${uid}`;
   const nested = useParentItem() !== undefined;
@@ -97,7 +100,8 @@
     // Gesperrte Bereiche behalten ihren Zustand; die Ansage nennt, wie viele danach offen sind
     const after = entries.filter((e) => (e.disabled ? e.open : flag)).length;
     for (const e of entries) if (!e.disabled) e.setOpen(flag);
-    announcement = summaryText(after, entries.length);
+    // Der Text bleibt in der Sprache des Klicks: ein späterer Sprachwechsel ändert die Live-Region nicht (keine Ansage)
+    announcement = summaryText(after, entries.length, i18n.options);
   }
 
   function jump(event: MouseEvent, entry: AccordionEntry) {
@@ -111,7 +115,7 @@
   const classes = $derived(['hoops-acc', `hoops-acc--${variant}`, sticky && 'hoops-acc--sticky', nested && 'hoops-acc--nested', klass].filter(Boolean).join(' '));
 </script>
 
-<div class={classes} bind:this={root}>
+<div class={classes} bind:this={root} lang={i18n.lang}>
   {#if entries.length === 0 && (showAll || nav)}
     <!-- Platz für Leiste und Sprungleiste schon im Server-Markup: kein Sprung nach dem Hydrieren -->
     <div class="hoops-acc-tools hoops-acc-tools--pending" data-parts={showAll && nav ? 'both' : showAll ? 'bar' : 'nav'} aria-hidden="true"></div>
@@ -119,14 +123,14 @@
     <div class="hoops-acc-tools">
       {#if showAll}
         <div class="hoops-acc-bar">
-          <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(true)}>Alle öffnen</button>
-          <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(false)}>Alle schließen</button>
+          <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(true)}>{i18n.t('accordion.expand-all')}</button>
+          <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--sm" aria-controls={entries.map((e) => `${e.id}-panel`).join(' ')} onclick={() => setAll(false)}>{i18n.t('accordion.collapse-all')}</button>
           <span class="hoops-sr-only" aria-live="polite" aria-atomic="true">{announcement}</span>
         </div>
       {/if}
       {#if nav}
-        <nav class="hoops-acc-nav{navOpen ? ' is-open' : ''}" aria-label={navLabel}>
-          <button type="button" class="hoops-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>{navLabel}</button>
+        <nav class="hoops-acc-nav{navOpen ? ' is-open' : ''}" aria-label={navName}>
+          <button type="button" class="hoops-acc-nav-toggle" aria-expanded={navOpen} aria-controls={listId} onclick={() => (navOpen = !navOpen)}>{navName}</button>
           <ul class="hoops-acc-nav-list" id={listId}>
             {#each entries.filter((e) => e.anchor !== false && e.title) as entry (entry.id)}
               <li class="hoops-acc-nav-item">

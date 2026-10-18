@@ -299,7 +299,7 @@ describe('nachgebessert: Spielkarten-Kopf, Link mit onclick, Badge, Statistik-Ra
     expect(read('svelte/TeamCard.svelte')).toMatch(/<a class="hoops-team-link" \{href\} \{onclick\}>/);
     expect(read('react/TeamCard.tsx')).toMatch(/<a className="hoops-team-link" href=\{href\} onClick=\{onClick\}>/);
     expect(read('svelte/MatchCard.svelte')).toContain("onclick={tag === 'div' ? undefined : onclick}");
-    expect(read('react/MatchCard.tsx')).toMatch(/<a className=\{cls\} href=\{href\} onClick=\{onClick\}>/);
+    expect(read('react/MatchCard.tsx')).toMatch(/<a className=\{cls\} href=\{href\} lang=\{i18n\.lang\} onClick=\{onClick\}>/);
   });
 
   it('TeamCard: last.outcome in Typ und Funktion', () => {

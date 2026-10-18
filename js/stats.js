@@ -13,18 +13,11 @@ export function statEmptyLabel(options) {
 }
 
 /**
- * Der Text für den fehlenden Wert in der globalen Sprache (nur für Svelte und React, die den Wert bis I3 als Konstante lesen). Ein Live-Binding:
- * `statItems` frischt es bei jedem Aufruf auf, damit ein späteres `setLocale` wirkt. Neuer Code ruft `statEmptyLabel`.
- */
-export let statEmptyText = statEmptyLabel();
-
-/**
  * Kennzahlen aufbereiten: `{ label, value }` mit nicht leerer Beschriftung bleiben, alles andere entfällt. Zahlen bekommen das Dezimaltrennzeichen der Sprache
  * (`41.3` wird deutsch `41,3`), Texte werden getrimmt; kein gültiger Wert (`null`, `undefined`, leer, `NaN`, `Infinity`, Objekte) ergibt `empty: true`
  * und den Gedankenstrich als sichtbaren Text. Ergebnis: `{ label, value, empty }[]`.
  */
 export function statItems(items, options) {
-  statEmptyText = statEmptyLabel();
   if (!Array.isArray(items)) return [];
   const out = [];
   for (const item of items) {

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from './cn';
+import { useT } from './i18n';
 
 export type TopBarContext = 'default' | 'live' | 'admin';
 
@@ -40,8 +41,9 @@ export function TopBar({
   contained = false,
   className,
 }: TopBarProps) {
+  const i18n = useT();
   return (
-    <Root className={cn('hoops-topbar', 'hoops-topbar--dark', contained && 'hoops-topbar--contained', className)}>
+    <Root className={cn('hoops-topbar', 'hoops-topbar--dark', contained && 'hoops-topbar--contained', className)} lang={i18n.lang}>
       <div className="hoops-topbar-brand">
         <span className="hoops-topbar-mark" aria-hidden="true">
           {mark}
@@ -55,7 +57,7 @@ export function TopBar({
         <div className="hoops-topbar-center">{center}</div>
       ) : context === 'live' ? (
         <div className="hoops-topbar-ctx">
-          <span className="hoops-topbar-live">Live</span>
+          <span className="hoops-topbar-live">{i18n.t('common.live')}</span>
           {matchLabel ? <span>{matchLabel}</span> : null}
           {score ? <span className="hoops-topbar-score">{score}</span> : null}
           {clock ? <span className="hoops-topbar-clock">{clock}</span> : null}

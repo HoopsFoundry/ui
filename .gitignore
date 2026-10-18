@@ -53,3 +53,4 @@ tests/.portal-direct-tmp/
 release/
 tests/.release-tmp*/
 .playwright-mcp/
+tests/.mutants-*/

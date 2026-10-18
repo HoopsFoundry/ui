@@ -78,10 +78,10 @@ describe('Svelte-Tabs: Mehrfachauswahl wie in der React-Fassung', () => {
 
 describe('Stepper: Schaltfläche trägt die sichtbare Nummer im Namen (WCAG 2.5.3)', () => {
   it('Svelte', () => {
-    expect(stepperSvelte).toMatch(/aria-label="\{i \+ 1\}\. \{s\.label\}"/);
+    expect(stepperSvelte).toMatch(/aria-label=\{i18n\.t\('stepper\.step', \{ number: i \+ 1, label: s\.label \}\)\}/);
   });
   it('React', () => {
-    expect(read('../react/Stepper.tsx')).toContain('aria-label={`${index + 1}. ${step.label}`}');
+    expect(read('../react/Stepper.tsx')).toContain("aria-label={i18n.t('stepper.step', { number: index + 1, label: step.label })}");
   });
 });
 

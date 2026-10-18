@@ -46,8 +46,6 @@ export interface ThemeBootOptions {
 
 export const THEME_KEY: string;
 export const THEME_ATTRIBUTE: string;
-/** Beschriftung in der globalen Sprache (Live-Binding); neuer Code nutzt `t('theme.toggle')`. */
-export let THEME_LABEL: string;
 export function parseTheme(value: unknown): ThemeMode | null;
 export function resolveTheme(mode: unknown, prefersDark: boolean): ThemeState;
 export function nextTheme(mode: unknown, prefersDark: boolean): ThemeState;

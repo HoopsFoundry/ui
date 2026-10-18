@@ -19,6 +19,8 @@
    */
   import { initials, shortName } from '../js/schedule.js';
   import { resolvePeriod } from '../js/periods.js';
+  import { useI18n } from './i18n.js';
+  import type { CatalogValue } from '../js/i18n/index.js';
   type State = 'scheduled' | 'live' | 'finished';
   type Team = { name: string; short?: string; logo?: string; color?: 'heim' | 'gast'; score?: number };
   type Names = 'full' | 'short';
@@ -40,6 +42,7 @@
     clock = '',
     href = undefined,
     onclick = undefined,
+    texts = undefined,
   }: {
     state?: State;
     league?: string;
@@ -58,12 +61,16 @@
     clock?: string;
     href?: string;
     onclick?: () => void;
+    /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters und `setTexts`. */
+    texts?: Record<string, CatalogValue>;
   } = $props();
+
+  const i18n = useI18n(() => texts);
 
   let heimWin = $derived(state === 'finished' && (heim.score ?? 0) > (gast.score ?? 0));
   let gastWin = $derived(state === 'finished' && (gast.score ?? 0) > (heim.score ?? 0));
   const tag = $derived(href ? 'a' : onclick ? 'button' : 'div');
-  const liveText = $derived([resolvePeriod({ period, periods, quarter }).label, clock].filter(Boolean).join(' '));
+  const liveText = $derived([resolvePeriod({ period, periods, quarter }, i18n.options).label, clock].filter(Boolean).join(' '));
 </script>
 
 {#snippet teamBlock(t: Team)}
@@ -78,6 +85,7 @@
   class={`hoops-match hoops-match--${state}${logos ? ' hoops-match--logos' : ''}`}
   href={tag === 'a' ? href : undefined}
   type={tag === 'button' ? 'button' : undefined}
+  lang={i18n.lang}
   onclick={tag === 'div' ? undefined : onclick}
 >
   <span class="hoops-match-head">
@@ -86,9 +94,9 @@
       {#if matchday}<span class="hoops-match-muted">· {matchday}</span>{/if}
     </span>
     {#if state === 'live'}
-      <span class="hoops-match-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live · {liveText}</span>
+      <span class="hoops-match-live"><span class="hoops-match-pulse" aria-hidden="true"></span> {i18n.t('common.live')} · {liveText}</span>
     {:else if state === 'finished'}
-      <span class="hoops-match-final">Endstand</span>
+      <span class="hoops-match-final">{i18n.t('match.final')}</span>
     {:else if date}
       <span class="hoops-match-when">{date}{time ? ` · ${time}` : ''}</span>
     {/if}

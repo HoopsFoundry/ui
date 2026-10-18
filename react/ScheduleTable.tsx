@@ -2,6 +2,9 @@ import { Fragment, type ReactNode } from 'react';
 import { cn } from './cn';
 import { CollapsibleFrame } from './internal/CollapsibleFrame';
 import { devWarn } from './internal/devWarn';
+import { useT } from './i18n';
+import { outcomeLetter } from '../js/league.js';
+import type { CatalogValue } from '../js/i18n/index.js';
 import {
   ariaForResult,
   columnsFor,
@@ -55,6 +58,8 @@ export interface ScheduleTableProps {
   onOpenChange?: (open: boolean) => void;
   /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
   id?: string;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
   /** Router-Links für Teamnamen und Liga. */
   renderLink?: ScheduleRenderLink;
@@ -82,15 +87,18 @@ export function ScheduleTable({
   defaultOpen,
   onOpenChange,
   id,
+  texts,
   className,
   renderLink,
   renderTime,
   renderNotice,
 }: ScheduleTableProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT(texts);
+  const { options } = i18n;
   const mode: ScheduleLayout = layout ?? layoutFor(games);
   const dens: ScheduleDensity = density ?? densityFor(games, mode);
-  const cols = columnsFor(mode, games, Boolean(renderNotice));
+  const cols = columnsFor(mode, games, Boolean(renderNotice), options);
   const groups = groupBySection(games);
   const hasHead = Boolean(title || meta);
 
@@ -127,8 +135,8 @@ export function ScheduleTable({
           <td key={key} role="cell" className="hoops-sch-when">
             {game.date ? <span className="hoops-sch-date">{game.date}</span> : null}
             {renderTime || game.time ? <span className="hoops-sch-time">{renderTime ? renderTime(game) : game.time}</span> : null}
-            {stateLabel(game.state) ? <span className="hoops-sr-only">{` ${stateLabel(game.state)}`}</span> : null}
-            {game.state === 'live' ? <LiveTag /> : null}
+            {stateLabel(game.state, options) ? <span className="hoops-sr-only">{` ${stateLabel(game.state, options)}`}</span> : null}
+            {game.state === 'live' ? <LiveTag texts={texts} /> : null}
             {mode !== 'columns' && game.venue ? <span className="hoops-sch-venue">{game.venue}</span> : null}
           </td>
         );
@@ -136,7 +144,7 @@ export function ScheduleTable({
         return (
           <td key={key} role="cell" className="hoops-sch-ha">
             <span className={cn('hoops-chip hoops-chip--mono', game.at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky')}>
-              {game.at === 'gast' ? '@' : 'vs.'}
+              {i18n.t(game.at === 'gast' ? 'schedule.chip.away' : 'schedule.chip.home')}
             </span>
           </td>
         );
@@ -158,7 +166,7 @@ export function ScheduleTable({
                 <span className="hoops-sch-sep" aria-hidden="true">
                   {' – '}
                 </span>
-                <span className="hoops-sr-only"> gegen </span>
+                <span className="hoops-sr-only"> {i18n.t('schedule.versus')} </span>
                 <TeamName team={game.gast} loser={winner === 'heim'} renderLink={renderLink} names={names} logo={logos === true} />
               </>
             )}
@@ -213,12 +221,13 @@ export function ScheduleTable({
           <td key={key} role="cell" className="hoops-sch-res">
             <ResultText
               visible={visible}
-              spoken={ariaForResult(game, mode)}
+              spoken={ariaForResult(game, mode, options)}
               provisional={game.provisional}
+              texts={texts}
               chip={
                 result ? (
                   <span className={cn('hoops-chip hoops-chip--mono', OUTCOME_CHIP[result])} aria-hidden="true">
-                    {result}
+                    {outcomeLetter(result, options)}
                   </span>
                 ) : null
               }
@@ -252,13 +261,9 @@ export function ScheduleTable({
         <tr key={game.id} role="row" className={classes}>
           <td role="cell" className="hoops-sch-bye" colSpan={cols.length}>
             {game.time ? <span className="hoops-sch-time">{game.time} · </span> : null}
-            {game.heim ? (
-              <>
-                <TeamName team={game.heim} renderLink={renderLink} names={names} logo={logos === true} /> hat Freilos
-              </>
-            ) : (
-              (game.note ?? 'Spielfrei')
-            )}
+            {game.heim
+              ? i18n.sentence('schedule.bye', 'team', <TeamName team={game.heim} renderLink={renderLink} names={names} logo={logos === true} />)
+              : game.note || i18n.t('schedule.bye-none')}
           </td>
         </tr>
       );
@@ -273,7 +278,7 @@ export function ScheduleTable({
   const rootClass = cn('hoops-frame', className);
   // Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1)
   const region = (
-    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Spielplan'}>
+    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || i18n.t('schedule.table-label')}>
       <table role="table" className={cn('hoops-tbl hoops-tbl--schedule', `hoops-tbl--${dens}`, `hoops-sch--${mode}`)}>
         {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
         <thead role="rowgroup" className={mode === 'columns' ? undefined : 'hoops-sr-only'}>
@@ -313,6 +318,7 @@ export function ScheduleTable({
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
+        lang={i18n.lang}
         meta={meta ? <span className="hoops-frame-meta"><span>{meta}</span></span> : undefined}
       >
         {region}
@@ -321,7 +327,7 @@ export function ScheduleTable({
   }
   if (collapsible) devWarn('[HoopsFoundry UI] ScheduleTable: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
-    <div className={rootClass}>
+    <div className={rootClass} lang={i18n.lang}>
       {hasHead ? (
         <div className="hoops-frame-head">
           {/* Platzhalter, damit die Meta-Angaben rechts stehen */}

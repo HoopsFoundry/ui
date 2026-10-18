@@ -165,11 +165,11 @@ safeHref('/ligen/oberliga');            // → '/ligen/oberliga'
 renderEmptyState({ title: '<script>alert(1)</script>', actions: [{ label: 'Los', href: 'javascript:alert(1)' }] });`;
 
 /** Gemessene Größen des Bündels (Bytes); der Test misst neu und verlangt, dass die Angaben um höchstens 5 % abweichen. */
-export const bundleSizes = { js: 82094, min: 48133, gzip: 16762, css: 192969 };
+export const bundleSizes = { js: 82759, min: 48641, gzip: 16822, css: 192900 };
 /** Budgets in KiB (1 KiB = 1024 Byte); die Namen behalten das alte Kürzel. */
 export const budget = { minKB: 48, gzipKB: 17 };
 /** Das Render-Bündel (hoops-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
-export const renderSizes = { js: 91926, min: 57602, gzip: 18710 };
+export const renderSizes = { js: 92233, min: 57814, gzip: 18698 };
 export const renderBudget = { minKB: 57, gzipKB: 19 };
 /** Das Karten-Bündel (hoops-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
 export const mapSizes = { js: 45150, min: 25622, gzip: 10127 };

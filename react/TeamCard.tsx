@@ -4,6 +4,9 @@ import { initials, shortName } from '../js/schedule.js';
 import { lastResult, opponentPrefix, rankInfo, recordInfo, squadText, statEntries } from '../js/team.js';
 import type { TeamLast, TeamNext, TeamRecord, TeamRef, TeamSquad, TeamStats } from '../js/team.js';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
+import { outcomeLetter } from '../js/league.js';
+import { useT } from './i18n';
+import type { CatalogValue } from '../js/i18n/index.js';
 
 export type { TeamLast, TeamNext, TeamRecord, TeamRef, TeamSquad, TeamStats };
 export type TeamCardSize = 'standard' | 'compact';
@@ -43,6 +46,8 @@ export interface TeamCardProps {
   onClick?: MouseEventHandler<HTMLElement>;
   /** Überschriftenebene des Namens in `standard`, h2 bis h6. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor h3. */
   titleAs?: HeadingTag;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
 }
 
@@ -106,16 +111,19 @@ export function TeamCard({
   href,
   onClick,
   titleAs,
+  texts,
   className,
 }: TeamCardProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT(texts);
+  const { options } = i18n;
   const clickable = Boolean(href) || Boolean(onClick);
-  const rec = recordInfo(record);
-  const pos = rankInfo(rank, rankOf);
+  const rec = recordInfo(record, options);
+  const pos = rankInfo(rank, rankOf, options);
   const hasPoints = typeof points === 'number' && Number.isFinite(points);
-  const squadLine = squadText(squad);
-  const statList = statEntries(stats);
-  const res = lastResult(last);
+  const squadLine = squadText(squad, options);
+  const statList = statEntries(stats, options);
+  const res = lastResult(last, options);
   const own: TeamRef = { name, short, logo };
 
   const nameBlock: ReactNode = href ? (
@@ -150,13 +158,13 @@ export function TeamCard({
     <>
       {at ? (
         <span className={cn('hoops-chip', 'hoops-chip--mono', at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky')} aria-hidden="true">
-          {at === 'gast' ? '@' : 'vs.'}
+          {i18n.t(at === 'gast' ? 'schedule.chip.away' : 'schedule.chip.home')}
         </span>
       ) : null}
       <span className="hoops-team-game-opp">
         {logos ? <LogoBadge team={o} size="hoops-team-logo--sm" /> : null}
         <span>
-          <span className="hoops-sr-only">{opponentPrefix(at)}</span>
+          <span className="hoops-sr-only">{opponentPrefix(at, options)}</span>
           <NameText team={o} names={names} />
         </span>
       </span>
@@ -165,7 +173,7 @@ export function TeamCard({
 
   if (size === 'compact') {
     return (
-      <div className={cn('hoops-team', 'hoops-team--compact', clickable && 'hoops-team--link', className)}>
+      <div className={cn('hoops-team', 'hoops-team--compact', clickable && 'hoops-team--link', className)} lang={i18n.lang}>
         <LogoBadge team={own} />
         <div className="hoops-team-who">
           <span className="hoops-team-nm">{nameBlock}</span>
@@ -183,7 +191,7 @@ export function TeamCard({
           {pos ? (
             <>
               <span className="hoops-team-rank" aria-hidden="true">
-                Platz {pos.text}
+                {i18n.t('team.rank.compact', { rank: pos.text })}
               </span>
               <span className="hoops-sr-only">{pos.aria}</span>
             </>
@@ -194,7 +202,7 @@ export function TeamCard({
   }
 
   return (
-    <div className={cn('hoops-team', 'hoops-team--standard', clickable && 'hoops-team--link', className)}>
+    <div className={cn('hoops-team', 'hoops-team--standard', clickable && 'hoops-team--link', className)} lang={i18n.lang}>
       <div className="hoops-team-head">
         <LogoBadge team={own} size="hoops-team-logo--lg" />
         <div className="hoops-team-who">
@@ -207,7 +215,7 @@ export function TeamCard({
         <div className="hoops-team-vitals">
           {rec ? <Tile value={rec.text} label={rec.label} aria={rec.aria} /> : null}
           {pos ? <Tile value={pos.text} label={pos.label} aria={pos.aria} /> : null}
-          {hasPoints ? <Tile value={String(points)} label="Punkte" aria={`Punkte: ${points}`} /> : null}
+          {hasPoints ? <Tile value={String(points)} label={i18n.t('team.points')} aria={i18n.t('team.points-aria', { points: points as number })} /> : null}
         </div>
       ) : null}
 
@@ -215,7 +223,7 @@ export function TeamCard({
         <div className="hoops-team-games">
           {next ? (
             <div className="hoops-team-game">
-              <div className="hoops-team-game-l">Nächstes Spiel</div>
+              <div className="hoops-team-game-l">{i18n.t('team.next')}</div>
               <div className="hoops-team-game-row">
                 {opponent(next.opponent, next.at)}
                 {next.date || next.time ? <span className="hoops-team-game-end">{[next.date, next.time].filter(Boolean).join(' · ')}</span> : null}
@@ -225,14 +233,14 @@ export function TeamCard({
           ) : null}
           {last ? (
             <div className="hoops-team-game">
-              <div className="hoops-team-game-l">{last.date ? `Letztes Spiel · ${last.date}` : 'Letztes Spiel'}</div>
+              <div className="hoops-team-game-l">{last.date ? `${i18n.t('team.last')} · ${last.date}` : i18n.t('team.last')}</div>
               <div className="hoops-team-game-row">
                 {opponent(last.opponent, last.at)}
                 {res ? (
                   <span className="hoops-team-game-end">
                     {res.outcome ? (
                       <span className={cn('hoops-chip', 'hoops-chip--mono', OUTCOME_CHIP[res.outcome])} aria-hidden="true">
-                        {res.outcome}
+                        {outcomeLetter(res.outcome, options)}
                       </span>
                     ) : null}
                     <span className="hoops-team-game-score" aria-hidden="true">
@@ -250,9 +258,9 @@ export function TeamCard({
       {squadLine ? <div className="hoops-team-squad">{squadLine}</div> : null}
 
       {statList.length > 0 ? (
-        <div className="hoops-team-stats" role="group" aria-label="Saison-Statistik">
+        <div className="hoops-team-stats" role="group" aria-label={i18n.t('team.season-stats')}>
           <div className="hoops-team-sec" aria-hidden="true">
-            Saison-Statistik
+            {i18n.t('team.season-stats')}
           </div>
           <div className="hoops-team-vitals">
             {statList.map((stat) => (

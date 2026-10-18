@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Icon } from './Icon';
 import { cn } from './cn';
+import { useT } from './i18n';
 
 export interface BreadcrumbItem {
   label: string;
@@ -20,11 +21,12 @@ export interface BreadcrumbsProps {
 }
 
 /** Pfadanzeige: plain (Seitenkopf), tagged (mit Kontext-Kürzeln) oder chip (mobil). Das letzte Element ist die aktuelle Seite. */
-export function Breadcrumbs({ items, variant = 'plain', ariaLabel = 'Breadcrumb', className }: BreadcrumbsProps) {
+export function Breadcrumbs({ items, variant = 'plain', ariaLabel, className }: BreadcrumbsProps) {
+  const i18n = useT();
   const base = variant === 'chip' ? 'hoops-crumbs-chip' : 'hoops-crumbs-item';
 
   return (
-    <nav aria-label={ariaLabel} className={cn('hoops-crumbs', `hoops-crumbs--${variant}`, className)}>
+    <nav aria-label={ariaLabel ?? i18n.t('breadcrumbs.label')} lang={i18n.lang} className={cn('hoops-crumbs', `hoops-crumbs--${variant}`, className)}>
       {items.map((item, index) => {
         const isLast = index === items.length - 1;
         const content = (

@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { Icon, type IconName } from './Icon';
 import { cn } from './cn';
+import { useT } from './i18n';
 
 export interface BottomNavItem {
   id: string;
@@ -33,9 +34,10 @@ export function BottomNav({
   defaultValue,
   onValueChange,
   onAction,
-  ariaLabel = 'Hauptnavigation',
+  ariaLabel,
   className,
 }: BottomNavProps) {
+  const i18n = useT();
   const [inner, setInner] = useState(defaultValue ?? items.find((item) => !item.fab)?.id ?? '');
   const value = valueProp ?? inner;
 
@@ -45,7 +47,7 @@ export function BottomNav({
   };
 
   return (
-    <nav aria-label={ariaLabel} className={cn('hoops-bnav', className)}>
+    <nav aria-label={ariaLabel ?? i18n.t('bottomnav.label')} lang={i18n.lang} className={cn('hoops-bnav', className)}>
       {items.map((item) => {
         if (item.fab) {
           const icon = <Icon name={item.icon ?? 'plus'} size={22} />;

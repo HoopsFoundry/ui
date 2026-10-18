@@ -10,6 +10,8 @@
    * Items: [{ label, href?, tag? }]. Das letzte Element ist die aktuelle Seite
    * (kein Link, aria-current="page"); Einträge ohne href sind reiner Text.
    */
+  import { useI18n } from './i18n.js';
+
   type Item = {
     label: string;
     href?: string;
@@ -19,17 +21,21 @@
   let {
     items,
     variant = 'plain',
-    ariaLabel = 'Breadcrumb',
+    ariaLabel,
   }: {
     items: Item[];
     variant?: 'plain' | 'tagged' | 'chip';
+    /** Name der Navigation; Standard aus dem Katalog (`breadcrumbs.label`). */
     ariaLabel?: string;
   } = $props();
+
+  const i18n = useI18n();
+  const label = $derived(ariaLabel ?? i18n.t('breadcrumbs.label'));
 
   const base = $derived(variant === 'chip' ? 'hoops-crumbs-chip' : 'hoops-crumbs-item');
 </script>
 
-<nav class={`hoops-crumbs hoops-crumbs--${variant}`} aria-label={ariaLabel}>
+<nav class={`hoops-crumbs hoops-crumbs--${variant}`} aria-label={label} lang={i18n.lang}>
   {#each items as it, i}
     {@const isLast = i === items.length - 1}
     {#if isLast}

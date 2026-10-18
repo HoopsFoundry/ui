@@ -47,6 +47,10 @@
     "./svelte/VenueCard": "./svelte/VenueCard.svelte",
     "./svelte/FormChips": "./svelte/FormChips.svelte",
     "./svelte/StatGrid": "./svelte/StatGrid.svelte",
+    "./svelte/i18n": {
+      "types": "./svelte/i18n.d.ts",
+      "import": "./svelte/i18n.js"
+    },
     "./appnav.js": "./js/appnav.js",
     "./schedule.js": {
       "types": "./js/schedule.d.ts",

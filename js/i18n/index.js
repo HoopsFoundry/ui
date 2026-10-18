@@ -26,8 +26,8 @@ function normalize(code) {
   const result = canonical(code);
   if (result) return result;
   const shown = String(code).slice(0, 40);
-  if (!warned.has(`locale:${shown}`)) {
-    warned.add(`locale:${shown}`);
+  if (!st().warned.has(`locale:${shown}`)) {
+    st().warned.add(`locale:${shown}`);
     if (!production()) console.warn(`[hoops-i18n] Ungültiger Sprachcode '${shown}', es gilt ${DEFAULT_LOCALE}.`);
   }
   return DEFAULT_LOCALE;
@@ -35,16 +35,30 @@ function normalize(code) {
 
 const production = () => typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'production';
 
-let locale = DEFAULT_LOCALE;
-let catalogs = new Map([[DEFAULT_LOCALE, en]]);
-let overrides = {};
-let listeners = new Set();
-let warned = new Set();
+// Zustand: ein gemeinsames Objekt unter `globalThis[Symbol.for('hoops.i18n')]`. So teilen sich mehrere Kopien des Kerns auf einer Seite (das Quelltext-Modul,
+// `hoops.js`, das gebaute React-Bündel `dist/react`) dieselbe Sprache, dieselben Kataloge, Überschreibungen und Abonnenten. Es wird erst beim ersten Zugriff
+// angelegt (beim Import passiert nichts, sideEffects: false). Eine fremde Gestalt oder Version unter dem Schlüssel wird nicht übernommen (dann hat die Kopie
+// ihren eigenen Zustand).
+const STATE_KEY = Symbol.for('hoops.i18n');
+const STATE_VERSION = 1;
+const validState = (value) =>
+  value !== null && typeof value === 'object' && value.version === STATE_VERSION && typeof value.locale === 'string' &&
+  value.catalogs instanceof Map && value.listeners instanceof Set && value.warned instanceof Set && value.overrides !== null && typeof value.overrides === 'object';
+const freshState = () => ({ version: STATE_VERSION, locale: DEFAULT_LOCALE, catalogs: new Map([[DEFAULT_LOCALE, en]]), overrides: {}, listeners: new Set(), warned: new Set() });
+let own = null;
+function st() {
+  if (own) return own;
+  const shared = globalThis[STATE_KEY];
+  if (validState(shared)) return (own = shared);
+  own = freshState();
+  if (shared === undefined) globalThis[STATE_KEY] = own;
+  return own;
+}
 
 function notify() {
-  for (const fn of [...listeners]) {
+  for (const fn of [...st().listeners]) {
     try {
-      fn(locale);
+      fn(st().locale);
     } catch (error) {
       console.error('[hoops-i18n] Ein Abonnent hat beim Sprachwechsel einen Fehler geworfen.', error);
     }
@@ -53,13 +67,13 @@ function notify() {
 
 /** Setzt die globale Sprache (Schreibweise wie `de-AT` bleibt erhalten, die Auflösung fällt auf `de` und `en` zurück). */
 export function setLocale(code) {
-  locale = normalize(code);
+  st().locale = normalize(code);
   notify();
 }
 
 /** Aktuelle globale Sprache; Standard `en`. */
 export function getLocale() {
-  return locale;
+  return st().locale;
 }
 
 /** Fügt einen Katalog hinzu oder ersetzt den der Sprache. */
@@ -69,51 +83,53 @@ export function registerLocale(code, catalog) {
     normalize(code);
     return;
   }
-  catalogs.set(key, catalog && typeof catalog === 'object' ? catalog : {});
+  st().catalogs.set(key, catalog && typeof catalog === 'object' ? catalog : {});
   notify();
 }
 
 /** Globale Überschreibungen `{ schlüssel: text }`; ersetzt die vorherigen, `setTexts({})` löscht sie. */
 export function setTexts(texts) {
-  overrides = texts && typeof texts === 'object' ? { ...texts } : {};
+  st().overrides = texts && typeof texts === 'object' ? { ...texts } : {};
   notify();
 }
 
 /** Aktuelle globale Überschreibungen (Kopie). */
 export function getTexts() {
-  return { ...overrides };
+  return { ...st().overrides };
 }
 
 /** Meldet `fn(locale)` bei jeder Änderung an; gibt die Abmeldefunktion zurück. */
 export function subscribe(fn) {
-  listeners.add(fn);
+  const set = st().listeners;
+  set.add(fn);
   return () => {
-    listeners.delete(fn);
+    set.delete(fn);
   };
 }
 
 /** Sprache eines Aufrufs: `options.locale`, sonst die globale Sprache. */
 export function localeOf(options) {
-  return options && options.locale ? normalize(options.locale) : locale;
+  return options && options.locale ? normalize(options.locale) : st().locale;
 }
 
 /** Registrierte Sprachcodes. */
 export function availableLocales() {
-  return [...catalogs.keys()];
+  return [...st().catalogs.keys()];
 }
 
 /** Nur für Tests: Zustand auf Werkseinstellung (Sprache `en`, nur der eingebaute englische Katalog, keine Überschreibungen, keine Abonnenten). */
 export function __resetForTests() {
-  locale = DEFAULT_LOCALE;
-  catalogs = new Map([[DEFAULT_LOCALE, en]]);
-  overrides = {};
-  listeners = new Set();
-  warned = new Set();
+  const state = st();
+  state.locale = DEFAULT_LOCALE;
+  state.catalogs = new Map([[DEFAULT_LOCALE, en]]);
+  state.overrides = {};
+  state.listeners = new Set();
+  state.warned = new Set();
 }
 
 /** Nur für Tests: Zahl der Abonnenten (Prüfung auf Lecks nach `destroy`). */
 export function __subscriberCount() {
-  return listeners.size;
+  return st().listeners.size;
 }
 
 const has = (object, key) => object !== null && typeof object === 'object' && Object.prototype.hasOwnProperty.call(object, key);
@@ -123,6 +139,7 @@ const usable = (value) => typeof value === 'string' || isPlural(value);
 
 function lookup(key, code, options) {
   if (has(options && options.texts, key) && usable(options.texts[key])) return options.texts[key];
+  const { overrides, catalogs } = st();
   if (has(overrides, key) && usable(overrides[key])) return overrides[key];
   const chain = [code, code.split('-')[0], DEFAULT_LOCALE];
   for (const c of chain) {
@@ -152,8 +169,8 @@ export function t(key, params, options) {
   const code = localeOf(options);
   const found = lookup(key, code, options);
   if (found === undefined) {
-    if (!warned.has(key)) {
-      warned.add(key);
+    if (!st().warned.has(key)) {
+      st().warned.add(key);
       if (!production()) {
         console.warn(`[hoops-i18n] Schlüssel fehlt in allen Katalogen: ${key}`);
       }

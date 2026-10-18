@@ -20,6 +20,8 @@
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
   import CollapsibleFrame from './internal/CollapsibleFrame.svelte';
+  import { useI18n } from './i18n.js';
+  import type { CatalogValue } from '../js/i18n/index.js';
 
   type Density = 'touch' | 'default' | 'compact' | 'dense';
 
@@ -40,6 +42,7 @@
     collapsible = false,
     open = $bindable(false),
     id = undefined,
+    texts = undefined,
     class: klass = '',
   }: {
     title?: string;
@@ -63,10 +66,13 @@
     open?: boolean;
     /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
     id?: string;
+    /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters und `setTexts`. */
+    texts?: Record<string, CatalogValue>;
     class?: string;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  const i18n = useI18n(() => texts);
   // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
   $inspect(collapsible && !title).with((_type, missing) => {
     if (missing) console.warn('[HoopsFoundry UI] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
@@ -76,13 +82,13 @@
 {#snippet frameMeta()}
   <span class="hoops-frame-meta">
     {#if meta}<span>{meta}</span>{/if}
-    {#if live}<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
+    {#if live}<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> {i18n.t('common.live')}</span>{/if}
   </span>
 {/snippet}
 
 {#snippet tableRegion()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
-  <div class="hoops-table-scroll" role="region" tabindex="0" aria-label={caption || title || 'Tabelle'}>
+  <div class="hoops-table-scroll" role="region" tabindex="0" aria-label={caption || title || i18n.t('table.label')}>
     <table class={`hoops-tbl hoops-tbl--${density} ${striped ? 'hoops-tbl--striped' : ''}`}>
       {#if caption}<caption class="hoops-sr-only">{caption}</caption>{/if}
       {#if columns}
@@ -107,17 +113,17 @@
 {/snippet}
 
 {#if collapsible && title}
-  <CollapsibleFrame rootClass={`hoops-frame ${dark ? 'hoops-frame--dark' : ''} ${klass}`} {id} {title} {titleAs} bind:open meta={meta || live ? frameMeta : undefined}>
+  <CollapsibleFrame rootClass={`hoops-frame ${dark ? 'hoops-frame--dark' : ''} ${klass}`} {id} {title} {titleAs} bind:open meta={meta || live ? frameMeta : undefined} lang={i18n.lang}>
     {@render tableRegion()}
   </CollapsibleFrame>
 {:else}
-<div class={`hoops-frame ${dark ? 'hoops-frame--dark' : ''} ${klass}`}>
+<div class={`hoops-frame ${dark ? 'hoops-frame--dark' : ''} ${klass}`} lang={i18n.lang}>
   {#if title || meta || live}
     <div class="hoops-frame-head">
       {#if title}<svelte:element this={heading.tag} class="hoops-frame-title">{title}</svelte:element>{:else}<span></span>{/if}
       <div class="hoops-frame-meta">
         {#if meta}<span>{meta}</span>{/if}
-        {#if live}<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>{/if}
+        {#if live}<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> {i18n.t('common.live')}</span>{/if}
       </div>
     </div>
   {/if}

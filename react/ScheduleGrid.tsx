@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { cn } from './cn';
 import { CollapsibleFrame } from './internal/CollapsibleFrame';
 import { devWarn } from './internal/devWarn';
+import { useT } from './i18n';
+import type { CatalogValue } from '../js/i18n/index.js';
 import { ariaForResult, buildGrid, hasScore, stateLabel, winnerSide } from '../js/schedule.js';
 import { LiveTag, ResultText, TeamName, type ScheduleRenderLink } from './ScheduleParts';
 import type { ScheduleBreak, ScheduleDensity, ScheduleGame, ScheduleGridColumn, ScheduleNames } from './schedule-types';
@@ -16,6 +18,7 @@ export interface ScheduleGridProps {
   slots?: string[];
   /** Pausen und Sperrzeiten als Zeile über alle Spalten. */
   breaks?: ScheduleBreak[];
+  /** Text in leeren Zellen; Standard aus dem Katalog (`schedule.grid-empty`). */
   emptyLabel?: string;
   /** Zeilenhöhe; Standard: `default` (anders als ScheduleTable wird sie nicht aus den Spielen abgeleitet). */
   density?: ScheduleDensity;
@@ -37,6 +40,8 @@ export interface ScheduleGridProps {
   onOpenChange?: (open: boolean) => void;
   /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
   id?: string;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
   renderLink?: ScheduleRenderLink;
   /** Zusätzlicher Inhalt in der Spielzelle, z. B. Konflikt-Badge. */
@@ -49,7 +54,7 @@ export function ScheduleGrid({
   columns,
   slots,
   breaks,
-  emptyLabel = 'frei',
+  emptyLabel,
   density = 'default',
   names = 'full',
   logos = false,
@@ -62,11 +67,14 @@ export function ScheduleGrid({
   defaultOpen,
   onOpenChange,
   id,
+  texts,
   className,
   renderLink,
   renderNotice,
 }: ScheduleGridProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT(texts);
+  const { options } = i18n;
   const rows = buildGrid({ games, columns, slots, breaks });
   const hasHead = Boolean(title || meta);
 
@@ -86,23 +94,24 @@ export function ScheduleGrid({
         )}
       >
         <div className="hoops-sg-teams">
-          {stateLabel(game.state) ? <span className="hoops-sr-only">{`${stateLabel(game.state)} `}</span> : null}
+          {stateLabel(game.state, options) ? <span className="hoops-sr-only">{`${stateLabel(game.state, options)} `}</span> : null}
           <TeamName team={game.heim} loser={winner === 'gast'} renderLink={renderLink} names={names} logo={logos} />
           <span className="hoops-sch-sep" aria-hidden="true">
             {' – '}
           </span>
-          <span className="hoops-sr-only"> gegen </span>
+          <span className="hoops-sr-only"> {i18n.t('schedule.versus')} </span>
           <TeamName team={game.gast} loser={winner === 'heim'} renderLink={renderLink} names={names} logo={logos} />
-          {game.state === 'live' && !hasScore(game, 'versus') ? <LiveTag /> : null}
+          {game.state === 'live' && !hasScore(game, 'versus') ? <LiveTag texts={texts} /> : null}
         </div>
         {(game.state === 'finished' || game.state === 'live') && hasScore(game, 'versus') ? (
           <div className="hoops-sg-result">
             <ResultText
               visible={`${game.heim?.score} : ${game.gast?.score}`}
-              spoken={ariaForResult(game, 'versus')}
+              spoken={ariaForResult(game, 'versus', options)}
               provisional={game.provisional}
+              texts={texts}
             />
-            {game.state === 'live' ? <LiveTag /> : null}
+            {game.state === 'live' ? <LiveTag texts={texts} /> : null}
           </div>
         ) : null}
         {metaText ? <div className="hoops-sg-meta">{metaText}</div> : null}
@@ -115,13 +124,13 @@ export function ScheduleGrid({
   const rootClass = cn('hoops-frame', className);
   // Scrollbereich ist fokussierbar, damit Tastaturnutzer ihn scrollen können (WCAG 2.1.1)
   const region = (
-    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Zeitraster'}>
+    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || i18n.t('schedule.grid-label')}>
       <table role="table" className={cn('hoops-tbl hoops-sgrid', `hoops-tbl--${density}`)}>
         {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
         <thead role="rowgroup">
           <tr role="row">
             <th scope="col" role="columnheader" className="hoops-sg-time">
-              Zeit
+              {i18n.t('schedule.col.time')}
             </th>
             {columns.map((column) => (
               <th key={column.id} scope="col" role="columnheader">
@@ -149,16 +158,12 @@ export function ScheduleGrid({
               return (
                 <tr key={`y-${index}`} role="row" className="hoops-sg-bye">
                   <th scope="row" role="rowheader" className="hoops-sg-time">
-                    {row.time ? row.time : <span className="hoops-sr-only">Zeit offen</span>}
+                    {row.time ? row.time : <span className="hoops-sr-only">{i18n.t('schedule.time-open')}</span>}
                   </th>
                   <td role="cell" colSpan={columns.length}>
-                    {row.game.heim ? (
-                      <>
-                        <TeamName team={row.game.heim} renderLink={renderLink} names={names} logo={logos} /> hat Freilos
-                      </>
-                    ) : (
-                      (row.game.note ?? 'Spielfrei')
-                    )}
+                    {row.game.heim
+                      ? i18n.sentence('schedule.bye', 'team', <TeamName team={row.game.heim} renderLink={renderLink} names={names} logo={logos} />)
+                      : row.game.note || i18n.t('schedule.bye-none')}
                   </td>
                 </tr>
               );
@@ -175,7 +180,7 @@ export function ScheduleGrid({
                     className={cn('hoops-sg-cell', cell.length === 0 && 'is-empty')}
                     data-label={columns[columnIndex].label}
                   >
-                    {cell.length === 0 ? <span className="hoops-sg-empty">{emptyLabel}</span> : cell.map(gameBlock)}
+                    {cell.length === 0 ? <span className="hoops-sg-empty">{emptyLabel ?? i18n.t('schedule.grid-empty')}</span> : cell.map(gameBlock)}
                   </td>
                 ))}
               </tr>
@@ -196,6 +201,7 @@ export function ScheduleGrid({
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
+        lang={i18n.lang}
         meta={meta ? <span className="hoops-frame-meta"><span>{meta}</span></span> : undefined}
       >
         {region}
@@ -204,7 +210,7 @@ export function ScheduleGrid({
   }
   if (collapsible) devWarn('[HoopsFoundry UI] ScheduleGrid: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
-    <div className={rootClass}>
+    <div className={rootClass} lang={i18n.lang}>
       {hasHead ? (
         <div className="hoops-frame-head">
           {title ? <Heading className="hoops-frame-title">{title}</Heading> : <span />}

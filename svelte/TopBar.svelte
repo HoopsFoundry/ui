@@ -12,6 +12,7 @@
    *   admin   — Breadcrumb-Kontext (Vereinsregister, Einstellungen)
    */
   import type { Snippet } from 'svelte';
+  import { useI18n } from './i18n.js';
 
   let {
     brand = 'Hoops',
@@ -41,9 +42,11 @@
     /** Begrenzt den Inhalt auf `--hoops-shell-max` (Hintergrund bleibt voll breit). */
     contained?: boolean;
   } = $props();
+
+  const i18n = useI18n();
 </script>
 
-<div class="hoops-topbar hoops-topbar--dark" class:hoops-topbar--contained={contained}>
+<div class="hoops-topbar hoops-topbar--dark" class:hoops-topbar--contained={contained} lang={i18n.lang}>
   <div class="hoops-topbar-brand">
     <span class="hoops-topbar-mark" aria-hidden="true">{mark}</span>
     {brand}
@@ -55,7 +58,7 @@
     <div class="hoops-topbar-center">{@render center()}</div>
   {:else if context === 'live'}
     <div class="hoops-topbar-ctx">
-      <span class="hoops-topbar-live">Live</span>
+      <span class="hoops-topbar-live">{i18n.t('common.live')}</span>
       {#if matchLabel}<span>{matchLabel}</span>{/if}
       {#if score}<span class="hoops-topbar-score">{score}</span>{/if}
       {#if clock}<span class="hoops-topbar-clock">{clock}</span>{/if}

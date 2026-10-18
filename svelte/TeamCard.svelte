@@ -17,6 +17,9 @@
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
   import { lastResult, opponentPrefix, rankInfo, recordInfo, squadText, statEntries } from '../js/team.js';
+  import { outcomeLetter } from '../js/league.js';
+  import { useI18n } from './i18n.js';
+  import type { CatalogValue } from '../js/i18n/index.js';
   import type { TeamLast, TeamNext, TeamRecord, TeamRef, TeamSquad, TeamStats } from '../js/team.js';
 
   const OUTCOME_CHIP = { S: 'hoops-chip--ok', N: 'hoops-chip--err', U: '' } as const;
@@ -42,6 +45,7 @@
     href = undefined,
     onclick = undefined,
     titleAs = undefined,
+    texts = undefined,
   }: {
     name: string;
     short?: string;
@@ -64,17 +68,20 @@
     onclick?: () => void;
     /** Überschriftenebene, h2 bis h6. Rangfolge: `titleAs` vor der Ebene aus `HeadingLevel` vor h3. */
     titleAs?: HeadingTag;
+    /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters und `setTexts`. */
+    texts?: Record<string, CatalogValue>;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  const i18n = useI18n(() => texts);
 
   const clickable = $derived(Boolean(href) || Boolean(onclick));
-  const rec = $derived(recordInfo(record));
-  const pos = $derived(rankInfo(rank, rankOf));
+  const rec = $derived(recordInfo(record, i18n.options));
+  const pos = $derived(rankInfo(rank, rankOf, i18n.options));
   const hasPoints = $derived(typeof points === 'number' && Number.isFinite(points));
-  const squadLine = $derived(squadText(squad));
-  const statList = $derived(statEntries(stats));
-  const res = $derived(lastResult(last));
+  const squadLine = $derived(squadText(squad, i18n.options));
+  const statList = $derived(statEntries(stats, i18n.options));
+  const res = $derived(lastResult(last, i18n.options));
 </script>
 
 {#snippet nameText(t: TeamRef, withNames: 'full' | 'short')}
@@ -110,15 +117,15 @@
 {/snippet}
 
 {#snippet opponentName(o: TeamRef, at: 'heim' | 'gast' | undefined)}
-  {#if at}<span class={`hoops-chip hoops-chip--mono ${at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}`} aria-hidden="true">{at === 'gast' ? '@' : 'vs.'}</span>{/if}
+  {#if at}<span class={`hoops-chip hoops-chip--mono ${at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}`} aria-hidden="true">{i18n.t(at === 'gast' ? 'schedule.chip.away' : 'schedule.chip.home')}</span>{/if}
   <span class="hoops-team-game-opp">
     {#if logos}{@render logoBadge(o, 'hoops-team-logo--sm')}{/if}
-    <span><span class="hoops-sr-only">{opponentPrefix(at)}</span>{@render nameText(o, names)}</span>
+    <span><span class="hoops-sr-only">{opponentPrefix(at, i18n.options)}</span>{@render nameText(o, names)}</span>
   </span>
 {/snippet}
 
 {#if size === 'compact'}
-  <div class={`hoops-team hoops-team--compact${clickable ? ' hoops-team--link' : ''}`}>
+  <div class={`hoops-team hoops-team--compact${clickable ? ' hoops-team--link' : ''}`} lang={i18n.lang}>
     {@render logoBadge({ name, logo }, '')}
     <div class="hoops-team-who">
       <span class="hoops-team-nm">{@render nameBlock()}</span>
@@ -126,11 +133,11 @@
     </div>
     <span class="hoops-team-end">
       {#if rec}<span class="hoops-team-rec" aria-hidden="true">{rec.text}</span><span class="hoops-sr-only">{rec.aria}</span>{/if}
-      {#if pos}<span class="hoops-team-rank" aria-hidden="true">Platz {pos.text}</span><span class="hoops-sr-only">{pos.aria}</span>{/if}
+      {#if pos}<span class="hoops-team-rank" aria-hidden="true">{i18n.t('team.rank.compact', { rank: pos.text })}</span><span class="hoops-sr-only">{pos.aria}</span>{/if}
     </span>
   </div>
 {:else}
-  <div class={`hoops-team hoops-team--standard${clickable ? ' hoops-team--link' : ''}`}>
+  <div class={`hoops-team hoops-team--standard${clickable ? ' hoops-team--link' : ''}`} lang={i18n.lang}>
     <div class="hoops-team-head">
       {@render logoBadge({ name, logo }, 'hoops-team-logo--lg')}
       <div class="hoops-team-who">
@@ -143,7 +150,7 @@
       <div class="hoops-team-vitals">
         {#if rec}{@render tile(rec.text, rec.label, rec.aria)}{/if}
         {#if pos}{@render tile(pos.text, pos.label, pos.aria)}{/if}
-        {#if hasPoints}{@render tile(String(points), 'Punkte', `Punkte: ${points}`)}{/if}
+        {#if hasPoints}{@render tile(String(points), i18n.t('team.points'), i18n.t('team.points-aria', { points: points as number }))}{/if}
       </div>
     {/if}
 
@@ -151,7 +158,7 @@
       <div class="hoops-team-games">
         {#if next}
           <div class="hoops-team-game">
-            <div class="hoops-team-game-l">Nächstes Spiel</div>
+            <div class="hoops-team-game-l">{i18n.t('team.next')}</div>
             <div class="hoops-team-game-row">
               {@render opponentName(next.opponent, next.at)}
               {#if next.date || next.time}<span class="hoops-team-game-end">{[next.date, next.time].filter(Boolean).join(' · ')}</span>{/if}
@@ -161,12 +168,12 @@
         {/if}
         {#if last}
           <div class="hoops-team-game">
-            <div class="hoops-team-game-l">{last.date ? `Letztes Spiel · ${last.date}` : 'Letztes Spiel'}</div>
+            <div class="hoops-team-game-l">{last.date ? `${i18n.t('team.last')} · ${last.date}` : i18n.t('team.last')}</div>
             <div class="hoops-team-game-row">
               {@render opponentName(last.opponent, last.at)}
               {#if res}
                 <span class="hoops-team-game-end">
-                  {#if res.outcome}<span class={`hoops-chip hoops-chip--mono ${OUTCOME_CHIP[res.outcome]}`} aria-hidden="true">{res.outcome}</span>{/if}
+                  {#if res.outcome}<span class={`hoops-chip hoops-chip--mono ${OUTCOME_CHIP[res.outcome]}`} aria-hidden="true">{outcomeLetter(res.outcome, i18n.options)}</span>{/if}
                   <span class="hoops-team-game-score" aria-hidden="true">{res.score}</span>
                   <span class="hoops-sr-only">{res.aria}</span>
                 </span>
@@ -180,8 +187,8 @@
     {#if squadLine}<div class="hoops-team-squad">{squadLine}</div>{/if}
 
     {#if statList.length}
-      <div class="hoops-team-stats" role="group" aria-label="Saison-Statistik">
-        <div class="hoops-team-sec" aria-hidden="true">Saison-Statistik</div>
+      <div class="hoops-team-stats" role="group" aria-label={i18n.t('team.season-stats')}>
+        <div class="hoops-team-sec" aria-hidden="true">{i18n.t('team.season-stats')}</div>
         <div class="hoops-team-vitals">
           {#each statList as s (s.key)}
             <div>

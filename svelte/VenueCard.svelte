@@ -29,10 +29,12 @@
     venueHref,
     venueMapLabel,
     venueMapLinks,
-    venueText,
+    venueString,
   } from '../js/venue.js';
   import type { VenueAddress, VenueContact } from '../js/venue.js';
   import MapView from './Map.svelte';
+  import { useI18n } from './i18n.js';
+  import type { CatalogValue } from '../js/i18n/index.js';
 
   let {
     name,
@@ -43,9 +45,9 @@
     contact = undefined,
     games = undefined,
     limit = undefined,
-    gamesLabel = venueText.gamesLabel,
+    gamesLabel = undefined,
     href = undefined,
-    linkLabel = venueText.linkLabel,
+    linkLabel = undefined,
     names = 'full',
     logos = false,
     size = 'standard',
@@ -54,6 +56,7 @@
     tileUrl = undefined,
     privacyNote = undefined,
     mapHeight = 250,
+    texts = undefined,
     class: klass = '',
   }: {
     /** Name der Halle, z. B. „Sporthalle Nordhain“. Pflicht; leer oder nur Leerraum ergibt keine Überschrift. */
@@ -71,9 +74,11 @@
     games?: ScheduleGame[];
     /** Höchstzahl der Spiele (1 bis 5, Standard 2). */
     limit?: number;
+    /** Überschrift der Spiele; Standard aus dem Katalog (`venue.games-label`). */
     gamesLabel?: string;
     /** Seite der Halle; ohne `href` entfällt der Link. */
     href?: string;
+    /** Text des Links zur Hallenseite; Standard aus dem Katalog (`venue.link-label`). */
     linkLabel?: string;
     names?: 'full' | 'short';
     logos?: boolean;
@@ -86,10 +91,17 @@
     privacyNote?: string;
     /** Mindesthöhe der Karte in Pixeln (mindestens 200); die Karte wächst mit den Daten daneben. */
     mapHeight?: number;
+    /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters und `setTexts`, aber nicht `venueText` und die Eigenschaften wie `gamesLabel`. */
+    texts?: Record<string, CatalogValue>;
     class?: string;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  const i18n = useI18n(() => texts);
+  // Text der Halle in Sprache und Texten dieses Bausteins; eine Zuweisung an `venueText` hat Vorrang
+  const V = (name: Parameters<typeof venueString>[0]) => venueString(name, i18n.options);
+  const gamesTitle = $derived(gamesLabel ?? V('gamesLabel'));
+  const more = $derived(linkLabel ?? V('linkLabel'));
 
   /** Ohne Namen (leer oder nur Leerraum) entfällt die Überschrift, statt leer zu bleiben. */
   const title = $derived(typeof name === 'string' ? name.trim() : '');
@@ -97,7 +109,7 @@
   const lines = $derived(addressLines(address));
   const person = $derived(contactInfo(contact));
   const rows = $derived(size === 'compact' ? [] : venueGames(games, limit));
-  const mapLinks = $derived(venueMapLinks({ lat, lng, name: title }));
+  const mapLinks = $derived(venueMapLinks({ lat, lng, name: title }, i18n.options));
   const marker = $derived([{ id: 'halle', lat: lat as number, lng: lng as number, label: title }]);
   const keys = $derived(gameKeys(rows));
   const target = $derived(venueHref(href));
@@ -108,19 +120,19 @@
   <div class="hoops-venue-team">
     <span class={`hoops-venue-dot hoops-venue-dot--${side}`} aria-hidden="true"></span>
     {#if logos}<span class={`hoops-team-logo hoops-team-logo--sm${team.logo ? '' : ' hoops-team-logo--initials'}`} aria-hidden="true">{#if team.logo}<img src={team.logo} alt="" loading="lazy" />{:else}{initials(team.name, 2)}{/if}</span>{/if}
-    <span class="hoops-sr-only">{side === 'heim' ? venueText.home : venueText.away}:</span>
+    <span class="hoops-sr-only">{V(side === 'heim' ? 'home' : 'away')}:</span>
     <span class="hoops-venue-team-name">
       {#if kurz}<span class="hoops-team-name" class:hoops-team-name--short={names === 'short'}><span class="hoops-name-full">{team.name}</span><span class="hoops-name-short" aria-hidden="true" title={team.name}>{kurz}</span></span>{:else}{team.name}{/if}
     </span>
   </div>
 {/snippet}
 
-<div class={`hoops-venue hoops-venue--${size}${hasMap ? ' hoops-venue--map' : ''}${klass ? ` ${klass}` : ''}`}>
+<div class={`hoops-venue hoops-venue--${size}${hasMap ? ' hoops-venue--map' : ''}${klass ? ` ${klass}` : ''}`} lang={i18n.lang}>
   <div class="hoops-venue-in">
   {#if hasMap}
     <div class="hoops-venue-map">
       <MapView
-        label={venueMapLabel(title)}
+        label={venueMapLabel(title, i18n.options)}
         markers={marker}
         interactive={false}
         showList={false}
@@ -128,6 +140,7 @@
         {load}
         {tileUrl}
         {privacyNote}
+        {texts}
         appLinks={[]}
       />
       <div class="hoops-venue-maplinks">
@@ -149,20 +162,20 @@
 
     {#if person}
       <dl class="hoops-venue-contact">
-        {#if person.name}<div><dt>{venueText.contact}</dt><dd>{person.name}</dd></div>{/if}
-        {#if person.phone}<div><dt>{venueText.phone}</dt><dd>{#if person.phone.href}<a class="hoops-link" href={person.phone.href}>{person.phone.text}</a>{:else}{person.phone.text}{/if}</dd></div>{/if}
-        {#if person.email}<div><dt>{venueText.email}</dt><dd>{#if person.email.href}<a class="hoops-link" href={person.email.href}>{person.email.text}</a>{:else}{person.email.text}{/if}</dd></div>{/if}
+        {#if person.name}<div><dt>{V('contact')}</dt><dd>{person.name}</dd></div>{/if}
+        {#if person.phone}<div><dt>{V('phone')}</dt><dd>{#if person.phone.href}<a class="hoops-link" href={person.phone.href}>{person.phone.text}</a>{:else}{person.phone.text}{/if}</dd></div>{/if}
+        {#if person.email}<div><dt>{V('email')}</dt><dd>{#if person.email.href}<a class="hoops-link" href={person.email.href}>{person.email.text}</a>{:else}{person.email.text}{/if}</dd></div>{/if}
       </dl>
     {/if}
 
     {#if rows.length}
       <div class="hoops-venue-games">
-        <div class="hoops-venue-sec" aria-hidden="true">{gamesLabel}</div>
-        <ul class="hoops-venue-game-list" aria-label={gamesLabel}>
+        <div class="hoops-venue-sec" aria-hidden="true">{gamesTitle}</div>
+        <ul class="hoops-venue-game-list" aria-label={gamesTitle}>
           {#each rows as game, i (keys[i])}
             {@const when = gameWhen(game)}
             {@const meta = gameMeta(game)}
-            {@const state = gameState(game)}
+            {@const state = gameState(game, i18n.options)}
             <li class="hoops-venue-game">
               {#if when || state}
                 <div class="hoops-venue-game-head">
@@ -183,7 +196,7 @@
 
     {#if target}
       <div class="hoops-venue-foot">
-        <a class="hoops-link hoops-venue-more" href={target}>{linkLabel}{#if title}<span class="hoops-sr-only">, {title}</span>{/if}</a>
+        <a class="hoops-link hoops-venue-more" href={target}>{more}{#if title}<span class="hoops-sr-only">, {title}</span>{/if}</a>
       </div>
     {/if}
   </div>

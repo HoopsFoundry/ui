@@ -14,6 +14,8 @@
    * Der Punkt ist nur ein Button, wenn `onstep` gesetzt und der Schritt nicht
    * pending ist; sonst eine reine Anzeige.
    */
+  import { useI18n } from './i18n.js';
+
   type Step = {
     id: string;
     label: string;
@@ -25,15 +27,19 @@
     steps,
     variant = 'horizontal',
     onstep,
-    ariaLabel = 'Fortschritt',
+    ariaLabel,
   }: {
     steps: Step[];
     variant?: 'horizontal' | 'compact' | 'vertical';
     onstep?: (id: string) => void;
+    /** Name der Liste; Standard aus dem Katalog (`stepper.label`). */
     ariaLabel?: string;
   } = $props();
 
-  const stateText = { done: 'erledigt', current: 'aktuell', pending: 'ausstehend' } as const;
+  const i18n = useI18n();
+  const label = $derived(ariaLabel ?? i18n.t('stepper.label'));
+  const STATE_KEY = { done: 'stepper.state.done', current: 'stepper.state.current', pending: 'stepper.state.pending' } as const;
+  const stateText = (state: Step['state']) => i18n.t(STATE_KEY[state]);
 
   let currentIdx = $derived(steps.findIndex((s) => s.state === 'current'));
   let doneCount = $derived(steps.filter((s) => s.state === 'done').length);
@@ -41,7 +47,7 @@
 
 {#snippet dot(s: Step, i: number)}
   {#if onstep && s.state !== 'pending'}
-    <button type="button" class="hoops-step-dot" aria-label="{i + 1}. {s.label}" onclick={() => onstep?.(s.id)}>
+    <button type="button" class="hoops-step-dot" aria-label={i18n.t('stepper.step', { number: i + 1, label: s.label })} onclick={() => onstep?.(s.id)}>
       {#if s.state === 'done'}
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>
       {:else}
@@ -60,18 +66,18 @@
 {/snippet}
 
 {#if variant === 'horizontal'}
-  <ol class="hoops-step hoops-step--h" aria-label={ariaLabel}>
+  <ol class="hoops-step hoops-step--h" aria-label={label} lang={i18n.lang}>
     {#each steps as s, i (s.id)}
       <li class={`hoops-step-item is-${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
         {@render dot(s, i)}
-        <div class="hoops-step-label">{s.label}<span class="hoops-sr-only"> ({stateText[s.state]})</span></div>
+        <div class="hoops-step-label">{s.label}<span class="hoops-sr-only"> ({stateText(s.state)})</span></div>
         {#if i < steps.length - 1}<span class="hoops-step-line" aria-hidden="true"></span>{/if}
       </li>
     {/each}
   </ol>
 
 {:else if variant === 'compact'}
-  <div class="hoops-step hoops-step--c" role="group" aria-label={ariaLabel}>
+  <div class="hoops-step hoops-step--c" role="group" aria-label={label} lang={i18n.lang}>
     <div class="hoops-step-track" aria-hidden="true">
       <div class="hoops-step-fill" style={`width: ${steps.length ? (doneCount / steps.length) * 100 : 0}%;`}></div>
     </div>
@@ -82,7 +88,7 @@
   </div>
 
 {:else}
-  <ol class="hoops-step hoops-step--v" aria-label={ariaLabel}>
+  <ol class="hoops-step hoops-step--v" aria-label={label} lang={i18n.lang}>
     {#each steps as s, i (s.id)}
       <li class={`hoops-step-item is-${s.state}`} aria-current={s.state === 'current' ? 'step' : undefined}>
         <div class="hoops-step-rail">
@@ -90,7 +96,7 @@
           {#if i < steps.length - 1}<span class="hoops-step-vline" aria-hidden="true"></span>{/if}
         </div>
         <div class="hoops-step-body">
-          <div class="hoops-step-label">{s.label}<span class="hoops-sr-only"> ({stateText[s.state]})</span></div>
+          <div class="hoops-step-label">{s.label}<span class="hoops-sr-only"> ({stateText(s.state)})</span></div>
           {#if s.description}<div class="hoops-step-desc">{s.description}</div>{/if}
         </div>
       </li>

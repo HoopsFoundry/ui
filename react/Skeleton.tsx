@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import { cn } from './cn';
+import { useT } from './i18n';
 
 export type SkeletonVariant = 'line' | 'block' | 'circle' | 'row' | 'match';
 
@@ -27,13 +28,15 @@ export function Skeleton({
   height = 'auto',
   rounded = '6px',
   count = 1,
-  label = 'Lädt …',
+  label,
   className,
 }: SkeletonProps) {
+  const i18n = useT();
+  const text = label ?? i18n.t('skeleton.loading');
   // label="" lässt den Status-Text weg (mehrere Skeletons auf einer Seite)
-  const status = label ? (
-    <span role="status" className="hoops-sr-only">
-      {label}
+  const status = text ? (
+    <span role="status" className="hoops-sr-only" lang={i18n.lang}>
+      {text}
     </span>
   ) : null;
 

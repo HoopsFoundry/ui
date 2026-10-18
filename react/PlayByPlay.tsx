@@ -1,4 +1,5 @@
 import { cn } from './cn';
+import { useT } from './i18n';
 import { resolvePeriod } from '../js/periods.js';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
 
@@ -36,12 +37,12 @@ export interface PlayByPlayProps {
   className?: string;
 }
 
-const TEAM_TEXT = { heim: 'Heim:', gast: 'Gast:' } as const;
+const TEAM_KEY = { heim: 'playbyplay.team.home', gast: 'playbyplay.team.away' } as const;
 
 /** Live-Scoring-Ereignisstrom: Zeit, Teamstreifen, Aktion, Spielstand; neue Einträge blenden ein. */
 export function PlayByPlay({
   events,
-  title = 'Play-by-Play · neueste oben',
+  title,
   titleAs,
   meta = '',
   live = true,
@@ -50,24 +51,26 @@ export function PlayByPlay({
   className,
 }: PlayByPlayProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT();
+  const headline = title ?? i18n.t('playbyplay.title');
   return (
-    <div className={cn('hoops-pbp-frame', dark && 'hoops-pbp-frame--dark', className)}>
+    <div className={cn('hoops-pbp-frame', dark && 'hoops-pbp-frame--dark', className)} lang={i18n.lang}>
       <div className="hoops-pbp-head">
-        <Heading className="hoops-pbp-title">{title}</Heading>
+        <Heading className="hoops-pbp-title">{headline}</Heading>
         <div className="hoops-pbp-meta">
           {meta ? <span>{meta}</span> : null}
           {live ? (
             <span className="hoops-pbp-live">
-              <span className="hoops-pbp-dot" aria-hidden="true" /> Live
+              <span className="hoops-pbp-dot" aria-hidden="true" /> {i18n.t('common.live')}
             </span>
           ) : null}
         </div>
       </div>
 
-      <div className="hoops-pbp-feed" role="log" aria-label={title} tabIndex={0}>
+      <div className="hoops-pbp-feed" role="log" aria-label={headline} tabIndex={0}>
         {events.map((event) => {
           const team = event.team ?? 'none';
-          const abschnitt = resolvePeriod({ period: event.period, periods, quarter: event.quarter });
+          const abschnitt = resolvePeriod({ period: event.period, periods, quarter: event.quarter }, i18n.options);
           return (
             <div key={event.id} className={cn('hoops-pbp-event', `hoops-pbp-event--${event.kind ?? 'default'}`)}>
               <div className="hoops-pbp-time">
@@ -88,7 +91,7 @@ export function PlayByPlay({
               <div className={cn('hoops-pbp-strip', `hoops-pbp-strip--${team}`)} aria-hidden="true" />
               <div className="hoops-pbp-body">
                 <div className="hoops-pbp-action">
-                  {team !== 'none' ? <span className="hoops-sr-only">{TEAM_TEXT[team]} </span> : null}
+                  {team !== 'none' ? <span className="hoops-sr-only">{i18n.t(TEAM_KEY[team])} </span> : null}
                   {event.titleBold ? (
                     <>
                       <b>{event.titleBold}</b> ·{' '}
@@ -105,7 +108,7 @@ export function PlayByPlay({
                     <span className="hoops-pbp-sep">:</span>
                     {event.score.gast}
                   </span>
-                  <span className="hoops-sr-only">{`Spielstand ${event.score.heim} zu ${event.score.gast}`}</span>
+                  <span className="hoops-sr-only">{i18n.t('playbyplay.score', { home: event.score.heim, away: event.score.gast })}</span>
                 </div>
               ) : null}
             </div>

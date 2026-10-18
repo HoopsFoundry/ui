@@ -3,8 +3,8 @@
 // Begründung der Werte steht in den jeweiligen Tests (gemessener Stand und Reserve).
 const KiB = 1024;
 
-// Seit I2 (Internationalisierung) enthält der Kern den Sprachkern und den englischen Katalog (gemessen: hoops.min.js 48 133 B, gzip 16 762 B, vorher 37 164 B und
-// 13 241 B), die Bündel render und map haben die Texte über t() und die Optionen locale/texts verdrahtet (render 57 602 B, vorher 51 312 B; map 25 622 B, vorher
+// Seit I2 (Internationalisierung) enthält der Kern den Sprachkern und den englischen Katalog (gemessen: hoops.min.js 48 641 B, gzip 16 822 B, vorher 37 164 B und
+// 13 241 B; I3 nahm die Live-Bindungen statEmptyText und THEME_LABEL heraus und ergänzte den geteilten Zustand unter globalThis[Symbol.for('hoops.i18n')], zusammen 508 B mehr als nach I2), die Bündel render und map haben die Texte über t() und die Optionen locale/texts verdrahtet (render 57 814 B, vorher 51 312 B; I3 ergänzte outcomeLetter und data-letter der Formleiste; map 25 622 B, vorher
 // 22 053 B), das deutsche Sprachbündel ist neu (6 633 B). Die Grenzen sind die kleinste volle KiB-Stufe über der Messung.
 export const BUDGETS = {
   hoops: { file: 'hoops.min.js', minBytes: 48 * KiB, gzipBytes: 17 * KiB },
