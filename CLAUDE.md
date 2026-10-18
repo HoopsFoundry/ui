@@ -18,6 +18,7 @@ node scripts/check-map-docs.mjs <ordner>  # axe auf den Karten-Seiten eines Stor
 node scripts/release-vanilla.mjs --dry-run --allow-dirty --no-build   # Release-Ablauf prüfen (schreibt nichts); ohne --dry-run nach release/ (gitignored)
 node scripts/check-portal-seite.mjs --browsers=chromium,webkit   # Beispiel-Portalseite im Browser (Release → portal-sync → strenge CSP, axe); nicht Teil von npm test
 node scripts/check-browser-matrix.mjs --markdown   # Kernbausteine in Chromium, Firefox, WebKit (Accordion, Tabs, Modal/::backdrop, Karte, PageNav, Theme, Container, Bewegung); nicht Teil von npm test
+node scripts/check-csp-boot.mjs     # Boot-Skript des Dunkelmodus unter echter CSP (Hash, meta, nonce, Gegenproben) in Chromium/Firefox/WebKit; nicht Teil von npm test
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```

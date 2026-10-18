@@ -58,6 +58,8 @@ Ein Inline-Skript braucht bei einer strengen `script-src`-Regel eine Freigabe: e
 
 <CodeBlock label="Hash oder nonce" language="Shell und HTTP" code={cspHeader} />
 
+Das Rezept ist im Browser geprüft (`node scripts/check-csp-boot.mjs`, Chromium 153 und WebKit 26.6): Mit dem Hash im Header, mit dem Hash im `meta`-Element und mit einer nonce, die der Server je Antwort neu erzeugt, läuft das Skript und die gemerkte Wahl steht vor dem ersten Zeichnen auf `<html>`. Ohne Freigabe, mit falscher nonce und mit dem Standard-Hash für ein Skript mit anderen Optionen (`defaultMode: 'dark'`) blockiert der Browser es und meldet eine Verletzung von `script-src`; die Seite und der Umschalter funktionieren weiter. Eine Falle: Rechne den Hash mit `printf '%s'`, nicht mit `echo` (ein angehängter Zeilenumbruch ergibt einen anderen Hash). Im Test steht das `meta`-Element vor dem Skript. Firefox ist in dieser Umgebung nicht gelaufen (siehe Foundation/Vanilla, Abschnitt Kompatibilität).
+
 ## Zustände
 
 Der Umschalter ist ein Icon-Button: Hover hinterlegt ihn, Fokus zeigt den gestrichelten Ring in Gold/Amber, Gedrückt (Dunkelmodus aktiv) zeigt die Auswahlfläche und den Mond.
