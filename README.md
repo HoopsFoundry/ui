@@ -172,6 +172,36 @@ import { Button, TextInput, Select, Modal, Banner, AppNav, Checkbox, Table, Bott
 
 Tailwind-Nutzer: `components.css` **nach** `@tailwind base` laden (Preflight setzt sonst Button-Hintergründe zurück).
 
+### Sprache in Svelte und React
+
+Die eingebauten Texte (Beschriftungen, `aria-label`, Statuszeilen) stehen in Katalogen. Die Standardsprache ist Englisch; für Deutsch einmal den Katalog laden und die Sprache setzen. Beide Fassungen lesen denselben Kern (`@hoopsfoundry/ui/i18n`) und rendern bei jedem Wechsel (`setLocale`, `registerLocale`, `setTexts`) neu, ohne Zustand, Fokus oder offene Bereiche zu verlieren.
+
+```tsx
+import '@hoopsfoundry/ui/i18n/de';                       // registriert den deutschen Katalog (steht unter sideEffects)
+import { setLocale } from '@hoopsfoundry/ui/i18n';
+import { HoopsProvider, useLocale, LeagueCard } from '@hoopsfoundry/ui/react';
+
+setLocale('de');                                          // global, für die ganze Seite
+
+// oder nur für einen Teilbaum (ändert den globalen Zustand nicht; geschachtelte Anbieter gelten innen):
+<HoopsProvider locale="de" texts={{ 'league.link': 'Alle Tabellen' }} documentLang="en">
+  <LeagueCard title="Liga" teams={teams} />               // einzelne Texte auch über `texts` an der Komponente
+</HoopsProvider>
+```
+
+`useLocale()` liefert die wirksame Sprache an dieser Stelle des Baums. Vorrang eines Textes: Eigenschaft des Bausteins (`label`, `ariaLabel`, `linkLabel` …) vor `texts` des Bausteins (LeagueCard, TeamCard, MatchCard, ScheduleTable, ScheduleGrid, Table, VenueCard, MapView, FormChips, StatGrid) vor `texts` des Anbieters vor `setTexts` vor Katalog. Weicht die Sprache eines Bausteins von `document.documentElement.lang` ab, setzt er `lang` an der Wurzel; beim Server-Rendern entscheidet die Angabe `documentLang` des Anbieters (ohne sie bleibt das Attribut weg).
+
+In Svelte genügt `setLocale`; für einen Teilbaum gibt es `provideI18n` (aus `@hoopsfoundry/ui/svelte/i18n`, einmal beim Initialisieren einer Komponente aufrufen) und für eigene Bausteine `useI18n`:
+
+```svelte
+<script>
+  import { provideI18n } from '@hoopsfoundry/ui/svelte/i18n';
+  provideI18n(() => ({ locale: 'de', texts: { 'league.link': 'Alle Tabellen' } }));
+</script>
+```
+
+**Bruch gegenüber 0.10:** `statEmptyText` (js/stats.js) und `THEME_LABEL` (js/theme.js, Vanilla-Bündel) entfallen; stattdessen `statEmptyLabel(options)` und `t('theme.toggle')`. Die Buchstaben der Formleiste (`variant="letters"`) stehen im Attribut `data-letter` und kommen aus dem Katalog (deutsch S, N, U, englisch W, L, D); wer das Markup von Hand schreibt, setzt `data-letter` an `hoops-form-item`.
+
 ## AppNav ohne Framework
 
 `css/components.css` + `js/appnav.js` genügen. Das Skript initialisiert alle `[data-hoops-appnav]`.
@@ -232,7 +262,7 @@ Für LeagueCard, TeamCard, VenueCard, ScheduleTable, ScheduleGrid, Table, MatchC
 
 ### Gebündelt, ohne Build (`dist/vanilla`)
 
-`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `hoops.js` (ES-Modul), `hoops.min.js`, Quellkarten, `hoops.d.ts` (zusammengeführt), `hoops.css` (`tokens.css` plus `components.css`, setzt `--hoops-version`) und `courtlines/`. Export `@hoopsfoundry/ui/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `hoops.min.js` ist rund 47,0 KiB groß (gzip 16,4 KiB, Budget 48 KiB und 17 KiB als Test; darin der Sprachkern und der englische Katalog). **Sprache:** Die Standardsprache ist Englisch. Für Deutsch einmal `import './hoops-i18n-de.min.js'` (liegt neben `hoops.min.js`) und `setLocale('de')` aus `hoops.min.js`; weitere API: `getLocale`, `registerLocale`, `setTexts`, `t`, Ereignis `hoops:localechange`. `hoops-render.js`, `hoops-map.js` und `hoops-i18n-de.js` importieren `hoops.js` aus demselben Ordner und brauchen es daneben (Svelte und React folgen mit der Sprachauswahl).
+`npm run build:vanilla` (läuft auch bei `npm install` aus Git über `prepare`; `npm run build:react` bleibt unverändert) schreibt nach `dist/vanilla`: `hoops.js` (ES-Modul), `hoops.min.js`, Quellkarten, `hoops.d.ts` (zusammengeführt), `hoops.css` (`tokens.css` plus `components.css`, setzt `--hoops-version`) und `courtlines/`. Export `@hoopsfoundry/ui/vanilla` (Bündel mit Typen), `…/vanilla/*` (die Dateien). Das Bündel hat keine Abhängigkeiten, enthält weder Framework noch Karte noch Leaflet und kein `innerHTML`; `hoops.min.js` ist rund 46,9 KiB groß (gzip 16,3 KiB, Budget 48 KiB und 17 KiB als Test; darin der Sprachkern und der englische Katalog). **Sprache:** Die Standardsprache ist Englisch. Für Deutsch einmal `import './hoops-i18n-de.min.js'` (liegt neben `hoops.min.js`) und `setLocale('de')` aus `hoops.min.js`; weitere API: `getLocale`, `registerLocale`, `setTexts`, `t`, Ereignis `hoops:localechange`. `hoops-render.js`, `hoops-map.js` und `hoops-i18n-de.js` importieren `hoops.js` aus demselben Ordner und brauchen es daneben; Svelte und React lesen denselben Kern (Abschnitt „Sprache in Svelte und React“).
 
 #### Karte ohne Framework (`hoops-map.js`)
 

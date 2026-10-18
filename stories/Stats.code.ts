@@ -35,7 +35,7 @@ ${statsCompactMarkup}
      Den Text liefert formLabel(form) aus league.js. -->
 ${formMarkup}
 
-<!-- Mit Buchstaben S, N, U (kommen aus dem CSS) -->
+<!-- Mit Buchstaben (data-letter, aus dem Katalog: S, N, U oder W, L, D) -->
 ${formLettersMarkup}
 
 <script type="module">

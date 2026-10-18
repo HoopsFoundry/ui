@@ -12,7 +12,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
-// Größenbudget (gemessen: 47,0 KiB min, 16,4 KiB gzip, davon Sprachkern und englischer Katalog; vor I2: 36,3 KiB und 12,9 KiB; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
+// Größenbudget (gemessen: 46,9 KiB min, 16,3 KiB gzip, davon Sprachkern und englischer Katalog; vor I2: 36,3 KiB und 12,9 KiB; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
 export const BUDGET = BUDGETS['hoops'];
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku

@@ -176,6 +176,26 @@ describe('texts-Eigenschaft der Bausteine (Vorrang vor setTexts, gleiche Ausgabe
   });
 });
 
+// Kennbuchstaben (Daten S, N, U bleiben): Formleiste (data-letter) und Chips in Spielplan und Mannschaftskarte zeigen den Buchstaben der Sprache
+describe('Kennbuchstaben nach Sprache', () => {
+  const chips = (html: string) => [...html.matchAll(/<span aria-hidden="true" class="hoops-chip [^"]*">([A-Z])</g)].map((m) => m[1]);
+  it.each([['en', ['W', 'L', 'D']], ['de', ['S', 'N', 'U']]] as const)('%s: Formleiste und Chips in Svelte, React und Vanilla', async (locale, letters) => {
+    setLocale(locale);
+    p.locale(locale);
+    const form = { form: ['S', 'N', 'U'], variant: 'letters' };
+    for (const html of [await p.svelte('FormChips', form), await p.react('FormChips', form), normalize(renderFormChips(form))]) {
+      expect([...html.matchAll(/data-letter="([A-Z])"/g)].map((m) => m[1])).toEqual(letters);
+    }
+    const dots = { form: ['S'] };
+    for (const html of [await p.svelte('FormChips', dots), await p.react('FormChips', dots), normalize(renderFormChips(dots))]) expect(html).not.toContain('data-letter');
+    const team = { name: 'Alpha', last: { opponent: { name: 'Beta' }, ownScore: 90, opponentScore: 80 } };
+    for (const html of [await p.svelte('TeamCard', team), await p.react('TeamCard', team), normalize(renderTeamCard(team))]) expect(chips(html)).toEqual([letters[0]]);
+    const games = [{ id: 'a', state: 'finished', opponent: { name: 'B', score: 2 }, ownScore: 1, outcome: 'N' }];
+    const table = { games, layout: 'opponent' };
+    for (const html of [await p.svelte('ScheduleTable', table), await p.react('ScheduleTable', table), normalize(renderScheduleTable(table))]) expect(chips(html)).toEqual([letters[1]]);
+  });
+});
+
 describe('Parität je Sprache: Aufbau der Prüfung', () => {
   it('die Wortlisten der anderen Sprache sind nicht leer (sonst prüft der Test nichts)', () => {
     expect(onlyDe.length).toBeGreaterThan(40);

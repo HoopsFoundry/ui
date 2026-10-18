@@ -29,7 +29,7 @@ Eine Kennzahl hat eine Beschriftung und einen Wert. Das Markup ist eine Beschrei
 
 ## Form: die letzten Spiele
 
-`FormChips` zeigt höchstens die **letzten fünf** Ergebnisse, das neueste zuletzt. Eingaben sind `S` (Sieg), `N` (Niederlage) und `U` (Unentschieden); alles andere wird ignoriert, ohne gültigen Eintrag erscheint nichts. Die Zeichen unterscheiden sich in der **Form**, nicht nur in der Farbe: Sieg ein gefüllter Punkt, Niederlage ein Quadrat, Unentschieden ein Ring. Mit `variant="letters"` stehen die Buchstaben S, N, U in farbigen Marken (die Buchstaben kommen aus dem CSS und sind nicht Teil des Textes).
+`FormChips` zeigt höchstens die **letzten fünf** Ergebnisse, das neueste zuletzt. Eingaben sind `S` (Sieg), `N` (Niederlage) und `U` (Unentschieden); alles andere wird ignoriert, ohne gültigen Eintrag erscheint nichts. Die Zeichen unterscheiden sich in der **Form**, nicht nur in der Farbe: Sieg ein gefüllter Punkt, Niederlage ein Quadrat, Unentschieden ein Ring. Mit `variant="letters"` stehen die Buchstaben S, N, U in farbigen Marken (der Buchstabe steht im Attribut `data-letter` und kommt aus dem Katalog der Sprache: deutsch S, N, U, englisch W, L, D; er ist nicht Teil des vorgelesenen Textes).
 
 <Canvas of={StatsStories.Form} />
 
