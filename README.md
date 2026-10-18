@@ -200,6 +200,8 @@ In Svelte genügt `setLocale`; für einen Teilbaum gibt es `provideI18n` (aus `@
 </script>
 ```
 
+Alles Weitere (Sprache je Fassung, Texte überschreiben, eigene Sprache mit `registerLocale`, Ereignis `hoops:localechange`, Verhalten bei unbekannter Sprache, Übersetzungsleitfaden mit Glossar, Migrationstabelle): Storybook `Foundation/Internationalisierung`. Der Umschalter **Sprache** in der Werkzeugleiste stellt dort alle Beispiele zwischen Deutsch und Englisch um.
+
 **Bruch gegenüber 0.10:** `statEmptyText` (js/stats.js) und `THEME_LABEL` (js/theme.js, Vanilla-Bündel) entfallen; stattdessen `statEmptyLabel(options)` und `t('theme.toggle')`. Die Buchstaben der Formleiste (`variant="letters"`) stehen im Attribut `data-letter` und kommen aus dem Katalog (deutsch S, N, U, englisch W, L, D); wer das Markup von Hand schreibt, setzt `data-letter` an `hoops-form-item`.
 
 ## AppNav ohne Framework

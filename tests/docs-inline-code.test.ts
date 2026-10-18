@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { read } from './helpers/docs-code';
 
 const MAX = 44;
-describe.each(['stories/Stats.mdx', 'stories/PageNav.mdx', 'stories/Foundation/DarkMode.mdx', 'stories/Map.mdx'])('%s', (file) => {
+describe.each(['stories/Stats.mdx', 'stories/PageNav.mdx', 'stories/Foundation/DarkMode.mdx', 'stories/Map.mdx', 'stories/Foundation/Internationalisierung.mdx'])('%s', (file) => {
   it(`jedes Code-Stück im Fließtext hat höchstens ${MAX} Zeichen`, () => {
     const text = read(file).replace(/```[\s\S]*?```/g, '');
     const longest = [...text.matchAll(/`([^`\n]+)`/g)].map((m) => m[1]).filter((c) => c.length > MAX);

@@ -1,0 +1,172 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as I18nStories from './Internationalisierung.stories';
+import { FrameworkCode } from '../docs/blocks/FrameworkCode';
+import { CodeBlock } from '../docs/blocks/CodeBlock';
+import { DocTable } from '../docs/blocks/DocTable';
+import {
+  einstellenVanilla, einstellenSvelte, einstellenReact, ueberschreibenVanilla, ueberschreibenSvelte, ueberschreibenReact,
+  ergaenzen, pruefen, ereignis, glossar, datenBegriffe, katalog, laengsteDe, migration,
+} from './Internationalisierung.code';
+import '../docs/blocks/blocks.css';
+
+<Meta of={I18nStories} />
+
+# Internationalisierung
+
+Die Bausteine bringen eigene Texte mit: Beschriftungen („Karte laden“, „Nach oben“), Namen für Hilfstechnik (`aria-label` wie „Schließen“ oder „Legende“), Statuszeilen, Zusammenfassungen („12 Teams · 40 von 90 Spielen gespielt“), Spaltenköpfe und die Buchstaben der Formleiste. Diese Texte stehen in **Katalogen**, nicht in den Komponenten. **Die Standardsprache ist Englisch**; Deutsch liegt als eigenes Modul bei. Die Sprache gilt global für die Seite oder App, einzelne Texte lassen sich überschreiben, weitere Sprachen ergänzt jede Anwendung selbst. Namen, Daten und andere Texte, die du übergibst („Sa, 12.10.“, „Lindenberg Hawks“), bleiben unverändert.
+
+## Überblick
+
+- **Ein Kern für alle Fassungen:** `@hoopsfoundry/ui/i18n` mit `setLocale`, `getLocale`, `t`, `registerLocale`, `setTexts`, `subscribe`. Svelte, React und die Vanilla-Bündel lesen denselben Zustand (er liegt unter `globalThis[Symbol.for('hoops.i18n')]`, auch wenn mehrere Kopien des Kerns auf der Seite sind).
+- **Kataloge:** Englisch ist im Kern eingebaut. Deutsch kommt über `@hoopsfoundry/ui/i18n/de` bzw. ohne Build über `hoops-i18n-de.js`; das Modul registriert sich beim Import. Beide Kataloge haben {katalog.schluessel} Schlüssel aus {katalog.bausteine} Bereichen, davon {katalog.mehrzahl} mit Mehrzahlformen und {katalog.platzhalter} mit Platzhaltern.
+- **Zur Laufzeit umschaltbar:** Ein Aufruf von `setLocale` stellt alle sichtbaren Bausteine um, ohne Neuladen und ohne dass Fokus, offene Bereiche oder Auswahl verloren gehen. Eine Live-Region sagt dabei nichts an.
+- **`lang` am Baustein:** Weicht die Sprache eines Bausteins von `document.documentElement.lang` ab, trägt seine Wurzel `lang` (Hilfstechnik liest dann richtig vor). Verglichen wird die Basissprache: `de-AT` und `de` gelten als gleich.
+- **Zahlen** (Dezimalkomma, Tausender, Koordinaten) laufen über `Intl` in der gewählten Sprache.
+
+Die Beispiele auf dieser Seite folgen dem Umschalter **Sprache** in der Werkzeugleiste (Deutsch oder English). Die Doku-Texte bleiben deutsch; Vorschauen im eigenen Rahmen (iframe) auf anderen Seiten behalten ihre Einstellung.
+
+## Beispiel: dieselben Bausteine in der gewählten Sprache
+
+Svelte-Komponenten (LeagueCard, Stepper, Formleiste mit Buchstaben). Schalte die Sprache um: Spaltenköpfe, Legende, Zusammenfassung, Link, Stepper-Zustände und die Buchstaben S, N, U bzw. W, L, D wechseln, die Namen der Mannschaften bleiben.
+
+<Canvas of={I18nStories.SvelteSprache} />
+
+Dieselbe Karte ohne Framework, eingesetzt mit `mountLeagueCard`. Sie folgt dem Umschalter über das Ereignis `hoops:localechange` und wird mit gleichem Zustand neu eingesetzt:
+
+<Canvas of={I18nStories.VanillaSprache} />
+
+## Sprache einstellen
+
+Einmal beim Start der Seite oder App: deutschen Katalog laden, Sprache setzen. Ohne diesen Aufruf ist alles englisch. Wer später `setLocale` aufruft (zum Beispiel aus einer Sprachauswahl der App), stellt alles um, was schon zu sehen ist.
+
+<DocTable
+  label="Sprache je Fassung"
+  head={['Fassung', 'Sprache global', 'Nur für einen Teil', 'Deutsch laden']}
+  rows={[
+    ['Vanilla ohne Build', <><code>setLocale('de')</code> aus <code>hoops.min.js</code></>, <>bei <code>render*</code>: <code>options.locale</code> nur für den Aufruf</>, <><code>import './hoops-i18n-de.min.js'</code> (neben <code>hoops.min.js</code>)</>],
+    ['Vanilla mit Bündler', <><code>setLocale</code> aus <code>@hoopsfoundry/ui/i18n</code></>, <><code>options.locale</code> bei <code>render*</code></>, <><code>import '@hoopsfoundry/ui/i18n/de'</code></>],
+    ['Svelte', <><code>setLocale</code> aus <code>@hoopsfoundry/ui/i18n</code></>, <><code>{"provideI18n(() => ({ locale: 'en' }))"}</code> aus <code>@hoopsfoundry/ui/svelte/i18n</code></>, <><code>import '@hoopsfoundry/ui/i18n/de'</code></>],
+    ['React', <><code>setLocale</code> aus <code>@hoopsfoundry/ui/i18n</code></>, <><code>{'<HoopsProvider locale="en">'}</code>; <code>useLocale()</code> liefert die wirksame Sprache</>, <><code>import '@hoopsfoundry/ui/i18n/de'</code></>],
+  ]}
+/>
+
+<FrameworkCode label="Sprache einstellen" vanilla={einstellenVanilla} svelte={einstellenSvelte} react={einstellenReact} />
+
+- **Bündler:** `@hoopsfoundry/ui/i18n/de` steht in `package.json` unter `sideEffects`. Ein Bündler verwirft den Import deshalb nicht, auch wenn nichts daraus benutzt wird.
+- **Ohne Build:** `hoops-i18n-de.js`, `hoops-render.js` und `hoops-map.js` importieren den Kern aus `hoops.js` im selben Ordner (die `.min.js`-Dateien aus `hoops.min.js`). Lege die Dateien zusammen ab und mische nicht minifizierte und minifizierte Fassungen.
+- **Server-Rendern:** `HoopsProvider` und `provideI18n` nehmen `documentLang`, die Sprache der Seite. Nur damit entsteht `lang` schon auf dem Server; ohne die Angabe setzt erst der Browser das Attribut, und React meldet beim Hydrieren einen Unterschied.
+- **Anbieter ändern den globalen Zustand nie.** Geschachtelte Anbieter gelten innen: ihre `locale` und `documentLang` ersetzen die äußeren, ihre `texts` werden darübergelegt.
+
+## Texte überschreiben
+
+Jeder eingebaute Text hat einen Schlüssel (zum Beispiel `league.link`, `modal.close`). Du kannst ihn global, für einen Teilbaum, für eine Komponente oder für einen Aufruf ersetzen. Vorrang, vom stärksten zum schwächsten:
+
+1. **Eigenschaft des Bausteins:** `label`, `ariaLabel`, `closeLabel`, `linkLabel`, `gamesLabel`, `seatLabel` … (in Vanilla die gleichnamigen Optionen).
+2. **`texts` am Baustein:** in Svelte und React bei LeagueCard, TeamCard, MatchCard, ScheduleTable, ScheduleGrid, Table, VenueCard, Map, FormChips und StatGrid; in Vanilla `options.texts` bei `render*`, `mount*` und `init*`.
+3. **`texts` des Anbieters:** `HoopsProvider texts` bzw. `provideI18n(() => ({ texts }))`.
+4. **Global:** `setTexts({ … })`. Gilt für jede Sprache; ein zweiter Aufruf ersetzt die Liste, `setTexts({})` löscht sie.
+5. **Katalog der Sprache**, dann der Basissprache (`de-AT` → `de`), dann Englisch.
+
+Ein Wert ist eine Zeichenkette oder ein Mehrzahlobjekt (`{ one, other }`); andere Werte (Zahlen, `null`) werden übergangen und die nächste Stufe gilt.
+
+<FrameworkCode label="Texte überschreiben" vanilla={ueberschreibenVanilla} svelte={ueberschreibenSvelte} react={ueberschreibenReact} />
+
+Die Karte mit `texts` an der Komponente: Link und Legende sind ersetzt, alle anderen Texte folgen weiter der Sprache.
+
+<Canvas of={I18nStories.EigeneTexte} />
+
+## Sprache ergänzen
+
+`registerLocale(code, katalog)` fügt einen Katalog hinzu oder ersetzt ihn; registrierte Sprachen nennt `availableLocales()`. Der Katalog ist ein flaches Objekt `{ schlüssel: wert }` mit den Schlüsseln des englischen Katalogs (Typ `Catalog` aus `@hoopsfoundry/ui/i18n`). Fehlt ein Schlüssel, gilt die Rückfallkette: Sprache (`de-CH`) → Basissprache (`de`) → Englisch. Eine regionale Variante braucht deshalb nur die abweichenden Texte. Registriere den Katalog vor dem Aufruf von `setLocale`; ein späteres `registerLocale` stellt die Bausteine aber ebenfalls um.
+
+<CodeBlock label="Katalog registrieren" language="JavaScript" code={ergaenzen} />
+
+<CodeBlock label="Eigenen Katalog prüfen" language="JavaScript" code={pruefen} />
+
+Das Prüfskript `scripts/check-i18n.mjs` meldet je Sprache fehlende und überzählige Schlüssel, abweichende Platzhalter, leere Werte und Mehrzahlformen, die `Intl.PluralRules` für die Sprache verlangt (für Französisch zum Beispiel `one`, `many` und `other`). Mit `--unused` meldet es Schlüssel, die kein Baustein verwendet.
+
+## Ereignis hoops:localechange
+
+Jede Änderung (`setLocale`, `registerLocale`, `setTexts`) meldet der Kern seinen Abonnenten. Auf Vanilla-Seiten wird daraus das `CustomEvent` `hoops:localechange` auf `document` mit `detail: { locale }` (die danach gültige Sprache). Gemountete Bausteine (`init*`, `mount*`) hören darauf und führen ihre Texte nach; `mount*` setzt das Markup mit gleichem Zustand neu ein.
+
+- **Gesendet wird nur, solange jemand zuhört:** Das Ereignis entsteht, solange mindestens ein Vanilla-Baustein läuft oder ein `onLocaleChange`-Abonnement besteht. Wer selbst reagieren will, nimmt deshalb `onLocaleChange(fn)` aus `hoops.js` (gibt die Abmeldefunktion zurück), nicht nur `addEventListener`.
+- In Svelte und React braucht es das Ereignis nicht: die Komponenten rendern über das Abonnement am Kern neu. Für eigene Logik gibt es `subscribe(fn)` aus `@hoopsfoundry/ui/i18n`.
+
+<CodeBlock label="Auf Sprachwechsel reagieren" language="JavaScript" code={ereignis} />
+
+## Unbekannte oder ungültige Sprache
+
+<DocTable
+  label="Verhalten bei unbekannter Sprache"
+  head={['Aufruf', 'getLocale()', 'Texte', 'Hinweis']}
+  rows={[
+    [<code>setLocale('de')</code>, <code>'de'</code>, 'Deutsch', <>nur nach dem Import von <code>@hoopsfoundry/ui/i18n/de</code>; sonst englische Texte wie in der nächsten Zeile</>],
+    [<code>setLocale('fr')</code>, <code>'fr'</code>, 'Englisch (Rückfall)', <>keine Warnung; Zahlen nach französischen Regeln; weicht die Seite ab, trägt der Baustein <code>lang="fr"</code>, obwohl der Text englisch ist. Katalog vorher registrieren.</>],
+    [<code>setLocale('de_AT')</code>, <code>'de-AT'</code>, 'Deutsch (Basissprache)', 'Unterstrich wird zu Bindestrich, die Schreibweise vereinheitlicht'],
+    [<code>setLocale('xx!!')</code>, <code>'en'</code>, 'Englisch', 'ungültiger Code: einmalige Warnung in der Entwicklung, dann gilt en'],
+    [<code>t('gibt.es.nicht')</code>, '–', 'der Schlüssel selbst', 'einmalige Warnung in der Entwicklung'],
+  ]}
+/>
+
+## Übersetzungsleitfaden
+
+Für alle, die einen Katalog schreiben: eine neue Sprache für die eigene Anwendung oder als Beitrag zum Paket.
+
+### Schlüssel
+
+- **Schema `<baustein>.<bedeutung>`**, klein geschrieben, Teile mit Bindestrich (`accordion.expand-all`, `league.col.played-short`). Gemeinsame Texte stehen unter `common.*` (`common.home`, `common.outcome.win`).
+- **Die Schlüssel kommen aus dem englischen Katalog** (`@hoopsfoundry/ui/i18n/en`). Neue Schlüssel erfindet nur das Paket; eine Übersetzung übernimmt alle, ändert keinen und lässt keinen weg.
+- **Kurzformen haben eigene Schlüssel** (`…-short`, `periods.short.*`): Die Kurzform steht im Spaltenkopf, die Langform liest der Screenreader. Übersetze beide.
+
+### Platzhalter
+
+- **`{name}`** steht für einen Wert, den der Baustein einsetzt (`{count}`, `{team}`, `{rank}`). Namen nicht übersetzen, nicht umbenennen, nicht weglassen; die Reihenfolge im Satz bestimmt die Sprache („{number}. Viertel“, „Quarter {number}“).
+- **Ein Platzhalter ohne Wert bleibt sichtbar stehen** (`{label}`), ein fehlender Schlüssel erscheint als Schlüssel. Das Prüfskript meldet beides vorher: einen Platzhalter, der anders heißt als im englischen Text, und einen fehlenden Schlüssel.
+- **Kein Markup in Werten.** Wo im Satz ein Element steht (der Teamname in „{team} hat Freilos“), schneidet der Baustein am Platzhalter und setzt das Element selbst ein.
+
+### Mehrzahl und Zahlen
+
+- **Mehrzahl als Objekt** mit den Kategorien von `Intl.PluralRules` der Sprache: Deutsch und Englisch kennen `one` und `other`, andere Sprachen mehr (Polnisch `one`, `few`, `many`, `other`). `one` und `other` sind immer Pflicht; die Zahl steht als `{count}` im Text. Gewählt wird die Form nach `count`.
+- **Zahlen nicht in den Text schreiben:** Dezimalzeichen und Tausendertrennung macht `Intl` (`formatNumber`, `formatCoords` aus `@hoopsfoundry/ui/i18n/format`), die Himmelsrichtungen der Koordinaten kommen aus `common.direction.*`.
+
+### Länge
+
+Spaltenköpfe, Knöpfe und Chips haben wenig Platz. Gemessen an den beiden Katalogen: Alle deutschen Texte zusammen haben {katalog.zeichenDe} Zeichen, die englischen {katalog.zeichenEn}. Am stärksten länger ist das Deutsche hier:
+
+<DocTable
+  label="Längste deutsche Texte im Vergleich"
+  head={['Schlüssel', 'Deutsch', 'Englisch', 'Zeichen mehr']}
+  rows={laengsteDe.map((z) => [<code>{z.key}</code>, z.de, z.en, String(z.mehr)])}
+/>
+
+Halte Kurzformen kurz (`SP`, `PKT`, `VL`), prüfe lange Texte in der schmalen Ansicht (390 px) und nutze sonst eine Kurzform mit eigenem Schlüssel.
+
+### Glossar
+
+Fachbegriffe aus den Katalogen `de` und `en`. Ein Test vergleicht jede Zeile mit den Katalogen; ändert sich ein Begriff im Katalog, schlägt er fehl, bis das Glossar nachgezogen ist.
+
+<DocTable
+  label="Glossar der Fachbegriffe"
+  head={['Deutsch', 'Englisch', 'Schlüssel', 'Hinweis']}
+  rows={glossar.map((g) => [g.de, g.en, <code>{g.key}{g.form ? ` (${g.form})` : ''}</code>, g.hinweis ?? ''])}
+/>
+
+**Nicht im Katalog:** Die Texte der Spielereignisse im Play-by-Play (Foul, Freiwurf, Auszeit, Wechsel …) liefert die Anwendung als Daten (`title`); die Art (`kind`) wählt nur Farbe und Symbol. Für diese Daten empfehlen wir:
+
+<DocTable
+  label="Empfohlene Begriffe für Spielereignisse"
+  head={['kind', 'Deutsch', 'Englisch']}
+  rows={datenBegriffe.map((b) => [<code>{b.kind}</code>, b.de, b.en])}
+/>
+
+## Migration
+
+Mit der Internationalisierung ändert sich die Standardsprache. Das Migrationsskript (`hoops-migrate`) kennt diese Änderungen nicht, sie sind von Hand zu erledigen:
+
+<DocTable
+  label="Migration auf die Internationalisierung"
+  head={['Änderung', 'Was zu tun ist', 'Migrationsskript']}
+  rows={migration.map((m) => [m.aenderung, m.tun, m.skript])}
+/>
+
+Der schnellste Weg zur alten Darstellung ist eine Stelle im Start-Code: deutschen Katalog importieren und `setLocale('de')`. Danach sehen alle Bausteine aus wie bisher.

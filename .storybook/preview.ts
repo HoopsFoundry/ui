@@ -10,13 +10,11 @@ import 'leaflet/dist/leaflet.css';
 import './storybook.css';
 import { installPseudoStates } from './pseudo-states';
 import { setForcedState, type ForcedState } from './state-switch';
-// Sprache der Dokumentation: Die Bibliothek startet mit Englisch, die Doku-Seiten und ihre Beispiele sind deutsch. Bis zur Sprachauswahl in der
-// Werkzeugleiste registriert dieser Import den deutschen Katalog, und `setLocale('de')` hält die Doku in der bisherigen Sprache.
+// Sprache der Bausteine: Die Bibliothek startet mit Englisch (Katalog im Kern), dieser Import registriert den deutschen Katalog. Welche Sprache
+// gilt, wählt der Umschalter „Sprache“ in der Werkzeugleiste (Global `locale`, Start `de`, weil die Doku-Texte deutsch sind); der Decorator unten
+// ruft `setLocale`. Svelte-Komponenten rendern über das Abonnement am Kern neu, gemountete Vanilla-Bausteine über `hoops:localechange`.
 import '../js/i18n/de-register.js';
-import { setLocale } from '../js/i18n/index.js';
-
-setLocale('de');
-
+import { getLocale, setLocale } from '../js/i18n/index.js';
 
 const preview: Preview = {
   globalTypes: {
@@ -69,6 +67,18 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    locale: {
+      description: 'Sprache der eingebauten Texte (setLocale); die Doku-Texte bleiben deutsch',
+      toolbar: {
+        title: 'Sprache',
+        icon: 'globe',
+        items: [
+          { value: 'de', title: 'Deutsch (de)' },
+          { value: 'en', title: 'English (en)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     state: {
       description: 'Zustand erzwingen (Hover, Fokus, Aktiv)',
       toolbar: {
@@ -89,6 +99,7 @@ const preview: Preview = {
     type: 'standard',
     framework: 'svelte',
     motion: 'normal',
+    locale: 'de',
     state: 'normal',
 
     backgrounds: {
@@ -110,7 +121,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Introduction',
-          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode', 'Vanilla'],
+          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode', 'Vanilla', 'Internationalisierung'],
           'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Kennzahlen', 'Map', 'VenueCard', 'Tabs', 'Accordion', 'PageNav', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
         ],
       },
@@ -134,6 +145,10 @@ const preview: Preview = {
       if (context.globals.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
       else delete document.documentElement.dataset.motion;
       setForcedState((context.globals.state ?? 'normal') as ForcedState);
+      // Sprache der Bausteine (Umschalter „Sprache“): nur bei einem Wechsel setzen, sonst meldete jeder Durchlauf allen Abonnenten eine Änderung.
+      // Svelte-Komponenten und gemountete Vanilla-Bausteine folgen dem Kern ohne Neuaufbau der Story.
+      const locale = context.globals.locale === 'en' ? 'en' : 'de';
+      if (getLocale() !== locale) setLocale(locale);
       return story();
     },
     withThemeByDataAttribute({
