@@ -105,58 +105,74 @@ describe('Live-Stellen sprechen Grün, Rot bleibt Fehlern vorbehalten', () => {
   });
 });
 
-describe('Zwei Animationen für alles Live: Punkt und Text', () => {
+// Alle Regeln, deren Selektorliste eine laufende Ergebniszahl trifft, und die kleinste Deckkraft, die sie ihr geben
+// (direkt über opacity oder über eine Keyframe-Animation). Ohne Animation und ohne opacity ist das 1.
+const SCORE_SELECTORS = ['.hoops-sch-row.is-live .hoops-sch-score', '.hoops-sg-game.is-live .hoops-sch-score', '.hoops-match--live .hoops-match-score'];
+const keyframeBody = (name: string) => {
+  const m = css.match(new RegExp(`@keyframes ${name}\\s*\\{([^@]*?\\}\\s*)\\}`));
+  expect(m, `@keyframes ${name}`).not.toBeNull();
+  return m![1];
+};
+const minOpacity = (name: string) => Math.min(1, ...[...keyframeBody(name).matchAll(/opacity:\s*([\d.]+)/g)].map((m) => Number(m[1])));
+const scoreAlpha = () => {
+  let alpha = 1;
+  let rules = 0;
+  const plain = css.replace(/\/\*[\s\S]*?\*\//g, '');
+  for (const m of plain.matchAll(/(?<=^|[{}])\s*([^{}@]+)\{([^{}]*)\}/g)) {
+    const selectors = m[1].split(',').map((x) => x.trim().replace(/^:root\[data-motion="reduce"\] /, ''));
+    if (!selectors.some((sel) => /hoops-(?:sch|match)-score/.test(sel))) continue;
+    rules += 1;
+    const body = m[2];
+    const op = body.match(/(?:^|;|\s)opacity:\s*([\d.]+)/);
+    if (op) alpha = Math.min(alpha, Number(op[1]));
+    const anim = body.match(/animation(?:-name)?:\s*([\w-]+)/);
+    if (anim && anim[1] !== 'none') alpha = Math.min(alpha, minOpacity(anim[1]));
+  }
+  // Schutz gegen eine leere Suche: mindestens die Farbregel der Live-Zahlen muss gefunden werden
+  expect(rules).toBeGreaterThan(0);
+  return alpha;
+};
+
+describe('Eine Animation für alles Live: nur der Punkt pulsiert', () => {
   const keyframes = [...css.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]);
-  const keyframeBody = (name: string) => css.match(new RegExp(`@keyframes ${name}\\s*\\{([^@]*?\\}\\s*)\\}`))![1];
-  const minOpacity = (name: string) => Math.min(...[...keyframeBody(name).matchAll(/opacity:\s*([\d.]+)/g)].map((m) => Number(m[1])));
   const groupFor = (animation: string) => {
     const m = css.match(new RegExp(`\\n((?:[^{}\\n]*,\\s)*[^{}\\n]*)\\{\\s*animation:\\s*${animation} ([\\d.]+)s ease-in-out infinite;\\s*\\}`));
     expect(m, animation).not.toBeNull();
     return { selectors: m![1].split(',').map((x) => x.trim()).filter(Boolean), seconds: Number(m![2]) };
   };
   const dot = groupFor('hoops-live-pulse');
-  const text = groupFor('hoops-live-pulse-text');
 
-  it('genau zwei Keyframes (Punkt und Text), die alten Einzel-Animationen sind weg', () => {
-    expect(keyframes.filter((n) => n.startsWith('hoops-live-pulse')).sort()).toEqual(['hoops-live-pulse', 'hoops-live-pulse-text']);
-    for (const old of ['hoops-mc-pulse', 'hoops-pbp-pulse', 'hoops-tb-pulse', 'hoops-pulse']) {
+  it('genau eine Live-Keyframe, die alten Einzel-Animationen und die Text-Keyframe sind weg', () => {
+    expect(keyframes.filter((n) => n.startsWith('hoops-live-pulse'))).toEqual(['hoops-live-pulse']);
+    for (const old of ['hoops-mc-pulse', 'hoops-pbp-pulse', 'hoops-tb-pulse', 'hoops-pulse', 'hoops-live-pulse-text']) {
       expect(keyframes).not.toContain(old);
       expect(css).not.toContain(old);
     }
   });
 
-  it('nur die Deckkraft ändert sich, mit Untergrenze je Typ: Punkt 0,35, Text 0,8', () => {
-    for (const name of ['hoops-live-pulse', 'hoops-live-pulse-text']) {
-      const body = keyframeBody(name);
-      expect(body).toMatch(/0%,\s*100%\s*\{\s*opacity:\s*1;\s*\}/);
-      expect(body).not.toMatch(/transform|box-shadow|scale|translate|color|background/);
-    }
+  it('nur die Deckkraft ändert sich, Untergrenze 0,35', () => {
+    const body = keyframeBody('hoops-live-pulse');
+    expect(body).toMatch(/0%,\s*100%\s*\{\s*opacity:\s*1;\s*\}/);
+    expect(body).not.toMatch(/transform|box-shadow|scale|translate|color|background/);
     expect(minOpacity('hoops-live-pulse')).toBe(0.35);
-    expect(minOpacity('hoops-live-pulse-text')).toBe(0.8);
   });
 
   it('Dauer je Durchlauf aus dem CSS: 1,6 s, also unter 1 Hz (WCAG 2.3.1)', () => {
-    for (const group of [dot, text]) {
-      expect(group.seconds).toBe(1.6);
-      expect(1 / group.seconds).toBeLessThan(1);
-    }
+    expect(dot.seconds).toBe(1.6);
+    expect(1 / dot.seconds).toBeLessThan(1);
   });
 
-  it('Punkt-Selektoren und Text-Selektoren sind getrennt, Text nutzt nie die Punkt-Keyframe', () => {
+  it('die Punkt-Selektoren pulsieren, die Ergebniszahlen nicht', () => {
     for (const selector of ['.hoops-live-pulse', '.hoops-live-dot', '.hoops-match-pulse', '.hoops-pbp-dot', '.hoops-crumb-dot', '.hoops-topbar-live::before']) {
       expect(dot.selectors).toContain(selector);
-      expect(text.selectors).not.toContain(selector);
     }
-    const textSelectors = ['.hoops-sch-row.is-live .hoops-sch-score', '.hoops-sg-game.is-live .hoops-sch-score', '.hoops-match--live .hoops-match-score'];
-    for (const selector of textSelectors) {
-      expect(text.selectors).toContain(selector);
-      expect(dot.selectors).not.toContain(selector);
-    }
+    for (const selector of SCORE_SELECTORS) expect(dot.selectors).not.toContain(selector);
+    expect(scoreAlpha()).toBe(1);
   });
 
   it('keine andere Regel gibt Live-Elementen eine eigene Animation', () => {
     const decls = [...css.matchAll(/animation:\s*([^;}]+)/g)].map((m) => m[1].trim()).filter((d) => /pulse/.test(d));
-    expect(decls.sort()).toEqual(['hoops-live-pulse 1.6s ease-in-out infinite', 'hoops-live-pulse-text 1.6s ease-in-out infinite']);
+    expect(decls).toEqual(['hoops-live-pulse 1.6s ease-in-out infinite']);
   });
 
   const reduced = () => {
@@ -171,7 +187,7 @@ describe('Zwei Animationen für alles Live: Punkt und Text', () => {
   };
 
   it('bei prefers-reduced-motion: reduce steht jede Live-Animation still', () => {
-    expect(reduced()).toEqual([...dot.selectors, ...text.selectors].sort());
+    expect(reduced()).toEqual([...dot.selectors].sort());
   });
 
   it('der Pause-Schalter data-motion="reduce" deckt dieselben Selektoren ab wie die Medienabfrage', () => {
@@ -179,27 +195,31 @@ describe('Zwei Animationen für alles Live: Punkt und Text', () => {
   });
 });
 
-describe('Kontrast im Puls-Tal (Text bei Deckkraft 0,8 ≥ 4,5:1)', () => {
+describe('Ergebniszahlen laufender Spiele bleiben jederzeit ≥ 7:1 (Lückenplan 2.6)', () => {
+  // Gerechnet mit der kleinsten Deckkraft, die das CSS der Zahl gibt (Animation oder opacity); jede Pulsierung
+  // unter etwa 0,96 lässt hell mindestens eine Fläche unter 7:1 fallen und macht diesen Test rot.
   const surfaces = ['--hoops-surface', '--hoops-surface-2', '--hoops-hover-bg', '--hoops-selected-bg'];
-  const valley = Number(css.match(/@keyframes hoops-live-pulse-text\s*\{[^@]*?50%\s*\{\s*opacity:\s*([\d.]+)/)![1]);
+  const alpha = scoreAlpha();
   for (const [name, block] of Object.entries(blocks)) {
     for (const brand of ['BBV', 'DBB'] as const) {
-      it(`${name}, ${brand}: --hoops-live-fg gemischt mit der Fläche bleibt ≥ 4,5:1`, () => {
+      it(`${name}, ${brand}: --hoops-live-fg bei kleinster Deckkraft ≥ 7:1 auf allen Seitenflächen`, () => {
         const scope = `--hoops-h-signal: var(${brand === 'BBV' ? '--hoops-h-amber' : '--hoops-h-gold'});\n${block}\n${brand === 'DBB' ? dbb + '\n' : ''}${tokens}`;
         const fg = color('var(--hoops-live-fg)', scope);
         for (const surface of surfaces) {
           const bg = color(`var(${surface})`, scope);
-          expect(ratio(over(fg, bg, valley), bg), surface).toBeGreaterThanOrEqual(4.5);
+          expect(ratio(over(fg, bg, alpha), bg), surface).toBeGreaterThanOrEqual(AAA);
         }
       });
     }
   }
 
-  it('die Untergrenze 0,75 würde hell scheitern (Regression gegen zu tiefes Tal)', () => {
+  it('Regression: der frühere Text-Puls bis 0,8 läge hell unter 7:1 (und schon 0,95 reicht nicht)', () => {
     const scope = `--hoops-h-signal: var(--hoops-h-amber);\n${blocks.Hell}\n${tokens}`;
     const fg = color('var(--hoops-live-fg)', scope);
-    const worst = Math.min(...surfaces.map((s) => { const bg = color(`var(${s})`, scope); return ratio(over(fg, bg, 0.75), bg); }));
-    expect(worst).toBeLessThan(4.5);
+    for (const a of [0.8, 0.95]) {
+      const worst = Math.min(...surfaces.map((s) => { const bg = color(`var(${s})`, scope); return ratio(over(fg, bg, a), bg); }));
+      expect(worst).toBeLessThan(AAA);
+    }
   });
 });
 

@@ -9,7 +9,7 @@ import '../docs/blocks/blocks.css';
 
 # Live
 
-Alles, was gerade läuft, spricht dieselbe grüne Sprache: ein grüner Punkt, der sanft pulsiert, das Wort „Live“ (oder „läuft“) und, wo ein Stand zu sehen ist, grüne Ergebniszahlen. Rot bleibt für Fehler, Fouls und abgesagte Spiele. Marke (BBV/DBB) und Hell/Dunkel in der Werkzeugleiste umschalten.
+Alles, was gerade läuft, spricht dieselbe grüne Sprache: ein grüner Punkt, der sanft pulsiert, das Wort „Live“ (oder „läuft“) und, wo ein Stand zu sehen ist, grüne Ergebniszahlen (ruhig, ohne Puls). Rot bleibt für Fehler, Fouls und abgesagte Spiele. Marke (BBV/DBB) und Hell/Dunkel in der Werkzeugleiste umschalten.
 
 ## Alle Live-Stellen nebeneinander
 
@@ -31,29 +31,15 @@ Die Token stehen in `css/components.css` neben den `--hoops-chip-*`-Token, jewei
   ]}
 />
 
-Der Punkt hat mindestens 3:1 gegen jede Seitenfläche (Hell, Dunkel, flache Fläche, Hover, Auswahl) und mindestens 4,7:1 auf den dunklen Leisten. Statisch erreichen alle Texte mindestens 7:1. Pulsierender Text (Ergebniszahlen) fällt im Puls-Tal auf 80 % Deckkraft; dort bleibt der Kontrast bei mindestens 4,5:1 (gerechnet als Mischung von Textfarbe und Fläche):
-
-<DocTable
-  label="Kontrast der Ergebniszahlen im Puls-Tal"
-  head={['Fläche', 'Hell (BBV und DBB)', 'Dunkel (BBV und DBB)']}
-  rows={[
-    [<code>--hoops-surface</code>, '5,18:1', '8,75:1'],
-    [<code>--hoops-surface-2</code>, '4,84 bis 4,86:1', '8,50 bis 8,51:1'],
-    [<code>--hoops-hover-bg</code>, '5,04:1', '8,50 bis 8,51:1'],
-    [<code>--hoops-selected-bg</code>, '4,94 bis 4,95:1', '6,71:1'],
-  ]}
-/>
+Der Punkt hat mindestens 3:1 gegen jede Seitenfläche (Hell, Dunkel, flache Fläche, Hover, Auswahl) und mindestens 4,7:1 auf den dunklen Leisten. Alle Texte erreichen mindestens 7:1, und zwar jederzeit: Text pulsiert nicht. Die grünen Ergebniszahlen haben hell nur 7,7 bis 8,5:1; schon bei 95 % Deckkraft fielen sie auf einer Fläche unter 7:1. Bis Version 0.10.0 pulsierten sie bis 80 % Deckkraft und lagen dabei hell bei 4,8 bis 5,2:1 (Test `tests/live.test.ts` rechnet mit der kleinsten Deckkraft, die das CSS der Zahl gibt).
 
 ## Animation
 
-Es gibt zwei Animationen, beide nur über die Deckkraft, beide 1,6 Sekunden, `ease-in-out`:
-
-- `hoops-live-pulse` für Punkte und Flächen: Deckkraft 1 → 0,35 → 1.
-- `hoops-live-pulse-text` für Text: Deckkraft 1 → 0,8 → 1. Bei 0,75 läge der Kontrast im Tal auf hellen Flächen nur bei 4,3:1, deshalb die Untergrenze 0,8.
+Es gibt eine Animation, `hoops-live-pulse`, nur über die Deckkraft (1 → 0,35 → 1), 1,6 Sekunden, `ease-in-out`. Sie hängt nur an Punkten und Flächen, nie an Text: Text bliebe im Puls-Tal nicht bei 7:1.
 
 Es ändert sich nur die Deckkraft: keine Bewegung, kein Farbwechsel, kein Flackern. Eine Periode dauert 1,6 Sekunden, das ist weniger als ein Wechsel pro Sekunde (WCAG 2.3.1). Mit `prefers-reduced-motion: reduce` oder `data-motion="reduce"` auf `<html>` steht jede Live-Stelle still und bleibt voll deckend.
 
-Die Punkt-Animation hängt an `.hoops-live-dot`, `.hoops-match-pulse`, `.hoops-pbp-dot`, `.hoops-crumb-dot` und dem Punkt der TopBar; die Text-Animation an den Ergebniszahlen laufender Spiele (Spielplan, Zeitraster, Spielkarte). Für eigene Punkte gibt es die Hilfsklasse `.hoops-live-pulse`.
+Die Animation hängt an `.hoops-live-dot`, `.hoops-match-pulse`, `.hoops-pbp-dot`, `.hoops-crumb-dot` und dem Punkt der TopBar. Die Ergebniszahlen laufender Spiele (Spielplan, Zeitraster, Spielkarte) sind grün, pulsieren aber nicht. Für eigene Punkte gibt es die Hilfsklasse `.hoops-live-pulse`; setze sie nicht auf Text.
 
 ## Pause-Schalter
 

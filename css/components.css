@@ -231,19 +231,15 @@
 /* ── Live: eine Sprache für alles, was gerade läuft ──────────────
    Grün statt Rot (Rot bleibt Fehler, Foul und Abgesagt). Punkt/Fläche --hoops-live-fill, Text --hoops-live-fg
    (auf immer dunklen Flächen --hoops-live-fg-on-dark). Nie nur Farbe: das Wort „Live“ bzw. der Screenreader-Text „läuft“ bleibt.
-   Zwei Animationen (Punkt, Text), beide nur Deckkraft, 1,6 s (unter 1 Hz), keine Bewegung; bei „Bewegung reduzieren“ oder data-motion="reduce" aus. */
+   Eine Animation (nur Punkte und Flächen), nur Deckkraft, 1,6 s (unter 1 Hz), keine Bewegung; bei „Bewegung reduzieren“ oder data-motion="reduce" aus. */
 .hoops-live { display: inline-flex; align-items: center; gap: 6px; color: var(--hoops-live-fg); font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
 .hoops-live-dot { flex: none; width: 7px; height: 7px; border-radius: 50%; background: var(--hoops-live-fill); }
 .hoops-sch-row.is-live .hoops-sch-score, .hoops-sg-game.is-live .hoops-sch-score, .hoops-match--live .hoops-match-score { color: var(--hoops-live-fg); }
-/* Zwei Keyframes mit je eigener Untergrenze: Punkte und Flächen pulsieren bis 0,35, Text nur bis 0,8
-   (Kontrast im Tal mindestens 4,5:1 auf allen Seitenflächen, Hell und Dunkel, BBV und DBB; bei 0,75 wären es hell nur 4,3:1). */
+/* Eine Keyframe für Punkte und Flächen (Deckkraft bis 0,35). Text pulsiert nicht: die grünen Ergebniszahlen
+   haben hell nur 7,7 bis 8,5:1, schon bei Deckkraft 0,95 fielen sie unter 7:1 (AAA). Die Bewegung trägt der Punkt. */
 @keyframes hoops-live-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
-@keyframes hoops-live-pulse-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }
 .hoops-live-pulse, .hoops-live-dot, .hoops-match-pulse, .hoops-pbp-dot, .hoops-crumb-dot, .hoops-topbar-live::before {
   animation: hoops-live-pulse 1.6s ease-in-out infinite;
-}
-.hoops-sch-row.is-live .hoops-sch-score, .hoops-sg-game.is-live .hoops-sch-score, .hoops-match--live .hoops-match-score {
-  animation: hoops-live-pulse-text 1.6s ease-in-out infinite;
 }
 /* Aus: Systemeinstellung „Bewegung reduzieren“ oder das Attribut data-motion="reduce" auf <html> (Pause-Schalter der App, WCAG 2.2.2).
    Beide Regeln decken dieselben Selektoren ab (Test in tests/live.test.ts). */
@@ -253,10 +249,7 @@
   .hoops-match-pulse,
   .hoops-pbp-dot,
   .hoops-crumb-dot,
-  .hoops-topbar-live::before,
-  .hoops-sch-row.is-live .hoops-sch-score,
-  .hoops-sg-game.is-live .hoops-sch-score,
-  .hoops-match--live .hoops-match-score {
+  .hoops-topbar-live::before {
     animation: none;
   }
 }
@@ -265,10 +258,7 @@
 :root[data-motion="reduce"] .hoops-match-pulse,
 :root[data-motion="reduce"] .hoops-pbp-dot,
 :root[data-motion="reduce"] .hoops-crumb-dot,
-:root[data-motion="reduce"] .hoops-topbar-live::before,
-:root[data-motion="reduce"] .hoops-sch-row.is-live .hoops-sch-score,
-:root[data-motion="reduce"] .hoops-sg-game.is-live .hoops-sch-score,
-:root[data-motion="reduce"] .hoops-match--live .hoops-match-score {
+:root[data-motion="reduce"] .hoops-topbar-live::before {
   animation: none;
 }
 
