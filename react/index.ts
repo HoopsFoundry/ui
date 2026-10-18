@@ -49,3 +49,4 @@ export { LeagueCard, type LeagueCardProps, type LeagueCardSize, type LeagueCardN
 export { PlayerCard, type PlayerCardProps, type PlayerCardSize, type PlayerTeam, type PlayerVital } from './PlayerCard';
 export { PlayByPlay, type PlayByPlayProps, type PbpEvent, type PbpTeam, type PbpKind } from './PlayByPlay';
 export { CourtLines, type CourtLinesProps } from './CourtLines';
+export { HoopsProvider, useLocale, type HoopsProviderProps } from './i18n';
