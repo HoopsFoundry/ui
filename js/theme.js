@@ -2,17 +2,24 @@
  * HoopsFoundry UI Theme · Hell, Dunkel oder System
  * --------------------------------------------------------------
  * `initTheme(button, options)` macht einen Button zum Umschalter für den Dunkelmodus. Drei Modi: `light`, `dark` und `system` (kein Attribut,
- * das CSS folgt `prefers-color-scheme`; Änderungen der Systemeinstellung werden gehört). Der Button hat eine feste Beschriftung („Dunkelmodus“)
+ * das CSS folgt `prefers-color-scheme`; Änderungen der Systemeinstellung werden gehört). Der Button hat eine feste Beschriftung (Katalogtext `theme.toggle`, deutsch „Dunkelmodus“)
  * und `aria-pressed` (gedrückt = Dunkelmodus aktiv); die Symbole wechseln über `data-theme-state` im CSS, nicht über den Namen. Ein Klick
  * schaltet zwischen hell und dunkel und merkt sich die Wahl (Standard `localStorage`, Schlüssel `hoops-theme`, blockierter Speicher bleibt ohne Fehler).
  * `themeBootScript(options)` liefert den kleinen Inline-Code für den `<head>`, der die gemerkte Wahl vor dem ersten Zeichnen setzt (kein Flackern).
  * Kein Inline-`onclick`, kein globaler Zustand, kein `innerHTML`. Rückgabe `{ destroy(), getMode(), setMode(mode) }`. Typen: js/theme.d.ts.
  */
+import { langFor } from './i18n/lang.js';
+import { t } from './i18n/index.js';
+import { onLocaleChange } from './i18n-events.js';
 import { createCleanups, createRegistry, listen } from './lifecycle.js';
 
 export const THEME_KEY = 'hoops-theme';
 export const THEME_ATTRIBUTE = 'data-theme';
-export const THEME_LABEL = 'Dunkelmodus';
+/**
+ * Beschriftung des Umschalters in der globalen Sprache (Live-Binding; `initTheme` frischt es auf). Neuer Code nutzt `t('theme.toggle')`; der Umschalter
+ * liest den Katalog selbst und folgt einem Sprachwechsel.
+ */
+export let THEME_LABEL = t('theme.toggle');
 const MODES = ['light', 'dark', 'system'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const SYNC_EVENT = 'hoops-theme-sync';
@@ -93,7 +100,10 @@ export function initTheme(button, options = {}) {
   const key = typeof opts.storageKey === 'string' && opts.storageKey ? opts.storageKey : THEME_KEY;
   const attribute = typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;
   const target = opts.target && typeof opts.target.setAttribute === 'function' ? opts.target : doc.documentElement;
-  const label = typeof opts.label === 'string' && opts.label.trim() ? opts.label.trim() : THEME_LABEL;
+  THEME_LABEL = t('theme.toggle');
+  // Beschriftung: die Option `label`, sonst der Katalogtext (folgt einem Sprachwechsel); `locale`/`texts` wählen Sprache und Texte
+  const own = typeof opts.label === 'string' && opts.label.trim() ? opts.label.trim() : '';
+  const labelNow = () => own || t('theme.toggle', undefined, { locale: opts.locale, texts: opts.texts });
   let storage = null;
   if (opts.storage !== null) {
     try {
@@ -146,7 +156,18 @@ export function initTheme(button, options = {}) {
     }
   }
   // Feste Beschriftung; hat der Button sichtbaren Text, ist das sein Name
-  if (!button.textContent.trim() && !button.hasAttribute('aria-label') && !button.hasAttribute('aria-labelledby')) button.setAttribute('aria-label', label);
+  // Den Namen setzen wir nur, wenn der Button keinen eigenen hat; dann folgt er auch einem Sprachwechsel
+  const named = !button.textContent.trim() && !button.hasAttribute('aria-label') && !button.hasAttribute('aria-labelledby');
+  if (named) button.setAttribute('aria-label', labelNow());
+  const langBefore = button.getAttribute('lang');
+  const setLang = () => {
+    if (!named) return;
+    const lang = langFor({ locale: opts.locale });
+    if (lang) button.setAttribute('lang', lang);
+    else if (langBefore === null) button.removeAttribute('lang');
+    else button.setAttribute('lang', langBefore);
+  };
+  setLang();
   button.hidden = false;
   apply();
 
@@ -159,6 +180,11 @@ export function initTheme(button, options = {}) {
       cleanups.add(() => query.removeListener(onScheme));
     }
   }
+  // Sprachwechsel: der selbst gesetzte Name folgt
+  cleanups.add(onLocaleChange(() => {
+    if (named) button.setAttribute('aria-label', labelNow());
+    setLang();
+  }));
   // Ein anderer Tab ändert die Wahl
   cleanups.add(listen(win, 'storage', (event) => {
     if (event.key !== null && event.key !== key) return;
@@ -175,6 +201,10 @@ export function initTheme(button, options = {}) {
   const handle = registry.claim(button, () => {
     cleanups.run();
     for (const icon of created) icon.remove();
+    if (named) {
+      if (langBefore === null) button.removeAttribute('lang');
+      else button.setAttribute('lang', langBefore);
+    }
     button.classList.remove('hoops-theme-toggle');
     if (!button.classList.length) button.removeAttribute('class');
     for (const [name, value] of [['aria-pressed', before.pressed], ['aria-label', before.label], ['type', before.type], ['data-theme-state', before.state], ['data-theme-mode', before.mode]]) {

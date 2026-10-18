@@ -185,7 +185,7 @@ Die Option `loadLeaflet` (Funktion, die ein Promise mit Leaflet liefert) ersetzt
   ]}
 />
 
-Das Bündel steht allein (es braucht weder `hoops.js` noch `hoops-render.js`); umgekehrt importiert `hoops-render.min.js` statisch `./hoops.min.js` (und `hoops-render.js` das `./hoops.js`), also gehören beide Dateien in denselben Ordner; `mountVenueCard` aus `hoops-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
+Das Bündel braucht `hoops.js` (den Sprachkern) im selben Ordner, aber nicht `hoops-render.js`; ebenso importiert `hoops-render.min.js` statisch `./hoops.min.js` (und `hoops-render.js` das `./hoops.js`), also gehören diese Dateien in denselben Ordner. Fehlt `hoops.js`, meldet der Browser nur einen fehlenden Modulimport (404); `mountVenueCard` aus `hoops-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
 
 ## Sicherheit
 
@@ -215,7 +215,7 @@ Gemessen am gebauten Bündel (`npm run build:vanilla`); ein Test misst neu, häl
   ]}
 />
 
-Das Budget des Kerns hat noch rund 3,5 KiB Polster (min) und 2 KiB (gzip). Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `hoops-render.js`, die Karte in `hoops-map.js`, jede mit eigenem Budget (siehe „Markup erzeugen“ und „Karte“); der Kern bleibt, was er war.
+Das Budget des Kerns hat noch rund 1 KiB Polster (min) und 0,6 KiB (gzip); der Kern enthält seit der Internationalisierung den Sprachkern und den englischen Katalog. Die Zahl wächst mit jedem Baustein; Karte und Leaflet sind nicht enthalten (Leaflet kommt erst nach Einwilligung dazu). Die Render-Funktionen liegen deshalb in einer eigenen Datei, `hoops-render.js`, die Karte in `hoops-map.js`, jede mit eigenem Budget (siehe „Markup erzeugen“ und „Karte“); der Kern bleibt, was er war.
 
 ## Kopieren ins Projekt
 
@@ -246,7 +246,7 @@ Voraussetzung ist Node 18 oder neuer. Gelaufen sind das Release-Skript und `hoop
 
 ## Einbinden aus dem Release
 
-Jedes Release hat sechs Anhänge: den Tarball `hoops-ui-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `hoops-ui-<version>/`), `hoops-ui-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball), `hoops-ui-<version>.tgz.sha256` (nur der Tarball, bequem für `sha256sum -c`), `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der drei Bündel in KiB, Abhängigkeiten, Hinweis zu Leaflet, das Hilfsskript) sowie `hoops-sync.mjs` und `hoops-sync.mjs.sha256`. Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `hoops.css` dieselbe Version tragen und jedes Bündel sein Größenbudget einhält (sonst bricht es ab). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 und Zeitstempel 0 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist deshalb die veröffentlichte `.sha256`. Das Skript schreibt nach `release/` (nicht im Git; ein vorhandenes Ziel wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.hoops-release` trägt) und braucht weder Netz noch Git-Schreibrechte.
+Jedes Release hat sechs Anhänge: den Tarball `hoops-ui-<version>.tgz` (`dist/vanilla`, `fonts/` und `version.json` unter dem Ordner `hoops-ui-<version>/`), `hoops-ui-<version>.sha256` (eine Zeile je Datei im Format von `sha256sum`, die erste für den Tarball), `hoops-ui-<version>.tgz.sha256` (nur der Tarball, bequem für `sha256sum -c`), `manifest.json` (Name, Version, Dateien mit Größe und Prüfsumme, Größen und Budgets der vier Bündel in KiB (Kern, Render, Karte, deutsche Sprache), Abhängigkeiten, Hinweis zu Leaflet, das Hilfsskript) sowie `hoops-sync.mjs` und `hoops-sync.mjs.sha256`. Ein Skript im Paket, `scripts/release-vanilla.mjs`, erzeugt sie; es prüft vorher, dass `package.json`, `VERSION` in allen sechs Bündeldateien und `--hoops-version` in `hoops.css` dieselbe Version tragen und jedes Bündel sein Größenbudget einhält (sonst bricht es ab). Der Tarball ist auf derselben Plattform und Node-Version byte-gleich (feste Reihenfolge, Zeitstempel 0, Besitzer 0, gzip-Kopf mit Betriebssystem-Byte 3 und Zeitstempel 0 normiert); andere zlib-Versionen können den Strom anders verdichten, maßgeblich ist deshalb die veröffentlichte `.sha256`. Das Skript schreibt nach `release/` (nicht im Git; ein vorhandenes Ziel wird nur ersetzt, wenn es leer ist oder die Marker-Datei `.hoops-release` trägt) und braucht weder Netz noch Git-Schreibrechte.
 
 <CodeBlock label="Holen, prüfen, einsetzen" language="Shell" code={releaseSync} />
 
@@ -315,6 +315,7 @@ JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Proj
     ['Tabs', <><code>initTabs</code>, <code>nextTab</code>, <code>initialTab</code>, <code>TAB_EVENT</code></>],
     ['Modal', <><code>initModal</code>, <code>openModal</code>, <code>closeModal</code>, <code>focusables</code>, <code>MODAL_OPEN_EVENT</code>, <code>MODAL_CLOSE_EVENT</code></>],
     ['Hilfen', <><code>safeHref</code>, <code>reducedMotion</code></>],
+    ['Sprache und Texte', <><code>setLocale</code>, <code>getLocale</code>, <code>registerLocale</code>, <code>setTexts</code>, <code>t</code>, <code>availableLocales</code>, <code>localeOf</code>, <code>onLocaleChange</code>, <code>LOCALE_EVENT</code></>],
     ['Version', <><code>VERSION</code>, <code>cssVersion</code>, <code>checkVersion</code></>],
   ]}
 />

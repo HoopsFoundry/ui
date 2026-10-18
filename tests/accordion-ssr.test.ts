@@ -54,6 +54,7 @@ beforeAll(async () => {
     esbuild: { jsx: 'automatic' }, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error',
   });
   render = ((await vite.ssrLoadModule('svelte/server')) as { render: Render }).render;
+  await vite.ssrLoadModule('/tests/setup-i18n.ts'); // Standardsprache der Tests (Deutsch) auch im Modulgraphen dieses Servers
   Host = await load('tests/helpers/AccordionSsr.svelte');
   Acc = (await load('react/Accordion.tsx', 'Accordion')) as typeof Acc;
   Item = (await load('react/Accordion.tsx', 'AccordionItem')) as typeof Item;

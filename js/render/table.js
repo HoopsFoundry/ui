@@ -7,8 +7,9 @@
  * Link über `safeHref`). Props wie die Komponente: `title`, `titleAs`, `meta`, `live`, `density`, `dark`, `striped`, `columns`, `caption`,
  * `collapsible`, `open`, `id`, `className`. Typen: js/render/table.d.ts.
  */
+import { t as tr } from '../i18n/index.js';
 import { attr, esc } from './escape.js';
-import { collapsibleFrame, cls, headingOf, klass, list, obj, pick, str, uidFor, url } from './core.js';
+import { collapsibleFrame, cls, headingOf, klass, list, obj, pick, str, uidFor, url, withLang } from './core.js';
 import { mount } from './mount.js';
 
 const DENSITIES = ['touch', 'default', 'compact', 'dense'];
@@ -63,27 +64,30 @@ export function renderTable(props, options) {
     : list(p.head).length ? `<thead>${rowsOf(p.head, 'th')}</thead>` : '';
   const foot = list(p.foot).length ? `<tfoot>${rowsOf(p.foot, 'td')}</tfoot>` : '';
   const region =
-    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || 'Tabelle')}">` +
+    `<div class="hoops-table-scroll" role="region" tabindex="0" aria-label="${attr(caption || title || tr('table.label', undefined, options))}">` +
     `<table class="${klass('hoops-tbl', `hoops-tbl--${density}`, p.striped === true && 'hoops-tbl--striped')}">` +
     (caption ? `<caption class="hoops-sr-only">${esc(caption)}</caption>` : '') +
     `${head}<tbody>${rowsOf(p.rows, 'td')}</tbody>${foot}</table></div>`;
 
   const rootClass = cls('hoops-frame', p.dark === true && 'hoops-frame--dark', str(p.className));
-  const metaInner = `${meta ? `<span>${esc(meta)}</span>` : ''}${live ? '<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> Live</span>' : ''}`;
+  const metaInner = `${meta ? `<span>${esc(meta)}</span>` : ''}${live ? `<span class="hoops-crumb"><span class="hoops-crumb-dot" aria-hidden="true"></span> ${esc(tr('common.live', undefined, options))}</span>` : ''}`;
 
   if (p.collapsible === true && title) {
-    return collapsibleFrame({
-      kind: 'frame', rootClass, id, title, titleAs: p.titleAs, open,
-      meta: meta || live ? `<span class="hoops-frame-meta">${metaInner}</span>` : undefined,
-      content: region, uid: uidFor(p, options),
-    });
+    return withLang(
+      collapsibleFrame({
+        kind: 'frame', rootClass, id, title, titleAs: p.titleAs, open,
+        meta: meta || live ? `<span class="hoops-frame-meta">${metaInner}</span>` : undefined,
+        content: region, uid: uidFor(p, options),
+      }),
+      options,
+    );
   }
   const tag = headingOf(p.titleAs);
   const header =
     title || meta || live
       ? `<div class="hoops-frame-head">${title ? `<${tag} class="hoops-frame-title">${esc(title)}</${tag}>` : '<span></span>'}<div class="hoops-frame-meta">${metaInner}</div></div>`
       : '';
-  return `<div class="${klass(rootClass)}">${header}${region}</div>`;
+  return withLang(`<div class="${klass(rootClass)}">${header}${region}</div>`, options);
 }
 
 /** Setzt `renderTable` in `el` ein. Gibt `{ update(props), destroy() }` zurück; `collapsible` startet das Accordion-Verhalten. */

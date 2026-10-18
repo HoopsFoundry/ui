@@ -144,7 +144,8 @@ describe('Map: Quelltext', () => {
     expect(js).toContain('L.divIcon(');
     expect(js).not.toMatch(/L\.icon\(|marker-icon|\.png|iconUrl/);
     expect(js).toMatch(/keyboard: true/);
-    expect(js).toMatch(/title: markerName\(item\)/);
+    expect(js).toMatch(/markerName\(item, textOptions\(\)\)/);
+    expect(js).toMatch(/title: name, alt: name/);
     expect(js).toMatch(/map\.remove\(\)/);
   });
   it('Animationen aus bei reduzierter Bewegung (Optionen im Skript)', () => {

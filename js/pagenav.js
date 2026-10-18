@@ -8,12 +8,15 @@
  * Typen: js/pagenav.d.ts.
  */
 import { hashTarget, isAccordionItem, revealAround, scrollToElement } from './accordion.js';
+import { langFor } from './i18n/lang.js';
+import { t } from './i18n/index.js';
+import { onLocaleChange } from './i18n-events.js';
 import { createCleanups, createRegistry, emptyHandle, listen } from './lifecycle.js';
 import { reducedMotion } from './motion.js';
 
 /** Mindestzahl der Einträge, ab der die Navigation erscheint. */
 export const MIN_HEADINGS = 3;
-const DEFAULTS = { selector: 'h2, [data-pagenav]', skipAttribute: 'data-pagenav-skip', label: 'Auf dieser Seite', debounce: 150, maxWait: 1000 };
+const DEFAULTS = { selector: 'h2, [data-pagenav]', skipAttribute: 'data-pagenav-skip', debounce: 150, maxWait: 1000 };
 const registry = createRegistry('pagenav');
 let uid = 0;
 
@@ -115,7 +118,9 @@ export function initPageNav(root, options = {}) {
   const opts = options && typeof options === 'object' ? options : {};
   const selector = typeof opts.selector === 'string' && opts.selector.trim() ? opts.selector : DEFAULTS.selector;
   const skipAttribute = typeof opts.skipAttribute === 'string' && /^[A-Za-z_:][-\w:.]*$/.test(opts.skipAttribute) ? opts.skipAttribute : DEFAULTS.skipAttribute;
-  const label = typeof opts.label === 'string' && opts.label.trim() ? opts.label.trim() : DEFAULTS.label;
+  // Name der Navigation: die Option `label`, sonst der Katalogtext (folgt einem Sprachwechsel); `locale`/`texts` wählen Sprache und Texte
+  const own = typeof opts.label === 'string' && opts.label.trim() ? opts.label.trim() : '';
+  const label = () => own || t('pagenav.label', undefined, { locale: opts.locale, texts: opts.texts });
   const minHeadings = Number.isInteger(opts.minHeadings) && opts.minHeadings >= 1 ? opts.minHeadings : MIN_HEADINGS;
   const observe = opts.observe !== false;
   const syncHash = opts.syncHash !== false;
@@ -195,7 +200,8 @@ export function initPageNav(root, options = {}) {
     const eyebrow = doc.createElement('p');
     eyebrow.className = 'hoops-eyebrow';
     eyebrow.id = `${id}-label`;
-    eyebrow.textContent = label;
+    eyebrow.textContent = label();
+    setLang(el);
     const ul = doc.createElement('ul');
     ul.className = 'hoops-pagenav-list';
     // mit Seitenadresse: <base href> würde ein bloßes #id auf die Startseite lenken
@@ -232,6 +238,23 @@ export function initPageNav(root, options = {}) {
     nav?.remove();
     nav = null;
   };
+
+  // lang an der Navigation, wenn ihre Sprache von der Seite abweicht
+  function setLang(el) {
+    const lang = langFor({ locale: opts.locale });
+    if (lang) el.setAttribute('lang', lang);
+    else el.removeAttribute('lang');
+  }
+
+  // Sprachwechsel: Überschrift der vorhandenen Navigation nachführen (kein Neuaufbau)
+  if (!own) {
+    cleanups.add(onLocaleChange(() => {
+      if (!nav) return;
+      const eyebrow = nav.querySelector('.hoops-eyebrow');
+      if (eyebrow) eyebrow.textContent = label();
+      setLang(nav);
+    }));
+  }
 
   const refresh = () => {
     const found = targets();

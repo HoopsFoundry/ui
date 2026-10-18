@@ -220,6 +220,7 @@ describe('Nie nur Farbe: das Wort „Live“ bzw. „läuft“ bleibt', () => {
   });
 
   it('Screenreader-Ergebnis sagt „läuft“', () => {
-    expect(read('js/schedule.js')).toContain("'läuft'");
+    // der Text steht im Katalog (de: „läuft“), die Funktion liest ihn über den Schlüssel
+    expect(read('js/schedule.js')).toContain("'schedule.live-spoken'");
   });
 });

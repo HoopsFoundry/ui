@@ -4,24 +4,31 @@
  * Reine Funktionen ohne DOM und ohne Intl (feste Formatierung, SSR-stabil). Svelte und React nutzen dieselbe Logik.
  * Typen: js/venue.d.ts.
  */
+import { t } from './i18n/index.js';
+import { textTable } from './i18n/text-table.js';
 import { isCoord, mapLinks } from './map.js';
 import { safeHref } from './url.js';
 
-export const venueText = {
-  gamesLabel: 'Nächste Spiele in der Halle',
-  linkLabel: 'Zur Hallenseite',
-  mapLink: 'Größere Karte',
-  routeLink: 'Route planen',
-  contact: 'Kontakt',
-  phone: 'Telefon',
-  email: 'E-Mail',
-  home: 'Heim',
-  away: 'Gast',
-  live: 'Live',
-  cancelled: 'Abgesagt',
-  postponed: 'Verschoben',
-  mapLabel: 'Karte',
-};
+// Texte der Hallenkarte: Eigenschaft → Katalogschlüssel (ausgeschrieben, damit die Verwendungsprüfung sie erkennt)
+const venueTable = textTable({
+  gamesLabel: 'venue.games-label',
+  linkLabel: 'venue.link-label',
+  mapLink: 'venue.map-link',
+  routeLink: 'venue.route-link',
+  contact: 'venue.contact',
+  phone: 'venue.phone',
+  email: 'venue.email',
+  home: 'common.home',
+  away: 'common.away',
+  live: 'common.live',
+  cancelled: 'venue.cancelled',
+  postponed: 'venue.postponed',
+  mapLabel: 'venue.map-label',
+});
+/** Die Texte in der globalen Sprache; eine Zuweisung überschreibt sie für alle Aufrufe (Vorrang vor Katalog und `texts`). */
+export const venueText = venueTable.table;
+/** Ein Text der Tabelle `venueText` in der Sprache des Aufrufs (`options.locale`, `options.texts`); eine Zuweisung an `venueText` hat Vorrang. */
+export const venueString = venueTable.lookup;
 
 /** Höchstzahl der Spiele, wenn die App nichts angibt, und die obere Grenze. */
 export const DEFAULT_GAMES = 2;
@@ -30,9 +37,9 @@ export const MAX_GAMES = 5;
 const text = (value) => (typeof value === 'string' ? value.trim() : '');
 
 /** Name der Karte für Hilfstechnik: „Karte: Sporthalle Nordhain“ (verschiedene Hallen ergeben verschiedene Namen). */
-export function venueMapLabel(name) {
+export function venueMapLabel(name, options) {
   const n = text(name);
-  return n ? `${venueText.mapLabel}: ${n}` : venueText.mapLabel;
+  return n ? t('venue.map-label-named', { name: n }, options) : venueString('mapLabel', options);
 }
 
 /** Adresse in höchstens zwei Zeilen: Straße, dann „PLZ Ort“. Leere Teile entfallen; ohne Angaben `[]`. */
@@ -125,20 +132,20 @@ export function gameMeta(game) {
 }
 
 /** Hinweis zum Zustand: `{ text, tone }` für „Live“ (ok), „Abgesagt“ (err) und „Verschoben“ (warn); sonst `undefined`. */
-export function gameState(game) {
-  if (game?.state === 'live') return { text: venueText.live, tone: 'ok' };
-  if (game?.state === 'cancelled') return { text: venueText.cancelled, tone: 'err' };
-  if (game?.state === 'postponed') return { text: venueText.postponed, tone: 'warn' };
+export function gameState(game, options) {
+  if (game?.state === 'live') return { text: venueString('live', options), tone: 'ok' };
+  if (game?.state === 'cancelled') return { text: venueString('cancelled', options), tone: 'err' };
+  if (game?.state === 'postponed') return { text: venueString('postponed', options), tone: 'warn' };
   return undefined;
 }
 
 /** Links unter der Karte (Größere Karte, Route planen); ohne gültige Koordinaten `[]`. */
-export function venueMapLinks({ lat, lng, name }) {
+export function venueMapLinks({ lat, lng, name }, options) {
   if (!isCoord(lat, lng)) return [];
   const links = mapLinks({ lat, lng, label: text(name) });
   return [
-    { kind: 'osm', text: venueText.mapLink, href: links.osm },
-    { kind: 'route', text: venueText.routeLink, href: links.route },
+    { kind: 'osm', text: venueString('mapLink', options), href: links.osm },
+    { kind: 'route', text: venueString('routeLink', options), href: links.route },
   ];
 }
 

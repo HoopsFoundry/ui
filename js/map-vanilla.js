@@ -14,7 +14,9 @@
  * `textContent`, Ziele durch `safeHref`, Aufzählungen (`load`, `darkTiles`, `appLinks`, `kind`) gegen feste Listen. Beim Import passiert nichts
  * (kein Zugriff auf `window`/`document`). Typen: js/map-vanilla.d.ts.
  */
-import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, tilesMode, validTileUrl } from './map.js';
+import { langFor } from './i18n/lang.js';
+import { onLocaleChange } from './i18n-events.js';
+import { DEFAULT_TILE_URL, mapItems, mapString, placeholderPins, tilesMode, validTileUrl } from './map.js';
 import { createMapController, devWarn } from './map-leaflet.js';
 import { createRegistry } from './lifecycle.js';
 import { attr } from './render/escape.js';
@@ -26,14 +28,29 @@ import { list, obj, str, uidFor } from './render/core.js';
 const registry = createRegistry('map');
 const noop = () => ({ update() {}, destroy() {} });
 const SAFE_ATTRS = ['data-state', 'data-dim', 'data-tiles', 'class'];
+// Eingebaute Texte am Markup: [Rolle, Auswahl, Attribut (null: Textinhalt), Name in mapText]. Bei einem Sprachwechsel folgt ein Text, der noch dem
+// bisherigen Standardtext gleicht; ein eigener Text (`privacyNote`, `attribution`, ein Text des Servers) bleibt stehen.
+const ROLES = [
+  ['skip', '.hoops-map-skip', null, 'skip'],
+  ['note', '.hoops-map-note', null, 'privacy'],
+  ['load', '.hoops-map-load', null, 'load'],
+  ['retry', '.hoops-map-retry', null, 'retry'],
+  ['attribution', '.hoops-map-attr a', null, 'attribution'],
+  ['list', '.hoops-map-list', 'aria-label', 'listLabel'],
+  ['canvas', '.hoops-map-canvas', 'aria-label', 'canvasHint'],
+  ['zoomGroup', '.hoops-map-zoom', 'aria-label', 'zoomGroup'],
+  ['zoomIn', '.hoops-map-zoom-btn:nth-child(1)', 'aria-label', 'zoomIn'],
+  ['zoomOut', '.hoops-map-zoom-btn:nth-child(2)', 'aria-label', 'zoomOut'],
+];
 
 /**
  * Markup der Karte (Platzhalter, Region, Liste, Statuszeile) wie `MapView`. `props`: `markers`, `label` (Pflicht), `center`, `zoom`, `height`, `interactive`,
- * `load`, `tileUrl`, `attribution`, `privacyNote`, `appLinks`, `showList`, `dimInDark`, `darkTiles`, `seatLabel`, `className`; `options.uid` legt die Basis der ids fest.
+ * `load`, `tileUrl`, `attribution`, `privacyNote`, `appLinks`, `showList`, `dimInDark`, `darkTiles`, `seatLabel`, `className`; `options.uid` legt die Basis der ids fest,
+ * `options.locale` und `options.texts` wählen Sprache und Texte (Standard: die globale Sprache; `mapText` und die Eigenschaften wie `seatLabel` haben Vorrang).
  */
 export function renderMap(props, options) {
   const p = obj(props);
-  return renderMapView({ ...p, loadReady: true }, uidFor(p, options));
+  return renderMapView({ ...p, loadReady: true }, uidFor(p, options), options);
 }
 
 const hooksOf = (source, previous = {}) => {
@@ -54,10 +71,10 @@ const call = (fn, arg) => {
 
 const zoomIcon = (path) =>
   `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="${path}"></path></svg>`;
-const zoomMarkup = (canvasId) =>
-  `<div class="hoops-map-zoom" role="group" aria-label="${attr(mapText.zoomGroup)}">` +
-  `<button type="button" class="hoops-map-zoom-btn" aria-label="${attr(mapText.zoomIn)}" aria-controls="${attr(canvasId)}">${zoomIcon('M10 4v12M4 10h12')}</button>` +
-  `<button type="button" class="hoops-map-zoom-btn" aria-label="${attr(mapText.zoomOut)}" aria-controls="${attr(canvasId)}">${zoomIcon('M4 10h12')}</button></div>`;
+const zoomMarkup = (canvasId, options) =>
+  `<div class="hoops-map-zoom" role="group" aria-label="${attr(mapString('zoomGroup', options))}">` +
+  `<button type="button" class="hoops-map-zoom-btn" aria-label="${attr(mapString('zoomIn', options))}" aria-controls="${attr(canvasId)}">${zoomIcon('M10 4v12M4 10h12')}</button>` +
+  `<button type="button" class="hoops-map-zoom-btn" aria-label="${attr(mapString('zoomOut', options))}" aria-controls="${attr(canvasId)}">${zoomIcon('M4 10h12')}</button></div>`;
 
 /** Hängt die Karte an `root` (ein Element `.hoops-map`). `restore`: `destroy` stellt das Markup vom Beginn wieder her. */
 function attach(root, options, { restore }) {
@@ -74,6 +91,8 @@ function attach(root, options, { restore }) {
 
   let props = obj(options);
   let hooks = hooksOf(props);
+  // Sprache und Texte dieser Karte: `locale`/`texts` aus den Optionen, sonst die globale Sprache (der Wechsel kommt über `hoops:localechange`)
+  const textOptions = () => ({ locale: props.locale, texts: props.texts });
   const has = (key) => props[key] !== undefined;
   const pristine = restore ? [...root.childNodes].map((node) => node.cloneNode(true)) : [];
   const restoreAttributes = (() => {
@@ -114,6 +133,8 @@ function attach(root, options, { restore }) {
     interactive: props.interactive !== false,
     tileUrl: tileUrlOf(props),
     seatLabel: typeof props.seatLabel === 'string' ? props.seatLabel : undefined,
+    locale: props.locale,
+    texts: props.texts,
   });
 
   const focusedIn = (node) => {
@@ -178,8 +199,8 @@ function attach(root, options, { restore }) {
       devWarn(`[hoops-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
     }
     const showList = props.showList !== false;
-    const privacy = typeof props.privacyNote === 'string' ? props.privacyNote : mapText.privacy;
-    const items = mapItems(list(props.markers), Array.isArray(props.appLinks) ? props.appLinks : ['osm', 'route'], { seat: typeof props.seatLabel === 'string' ? props.seatLabel : undefined });
+    const privacy = typeof props.privacyNote === 'string' ? props.privacyNote : mapString('privacy', textOptions());
+    const items = mapItems(list(props.markers), Array.isArray(props.appLinks) ? props.appLinks : ['osm', 'route'], { seat: typeof props.seatLabel === 'string' ? props.seatLabel : undefined }, textOptions());
 
     root.setAttribute('data-state', state);
     if (has('dimInDark')) root.setAttribute('data-dim', props.dimInDark !== false ? 'true' : 'false');
@@ -189,7 +210,7 @@ function attach(root, options, { restore }) {
     if (has('label')) root.querySelector('.hoops-map-frame')?.setAttribute('aria-label', str(props.label));
     if (has('attribution')) {
       const link = stage.querySelector('.hoops-map-attr a');
-      if (link) link.textContent = str(props.attribution).trim() || mapText.attribution;
+      if (link) link.textContent = str(props.attribution).trim() || mapString('attribution', textOptions());
     }
 
     // Kartenfläche und Controller: laufen nur im Zustand „loading“ oder „ready“
@@ -200,7 +221,7 @@ function attach(root, options, { restore }) {
         canvas.className = 'hoops-map-canvas';
         canvas.id = canvasId;
         canvas.setAttribute('role', 'group');
-        canvas.setAttribute('aria-label', mapText.canvasHint);
+        canvas.setAttribute('aria-label', mapString('canvasHint', textOptions()));
         stage.insertBefore(canvas, stage.firstChild);
       }
       if (state === 'loading') canvas.setAttribute('inert', '');
@@ -240,7 +261,7 @@ function attach(root, options, { restore }) {
       if (state === 'idle') {
         let created = false;
         if (!card) {
-          ph.append(fragmentOf(doc, mapCardMarkup(privacy, true)));
+          ph.append(fragmentOf(doc, mapCardMarkup(privacy, true, textOptions())));
           card = ph.querySelector('.hoops-map-ph-card');
           created = true;
         }
@@ -256,7 +277,7 @@ function attach(root, options, { restore }) {
         // Nach einem Ladefehler: „Erneut versuchen“ (nicht bei ungültiger tileUrl, die ein Neuversuch nicht heilt)
         if (!card?.querySelector('.hoops-map-retry')) {
           card?.remove();
-          ph.append(fragmentOf(doc, mapRetryMarkup()));
+          ph.append(fragmentOf(doc, mapRetryMarkup(textOptions())));
         }
       } else {
         card?.remove();
@@ -267,7 +288,7 @@ function attach(root, options, { restore }) {
     let zoom = stage.querySelector('.hoops-map-zoom');
     if (state === 'ready' && props.interactive !== false) {
       if (!zoom) {
-        const fragment = fragmentOf(doc, zoomMarkup(canvasId));
+        const fragment = fragmentOf(doc, zoomMarkup(canvasId, textOptions()));
         zoom = fragment.firstChild;
         stage.insertBefore(fragment, stage.querySelector('.hoops-map-status'));
       }
@@ -279,14 +300,14 @@ function attach(root, options, { restore }) {
       zoom?.remove();
     }
 
-    const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';
+    const status = state === 'error' ? mapString('error', textOptions()) : state === 'loading' ? mapString('loading', textOptions()) : '';
     const statusEl = stage.querySelector('.hoops-map-status');
     if (statusEl && statusEl.textContent !== status) statusEl.textContent = status;
 
     // Liste der Orte (die Textalternative): nur ersetzen, wenn sich das Markup ändert
     if (has('showList')) root.querySelector('.hoops-map-text')?.classList.toggle('is-quiet', !showList);
     if (has('markers')) {
-      const html = mapListMarkup(items, showList);
+      const html = mapListMarkup(items, showList, textOptions());
       const ol = root.querySelector('.hoops-map-list');
       if (ol && html !== lastList) {
         replaceList(ol, html);
@@ -343,9 +364,51 @@ function attach(root, options, { restore }) {
   };
   root.addEventListener('click', onClick);
 
+  // lang: weicht die Sprache der Karte von der Seite ab, setzt die Karte lang an die Wurzel (und nimmt es zurück, wenn es nicht mehr nötig ist)
+  let langSet = false;
+  const applyLang = () => {
+    const lang = langFor({ locale: props.locale, documentLang: props.documentLang });
+    if (lang) {
+      root.setAttribute('lang', lang);
+      langSet = true;
+    } else if (langSet) {
+      root.removeAttribute('lang');
+      langSet = false;
+    }
+  };
+
+  // Sprachwechsel: eingebaute Texte am Markup nachführen, Statuszeile, Liste und Marker neu beschriften (ohne Leaflet neu zu laden, ohne Ansicht)
+  const roleTexts = () => {
+    const o = textOptions();
+    return Object.fromEntries(ROLES.map(([role, , , name]) => [role, mapString(name, o)]));
+  };
+  let defaults = roleTexts();
+  const refreshTexts = () => {
+    const next = roleTexts();
+    for (const [role, selector, attribute] of ROLES) {
+      const el = root.querySelector(selector);
+      if (!el) continue;
+      const current = attribute ? el.getAttribute(attribute) : el.textContent;
+      if (current === defaults[role] && current !== next[role]) {
+        if (attribute) el.setAttribute(attribute, next[role]);
+        else el.textContent = next[role];
+      }
+    }
+    defaults = next;
+  };
+  const stopLocale = onLocaleChange(() => {
+    if (destroyed) return;
+    refreshTexts();
+    applyLang();
+    sync();
+    controller?.update(controllerOptions());
+  });
+
   const handle = registry.claim(root, () => {
     destroyed = true;
     active = null;
+    stopLocale();
+    if (langSet) root.removeAttribute('lang');
     controller?.destroy();
     controller = null;
     root.removeEventListener('click', onClick);
@@ -357,6 +420,7 @@ function attach(root, options, { restore }) {
     }
   });
 
+  applyLang();
   sync();
 
   return {
@@ -373,6 +437,9 @@ function attach(root, options, { restore }) {
       }
       props = merged;
       hooks = hooksOf(obj(next), hooks);
+      // Eigene Sprache oder Texte geändert: Standardtexte am Markup nachführen (ohne Änderung ein Leerlauf)
+      refreshTexts();
+      applyLang();
       // Neue Kachel-Adresse: ein früherer Fehler gilt nicht mehr, die Karte versucht es erneut
       if (tileUrlOf(props) !== before) failure = null;
       const had = controller;
@@ -414,10 +481,13 @@ export function mountMap(el, props, options) {
   const uid = typeof o.uid === 'string' && o.uid.replace(/[^A-Za-z0-9_-]/g, '') ? o.uid : nextUid();
   const p = obj(props);
   const original = [...el.childNodes];
-  insertMarkup(el, renderMap(p, { uid }));
+  // Sprache und Texte: die Eigenschaften der Karte, sonst die Optionen von mountMap
+  const locale = p.locale ?? o.locale;
+  const texts = p.texts ?? o.texts;
+  insertMarkup(el, renderMap(p, { uid, locale, texts }));
   const root = el.querySelector('.hoops-map');
   const hooks = hooksOf(o);
-  const inner = attach(root, { ...p, loadLeaflet: p.loadLeaflet ?? hooks.loadLeaflet, onLoad: p.onLoad ?? hooks.onLoad, onError: p.onError ?? hooks.onError, onMarkerClick: p.onMarkerClick ?? hooks.onMarkerClick }, { restore: false });
+  const inner = attach(root, { ...p, locale, texts, loadLeaflet: p.loadLeaflet ?? hooks.loadLeaflet, onLoad: p.onLoad ?? hooks.onLoad, onError: p.onError ?? hooks.onError, onMarkerClick: p.onMarkerClick ?? hooks.onMarkerClick }, { restore: false });
   const handle = registry.claim(el, () => {
     inner.destroy();
     el.replaceChildren(...original);

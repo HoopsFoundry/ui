@@ -5,9 +5,15 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 
 ## [Unveröffentlicht]
 
+### Geändert (Bruch)
+
+- **Standardsprache Englisch für Vanilla und die gemeinsame Logik (`js/*.js`, `render*`, `init*`, `mount*`, Karte):** Wer deutsche Texte will, importiert einmal `hoops-i18n-de.js` (bzw. `@hoopsfoundry/ui/i18n/de`) und ruft `setLocale('de')` auf. Svelte und React folgen (I3); bis dahin bleiben ihre fest eingebauten Texte deutsch, die der gemeinsamen Logik folgen der gewählten Sprache.
+- **`hoops-map.js` und `hoops-render.js` importieren den Sprachkern aus `hoops.js`** desselben Ordners; die Karte braucht `hoops.js` daneben. Bündelgrößen (min): Kern 48 133 B (vorher 37 164 B), Render 57 602 B (51 312 B), Karte 25 622 B (22 053 B).
+
 ### Hinzugefügt
 
-- **Internationalisierung, Infrastruktur (noch ohne Wirkung auf die Komponenten):** `@hoopsfoundry/ui/i18n` (Kern mit `t`, `setLocale`, `registerLocale`, `setTexts`, `subscribe`), `@hoopsfoundry/ui/i18n/format` (`formatNumber`, `formatCoords`), die Kataloge `@hoopsfoundry/ui/i18n/en` und `@hoopsfoundry/ui/i18n/de` (168 Schlüssel je Sprache; `de` registriert sich beim Import), das Prüfskript `scripts/check-i18n.mjs` und das Inventar der festen Texte. Die Komponenten bleiben in dieser Fassung deutsch und unverändert; die Verdrahtung und der Wechsel der Standardsprache auf Englisch folgen später. Siehe ADR-012.
+- **Sprache in Vanilla:** `setLocale`, `getLocale`, `registerLocale`, `setTexts`, `t`, `availableLocales` in `hoops.js`; Ereignis `hoops:localechange`; Optionen `locale` und `texts` bei `render*`, `init*`, `mount*`; `lang` an der Wurzel bei abweichender Sprache; Bündel `hoops-i18n-de.js` (6 633 B min).
+- **Internationalisierung, Infrastruktur:** `@hoopsfoundry/ui/i18n` (Kern mit `t`, `setLocale`, `registerLocale`, `setTexts`, `subscribe`), `@hoopsfoundry/ui/i18n/format` (`formatNumber`, `formatCoords`), die Kataloge `@hoopsfoundry/ui/i18n/en` und `@hoopsfoundry/ui/i18n/de` (168 Schlüssel je Sprache; `de` registriert sich beim Import), das Prüfskript `scripts/check-i18n.mjs` und das Inventar der festen Texte. Vanilla, Render-Funktionen und Karte nutzen sie seit dieser Fassung (Standardsprache Englisch, siehe „Geändert (Bruch)“); Svelte und React folgen. Siehe ADR-012.
 - **Deploy:** Bei geändertem SSH-Host-Schlüssel des Webspace gibt `deploy-webspace.yml` eine Anleitung aus (Fingerprint prüfen, Secret `DEPLOY_KNOWN_HOSTS` erneuern); die strenge Prüfung bleibt.
 
 ### Geändert

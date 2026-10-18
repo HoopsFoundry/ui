@@ -8,11 +8,14 @@
  * Rückgabe `{ destroy() }`. ES-Modul ohne Auto-Start, kein Zugriff auf `window`/`document` beim Import.
  * Typen: js/backtop.d.ts.
  */
+import { langFor } from './i18n/lang.js';
+import { t } from './i18n/index.js';
+import { onLocaleChange } from './i18n-events.js';
 import { createCleanups, createRegistry, emptyHandle, listen } from './lifecycle.js';
 import { reducedMotion } from './motion.js';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
-const DEFAULTS = { label: 'Nach oben', showAfter: 480, gap: 16, avoid: '.hoops-bnav' };
+const DEFAULTS = { showAfter: 480, gap: 16, avoid: '.hoops-bnav' };
 const registry = createRegistry('backtop');
 
 /** Pfeil nach oben als SVG (aria-hidden), mit DOM-Aufrufen erzeugt. */
@@ -31,7 +34,7 @@ export function backTopVisible({ scrollY, innerHeight, scrollHeight, showAfter =
 }
 
 /**
- * Nach-oben-Knopf. Optionen: `label` (Name des Knopfes, Standard „Nach oben“; auch `backLabel`), `container` (Element oder Auswahl, in den der
+ * Nach-oben-Knopf. Optionen: `label` (Name des Knopfes, Standard der Katalogtext `backtop.label`, deutsch „Nach oben“; auch `backLabel`; `locale`/`texts` wählen Sprache und Texte), `container` (Element oder Auswahl, in den der
  * Knopf kommt, Standard `body`), `button` (vorhandener Knopf, der übernommen wird, statt einen anzulegen), `showAfter` (Pixel, Standard 480),
  * `target` (Auswahl des Fokusziels, Standard `h1`; Rückfall `main`), `avoid` (Auswahl einer festen unteren Leiste, über der der Knopf bleibt,
  * Standard `.hoops-bnav`; `null` schaltet das ab), `offset` (zusätzlicher Abstand von unten, CSS-Länge, setzt `--hoops-backtop-offset`).
@@ -47,7 +50,9 @@ export function initBackToTop(options = {}) {
   if (!key) return emptyHandle();
   registry.release(key);
 
-  const label = [opts.label, opts.backLabel].find((v) => typeof v === 'string' && v.trim())?.trim() ?? DEFAULTS.label;
+  const own = [opts.label, opts.backLabel].find((v) => typeof v === 'string' && v.trim())?.trim();
+  // der eigene Name hat Vorrang; sonst der Katalogtext (folgt einem Sprachwechsel)
+  const labelNow = () => own ?? t('backtop.label', undefined, { locale: opts.locale, texts: opts.texts });
   const showAfter = Number.isFinite(opts.showAfter) && opts.showAfter >= 0 ? opts.showAfter : DEFAULTS.showAfter;
   const targetSelector = typeof opts.target === 'string' && opts.target.trim() ? opts.target : 'h1';
   const avoid = opts.avoid === null ? null : typeof opts.avoid === 'string' ? opts.avoid : DEFAULTS.avoid;
@@ -67,7 +72,15 @@ export function initBackToTop(options = {}) {
       button.append(icon);
     }
   }
-  button.setAttribute('aria-label', label);
+  button.setAttribute('aria-label', labelNow());
+  const langBefore = button.getAttribute('lang');
+  const setLang = () => {
+    const lang = langFor({ locale: opts.locale });
+    if (lang) button.setAttribute('lang', lang);
+    else if (langBefore === null) button.removeAttribute('lang');
+    else button.setAttribute('lang', langBefore);
+  };
+  setLang();
   button.hidden = true;
   if (!adopted) host.append(button);
 
@@ -120,6 +133,11 @@ export function initBackToTop(options = {}) {
   }));
   cleanups.add(listen(win, 'scroll', update, { passive: true }));
   cleanups.add(listen(win, 'resize', update));
+  // Sprachwechsel: Name des Knopfes nachführen (ein eigener Name bleibt)
+  cleanups.add(onLocaleChange(() => {
+    if (own === undefined) button.setAttribute('aria-label', labelNow());
+    setLang();
+  }));
   update();
 
   return registry.claim(key, () => {
@@ -133,6 +151,8 @@ export function initBackToTop(options = {}) {
       else button.removeAttribute('class');
       if (before.label === null) button.removeAttribute('aria-label');
       else button.setAttribute('aria-label', before.label);
+      if (langBefore === null) button.removeAttribute('lang');
+      else button.setAttribute('lang', langBefore);
       if (before.offset) button.style.setProperty('--hoops-backtop-offset', before.offset);
       else button.style.removeProperty('--hoops-backtop-offset');
     } else button.remove();

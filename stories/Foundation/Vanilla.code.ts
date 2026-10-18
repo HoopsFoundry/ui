@@ -165,15 +165,15 @@ safeHref('/ligen/oberliga');            // → '/ligen/oberliga'
 renderEmptyState({ title: '<script>alert(1)</script>', actions: [{ label: 'Los', href: 'javascript:alert(1)' }] });`;
 
 /** Gemessene Größen des Bündels (Bytes); der Test misst neu und verlangt, dass die Angaben um höchstens 5 % abweichen. */
-export const bundleSizes = { js: 66556, min: 37632, gzip: 13366, css: 191684 };
+export const bundleSizes = { js: 82094, min: 48133, gzip: 16762, css: 192969 };
 /** Budgets in KiB (1 KiB = 1024 Byte); die Namen behalten das alte Kürzel. */
-export const budget = { minKB: 40, gzipKB: 15 };
+export const budget = { minKB: 48, gzipKB: 17 };
 /** Das Render-Bündel (hoops-render.js) hat ein eigenes Budget: es ist größer als der Kern (zehn Komponenten mit Markup und Logik) und importiert den Kern. */
-export const renderSizes = { js: 81838, min: 52088, gzip: 17549 };
-export const renderBudget = { minKB: 52, gzipKB: 18 };
+export const renderSizes = { js: 91926, min: 57602, gzip: 18710 };
+export const renderBudget = { minKB: 57, gzipKB: 19 };
 /** Das Karten-Bündel (hoops-map.js) hat ein eigenes Budget: Zustände, Markup und Leaflet-Anbindung; Leaflet selbst gehört nicht dazu. */
-export const mapSizes = { js: 38932, min: 22360, gzip: 9140 };
-export const mapBudget = { minKB: 24, gzipKB: 10 };
+export const mapSizes = { js: 45150, min: 25622, gzip: 10127 };
+export const mapBudget = { minKB: 26, gzipKB: 10 };
 
 /** Release-Adresse aus project.config.json (die eine Quelle; keine feste Adresse im Code). */
 const RELEASE = project.releaseBaseUrl;

@@ -12,13 +12,17 @@ import * as source from '../js/map-bundle.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Karten-Bündel (gemessen: 22 053 B = 21,7 KiB min, 9 055 B = 8,9 KiB gzip). Begründung: Zustände und Markup der Karte, die
+// Eigenes Budget für das Karten-Bündel (gemessen: 25 622 B = 25,0 KiB min, 10 127 B = 9,9 KiB gzip, vor I2: 22 053 B und 9 055 B). Begründung: Zustände und Markup der Karte, die
 // Leaflet-Anbindung (Marker, Gesten, Fehlerfälle) und die Logik aus map.js; Leaflet selbst gehört nicht dazu, es wird erst nach dem Klick geladen.
 export const MAP_BUDGET = BUDGETS['hoops-map'];
 export const MAP_EXPORTS = ['VERSION', 'initMap', 'initMapBlock', 'mountMap', 'renderMap'];
 
 beforeAll(async () => {
   mod = await import(/* @vite-ignore */ pathToFileURL(`${out}hoops-map.js`).href);
+  // Das Bündel teilt den Kern mit hoops.js; das deutsche Bündel registriert `de` dort, die Quellmodule kennen die Testeinstellung `de`
+  const core = (await import(/* @vite-ignore */ pathToFileURL(`${out}hoops.js`).href)) as { setLocale: (code: string) => void };
+  await import(/* @vite-ignore */ pathToFileURL(`${out}hoops-i18n-de.js`).href);
+  core.setLocale('de');
 });
 
 describe('Karten-Bündel dist/vanilla/hoops-map', () => {
@@ -45,7 +49,10 @@ describe('Karten-Bündel dist/vanilla/hoops-map', () => {
   it('Leaflet ist nicht gebündelt: nur ein dynamischer import("leaflet"), kein statischer, kein require, sonst kein Import', () => {
     for (const name of ['hoops-map.js', 'hoops-map.min.js']) {
       const code = text(name);
-      expect(code, name).not.toMatch(/^\s*import\s[^;]*from\s*["'][^"']+["']/m);
+      // der Sprachkern kommt aus dem Kern desselben Ordners (hoops.js bzw. hoops.min.js); sonst kein statischer Import
+      const core = name.endsWith('.min.js') ? './hoops.min.js' : './hoops.js';
+      const staticImports = [...code.matchAll(/(?:^|[;}\s])import\s*(?:\{[^}]*\}\s*from\s*)?["']([^"']+)["']/g)].map((m) => m[1]);
+      expect([...new Set(staticImports)], name).toEqual([core]);
       expect(code, name).not.toMatch(/\brequire\(/);
       const dynamic = [...code.matchAll(/import\(\s*["']([^"']+)["']\s*\)/g)].map((m) => m[1]);
       expect(dynamic, name).toEqual(['leaflet']);

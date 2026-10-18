@@ -1,3 +1,5 @@
+import type { TOptions } from './i18n/index.js';
+
 /** Ein Marker der Karte. */
 export interface MapMarker {
   /** Eindeutige Kennung (Schlüssel für Aktualisierungen). */
@@ -79,13 +81,16 @@ export interface MapPin {
   y: number;
 }
 
+/** Die Texte der Karte in der globalen Sprache; `delete mapText.load` und die Zuweisung von `undefined` nehmen eine Überschreibung zurück; eine Zuweisung überschreibt den Text für alle Aufrufe (Vorrang vor Katalog und `texts`). */
 export const mapText: {
   load: string; loading: string; error: string; privacy: string; skip: string; zoomIn: string; zoomOut: string;
   attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; seat: string; retry: string; zoomGroup: string; canvasHint: string;
 };
+/** Ein Text aus `mapText` in der Sprache des Aufrufs (`options.locale`, `options.texts`); eine Zuweisung an `mapText` hat Vorrang. */
+export function mapString(name: Exclude<keyof typeof mapText, 'attributionHref'>, options?: TOptions): string;
 export const DEFAULT_TILE_URL: string;
 /** Name eines Markers für Hilfstechnik; ein Sitzmarker bekommt den Zusatz „Vereinssitz“. */
-export function markerName(item: { label?: string; kind?: MapMarkerKind; number?: number | null; seatText?: string }): string;
+export function markerName(item: { label?: string; kind?: MapMarkerKind; number?: number | null; seatText?: string }, options?: TOptions): string;
 /** `invert` bleibt `invert`, alles andere ergibt `dim`. */
 export function tilesMode(value: unknown): MapDarkTiles;
 export const MIN_ZOOM: number;
@@ -97,7 +102,7 @@ export function isCoord(lat: unknown, lng: unknown): boolean;
 /** Links in Karten-Apps; ungültige Koordinaten ergeben `null`. Die Bezeichnung ist kodiert. */
 export function mapLinks(input: { lat: number; lng: number; label?: string }): MapLinkSet | null;
 /** „49,4875° N, 8,4660° O“; ungültige Werte ergeben eine leere Zeichenkette. */
-export function formatCoords(lat: number, lng: number): string;
+export function formatCoords(lat: number, lng: number, options?: TOptions): string;
 /** Kachel-Adresse prüfen: `{z}`, `{x}`, `{y}` Pflicht; `https:`, Pfad ab Wurzel oder `http://localhost`. */
 export function validTileUrl(url: unknown): boolean;
 /** Wie `safeHref` aus js/url.js (dort definiert, hier abwärtskompatibel erneut exportiert). */
@@ -105,7 +110,7 @@ export { safeHref } from './url.js';
 /** Umschließendes Rechteck der gültigen Marker; ohne gültigen Marker `null`. */
 export function boundsOf(markers: ReadonlyArray<Pick<MapMarker, 'lat' | 'lng'>>): MapBounds | null;
 /** Marker für Liste, Platzhalter und Karte aufbereiten (ungültige entfallen). */
-export function mapItems(markers: ReadonlyArray<MapMarker>, appLinks?: ReadonlyArray<MapAppLink>, texts?: { seat?: string }): MapItem[];
+export function mapItems(markers: ReadonlyArray<MapMarker>, appLinks?: ReadonlyArray<MapAppLink>, texts?: { seat?: string }, options?: TOptions): MapItem[];
 /** Ausschnitt beim Start: Mittelpunkt und Zoom oder ein Rechteck zum Einpassen. */
 export function initialView(input: { markers?: ReadonlyArray<MapMarker>; center?: [number, number]; zoom?: number }): MapView;
 /** Lage der Marker im Platzhalter in Prozent. */

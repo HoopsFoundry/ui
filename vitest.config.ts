@@ -10,7 +10,8 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./react/test-setup.ts'],
+    // tests/setup-i18n.ts: Standardsprache der bestehenden Tests ist Deutsch (die Bibliothek startet mit Englisch)
+    setupFiles: ['./react/test-setup.ts', './tests/setup-i18n.ts'],
     // baut das Vanilla-Bündel einmal für tests/vanilla-bundle*.test.ts
     globalSetup: ['./tests/helpers/bundle-setup.ts'],
     include: ['react/**/*.test.{ts,tsx}', 'tests/**/*.test.ts', 'tests/**/*.test.tsx'],

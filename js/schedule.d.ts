@@ -1,3 +1,5 @@
+import type { TOptions } from './i18n/index.js';
+
 export type ScheduleState = 'scheduled' | 'live' | 'finished' | 'cancelled' | 'postponed' | 'bye';
 export type ScheduleLayout = 'versus' | 'opponent' | 'columns';
 export type ScheduleDensity = 'touch' | 'default' | 'compact';
@@ -83,13 +85,14 @@ export type ScheduleGridRow =
 
 export function outcome(own: number | undefined, opp: number | undefined): ScheduleOutcome | undefined;
 export function resolveOutcome(game: ScheduleGame): ScheduleOutcome | undefined;
-export function stateLabel(state: ScheduleState | undefined): 'abgesagt' | 'verschoben' | undefined;
+/** Text für abgesagte und verschobene Spiele in der Sprache des Aufrufs (`options.locale`, `options.texts`). */
+export function stateLabel(state: ScheduleState | undefined, options?: TOptions): string | undefined;
 export function winnerSide(game: ScheduleGame): 'heim' | 'gast' | null;
 /** Mit `layout`: Perspektive nur bei `opponent`, sonst heim/gast. Ohne: Perspektive, wenn `game.opponent` existiert. */
 export function hasScore(game: ScheduleGame, layout?: ScheduleLayout): boolean;
 export function layoutFor(games: ScheduleGame[]): ScheduleLayout;
 export function densityFor(games: ScheduleGame[], layout: ScheduleLayout): ScheduleDensity;
-export function columnsFor(layout: ScheduleLayout, games: ScheduleGame[], hasNotice?: boolean): ScheduleColumn[];
+export function columnsFor(layout: ScheduleLayout, games: ScheduleGame[], hasNotice?: boolean, options?: TOptions): ScheduleColumn[];
 export function startMinutes(time: string | undefined): number;
 export function slotsFromGames(games: ScheduleGame[]): string[];
 export function groupBySection(games: ScheduleGame[]): ScheduleGroup[];
@@ -97,7 +100,7 @@ export function groupBySection(games: ScheduleGame[]): ScheduleGroup[];
 export function initials(name: string, max?: number): string;
 /** Kurzname eines Teams; `undefined`, wenn keiner angegeben ist oder er dem Namen gleicht. */
 export function shortName(team: { name: string; short?: string } | undefined): string | undefined;
-export function ariaForResult(game: ScheduleGame, layout: ScheduleLayout): string;
+export function ariaForResult(game: ScheduleGame, layout: ScheduleLayout, options?: TOptions): string;
 export function buildGrid(input: {
   games: ScheduleGame[];
   columns: ScheduleGridColumn[];

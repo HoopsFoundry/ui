@@ -168,7 +168,9 @@ describe('Tarball, Prüfsummen, Manifest', () => {
     }
     expect(manifest.bundles.hoops.requires).toEqual([]);
     expect(manifest.bundles['hoops-render'].requires).toEqual(['hoops']);
-    expect(manifest.bundles['hoops-map'].requires).toEqual([]);
+    // Karte und deutsches Sprachbündel importieren den Sprachkern aus dem Kern desselben Ordners
+    expect(manifest.bundles['hoops-map'].requires).toEqual(['hoops']);
+    expect(manifest.bundles['hoops-i18n-de'].requires).toEqual(['hoops']);
     expect(manifest.leaflet).toMatchObject({ required: false, range: pkg.peerDependencies.leaflet });
     expect(manifest.leaflet.note).toMatch(/Klick/);
     expect(manifest.pairing).toMatch(/hoops\.css/);
@@ -244,7 +246,7 @@ describe('Budgets, Ausgabeordner, Hilfsskript', () => {
     const dir = await copyBundle('budget');
     await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'x'.repeat(5000)}`);
     const out = `${tmpRoot}/budget-out`;
-    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von hoops.min.js liegt bei 40 KiB
+    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von hoops.min.js liegt bei 48 KiB
     await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'y'.repeat(BUDGETS.hoops.minBytes)}`);
     await expect(releaseVanilla({ bundleDir: dir, outDir: out, build: false, allowDirty: true })).rejects.toThrow(/Größenbudget überschritten: hoops\.min\.js/);
     expect(existsSync(out)).toBe(false);

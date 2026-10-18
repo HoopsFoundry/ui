@@ -83,6 +83,14 @@ const SAMPLE: [string, string][] = [
   ['team.record.aria', 'js/team.js'], ['team.rank.aria-of', 'js/team.js'], ['team.squad.players', 'js/team.js'],
   ['team.opponent.home', 'js/team.js'], ['player.captain', 'react/PlayerCard.tsx'], ['stats.empty', 'js/stats.js'],
 ];
+// Seit I2 stehen die deutschen Texte der Dateien in js/ nur noch im Katalog; der Vergleich mit „heute“ läuft dort gegen die Spalte „Deutsch (heute)“ des
+// Inventars (Stand vor der Verdrahtung). Für svelte/ und react/ (bis I3) bleibt der Vergleich mit dem Quelltext.
+const inventoryText = read('docs/superpowers/specs/2026-10-17-i18n-inventar.md');
+const inventoryDe = (key: string) => {
+  const line = inventoryText.split('\n').find((l) => l.startsWith(`| \`${key}\` | `));
+  const cell = line?.split(' | ')[1] ?? '';
+  return cell.split(' ‖ ').map((c) => c.replace(/^`|`$/g, ''));
+};
 describe('heutige Texte (Wort für Wort)', () => {
   it('Stichprobe von mindestens 25 Schlüsseln aus mehreren Bausteinen mit Mehrzahl und Platzhaltern', () => {
     expect(new Set(SAMPLE.map(([k]) => k)).size).toBeGreaterThanOrEqual(25);
@@ -92,6 +100,10 @@ describe('heutige Texte (Wort für Wort)', () => {
   });
   for (const [key, file] of SAMPLE) {
     it(`${key} in ${file}`, () => {
+      if (file.startsWith('js/')) {
+        expect(forms(cats.de[key]), key).toEqual(inventoryDe(key));
+        return;
+      }
       const source = read(file);
       const pieces = forms(cats.de[key]).flatMap((t) => t.split(/\{[^}]*\}/)).map((p) => p.trim()).filter((p) => p.length > 1);
       expect(pieces.length, key).toBeGreaterThan(0);

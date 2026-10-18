@@ -275,7 +275,7 @@ Eine Seite ohne Bundler und ohne Framework kann die Karte vollständig betreiben
 
 <CodeBlock label="Dateien ins Projekt kopieren" language="Shell" code={kopieren} />
 
-**Abhängigkeiten der Bündel:** `hoops-map.min.js` steht allein (Leaflet kommt zur Laufzeit über `loadLeaflet`). `hoops-render.min.js` importiert statisch `./hoops.min.js` aus demselben Ordner: wer die Hallenkarte aus Daten nutzt, kopiert beide, sonst meldet der Browser einen 404 und das Modul lädt nicht. Ein Test gleicht die Liste gegen die statischen Importe aller Bündel ab.
+**Abhängigkeiten der Bündel:** `hoops-map.min.js` und `hoops-render.min.js` importieren beide statisch `./hoops.min.js` aus demselben Ordner (dort liegt der Sprachkern; Leaflet kommt zur Laufzeit über `loadLeaflet`). Wer die Karte oder die Hallenkarte nutzt, kopiert `hoops.min.js` dazu; fehlt die Datei, meldet der Browser nur einen fehlenden Modulimport (404) und das Modul lädt nicht. Ein Test gleicht die Liste gegen die statischen Importe aller Bündel ab.
 
 Die Dateien kommen aus `@hoopsfoundry/ui/vanilla-map` (`dist/vanilla/hoops-map.min.js`, Quellkarte daneben) und aus dem Leaflet-Paket (BSD-2-Clause, siehe oben). `hoops.css` und `leaflet.css` binden die Seiten per `<link>` ein; die Optik von Zoom, Marker, Quellenangabe und Platzhalter liefert `hoops.css`, Layout und Gesten liefert `leaflet.css`.
 

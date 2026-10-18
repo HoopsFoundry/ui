@@ -1,6 +1,10 @@
 import type { HoopsHandle } from './lifecycle.js';
 
 export interface BackToTopOptions {
+  /** Sprache nur für diesen Baustein (sonst die globale Sprache, ein Sprachwechsel führt die Texte nach). */
+  locale?: string;
+  /** Eigene Texte nach Katalogschlüssel (Vorrang vor den globalen Überschreibungen und dem Katalog; die Option des Bausteins, zum Beispiel `label`, geht vor). */
+  texts?: Record<string, string | { one: string; other: string; [form: string]: string }>;
   /** Name des Knopfes (Standard „Nach oben“). */
   label?: string;
   /** Alias für `label`. */

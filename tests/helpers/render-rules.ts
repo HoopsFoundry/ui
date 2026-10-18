@@ -1,6 +1,7 @@
 // Regeln der Render-Funktionen (V2a) als prüfbare Aussagen. tests/render-mutation.test.ts lädt die Module aus dem echten Quelltext (alle Regeln
 // müssen gelten) und aus verfälschtem Quelltext (die zugehörige Regel muss kippen). Eine Regel prüft das erzeugte Markup als Zeichenkette.
 import { resolve } from 'node:path';
+import { deSetupImport } from './i18n-de';
 import { pathToFileURL } from 'node:url';
 import { read, type Rules } from './mutation';
 
@@ -18,7 +19,7 @@ const BAD_TEXT = '<img src=x onerror=alert(1)>';
 /** Ersetzungen, die ein gemeinsames Modul Schadtext liefern lassen (gesprochener Ergebnistext, Abschnittsbezeichnung). */
 export const HOSTILE_SHARED = [
   { file: 'js:schedule' as FileName, from: "return parts.join(', ');", to: `return '${BAD_TEXT}';` },
-  { file: 'js:periods' as FileName, from: 'export function resolvePeriod({ period, periods, quarter } = {}) {', to: `export function resolvePeriod({ period, periods, quarter } = {}) {\n  if (period !== undefined || quarter !== undefined) return { label: '${BAD_TEXT}', short: '', alias: false };` },
+  { file: 'js:periods' as FileName, from: 'export function resolvePeriod({ period, periods, quarter } = {}, options) {', to: `export function resolvePeriod({ period, periods, quarter } = {}, options) {\n  if (period !== undefined || quarter !== undefined) return { label: '${BAD_TEXT}', short: '', alias: false };` },
 ];
 
 export const sourceOf = (file: FileName) => read(pathOf(file));
@@ -38,11 +39,11 @@ export async function loadAll(override?: { file: FileName; source: string }, pat
     // Anpassungen für „Defense in Depth“-Läufe: ein gemeinsames Modul liefert Schadtext, die Render-Funktion muss ihn maskieren
     for (const patch of patches) if (pathOf(patch.file) === path) source = source.replace(patch.from, patch.to);
     const dir = path.slice(0, path.lastIndexOf('/'));
-    const code = source.replace(/from '(\.{1,2}\/[\w-]+\.js)'/g, (_m, spec: string) => {
+    const code = source.replace(/from '(\.{1,2}\/[\w./-]+\.js)'/g, (_m, spec: string) => {
       const target = spec.startsWith('../') ? `${dir.slice(0, dir.lastIndexOf('/'))}/${spec.slice(3)}` : `${dir}/${spec.slice(2)}`;
       return `from '${urlOf(target)}'`;
     });
-    const url = `data:text/javascript;base64,${Buffer.from(code).toString('base64')}`;
+    const url = `data:text/javascript;base64,${Buffer.from(deSetupImport + code).toString('base64')}`; // deutsche Standardsprache auch in dieser Instanz des Sprachkerns
     urls.set(path, url);
     return url;
   };

@@ -6,6 +6,10 @@ export interface AccordionTreeNode {
   parent?: string | null;
 }
 export interface AccordionOptions {
+  /** Sprache nur für diesen Baustein (sonst die globale Sprache, ein Sprachwechsel führt die Texte nach). */
+  locale?: string;
+  /** Eigene Texte nach Katalogschlüssel (Vorrang vor den globalen Überschreibungen und dem Katalog; die Option des Bausteins, zum Beispiel `label`, geht vor). */
+  texts?: Record<string, string | { one: string; other: string; [form: string]: string }>;
   /** Nur ein Bereich gleichzeitig offen (Standard `false`). */
   exclusive?: boolean;
   /** Deep-Link: `#id` öffnet den Bereich samt Eltern (Standard `true`). */
@@ -16,7 +20,7 @@ export interface AccordionOptions {
   nav?: boolean;
   /** Kopf des offenen Bereichs klebt oben (`--hoops-acc-sticky-top`). */
   sticky?: boolean;
-  /** Name der Sprungleiste (`aria-label` und Text des Handy-Schalters), Standard „Bereiche“. */
+  /** Name der Sprungleiste (`aria-label` und Text des Handy-Schalters), Standard der Katalogtext `accordion.nav` (deutsch „Bereiche“). */
   navLabel?: string;
 }
 

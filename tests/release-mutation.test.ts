@@ -102,7 +102,7 @@ const RULES: Record<string, (mod: any) => Promise<boolean>> = {
   },
   'Manifest: Budgets stammen aus vanilla-budgets': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });
-    return r.manifest.bundles.hoops.budget.minBytes === 40 * 1024 && r.manifest.bundles['hoops-map'].budget.gzipBytes === 10 * 1024;
+    return r.manifest.bundles.hoops.budget.minBytes === 48 * 1024 && r.manifest.bundles['hoops-map'].budget.gzipBytes === 10 * 1024;
   },
   'Manifest: Abhängigkeit des Render-Bündels aus den Importen': async (mod) => {
     const r = await mod.releaseVanilla({ bundleDir, outDir: outName(), build: false, allowDirty: true });

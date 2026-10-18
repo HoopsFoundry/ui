@@ -4,15 +4,18 @@
  * Reine Funktionen ohne DOM. Svelte und React nutzen dieselbe Logik,
  * damit beide Fassungen gleich entscheiden. Typen: js/schedule.d.ts.
  */
+import { t } from './i18n/index.js';
+
 const START = /(\d{1,2}):(\d{2})/;
-const OUTCOME_TEXT = { S: 'Sieg', N: 'Niederlage', U: 'Unentschieden' };
+// Schlüssel der Ergebnisworte; die Daten (`S`, `N`, `U`) bleiben Teil der Schnittstelle, nur die Anzeige geht über den Katalog
+const OUTCOME_KEY = { S: 'common.outcome.win', N: 'common.outcome.loss', U: 'common.outcome.draw' };
 
 const isNum = (value) => typeof value === 'number' && Number.isFinite(value);
 
-/** Text für Zustände, die sonst nur Farbe und Durchstreichung zeigen (WCAG 1.4.1); sonst undefined. */
-export function stateLabel(state) {
-  if (state === 'cancelled') return 'abgesagt';
-  if (state === 'postponed') return 'verschoben';
+/** Text für Zustände, die sonst nur Farbe und Durchstreichung zeigen (WCAG 1.4.1); sonst undefined. `options`: `locale`, `texts`. */
+export function stateLabel(state, options) {
+  if (state === 'cancelled') return t('schedule.state.cancelled', undefined, options);
+  if (state === 'postponed') return t('schedule.state.postponed', undefined, options);
   return undefined;
 }
 
@@ -57,30 +60,30 @@ export function densityFor(games, layout) {
   return layout === 'opponent' || games.some((game) => game.league) ? 'touch' : 'default';
 }
 
-/** Spalten der Tabelle (Variante A) je Layout; bei `columns` nur Spalten, für die Daten vorliegen. */
-export function columnsFor(layout, games, hasNotice = false) {
+/** Spalten der Tabelle (Variante A) je Layout; bei `columns` nur Spalten, für die Daten vorliegen. `options`: `locale`, `texts`. */
+export function columnsFor(layout, games, hasNotice = false, options) {
   if (layout === 'versus') {
     return [
-      { key: 'when', label: 'Zeit' },
-      { key: 'match', label: 'Spiel' },
-      { key: 'res', label: 'Ergebnis' },
+      { key: 'when', label: t('schedule.col.time', undefined, options) },
+      { key: 'match', label: t('schedule.col.game', undefined, options) },
+      { key: 'res', label: t('schedule.col.result', undefined, options) },
     ];
   }
   if (layout === 'opponent') {
     return [
-      { key: 'when', label: 'Zeit' },
-      { key: 'ha', label: 'Heim oder Auswärts' },
-      { key: 'match', label: 'Gegner' },
-      { key: 'res', label: 'Ergebnis' },
+      { key: 'when', label: t('schedule.col.time', undefined, options) },
+      { key: 'ha', label: t('schedule.col.home-away', undefined, options) },
+      { key: 'match', label: t('schedule.col.opponent', undefined, options) },
+      { key: 'res', label: t('schedule.col.result', undefined, options) },
     ];
   }
   const cols = [];
-  if (games.some((game) => game.nr)) cols.push({ key: 'nr', label: 'Nr' });
-  cols.push({ key: 'when', label: 'Zeit' });
-  if (games.some((game) => game.field)) cols.push({ key: 'field', label: 'Feld' });
-  if (games.some((game) => game.venue)) cols.push({ key: 'venue', label: 'Halle' });
-  cols.push({ key: 'heim', label: 'Heim' }, { key: 'res', label: 'Ergebnis' }, { key: 'gast', label: 'Gast' });
-  if (hasNotice) cols.push({ key: 'notice', label: 'Hinweis' });
+  if (games.some((game) => game.nr)) cols.push({ key: 'nr', label: t('schedule.col.number', undefined, options) });
+  cols.push({ key: 'when', label: t('schedule.col.time', undefined, options) });
+  if (games.some((game) => game.field)) cols.push({ key: 'field', label: t('schedule.col.field', undefined, options) });
+  if (games.some((game) => game.venue)) cols.push({ key: 'venue', label: t('schedule.col.venue', undefined, options) });
+  cols.push({ key: 'heim', label: t('common.home', undefined, options) }, { key: 'res', label: t('schedule.col.result', undefined, options) }, { key: 'gast', label: t('common.away', undefined, options) });
+  if (hasNotice) cols.push({ key: 'notice', label: t('schedule.col.notice', undefined, options) });
   return cols;
 }
 
@@ -132,18 +135,18 @@ export function shortName(team) {
   return short && short !== team.name ? short : undefined;
 }
 
-/** Text des Ergebnisses für Screenreader; nur sinnvoll, wenn hasScore(game, layout) gilt. */
-export function ariaForResult(game, layout) {
+/** Text des Ergebnisses für Screenreader; nur sinnvoll, wenn hasScore(game, layout) gilt. `options`: `locale`, `texts`. */
+export function ariaForResult(game, layout, options) {
   const parts = [];
   if (layout === 'opponent' && game.opponent) {
-    parts.push(`Eigene ${game.ownScore}`, `Gegner ${game.opponent.score}`);
+    parts.push(t('schedule.aria.own', { score: game.ownScore }, options), t('schedule.aria.opponent', { score: game.opponent.score }, options));
     const result = resolveOutcome(game);
-    if (result) parts.push(OUTCOME_TEXT[result]);
+    if (result) parts.push(t(OUTCOME_KEY[result], undefined, options));
   } else {
-    parts.push(`Heim ${game.heim?.score}`, `Gast ${game.gast?.score}`);
+    parts.push(t('schedule.aria.home', { score: game.heim?.score }, options), t('schedule.aria.away', { score: game.gast?.score }, options));
   }
-  if (game.provisional) parts.push('vorläufig');
-  if (game.state === 'live') parts.push('läuft');
+  if (game.provisional) parts.push(t('schedule.provisional', undefined, options));
+  if (game.state === 'live') parts.push(t('schedule.live-spoken', undefined, options));
   return parts.join(', ');
 }
 

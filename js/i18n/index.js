@@ -111,6 +111,11 @@ export function __resetForTests() {
   warned = new Set();
 }
 
+/** Nur für Tests: Zahl der Abonnenten (Prüfung auf Lecks nach `destroy`). */
+export function __subscriberCount() {
+  return listeners.size;
+}
+
 const has = (object, key) => object !== null && typeof object === 'object' && Object.prototype.hasOwnProperty.call(object, key);
 const isPlural = (value) => value !== null && typeof value === 'object' && !Array.isArray(value) && typeof value.other === 'string';
 /** Nur Zeichenketten und Mehrzahlobjekte (mit `other` als Zeichenkette) sind gültige Werte. */

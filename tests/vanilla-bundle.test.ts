@@ -12,7 +12,7 @@ const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url),
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, unknown>;
 
-// Größenbudget (gemessen: 36,3 KiB min, 12,9 KiB gzip; Reserve für kleine Ergänzungen; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
+// Größenbudget (gemessen: 47,0 KiB min, 16,4 KiB gzip, davon Sprachkern und englischer Katalog; vor I2: 36,3 KiB und 12,9 KiB; Render-Funktionen und Karte haben eigene Bündel mit eigenem Budget)
 export const BUDGET = BUDGETS['hoops'];
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
@@ -22,6 +22,8 @@ export const EXPORTS = [
   'initBackToTop', 'initModal', 'initPageNav', 'initTabs', 'initTheme', 'initialTab', 'nextHeader', 'nextTab', 'nextTheme', 'openModal',
   'parseOptions', 'parseTheme', 'readTheme', 'reducedMotion', 'resolveTheme', 'revealAround', 'safeHref', 'scrollToElement', 'slug',
   'themeBootScript', 'writeTheme',
+  // Sprache und Texte (I2); localeOf und onLocaleChange sind für die Bündel render, map und i18n-de, die den Kern von hier importieren
+  'LOCALE_EVENT', 'availableLocales', 'getLocale', 'localeOf', 'onLocaleChange', 'registerLocale', 'setLocale', 'setTexts', 't',
 ];
 
 beforeAll(async () => {

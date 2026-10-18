@@ -16,6 +16,10 @@ export { initBackToTop } from './backtop.js';
 export { initTheme, themeBootScript, parseTheme, resolveTheme, nextTheme, readTheme, writeTheme, THEME_KEY, THEME_ATTRIBUTE, THEME_LABEL } from './theme.js';
 export { initTabs, nextTab, initialTab, TAB_EVENT } from './tabs.js';
 export { initModal, openModal, closeModal, focusables, MODAL_OPEN_EVENT, MODAL_CLOSE_EVENT } from './modal.js';
+// Sprache und Texte (siehe js/i18n/index.js). Der Kern liegt nur in diesem Bündel: hoops-render.js, hoops-map.js und hoops-i18n-de.js importieren ihn von hier
+// (eine Instanz auf der Seite). `localeOf` und `onLocaleChange` sind für diese Bündel; `onLocaleChange(fn)` hört auf das Ereignis `hoops:localechange`.
+export { setLocale, getLocale, registerLocale, setTexts, t, availableLocales, localeOf } from './i18n/index.js';
+export { onLocaleChange, LOCALE_EVENT } from './i18n-events.js';
 
 /** Version des Pakets, aus dem dieses Bündel gebaut wurde (im Quelltext ohne Build `dev`). */
 // eslint-disable-next-line no-undef

@@ -10,6 +10,10 @@ export interface ThemeStorage {
 }
 
 export interface ThemeOptions {
+  /** Sprache nur für diesen Baustein (sonst die globale Sprache, ein Sprachwechsel führt die Texte nach). */
+  locale?: string;
+  /** Eigene Texte nach Katalogschlüssel (Vorrang vor den globalen Überschreibungen und dem Katalog; die Option des Bausteins, zum Beispiel `label`, geht vor). */
+  texts?: Record<string, string | { one: string; other: string; [form: string]: string }>;
   /** Modus ohne gemerkte Wahl (Standard `system`); derselbe Wert wie bei `themeBootScript`: gemerkte Wahl vor `defaultMode` vor `system`. */
   defaultMode?: ThemeMode;
   /** Schlüssel im Speicher (Standard `hoops-theme`). */
@@ -42,7 +46,8 @@ export interface ThemeBootOptions {
 
 export const THEME_KEY: string;
 export const THEME_ATTRIBUTE: string;
-export const THEME_LABEL: string;
+/** Beschriftung in der globalen Sprache (Live-Binding); neuer Code nutzt `t('theme.toggle')`. */
+export let THEME_LABEL: string;
 export function parseTheme(value: unknown): ThemeMode | null;
 export function resolveTheme(mode: unknown, prefersDark: boolean): ThemeState;
 export function nextTheme(mode: unknown, prefersDark: boolean): ThemeState;

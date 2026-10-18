@@ -5,29 +5,41 @@
  * Typen: js/map.d.ts.
  */
 
+import { formatCoords as formatCoordsFor } from './i18n/format.js';
+import { t } from './i18n/index.js';
+import { textTable } from './i18n/text-table.js';
 import { safeHref } from './url.js';
 
-/** Texte der Komponente (eine Quelle für Svelte und React). */
-export const mapText = {
-  load: 'Karte laden',
-  retry: 'Erneut versuchen',
-  loading: 'Karte wird geladen …',
-  error: 'Die Karte konnte nicht geladen werden. Adresse und Route siehe unten.',
-  privacy: 'Beim Laden der Karte erhält der Kartendienst deine IP-Adresse.',
-  skip: 'Karte überspringen',
-  zoomIn: 'Vergrößern',
-  zoomOut: 'Verkleinern',
-  attribution: '© OpenStreetMap-Mitwirkende',
-  attributionHref: 'https://www.openstreetmap.org/copyright',
-  linkGeo: 'In Karten-App öffnen',
-  linkOsm: 'In OpenStreetMap öffnen',
-  linkRoute: 'Route planen',
-  listLabel: 'Orte auf der Karte',
-  own: 'Eigener Ort',
-  seat: 'Vereinssitz',
-  zoomGroup: 'Maßstab',
-  canvasHint: 'Kartenfläche. Pfeiltasten verschieben, Plus und Minus ändern den Maßstab.',
-};
+// Texte der Karte: Eigenschaft → Katalogschlüssel (ausgeschrieben, damit die Verwendungsprüfung sie erkennt)
+const mapTable = textTable(
+  {
+    load: 'map.load',
+    retry: 'map.retry',
+    loading: 'map.loading',
+    error: 'map.error',
+    privacy: 'map.privacy',
+    skip: 'map.skip',
+    zoomIn: 'map.zoom-in',
+    zoomOut: 'map.zoom-out',
+    attribution: 'map.attribution',
+    linkGeo: 'map.link.geo',
+    linkOsm: 'map.link.osm',
+    linkRoute: 'map.link.route',
+    listLabel: 'map.list',
+    own: 'map.own',
+    seat: 'map.seat',
+    zoomGroup: 'map.zoom-group',
+    canvasHint: 'map.canvas-hint',
+  },
+  { attributionHref: 'https://www.openstreetmap.org/copyright' },
+);
+/**
+ * Texte der Komponente (eine Quelle für Svelte und React) in der globalen Sprache. Eine Zuweisung (`mapText.load = '…'`) überschreibt den Text
+ * für alle Aufrufe und hat Vorrang vor dem Katalog und vor `texts`.
+ */
+export const mapText = mapTable.table;
+/** Ein Text der Tabelle `mapText` in der Sprache des Aufrufs (`options.locale`, `options.texts`); eine Zuweisung an `mapText` hat Vorrang. */
+export const mapString = mapTable.lookup;
 
 /** Standard-Kachel-Adresse (Demo und Entwicklung; produktiv einen eigenen Proxy oder Kachelserver nutzen). */
 export const DEFAULT_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
@@ -71,17 +83,12 @@ export function mapLinks({ lat, lng, label } = {}) {
 }
 
 /**
- * Koordinaten im deutschen Format: „49,4875° N, 8,4660° O“ (4 Nachkommastellen, Komma, Himmelsrichtung statt Vorzeichen).
- * Null und −0 gelten als N und O; eine Länge von 180 ist O, −180 ist W. Ungültige Werte ergeben eine leere Zeichenkette.
+ * Koordinaten in der Schreibweise der Sprache: deutsch „49,4875° N, 8,4660° O“, englisch „49.4875° N, 8.4660° E“ (4 Nachkommastellen,
+ * Dezimaltrennzeichen und Himmelsrichtung der Sprache statt Vorzeichen). Null und −0 gelten als N und O (E); eine Länge von 180 ist O, −180 ist W.
+ * Ungültige Werte ergeben eine leere Zeichenkette. `options`: `locale`, `texts`.
  */
-export function formatCoords(lat, lng) {
-  if (!isCoord(lat, lng)) return '';
-  const part = (value, plus, minus) => {
-    const text = Math.abs(value).toFixed(4);
-    const zero = Number(text) === 0;
-    return `${text.replace('.', ',')}° ${value < 0 && !zero ? minus : plus}`;
-  };
-  return `${part(lat, 'N', 'S')}, ${part(lng, 'O', 'W')}`;
+export function formatCoords(lat, lng, options) {
+  return formatCoordsFor(lat, lng, options);
 }
 
 /**
@@ -137,15 +144,15 @@ export function boundsOf(markers) {
 }
 
 /** Name eines Markers für Hilfstechnik: die sichtbare Nummer voran, dann der Name des Orts („1, Sporthalle Nordhain“); ein Sitzmarker hat keine Nummer und den Zusatz „Vereinssitz“ („Sporthalle Nordhain, Vereinssitz“, Text über `seatText` des Eintrags). */
-export function markerName(item) {
+export function markerName(item, options) {
   const label = item && typeof item.label === 'string' ? item.label : '';
   if (item?.kind === 'seat') {
-    const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapText.seat;
-    return label ? `${label}, ${seat}` : seat;
+    const seat = typeof item.seatText === 'string' && item.seatText.trim() ? item.seatText.trim() : mapString('seat', options);
+    return label ? t('map.marker.seat', { label, seat }, options) : seat;
   }
   // Die sichtbare Nummer steht voran („1, Sporthalle Nordhain“): Der Name enthält so den Text des Markers (WCAG 2.5.3, Label im Namen)
   const number = item?.number;
-  return Number.isInteger(number) && number >= 0 ? (label ? `${number}, ${label}` : String(number)) : label;
+  return Number.isInteger(number) && number >= 0 ? (label ? t('map.marker.numbered', { number, label }, options) : String(number)) : label;
 }
 
 /** Kachelverfahren im Dunkelmodus: `invert` (invertieren und umfärben) oder `dim` (abdunkeln, Standard); alles andere ergibt `dim`. */
@@ -157,7 +164,7 @@ export function tilesMode(value) {
  * Marker für Liste, Platzhalter und Karte aufbereiten (`texts.seat`: Text für den Sitzmarker statt „Vereinssitz“): ungültige Koordinaten fallen weg, `href` läuft durch `safeHref`, ids sind eindeutig (doppelte und fehlende bekommen `marker-<Index>` bzw. `<id>-2`), Nummer = `number` oder bei mehreren
  * Markern die laufende Nummer (ein Marker bekommt keine), dazu Koordinatentext und Links (nur die in `appLinks` gewünschten).
  */
-export function mapItems(markers, appLinks = ['osm', 'route'], texts = {}) {
+export function mapItems(markers, appLinks = ['osm', 'route'], texts = {}, options) {
   const valid = (Array.isArray(markers) ? markers : []).filter((m) => m && isCoord(m.lat, m.lng));
   const wants = Array.isArray(appLinks) ? appLinks : [];
   // Eindeutige ids: ausdrückliche ids behalten ihren Wert (die erste gewinnt), doppelte und fehlende bekommen einen freien Ersatz
@@ -178,9 +185,9 @@ export function mapItems(markers, appLinks = ['osm', 'route'], texts = {}) {
     const label = typeof m.label === 'string' ? m.label : '';
     const all = mapLinks({ lat: m.lat, lng: m.lng, label });
     const links = [];
-    if (wants.includes('geo')) links.push({ kind: 'geo', text: mapText.linkGeo, href: all.geo });
-    if (wants.includes('osm')) links.push({ kind: 'osm', text: mapText.linkOsm, href: all.osm });
-    if (wants.includes('route')) links.push({ kind: 'route', text: mapText.linkRoute, href: all.route });
+    if (wants.includes('geo')) links.push({ kind: 'geo', text: mapString('linkGeo', options), href: all.geo });
+    if (wants.includes('osm')) links.push({ kind: 'osm', text: mapString('linkOsm', options), href: all.osm });
+    if (wants.includes('route')) links.push({ kind: 'route', text: mapString('linkRoute', options), href: all.route });
     const given = Number.isInteger(m.number) && m.number >= 0 ? m.number : null;
     const hasId = m.id !== undefined && m.id !== null && m.id !== '';
     return {
@@ -191,9 +198,9 @@ export function mapItems(markers, appLinks = ['osm', 'route'], texts = {}) {
       href: safeHref(m.href),
       own: m.own === true,
       kind: seat ? 'seat' : 'place',
-      seatText: typeof texts?.seat === 'string' && texts.seat.trim() ? texts.seat.trim() : mapText.seat,
+      seatText: typeof texts?.seat === 'string' && texts.seat.trim() ? texts.seat.trim() : mapString('seat', options),
       number: seat ? null : given ?? (places > 1 ? running : null),
-      coords: formatCoords(m.lat, m.lng),
+      coords: formatCoords(m.lat, m.lng, options),
       links,
     };
   });

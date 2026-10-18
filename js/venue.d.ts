@@ -1,4 +1,5 @@
 import type { ScheduleGame } from './schedule.js';
+import type { TOptions } from './i18n/index.js';
 
 export interface VenueAddress {
   street?: string;
@@ -31,15 +32,18 @@ export interface VenueMapLink {
   href: string;
 }
 
+/** Die Texte der Hallenkarte in der globalen Sprache; `delete` und die Zuweisung von `undefined` nehmen eine Überschreibung zurück; eine Zuweisung überschreibt den Text für alle Aufrufe. */
 export const venueText: {
   gamesLabel: string; linkLabel: string; mapLink: string; routeLink: string; contact: string; phone: string; email: string;
   home: string; away: string; live: string; cancelled: string; postponed: string; mapLabel: string;
 };
+/** Ein Text aus `venueText` in der Sprache des Aufrufs (`options.locale`, `options.texts`); eine Zuweisung an `venueText` hat Vorrang. */
+export function venueString(name: keyof typeof venueText, options?: TOptions): string;
 export const DEFAULT_GAMES: number;
 export const MAX_GAMES: number;
 
 /** Name der Karte für Hilfstechnik: „Karte: Sporthalle Nordhain“. */
-export function venueMapLabel(name: string | undefined): string;
+export function venueMapLabel(name: string | undefined, options?: TOptions): string;
 /** Adresse in höchstens zwei Zeilen: Straße, dann „PLZ Ort“; leere Teile entfallen. */
 export function addressLines(address: VenueAddress | undefined): string[];
 /** `tel:`-Adresse aus einer Rufnummer; ungültige Zeichen oder weniger als drei Ziffern ergeben `undefined`. */
@@ -57,7 +61,7 @@ export function gameKeys(games: ScheduleGame[] | undefined): string[];
 export function gameWhen(game: ScheduleGame): string;
 export function gameMeta(game: ScheduleGame): string;
 /** Hinweis zum Zustand eines Spiels (Live, Abgesagt, Verschoben) mit Ton für den Chip. */
-export function gameState(game: ScheduleGame): { text: string; tone: 'ok' | 'err' | 'warn' } | undefined;
-export function venueMapLinks(options: { lat?: number; lng?: number; name?: string }): VenueMapLink[];
+export function gameState(game: ScheduleGame, options?: TOptions): { text: string; tone: 'ok' | 'err' | 'warn' } | undefined;
+export function venueMapLinks(place: { lat?: number; lng?: number; name?: string }, options?: TOptions): VenueMapLink[];
 export function venueHref(href: string | undefined): string | undefined;
 export function isCoord(lat: unknown, lng: unknown): boolean;

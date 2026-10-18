@@ -12,7 +12,7 @@ import * as source from '../js/render/index.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Render-Bündel (gemessen: 51 312 B = 50,2 KiB min, 17 450 B = 17,1 KiB gzip; der Kern hat sein eigenes in vanilla-bundle.test.ts: 37 164 B, 13 241 B; die Karte liegt im Bündel hoops-map).
+// Eigenes Budget für das Render-Bündel (gemessen: 57 602 B = 56,3 KiB min, 18 710 B = 18,3 KiB gzip, vor I2: 51 312 B und 17 450 B; der Kern hat sein eigenes in vanilla-bundle.test.ts: 48 133 B, 16 762 B; die Karte liegt im Bündel hoops-map).
 // Begründung: zehn Komponenten mit Markup, Logik aus league/schedule/team/venue/map; das Accordion kommt aus dem Kern und zählt hier nicht.
 export const RENDER_BUDGET = BUDGETS['hoops-render'];
 
@@ -24,6 +24,10 @@ export const RENDER_EXPORTS = [
 
 beforeAll(async () => {
   mod = await import(/* @vite-ignore */ pathToFileURL(`${out}hoops-render.js`).href);
+  // Das Bündel teilt den Kern mit hoops.js; das deutsche Bündel registriert `de` dort (derselbe Ordner, dieselbe Instanz), die Quellmodule kennen die Testeinstellung `de`
+  const core = (await import(/* @vite-ignore */ pathToFileURL(`${out}hoops.js`).href)) as { setLocale: (code: string) => void };
+  await import(/* @vite-ignore */ pathToFileURL(`${out}hoops-i18n-de.js`).href);
+  core.setLocale('de');
 });
 
 describe('Render-Bündel dist/vanilla/hoops-render', () => {
@@ -39,7 +43,7 @@ describe('Render-Bündel dist/vanilla/hoops-render', () => {
     for (const [name, core] of [['hoops-render.js', './hoops.js'], ['hoops-render.min.js', './hoops.min.js']] as const) {
       const code = text(name);
       const imports = [...code.matchAll(/(?:^|[;}\s])import\s*(?:\{[^}]*\}\s*from\s*)?["']([^"']+)["']/g)].map((m) => m[1]);
-      expect(imports, name).toEqual([core]);
+      expect([...new Set(imports)], name).toEqual([core]);
       expect(code, name).not.toMatch(/\brequire\(/);
       expect(code, name).not.toMatch(/import\(/);
       for (const word of ['react', 'svelte', 'radix']) expect(code.toLowerCase(), `${name}: ${word}`).not.toContain(word);

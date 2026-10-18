@@ -145,7 +145,7 @@ export async function buildManifest({ root = ROOT, bundleDir, version, files, ta
       range: leafletRange,
       note: 'Leaflet gehört nicht zum Release. Es wird nur für die Karte gebraucht, lokal ausgeliefert (loadLeaflet) und erst nach dem Klick geladen.',
     },
-    pairing: 'hoops.js, hoops-render.js, hoops-map.js und hoops.css einer Version gehören zusammen (VERSION im Bündel == --hoops-version in hoops.css).',
+    pairing: 'hoops.js, hoops-render.js, hoops-map.js, hoops-i18n-de.js und hoops.css einer Version gehören zusammen (VERSION im Bündel == --hoops-version in hoops.css; hoops-render, hoops-map und hoops-i18n-de importieren den Kern hoops.js desselben Ordners).',
   };
 }
 
