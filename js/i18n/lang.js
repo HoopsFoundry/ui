@@ -13,8 +13,10 @@ const base = (code) => String(code).split('-')[0].toLowerCase();
 /** Der Wert für `lang` oder eine leere Zeichenkette, wenn kein Attribut nötig ist. `options`: `locale`, `documentLang`. */
 export function langFor(options) {
   const code = localeOf(options);
-  let page = options && typeof options.documentLang === 'string' ? options.documentLang : '';
-  if (!page && !(options && 'documentLang' in options) && typeof document !== 'undefined' && document.documentElement) page = document.documentElement.lang;
+  // `documentLang` als Zeichenkette (auch leer) gilt als angegeben; `undefined` (fehlt oder ausdrücklich undefined) heißt: das Dokument fragen
+  const given = options && typeof options.documentLang === 'string';
+  let page = given ? options.documentLang : '';
+  if (!given && typeof document !== 'undefined' && document.documentElement) page = document.documentElement.lang;
   page = typeof page === 'string' ? page.trim() : '';
   if (!page) return '';
   return base(page) === base(code) ? '' : code;

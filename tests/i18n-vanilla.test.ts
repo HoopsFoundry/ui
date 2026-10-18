@@ -115,3 +115,29 @@ describe('Texte folgen dem Sprachwechsel (en → de → en)', () => {
     handle.destroy();
   });
 });
+
+describe('lang an der Karte (WCAG 3.1.2)', () => {
+  const markers = [{ id: 'a', lat: 49.4, lng: 8.4, label: 'Halle' }];
+  it('initMap mit locale en auf einer deutschen Seite setzt lang="en" an die Wurzel', async () => {
+    const { initMap, renderMap } = await import('../js/map-vanilla.js');
+    document.documentElement.lang = 'de';
+    const host = html(renderMap({ label: 'K', markers }, { locale: 'en', documentLang: 'en' }));
+    expect(host.querySelector('.hoops-map')!.hasAttribute('lang')).toBe(false);
+    const handle = initMap(host, { label: 'K', markers, locale: 'en' });
+    expect(host.querySelector('.hoops-map')!.getAttribute('lang')).toBe('en');
+    handle.destroy();
+  });
+  it('mountMap folgt dem Sprachwechsel: setLocale en setzt lang, zurück auf de nimmt es weg', () => {
+    document.documentElement.lang = 'de';
+    setLocale('de');
+    const host = html('<div></div>').firstElementChild as HTMLElement;
+    const handle = mountMap(host, { label: 'K', markers });
+    const root = () => host.querySelector('.hoops-map')!;
+    expect(root().hasAttribute('lang')).toBe(false);
+    setLocale('en');
+    expect(root().getAttribute('lang')).toBe('en');
+    setLocale('de');
+    expect(root().hasAttribute('lang')).toBe(false);
+    handle.destroy();
+  });
+});
