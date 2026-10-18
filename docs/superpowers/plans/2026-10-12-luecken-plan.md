@@ -24,7 +24,7 @@ Stand 2026-10-16: erledigt (✓) sind 1.1, 1.2, 1.4, 1.5, 1.7, 1.8, 1.9 (Branch 
 ## Welle 2: Prüflücken schließen (nichts bauen, nur belegen)
 | # | Lücke | Plan | Aufwand |
 |---|---|---|---|
-| 2.1 | Nur Chromium getestet (alle Pakete) | Playwright-Firefox und -WebKit für die Kern-Matrix (Accordion, Tabs, Modal, Map-Platzhalter, PageNav, Theme, `dialog`/`::backdrop`, Container-Abfragen); Ergebnisse als Tabelle in der Doku | M |
+| 2.1 | Nur Chromium getestet (alle Pakete) | Playwright-Firefox und -WebKit für die Kern-Matrix (Accordion, Tabs, Modal, Map-Platzhalter, PageNav, Theme, `dialog`/`::backdrop`, Container-Abfragen); Ergebnisse als Tabelle in der Doku. **Stand 2026-10-18: erledigt für Chromium und WebKit (Branch `feat/welle2`).** `scripts/check-browser-matrix.mjs`, 31 Prüfungen je Browser, Chromium 153 und WebKit 26.6 alle bestanden, keine Abweichung; Tabelle in `Foundation/Vanilla`, Abschnitt Kompatibilität. Firefox startet in dieser Umgebung nicht (macOS 27, Ursache ungeklärt), Lauf auf anderem Rechner offen | M |
 | 2.2 | Boot-Skript nicht gegen echte CSP getestet | Testseite mit `script-src 'nonce-…'` und mit Hash; Doku-Rezept verifizieren | S |
 | 2.3 | Browser-Matrix nach Fixes nicht voll wiederholt (VenueCard; Docs Kennzahlen/PageNav/Dark Mode; Map-Docs) | Einmal eine vollständige axe- und Regressionsmatrix über alle Docs-Seiten als wiederverwendbares Skript (liegt im Scratchpad verstreut) ins Repo (`scripts/`), CI-fähig | M |
 | 2.4 | Deploy-Workflow nach den letzten Pushes nicht angesehen | `gh run list` prüfen, Fehler beheben | S |

@@ -242,5 +242,27 @@ export const compat = {
   ],
 };
 
+/** Browser-Matrix der Kernbausteine (scripts/check-browser-matrix.mjs, Lückenplan 2.1); Stand der Messung 2026-10-18. Je Bereich: Zahl der Prüfungen und Ergebnis je Browser. */
+export const coreMatrix = {
+  command: 'node scripts/check-browser-matrix.mjs --markdown',
+  checksPerBrowser: 31,
+  browsers: [
+    { name: 'Chromium', version: '153.0.8010.12', result: '31 von 31 bestanden' },
+    { name: 'WebKit (Safari-Engine)', version: '26.6', result: '31 von 31 bestanden' },
+    { name: 'Firefox', version: 'Playwright 1543 (155.0) und System-Firefox 138.0.1', result: 'nicht gelaufen' },
+  ],
+  groups: [
+    { name: 'Accordion', checks: 5, what: 'Klick und Enter öffnen und schließen (aria-expanded, Panel verborgen und inert), gestrichelter Fokusring, natives details ohne Skript' },
+    { name: 'Tabs', checks: 4, what: 'Pfeiltasten mit Umlauf, Pos1 und Ende, genau ein sichtbares Panel' },
+    { name: 'Modal', checks: 7, what: 'dialog mit showModal: :modal, ::backdrop mit deckender Farbe, Top-Layer (Klick neben der Fläche trifft den Dialog), Fokus hinein, Fokusfalle, Escape mit Fokus zurück, Scroll-Sperre' },
+    { name: 'Karte', checks: 3, what: 'Platzhalter mit Knopf ≥ 44 px; vor dem Klick kein Leaflet, keine Kachel, kein Cookie, kein Speicher' },
+    { name: 'PageNav', checks: 3, what: 'Navigation aus den Überschriften, Sprung mit Fokus auf dem Ziel' },
+    { name: 'Theme', checks: 5, what: 'Umschalter mit aria-pressed, Speicher, Token wechseln, prefers-color-scheme ohne Wahl, Boot-Skript setzt die Wahl vor dem ersten Zeichnen' },
+    { name: 'Container', checks: 2, what: 'Hallenkarte einspaltig im 520-px-Behälter, zweispaltig im 960-px-Behälter, bei 1280 und 600 px Fensterbreite' },
+    { name: 'Bewegung', checks: 2, what: 'Live-Punkt pulsiert, Ergebniszahl nie; prefers-reduced-motion und data-motion="reduce" halten an' },
+  ],
+  firefoxNote: 'Ursache ungeklärt. Playwrights Firefox bricht ohne Fenster mit „Could not find profile folder“ ab; mit Fenster beendet macOS den Inhaltsprozess (Signal 9, „sandbox_extension_issue_file_to_process failed“). Der System-Firefox über WebDriver BiDi (--firefox-channel=moz-firefox) startet nicht innerhalb von 60 s, mit derselben Sandbox-Meldung. Gemessen unter macOS 27.0.1; ein Lauf auf einem anderen Rechner steht aus.',
+};
+
 /** Node-Versionen, mit denen das Release-Skript und hoops-sync.mjs (--from-dir und --from-release gegen einen lokalen Server) gelaufen sind. */
 export const nodeVersions = ['18.20.8', '20.20.2', '22.21.0'];
