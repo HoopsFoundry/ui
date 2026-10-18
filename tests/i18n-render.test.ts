@@ -7,8 +7,8 @@ import { renderEmptyState, renderFormChips, renderLeagueCard, renderMatchCard, r
 import { renderMap } from '../js/map-vanilla.js';
 import { mapText, formatCoords } from '../js/map.js';
 import { periodLabel, periodShort } from '../js/periods.js';
-import { leagueSummary, windowLabel, diffText } from '../js/league.js';
-import { squadText, recordInfo } from '../js/team.js';
+import { leagueSummary, windowLabel, diffText, cellNumber } from '../js/league.js';
+import { squadText, recordInfo, formatNumber as formatNumberTeam } from '../js/team.js';
 import { statItems } from '../js/stats.js';
 import { summaryText } from '../js/accordion.js';
 
@@ -150,5 +150,16 @@ describe('lang-Attribut', () => {
       document.documentElement.removeAttribute('lang');
     }
     expect(renderStats({ items: [{ label: 'A', value: 1 }] })).not.toContain('lang=');
+  });
+});
+
+describe('Randwerte der Zahlenschreibung wie vor I2 (String(n), nur das Dezimalzeichen wechselt)', () => {
+  const VALUES: [number, string][] = [[-0, '0'], [1e-7, '1e-7'], [1e21, '1e+21'], [1.5e-10, '1.5e-10'], [5e-324, '5e-324'], [0.1 + 0.2, '0.30000000000000004'], [12.5, '12.5'], [1234.5, '1234.5']];
+  it.each(VALUES)('%s', (value, plain) => {
+    expect(cellNumber(value, { locale: 'en' })).toBe(plain);
+    expect(cellNumber(value, { locale: 'de' })).toBe(plain.replace('.', ','));
+    expect(statItems([{ label: 'A', value }], { locale: 'de' })[0].value).toBe(plain.replace('.', ','));
+    expect(formatNumberTeam(value, { locale: 'de' })).toBe(plain.replace('.', ','));
+    expect(diffText(value === 0 ? 0 : Math.abs(value), { locale: 'en' })).toBe(value === 0 ? '0' : `+${plain}`);
   });
 });

@@ -11,19 +11,27 @@ export function formatNumber(n, options, localeOptions) {
   return new Intl.NumberFormat(localeOf(localeOptions), options).format(n);
 }
 
-const plainFormats = new Map();
+const decimals = new Map();
+/** Dezimaltrennzeichen der Sprache (ohne Intl-Formatierung der Zahl selbst). */
+function decimalOf(code) {
+  let sign = decimals.get(code);
+  if (sign === undefined) {
+    try {
+      sign = new Intl.NumberFormat(code).formatToParts(1.1).find((part) => part.type === 'decimal')?.value ?? '.';
+    } catch {
+      sign = '.';
+    }
+    decimals.set(code, sign);
+  }
+  return sign;
+}
 /**
- * Zahl so, wie `String(n)` sie schreibt (kein Tausendertrenner, keine Rundung), aber mit dem Dezimaltrennzeichen der Sprache:
- * `12.5` ergibt „12,5“ auf Deutsch und „12.5“ auf Englisch. Für Tabellenzellen, Kennzahlen und Korbdifferenz.
+ * Zahl so, wie `String(n)` sie schreibt (kein Tausendertrenner, keine Rundung, `-0` ergibt „0“, sehr kleine und große Werte bleiben in
+ * Exponentialschreibweise wie „1e-7“), nur der Dezimalpunkt wird durch das Dezimaltrennzeichen der Sprache ersetzt: `12.5` ergibt „12,5“
+ * auf Deutsch und „12.5“ auf Englisch. Für Tabellenzellen, Kennzahlen und Korbdifferenz.
  */
 export function formatPlain(n, localeOptions) {
-  const code = localeOf(localeOptions);
-  let format = plainFormats.get(code);
-  if (!format) {
-    format = new Intl.NumberFormat(code, { useGrouping: false, maximumFractionDigits: 20 });
-    plainFormats.set(code, format);
-  }
-  return format.format(n);
+  return String(n).replace('.', decimalOf(localeOf(localeOptions)));
 }
 
 const isCoord = (lat, lng) =>
