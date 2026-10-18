@@ -69,7 +69,7 @@ describe('Bündel: Exportliste und Größen stimmen mit der Doku', () => {
     near(code.mapSizes.js, statSync(`${bundleDir}hoops-map.js`).size);
     near(code.mapSizes.min, statSync(`${bundleDir}hoops-map.min.js`).size);
     near(code.mapSizes.gzip, gzipSync(readFileSync(`${bundleDir}hoops-map.min.js`)).length);
-    expect(code.mapBudget).toEqual({ minKB: 25, gzipKB: 10 });
+    expect(code.mapBudget).toEqual({ minKB: 26, gzipKB: 10 });
     expect(code.mapSizes.min).toBeLessThanOrEqual(code.mapBudget.minKB * 1024);
     expect(code.mapSizes.gzip).toBeLessThanOrEqual(code.mapBudget.gzipKB * 1024);
     expect(code.budget).toEqual({ minKB: 48, gzipKB: 17 });

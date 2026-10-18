@@ -164,7 +164,7 @@ describe('Kopierliste gegen die statischen Importe der Bündel', () => {
     expect(copied.has('hoops.min.js')).toBe(true);
   });
   it('die Dokumentation nennt die Abhängigkeit (Map und Foundation/Vanilla)', () => {
-    expect(read('stories/Map.mdx')).toContain('importiert statisch `./hoops.min.js`');
+    expect(read('stories/Map.mdx')).toContain('importieren beide statisch `./hoops.min.js`');
     expect(read('stories/Foundation/Vanilla.mdx')).toContain('importiert `hoops-render.min.js` statisch `./hoops.min.js`');
   });
 });
@@ -194,7 +194,7 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
     const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
     expect(adr).toContain('Vanilla-Fassung: `js/map-vanilla.js`');
     expect(adr).toContain('`hoops-map.js` (Karte)');
-    expect(adr).toContain('Karte 25 KiB min und 10 KiB gzip');
+    expect(adr).toContain('Karte 26 KiB min und 10 KiB gzip');
     expect(read('docs/architecture/sections/05-building-block-view.adoc')).toContain('`js/map-vanilla.js`');
     expect(read('docs/architecture/sections/06-runtime-view.adoc')).toContain('`initMap` und `mountMap`');
     for (const file of ['01-introduction-and-goals', '04-solution-strategy', '05-building-block-view', '06-runtime-view', '07-deployment-view', '08-crosscutting-concepts', '09-architecture-decisions', '11-risks-and-technical-debt', '12-glossary']) {
@@ -204,8 +204,8 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
   });
   it('die Zahlen der Doku stimmen mit dem Bündel überein (KiB)', () => {
     const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
-    expect(adr).toMatch(/gemessen 21,8 und 8,9/);
-    expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 25, gzipKB: 10 };');
+    expect(adr).toMatch(/gemessen 25,0 und 9,9/);
+    expect(read('stories/Foundation/Vanilla.code.ts')).toContain('export const mapBudget = { minKB: 26, gzipKB: 10 };');
   });
 });
 

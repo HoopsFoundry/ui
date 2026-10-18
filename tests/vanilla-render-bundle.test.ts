@@ -12,7 +12,7 @@ import * as source from '../js/render/index.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Render-Bündel (gemessen: 57 396 B = 56,0 KiB min, 18 602 B = 18,2 KiB gzip, vor I2: 51 312 B und 17 450 B; der Kern hat sein eigenes in vanilla-bundle.test.ts: 48 155 B, 16 768 B; die Karte liegt im Bündel hoops-map).
+// Eigenes Budget für das Render-Bündel (gemessen: 57 602 B = 56,3 KiB min, 18 710 B = 18,3 KiB gzip, vor I2: 51 312 B und 17 450 B; der Kern hat sein eigenes in vanilla-bundle.test.ts: 48 133 B, 16 762 B; die Karte liegt im Bündel hoops-map).
 // Begründung: zehn Komponenten mit Markup, Logik aus league/schedule/team/venue/map; das Accordion kommt aus dem Kern und zählt hier nicht.
 export const RENDER_BUDGET = BUDGETS['hoops-render'];
 

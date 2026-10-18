@@ -12,7 +12,7 @@ import * as source from '../js/map-bundle.js';
 const text = (name: string) => readFileSync(`${out}${name}`, 'utf8');
 let mod: Record<string, (...a: unknown[]) => unknown>;
 
-// Eigenes Budget für das Karten-Bündel (gemessen: 25 496 B = 24,9 KiB min, 10 071 B = 9,8 KiB gzip, vor I2: 22 053 B und 9 055 B). Begründung: Zustände und Markup der Karte, die
+// Eigenes Budget für das Karten-Bündel (gemessen: 25 622 B = 25,0 KiB min, 10 127 B = 9,9 KiB gzip, vor I2: 22 053 B und 9 055 B). Begründung: Zustände und Markup der Karte, die
 // Leaflet-Anbindung (Marker, Gesten, Fehlerfälle) und die Logik aus map.js; Leaflet selbst gehört nicht dazu, es wird erst nach dem Klick geladen.
 export const MAP_BUDGET = BUDGETS['hoops-map'];
 export const MAP_EXPORTS = ['VERSION', 'initMap', 'initMapBlock', 'mountMap', 'renderMap'];

@@ -8,7 +8,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 ### Geändert (Bruch)
 
 - **Standardsprache Englisch für Vanilla und die gemeinsame Logik (`js/*.js`, `render*`, `init*`, `mount*`, Karte):** Wer deutsche Texte will, importiert einmal `hoops-i18n-de.js` (bzw. `@hoopsfoundry/ui/i18n/de`) und ruft `setLocale('de')` auf. Svelte und React folgen (I3); bis dahin bleiben ihre fest eingebauten Texte deutsch, die der gemeinsamen Logik folgen der gewählten Sprache.
-- **`hoops-map.js` und `hoops-render.js` importieren den Sprachkern aus `hoops.js`** desselben Ordners; die Karte braucht `hoops.js` daneben. Bündelgrößen (min): Kern 48 155 B (vorher 37 164 B), Render 57 396 B (51 312 B), Karte 25 496 B (22 053 B).
+- **`hoops-map.js` und `hoops-render.js` importieren den Sprachkern aus `hoops.js`** desselben Ordners; die Karte braucht `hoops.js` daneben. Bündelgrößen (min): Kern 48 133 B (vorher 37 164 B), Render 57 602 B (51 312 B), Karte 25 622 B (22 053 B).
 
 ### Hinzugefügt
 
