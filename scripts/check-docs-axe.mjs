@@ -6,6 +6,7 @@
  *   node scripts/check-docs-axe.mjs storybook-static           # alle Docs-Seiten × BBV/DBB × hell/dunkel, 1280 px
  *   node scripts/check-docs-axe.mjs storybook-static --widths=1280,420 --filter=components-map --concurrency=4
  *   node scripts/check-docs-axe.mjs storybook-static --json=axe-docs.json   # Ergebnis zusätzlich als Datei (CI-Artefakt)
+ *   node scripts/check-docs-axe.mjs storybook-static --scope=page            # ganze Seite samt Storybook-Rahmen (zur Information, Lückenplan 2.5)
  *
  * Die Seiten kommen aus `index.json` des Builds (alle Einträge vom Typ `docs`): neue Seiten sind ohne Änderung am Skript dabei.
  * Matrix: Marke (`brand:bbv|dbb`) × Theme (`theme:Light|Dark`, dazu `prefers-color-scheme` im Kontext) × Breiten. Je Lauf:
@@ -34,6 +35,8 @@ const WIDTHS = (args.widths ?? '1280').split(',').map(Number);
 const BRANDS = (args.brands ?? 'bbv,dbb').split(',');
 const THEMES = (args.themes ?? 'Light,Dark').split(',');
 const CONCURRENCY = Math.max(1, Number(args.concurrency ?? 4));
+// content: nur unser Docs-Inhalt (Standard, Gate); page: das ganze Dokument samt Storybook-Rahmen, ohne Ausnahmen (zeigt, was Storybook erzeugt)
+const WHOLE_PAGE = args.scope === 'page';
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.map': 'application/json' };
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const EXTRA = ['color-contrast-enhanced', 'target-size', 'landmark-unique', 'heading-order'];
@@ -92,15 +95,15 @@ async function checkPage(ctx, doc, combo) {
     if (render.text < 50 || render.error) failures.push({ page: doc.id, combo, kind: 'Darstellung', detail: render.error || `Inhalt fast leer (${render.text} Zeichen)` });
     if (render.pageOverflow > 0) failures.push({ page: doc.id, combo, kind: 'seitliches Scrollen', detail: `${render.pageOverflow}px` });
     await page.evaluate(axeSource);
-    const violations = await page.evaluate(async ({ tags, extra, off, exclude }) => {
+    const violations = await page.evaluate(async ({ tags, extra, off, exclude, whole }) => {
       const rules = { ...Object.fromEntries(extra.map((r) => [r, { enabled: true }])), ...Object.fromEntries(off.map((r) => [r, { enabled: false }])) };
-      const target = document.querySelector('.sbdocs-content') ?? document;
-      const out = await window.axe.run({ include: [target], exclude: exclude.map((s) => [s]) }, { runOnly: { type: 'tag', values: tags }, rules });
-      const chrome = (n) => n.target.some((t) => /\.sbdocs|\.docblock|\.sb-|\.css-[a-z0-9]+|react-aria|\.token/.test(t));
+      const target = whole ? document : (document.querySelector('.sbdocs-content') ?? document);
+      const out = await window.axe.run(whole ? document : { include: [target], exclude: exclude.map((s) => [s]) }, { runOnly: { type: 'tag', values: tags }, rules });
+      const chrome = (n) => !whole && n.target.some((t) => /\.sbdocs|\.docblock|\.sb-|\.css-[a-z0-9]+|react-aria|\.token/.test(t));
       return out.violations
         .map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.filter((n) => !chrome(n)).map((n) => `${n.target.join(' ')}: ${(n.failureSummary || '').split('\n')[1] ?? ''}`.slice(0, 240)) }))
         .filter((v) => v.nodes.length > 0);
-    }, { tags: TAGS, extra: EXTRA, off: PAGE_RULES, exclude: EXCLUDE });
+    }, { tags: TAGS, extra: EXTRA, off: WHOLE_PAGE ? [] : PAGE_RULES, exclude: WHOLE_PAGE ? [] : EXCLUDE, whole: WHOLE_PAGE });
     for (const v of violations) {
       byRule[v.id] = (byRule[v.id] ?? 0) + v.nodes.length;
       failures.push({ page: doc.id, combo, kind: `axe ${v.id}`, detail: v.nodes.slice(0, 3).join(' | '), count: v.nodes.length });
