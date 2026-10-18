@@ -246,7 +246,7 @@ describe('Budgets, Ausgabeordner, Hilfsskript', () => {
     const dir = await copyBundle('budget');
     await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'x'.repeat(5000)}`);
     const out = `${tmpRoot}/budget-out`;
-    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von hoops.min.js liegt bei 40 KiB
+    // die Versionsprüfung bleibt grün (die Datei trägt weiter VERSION); das Budget von hoops.min.js liegt bei 48 KiB
     await writeFile(`${dir}/hoops.min.js`, `${await readFile(`${dir}/hoops.min.js`, 'utf8')}\n//${'y'.repeat(BUDGETS.hoops.minBytes)}`);
     await expect(releaseVanilla({ bundleDir: dir, outDir: out, build: false, allowDirty: true })).rejects.toThrow(/Größenbudget überschritten: hoops\.min\.js/);
     expect(existsSync(out)).toBe(false);

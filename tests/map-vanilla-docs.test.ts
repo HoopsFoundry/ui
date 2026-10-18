@@ -194,7 +194,7 @@ describe('Dokumentation: README, CHANGELOG, Einführung, arc42', () => {
     const adr = read('docs/architecture/sections/09-architecture-decisions.adoc');
     expect(adr).toContain('Vanilla-Fassung: `js/map-vanilla.js`');
     expect(adr).toContain('`hoops-map.js` (Karte)');
-    expect(adr).toContain('Karte 24 KiB min und 10 KiB gzip');
+    expect(adr).toContain('Karte 25 KiB min und 10 KiB gzip');
     expect(read('docs/architecture/sections/05-building-block-view.adoc')).toContain('`js/map-vanilla.js`');
     expect(read('docs/architecture/sections/06-runtime-view.adoc')).toContain('`initMap` und `mountMap`');
     for (const file of ['01-introduction-and-goals', '04-solution-strategy', '05-building-block-view', '06-runtime-view', '07-deployment-view', '08-crosscutting-concepts', '09-architecture-decisions', '11-risks-and-technical-debt', '12-glossary']) {

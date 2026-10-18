@@ -13,8 +13,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 ### Hinzugefügt
 
 - **Sprache in Vanilla:** `setLocale`, `getLocale`, `registerLocale`, `setTexts`, `t`, `availableLocales` in `hoops.js`; Ereignis `hoops:localechange`; Optionen `locale` und `texts` bei `render*`, `init*`, `mount*`; `lang` an der Wurzel bei abweichender Sprache; Bündel `hoops-i18n-de.js` (6 633 B min).
-
-- **Internationalisierung, Infrastruktur (noch ohne Wirkung auf die Komponenten):** `@hoopsfoundry/ui/i18n` (Kern mit `t`, `setLocale`, `registerLocale`, `setTexts`, `subscribe`), `@hoopsfoundry/ui/i18n/format` (`formatNumber`, `formatCoords`), die Kataloge `@hoopsfoundry/ui/i18n/en` und `@hoopsfoundry/ui/i18n/de` (168 Schlüssel je Sprache; `de` registriert sich beim Import), das Prüfskript `scripts/check-i18n.mjs` und das Inventar der festen Texte. Die Komponenten bleiben in dieser Fassung deutsch und unverändert; die Verdrahtung und der Wechsel der Standardsprache auf Englisch folgen später. Siehe ADR-012.
+- **Internationalisierung, Infrastruktur:** `@hoopsfoundry/ui/i18n` (Kern mit `t`, `setLocale`, `registerLocale`, `setTexts`, `subscribe`), `@hoopsfoundry/ui/i18n/format` (`formatNumber`, `formatCoords`), die Kataloge `@hoopsfoundry/ui/i18n/en` und `@hoopsfoundry/ui/i18n/de` (168 Schlüssel je Sprache; `de` registriert sich beim Import), das Prüfskript `scripts/check-i18n.mjs` und das Inventar der festen Texte. Vanilla, Render-Funktionen und Karte nutzen sie seit dieser Fassung (Standardsprache Englisch, siehe „Geändert (Bruch)“); Svelte und React folgen. Siehe ADR-012.
 - **Deploy:** Bei geändertem SSH-Host-Schlüssel des Webspace gibt `deploy-webspace.yml` eine Anleitung aus (Fingerprint prüfen, Secret `DEPLOY_KNOWN_HOSTS` erneuern); die strenge Prüfung bleibt.
 
 ### Geändert

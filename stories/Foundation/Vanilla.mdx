@@ -185,7 +185,7 @@ Die Option `loadLeaflet` (Funktion, die ein Promise mit Leaflet liefert) ersetzt
   ]}
 />
 
-Das Bündel steht allein (es braucht weder `hoops.js` noch `hoops-render.js`); umgekehrt importiert `hoops-render.min.js` statisch `./hoops.min.js` (und `hoops-render.js` das `./hoops.js`), also gehören beide Dateien in denselben Ordner; `mountVenueCard` aus `hoops-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
+Das Bündel braucht `hoops.js` (den Sprachkern) im selben Ordner, aber nicht `hoops-render.js`; ebenso importiert `hoops-render.min.js` statisch `./hoops.min.js` (und `hoops-render.js` das `./hoops.js`), also gehören diese Dateien in denselben Ordner. Fehlt `hoops.js`, meldet der Browser nur einen fehlenden Modulimport (404); `mountVenueCard` aus `hoops-render.js` bekommt `initMap` als Option und startet damit die eingebettete Karte. `mountMap` setzt Pins und Höhe über das CSSOM: `style-src 'self'` genügt. In der Content-Security-Policy gehört der Kachel-Host (oder der eigene Proxy) in `img-src`.
 
 ## Sicherheit
 
