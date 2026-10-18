@@ -10,6 +10,12 @@ import 'leaflet/dist/leaflet.css';
 import './storybook.css';
 import { installPseudoStates } from './pseudo-states';
 import { setForcedState, type ForcedState } from './state-switch';
+// Sprache der Dokumentation: Die Bibliothek startet mit Englisch, die Doku-Seiten und ihre Beispiele sind deutsch. Bis zur Sprachauswahl in der
+// Werkzeugleiste registriert dieser Import den deutschen Katalog, und `setLocale('de')` hält die Doku in der bisherigen Sprache.
+import '../js/i18n/de-register.js';
+import { setLocale } from '../js/i18n/index.js';
+
+setLocale('de');
 
 
 const preview: Preview = {
