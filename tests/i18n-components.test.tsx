@@ -183,6 +183,21 @@ describe.each(FASSUNGEN)('$name: Texte der Bausteine mit den bisher offenen Schl
   });
 });
 
+describe.each(FASSUNGEN)('$name: Modal trägt lang bei abweichender Sprache', (fassung) => {
+  it('lang am Dialog nur, wenn die Sprache der Seite eine andere ist', async () => {
+    document.documentElement.lang = 'de';
+    const page = fassung.mount();
+    const dialog = document.querySelector('.hoops-modal')!;
+    const holder = dialog.closest('[lang]');
+    expect(holder?.getAttribute('lang')).toBe('en');
+    act(() => setLocale('de'));
+    await page.flush();
+    expect(document.querySelector('.hoops-modal')!.closest('[lang]')?.getAttribute('lang') === 'en').toBe(false);
+    document.documentElement.removeAttribute('lang');
+    await page.stop();
+  });
+});
+
 describe('React: lang an der Wurzel bei abweichender Sprache', () => {
   it('Stepper und Skeleton setzen lang, wenn die Seite eine andere Sprache hat', () => {
     document.documentElement.lang = 'de';

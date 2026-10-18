@@ -2,6 +2,10 @@
 // Parität je Sprache (I3): Für jede Komponente und jede Sprache (en, de) ergeben Svelte-SSR, React-SSR und (soweit es eine gibt) die Vanilla-`render*`-Funktion
 // denselben sichtbaren Text und dieselben aria-label (bei Komponenten mit Render-Funktion sogar dasselbe normalisierte Markup). Dazu: kein Rohschlüssel in der
 // Ausgabe und kein Text der jeweils anderen Sprache (Wörter des Katalogs, abzüglich der Daten der Eingaben). Fehler nennen Komponente und Sprache.
+// Grenzen: Bei Komponenten ohne `render*`-Funktion (Tabs, AppNav, BottomNav, Breadcrumbs, Stepper, Skeleton, PlayByPlay, PlayerCard, TopBar, Accordion) vergleicht
+// der Test nur Text, aria-label und lang, nicht das Markup (die Fassungen dürfen sich im Aufbau unterscheiden, solange Text und Namen gleich sind); den Aufbau
+// sichern die Paritätstests der einzelnen Komponenten. Das Modal lässt sich nicht per React-SSR vergleichen (Radix rendert den Dialog in ein Portal, das
+// `renderToString` auslässt): Svelte-SSR hier, beide Fassungen im Browser-DOM in tests/i18n-components.test.tsx (closeLabel, modal.close, lang).
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -193,6 +197,18 @@ describe('Kennbuchstaben nach Sprache', () => {
     const games = [{ id: 'a', state: 'finished', opponent: { name: 'B', score: 2 }, ownScore: 1, outcome: 'N' }];
     const table = { games, layout: 'opponent' };
     for (const html of [await p.svelte('ScheduleTable', table), await p.react('ScheduleTable', table), normalize(renderScheduleTable(table))]) expect(chips(html)).toEqual([letters[1]]);
+  });
+});
+
+describe('Modal (Svelte-SSR; React siehe tests/i18n-components.test.tsx)', () => {
+  it.each([['en', 'Close'], ['de', 'Schließen']])('%s: Name des Schließen-Knopfs aus modal.close, closeLabel hat Vorrang', async (locale, close) => {
+    p.locale(locale);
+    const body = p.snippet('Inhalt');
+    expect(await p.svelte('Modal', { open: true, title: 'Titel', children: body })).toContain(`aria-label="${close}"`);
+    const own = await p.svelte('Modal', { open: true, title: 'Titel', children: body, closeLabel: 'Zu' });
+    expect(own).toContain('aria-label="Zu"');
+    expect(own).not.toContain(`aria-label="${close}"`);
+    p.locale('en');
   });
 });
 

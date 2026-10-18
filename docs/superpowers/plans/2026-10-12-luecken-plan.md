@@ -28,6 +28,7 @@ Stand 2026-10-16: erledigt (✓) sind 1.1, 1.2, 1.4, 1.5, 1.7, 1.8, 1.9 (Branch 
 | 2.2 | Boot-Skript nicht gegen echte CSP getestet | Testseite mit `script-src 'nonce-…'` und mit Hash; Doku-Rezept verifizieren | S |
 | 2.3 | Browser-Matrix nach Fixes nicht voll wiederholt (VenueCard; Docs Kennzahlen/PageNav/Dark Mode; Map-Docs) | Einmal eine vollständige axe- und Regressionsmatrix über alle Docs-Seiten als wiederverwendbares Skript (liegt im Scratchpad verstreut) ins Repo (`scripts/`), CI-fähig | M |
 | 2.4 | Deploy-Workflow nach den letzten Pushes nicht angesehen | `gh run list` prüfen, Fehler beheben | S |
+| 2.6 | Kontrast der laufenden Ergebnisse: `.hoops-sch-score` in `.hoops-sg-game.is-live` (ebenso Spielplan-Zeile und MatchCard) liegt wegen der Pulse-Animation `hoops-live-pulse-text` (Deckkraft bis 0,8) bei 5,3:1 bis 5,8:1 (`color-contrast-enhanced`, Soll 7:1). Gemessen mit `data-motion="reduce"` (Animation aus): kein Verstoß, also 7:1 oder besser. Befund aus der Browser-Prüfung zu I3, bestand schon davor. | Pulse so dämpfen, dass der Text nie unter 7:1 fällt (Deckkraft mindestens ~0,95 oder Farbe dunkler) oder die Zahl nicht pulsen lassen; Test in `tests/live.test.ts` und `tests/contrast-aaa.test.ts` | S |
 | 2.5 | Storybook-Oberfläche verletzt `region`, `landmark-one-main`, Link-Kontrast im Dunkelmodus (AA) | Eigenes Manager-/Docs-Theme prüfen: Link- und Button-Farben in `.storybook/storybook.css`/Theme anpassen | M |
 
 ## Welle 3: Vanilla-Paket fertigstellen (V2) und Portal

@@ -76,9 +76,9 @@ export function useLocale(): string {
 export interface UseT {
   /** Übersetzt `key` mit `params` in der wirksamen Sprache. */
   t: (key: string, params?: Params) => string;
-  /** Optionen für die Funktionen aus `js/` (`{ locale, texts, documentLang }`). */
   /** Satz mit einem Platzhalter, an dessen Stelle `node` gehört (zum Beispiel „{team} hat Freilos“); die Wortstellung bleibt Sache der Sprache. */
   sentence: (key: string, name: string, node: ReactNode) => ReactNode;
+  /** Optionen für die Funktionen aus `js/` (`{ locale, texts, documentLang }`). */
   options: { locale?: string; texts?: Record<string, CatalogValue>; documentLang?: string };
   locale: string;
   /** Wert für `lang` an der Wurzel des Bausteins (`undefined`, wenn die Sprache der Seite gilt). */
