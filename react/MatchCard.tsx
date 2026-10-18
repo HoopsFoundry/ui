@@ -3,6 +3,8 @@ import { cn } from './cn';
 import { shortName } from '../js/schedule.js';
 import { resolvePeriod } from '../js/periods.js';
 import { TeamLogo } from './ScheduleParts';
+import { useT } from './i18n';
+import type { CatalogValue } from '../js/i18n/index.js';
 
 export type MatchState = 'scheduled' | 'live' | 'finished';
 
@@ -41,6 +43,8 @@ export interface MatchCardProps {
   /** Mit `href` wird die Karte ein Link, mit `onClick` ein Button, sonst ein div. */
   href?: string;
   onClick?: MouseEventHandler<HTMLElement>;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
 }
 
@@ -62,12 +66,14 @@ export function MatchCard({
   clock = '',
   href,
   onClick,
+  texts,
   className,
 }: MatchCardProps) {
+  const i18n = useT(texts);
   const heimWin = state === 'finished' && (heim.score ?? 0) > (gast.score ?? 0);
   const gastWin = state === 'finished' && (gast.score ?? 0) > (heim.score ?? 0);
   const showScore = state !== 'scheduled';
-  const liveText = [resolvePeriod({ period, periods, quarter }).label, clock].filter(Boolean).join(' ');
+  const liveText = [resolvePeriod({ period, periods, quarter }, i18n.options).label, clock].filter(Boolean).join(' ');
 
   const teamBlock = (team: MatchTeam) => {
     const short = shortName(team);
@@ -97,10 +103,10 @@ export function MatchCard({
         </span>
         {state === 'live' ? (
           <span className="hoops-match-live">
-            <span className="hoops-match-pulse" aria-hidden="true" /> Live · {liveText}
+            <span className="hoops-match-pulse" aria-hidden="true" /> {i18n.t('common.live')} · {liveText}
           </span>
         ) : state === 'finished' ? (
-          <span className="hoops-match-final">Endstand</span>
+          <span className="hoops-match-final">{i18n.t('match.final')}</span>
         ) : date ? (
           <span className="hoops-match-when">
             {date}
@@ -131,17 +137,21 @@ export function MatchCard({
   const cls = cn('hoops-match', `hoops-match--${state}`, logos && 'hoops-match--logos', className);
   if (href) {
     return (
-      <a className={cls} href={href} onClick={onClick}>
+      <a className={cls} href={href} lang={i18n.lang} onClick={onClick}>
         {body}
       </a>
     );
   }
   if (onClick) {
     return (
-      <button type="button" className={cls} onClick={onClick}>
+      <button type="button" className={cls} lang={i18n.lang} onClick={onClick}>
         {body}
       </button>
     );
   }
-  return <div className={cls}>{body}</div>;
+  return (
+    <div className={cls} lang={i18n.lang}>
+      {body}
+    </div>
+  );
 }

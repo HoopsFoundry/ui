@@ -18,7 +18,7 @@ export const statsCompactMarkup = `<dl class="hoops-stats hoops-stats--compact">
 /** Markup der Form (Punkte); der versteckte Text ist formLabel(form) aus league.js. */
 export const formMarkup = `<span class="hoops-form"><span class="hoops-form-list" aria-hidden="true"><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--n"></span><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--u"></span></span><span class="hoops-sr-only">Form: Sieg, Sieg, Niederlage, Sieg, Unentschieden</span></span>`;
 
-export const formLettersMarkup = `<span class="hoops-form hoops-form--letters"><span class="hoops-form-list" aria-hidden="true"><span class="hoops-form-item hoops-form-item--s"></span><span class="hoops-form-item hoops-form-item--n"></span><span class="hoops-form-item hoops-form-item--u"></span></span><span class="hoops-sr-only">Form: Sieg, Niederlage, Unentschieden</span></span>`;
+export const formLettersMarkup = `<span class="hoops-form hoops-form--letters"><span class="hoops-form-list" aria-hidden="true"><span class="hoops-form-item hoops-form-item--s" data-letter="S"></span><span class="hoops-form-item hoops-form-item--n" data-letter="N"></span><span class="hoops-form-item hoops-form-item--u" data-letter="U"></span></span><span class="hoops-sr-only">Form: Sieg, Niederlage, Unentschieden</span></span>`;
 
 export const vanilla = `<!-- Einmal im App-Root einbinden -->
 <link rel="stylesheet" href="tokens/tokens.css" />

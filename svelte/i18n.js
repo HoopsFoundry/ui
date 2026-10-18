@@ -69,5 +69,13 @@ export function useI18n(getTexts) {
     t(key, params) {
       return t(key, params, read());
     },
+    /**
+     * Satz mit einem Platzhalter, an dessen Stelle Markup gehört (zum Beispiel „{team} hat Freilos“): liefert die Teile vor und nach dem Platzhalter
+     * `name`; die Vorlage setzt das Markup dazwischen. So bleibt die Wortstellung Sache der Sprache.
+     */
+    sentence(key, name) {
+      const marker = '\u0001';
+      return t(key, { [name]: marker }, read()).split(marker);
+    },
   };
 }

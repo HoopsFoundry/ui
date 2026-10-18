@@ -3,6 +3,8 @@ import { cn } from './cn';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
 import { CollapsibleFrame } from './internal/CollapsibleFrame';
 import { devWarn } from './internal/devWarn';
+import { useT } from './i18n';
+import type { CatalogValue } from '../js/i18n/index.js';
 
 export type TableDensity = 'touch' | 'default' | 'compact' | 'dense';
 
@@ -43,6 +45,8 @@ export interface TableProps {
   onOpenChange?: (open: boolean) => void;
   /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
   id?: string;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
 }
 
@@ -67,22 +71,24 @@ export function Table({
   defaultOpen,
   onOpenChange,
   id,
+  texts,
   className,
 }: TableProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT(texts);
   const hasHead = Boolean(title || meta || live);
   const metaItems = (
     <>
       {meta ? <span>{meta}</span> : null}
       {live ? (
         <span className="hoops-crumb">
-          <span className="hoops-crumb-dot" aria-hidden="true" /> Live
+          <span className="hoops-crumb-dot" aria-hidden="true" /> {i18n.t('common.live')}
         </span>
       ) : null}
     </>
   );
   const region = (
-    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || 'Tabelle'}>
+    <div className="hoops-table-scroll" role="region" tabIndex={0} aria-label={caption || (typeof title === 'string' && title) || i18n.t('table.label')}>
       <table className={cn('hoops-tbl', `hoops-tbl--${density}`, striped && 'hoops-tbl--striped')}>
         {caption ? <caption className="hoops-sr-only">{caption}</caption> : null}
         {columns ? (
@@ -120,6 +126,7 @@ export function Table({
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={onOpenChange}
+        lang={i18n.lang}
         meta={meta || live ? <span className="hoops-frame-meta">{metaItems}</span> : undefined}
       >
         {region}
@@ -128,7 +135,7 @@ export function Table({
   }
   if (collapsible) devWarn('[HoopsFoundry UI] Table: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
   return (
-    <div className={rootClass}>
+    <div className={rootClass} lang={i18n.lang}>
       {hasHead ? (
         <div className="hoops-frame-head">
           {title ? <Heading className="hoops-frame-title">{title}</Heading> : <span />}

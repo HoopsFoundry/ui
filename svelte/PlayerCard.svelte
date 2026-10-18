@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
+  import { useI18n } from './i18n.js';
   /**
    * HoopsFoundry UI PlayerCard · Svelte 5
    * --------------------------------------------------------------
@@ -56,6 +57,7 @@
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  const i18n = useI18n();
 
   const posClass = $derived(position ? `hoops-pos ${position.toLowerCase()}` : '');
 
@@ -68,9 +70,9 @@
 {#snippet roleLine()}
   <div class="hoops-pc-role">
     {#if position}<span class={posClass}>{position}</span>{/if}
-    {#if captain}<span class="hoops-pc-cap">Kapitän</span>{/if}
+    {#if captain}<span class="hoops-pc-cap">{i18n.t('player.captain')}</span>{/if}
     {#if age}<span>{age}</span>{/if}
-    {#if height_cm}<span>{height_cm} cm</span>{/if}
+    {#if height_cm}<span>{i18n.t('player.height', { height: height_cm })}</span>{/if}
   </div>
 {/snippet}
 
@@ -117,13 +119,13 @@
 
 {#if size === 'compact'}
   {#if onclick}
-    <button class="hoops-pc-row" {onclick} type="button">{@render compactBody()}</button>
+    <button class="hoops-pc-row" {onclick} type="button" lang={i18n.lang}>{@render compactBody()}</button>
   {:else}
-    <div class="hoops-pc-row">{@render compactBody()}</div>
+    <div class="hoops-pc-row" lang={i18n.lang}>{@render compactBody()}</div>
   {/if}
 
 {:else if size === 'standard'}
-  <div class="hoops-pc-card">
+  <div class="hoops-pc-card" lang={i18n.lang}>
     <div class="hoops-pc-head">
       {#if showPhoto}
         <span class="hoops-pc-av hoops-pc-av--lg">{@render photoImg()}<span class={`hoops-tn hoops-tn--badge hoops-tn--badge-lg ${team} ${captain ? 'captain' : ''}`}>{jersey}</span></span>
@@ -139,7 +141,7 @@
   </div>
 
 {:else}
-  <div class={showPhoto ? 'hoops-pc-hero hoops-pc-hero--photo' : 'hoops-pc-hero'}>
+  <div class={showPhoto ? 'hoops-pc-hero hoops-pc-hero--photo' : 'hoops-pc-hero'} lang={i18n.lang}>
     <div class="hoops-pc-hero-left">
       {#if showPhoto}
         {@render photoImg()}

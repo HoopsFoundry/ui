@@ -1,6 +1,7 @@
 import { useRef, useState, type KeyboardEvent } from 'react';
 import { Icon, type IconName } from './Icon';
 import { cn } from './cn';
+import { useT } from './i18n';
 import { nextTab } from '../js/tabs.js';
 
 export interface TabItem {
@@ -35,7 +36,7 @@ export function Tabs({
   items,
   variant = 'underline',
   size = 'md',
-  ariaLabel = 'Tabs',
+  ariaLabel,
   className,
   value: valueProp,
   defaultValue,
@@ -45,6 +46,7 @@ export function Tabs({
   defaultActiveIds = [],
   onActiveIdsChange,
 }: TabsProps) {
+  const i18n = useT();
   const firstEnabled = items.find((item) => !item.disabled)?.id ?? '';
   const [innerValue, setInnerValue] = useState(defaultValue ?? firstEnabled);
   const [innerActiveIds, setInnerActiveIds] = useState(defaultActiveIds);
@@ -81,7 +83,8 @@ export function Tabs({
     <div
       className={cn('hoops-tabs', `hoops-tabs--${variant}`, `hoops-tabs--${size}`, className)}
       role={multi ? 'group' : 'tablist'}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? i18n.t('tabs.label')}
+      lang={i18n.lang}
       aria-orientation={!multi && variant === 'vertical' ? 'vertical' : undefined}
     >
       {items.map((item, index) => {

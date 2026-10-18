@@ -17,7 +17,7 @@ export const BUDGET = BUDGETS['hoops'];
 
 // Die dokumentierte Liste (Foundation/Vanilla): neue Exporte gehören bewusst hierher und in die Doku
 export const EXPORTS = [
-  'HOOPS_BLOCKS', 'MODAL_CLOSE_EVENT', 'MODAL_OPEN_EVENT', 'TAB_EVENT', 'THEME_ATTRIBUTE', 'THEME_KEY', 'THEME_LABEL', 'VERSION',
+  'HOOPS_BLOCKS', 'MODAL_CLOSE_EVENT', 'MODAL_OPEN_EVENT', 'TAB_EVENT', 'THEME_ATTRIBUTE', 'THEME_KEY', 'VERSION',
   'checkVersion', 'closeModal', 'createHandle', 'cssVersion', 'focusables', 'hashTarget', 'initAccordion', 'initAccordions', 'initAll',
   'initBackToTop', 'initModal', 'initPageNav', 'initTabs', 'initTheme', 'initialTab', 'nextHeader', 'nextTab', 'nextTheme', 'openModal',
   'parseOptions', 'parseTheme', 'readTheme', 'reducedMotion', 'resolveTheme', 'revealAround', 'safeHref', 'scrollToElement', 'slug',

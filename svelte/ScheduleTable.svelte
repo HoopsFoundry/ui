@@ -20,6 +20,9 @@
   import type { HeadingTag } from '../js/heading.js';
   import { useHeadingTag } from './heading-context.js';
   import CollapsibleFrame from './internal/CollapsibleFrame.svelte';
+  import { useI18n } from './i18n.js';
+  import { outcomeLetter } from '../js/league.js';
+  import type { CatalogValue } from '../js/i18n/index.js';
   import {
     ariaForResult,
     columnsFor,
@@ -48,6 +51,7 @@
     collapsible = false,
     open = $bindable(false),
     id = undefined,
+    texts = undefined,
     class: klass = '',
     time = undefined,
     notice = undefined,
@@ -68,12 +72,15 @@
     open?: boolean;
     /** Anker für Deep-Link und Sprungleiste einer `Accordion`-Gruppe (nur mit `collapsible`); ohne `id` gibt es keinen. */
     id?: string;
+    /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters und `setTexts`. */
+    texts?: Record<string, CatalogValue>;
     class?: string;
     time?: Snippet<[ScheduleGame]>;
     notice?: Snippet<[ScheduleGame]>;
   } = $props();
 
   const heading = useHeadingTag(() => titleAs);
+  const i18n = useI18n(() => texts);
   // Nur in der Entwicklung (`$inspect` entfällt im Produktionsbuild)
   $inspect(collapsible && !title).with((_type, missing) => {
     if (missing) console.warn('[HoopsFoundry UI] ScheduleTable: `collapsible` braucht einen `title`, sonst bleibt der Rahmen unverändert.');
@@ -81,7 +88,7 @@
 
   const mode = $derived<ScheduleLayout>(layout ?? layoutFor(games));
   const dens = $derived<ScheduleDensity>(density ?? densityFor(games, mode));
-  const cols = $derived(columnsFor(mode, games, Boolean(notice)));
+  const cols = $derived(columnsFor(mode, games, Boolean(notice), i18n.options));
   const groups = $derived(groupBySection(games));
   const showOppLogo = $derived(logos !== false);
   const OUTCOME_CHIP = { S: 'hoops-chip--ok', N: 'hoops-chip--err', U: '' } as const;
@@ -122,7 +129,7 @@
     <tr role="row" class="hoops-sch-row is-bye">
       <td role="cell" class="hoops-sch-bye" colspan={cols.length}>
         {#if game.time}<span class="hoops-sch-time">{game.time} · </span>{/if}
-        {#if game.heim}{@render team(game.heim, false, logos === true)} hat Freilos{:else}{game.note ?? 'Spielfrei'}{/if}
+        {#if game.heim}{@const parts = i18n.sentence('schedule.bye', 'team')}{#each parts as part, index}{#if index > 0}{@render team(game.heim, false, logos === true)}{/if}{part}{/each}{:else}{game.note || i18n.t('schedule.bye-none')}{/if}
       </td>
     </tr>
   {:else}
@@ -142,15 +149,15 @@
           <td role="cell" class="hoops-sch-when">
             {#if game.date}<span class="hoops-sch-date">{game.date}</span>{/if}
             {#if time || game.time}<span class="hoops-sch-time">{#if time}{@render time(game)}{:else}{game.time}{/if}</span>{/if}
-            {#if stateLabel(game.state)}<span class="hoops-sr-only">{` ${stateLabel(game.state)}`}</span>{/if}
+            {#if stateLabel(game.state, i18n.options)}<span class="hoops-sr-only">{` ${stateLabel(game.state, i18n.options)}`}</span>{/if}
             {#if game.state === 'live'}
-              <span class="hoops-match-live hoops-sch-live"><span class="hoops-match-pulse" aria-hidden="true"></span> Live</span>
+              <span class="hoops-match-live hoops-sch-live"><span class="hoops-match-pulse" aria-hidden="true"></span> {i18n.t('common.live')}</span>
             {/if}
             {#if mode !== 'columns' && game.venue}<span class="hoops-sch-venue">{game.venue}</span>{/if}
           </td>
         {:else if col.key === 'ha'}
           <td role="cell" class="hoops-sch-ha">
-            <span class="hoops-chip hoops-chip--mono {game.at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}">{game.at === 'gast' ? '@' : 'vs.'}</span>
+            <span class="hoops-chip hoops-chip--mono {game.at === 'gast' ? 'hoops-chip--amber' : 'hoops-chip--sky'}">{i18n.t(game.at === 'gast' ? 'schedule.chip.away' : 'schedule.chip.home')}</span>
           </td>
         {:else if col.key === 'match'}
           <td role="cell" class="hoops-sch-match">
@@ -166,7 +173,7 @@
             {:else}
               {@render team(game.heim, winner === 'gast', logos === true)}
               <span class="hoops-sch-sep" aria-hidden="true"> – </span>
-              <span class="hoops-sr-only"> gegen </span>
+              <span class="hoops-sr-only"> {i18n.t('schedule.versus')} </span>
               {@render team(game.gast, winner === 'heim', logos === true)}
             {/if}
             {#if game.league}
@@ -194,10 +201,10 @@
               <span class="hoops-sch-none">–</span>
             {:else}
               <span class="hoops-sch-resbox">
-                {#if result}<span class="hoops-chip hoops-chip--mono {OUTCOME_CHIP[result]}" aria-hidden="true">{result}</span>{/if}
+                {#if result}<span class="hoops-chip hoops-chip--mono {OUTCOME_CHIP[result]}" aria-hidden="true">{outcomeLetter(result, i18n.options)}</span>{/if}
                 <span class="hoops-sch-score" aria-hidden="true">{mode === 'opponent' && game.opponent ? `${game.ownScore} : ${game.opponent.score}` : `${game.heim?.score} : ${game.gast?.score}`}</span>
-                <span class="hoops-sr-only">{ariaForResult(game, mode)}</span>
-                {#if game.provisional}<small class="hoops-sch-prov" aria-hidden="true">vorläufig</small>{/if}
+                <span class="hoops-sr-only">{ariaForResult(game, mode, i18n.options)}</span>
+                {#if game.provisional}<small class="hoops-sch-prov" aria-hidden="true">{i18n.t('schedule.provisional')}</small>{/if}
               </span>
             {/if}
           </td>
@@ -215,7 +222,7 @@
 
 {#snippet tableRegion()}
   <!-- svelte-ignore a11y_no_noninteractive_tabindex -- Fokussierbar mit Absicht: Tastaturnutzer müssen den scrollbaren Bereich erreichen (WCAG 2.1.1) -->
-  <div class="hoops-table-scroll" role="region" tabindex="0" aria-label={caption || title || 'Spielplan'}>
+  <div class="hoops-table-scroll" role="region" tabindex="0" aria-label={caption || title || i18n.t('schedule.table-label')}>
     <!-- svelte-ignore a11y_no_redundant_roles -->
     <table role="table" class="hoops-tbl hoops-tbl--schedule hoops-tbl--{dens} hoops-sch--{mode}">
       {#if caption}<caption class="hoops-sr-only">{caption}</caption>{/if}
@@ -245,11 +252,11 @@
 {/snippet}
 
 {#if collapsible && title}
-  <CollapsibleFrame rootClass="hoops-frame {klass}" {id} {title} {titleAs} bind:open meta={meta ? frameMeta : undefined}>
+  <CollapsibleFrame rootClass="hoops-frame {klass}" {id} {title} {titleAs} bind:open meta={meta ? frameMeta : undefined} lang={i18n.lang}>
     {@render tableRegion()}
   </CollapsibleFrame>
 {:else}
-  <div class="hoops-frame {klass}">
+  <div class="hoops-frame {klass}" lang={i18n.lang}>
     {#if title || meta}
       <div class="hoops-frame-head">
         {#if title}<svelte:element this={heading.tag} class="hoops-frame-title">{title}</svelte:element>{:else}<span></span>{/if}

@@ -1,6 +1,8 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { cn } from './cn';
-import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, tilesMode, validTileUrl } from '../js/map.js';
+import { DEFAULT_TILE_URL, mapItems, mapString, mapText, placeholderPins, tilesMode, validTileUrl } from '../js/map.js';
+import { useT } from './i18n';
+import type { CatalogValue } from '../js/i18n/index.js';
 import type { MapAppLink, MapDarkTiles, MapMarker } from '../js/map.js';
 import { createMapController, devWarn } from '../js/map-leaflet.js';
 
@@ -44,6 +46,8 @@ export interface MapViewProps {
   /** Laden fehlgeschlagen. */
   onError?: (reason: MapErrorReason) => void;
   onMarkerClick?: (marker: unknown) => void;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`, aber nicht `mapText` und die Eigenschaften wie `seatLabel`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
 }
 
@@ -75,8 +79,8 @@ export function MapView({
   interactive = true,
   load = 'click',
   tileUrl = DEFAULT_TILE_URL,
-  attribution = mapText.attribution,
-  privacyNote = mapText.privacy,
+  attribution,
+  privacyNote,
   appLinks = ['osm', 'route'],
   showList = true,
   dimInDark = true,
@@ -85,8 +89,12 @@ export function MapView({
   onLoad,
   onError,
   onMarkerClick,
+  texts,
   className,
 }: MapViewProps) {
+  const i18n = useT(texts);
+  // Text der Karte in Sprache und Texten dieses Bausteins; eine Zuweisung an `mapText` hat Vorrang
+  const T = (name: Parameters<typeof mapString>[0]) => mapString(name, i18n.options);
   const uid = useId();
   const canvasId = `hoops-map-canvas-${uid}`;
   const textId = `hoops-map-text-${uid}`;
@@ -99,16 +107,17 @@ export function MapView({
   const handlers = useRef({ onLoad, onError, onMarkerClick });
   handlers.current = { onLoad, onError, onMarkerClick };
 
-  const items = mapItems(markers, appLinks, { seat: seatLabel });
+  const items = mapItems(markers, appLinks, { seat: seatLabel }, i18n.options);
   const pins = placeholderPins(items);
   const urlOk = validTileUrl(tileUrl);
   const state = !urlOk || failure ? 'error' : phase;
   const running = state === 'loading' || state === 'ready';
   // Nach einem Ladefehler (nicht bei ungültiger tileUrl) bietet der Platzhalter „Erneut versuchen“ an
   const canRetry = state === 'error' && urlOk && failure !== null;
-  const status = state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '';
-  const source = attribution && attribution.trim() ? attribution : mapText.attribution;
-  const options = { markers, appLinks, center, zoom, interactive, tileUrl, seatLabel };
+  const status = state === 'error' ? T('error') : state === 'loading' ? T('loading') : '';
+  const source = attribution && attribution.trim() ? attribution : T('attribution');
+  const note = privacyNote ?? T('privacy');
+  const options = { markers, appLinks, center, zoom, interactive, tileUrl, seatLabel, locale: i18n.options.locale, texts: i18n.options.texts };
   const optionsRef = useRef(options);
   optionsRef.current = options;
 
@@ -168,14 +177,15 @@ export function MapView({
       data-state={state}
       data-dim={dimInDark ? 'true' : 'false'}
       data-tiles={tilesMode(darkTiles)}
+      lang={i18n.lang}
       style={{ '--hoops-map-h': `${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px` } as React.CSSProperties}
     >
       <a className="hoops-map-skip" href={`#${textId}`}>
-        {mapText.skip}
+        {T('skip')}
       </a>
       <div className="hoops-map-frame" role="region" aria-label={label}>
         <div className="hoops-map-stage">
-          {running ? <div className="hoops-map-canvas" id={canvasId} role="group" aria-label={mapText.canvasHint} ref={canvas} {...inert} /> : null}
+          {running ? <div className="hoops-map-canvas" id={canvasId} role="group" aria-label={T('canvasHint')} ref={canvas} {...inert} /> : null}
           {state !== 'ready' ? (
             <div className="hoops-map-ph">
               {(state === 'error' ? [] : pins).map((pin) => (
@@ -194,13 +204,13 @@ export function MapView({
                       setPhase('loading');
                     }}
                   >
-                    {mapText.retry}
+                    {T('retry')}
                   </button>
                 </div>
               ) : null}
               {state === 'idle' ? (
                 <div className="hoops-map-ph-card">
-                  <p className="hoops-map-note">{privacyNote}</p>
+                  <p className="hoops-map-note">{note}</p>
                   <button
                     type="button"
                     className="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load"
@@ -209,18 +219,18 @@ export function MapView({
                       setPhase('loading');
                     }}
                   >
-                    {mapText.load}
+                    {T('load')}
                   </button>
                 </div>
               ) : null}
             </div>
           ) : null}
           {state === 'ready' && interactive !== false ? (
-            <div className="hoops-map-zoom" role="group" aria-label={mapText.zoomGroup}>
-              <button type="button" className="hoops-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onClick={() => canIn && controller.current?.zoomIn()}>
+            <div className="hoops-map-zoom" role="group" aria-label={T('zoomGroup')}>
+              <button type="button" className="hoops-map-zoom-btn" aria-label={T('zoomIn')} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onClick={() => canIn && controller.current?.zoomIn()}>
                 <Plus />
               </button>
-              <button type="button" className="hoops-map-zoom-btn" aria-label={mapText.zoomOut} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onClick={() => canOut && controller.current?.zoomOut()}>
+              <button type="button" className="hoops-map-zoom-btn" aria-label={T('zoomOut')} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onClick={() => canOut && controller.current?.zoomOut()}>
                 <Minus />
               </button>
             </div>
@@ -234,7 +244,7 @@ export function MapView({
         </div>
       </div>
       <div className={cn('hoops-map-text', !showList && 'is-quiet')} id={textId} tabIndex={-1}>
-        <ol className="hoops-map-list" aria-label={mapText.listLabel}>
+        <ol className="hoops-map-list" aria-label={T('listLabel')}>
           {items.map((item) => (
             <li key={item.id} className="hoops-map-item" value={item.number ?? undefined}>
               {item.kind === 'seat' ? (
@@ -254,7 +264,7 @@ export function MapView({
                     <span>{item.label}</span>
                   )}
                   {item.kind === 'seat' ? <span className="hoops-chip">{item.seatText}</span> : null}
-                  {item.own ? <span className="hoops-chip hoops-chip--amber">{mapText.own}</span> : null}
+                  {item.own ? <span className="hoops-chip hoops-chip--amber">{T('own')}</span> : null}
                 </p>
                 <p className="hoops-map-coords">{item.coords}</p>
                 {showList && item.links.length > 0 ? (

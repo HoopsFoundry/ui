@@ -9,6 +9,8 @@
    * Mit href wird der Eintrag ein Link statt eines Buttons. Das Label ist Pflicht,
    * auch für den FAB (zugänglicher Name).
    */
+  import { useI18n } from './i18n.js';
+
   type Item = {
     id: string;
     label: string;
@@ -23,15 +25,19 @@
     value = $bindable(''),
     onchange,
     onaction,
-    ariaLabel = 'Hauptnavigation',
+    ariaLabel,
   }: {
     items: Item[];
     value?: string;
     onchange?: (id: string) => void;
     /** Der FAB ändert die Auswahl nicht, er löst nur diese Aktion aus (mit der FAB-ID). */
     onaction?: (id: string) => void;
+    /** Name der Navigation; Standard aus dem Katalog (`bottomnav.label`). */
     ariaLabel?: string;
   } = $props();
+
+  const i18n = useI18n();
+  const label = $derived(ariaLabel ?? i18n.t('bottomnav.label'));
 
   $effect(() => {
     if (!value && items.length) value = (items.find((item) => !item.fab) ?? items[0]).id;
@@ -59,7 +65,7 @@
   {#if it.badge !== undefined}<span class="hoops-bnav-badge">{it.badge}</span>{/if}
 {/snippet}
 
-<nav class="hoops-bnav" aria-label={ariaLabel}>
+<nav class="hoops-bnav" aria-label={label} lang={i18n.lang}>
   {#each items as it (it.id)}
     {#if it.fab}
       {#if it.href}

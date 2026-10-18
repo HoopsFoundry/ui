@@ -60,6 +60,8 @@ export function leagueWindow<T extends { rank: number; own?: boolean }>(teams: r
 export function leagueSummary(input?: LeagueSummaryInput, options?: TOptions): string;
 export function formEntries(form: unknown): LeagueFormEntry[];
 export function formLabel(form: unknown, options?: TOptions): string;
+/** Kennbuchstabe eines Ergebnisses (`S`, `N`, `U` der Daten) in der Sprache: deutsch S, N, U, englisch W, L, D; sonst leer. */
+export function outcomeLetter(entry: unknown, options?: TOptions): string;
 export function windowLabel(window: readonly { rank: number }[], teamCount?: number, options?: TOptions): string;
 export function diffText(value: unknown, options?: TOptions): string;
 export function diffSign(value: unknown): 'plus' | 'minus' | undefined;

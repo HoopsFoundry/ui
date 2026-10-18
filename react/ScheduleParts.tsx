@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { cn } from './cn';
 import { initials, shortName } from '../js/schedule.js';
 import type { ScheduleNames, ScheduleTeam } from './schedule-types';
+import { useT } from './i18n';
+import type { CatalogValue } from '../js/i18n/index.js';
 
 export interface ScheduleLinkProps {
   href: string;
@@ -69,10 +71,11 @@ export function TeamLogo({ name, logo }: { name: string; logo?: string }) {
 }
 
 /** Grüner Live-Hinweis (wie MatchCard), steht hinter der Uhrzeit. */
-export function LiveTag() {
+export function LiveTag({ texts }: { texts?: Record<string, CatalogValue> }) {
+  const i18n = useT(texts);
   return (
     <span className="hoops-match-live hoops-sch-live">
-      <span className="hoops-match-pulse" aria-hidden="true" /> Live
+      <span className="hoops-match-pulse" aria-hidden="true" /> {i18n.t('common.live')}
     </span>
   );
 }
@@ -83,10 +86,12 @@ interface ResultTextProps {
   provisional?: boolean;
   /** Sieg-/Niederlage-Chip links neben der Zahl (nur Layout `opponent`). */
   chip?: ReactNode;
+  texts?: Record<string, CatalogValue>;
 }
 
 /** Sichtbares Ergebnis (für Screenreader versteckt) plus gesprochener Text; "vorläufig" steht klein unter der Zahl. */
-export function ResultText({ visible, spoken, provisional = false, chip = null }: ResultTextProps) {
+export function ResultText({ visible, spoken, provisional = false, chip = null, texts }: ResultTextProps) {
+  const i18n = useT(texts);
   return (
     <span className="hoops-sch-resbox">
       {chip}
@@ -96,7 +101,7 @@ export function ResultText({ visible, spoken, provisional = false, chip = null }
       <span className="hoops-sr-only">{spoken}</span>
       {provisional ? (
         <small className="hoops-sch-prov" aria-hidden="true">
-          vorläufig
+          {i18n.t('schedule.provisional')}
         </small>
       ) : null}
     </span>

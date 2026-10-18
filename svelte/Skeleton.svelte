@@ -12,21 +12,27 @@
    *   row    — fertige Spieler-Zeile
    *   match  — fertige Spielkarte
    */
+  import { useI18n } from './i18n.js';
+
   let {
     variant = 'line',
     width = 'auto',
     height = 'auto',
     rounded = '6px',
     count = 1,
-    label = 'Lädt …',
+    label,
   }: {
     variant?: 'line' | 'block' | 'circle' | 'row' | 'match';
     width?: string;
     height?: string;
     rounded?: string;
     count?: number;
+    /** Text für Screenreader; Standard aus dem Katalog (`skeleton.loading`); `""` lässt den Status-Text weg. */
     label?: string;
   } = $props();
+
+  const i18n = useI18n();
+  const status = $derived(label ?? i18n.t('skeleton.loading'));
 </script>
 
 {#if variant === 'row'}
@@ -63,4 +69,4 @@
     ></div>
   {/each}
 {/if}
-{#if label}<span role="status" class="hoops-sr-only">{label}</span>{/if}
+{#if status}<span role="status" class="hoops-sr-only" lang={i18n.lang}>{status}</span>{/if}

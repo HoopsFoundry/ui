@@ -2,6 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { SeverityIcon, type Severity } from './SeverityIcon';
 import { cn } from './cn';
+import { useT } from './i18n';
 import { HeadingLevelContext, type HeadingTag } from './HeadingLevel';
 import { levelOfTag, nextLevel, resolveHeading } from '../js/heading.js';
 
@@ -40,7 +41,7 @@ export function Modal({
   size = 'md',
   closable = true,
   dismissOnBackdrop = false,
-  closeLabel = 'Schließen',
+  closeLabel,
   footer,
   className,
   children,
@@ -52,6 +53,7 @@ export function Modal({
     const active = document.activeElement;
     returnTo.current = active instanceof HTMLElement && active !== document.body ? active : null;
   }, [open]);
+  const i18n = useT();
   const blockOutsideDismiss = !closable || !dismissOnBackdrop;
   const TitleTag = resolveHeading(titleAs, 2);
   const contentLevel = nextLevel(levelOfTag(TitleTag));
@@ -63,6 +65,7 @@ export function Modal({
         <div className="hoops-modal-wrap">
           <Dialog.Content
             aria-describedby={undefined}
+            lang={i18n.lang}
             className={cn('hoops-modal', size !== 'md' && `hoops-modal--${size}`, className)}
             onInteractOutside={(event) => {
               if (blockOutsideDismiss) event.preventDefault();
@@ -92,7 +95,7 @@ export function Modal({
                 {subtitle ? <div className="hoops-m-subtitle">{subtitle}</div> : null}
               </div>
               {closable ? (
-                <Dialog.Close className="hoops-m-close" aria-label={closeLabel}>
+                <Dialog.Close className="hoops-m-close" aria-label={closeLabel ?? i18n.t('modal.close')}>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" aria-hidden="true" focusable="false">
                     <path d="M4 4l8 8M12 4l-8 8" />
                   </svg>

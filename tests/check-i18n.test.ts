@@ -54,9 +54,8 @@ describe('Zulassungsliste für unbenutzte Schlüssel', () => {
     const catalogs = await loadCatalogs();
     const allowlist = JSON.parse(readFileSync(resolve(process.cwd(), 'scripts/i18n-unused-allowlist.json'), 'utf8'));
     expect(checkAllowlist(Object.keys(catalogs.en), allowlist, usageSources())).toEqual([]);
-    // Nach I2 steht nur noch, was Svelte und React (I3) verdrahten; ein I2-Schlüssel in der Liste ist ein Fehler
-    expect(Object.values(allowlist).every((p) => p === 'I3')).toBe(true);
-    expect(Object.keys(allowlist).length).toBeGreaterThan(0);
+    // Nach I3 ist jeder Schlüssel verdrahtet: die Liste ist leer (ein neuer, noch unverwendeter Schlüssel müsste hier mit Grund stehen)
+    expect(allowlist).toEqual({});
   });
 });
 

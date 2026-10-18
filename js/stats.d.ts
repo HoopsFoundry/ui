@@ -14,8 +14,6 @@ export interface StatItem {
   empty: boolean;
 }
 
-/** Text für den fehlenden Wert in der globalen Sprache (Live-Binding, `statItems` frischt ihn auf); neuer Code nutzt `statEmptyLabel`. */
-export let statEmptyText: string;
 /** Text für den fehlenden Wert in der Sprache des Aufrufs (`options.locale`, `options.texts`). */
 export function statEmptyLabel(options?: TOptions): string;
 export function statItems(items: unknown, options?: TOptions): StatItem[];

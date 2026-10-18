@@ -13,11 +13,13 @@ import {
   venueHref,
   venueMapLabel,
   venueMapLinks,
-  venueText,
+  venueString,
 } from '../js/venue.js';
 import type { VenueAddress, VenueContact } from '../js/venue.js';
 import { MapView } from './Map';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
+import { useT } from './i18n';
+import type { CatalogValue, TOptions } from '../js/i18n/index.js';
 
 export type { VenueAddress, VenueContact };
 export type VenueCardSize = 'standard' | 'compact';
@@ -61,11 +63,13 @@ export interface VenueCardProps {
   privacyNote?: string;
   /** Mindesthöhe der Karte in Pixeln (mindestens 200); die Karte wächst mit den Daten daneben. */
   mapHeight?: number;
+  /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters (`HoopsProvider`) und `setTexts`, aber nicht `venueText` und die Eigenschaften wie `gamesLabel`. */
+  texts?: Record<string, CatalogValue>;
   className?: string;
 }
 
 /** Eine Mannschaft der Spielzeile: Trikotpunkt, optional Logo, versteckter Hinweis „Heim“/„Gast“, Name mit Kurzform. */
-function TeamLine({ team, side, names, logos }: { team: ScheduleTeam; side: 'heim' | 'gast'; names: VenueCardNames; logos: boolean }) {
+function TeamLine({ team, side, names, logos, options }: { team: ScheduleTeam; side: 'heim' | 'gast'; names: VenueCardNames; logos: boolean; options: TOptions }) {
   const short = shortName(team);
   return (
     <div className="hoops-venue-team">
@@ -75,7 +79,7 @@ function TeamLine({ team, side, names, logos }: { team: ScheduleTeam; side: 'hei
           {team.logo ? <img src={team.logo} alt="" loading="lazy" /> : initials(team.name, 2)}
         </span>
       ) : null}
-      <span className="hoops-sr-only">{side === 'heim' ? venueText.home : venueText.away}:</span>
+      <span className="hoops-sr-only">{venueString(side === 'heim' ? 'home' : 'away', options)}:</span>
       <span className="hoops-venue-team-name">
         {short ? (
           <span className={cn('hoops-team-name', names === 'short' && 'hoops-team-name--short')}>
@@ -102,9 +106,9 @@ export function VenueCard({
   contact,
   games,
   limit,
-  gamesLabel = venueText.gamesLabel,
+  gamesLabel,
   href,
-  linkLabel = venueText.linkLabel,
+  linkLabel,
   names = 'full',
   logos = false,
   size = 'standard',
@@ -113,26 +117,33 @@ export function VenueCard({
   tileUrl,
   privacyNote,
   mapHeight = 250,
+  texts,
   className,
 }: VenueCardProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT(texts);
+  const { options } = i18n;
+  // Text der Halle in Sprache und Texten dieses Bausteins; eine Zuweisung an `venueText` hat Vorrang
+  const V = (key: Parameters<typeof venueString>[0]) => venueString(key, options);
+  const gamesTitle = gamesLabel ?? V('gamesLabel');
+  const more = linkLabel ?? V('linkLabel');
   // Ohne Namen (leer oder nur Leerraum) entfällt die Überschrift, statt leer zu bleiben
   const title = typeof name === 'string' ? name.trim() : '';
   const hasMap = isCoord(lat, lng);
   const lines = addressLines(address);
   const person = contactInfo(contact);
   const rows: ScheduleGame[] = size === 'compact' ? [] : venueGames(games, limit);
-  const mapLinks = venueMapLinks({ lat, lng, name: title });
+  const mapLinks = venueMapLinks({ lat, lng, name: title }, options);
   const target = venueHref(href);
   const keys = gameKeys(rows);
 
   return (
-    <div className={cn('hoops-venue', `hoops-venue--${size}`, hasMap && 'hoops-venue--map', className)}>
+    <div className={cn('hoops-venue', `hoops-venue--${size}`, hasMap && 'hoops-venue--map', className)} lang={i18n.lang}>
       <div className="hoops-venue-in">
       {hasMap ? (
         <div className="hoops-venue-map">
           <MapView
-            label={venueMapLabel(title)}
+            label={venueMapLabel(title, options)}
             markers={[{ id: 'halle', lat: lat as number, lng: lng as number, label: title }]}
             interactive={false}
             showList={false}
@@ -140,6 +151,7 @@ export function VenueCard({
             load={load}
             tileUrl={tileUrl}
             privacyNote={privacyNote}
+            texts={texts}
             appLinks={[]}
           />
           <div className="hoops-venue-maplinks">
@@ -172,13 +184,13 @@ export function VenueCard({
           <dl className="hoops-venue-contact">
             {person.name ? (
               <div>
-                <dt>{venueText.contact}</dt>
+                <dt>{V('contact')}</dt>
                 <dd>{person.name}</dd>
               </div>
             ) : null}
             {person.phone ? (
               <div>
-                <dt>{venueText.phone}</dt>
+                <dt>{V('phone')}</dt>
                 <dd>
                   {person.phone.href ? (
                     <a className="hoops-link" href={person.phone.href}>
@@ -192,7 +204,7 @@ export function VenueCard({
             ) : null}
             {person.email ? (
               <div>
-                <dt>{venueText.email}</dt>
+                <dt>{V('email')}</dt>
                 <dd>
                   {person.email.href ? (
                     <a className="hoops-link" href={person.email.href}>
@@ -210,13 +222,13 @@ export function VenueCard({
         {rows.length > 0 ? (
           <div className="hoops-venue-games">
             <div className="hoops-venue-sec" aria-hidden="true">
-              {gamesLabel}
+              {gamesTitle}
             </div>
-            <ul className="hoops-venue-game-list" aria-label={gamesLabel}>
+            <ul className="hoops-venue-game-list" aria-label={gamesTitle}>
               {rows.map((game, index) => {
                 const when = gameWhen(game);
                 const meta = gameMeta(game);
-                const state = gameState(game);
+                const state = gameState(game, options);
                 return (
                   <li key={keys[index]} className="hoops-venue-game">
                     {when || state ? (
@@ -227,8 +239,8 @@ export function VenueCard({
                     ) : null}
                     {meta ? <div className="hoops-venue-game-meta">{meta}</div> : null}
                     <div className="hoops-venue-teams">
-                      {game.heim?.name ? <TeamLine team={game.heim} side="heim" names={names} logos={logos} /> : null}
-                      {game.gast?.name ? <TeamLine team={game.gast} side="gast" names={names} logos={logos} /> : null}
+                      {game.heim?.name ? <TeamLine team={game.heim} side="heim" names={names} logos={logos} options={options} /> : null}
+                      {game.gast?.name ? <TeamLine team={game.gast} side="gast" names={names} logos={logos} options={options} /> : null}
                     </div>
                   </li>
                 );
@@ -240,7 +252,7 @@ export function VenueCard({
         {target ? (
           <div className="hoops-venue-foot">
             <a className="hoops-link hoops-venue-more" href={target}>
-              {linkLabel}
+              {more}
               {title ? <span className="hoops-sr-only">, {title}</span> : null}
             </a>
           </div>

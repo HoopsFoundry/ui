@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react';
+import { Fragment, createContext, useContext, useMemo, useSyncExternalStore, type ReactNode } from 'react';
 import { localeOf, subscribe, t as translate, type CatalogValue, type Params } from '../js/i18n/index.js';
 import { langFor } from '../js/i18n/lang.js';
 
@@ -77,6 +77,8 @@ export interface UseT {
   /** Übersetzt `key` mit `params` in der wirksamen Sprache. */
   t: (key: string, params?: Params) => string;
   /** Optionen für die Funktionen aus `js/` (`{ locale, texts, documentLang }`). */
+  /** Satz mit einem Platzhalter, an dessen Stelle `node` gehört (zum Beispiel „{team} hat Freilos“); die Wortstellung bleibt Sache der Sprache. */
+  sentence: (key: string, name: string, node: ReactNode) => ReactNode;
   options: { locale?: string; texts?: Record<string, CatalogValue>; documentLang?: string };
   locale: string;
   /** Wert für `lang` an der Wurzel des Bausteins (`undefined`, wenn die Sprache der Seite gilt). */
@@ -94,6 +96,16 @@ export function useT(own?: Record<string, CatalogValue>): UseT {
   const options = { locale: context.locale, texts, documentLang: context.documentLang };
   return {
     t: (key, params) => translate(key, params, options),
+    sentence: (key, name, node) => {
+      const marker = '\u0001';
+      const parts = translate(key, { [name]: marker }, options).split(marker);
+      return parts.map((part, index) => (
+        <Fragment key={index}>
+          {index > 0 ? node : null}
+          {part}
+        </Fragment>
+      ));
+    },
     options,
     locale: localeOf(options),
     lang: langFor(options) || undefined,

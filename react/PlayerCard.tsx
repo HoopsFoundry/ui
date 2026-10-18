@@ -1,5 +1,6 @@
 import { useState, type MouseEventHandler } from 'react';
 import { cn } from './cn';
+import { useT } from './i18n';
 import { useHeadingTag, type HeadingTag } from './HeadingLevel';
 
 export type PlayerCardSize = 'compact' | 'standard' | 'hero';
@@ -73,6 +74,7 @@ export function PlayerCard({
   className,
 }: PlayerCardProps) {
   const Heading = useHeadingTag(titleAs);
+  const i18n = useT();
   // Eine URL, die nicht lädt, wird gemerkt: dann erscheint wieder die Trikotmarke (kein kaputtes Bildsymbol)
   const [failedUrl, setFailedUrl] = useState('');
   const showPhoto = Boolean(photo) && photo !== failedUrl;
@@ -94,9 +96,9 @@ export function PlayerCard({
   const role = (
     <div className="hoops-pc-role">
       {position ? <span className={posClass}>{position}</span> : null}
-      {captain ? <span className="hoops-pc-cap">Kapitän</span> : null}
+      {captain ? <span className="hoops-pc-cap">{i18n.t('player.captain')}</span> : null}
       {age ? <span>{age}</span> : null}
-      {heightCm ? <span>{heightCm} cm</span> : null}
+      {heightCm ? <span>{i18n.t('player.height', { height: heightCm })}</span> : null}
     </div>
   );
 
@@ -137,17 +139,19 @@ export function PlayerCard({
       </>
     );
     return onClick ? (
-      <button type="button" className={cn('hoops-pc-row', className)} onClick={onClick}>
+      <button type="button" className={cn('hoops-pc-row', className)} lang={i18n.lang} onClick={onClick}>
         {body}
       </button>
     ) : (
-      <div className={cn('hoops-pc-row', className)}>{body}</div>
+      <div className={cn('hoops-pc-row', className)} lang={i18n.lang}>
+        {body}
+      </div>
     );
   }
 
   if (size === 'standard') {
     return (
-      <div className={cn('hoops-pc-card', className)}>
+      <div className={cn('hoops-pc-card', className)} lang={i18n.lang}>
         <div className="hoops-pc-head">
           {showPhoto ? (
             <span className="hoops-pc-av hoops-pc-av--lg">
@@ -168,7 +172,7 @@ export function PlayerCard({
   }
 
   return (
-    <div className={cn('hoops-pc-hero', showPhoto && 'hoops-pc-hero--photo', className)}>
+    <div className={cn('hoops-pc-hero', showPhoto && 'hoops-pc-hero--photo', className)} lang={i18n.lang}>
       <div className="hoops-pc-hero-left">
         {showPhoto ? (
           <>

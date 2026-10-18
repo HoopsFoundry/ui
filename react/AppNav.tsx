@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { Icon } from './Icon';
 import { cn } from './cn';
+import { useT } from './i18n';
 
 export interface AppNavLink {
   id: string;
@@ -57,13 +58,14 @@ export function AppNav({
   items,
   currentHref,
   tone = 'light',
-  ariaLabel = 'Hauptnavigation',
-  menuLabel = 'Menü',
+  ariaLabel,
+  menuLabel,
   context,
   renderLink,
   contained = false,
   className,
 }: AppNavProps) {
+  const i18n = useT();
   const [menuOpen, setMenuOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const rootRef = useRef<HTMLElement>(null);
@@ -124,7 +126,8 @@ export function AppNav({
   return (
     <nav
       ref={rootRef}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? i18n.t('appnav.label')}
+      lang={i18n.lang}
       className={cn('hoops-appnav', `hoops-appnav--${tone}`, contained && 'hoops-appnav--contained', menuOpen && 'is-open', className)}
       onKeyDown={onKeyDown}
       onBlur={(event) => {
@@ -143,7 +146,7 @@ export function AppNav({
           onClick={() => setMenuOpen((open) => !open)}
         >
           <Icon name={menuOpen ? 'x' : 'menu'} size={20} />
-          <span>{menuLabel}</span>
+          <span>{menuLabel ?? i18n.t('appnav.menu')}</span>
         </button>
         <ul id={`${baseId}-list`} className="hoops-appnav-list">
           {items.map((item) => {

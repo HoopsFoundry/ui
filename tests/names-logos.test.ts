@@ -173,12 +173,13 @@ describe('Markieren, Tooltip, Freilos, Initialen', () => {
   });
 
   it.each(['svelte/ScheduleTable.svelte', 'svelte/ScheduleGrid.svelte'])('%s: Freilos nutzt den Team-Baustein', (path) => {
-    expect(read(path)).toMatch(/\{@render team\((game|row\.game)\.heim, false, logos( === true)?\)\} hat Freilos/);
+    // der Satz „{team} hat Freilos“ kommt aus dem Katalog (`schedule.bye`), das Team steht als Baustein an der Stelle des Platzhalters
+    expect(read(path)).toMatch(/schedule\.bye'[\s\S]{0,260}\{@render team\((game|row\.game)\.heim, false, logos( === true)?\)\}/);
     expect(read(path)).not.toContain('heim.name} hat Freilos');
   });
 
   it.each(['react/ScheduleTable.tsx', 'react/ScheduleGrid.tsx'])('%s: Freilos nutzt TeamName', (path) => {
-    expect(read(path)).toMatch(/<TeamName team=\{(game|row\.game)\.heim\}[^>]*\/> hat Freilos/);
+    expect(read(path)).toMatch(/sentence\('schedule\.bye', 'team', <TeamName team=\{(game|row\.game)\.heim\}[^>]*\/>/);
     expect(read(path)).not.toContain('heim.name} hat Freilos');
   });
 

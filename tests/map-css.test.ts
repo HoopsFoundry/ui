@@ -124,8 +124,8 @@ describe('Map: Quelltext', () => {
     expect(source).toContain('hoops-map-skip');
     expect(source).toContain('hoops-map-attr');
     expect(source).toContain('aria-controls');
-    expect(source).toContain('mapText.zoomIn');
-    expect(source).toContain('mapText.zoomOut');
+    expect(source).toContain("T('zoomIn')");
+    expect(source).toContain("T('zoomOut')");
   });
   it.each(sources)('%s: es gibt keinen Prop zum Ausblenden der Quellenangabe', (path) => {
     const source = read(path);

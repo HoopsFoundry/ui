@@ -15,11 +15,6 @@ import { createCleanups, createRegistry, listen } from './lifecycle.js';
 
 export const THEME_KEY = 'hoops-theme';
 export const THEME_ATTRIBUTE = 'data-theme';
-/**
- * Beschriftung des Umschalters in der globalen Sprache (Live-Binding; `initTheme` frischt es auf). Neuer Code nutzt `t('theme.toggle')`; der Umschalter
- * liest den Katalog selbst und folgt einem Sprachwechsel.
- */
-export let THEME_LABEL = t('theme.toggle');
 const MODES = ['light', 'dark', 'system'];
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const SYNC_EVENT = 'hoops-theme-sync';
@@ -100,7 +95,6 @@ export function initTheme(button, options = {}) {
   const key = typeof opts.storageKey === 'string' && opts.storageKey ? opts.storageKey : THEME_KEY;
   const attribute = typeof opts.attribute === 'string' && /^[a-z][a-z0-9-]*$/.test(opts.attribute) ? opts.attribute : THEME_ATTRIBUTE;
   const target = opts.target && typeof opts.target.setAttribute === 'function' ? opts.target : doc.documentElement;
-  THEME_LABEL = t('theme.toggle');
   // Beschriftung: die Option `label`, sonst der Katalogtext (folgt einem Sprachwechsel); `locale`/`texts` wählen Sprache und Texte
   const own = typeof opts.label === 'string' && opts.label.trim() ? opts.label.trim() : '';
   const labelNow = () => own || t('theme.toggle', undefined, { locale: opts.locale, texts: opts.texts });

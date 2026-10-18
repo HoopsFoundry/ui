@@ -11,6 +11,7 @@
   import { levelOfTag, nextLevel, resolveHeading, type HeadingTag } from '../js/heading.js';
   import { provideHeadingLevel } from './heading-context.js';
   import { initModal } from '../js/modal.js';
+  import { useI18n } from './i18n.js';
 
   type Severity = 'default' | 'danger' | 'warn' | 'ok' | 'info';
   type Size = 'sm' | 'md' | 'wide' | 'xwide';
@@ -27,6 +28,7 @@
     children,
     footer,
     onclose,
+    closeLabel,
   }: {
     open?: boolean;
     title?: string;
@@ -44,7 +46,11 @@
     children: Snippet;
     footer?: Snippet;
     onclose?: () => void;
+    /** Name des Schließen-Knopfs; Standard aus dem Katalog (`modal.close`). */
+    closeLabel?: string;
   } = $props();
+
+  const i18n = useI18n();
 
   const uid = $props.id();
   const titleId = `hoops-modal-title-${uid}`;
@@ -74,7 +80,7 @@
 {#if open}
 <div bind:this={root}>
   <div class="hoops-backdrop" role="presentation"></div>
-  <div class="hoops-modal-wrap" role="dialog" aria-modal="true" aria-labelledby={titleId}>
+  <div class="hoops-modal-wrap" role="dialog" aria-modal="true" aria-labelledby={titleId} lang={i18n.lang}>
     <div class="hoops-modal hoops-modal--{size}">
       <div class="hoops-m-head">
         {#if severity !== 'default'}
@@ -95,7 +101,7 @@
           {#if subtitle}<div class="hoops-m-subtitle">{subtitle}</div>{/if}
         </div>
         {#if closable}
-          <button type="button" class="hoops-m-close" aria-label="Schließen">
+          <button type="button" class="hoops-m-close" aria-label={closeLabel ?? i18n.t('modal.close')}>
             <svg width="16" height="16" aria-hidden="true" focusable="false" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg>
           </button>
         {/if}

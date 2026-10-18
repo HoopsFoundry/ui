@@ -8,7 +8,7 @@
  */
 import { langFor } from '../i18n/lang.js';
 import { t as tr } from '../i18n/index.js';
-import { formEntries, formLabel } from '../league.js';
+import { formEntries, formLabel, outcomeLetter } from '../league.js';
 import { resolveHeading } from '../heading.js';
 import { initials, shortName } from '../schedule.js';
 import { safeHref } from '../url.js';
@@ -116,7 +116,8 @@ export function logoBadge(team, extra) {
 export function formChips(form, variant, className, options) {
   const entries = formEntries(form);
   if (!entries.length) return '';
-  const items = entries.map((entry) => `<span class="hoops-form-item hoops-form-item--${entry.toLowerCase()}"></span>`).join('');
+  // Die Buchstaben der Variante `letters` stehen im Attribut `data-letter` (das CSS zeigt sie mit `attr()`), damit sie aus dem Katalog kommen
+  const items = entries.map((entry) => `<span class="hoops-form-item hoops-form-item--${entry.toLowerCase()}"${variant === 'letters' ? ` data-letter="${attr(outcomeLetter(entry, options))}"` : ''}></span>`).join('');
   return `<span class="${klass('hoops-form', variant === 'letters' && 'hoops-form--letters', className)}"><span class="hoops-form-list" aria-hidden="true">${items}</span><span class="hoops-sr-only">${esc(formLabel(form, options))}</span></span>`;
 }
 

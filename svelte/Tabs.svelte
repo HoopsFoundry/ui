@@ -23,6 +23,7 @@
    */
 
   import { nextTab } from '../js/tabs.js';
+  import { useI18n } from './i18n.js';
 
   type TabItem = {
     id: string;
@@ -42,7 +43,7 @@
     size = 'md',
     multi = false,         // pills can toggle multi-select
     activeIds = $bindable<string[]>([]),
-    ariaLabel = 'Tabs',
+    ariaLabel,
     onchange,
   }: {
     items: TabItem[];
@@ -51,9 +52,13 @@
     size?: Size;
     multi?: boolean;
     activeIds?: string[];
+    /** Name der Tableiste; Standard aus dem Katalog (`tabs.label`). */
     ariaLabel?: string;
     onchange?: (id: string) => void;
   } = $props();
+
+  const i18n = useI18n();
+  const label = $derived(ariaLabel ?? i18n.t('tabs.label'));
 
   // Initialise value to the first item if not provided.
   $effect(() => {
@@ -92,7 +97,8 @@
 <div
   class="hoops-tabs hoops-tabs--{variant} hoops-tabs--{size}"
   role={multi ? 'group' : 'tablist'}
-  aria-label={ariaLabel}
+  aria-label={label}
+  lang={i18n.lang}
   aria-orientation={multi ? undefined : variant === 'vertical' ? 'vertical' : 'horizontal'}
 >
   {#each items as item, i (item.id)}

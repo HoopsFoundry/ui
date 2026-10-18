@@ -37,7 +37,8 @@ export function statsCssRules(css: string): Rules {
     'Form: Punkte 10 px mit 5 px Abstand': /width:\s*10px/.test(body('.hoops-form-item')) && /height:\s*10px/.test(body('.hoops-form-item')) && /gap:\s*5px/.test(body('.hoops-form-list')),
     'Form: Punkte brechen nicht um (die Tabellenspalte bleibt breit), Buchstabenmarken dürfen': /flex-wrap:\s*nowrap/.test(body('.hoops-form-list')) && /flex-wrap:\s*wrap/.test(body('.hoops-form--letters .hoops-form-list')),
     'Form: Ring in der eigenen Zeile heller': /border-color:\s*var\(--hoops-mute-on-selected\)/.test(body('.hoops-tbl tr.is-own .hoops-form-item--u')),
-    'Form: Buchstaben S, N, U kommen aus dem CSS': /content:\s*"S"/.test(body('.hoops-form--letters .hoops-form-item--s::before')) && /content:\s*"N"/.test(body('.hoops-form--letters .hoops-form-item--n::before')) && /content:\s*"U"/.test(body('.hoops-form--letters .hoops-form-item--u::before')),
+    // Der Buchstabe steht im Attribut `data-letter` (aus dem Katalog der Sprache: S, N, U oder W, L, D); das CSS zeigt ihn nur an und enthält keinen festen Buchstaben
+    'Form: Buchstaben kommen aus data-letter, kein fester Buchstabe im CSS': /content:\s*attr\(data-letter\)/.test(body('.hoops-form--letters .hoops-form-item::before')) && !/content:\s*"[A-Z]"/.test(body('.hoops-form--letters .hoops-form-item::before')),
     'Form: Buchstabenmarken in Chip-Tönen': /background:\s*var\(--hoops-chip-ok-bg\);\s*color:\s*var\(--hoops-chip-ok-fg\)/.test(body('.hoops-form--letters .hoops-form-item--s')) && /background:\s*var\(--hoops-chip-err-bg\);\s*color:\s*var\(--hoops-chip-err-fg\)/.test(body('.hoops-form--letters .hoops-form-item--n')) && /background:\s*var\(--hoops-chip-neutral-bg\);\s*color:\s*var\(--hoops-chip-neutral-fg\)/.test(body('.hoops-form--letters .hoops-form-item--u')),
     'Form: Buchstabenmarken mindestens 24 px (WCAG 2.5.8)': /min-width:\s*24px/.test(body('.hoops-form--letters .hoops-form-item')) && /height:\s*24px/.test(body('.hoops-form--letters .hoops-form-item')),
     'Form: Schrift der Buchstaben aus Tokens': /font-size:\s*var\(--hoops-fs-caption\)/.test(body('.hoops-form--letters .hoops-form-item')),
@@ -50,13 +51,13 @@ export function statsCssRules(css: string): Rules {
 export function statsSourceRules(files: { formSvelte: string; formReact: string; statSvelte: string; statReact: string; leagueSvelte: string; leagueReact: string }): Rules {
   const { formSvelte, formReact, statSvelte, statReact, leagueSvelte, leagueReact } = files;
   return {
-    'FormChips: versteckter Text aus formLabel': formSvelte.includes('formLabel(form)') && formReact.includes('formLabel(form)') && /hoops-sr-only[^<]*>\{(label|formLabel\(form\))\}/.test(formSvelte) && /hoops-sr-only">\{formLabel\(form\)\}/.test(formReact),
+    'FormChips: versteckter Text aus formLabel': formSvelte.includes('formLabel(form, i18n.options)') && formReact.includes('formLabel(form, i18n.options)') && /hoops-sr-only[^<]*>\{(label|formLabel\(form, i18n\.options\))\}/.test(formSvelte) && /hoops-sr-only">\{formLabel\(form, i18n\.options\)\}/.test(formReact),
     'FormChips: Zeichen sind aria-hidden': /hoops-form-list" aria-hidden="true"/.test(formSvelte) && /hoops-form-list" aria-hidden="true"/.test(formReact),
     'FormChips: ohne Eintrag nichts': /\{#if entries\.length\}/.test(formSvelte) && /if \(!entries\.length\) return null/.test(formReact),
     'FormChips: Buchstaben-Variante': formSvelte.includes('hoops-form--letters') && formReact.includes('hoops-form--letters'),
     'LeagueCard nutzt FormChips': leagueSvelte.includes('<FormChips form={t.form ?? []}') && leagueReact.includes('<FormChips form={t.form ?? []}'),
     'StatGrid: Beschreibungsliste mit Beschriftung zuerst': /<dl class=/.test(statSvelte) && statSvelte.indexOf('<dt') >= 0 && statSvelte.indexOf('<dt') < statSvelte.indexOf('<dd') && /<dl className=/.test(statReact) && statReact.indexOf('<dt') >= 0 && statReact.indexOf('<dt') < statReact.indexOf('<dd'),
-    'StatGrid: leerer Wert mit verstecktem Text': statSvelte.includes('statEmptyText') && statReact.includes('statEmptyText') && /aria-hidden="true">\{s\.value\}/.test(statSvelte) && /aria-hidden="true">\{s\.value\}/.test(statReact),
+    'StatGrid: leerer Wert mit verstecktem Text': statSvelte.includes('statEmptyLabel(i18n.options)') && statReact.includes('statEmptyLabel(i18n.options)') && /aria-hidden="true">\{s\.value\}/.test(statSvelte) && /aria-hidden="true">\{s\.value\}/.test(statReact),
     'kein style in der Svelte-Datei': !/<style[\s>]/.test(formSvelte) && !/<style[\s>]/.test(statSvelte),
   };
 }

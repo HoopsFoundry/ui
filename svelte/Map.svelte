@@ -10,7 +10,9 @@
    * Der Dateiname ist `Map.svelte`; beim Import `MapView` nennen, damit das JS-Global `Map` nicht überdeckt wird.
    */
   import { tick, untrack } from 'svelte';
-  import { DEFAULT_TILE_URL, mapItems, mapText, placeholderPins, tilesMode, validTileUrl } from '../js/map.js';
+  import { DEFAULT_TILE_URL, mapItems, mapString, mapText, placeholderPins, tilesMode, validTileUrl } from '../js/map.js';
+  import { useI18n } from './i18n.js';
+  import type { CatalogValue } from '../js/i18n/index.js';
   import type { MapAppLink, MapDarkTiles, MapMarker } from '../js/map.js';
   import { createMapController, devWarn } from '../js/map-leaflet.js';
 
@@ -25,8 +27,8 @@
     interactive = true,
     load = 'click',
     tileUrl = DEFAULT_TILE_URL,
-    attribution = mapText.attribution,
-    privacyNote = mapText.privacy,
+    attribution = undefined,
+    privacyNote = undefined,
     appLinks = ['osm', 'route'],
     showList = true,
     dimInDark = true,
@@ -35,6 +37,7 @@
     onload = undefined,
     onerror = undefined,
     onmarkerclick = undefined,
+    texts = undefined,
     class: klass = '',
   }: {
     /** Orte auf der Karte: `{ id, lat, lng, label, href?, number?, own?, kind? }` (`kind: 'seat'`: Vereinssitz mit Haus-Symbol). Ungültige Koordinaten werden ignoriert. */
@@ -53,9 +56,9 @@
     load?: 'click' | 'auto';
     /** Kachel-Adresse mit {z}, {x}, {y}. Standard: OpenStreetMap (Demo); produktiv ein eigener Proxy oder Kachelserver. */
     tileUrl?: string;
-    /** Text der Quellenangabe (verlinkt auf die OpenStreetMap-Urheberrechtsseite); leer ergibt den Standard, ausblenden geht nicht. */
+    /** Text der Quellenangabe (verlinkt auf die OpenStreetMap-Urheberrechtsseite); leer ergibt den Standard aus dem Katalog, ausblenden geht nicht. */
     attribution?: string;
-    /** Hinweis im Platzhalter, z. B. bei eigenem Proxy ein anderer Text. */
+    /** Hinweis im Platzhalter, z. B. bei eigenem Proxy ein anderer Text; Standard aus dem Katalog (`map.privacy`). */
     privacyNote?: string;
     /** Links je Ort: `osm`, `geo`, `route`. */
     appLinks?: MapAppLink[];
@@ -72,9 +75,14 @@
     /** Laden fehlgeschlagen: `tile-url`, `import`, `init`, `update` oder `tiles`. */
     onerror?: (reason: string) => void;
     onmarkerclick?: (marker: unknown) => void;
+    /** Eigene Texte (Schlüssel des Katalogs); schlagen die des Anbieters und `setTexts`, aber nicht `mapText` und die Eigenschaften wie `seatLabel`. */
+    texts?: Record<string, CatalogValue>;
     class?: string;
   } = $props();
 
+  const i18n = useI18n(() => texts);
+  // Text der Karte in Sprache und Texten dieses Bausteins; eine Zuweisung an `mapText` hat Vorrang
+  const T = (name: Parameters<typeof mapString>[0]) => mapString(name, i18n.options);
   const uid = $props.id();
   const canvasId = `hoops-map-canvas-${uid}`;
   const textId = `hoops-map-text-${uid}`;
@@ -86,13 +94,14 @@
   let zoomNow = $state({ zoom: 0, min: 0, max: 99 });
   let userStarted = false;
 
-  const items = $derived(mapItems(markers, appLinks, { seat: seatLabel }));
+  const items = $derived(mapItems(markers, appLinks, { seat: seatLabel }, i18n.options));
   const pins = $derived(placeholderPins(items));
   const urlOk = $derived(validTileUrl(tileUrl));
   const state = $derived(!urlOk || failure ? 'error' : phase);
   const running = $derived(state === 'loading' || state === 'ready');
-  const status = $derived(state === 'error' ? mapText.error : state === 'loading' ? mapText.loading : '');
-  const source = $derived(attribution && attribution.trim() ? attribution : mapText.attribution);
+  const status = $derived(state === 'error' ? T('error') : state === 'loading' ? T('loading') : '');
+  const source = $derived(attribution && attribution.trim() ? attribution : T('attribution'));
+  const note = $derived(privacyNote ?? T('privacy'));
 
   $effect(() => {
     if (!urlOk) devWarn(`[hoops-map] Ungültige tileUrl: ${tileUrl}. Erwartet wird eine Adresse mit {z}, {x} und {y} über https, ein Pfad ab Wurzel oder http://localhost.`);
@@ -104,7 +113,7 @@
     untrack(() => { failure = null; });
   });
 
-  const options = () => ({ markers, appLinks, center, zoom, interactive, tileUrl, seatLabel });
+  const options = () => ({ markers, appLinks, center, zoom, interactive, tileUrl, seatLabel, locale: i18n.options.locale, texts: i18n.options.texts });
 
   // Karte erzeugen und beim Entfernen abbauen (map.remove()); die Eingaben liest nur der zweite Effekt
   $effect(() => {
@@ -160,13 +169,14 @@
   data-state={state}
   data-dim={dimInDark ? 'true' : 'false'}
   data-tiles={tilesMode(darkTiles)}
+  lang={i18n.lang}
   style={`--hoops-map-h:${Number.isFinite(height) ? Math.min(2000, Math.max(200, height)) : 320}px`}
 >
-  <a class="hoops-map-skip" href={`#${textId}`}>{mapText.skip}</a>
+  <a class="hoops-map-skip" href={`#${textId}`}>{T('skip')}</a>
   <div class="hoops-map-frame" role="region" aria-label={label}>
     <div class="hoops-map-stage">
       {#if running}
-        <div class="hoops-map-canvas" id={canvasId} role="group" aria-label={mapText.canvasHint} inert={state === 'loading'} bind:this={canvas}></div>
+        <div class="hoops-map-canvas" id={canvasId} role="group" aria-label={T('canvasHint')} inert={state === 'loading'} bind:this={canvas}></div>
       {/if}
       {#if state !== 'ready'}
         <div class="hoops-map-ph">
@@ -175,23 +185,23 @@
           {/each}
           {#if canRetry}
             <div class="hoops-map-ph-card">
-              <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-retry" onclick={retry}>{mapText.retry}</button>
+              <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-retry" onclick={retry}>{T('retry')}</button>
             </div>
           {/if}
           {#if state === 'idle'}
             <div class="hoops-map-ph-card">
-              <p class="hoops-map-note">{privacyNote}</p>
-              <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load" onclick={start}>{mapText.load}</button>
+              <p class="hoops-map-note">{note}</p>
+              <button type="button" class="hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load" onclick={start}>{T('load')}</button>
             </div>
           {/if}
         </div>
       {/if}
       {#if state === 'ready' && interactive !== false}
-        <div class="hoops-map-zoom" role="group" aria-label={mapText.zoomGroup}>
-          <button type="button" class="hoops-map-zoom-btn" aria-label={mapText.zoomIn} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onclick={() => canIn && controller?.zoomIn()}>
+        <div class="hoops-map-zoom" role="group" aria-label={T('zoomGroup')}>
+          <button type="button" class="hoops-map-zoom-btn" aria-label={T('zoomIn')} aria-controls={canvasId} aria-disabled={canIn ? undefined : 'true'} onclick={() => canIn && controller?.zoomIn()}>
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M10 4v12M4 10h12" /></svg>
           </button>
-          <button type="button" class="hoops-map-zoom-btn" aria-label={mapText.zoomOut} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onclick={() => canOut && controller?.zoomOut()}>
+          <button type="button" class="hoops-map-zoom-btn" aria-label={T('zoomOut')} aria-controls={canvasId} aria-disabled={canOut ? undefined : 'true'} onclick={() => canOut && controller?.zoomOut()}>
             <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 10h12" /></svg>
           </button>
         </div>
@@ -201,7 +211,7 @@
     </div>
   </div>
   <div class={`hoops-map-text${showList ? '' : ' is-quiet'}`} id={textId} tabindex="-1">
-    <ol class="hoops-map-list" aria-label={mapText.listLabel}>
+    <ol class="hoops-map-list" aria-label={T('listLabel')}>
       {#each items as item (item.id)}
         <li class="hoops-map-item" value={item.number ?? undefined}>
           {#if item.kind === 'seat'}<span class={`hoops-map-num is-seat${item.own ? ' is-own' : ''}`} aria-hidden="true"></span>{:else if item.number !== null}<span class={`hoops-map-num${item.own ? ' is-own' : ''}`} aria-hidden="true">{item.number}</span>{/if}
@@ -209,7 +219,7 @@
             <p class="hoops-map-name">
               {#if item.href}<a class="hoops-link" href={item.href}>{item.label}</a>{:else}<span>{item.label}</span>{/if}
               {#if item.kind === 'seat'}<span class="hoops-chip">{item.seatText}</span>{/if}
-              {#if item.own}<span class="hoops-chip hoops-chip--amber">{mapText.own}</span>{/if}
+              {#if item.own}<span class="hoops-chip hoops-chip--amber">{T('own')}</span>{/if}
             </p>
             <p class="hoops-map-coords">{item.coords}</p>
             {#if showList && item.links.length}

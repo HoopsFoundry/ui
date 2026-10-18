@@ -25,6 +25,7 @@
     titleAs = undefined,
     open = $bindable(false),
     meta = undefined,
+    lang = undefined,
     children,
   }: {
     /** `frame`: Rahmen der Tabellen (`hoops-frame`); `league`: Karte der Liga (`hoops-league`). */
@@ -40,6 +41,8 @@
     open?: boolean;
     /** Zusatzinfo rechts im Kopf (mit eigenem Wrapper des Aufrufers); Teil des zugänglichen Namens. */
     meta?: Snippet;
+    /** `lang` des Rahmens, wenn seine Sprache von der Seite abweicht (siehe svelte/i18n.js). */
+    lang?: string;
     children?: Snippet;
   } = $props();
 
@@ -98,7 +101,7 @@
   const rootClasses = $derived(`${rootClass} is-collapsible${open ? ' is-open' : ''}`);
 </script>
 
-<div class={rootClasses} {id} bind:this={el}>
+<div class={rootClasses} {id} {lang} bind:this={el}>
   <div class="{base}-head {base}-head--acc">
     <svelte:element this={heading.tag} class="{base}-title">
       <button

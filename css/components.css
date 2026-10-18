@@ -299,7 +299,7 @@
 .hoops-form-item--n { background: var(--hoops-chip-err-fg); border-radius: 2px; }
 .hoops-form-item--u { border: 2px solid var(--hoops-mute); }
 .hoops-tbl tr.is-own .hoops-form-item--u { border-color: var(--hoops-mute-on-selected); }
-/* Buchstaben: farbige Marken (Chip-Töne, Kontrast wie die Chips) mit S, N, U; der Buchstabe kommt aus dem CSS und ist nicht Teil des Textes */
+/* Buchstaben: farbige Marken (Chip-Töne, Kontrast wie die Chips); der Buchstabe steht im Attribut `data-letter` (aus dem Katalog der Sprache: S, N, U oder W, L, D) und ist nicht Teil des Textes */
 .hoops-form--letters .hoops-form-list { flex-wrap: wrap; gap: 4px; }
 .hoops-form--letters .hoops-form-item {
   display: inline-grid; place-items: center; width: auto; min-width: 24px; height: 24px; border: 0; border-radius: var(--hoops-radius-full);
@@ -308,9 +308,7 @@
 .hoops-form--letters .hoops-form-item--s { background: var(--hoops-chip-ok-bg); color: var(--hoops-chip-ok-fg); }
 .hoops-form--letters .hoops-form-item--n { background: var(--hoops-chip-err-bg); color: var(--hoops-chip-err-fg); border-radius: var(--hoops-radius-sm); }
 .hoops-form--letters .hoops-form-item--u { background: var(--hoops-chip-neutral-bg); color: var(--hoops-chip-neutral-fg); box-shadow: inset 0 0 0 1px var(--hoops-line-strong); }
-.hoops-form--letters .hoops-form-item--s::before { content: "S"; }
-.hoops-form--letters .hoops-form-item--n::before { content: "N"; }
-.hoops-form--letters .hoops-form-item--u::before { content: "U"; }
+.hoops-form--letters .hoops-form-item::before { content: attr(data-letter); }
 /* Windows-Kontrastmodus: Füllungen entfallen dort; Formen bleiben (Punkt, Quadrat, Ring) */
 @media (forced-colors: active) {
   .hoops-form-item--s, .hoops-form-item--n { background: CanvasText; forced-color-adjust: none; }

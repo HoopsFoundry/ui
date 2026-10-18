@@ -96,7 +96,8 @@ describe('LeagueCard: Quelltext', () => {
     const source = read(path);
     expect(source).toContain("from '../js/league.js'");
     for (const fn of ['leagueWindow(', 'leagueSummary(', 'diffText(', 'windowLabel(', 'zoneLegend(', 'liveInfo(']) expect(source, fn).toContain(fn);
-    expect(source).toContain("linkLabel = 'Komplette Tabelle und Spielplan'");
+    // der Standardtext des Links kommt aus dem Katalog
+    expect(source).toContain("'league.link'");
     expect(source).toMatch(/limit = 3/);
     expect(source).toMatch(/size = 'standard'/);
     expect(source).not.toMatch(/<h[1-6][\s>]|<\/h[1-6]>/);
@@ -105,11 +106,11 @@ describe('LeagueCard: Quelltext', () => {
   it.each(sources)('%s: Titelebene über useHeadingTag, versteckte Texte für eigene Zeile, Zone und Form', (path) => {
     const source = read(path);
     expect(source).toMatch(/useHeadingTag\(/);
-    expect(source).toContain(', eigene Mannschaft');
+    expect(source).toContain("'league.own-team'");
     expect(source).toContain('zone.row');
     expect(source).toContain('<FormChips form={t.form ?? []}');
     // der versteckte Text kommt aus formLabel (eine Quelle in FormChips)
-    expect(read(path.includes('svelte') ? 'svelte/FormChips.svelte' : 'react/FormChips.tsx')).toContain('formLabel(form)');
+    expect(read(path.includes('svelte') ? 'svelte/FormChips.svelte' : 'react/FormChips.tsx')).toContain('formLabel(form, i18n.options)');
     expect(source).toContain('role="region"');
   });
   it('package.json exportiert ./league.js (mit Typen) und ./svelte/LeagueCard', () => {

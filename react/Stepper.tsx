@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Icon } from './Icon';
 import { cn } from './cn';
+import { useT } from './i18n';
 
 export type StepState = 'done' | 'current' | 'pending';
 export type StepperVariant = 'horizontal' | 'compact' | 'vertical';
@@ -21,10 +22,12 @@ export interface StepperProps {
   className?: string;
 }
 
-const STATE_TEXT: Record<StepState, string> = { done: 'erledigt', current: 'aktuell', pending: 'ausstehend' };
+const STATE_KEY: Record<StepState, string> = { done: 'stepper.state.done', current: 'stepper.state.current', pending: 'stepper.state.pending' };
 
 /** Schrittanzeige für mehrstufige Abläufe (Setup, Runden, Onboarding). */
-export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fortschritt', className }: StepperProps) {
+export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel, className }: StepperProps) {
+  const i18n = useT();
+  const listLabel = ariaLabel ?? i18n.t('stepper.label');
   const currentIdx = steps.findIndex((s) => s.state === 'current');
   const doneCount = steps.filter((s) => s.state === 'done').length;
 
@@ -32,7 +35,7 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
     const content = step.state === 'done' ? <Icon name="check" size={14} /> : <span aria-hidden="true">{index + 1}</span>;
     if (onStep && step.state !== 'pending') {
       return (
-        <button type="button" className="hoops-step-dot" aria-label={`${index + 1}. ${step.label}`} onClick={() => onStep(step.id)}>
+        <button type="button" className="hoops-step-dot" aria-label={i18n.t('stepper.step', { number: index + 1, label: step.label })} onClick={() => onStep(step.id)}>
           {content}
         </button>
       );
@@ -47,13 +50,13 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
   const label = (step: StepItem): ReactNode => (
     <div className="hoops-step-label">
       {step.label}
-      <span className="hoops-sr-only"> ({STATE_TEXT[step.state]})</span>
+      <span className="hoops-sr-only"> ({i18n.t(STATE_KEY[step.state])})</span>
     </div>
   );
 
   if (variant === 'compact') {
     return (
-      <div className={cn('hoops-step', 'hoops-step--c', className)} role="group" aria-label={ariaLabel}>
+      <div className={cn('hoops-step', 'hoops-step--c', className)} role="group" aria-label={listLabel} lang={i18n.lang}>
         <div className="hoops-step-track" aria-hidden="true">
           <div className="hoops-step-fill" style={{ width: `${steps.length ? (doneCount / steps.length) * 100 : 0}%` }} />
         </div>
@@ -69,7 +72,7 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
 
   if (variant === 'vertical') {
     return (
-      <ol className={cn('hoops-step', 'hoops-step--v', className)} aria-label={ariaLabel}>
+      <ol className={cn('hoops-step', 'hoops-step--v', className)} aria-label={listLabel} lang={i18n.lang}>
         {steps.map((step, i) => (
           <li
             key={step.id}
@@ -91,7 +94,7 @@ export function Stepper({ steps, variant = 'horizontal', onStep, ariaLabel = 'Fo
   }
 
   return (
-    <ol className={cn('hoops-step', 'hoops-step--h', className)} aria-label={ariaLabel}>
+    <ol className={cn('hoops-step', 'hoops-step--h', className)} aria-label={listLabel} lang={i18n.lang}>
       {steps.map((step, i) => (
         <li
           key={step.id}

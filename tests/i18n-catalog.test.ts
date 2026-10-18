@@ -1,5 +1,5 @@
 // @vitest-environment node
-// Kataloge en und de: gleiche Schlüssel, Platzhalter, Mehrzahlformen, Schema, und "Wort für Wort" gegen den heutigen Quelltext.
+// Kataloge en und de: gleiche Schlüssel, Platzhalter, Mehrzahlformen, Schema, und "Wort für Wort" gegen den Stand vor der Verdrahtung (Inventar).
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import en from '../js/i18n/en.js';
@@ -67,7 +67,7 @@ describe('Kataloge', () => {
   });
 });
 
-// Stichprobe: der deutsche Katalogtext steht Wort für Wort im heutigen Quelltext (alle festen Teile zwischen den Platzhaltern).
+// Stichprobe: der deutsche Katalogtext entspricht Wort für Wort dem Text vor der Verdrahtung (alle festen Teile zwischen den Platzhaltern).
 const SAMPLE: [string, string][] = [
   ['map.load', 'js/map.js'], ['map.error', 'js/map.js'], ['map.privacy', 'js/map.js'], ['map.canvas-hint', 'js/map.js'],
   ['accordion.expand-all', 'js/accordion.js'], ['accordion.summary.all-open', 'js/accordion.js'], ['accordion.summary.partial', 'js/accordion.js'],
@@ -83,8 +83,8 @@ const SAMPLE: [string, string][] = [
   ['team.record.aria', 'js/team.js'], ['team.rank.aria-of', 'js/team.js'], ['team.squad.players', 'js/team.js'],
   ['team.opponent.home', 'js/team.js'], ['player.captain', 'react/PlayerCard.tsx'], ['stats.empty', 'js/stats.js'],
 ];
-// Seit I2 stehen die deutschen Texte der Dateien in js/ nur noch im Katalog; der Vergleich mit „heute“ läuft dort gegen die Spalte „Deutsch (heute)“ des
-// Inventars (Stand vor der Verdrahtung). Für svelte/ und react/ (bis I3) bleibt der Vergleich mit dem Quelltext.
+// Seit I2 (js/) und I3 (svelte/, react/) stehen die deutschen Texte nur noch im Katalog; der Vergleich mit „heute“ läuft gegen die Spalte „Deutsch (heute)“ des
+// Inventars (Stand vor der Verdrahtung). In svelte/ und react/ muss außerdem der Schlüssel im Quelltext vorkommen (die Datei liest den Katalog).
 const inventoryText = read('docs/superpowers/specs/2026-10-17-i18n-inventar.md');
 const inventoryDe = (key: string) => {
   const line = inventoryText.split('\n').find((l) => l.startsWith(`| \`${key}\` | `));
@@ -100,18 +100,8 @@ describe('heutige Texte (Wort für Wort)', () => {
   });
   for (const [key, file] of SAMPLE) {
     it(`${key} in ${file}`, () => {
-      if (file.startsWith('js/')) {
-        expect(forms(cats.de[key]), key).toEqual(inventoryDe(key));
-        return;
-      }
-      const source = read(file);
-      const pieces = forms(cats.de[key]).flatMap((t) => t.split(/\{[^}]*\}/)).map((p) => p.trim()).filter((p) => p.length > 1);
-      expect(pieces.length, key).toBeGreaterThan(0);
-      // Mehrzahl: Wörter der Einzelform und der Mehrzahlform stehen einzeln im Quelltext (ternäre Auswahl), darum je Wort prüfen
-      for (const p of pieces) {
-        const found = source.includes(p) || p.split(/\s+/).every((w) => source.includes(w));
-        expect(found, `${key}: "${p}"`).toBe(true);
-      }
+      expect(forms(cats.de[key]), key).toEqual(inventoryDe(key));
+      if (!file.startsWith('js/')) expect(read(file), `${file} liest ${key}`).toContain(`'${key}'`);
     });
   }
 });

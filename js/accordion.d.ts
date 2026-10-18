@@ -1,3 +1,4 @@
+import type { TOptions } from './i18n/index.js';
 /** Ein Kopf für die Tastaturnavigation: `disabled` überspringt ihn (oder `true`). */
 export type AccordionHeader = { disabled?: boolean } | boolean;
 /** Knoten des Bereichsbaums: `parent` fehlt oder ist `null` bei einem Bereich der obersten Ebene. */
@@ -36,7 +37,8 @@ export function ancestorsOf(id: string, tree: AccordionTreeNode[]): string[];
 /** Zugänglicher Name mit Zusatzinfo: `'Kader, 14 Spieler'`, ohne Doppelung. */
 export function labelWithMeta(title: unknown, meta?: unknown): string;
 /** Ansage nach „Alle öffnen/schließen“: „Alle Bereiche geöffnet“, „3 von 5 Bereichen geöffnet“ … */
-export function summaryText(open: number, total: number): string;
+/** Ansage nach „Alle öffnen/schließen“ in der Sprache des Aufrufs (`options.locale`, `options.texts`). */
+export function summaryText(open: number, total: number, options?: TOptions): string;
 /** Aktueller URL-Anker ohne `#` (dekodiert); ohne Browser leer. */
 export function currentHash(): string;
 /** Setzt beim Öffnen `#id` per `history.replaceState`; beim Schließen wird der Anker nur entfernt, wenn er zu `id` gehört. */

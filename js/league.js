@@ -60,6 +60,16 @@ export function leagueSummary({ teamCount, played, total } = {}, options) {
 
 const FORM_WORD = { S: 'common.outcome.win', N: 'common.outcome.loss', U: 'common.outcome.draw' };
 
+const OUTCOME_LETTER = { S: 'common.outcome-letter.win', N: 'common.outcome-letter.loss', U: 'common.outcome-letter.draw' };
+
+/**
+ * Kennbuchstabe eines Ergebnisses für Chips und Formleiste: aus den Daten `S`, `N`, `U` (Sieg, Niederlage, Unentschieden) wird der Buchstabe der
+ * Sprache (deutsch `S`, `N`, `U`, englisch `W`, `L`, `D`); unbekannte Werte ergeben eine leere Zeichenkette. Die Daten selbst bleiben `S`, `N`, `U`.
+ */
+export function outcomeLetter(entry, options) {
+  return typeof entry === 'string' && Object.hasOwn(OUTCOME_LETTER, entry) ? t(OUTCOME_LETTER[entry], undefined, options) : '';
+}
+
 /** Die gültigen Einträge der Form (S, N, U), höchstens die letzten fünf, neueste zuletzt. Alles andere wird ignoriert. */
 export function formEntries(form) {
   if (!Array.isArray(form)) return [];

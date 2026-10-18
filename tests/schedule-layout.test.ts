@@ -59,10 +59,10 @@ describe('Zeitraster: Live steht neben Paarung oder Ergebnis', () => {
     const svelte = read('svelte/ScheduleGrid.svelte');
     const react = read('react/ScheduleGrid.tsx');
     // Das Live-Tag steht nicht mehr als eigener Block zwischen Paarung und Ergebnis
-    expect(svelte).toMatch(/<div class="hoops-sg-result">[\s\S]*?Live[\s\S]*?<\/div>/);
+    expect(svelte).toMatch(/<div class="hoops-sg-result">[\s\S]*?common\.live[\s\S]*?<\/div>/);
     expect(svelte).toMatch(/!hasScore\(game, 'versus'\)/);
-    expect(react).toMatch(/!hasScore\(game, 'versus'\) \? <LiveTag \/>/);
-    expect(react).toMatch(/<\/ResultText>|<ResultText[\s\S]*?\/>\s*\{game\.state === 'live' \? <LiveTag \/> : null\}/);
+    expect(react).toMatch(/!hasScore\(game, 'versus'\) \? <LiveTag texts=\{texts\} \/>/);
+    expect(react).toMatch(/<\/ResultText>|<ResultText[\s\S]*?\/>\s*\{game\.state === 'live' \? <LiveTag texts=\{texts\} \/> : null\}/);
   });
 });
 

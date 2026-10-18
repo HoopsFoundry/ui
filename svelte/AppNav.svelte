@@ -13,6 +13,7 @@
    */
   import type { Snippet } from 'svelte';
   import Icon from './Icon.svelte';
+  import { useI18n } from './i18n.js';
 
   type Link = { id: string; label: string; href: string; disabled?: boolean; hint?: string };
   type Group = { id: string; label: string; items: Link[]; disabled?: boolean; hint?: string };
@@ -22,15 +23,17 @@
     items,
     currentHref = '',
     tone = 'light',
-    ariaLabel = 'Hauptnavigation',
-    menuLabel = 'Menü',
+    ariaLabel,
+    menuLabel,
     context,
     contained = false,
   }: {
     items: Item[];
     currentHref?: string;
     tone?: 'light' | 'dark';
+    /** Name der Navigation; Standard aus dem Katalog (`appnav.label`). */
     ariaLabel?: string;
+    /** Beschriftung des Menüknopfs; Standard aus dem Katalog (`appnav.menu`). */
     menuLabel?: string;
     /** Platz rechts in der Leiste, z. B. für einen späteren Turnierumschalter. */
     context?: Snippet;
@@ -38,6 +41,9 @@
     contained?: boolean;
   } = $props();
 
+  const i18n = useI18n();
+  const navLabel = $derived(ariaLabel ?? i18n.t('appnav.label'));
+  const toggleLabel = $derived(menuLabel ?? i18n.t('appnav.menu'));
   const baseId = `hoops-appnav-${++seq}`;
   let menuOpen = $state(false);
   let openGroup = $state<string | null>(null);
@@ -101,7 +107,8 @@
   class="hoops-appnav hoops-appnav--{tone}"
   class:hoops-appnav--contained={contained}
   class:is-open={menuOpen}
-  aria-label={ariaLabel}
+  aria-label={navLabel}
+  lang={i18n.lang}
   onkeydown={onKeydown}
   onfocusout={onFocusout}
 >
@@ -115,7 +122,7 @@
       onclick={() => (menuOpen = !menuOpen)}
     >
       <Icon name={menuOpen ? 'x' : 'menu'} size={20} />
-      <span>{menuLabel}</span>
+      <span>{toggleLabel}</span>
     </button>
     <ul id="{baseId}-list" class="hoops-appnav-list">
       {#each items as item (item.id)}

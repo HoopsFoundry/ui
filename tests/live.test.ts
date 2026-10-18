@@ -204,17 +204,18 @@ describe('Kontrast im Puls-Tal (Text bei Deckkraft 0,8 ≥ 4,5:1)', () => {
 });
 
 describe('Nie nur Farbe: das Wort „Live“ bzw. „läuft“ bleibt', () => {
+  // das Wort steht im Katalog (`common.live`), die Dateien lesen es über den Schlüssel und zeigen es sichtbar im Text (nicht aria-hidden)
   it.each([
-    ['svelte/TopBar.svelte', />Live</],
-    ['react/TopBar.tsx', />Live</],
-    ['svelte/MatchCard.svelte', /Live · /],
-    ['react/MatchCard.tsx', /Live · /],
-    ['svelte/PlayByPlay.svelte', /<\/span> Live</],
-    ['react/PlayByPlay.tsx', /Live\s*<\/span>/],
-    ['svelte/Table.svelte', /<\/span> Live</],
-    ['react/Table.tsx', /Live\s*<\/span>|\/> Live/],
-    ['svelte/ScheduleTable.svelte', /<\/span> Live</],
-    ['react/ScheduleParts.tsx', /\/> Live/],
+    ['svelte/TopBar.svelte', /<span class="hoops-topbar-live">\{i18n\.t\('common\.live'\)\}<\/span>/],
+    ['react/TopBar.tsx', /<span className="hoops-topbar-live">\{i18n\.t\('common\.live'\)\}<\/span>/],
+    ['svelte/MatchCard.svelte', /\{i18n\.t\('common\.live'\)\} · /],
+    ['react/MatchCard.tsx', /\{i18n\.t\('common\.live'\)\} · /],
+    ['svelte/PlayByPlay.svelte', /<\/span> \{i18n\.t\('common\.live'\)\}</],
+    ['react/PlayByPlay.tsx', /\/> \{i18n\.t\('common\.live'\)\}/],
+    ['svelte/Table.svelte', /<\/span> \{i18n\.t\('common\.live'\)\}</],
+    ['react/Table.tsx', /\/> \{i18n\.t\('common\.live'\)\}/],
+    ['svelte/ScheduleTable.svelte', /<\/span> \{i18n\.t\('common\.live'\)\}</],
+    ['react/ScheduleParts.tsx', /\/> \{i18n\.t\('common\.live'\)\}/],
   ])('%s zeigt das Wort', (path, pattern) => {
     expect(read(path)).toMatch(pattern);
   });
