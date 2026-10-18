@@ -611,8 +611,9 @@ dialog.hoops-modal-dialog:not(:modal) { background: var(--hoops-backdrop, rgb(0 
 .hoops-pill-s.dnp { background: var(--hoops-chip-err-bg); color: var(--hoops-chip-err-fg); }
 
 /* ── TopBar · dunkle App-Leiste (Modifier, die helle Vereinsregister-Leiste bleibt) ── */
+/* Mindesthöhe statt fester Höhe: in schmalen Spalten (unter etwa 410 px) bricht der Kontext um, statt Stand oder Uhr abzuschneiden (WCAG 1.4.10) */
 .hoops-topbar.hoops-topbar--dark {
-  display: flex; align-items: center; height: 56px; padding: 0 20px; gap: 20px;
+  display: flex; align-items: center; min-height: 56px; padding: 0 20px; gap: 20px;
   background: var(--hoops-base-1000); color: var(--hoops-n-100); border-bottom: 1px solid var(--hoops-n-900);
   font-family: var(--hoops-font-body);
 }
@@ -625,7 +626,7 @@ dialog.hoops-modal-dialog:not(:modal) { background: var(--hoops-backdrop, rgb(0 
   display: inline-flex; align-items: center; justify-content: center; font-weight: 800; font-size: var(--hoops-fs-body-sm);
 }
 .hoops-topbar-ctx {
-  display: flex; align-items: center; gap: 14px; margin-left: 28px; font-family: var(--hoops-font-mono);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 2px 14px; min-width: 0; margin-left: 28px; font-family: var(--hoops-font-mono);
   font-size: var(--hoops-fs-caption); color: var(--hoops-n-300); letter-spacing: 0.04em;
 }
 /* Live auf der immer dunklen Leiste: Text --hoops-live-fg-on-dark (≥ 7:1 auf Schwarz und Anthrazit #191919), Punkt --hoops-live-fill; Puls: siehe Abschnitt Live */

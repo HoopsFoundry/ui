@@ -14,7 +14,7 @@ Der neuere Vanilla-Plan konkretisiert den älteren Review. Aufgaben aus historis
 . Fokusmanagement und Tastaturparität: Modal und Tabs sind seit Welle 1 angeglichen (ADR-011); offen bleibt die Prüfung mit Hilfstechnik in echten Browsern.
 . Eingabesicherheit: URL-Regeln und künftige Renderer.
 . Karten-Lifecycle: in Chromium bei wiederholtem Auf- und Abbau stabil gemessen; nach einem Ladefehler bietet der Platzhalter „Erneut versuchen“ an (ADR-011), eine neue `tileUrl` löst ebenfalls einen neuen Versuch aus. Firefox ist im Prüflauf noch nicht abgedeckt.
-. Prüflücken: Browsermatrix, CSP und vollständige Docs-Prüfungen.
+. Prüflücken: Browsermatrix (`scripts/check-browser-matrix.mjs`), CSP des Boot-Skripts (`scripts/check-csp-boot.mjs`) und die axe-Matrix aller Docs-Seiten (`scripts/check-docs-axe.mjs`) liegen als Skripte vor und bestehen in Chromium und WebKit; offen bleiben Firefox (startet in der Prüfumgebung nicht) und ein CI-Lauf dieser Skripte (bisher nur lokal).
 . Auslieferung: noch nicht abgeschlossener Vanilla-Releaseprozess.
 . Dokumentationsdrift: abweichende Versionen, Begriffe und Planstände.
 . Agent-Zugriff: kein zentraler Root-Einstieg in der geprüften Struktur; Katalog noch unvollständig.
