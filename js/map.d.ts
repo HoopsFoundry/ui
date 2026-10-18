@@ -81,7 +81,7 @@ export interface MapPin {
   y: number;
 }
 
-/** Die Texte der Karte in der globalen Sprache; eine Zuweisung überschreibt den Text für alle Aufrufe (Vorrang vor Katalog und `texts`). */
+/** Die Texte der Karte in der globalen Sprache; `delete mapText.load` und die Zuweisung von `undefined` nehmen eine Überschreibung zurück; eine Zuweisung überschreibt den Text für alle Aufrufe (Vorrang vor Katalog und `texts`). */
 export const mapText: {
   load: string; loading: string; error: string; privacy: string; skip: string; zoomIn: string; zoomOut: string;
   attribution: string; attributionHref: string; linkGeo: string; linkOsm: string; linkRoute: string; listLabel: string; own: string; seat: string; retry: string; zoomGroup: string; canvasHint: string;

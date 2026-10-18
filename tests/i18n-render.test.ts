@@ -163,3 +163,21 @@ describe('Randwerte der Zahlenschreibung wie vor I2 (String(n), nur das Dezimalz
     expect(diffText(value === 0 ? 0 : Math.abs(value), { locale: 'en' })).toBe(value === 0 ? '0' : `+${plain}`);
   });
 });
+
+describe('mapText und venueText: Überschreibung zurücknehmen', () => {
+  it('delete und undefined nehmen die Zuweisung zurück, der Katalogtext gilt wieder', async () => {
+    const { venueText } = await import('../js/venue.js');
+    for (const table of [mapText as Record<string, string>, venueText as Record<string, string>]) {
+      const name = table === mapText ? 'load' : 'contact';
+      const catalog = table[name];
+      table[name] = 'Eigen';
+      expect(table[name]).toBe('Eigen');
+      delete table[name];
+      expect(table[name]).toBe(catalog);
+      table[name] = 'Eigen';
+      table[name] = undefined as never;
+      expect(table[name]).toBe(catalog);
+      expect(Object.keys(table)).toContain(name);
+    }
+  });
+});

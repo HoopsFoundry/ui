@@ -32,7 +32,7 @@ export interface VenueMapLink {
   href: string;
 }
 
-/** Die Texte der Hallenkarte in der globalen Sprache; eine Zuweisung überschreibt den Text für alle Aufrufe. */
+/** Die Texte der Hallenkarte in der globalen Sprache; `delete` und die Zuweisung von `undefined` nehmen eine Überschreibung zurück; eine Zuweisung überschreibt den Text für alle Aufrufe. */
 export const venueText: {
   gamesLabel: string; linkLabel: string; mapLink: string; routeLink: string; contact: string; phone: string; email: string;
   home: string; away: string; live: string; cancelled: string; postponed: string; mapLabel: string;
