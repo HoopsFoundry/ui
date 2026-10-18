@@ -13,7 +13,7 @@ import '../docs/blocks/blocks.css';
 
 # Internationalisierung
 
-Die Bausteine bringen eigene Texte mit: Beschriftungen („Karte laden“, „Nach oben“), Namen für Hilfstechnik (`aria-label` wie „Schließen“ oder „Legende“), Statuszeilen, Zusammenfassungen („12 Teams · 40 von 90 Spielen gespielt“), Spaltenköpfe und die Buchstaben der Formleiste. Diese Texte stehen in **Katalogen**, nicht in den Komponenten. **Die Standardsprache ist Englisch**; Deutsch liegt als eigenes Modul bei. Die Sprache gilt global für die Seite oder App, einzelne Texte lassen sich überschreiben, weitere Sprachen ergänzt jede Anwendung selbst. Namen, Daten und andere Texte, die du übergibst („Sa, 12.10.“, „Lindenberg Hawks“), bleiben unverändert.
+Die Bausteine bringen eigene Texte mit: Beschriftungen („Karte laden“, „Nach oben“), Namen für Hilfstechnik (`aria-label` wie „Schließen“ oder „Legende“), Statuszeilen, Zusammenfassungen („10 Teams · 40 von 90 Spielen gespielt“), Spaltenköpfe und die Buchstaben der Formleiste. Diese Texte stehen in **Katalogen**, nicht in den Komponenten. **Die Standardsprache ist Englisch**; Deutsch liegt als eigenes Modul bei. Die Sprache gilt global für die Seite oder App, einzelne Texte lassen sich überschreiben, weitere Sprachen ergänzt jede Anwendung selbst. Namen, Daten und andere Texte, die du übergibst („Sa, 12.10.“, „Lindenberg Hawks“), bleiben unverändert.
 
 ## Überblick
 
@@ -120,9 +120,9 @@ Für alle, die einen Katalog schreiben: eine neue Sprache für die eigene Anwend
 
 ### Platzhalter
 
-- **`{name}`** steht für einen Wert, den der Baustein einsetzt (`{count}`, `{team}`, `{rank}`). Namen nicht übersetzen, nicht umbenennen, nicht weglassen; die Reihenfolge im Satz bestimmt die Sprache („{number}. Viertel“, „Quarter {number}“).
+- **`{name}`** steht für einen Wert, den der Baustein einsetzt (`{count}`, `{team}`, `{rank}`). Namen nicht übersetzen, nicht umbenennen, nicht weglassen; die Reihenfolge im Satz bestimmt die Sprache (`{number}. Viertel`, `Quarter {number}`).
 - **Ein Platzhalter ohne Wert bleibt sichtbar stehen** (`{label}`), ein fehlender Schlüssel erscheint als Schlüssel. Das Prüfskript meldet beides vorher: einen Platzhalter, der anders heißt als im englischen Text, und einen fehlenden Schlüssel.
-- **Kein Markup in Werten.** Wo im Satz ein Element steht (der Teamname in „{team} hat Freilos“), schneidet der Baustein am Platzhalter und setzt das Element selbst ein.
+- **Kein Markup in Werten.** Wo im Satz ein Element steht (der Teamname in `{team} hat Freilos`), schneidet der Baustein am Platzhalter und setzt das Element selbst ein.
 
 ### Mehrzahl und Zahlen
 

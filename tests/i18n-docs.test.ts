@@ -319,6 +319,12 @@ describe('Seite, Werkzeugleiste, Einträge', () => {
     expect(stories).toMatch(/default \{[\s\S]*tags: \['!dev'\]/);
     expect(stories).toContain("title: 'Foundation/Internationalisierung'");
   });
+  it('geschweifte Klammern im Fließtext sind nur Ausdrücke mit katalog.* (sonst wertet MDX {name} als Variable aus und die Seite bricht)', () => {
+    const prose = mdx.split('\n').filter((line) => !/^\s|^import |^</.test(line)).map((line) => line.replace(/`[^`]*`/g, '')).join('\n');
+    const braces = [...prose.matchAll(/\{[^}]*\}/g)].map((m) => m[0]);
+    expect(braces.length).toBeGreaterThan(0);
+    for (const b of braces) expect(b).toMatch(/^\{katalog\.\w+\}$/);
+  });
   it('eindeutige Titel der Karten und Beschriftungen der Code-Blöcke (axe landmark-unique), keine Markdown-Tabellen', () => {
     const titles = [...demo.matchAll(/title(?:=|: )['"]([^'"]+)['"]/g)].map((m) => m[1]);
     expect(new Set(titles).size).toBe(titles.length);
