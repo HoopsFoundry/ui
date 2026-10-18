@@ -26,6 +26,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 - **Deploy:** Die Content-Security-Policy der Doku-Seite ist scharf (`Content-Security-Policy` statt `Report-Only`, gleicher Inhalt); alle 588 Storybook-Einträge laden in Chromium ohne Verstoß. Die Kartenkacheln (`tile.openstreetmap.org`) sind in `img-src` ausdrücklich erlaubt, weil der Platzhalter `*.tile…` den Host ohne Unterdomäne nicht abdeckt.
 - Doku: Beschreibende Sätze in Button, Tabelle und Kartenbibliothek sprechen nicht mehr vom „Spielbericht“.
 - **Icons `ft`, `2p`, `3p` sind jetzt Schiedsrichter-Handzeichen** (ein Finger, zwei Finger, zwei Finger mit abgespreiztem Daumen; gefüllte Zeichnung statt Linienzeichnung, `currentColor`, 24 × 24). Namen und Aufrufe bleiben gleich, das Aussehen ändert sich (Play-by-Play, Spielaktionen).
+- **Lückenplan Welle 2 (Prüflücken):** Laufende Ergebniszahlen pulsieren nicht mehr (Kontrast jederzeit ≥ 7:1, vorher hell 4,9:1 im Puls-Tal); die dunkle TopBar bricht in schmalen Spalten um (Mindesthöhe 56 px) statt die Uhr abzuschneiden; Doku-Links und Inline-Code in Storybook mit Seiten-Token. Neue Prüfskripte: `check-browser-matrix.mjs`, `check-csp-boot.mjs`, `check-docs-axe.mjs`.
 
 ## [0.10.0] — 2026-10-17 — Umbenennung auf HoopsFoundry UI, Marken-Rollen und DBB-Marke
 
