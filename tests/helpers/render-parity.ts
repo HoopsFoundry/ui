@@ -8,21 +8,23 @@ import { normalize } from './render-normalize';
 
 export { normalize };
 
-const rootDir = new URL('../../', import.meta.url).pathname;
+const defaultRoot = new URL('../../', import.meta.url).pathname;
 type Props = Record<string, unknown>;
 
 /** Registriert Start und Ende des Vite-Servers (SSR) in der aufrufenden Testdatei; die Fassungen werden je Aufruf geladen. */
-export function useParity() {
+export function useParity(rootDir: string = defaultRoot) {
   let vite: ViteDevServer;
   let render: (component: unknown, options: { props: Props }) => { body: string };
   let createRawSnippet: (fn: (...args: any[]) => { render: () => string }) => unknown;
+  let core: { setLocale: (code: string) => void; setTexts: (texts: Record<string, unknown>) => void } | undefined;
   beforeAll(async () => {
     vite = await createServer({
       root: rootDir, configFile: false, plugins: [svelte({ configFile: rootDir + 'svelte.config.js', compilerOptions: { generate: 'server', dev: false } })],
-      esbuild: { jsx: 'automatic' }, server: { middlewareMode: true }, appType: 'custom', logLevel: 'error',
+      esbuild: { jsx: 'automatic' }, server: { middlewareMode: true, hmr: false }, appType: 'custom', logLevel: 'error',
     });
     render = ((await vite.ssrLoadModule('svelte/server')) as { render: typeof render }).render;
     await vite.ssrLoadModule('/tests/setup-i18n.ts'); // Standardsprache der Tests (Deutsch) auch im Modulgraphen dieses Servers
+    core = (await vite.ssrLoadModule('/js/i18n/index.js')) as typeof core;
     createRawSnippet = ((await vite.ssrLoadModule('svelte')) as { createRawSnippet: typeof createRawSnippet }).createRawSnippet;
   }, 60000);
   afterAll(async () => {
@@ -30,6 +32,16 @@ export function useParity() {
   });
   const load = async (path: string, name = 'default') => ((await vite.ssrLoadModule(rootDir + path)) as Record<string, unknown>)[name];
   return {
+    /** Setzt Sprache und globale Texte im Modulgraphen des Servers (Svelte und React); der Aufrufer setzt sie für Vanilla im eigenen Graphen. */
+    locale(code: string, texts: Record<string, unknown> = {}) {
+      core!.setLocale(code);
+      core!.setTexts(texts);
+    },
+    /** Lädt eine Vanilla-Render-Funktion (`js/render/…`) im Modulgraphen des Servers und ruft sie auf (für Mutationstests auf einer Kopie des Quelltexts). */
+    async vanilla(file: string, name: string, props: Props, options?: Props) {
+      const mod = (await vite.ssrLoadModule(rootDir + file)) as Record<string, (p: Props, o?: Props) => string>;
+      return normalize(mod[name](props, options));
+    },
     /** Svelte-SSR einer Komponente aus `svelte/<name>.svelte`; `className` wird zu `class`. */
     async svelte(name: string, props: Props = {}) {
       const component = await load(`svelte/${name}.svelte`);
