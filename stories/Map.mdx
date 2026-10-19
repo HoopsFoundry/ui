@@ -4,6 +4,7 @@ import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, funktionenJs, nginxConf, kachelEndpunktTs, einbindungVite, sitzSvelte, sitzReact, sitzVanilla, leafletDirekt, initMapBeispiel, initAllKarte, importmapVariante, globalVariante, kopieren, ohneBuildSeite } from './Map.code';
 
@@ -192,7 +193,7 @@ Eine neue `tileUrl` setzt einen früheren Fehler zurück, die Karte versucht es 
 
 ## Dunkelmodus
 
-Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen über die semantischen Tokens (`--hoops-surface`, `--hoops-fg`, `--hoops-line-strong`, `--hoops-link`, `--hoops-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Die **Kacheln** werden mit `dimInDark` (Standard) etwas abgedunkelt: `filter: brightness(0.8)` nur auf der Kachelebene, nie auf Markern oder Steuerung; das Token `--hoops-map-dim` ändert den Wert. Die **Marker** sind in beiden Modi gleich: dunkle Füllung mit weißem Ring und dunkler Kontur, die Nummer weiß auf dunkel; der eigene Ort golden mit schwarzer Nummer. So hebt sich der Pin von hellen **und** dunklen Kacheln ab (Messwerte unten). Die Handy-Vorschau weiter unten zeigt beide Modi.
+Rahmen, Zoom-Schaltflächen, Quellenangabe, Platzhalter und Hinweise laufen über die semantischen Tokens (`--hoops-surface`, `--hoops-fg`, `--hoops-line-strong`, `--hoops-link`, `--hoops-chip-*`); die Karte braucht keinen eigenen Dunkelmodus. Die **Kacheln** werden mit `dimInDark` (Standard) etwas abgedunkelt: `filter: brightness(0.8)` nur auf der Kachelebene, nie auf Markern oder Steuerung; das Token `--hoops-map-dim` ändert den Wert. Die **Marker** sind in beiden Modi gleich: dunkle Füllung mit weißem Ring und dunkler Kontur, die Nummer weiß auf dunkel; der eigene Ort golden mit schwarzer Nummer. So hebt sich der Pin von hellen **und** dunklen Kacheln ab (Messwerte unten). Die Vorschauen auf dieser Seite folgen dem Umschalter Hell/Dunkel der Werkzeugleiste.
 
 ### Kacheln im Dunkelmodus: `darkTiles`
 
@@ -201,16 +202,13 @@ OpenStreetMap kennt keinen Dunkelmodus. Zwei Verfahren stehen zur Wahl, beide wi
 - **`dim`** (Standard): abdunkeln mit `brightness(0.8)` (Token `--hoops-map-dim`). Die Straßenfarben bleiben vertraut, die Karte bleibt aber hell.
 - **`invert`**: invertieren und umfärben mit `invert(1)`, `hue-rotate(180deg)`, `brightness(0.85)` und `contrast(0.9)` (Token `--hoops-map-invert-filter`). Die Karte wird wirklich dunkel, die Farben wirken dafür fremd (gemessen: Wasser `#aad3df` wird zu einem dunklen Blaugrün, rgb(27, 58, 68), das Land dunkelbraun, weiße Straßen werden fast schwarz, orange Straßen braun).
 
-Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau rechts zeigt beide im Dunkelmodus (der Rahmen ist dunkel geschaltet):
+Der Marker hebt sich auf beiden von der Kachel ab (Kontur oder Ring mit mindestens 3:1 auf allen Standard-Kachelfarben, geprüft); die Quellenangabe liegt auf einer eigenen Fläche und ist von beiden Verfahren unabhängig (Text über 7:1). Die Vorschau zeigt beide Verfahren nebeneinander. Sie folgt dem Theme der Werkzeugleiste; die Filter wirken nur im Dunkelmodus, schalte dazu Hell/Dunkel auf Dunkel:
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">darkTiles · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kacheln im Dunkelmodus">
-      <iframe style={{ height: '560px' }} title="Vorschau: Karten mit abgedunkelten und invertierten Kacheln im Dunkelmodus" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--dunkle-kacheln" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={MapStories.DunkleKacheln} title="darkTiles: dim und invert" height={560}>
+    Oben `darkTiles="dim"` (Standard), darunter `darkTiles="invert"`; im hellen Theme sehen beide gleich aus.
+  </PreviewStep>
+</StickyPreview>
 
 ## Druck
 
@@ -228,24 +226,15 @@ Zoom-Schaltflächen haben Standard, Hover (Fläche `--hoops-hover-bg`), Fokus (g
 
 Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeugleiste **Zustand** umschalten.
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel: Platzhalter und geladene Karte, Pins als Pins, die Liste darunter, die Seite scrollt nicht seitlich.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Map · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte hell">
-      <iframe title="Handy-Vorschau: Karte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-map--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Map · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Karte dunkel">
-      <iframe title="Handy-Vorschau: Karte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--handy" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={MapStories.Handy} title="Karte: Platzhalter und geladen">
+    Platzhalter und geladene Karte, Pins als Pins, die Liste darunter; in Handy-Breite (390 px) scrollt die Seite nicht seitlich.
+  </PreviewStep>
+</StickyPreview>
 
 ## Barrierefreiheit: Namen und Landmarken
 
@@ -327,24 +316,18 @@ Mit `load: 'auto'`, Vereinssitz und `darkTiles: 'invert'`:
 
 Ohne eigenen Proxy holt jede Kachel das Bild von `tile.openstreetmap.org` und gibt die IP-Adresse der Besucher weiter. Der Standard ist für Demo und Entwicklung gedacht; die Entscheidung dazu steht in der Architekturdokumentation (ADR-003, Karte). Rezepte (nginx und ein Node-Endpunkt) und die Pflichten gegenüber OpenStreetMap stehen im Abschnitt „Datenschutz und Kachelserver“ oben; `tileUrl` und `privacyNote` verweisen die Karte auf den eigenen Server.
 
-### Handy · 390 px Breite
+### Vanilla in Gerätebreite
 
-Die Vorschauen zeigen die Vanilla-Karte mit anderen Hallen als die Svelte-Vorschau oben: links der Platzhalter mit Seeberg und Kiefernau, rechts die geladene Karte mit der Geschäftsstelle und Kiefernau.
+Die Vorschau zeigt die Vanilla-Karte mit anderen Hallen als die Svelte-Vorschau oben, in der Breite des Umschalters **Breite**.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Vanilla · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte hell">
-      <iframe title="Handy-Vorschau: Vanilla-Karte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-map--vanilla-handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Vanilla · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Karte dunkel">
-      <iframe title="Handy-Vorschau: Vanilla-Karte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-map--vanilla-handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={MapStories.VanillaHandy} title="Vanilla: Platzhalter">
+    Der Platzhalter mit den Hallen Seeberg und Kiefernau.
+  </PreviewStep>
+  <PreviewStep of={MapStories.VanillaHandyGeladen} title="Vanilla: geladene Karte">
+    Die geladene Karte (`load: 'auto'`) mit der Geschäftsstelle und Kiefernau.
+  </PreviewStep>
+</StickyPreview>
 
 ### Leaflet direkt
 

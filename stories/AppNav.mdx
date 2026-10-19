@@ -3,6 +3,7 @@ import * as AppNavStories from './AppNav.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './AppNav.code';
 
@@ -56,22 +57,16 @@ Die Matrix ist fest gesetzt. Jede andere Story lässt sich über die Werkzeuglei
 
 ## Mobil: Hamburger-Menü unter 720 px
 
-Unter 720 px Fensterbreite verschwindet die Liste hinter dem Menü-Button (`hoops-appnav-toggle`, `aria-expanded`). Ein Klick öffnet die Liste untereinander mit ganzer Zeilenbreite, die Gruppen klappen eingerückt darunter auf. Diese Regel hängt an der Breite des Fensters, nicht an der des Rahmens. Darum sind die Vorschauen eingebettete Seiten mit fester Breite von 390 px: links geschlossen, rechts mit offenem Menü und geöffneter Gruppe „Vorbereiten“.
+Unter 720 px Fensterbreite verschwindet die Liste hinter dem Menü-Button (`hoops-appnav-toggle`, `aria-expanded`). Ein Klick öffnet die Liste untereinander mit ganzer Zeilenbreite, die Gruppen klappen eingerückt darunter auf. Diese Regel hängt an der Breite des Fensters, nicht an der des Rahmens. Darum ist die Vorschau eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. Unter 720 px (Handy) erscheint der Menü-Button, ab Tablet (768 px) die Liste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <div className="hoops-doc-cap">Geschlossen</div>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: AppNav geschlossen">
-      <iframe title="Handy-Vorschau: AppNav mit geschlossenem Menü in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-appnav--mobil-geschlossen" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <div className="hoops-doc-cap">Menü offen</div>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: AppNav mit offenem Menü">
-      <iframe title="Handy-Vorschau: AppNav mit offenem Menü in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-appnav--mobil-offen" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={AppNavStories.MobilGeschlossen} title="Menü geschlossen">
+    Unter 720 px steht nur der Menü-Button (`aria-expanded="false"`) in der Leiste.
+  </PreviewStep>
+  <PreviewStep of={AppNavStories.MobilOffen} title="Menü offen">
+    Das geöffnete Menü mit der aufgeklappten Gruppe „Vorbereiten“: die Links untereinander in ganzer Zeilenbreite, die Gruppe eingerückt darunter.
+  </PreviewStep>
+</StickyPreview>
 
 ## Verwendung: Import und Props
 

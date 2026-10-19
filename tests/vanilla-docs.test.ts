@@ -39,7 +39,7 @@ describe('Code-Beispiele', () => {
 describe('Bündel: Exportliste und Größen stimmen mit der Doku', () => {
   it('jeder Export des gebauten Bündels steht auf der Seite (und kein Name ist erfunden)', async () => {
     const mod = (await import(/* @vite-ignore */ pathToFileURL(`${bundleDir}hoops.js`).href)) as Record<string, unknown>;
-    const section = mdx.slice(mdx.indexOf('## Alle Exporte'), mdx.indexOf('## Handy'));
+    const section = mdx.slice(mdx.indexOf('## Alle Exporte'), mdx.indexOf('## Vorschau in Gerätebreite'));
     const listed = [...section.matchAll(/<code>(\w+)<\/code>/g)].map((m) => m[1]);
     expect(listed.sort()).toEqual(Object.keys(mod).sort());
   });
@@ -84,7 +84,7 @@ describe('Doku-Seite', () => {
     expect(mdx.indexOf('\n## ')).toBeLessThan(mdx.indexOf('<Canvas'));
   });
   it('die Pflichtabschnitte sind da', () => {
-    for (const title of ['## Überblick', '## Einbindung ohne Build', '## data-hoops: was initAll startet', '## Das Muster: init, destroy, idempotent', '## Markup erzeugen', '### update und destroy', '### Escaping und Eingaben', '### In Node und im Crawler', '### Bündel und Größe', '## Sicherheit', '### CSP und Boot-Skript', '## Bundle-Größen', '## Kopieren ins Projekt', '## Einbinden aus dem Release', '## Aktualisieren', '## Kompatibilität', '## Wechsel auf npm ab 1.0', '## Versionsabgleich', '## Alle Exporte', '## Handy · 390 px Breite', "## Dos und Don'ts"]) expect(mdx, title).toContain(title);
+    for (const title of ['## Überblick', '## Einbindung ohne Build', '## data-hoops: was initAll startet', '## Das Muster: init, destroy, idempotent', '## Markup erzeugen', '### update und destroy', '### Escaping und Eingaben', '### In Node und im Crawler', '### Bündel und Größe', '## Sicherheit', '### CSP und Boot-Skript', '## Bundle-Größen', '## Kopieren ins Projekt', '## Einbinden aus dem Release', '## Aktualisieren', '## Kompatibilität', '## Wechsel auf npm ab 1.0', '## Versionsabgleich', '## Alle Exporte', '## Vorschau in Gerätebreite', "## Dos und Don'ts"]) expect(mdx, title).toContain(title);
   });
   it('jede im MDX genutzte Story gibt es, jedes Beispiel gibt es in der Beispielkomponente', () => {
     for (const m of mdx.matchAll(/VanillaStories\.(\w+)/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\b`));
@@ -94,12 +94,9 @@ describe('Doku-Seite', () => {
     expect(stories).not.toContain('autodocs');
     for (const m of stories.matchAll(/export const (\w+)\s*= \{ \.\.\.example/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\s*= .*tags: \\['!dev'\\]`));
   });
-  it('Handy-Vorschauen: vier Iframes mit verschiedenen Beispielen, vier Dos und Don\'ts', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(4);
-    expect(mdx).toContain('id=foundation-vanilla--handy"');
-    expect(mdx).toContain('theme:Dark&id=foundation-vanilla--handy-dunkel');
-    expect(mdx).toContain('id=foundation-vanilla--markup-handy"');
-    expect(mdx).toContain('theme:Dark&id=foundation-vanilla--markup-handy-dunkel');
+  it('Vorschau in Gerätebreite: vier verschiedene Beispiele ohne festes Theme, vier Dos und Don\'ts', () => {
+    expect(mdx).not.toMatch(/<iframe |theme:Dark/);
+    for (const name of ['Handy', 'HandyAccordion', 'MarkupHandy', 'MarkupHandyTeam']) expect(mdx, name).toContain(`<PreviewStep of={VanillaStories.${name}} `);
     expect([...mdx.matchAll(/doText:/g)]).toHaveLength(4);
   });
   it('die Doku nennt Muster, Sicherheit und Versionsabgleich', () => {

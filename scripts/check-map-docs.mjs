@@ -22,9 +22,9 @@ const FILTER = process.argv[3] ?? '';
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.map': 'application/json' };
 const PAGES = [
   ['docs', 'components-map--docs'], ['docs', 'components-venuecard--docs'], ['docs', 'foundation-vanilla--docs'], ['docs', 'introduction--docs'],
-  ['story', 'components-map--vanilla-karte'], ['story', 'components-map--vanilla-geladen'], ['story', 'components-map--vanilla-handy'], ['story', 'components-map--vanilla-handy-dunkel'],
+  ['story', 'components-map--vanilla-karte'], ['story', 'components-map--vanilla-geladen'], ['story', 'components-map--vanilla-handy'], ['story', 'components-map--vanilla-handy-geladen'],
   ['story', 'components-map--do-lokal'], ['story', 'components-map--dont-lokal'],
-  ['story', 'components-venuecard--vanilla-karte'], ['story', 'components-venuecard--vanilla-handy'], ['story', 'components-venuecard--vanilla-handy-dunkel'],
+  ['story', 'components-venuecard--vanilla-karte'], ['story', 'components-venuecard--vanilla-handy'], ['story', 'components-venuecard--vanilla-handy-kompakt'],
 ];
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const EXTRA = ['color-contrast-enhanced', 'target-size', 'landmark-unique', 'heading-order'];

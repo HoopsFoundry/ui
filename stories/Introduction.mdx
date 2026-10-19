@@ -21,7 +21,7 @@ Komponenten-Bibliothek für Basketball-Apps, zum Beispiel Spielbericht, Scoreboa
 ## Marken, Schrift, Hell und Dunkel
 
 - **Marke:** BBV (Ink · Amber · Sky, Standard) und DBB (Schwarz · Gold · Orange), umschaltbar mit `data-brand="dbb"` auf `<html>`. Komponenten lesen nur Rollen-Tokens und `--hoops-*`, die Marke tauscht deren Werte aus. Mehr auf der Seite [Colors](?path=/docs/foundation-colors--docs).
-- **Schrift:** unabhängig von der Marke mit `data-type="dbb"` (Rubik und Sucrose mit Fallback Barlow Condensed statt Manrope und Sora). Mehr auf der Seite [Typography](?path=/docs/foundation-typography--docs).
+- **Schrift:** im Paket unabhängig von der Marke mit `data-type="dbb"` (Rubik und Sucrose mit Fallback Barlow Condensed statt Manrope und Sora). In dieser Doku bringt die Marke ihre Schrift mit (BBV: Sora und Manrope, DBB: Rubik und Sucrose); die Seite [Typography](?path=/docs/foundation-typography--docs) zeigt beide Schriften nebeneinander.
 - **Hell und Dunkel:** automatisch nach OS-Präferenz, erzwungen mit `data-theme="light"` oder `data-theme="dark"` auf `<html>`.
 - **Barrierefreiheit:** WCAG 2.1 AAA für alle Text-Paare, Fokus-Ring gestrichelt in Gold/Amber ([Focus & Hover](?path=/docs/foundation-focus-hover--docs)), Touch-Ziele in den Stufen 44, 56 und 64 px.
 
@@ -29,14 +29,14 @@ Komponenten-Bibliothek für Basketball-Apps, zum Beispiel Spielbericht, Scoreboa
 
 Oben im Storybook stehen die Schalter, die auf allen Seiten wirken:
 
-- **Marke:** BBV oder DBB.
-- **Schrift:** Standard (Sora, Manrope) oder DBB-Original (Rubik, Sucrose).
+- **Marke:** BBV (mit Sora und Manrope) oder DBB (mit Rubik und Sucrose). Die Marke setzt `data-brand` und `data-type` zusammen; einen eigenen Schalter für die Schrift gibt es nicht.
+- **Breite:** Vollbreite, Handy (390 px), Tablet (768 px) oder Desktop (1280 px) für die Vorschauen in Gerätebreite. Sie laufen als eigene Seite (iframe), damit die Media-Queries die gewählte Breite sehen; ist das Gerät breiter als die Spalte, wird die Vorschau verkleinert. In der Story-Ansicht bietet das Viewport-Werkzeug von Storybook dieselben Geräte.
 - **Theme:** Hell oder Dunkel.
 - **Fassung:** welche Code-Beispiele die Seiten zeigen: Vanilla (HTML und CSS), Svelte oder React.
 - **Sprache:** Deutsch oder Englisch für die eingebauten Texte der Bausteine (Beschriftungen, `aria-label`, Statuszeilen). Deutsch bleiben die Doku-Texte, der Code der Beispiele und die Demodaten, die eine Anwendung selbst übergäbe (Namen, Titel, Tab-Beschriftungen, Knopftexte wie „Erneut versuchen“, Kennzahlen-Beschriftungen) ([Internationalisierung](?path=/docs/foundation-internationalisierung--docs)).
 - **Zustand:** erzwingt Hover, Fokus oder Aktiv auf den Vorschauen einer Seite, damit du sie ohne Maus und Tastatur prüfen kannst.
 
-Marke, Schrift, Theme, Sprache und Zustand wirken auf Vorschauen, die direkt auf der Seite stehen; Vorschauen im eigenen Rahmen (iframe) behalten ihre Einstellung.
+Marke, Theme, Sprache, Bewegung, Fassung und Zustand wirken auf alle Vorschauen, auch auf die Vorschauen in Gerätebreite (sie laden dafür neu). Hell und Dunkel nebeneinander zeigt nur die Seite [Dark Mode](?path=/docs/foundation-dark-mode--docs); alle anderen Seiten folgen dem Schalter Theme. Auf Seiten mit Vorschau in Gerätebreite steht die Vorschau fest neben dem Text (ab 1100 px Breite des Doku-Bereichs) oder darüber und zeigt das Beispiel des Abschnitts, der gerade im Blick ist; die Liste über der Vorschau wählt es direkt. Bei reduzierter Bewegung wechselt sie nicht von selbst.
 
 ## Einbinden
 

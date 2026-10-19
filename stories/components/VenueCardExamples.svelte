@@ -78,14 +78,14 @@
     <VenueCard {...venueProps(9)} games={games} size="compact" tileUrl={tile} />
   </div>
 {:else if example === 'handy'}
-  <div class="narrow">
+  <div class="device">
     <VenueCard {...venueProps(10)} games={games} logos names="short" tileUrl={tile} />
     <div class="gap"></div>
     <VenueCard {...venueProps(11)} size="compact" tileUrl={tile} />
   </div>
-{:else if example === 'handy-dunkel'}
+{:else if example === 'handy-andere-hallen'}
   <!-- andere Hallen als bei 'handy': beide Vorschauen stehen auf einer Seite -->
-  <div class="narrow">
+  <div class="device">
     <VenueCard {...venueProps(0)} name="Sporthalle Nordhain Nord" games={games} logos names="short" tileUrl={tile} />
     <div class="gap"></div>
     <VenueCard {...venueProps(1)} name="Mehrzweckhalle Seeberg Süd" size="compact" tileUrl={tile} />
@@ -93,11 +93,11 @@
 {:else if example === 'vanilla'}
   <div use:vanilla={{ ...venueProps(13), name: 'Buchenhalle Süd', games: gamesPlain, tileUrl: tile } as never}></div>
 {:else if example === 'vanilla-handy'}
-  <div class="narrow">
+  <div class="device">
     <div use:vanilla={{ ...venueProps(14), name: 'Ahornhalle Nord', games: games, logos: true, names: 'short', tileUrl: tile } as never}></div>
   </div>
-{:else if example === 'vanilla-handy-dunkel'}
-  <div class="narrow">
+{:else if example === 'vanilla-handy-kompakt'}
+  <div class="device">
     <div use:vanilla={{ ...venueProps(21), name: 'Erlenhalle Ost', size: 'compact', tileUrl: tile, load: 'auto' } as never}></div>
   </div>
 {:else if example === 'zustaende'}
@@ -153,6 +153,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .stack { display: grid; gap: 24px; max-width: 860px; }
   .narrow { width: 100%; max-width: 380px; }
   .medium { width: 100%; max-width: 700px; }

@@ -3,6 +3,7 @@ import * as CardLibraryStories from './CardLibrary.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, namesVanilla, namesSvelte, namesReact, photoVanilla, photoSvelte, photoReact } from './CardLibrary.code';
 import { spielRender } from './Render.code';
@@ -48,18 +49,15 @@ Auf schmalen Karten brechen lange Vereinsnamen oder werden mit Auslassungspunkte
 
 Das Logo ist dekorativ (`alt=""`, `aria-hidden`), weil der Name daneben steht. Der Kurzname ist `aria-hidden`; wo er sichtbar ist, bleibt der volle Name unsichtbar im Dokument (`hoops-sr-only`-Muster), sodass Screenreader den vollen Namen genau einmal lesen; auch der Name einer Karte als Link oder Button enthält den vollen Namen. Der sichtbare Kurzname zeigt den vollen Namen als Tooltip (`title`), der versteckte volle Name ist nicht markierbar, Kopieren liefert nur den sichtbaren Namen. **Label im Namen (WCAG 2.5.3):** Ein abgekürzter Kurzname wie „TSV N.“ steckt nicht im zugänglichen Namen „TSV Nordhain 1920“; Sprachsteuerung („Klick TSV N.“) greift dann nicht. Wähle Kurznamen deshalb so, dass sie Teil des vollen Namens sind („Hawks“, „Seeberg“) oder dessen Anfang bilden. Ohne `short` ändert sich nichts.
 
-### Handy · 390 px Breite
+### Vorschau in Gerätebreite
 
-Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass `names` gesetzt ist: Der Kurzname erscheint automatisch.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. `names` ist nicht gesetzt: Bis 640 px Breite erscheint der Kurzname automatisch.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">MatchCard · logos</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: MatchCard mit Logos">
-      <iframe title="Handy-Vorschau: Spielkarte mit Kurznamen und Logos in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-card-library--karten-namen-handy" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={CardLibraryStories.KartenNamenHandy} title="Spielkarte mit Kurznamen und Logos">
+    Bis 640 px Breite stehen die Kurznamen neben den Logos, darüber die vollen Namen.
+  </PreviewStep>
+</StickyPreview>
 
 <FrameworkCode label="MatchCard: Kurznamen und Logos" vanilla={namesVanilla} svelte={namesSvelte} react={namesReact} />
 
@@ -83,14 +81,11 @@ Ohne `photo`, mit leerem `photo` oder wenn das Bild nicht lädt, erscheint wiede
 
 <Canvas of={CardLibraryStories.SpielerkartenFotoFallback} />
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">PlayerCard · hero mit Foto</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PlayerCard hero mit Foto">
-      <iframe title="Handy-Vorschau: Spielerkarte hero mit Foto in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-card-library--spielerkarten-foto-handy" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={CardLibraryStories.SpielerkartenFotoHandy} title="Spielerkarte hero mit Foto in Gerätebreite">
+    Bis 560 px Breite liegt das Porträt als Banner oben, darüber steht es links neben dem Text. Mit **Breite** auf Handy und Tablet lässt sich der Wechsel vergleichen.
+  </PreviewStep>
+</StickyPreview>
 
 **Alternativtext:** `photoAlt` ist standardmäßig leer. Das Foto ist dekorativ, weil der Name daneben steht; ein Screenreader liest den Namen so genau einmal. Fülle `photoAlt` nur, wenn das Bild eine Information trägt, die nicht im Text steht (zum Beispiel „im Heimtrikot“). Das Foto ist nie die einzige Information: Name und Trikotnummer stehen immer als Text da.
 

@@ -3,6 +3,7 @@ import * as ModalStories from './Modal.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './Modal.code';
 
@@ -121,24 +122,18 @@ Bei mehreren offenen Modals (ein Modal öffnet ein zweites) reagiert nur das obe
 
 Es gibt in Vanilla keinen `HeadingLevel`-Kontext: Die Ebene steht im Markup. Der Titel ist das Element mit `class="hoops-m-title"` (oder `data-hoops-modal-title`); sein Tag wählst du, `h2` ist der Standard wie bei `titleAs` in Svelte und React, erlaubt sind `h2` bis `h6`. Überschriften im Inhalt bekommen die nächste Ebene (Titel `h2`, darin `h3`); die Größe hängt am Token `--hoops-title-size`, nicht an der Ebene. Die Rangfolge: der Tag, den du schreibst, gilt; das Skript ändert ihn nie. Hat das Modal weder `aria-labelledby` noch `aria-label`, verbindet `initModal` den Titel mit dem Dialog (und vergibt dafür eine id, falls er keine hat). Titel und Inhalt sind Text: das Skript baut nichts mit `innerHTML`, setzt du Texte aus Daten ein, dann mit `textContent` oder `createContextualFragment` auf geprüftem Markup.
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Zwei eingebettete Seiten mit fester Breite, links hell mit einer Warnung, rechts dunkel mit einer zerstörerischen Aktion (Fokus auf der sicheren Wahl). Die Fläche schrumpft auf die Fensterbreite abzüglich 24 px Rand.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. Die Fläche des Modals schrumpft auf die Fensterbreite abzüglich 24 px Rand; die Vorschau ist 560 px hoch, weil das Modal fest positioniert ist.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Modal · Warnung · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal hell">
-      <iframe title="Handy-Vorschau: Modal mit Warnung hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-modal--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Modal · Verwerfen · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Modal dunkel">
-      <iframe title="Handy-Vorschau: Modal zum Verwerfen dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-modal--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={ModalStories.Handy} title="Warnung" height={560}>
+    Ein Modal mit Warnung (`severity="warn"`): Anwurfzeit nach 22:00 Uhr.
+  </PreviewStep>
+  <PreviewStep of={ModalStories.HandyVerwerfen} title="Zerstörerische Aktion" height={560}>
+    Ein Modal mit zerstörerischer Aktion (`severity="danger"`), der Fokus liegt auf der sicheren Wahl.
+  </PreviewStep>
+</StickyPreview>
 
 ## Verwendung: Import und Props
 

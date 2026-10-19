@@ -4,6 +4,7 @@ import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, tokensCss, funktionenJs } from './PageNav.code';
 
@@ -55,22 +56,16 @@ Zwei Navigationen mit demselben Namen verletzen die Regel `landmark-unique` von 
 
 `initBackToTop(options)` legt einen runden Button unten rechts an (44 × 44 px, Symbol als SVG, Name „Nach oben“). Er erscheint, sobald die Seite höher ist als zwei Fenster und mehr als 480 px gescrollt wurde. Ein Klick scrollt nach oben (sanft; bei „Bewegung reduzieren“ und mit `data-motion="reduce"` sofort) und setzt den Fokus auf die erste `h1`, sonst auf `main`. Verschwindet der Knopf, während er den Fokus hat, geht der Fokus an dasselbe Ziel.
 
-Der Knopf hängt am Fenster. Die Vorschau ist deshalb eine eingebettete Seite (350 px hoch): scrolle darin, bis er erscheint.
+Der Knopf hängt am Fenster. Die Vorschau ist deshalb eine eingebettete Seite (350 px hoch) in der Breite des Umschalters **Breite**: scrolle darin, bis er erscheint.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Nach oben</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Nach-oben-Knopf">
-      <iframe style={{ height: '350px', width: '390px' }} title="Vorschau: Nach-oben-Knopf in einer langen Seite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-pagenav--nach-oben" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Nach oben über einer festen BottomNav</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Nach-oben-Knopf mit BottomNav">
-      <iframe style={{ height: '350px', width: '390px' }} title="Vorschau: Nach-oben-Knopf über einer festen BottomNav" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-pagenav--nach-oben-bnav" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={PageNavStories.NachOben} title="Nach oben in einer langen Seite" height={350}>
+    Der Knopf erscheint unten rechts, sobald in der Vorschau mehr als 480 px gescrollt wurde.
+  </PreviewStep>
+  <PreviewStep of={PageNavStories.NachObenBnav} title="Nach oben über einer festen BottomNav" height={350}>
+    Mit einer festen BottomNav am unteren Rand steht der Knopf über ihr.
+  </PreviewStep>
+</StickyPreview>
 
 **Feste untere Leiste:** Steht eine `hoops-bnav` mit `position: fixed` (oder `sticky`) am unteren Rand, setzt `initBackToTop` den Knopf darüber (Höhe der Leiste plus 16 px) und folgt Änderungen beim Scrollen und bei `resize`. Mit der Option `offset` (CSS-Länge) legst du den Abstand selbst fest, mit `avoid: null` schaltest du die Erkennung ab. Rechts und unten gilt `env(safe-area-inset-*)`, damit der Knopf nicht unter der Home-Anzeige oder Kerbe sitzt.
 
@@ -103,24 +98,18 @@ Die Seitennavigation setzt **keine globalen Regeln** (kein `html { scroll-paddin
 - **Bewegung:** Sanftes Scrollen entfällt bei „Bewegung reduzieren“ und `data-motion="reduce"`.
 - **Kein `innerHTML`:** Texte werden als Text gesetzt, das Symbol des Knopfes als SVG per `createElementNS`; die Links zeigen nur auf die eigene Seite.
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Beispiele, damit die Namen der Navigationen unterscheidbar bleiben). Die Links brechen um, jeder ist 44 px hoch; die Bereiche der rechten Seite sind geschlossen.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">PageNav · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PageNav hell">
-      <iframe title="Handy-Vorschau: Seitennavigation hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-pagenav--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">PageNav · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: PageNav dunkel">
-      <iframe title="Handy-Vorschau: Seitennavigation dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-pagenav--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={PageNavStories.Handy} title="Seitennavigation">
+    In Handy-Breite (390 px) brechen die Links um, jeder ist 44 px hoch.
+  </PreviewStep>
+  <PreviewStep of={PageNavStories.HandyBereiche} title="Seitennavigation mit geschlossenen Bereichen">
+    Die Navigation verweist auch auf Überschriften in geschlossenen Accordion-Bereichen; ein Sprung öffnet den Bereich.
+  </PreviewStep>
+</StickyPreview>
 
 ## Verwendung: Import und Optionen
 

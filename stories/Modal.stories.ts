@@ -89,7 +89,7 @@ export const Zustaende    = { ...example('zustaende', '320px'), tags: ['!dev'] }
 export const VanillaDialog = { ...example('vanilla-dialog', '170px'), tags: ['!dev'] };
 export const VanillaDiv    = { ...example('vanilla-div', '420px'), tags: ['!dev'] };
 export const Handy         = { ...example('handy'), parameters: { controls: { disable: true }, layout: 'padded' }, tags: ['!dev'] };
-export const HandyDunkel   = { ...example('handy-dunkel'), parameters: { controls: { disable: true }, layout: 'padded' }, tags: ['!dev'] };
+export const HandyVerwerfen   = { ...example('handy-verwerfen'), parameters: { controls: { disable: true }, layout: 'padded' }, tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAktion     = { ...example('do-aktion', '420px'), tags: ['!dev'] };

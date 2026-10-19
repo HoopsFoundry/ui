@@ -364,5 +364,5 @@
   .surface { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); border-radius: var(--hoops-radius-lg); padding: 22px 24px; overflow-x: auto; }
   .states { display: grid; grid-template-columns: 70px repeat(6, minmax(170px, 1fr)); gap: 10px 12px; align-items: start; }
   .cell { min-width: 0; }
-  .page { max-width: 390px; padding: 16px; box-sizing: border-box; }
+  .page { padding: 16px; box-sizing: border-box; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
 </style>

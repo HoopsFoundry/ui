@@ -4,6 +4,7 @@ import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { CodeBlock } from './docs/blocks/CodeBlock';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, ebeneSvelte, ebeneReact, funktionenJs } from './VenueCard.code';
 import { hallenRender, hallenKarteLebendig, hallenKarteServer } from './Render.code';
@@ -86,24 +87,18 @@ Gemessen im Browser (Chromium, BBV); die Kartenbreite steht in der jeweiligen Ze
   ]}
 />
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (zwei verschiedene Hallen, damit die Karten auf der Seite unterscheidbar bleiben). Die Karte steht oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben. Genau gilt: ist die Containerbreite ohne den 1 px breiten Rand der Karte höchstens 640 px (die Karte also höchstens 642 px breit), steht die Karte oben; ab 643 px steht sie links. Auch die Kurznamen der Mannschaften (`names`) folgen der **Breite der Karte** (Container-Abfrage, dieselbe Schwelle von 640 px): in einer schmalen Spalte am großen Bildschirm erscheinen die Kurznamen, in einer breiten Karte auf dem Handy-Fenster nicht; `names="short"` zeigt sie immer.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. In Handy-Breite (390 px) steht die Karte oben (16:9, mindestens 224 px), die Daten darunter, Kontaktlinks sind 44 px hoch, die Mannschaften erscheinen als Kurzname; die Seite scrollt nicht seitlich. Maßgeblich ist die **Breite der Karte** (Container-Abfrage), nicht die des Fensters: auch in einer schmalen Spalte am großen Bildschirm steht die Karte oben. Genau gilt: ist die Containerbreite ohne den 1 px breiten Rand der Karte höchstens 640 px (die Karte also höchstens 642 px breit), steht die Karte oben; ab 643 px steht sie links. Auch die Kurznamen der Mannschaften (`names`) folgen der **Breite der Karte** (Container-Abfrage, dieselbe Schwelle von 640 px): in einer schmalen Spalte am großen Bildschirm erscheinen die Kurznamen, in einer breiten Karte auf dem Handy-Fenster nicht; `names="short"` zeigt sie immer.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">VenueCard · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard hell">
-      <iframe title="Handy-Vorschau: Hallenkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-venuecard--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">VenueCard · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: VenueCard dunkel">
-      <iframe title="Handy-Vorschau: Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={VenueCardStories.Handy} title="Hallenkarte mit Spielen und kompakt">
+    Eine Hallenkarte mit Spielen und Logos (`names="short"`) und darunter eine kompakte Hallenkarte. In Tablet-Breite (768 px) ist die Hallenkarte in dieser Vorschau 712 px breit (mehr als 642 px), die Karte steht dann links neben den Daten.
+  </PreviewStep>
+  <PreviewStep of={VenueCardStories.HandyAndereHallen} title="Andere Hallen">
+    Dieselben Varianten mit zwei anderen Hallen (Nordhain Nord, Seeberg Süd).
+  </PreviewStep>
+</StickyPreview>
 
 ## Dunkelmodus
 
@@ -170,24 +165,18 @@ Entsteht das Markup auf dem Server (Seitengenerierung, Crawler), markiert `rende
 
 <FrameworkCode label="Hallenkarte vom Server (Vanilla)" vanilla={hallenKarteServer} />
 
-### Vanilla auf dem Handy · 390 px Breite
+### Vanilla in Gerätebreite
 
-Die Vorschauen zeigen die Hallenkarte aus `mountVenueCard` mit anderen Hallen als die Svelte-Vorschauen oben: links die Ahornhalle mit Spielen, rechts die Erlenhalle kompakt mit sofort geladener Karte.
+Die Vorschau zeigt die Hallenkarte aus `mountVenueCard` mit anderen Hallen als die Svelte-Vorschau oben, in der Breite des Umschalters **Breite**.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">VenueCard Vanilla · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte hell">
-      <iframe title="Handy-Vorschau: Vanilla-Hallenkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-venuecard--vanilla-handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">VenueCard Vanilla · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla-Hallenkarte dunkel">
-      <iframe title="Handy-Vorschau: Vanilla-Hallenkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-venuecard--vanilla-handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={VenueCardStories.VanillaHandy} title="Vanilla: Ahornhalle mit Spielen">
+    Die Ahornhalle Nord mit Spielen, Logos und Kurznamen.
+  </PreviewStep>
+  <PreviewStep of={VenueCardStories.VanillaHandyKompakt} title="Vanilla: Erlenhalle kompakt">
+    Die Erlenhalle Ost kompakt mit sofort geladener Karte (`load: 'auto'`).
+  </PreviewStep>
+</StickyPreview>
 
 ## Dos und Don'ts
 

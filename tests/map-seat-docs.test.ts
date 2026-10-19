@@ -59,14 +59,15 @@ describe('Doku', () => {
   it('Abschnitte, Stories und Beispiele sind da', () => {
     for (const heading of ['## Vereinssitz', '### Kacheln im Dunkelmodus: `darkTiles`']) expect(mdx).toContain(heading);
     for (const name of ['Vereinssitz', 'SitzMarker', 'DunkleKacheln', 'DoSitz', 'DontSitz']) {
-      // DunkleKacheln steht als Iframe auf der Seite (eigenes Theme), die anderen als Canvas
-      expect(mdx, name).toContain(name === 'DunkleKacheln' ? 'id=components-map--dunkle-kacheln' : `MapStories.${name}`);
+      // DunkleKacheln steht als Vorschau (Iframe) auf der Seite, die anderen als Canvas
+      expect(mdx, name).toContain(name === 'DunkleKacheln' ? '<PreviewStep of={MapStories.DunkleKacheln} ' : `MapStories.${name}`);
       expect(stories, name).toMatch(new RegExp(`export const ${name}\\s+= .*tags: \\['!dev'\\]`));
     }
     for (const name of ['sitz', 'sitz-pins', 'dunkle-kacheln', 'do-sitz', 'dont-sitz']) expect(examples).toContain(`example === '${name}'`);
   });
-  it('die Dunkel-Vorschau ist ein Iframe mit dunklem Theme', () => {
-    expect(mdx).toContain('theme:Dark&id=components-map--dunkle-kacheln');
+  it('die Vorschau der darkTiles folgt dem Theme der Werkzeugleiste (kein festes Theme) und sagt das', () => {
+    expect(mdx).not.toContain('theme:Dark');
+    expect(mdx).toContain('die Filter wirken nur im Dunkelmodus, schalte dazu Hell/Dunkel auf Dunkel');
   });
   it('Marker-Feld kind und Prop darkTiles sind beschrieben', () => {
     expect(mdx).toMatch(/\['kind', "'place' \| 'seat'"/);

@@ -3,6 +3,7 @@ import * as VanillaStories from './Vanilla.stories';
 import { DosDonts } from '../docs/blocks/DosDonts';
 import { CodeBlock } from '../docs/blocks/CodeBlock';
 import { DocTable } from '../docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from '../docs/blocks/Preview';
 import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget, mapSizes, mapBudget, getSync, releaseSync, manualCheck, updateFlow, npmSwitch, compat, coreMatrix, nodeVersions } from './Vanilla.code';
 import syncSource from '../../scripts/portal-sync.mjs?raw';
 import portalSource from '../examples/portal-seite/portal.js?raw';
@@ -138,24 +139,18 @@ Das Render-Bündel ist eine eigene Datei: `hoops-render.js` importiert das Accor
 
 Wer nur den Kern braucht, lädt nur `hoops.js`; wer Markup erzeugt, lädt beide aus derselben Version. `VERSION` gibt es in beiden Bündeln (und `--hoops-version` in `hoops.css`); sie müssen übereinstimmen, `checkVersion()` des Kerns prüft nur `hoops.js` gegen `hoops.css`, ein Vergleich mit `VERSION` aus `hoops-render.js` gehört in dein Start-Skript. Die Exporte des Render-Bündels: <code>esc</code>, <code>attr</code>, <code>mount</code>, <code>VERSION</code> und die `render…`/`mount…`-Paare der Tabelle.
 
-### Markup auf dem Handy · 390 px Breite
+### Markup in Gerätebreite
 
-Zwei eingebettete Seiten aus Daten: links Ligencard, Spielkarte und Kennzahlen (hell), rechts Teamkarte, Hallenkarte und Leerzustand (dunkel).
+Die Vorschau ist eine eingebettete Seite aus Daten in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">Markup erzeugen · hell</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen hell">
-      <iframe title="Handy-Vorschau: Markup aus Daten hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-vanilla--markup-handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">Markup erzeugen · dunkel</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Markup erzeugen dunkel">
-      <iframe title="Handy-Vorschau: Markup aus Daten dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:dbb;theme:Dark&id=foundation-vanilla--markup-handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={VanillaStories.MarkupHandy} title="Ligencard, Spielkarte und Kennzahlen">
+    Markup aus `mountLeagueCard`, `mountMatchCard` und `mountStats`.
+  </PreviewStep>
+  <PreviewStep of={VanillaStories.MarkupHandyTeam} title="Teamkarte, Hallenkarte und Leerzustand">
+    Markup aus `mountTeamCard`, `mountVenueCard` und `mountEmptyState`.
+  </PreviewStep>
+</StickyPreview>
 
 ## Karte
 
@@ -338,24 +333,18 @@ JavaScript und CSS kommen aus derselben Datei-Gruppe, können aber in einem Proj
   ]}
 />
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Zwei eingebettete Seiten mit fester Breite: links das Register mit Tabs (hell), rechts ein Accordion (dunkel). Beide laufen mit `initAll`.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. Beide Beispiele laufen mit `initAll`.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Vanilla · Register · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Register hell">
-      <iframe title="Handy-Vorschau: Register mit Tabs hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-vanilla--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Vanilla · Accordion · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Vanilla Accordion dunkel">
-      <iframe title="Handy-Vorschau: Accordion dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=foundation-vanilla--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={VanillaStories.Handy} title="Register mit Tabs">
+    Das Vereinsregister mit zwei Tab-Leisten und ihren Panels.
+  </PreviewStep>
+  <PreviewStep of={VanillaStories.HandyAccordion} title="Accordion">
+    Ein Accordion aus Vanilla-Markup.
+  </PreviewStep>
+</StickyPreview>
 
 ## Dos und Don'ts
 

@@ -100,12 +100,12 @@ describe('Doku-Seite', () => {
   });
   it('Beispiel-Stories sind versteckt (literales Tag)', () => {
     for (const m of stories.matchAll(/export const (\w+)\s*= \{ \.\.\.example/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\s*= .*tags: \\['!dev'\\]`));
-    for (const name of ['VanillaDialog', 'VanillaDiv', 'Handy', 'HandyDunkel', 'DoFokus', 'DontFokus']) expect(stories).toMatch(new RegExp(`export const ${name}\\s*= .*tags: \\['!dev'\\]`));
+    for (const name of ['VanillaDialog', 'VanillaDiv', 'Handy', 'HandyVerwerfen', 'DoFokus', 'DontFokus']) expect(stories).toMatch(new RegExp(`export const ${name}\\s*= .*tags: \\['!dev'\\]`));
   });
-  it('Handy-Vorschauen: zwei Iframes mit verschiedenen Beispielen (hell Warnung, dunkel Verwerfen)', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(2);
-    expect(mdx).toContain('id=components-modal--handy"');
-    expect(mdx).toContain('theme:Dark&id=components-modal--handy-dunkel');
+  it('Vorschau in Gerätebreite: zwei verschiedene Beispiele (Warnung, Verwerfen), fest 560 px hoch, kein festes Theme', () => {
+    expect(mdx).not.toMatch(/<iframe |theme:Dark/);
+    expect(mdx).toContain('<PreviewStep of={ModalStories.Handy} title="Warnung" height={560}>');
+    expect(mdx).toContain('<PreviewStep of={ModalStories.HandyVerwerfen} title="Zerstörerische Aktion" height={560}>');
   });
   it('fünf Dos und Don\'ts, das neue zeigt die Fokus-Reihenfolge; die Don\'t-Bühne ist inert', () => {
     expect([...mdx.matchAll(/doText:/g)]).toHaveLength(5);

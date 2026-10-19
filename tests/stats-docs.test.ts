@@ -90,10 +90,10 @@ describe('Doku-Seite', () => {
     expect([...mdx.matchAll(/doText:/g)]).toHaveLength(3);
     expect(examples).toContain('class="dont-dots"');
   });
-  it('zwei Handy-Vorschauen mit verschiedenen Inhalten', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(2);
-    expect(mdx).toContain('id=components-kennzahlen--handy"');
-    expect(mdx).toContain('theme:Dark&id=components-kennzahlen--handy-dunkel');
+  it('Vorschau in Gerätebreite mit zwei verschiedenen Inhalten, kein festes Theme', () => {
+    expect(mdx).not.toMatch(/<iframe |theme:Dark/);
+    expect(mdx).toContain('<PreviewStep of={StatsStories.Handy} ');
+    expect(mdx).toContain('<PreviewStep of={StatsStories.HandyKompakt} ');
     const titles = [...examples.matchAll(/title=\{LIGEN\[(\d+)\]\}/g)].map((m) => m[1]);
     expect(new Set(titles).size).toBe(titles.length);
   });

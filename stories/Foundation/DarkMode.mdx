@@ -4,6 +4,7 @@ import { DosDonts } from '../docs/blocks/DosDonts';
 import { FrameworkCode } from '../docs/blocks/FrameworkCode';
 import { CodeBlock } from '../docs/blocks/CodeBlock';
 import { DocTable } from '../docs/blocks/DocTable';
+import { Preview } from '../docs/blocks/Preview';
 import { vanilla, svelte, react, bootScript, cspHeader, cssTokens } from './DarkMode.code';
 import '../docs/blocks/blocks.css';
 
@@ -33,16 +34,9 @@ Drei Fälle, in dieser Reihenfolge:
 - **Kein Inline-`onclick`**, kein globaler Zustand, kein `innerHTML`. Ein blockierter Speicher (Privatmodus, gesperrte Website-Daten) wirft keinen Fehler; die Wahl gilt dann nur für diesen Besuch.
 - **`hidden` bis zum Start:** Ohne Skript tut der Button nichts. Setze `hidden`; `initTheme` zeigt ihn.
 
-Probiere ihn in der eigenen Vorschau aus (der Modus wechselt hier nur im Rahmen):
+Probiere ihn in der eigenen Vorschau aus (der Modus wechselt hier nur im Rahmen; die Vorschau startet mit dem Theme und der Breite der Werkzeugleiste):
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Umschalter</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Umschalter ausprobieren">
-      <iframe style={{ height: '300px', width: '390px' }} title="Vorschau: Umschalter für den Dunkelmodus zum Ausprobieren" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-dark-mode--demo" loading="lazy" />
-    </div>
-  </div>
-</div>
+<Preview of={DarkModeStories.Demo} title="Umschalter zum Ausprobieren" height={300} />
 
 ## Kein Flackern: das Boot-Skript
 
@@ -93,23 +87,13 @@ Das Beispiel führt das Markup aus dem Code unten mit `initAll` aus (mit einem E
 - **Kontrast:** Alle Text-Paare liegen in beiden Modi und beiden Marken (BBV, DBB) über 7:1 (Tests); der Fokus-Ring ist im Dunkelmodus dezenter und hat mindestens 3:1.
 - **Systemeinstellung respektieren:** Wer nichts wählt, bekommt, was das Gerät eingestellt hat; die Wahl wird erst durch einen Klick gespeichert.
 
-## Handy · 390 px Breite
+## Hell und Dunkel nebeneinander
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Inhalte). In beiden funktioniert der Umschalter.
+Dies ist die einzige Seite, die beide Modi gleichzeitig zeigt; alle anderen Vorschauen folgen dem Umschalter Hell/Dunkel der Werkzeugleiste. Links ist das Theme fest hell, rechts fest dunkel (verschiedene Inhalte), die Breite folgt dem Umschalter **Breite**. In beiden funktioniert der Umschalter.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Dark Mode · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Dark Mode hell">
-      <iframe style={{ height: '320px' }} title="Handy-Vorschau: Umschalter hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=foundation-dark-mode--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Dark Mode · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Dark Mode dunkel">
-      <iframe style={{ height: '320px' }} title="Handy-Vorschau: Umschalter dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=foundation-dark-mode--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
+<div className="hoops-preview-pair">
+  <Preview of={DarkModeStories.Handy} title="Umschalter, fest hell" height={320} globals={{ theme: 'Light' }} />
+  <Preview of={DarkModeStories.HandyDunkel} title="Umschalter, fest dunkel" height={320} globals={{ theme: 'Dark' }} />
 </div>
 
 ## Verwendung: Import und Optionen

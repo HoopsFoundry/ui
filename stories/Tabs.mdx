@@ -3,6 +3,7 @@ import * as TabsStories from './Tabs.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './Tabs.code';
 
@@ -91,24 +92,18 @@ Ein Filter mit Mehrfachauswahl (`role="group"`, `aria-pressed`, keine Panels) me
 
 Die Rückgabe `{ destroy(), select(ziel), getValue() }` folgt dem gemeinsamen Muster: ein zweiter Aufruf für dieselbe Leiste ersetzt den ersten, `destroy()` entfernt Listener und stellt das Markup wieder her. Ergänzt werden nur fehlende Rollen, `id`s und `aria-labelledby` an den Panels; nichts davon wird mit `innerHTML` gebaut.
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Zwei eingebettete Seiten mit fester Breite: links das Register-Beispiel (hell), rechts eine Vereinsseite mit manueller Aktivierung, Zähler und gesperrtem Tab (dunkel).
+Die Beispiele laufen als eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite). Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. Ist das Gerät breiter als die Spalte, wird die Vorschau verkleinert; die Media-Queries sehen trotzdem die gewählte Breite. Beim Scrollen zeigt die Vorschau das Beispiel des Abschnitts, der gerade im Blick ist; die Liste über der Vorschau wählt es direkt.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Tabs · Register · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Tabs Register hell">
-      <iframe title="Handy-Vorschau: Tabs im Register in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-tabs--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Tabs · Vereinsseite · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Tabs Vereinsseite dunkel">
-      <iframe title="Handy-Vorschau: Tabs auf der Vereinsseite dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-tabs--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={TabsStories.Handy} title="Register mit Panels">
+    Zwei Leisten des Vereinsregisters, gestartet mit `initAll`: Segmented für Alle/Heim/Auswärts und Pills für Liga/Pokal, jede mit ihren Panels (`aria-controls`, nicht gewählte Panels `hidden` und `inert`).
+  </PreviewStep>
+  <PreviewStep of={TabsStories.HandyVerein} title="Vereinsseite mit manueller Aktivierung">
+    Eine Underline-Leiste mit Zähler und gesperrtem Tab, gestartet mit `activation: 'manual'`: Die Pfeiltasten bewegen nur den Fokus, **Enter** oder **Leertaste** wählt. Der gesperrte Tab „Presse“ wird übersprungen.
+  </PreviewStep>
+</StickyPreview>
 
 ## Verwendung: Import und Props
 

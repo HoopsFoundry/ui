@@ -61,15 +61,15 @@
     <div class="row"><span class="who">Buchstaben</span><span use:fragment={formLettersMarkup}></span></div>
   </div>
 {:else if example === 'handy'}
-  <div class="narrow">
+  <div class="device">
     <StatGrid items={STATS} />
     <div class="gap"></div>
     <div class="row"><span class="who">TSV Nordhain 1920</span><FormChips form={['S', 'S', 'N', 'S', 'U']} /></div>
     <div class="gap"></div>
     <LeagueCard title={LIGEN[41]} teams={demoTable(2)} columns={['form']} limit={3} size="compact" />
   </div>
-{:else if example === 'handy-dunkel'}
-  <div class="narrow">
+{:else if example === 'handy-kompakt'}
+  <div class="device">
     <StatGrid items={WITH_EMPTY} />
     <div class="gap"></div>
     <StatGrid items={STATS.slice(0, 3)} compact />
@@ -99,6 +99,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .stack { display: grid; gap: 20px; max-width: 760px; }
   .narrow { width: 100%; max-width: 380px; }
   .medium { width: 100%; max-width: 640px; }

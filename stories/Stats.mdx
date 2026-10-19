@@ -3,6 +3,7 @@ import * as StatsStories from './Stats.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react, tokensCss } from './Stats.code';
 import { kennzahlenRender } from './Render.code';
@@ -59,24 +60,18 @@ Ohne Framework schreibst du das Markup selbst. Die Klassen und der versteckte Te
 
 Alle Flächen und Texte laufen über die semantischen Tokens (`--hoops-surface`, `--hoops-fg`, `--hoops-chip-*`). Die Bausteine brauchen keinen eigenen Dunkelmodus und folgen der Marke (BBV, DBB).
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel (verschiedene Inhalte, damit die Beispiele auf der Seite unterscheidbar bleiben). Das Gitter wird zweispaltig, die Form bleibt in einer Zeile, und die Tabelle der Karte blendet die Form aus.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Kennzahlen und Form · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen hell">
-      <iframe title="Handy-Vorschau: Kennzahlen und Form hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-kennzahlen--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Kennzahlen und Form · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Kennzahlen dunkel">
-      <iframe title="Handy-Vorschau: Kennzahlen und Form dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-kennzahlen--handy-dunkel" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={StatsStories.Handy} title="Kennzahlen und Form">
+    In Handy-Breite (390 px) wird das Gitter zweispaltig, die Form bleibt in einer Zeile.
+  </PreviewStep>
+  <PreviewStep of={StatsStories.HandyKompakt} title="Leere Werte und kompaktes Gitter">
+    Ein Gitter mit leeren Werten, das kompakte Gitter (`compact`) mit drei Kennzahlen, die Form als Buchstaben (`variant="letters"`) und eine kompakte Ligencard mit Formspalte. Bis 640 px Breite blendet die Tabelle der Karte die Form aus (optionale Spalte), ab 641 px steht sie da.
+  </PreviewStep>
+</StickyPreview>
 
 ## Verwendung: Import und Props
 

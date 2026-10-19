@@ -1,8 +1,11 @@
 import { Meta, Canvas, Story } from '@storybook/addon-docs/blocks';
 import * as SpielplanStories from './Spielplan.examples.stories';
+import * as ScheduleTableStories from './ScheduleTable.stories';
+import * as ScheduleGridStories from './ScheduleGrid.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { tableVanilla, tableSvelte, tableReact, versusVanilla, versusSvelte, versusReact, gridVanilla, gridSvelte, gridReact, codeGame, namesVanilla, namesSvelte, namesReact, collapsibleVanilla, collapsibleSvelte, collapsibleReact } from './Spielplan.code';
 import { spielplanRender, rasterRender } from './Render.code';
@@ -259,18 +262,15 @@ Einzeilige Zeilen behalten mit Logos ihre Höhe (gemessen: 60, 48 und 40 px). In
 - **Markieren und Kopieren:** Wo der Kurzname sichtbar ist, ist der versteckte volle Name nicht markierbar (`user-select: none`); Markieren und Kopieren liefern nur den sichtbaren Namen. Mit der Maus zeigt der Kurzname den vollen Namen als Tooltip (`title`); für Hilfstechnik bleibt er verborgen, es kommt nichts doppelt.
 - **Sprachsteuerung (WCAG 2.5.3, Label im Namen):** Ein abgekürzter Kurzname wie „TSV N.“ steckt nicht im zugänglichen Namen „TSV Nordhain 1920“; „Klick TSV N.“ greift dann nicht. Wähle Kurznamen deshalb so, dass sie Teil des vollen Namens sind („Hawks“, „Seeberg“) oder dessen Anfang bilden.
 
-### Handy mit Kurznamen und Logos · 390 px Breite
+### Kurznamen und Logos in Gerätebreite
 
-Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass `names` gesetzt ist: Der Kurzname erscheint automatisch.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. `names` ist nicht gesetzt: Bis 640 px Breite erscheint der Kurzname automatisch.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">Gegenüberstellung · logos</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Gegenüberstellung mit Logos">
-      <iframe title="Handy-Vorschau: Spielplan mit Kurznamen und Logos in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan--namen-handy" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={SpielplanStories.NamenHandy} title="Gegenüberstellung mit Logos">
+    Layout `versus` mit Logos: Bis 640 px Breite stehen die Teams mit Logo untereinander (je Team eine Zeile), der Gedankenstrich entfällt, und die Kurznamen erscheinen.
+  </PreviewStep>
+</StickyPreview>
 
 <FrameworkCode label="Namen und Logos" vanilla={namesVanilla} svelte={namesSvelte} react={namesReact} />
 
@@ -294,30 +294,21 @@ Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px, ohne dass
 
 <Canvas of={SpielplanStories.DichteVorlaeufig} />
 
-### Handy-Ansicht · 390 px Breite
+### Handy-Ansicht in Gerätebreite
 
-Unter 640 px Breite werden Zeilen zu Karten und Anwurfzeiten zu Blöcken mit der Spalten-Beschriftung als Überschrift. Im Layout `opponent` steht in der ersten Zeile der Karte das Datum mit der Uhrzeit („Sa, 26.09.2026 · 17:30“), darunter „vs.“ oder „@“ vor Logo und Gegner und rechts das Ergebnis. Für Screenreader bleibt die Reihenfolge Zeit, Heim oder Auswärts, Gegner, Ergebnis. Diese Regeln hängen an der Breite des Fensters, nicht an der des Rahmens. Darum sind die Vorschauen eingebettete Seiten mit fester Breite von 390 px.
+Unter 640 px Breite werden Zeilen zu Karten und Anwurfzeiten zu Blöcken mit der Spalten-Beschriftung als Überschrift. Im Layout `opponent` steht in der ersten Zeile der Karte das Datum mit der Uhrzeit („Sa, 26.09.2026 · 17:30“), darunter „vs.“ oder „@“ vor Logo und Gegner und rechts das Ergebnis. Für Screenreader bleibt die Reihenfolge Zeit, Heim oder Auswärts, Gegner, Ergebnis. Diese Regeln hängen an der Breite des Fensters, nicht an der des Rahmens. Darum ist die Vorschau eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">Mannschaft · opponent</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Mannschaft · opponent">
-      <iframe title="Handy-Vorschau: Mannschafts-Spielplan in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan-tabelle--mannschaft" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">Turnier · columns</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Turnier · columns">
-      <iframe title="Handy-Vorschau: Turnier-Spielplan in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan-tabelle--turnier" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h4 className="hoops-doc-cap">Zeitraster · ScheduleGrid</h4>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Zeitraster · ScheduleGrid">
-      <iframe title="Handy-Vorschau: Zeitraster in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-spielplan-zeitraster--zeitraster" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview level={4}>
+  <PreviewStep of={ScheduleTableStories.Mannschaft} title="Mannschaft · opponent">
+    Der Spielplan einer Mannschaft im Layout `opponent`: bis 640 px Datum und Uhrzeit in der ersten Zeile, darunter „vs.“ oder „@“ vor Logo und Gegner, rechts das Ergebnis.
+  </PreviewStep>
+  <PreviewStep of={ScheduleTableStories.Turnier} title="Turnier · columns">
+    Ein Turnier im Layout `columns`: bis 640 px wird jede Zeile zur Karte, der Tabellenkopf bleibt nur für Screenreader.
+  </PreviewStep>
+  <PreviewStep of={ScheduleGridStories.Zeitraster} title="Zeitraster · ScheduleGrid">
+    Das Zeitraster: bis 640 px wird jede Anwurfzeit ein Block mit der Spalten-Beschriftung als Überschrift.
+  </PreviewStep>
+</StickyPreview>
 
 ## Tabellen einklappen
 
