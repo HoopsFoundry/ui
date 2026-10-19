@@ -77,7 +77,7 @@
 {#if example === 'anatomie'}
   <div class="frame" style="height: 440px">
     {@render mock()}
-    <ModalDemo title="Spielbericht beenden?" subtitle="Schiedsrichter-Unterschrift" body="Nach dem Senden kann der Spielbericht nicht mehr bearbeitet werden. Beide Schiedsrichter müssen unterschreiben." cancelLabel="Abbrechen" confirmLabel="Senden" />
+    <ModalDemo inline title="Spielbericht beenden?" subtitle="Schiedsrichter-Unterschrift" body="Nach dem Senden kann der Spielbericht nicht mehr bearbeitet werden. Beide Schiedsrichter müssen unterschreiben." cancelLabel="Abbrechen" confirmLabel="Senden" />
   </div>
 {:else if example === 'schweregrade'}
   <div class="grid2">
@@ -86,7 +86,7 @@
         <div class="cap">{s.severity}</div>
         <div class="frame" style="height: 400px">
           {@render mock()}
-          <ModalDemo {...s} size="sm" />
+          <ModalDemo inline {...s} size="sm" />
         </div>
       </div>
     {/each}
@@ -98,7 +98,7 @@
         <div class="cap">{s.label}</div>
         <div class="frame" style="height: 320px">
           {@render mock()}
-          <ModalDemo size={s.size} title="Spielbericht freigeben" subtitle="BBL · 17. Spieltag" body="Nach Freigabe ist eine Korrektur nur noch über den Verband möglich." />
+          <ModalDemo inline size={s.size} title="Spielbericht freigeben" subtitle="BBL · 17. Spieltag" body="Nach Freigabe ist eine Korrektur nur noch über den Verband möglich." />
         </div>
       </div>
     {/each}
@@ -182,22 +182,22 @@
     {@render staticModal({ id: 'dg', severity: 'danger', title: 'Spielbericht verwerfen?', subtitle: 'Nicht wiederherstellbar', body: 'Alle erfassten Aktionen werden gelöscht.', safe: 'Behalten', danger: 'Verwerfen', ring: 'danger' })}
   </div>
 {:else if example === 'do-aktion'}
-  <ModalDemo size="sm" title="Spielbericht senden?" subtitle="Letzter Schritt" body="Nach dem Senden ist der Bericht final." cancelLabel="Noch prüfen" confirmLabel="Senden" />
+  <ModalDemo inline size="sm" title="Spielbericht senden?" subtitle="Letzter Schritt" body="Nach dem Senden ist der Bericht final." cancelLabel="Noch prüfen" confirmLabel="Senden" />
 {:else if example === 'dont-aktion'}
-  <ModalDemo size="sm" title="Achtung" subtitle="" body="Nach dem Senden ist der Bericht final." cancelLabel="Nein" confirmLabel="OK" />
+  <ModalDemo inline size="sm" title="Achtung" subtitle="" body="Nach dem Senden ist der Bericht final." cancelLabel="Nein" confirmLabel="OK" />
 {:else if example === 'do-danger'}
-  <ModalDemo size="sm" severity="danger" title="Spielbericht verwerfen?" subtitle="Nicht wiederherstellbar" body="Alle erfassten Aktionen werden gelöscht." cancelLabel="Behalten" confirmLabel="Verwerfen" confirmVariant="danger" />
+  <ModalDemo inline size="sm" severity="danger" title="Spielbericht verwerfen?" subtitle="Nicht wiederherstellbar" body="Alle erfassten Aktionen werden gelöscht." cancelLabel="Behalten" confirmLabel="Verwerfen" confirmVariant="danger" />
 {:else if example === 'dont-danger'}
-  <ModalDemo size="sm" title="Spielbericht verwerfen?" subtitle="Nicht wiederherstellbar" body="Alle erfassten Aktionen werden gelöscht." cancelLabel="Behalten" confirmLabel="Verwerfen" />
+  <ModalDemo inline size="sm" title="Spielbericht verwerfen?" subtitle="Nicht wiederherstellbar" body="Alle erfassten Aktionen werden gelöscht." cancelLabel="Behalten" confirmLabel="Verwerfen" />
 {:else if example === 'do-ausweg'}
-  <ModalDemo size="sm" title="Verbindung verloren" subtitle="Offline" body="Aktionen werden lokal gespeichert und später hochgeladen." cancelLabel="Später" confirmLabel="Verstanden" />
+  <ModalDemo inline size="sm" title="Verbindung verloren" subtitle="Offline" body="Aktionen werden lokal gespeichert und später hochgeladen." cancelLabel="Später" confirmLabel="Verstanden" />
 {:else if example === 'dont-ausweg'}
   <!-- closable=false ohne Footer: kein Schließen-Button, kein Escape, keine Aktion -->
-  <ModalDemo size="sm" closable={false} footer={false} title="Verbindung verloren" subtitle="Offline" body="Aktionen werden lokal gespeichert und später hochgeladen." />
+  <ModalDemo inline size="sm" closable={false} footer={false} title="Verbindung verloren" subtitle="Offline" body="Aktionen werden lokal gespeichert und später hochgeladen." />
 {:else if example === 'do-schwere'}
-  <ModalDemo size="sm" severity="info" title="Bonus-Status" subtitle="FIBA-Regel 35" body="Ab dem 5. Mannschafts-Foul eines Viertels gibt es 2 Freiwürfe." cancelLabel="Schließen" confirmLabel="Verstanden" />
+  <ModalDemo inline size="sm" severity="info" title="Bonus-Status" subtitle="FIBA-Regel 35" body="Ab dem 5. Mannschafts-Foul eines Viertels gibt es 2 Freiwürfe." cancelLabel="Schließen" confirmLabel="Verstanden" />
 {:else if example === 'dont-schwere'}
-  <ModalDemo size="sm" severity="danger" title="Bonus-Status" subtitle="FIBA-Regel 35" body="Ab dem 5. Mannschafts-Foul eines Viertels gibt es 2 Freiwürfe." cancelLabel="Schließen" confirmLabel="Verstanden" />
+  <ModalDemo inline size="sm" severity="danger" title="Bonus-Status" subtitle="FIBA-Regel 35" body="Ab dem 5. Mannschafts-Foul eines Viertels gibt es 2 Freiwürfe." cancelLabel="Schließen" confirmLabel="Verstanden" />
 {/if}
 
 <style>
