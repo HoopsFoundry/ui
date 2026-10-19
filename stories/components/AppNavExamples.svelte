@@ -1,5 +1,6 @@
 <script>
-  import { t } from '../../js/i18n/index.js';
+  // als `tr` importiert: die Matrix unten nutzt `t` als Schleifenvariable ({#each tones as t}), die den Import sonst verdeckt
+  import { t as tr } from '../../js/i18n/index.js';
   import { onMount } from 'svelte';
   import AppNav from '../../svelte/AppNav.svelte';
   import TopBar from '../../svelte/TopBar.svelte';
@@ -15,7 +16,9 @@
     // Mobil-Vorschau: Menü und erste Gruppe öffnen, damit der Zustand ohne Klick zu sehen ist
     if (example === 'mobil-offen' && wrap) {
       wrap.querySelector('.hoops-appnav-toggle')?.click();
-      setTimeout(() => wrap.querySelector('.hoops-appnav-group-btn')?.click(), 0);
+      // Zeitgeber beim Abbau löschen: sonst greift er nach dem Aushängen auf ein leeres `wrap` zu
+      const timer = setTimeout(() => wrap?.querySelector('.hoops-appnav-group-btn')?.click(), 0);
+      return () => clearTimeout(timer);
     }
   });
 
@@ -64,7 +67,7 @@
                       <div class="hoops-appnav-bar">
                         <button type="button" class="hoops-appnav-toggle {stateClass[c]}" style="display: inline-flex" aria-expanded="false">
                           <svg class="hoops-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"></use></svg>
-                          <span>{t('appnav.menu')}</span>
+                          <span>{tr('appnav.menu')}</span>
                         </button>
                       </div>
                     </nav>

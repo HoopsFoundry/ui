@@ -22,6 +22,10 @@ describe('axe-Matrix der Docs-Seiten', () => {
     expect(script).not.toMatch(/\\\.css-\[a-z0-9\]\+/);
     expect(script).toContain("args['extra-css']");
   });
+  it('meldet Stories, die beim Rendern werfen (Storybook setzt den Stapel als <pre> in die Vorschau)', () => {
+    expect(script).toContain("document.querySelectorAll('.docs-story .sb-story > pre')");
+    expect(script).toContain("kind: 'Story-Fehler'");
+  });
   it('ist CI-fähig: Exit-Code 1 bei Befunden, 2 ohne Build, JSON-Ausgabe auf Wunsch', () => {
     expect(script).toMatch(/process\.exitCode = failures\.length === 0 \? 0 : 1/);
     expect(script).toMatch(/process\.exit\(2\)/);

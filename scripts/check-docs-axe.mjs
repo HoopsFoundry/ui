@@ -15,7 +15,8 @@
  *    landmark-unique, heading-order. Wie im a11y-Addon gelten Regeln für das ganze Dokument (region, landmark-one-main, page-has-heading-one)
  *    der App, nicht der Doku; Storybook-eigene Bausteine (Argumenttabelle, „Show code“, Vorschau-Aktionen, Codeblöcke, Syntaxfarben) sind
  *    ausgenommen (nur ganze Bausteine, scripts/docs-axe-chrome.mjs); MDX-Links und Inline-Code bleiben in der Prüfung. Was Storybook selbst erzeugt, dokumentiert Lückenplan 2.5.
- *  - Regression: die Seite rendert (Inhalt vorhanden, keine Fehlermeldung von Storybook), keine Seitenfehler und keine Konsolenfehler,
+ *  - Regression: die Seite rendert (Inhalt vorhanden, keine Fehlermeldung von Storybook, keine Story, die beim Rendern wirft), keine
+ *    Seitenfehler und keine Konsolenfehler,
  *    kein seitliches Scrollen des Docs-Inhalts.
  * Ausgabe: eine Zeile je Fehlschlag, am Ende eine Übersicht (Läufe, Seiten, Verstöße je Regel); Exit-Code 1 bei jedem Fehlschlag.
  * Läuft nicht unter `npm test` (braucht einen Storybook-Build und Chromium).
@@ -93,10 +94,15 @@ async function checkPage(ctx, doc, combo) {
         text: (content?.textContent ?? '').trim().length,
         error: sbError && getComputedStyle(sbError).display !== 'none' && (sbError.textContent ?? '').trim() ? (sbError.textContent ?? '').trim().slice(0, 200) : '',
         overflow: content ? content.scrollWidth - content.clientWidth : 0,
+        // Story, die beim Rendern wirft: Storybook setzt den Stapel als <pre><span>Error</span>: … in die Vorschau (kein Konsolenfehler)
+        storyErrors: [...document.querySelectorAll('.docs-story .sb-story > pre')]
+          .filter((pre) => /^\s*\w*Error\b/.test(pre.textContent ?? ''))
+          .map((pre) => `${pre.closest('[id^="story--"]')?.id ?? '?'}: ${(pre.textContent ?? '').split('\n')[0].slice(0, 160)}`),
         pageOverflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
     });
     if (render.text < 50 || render.error) failures.push({ page: doc.id, combo, kind: 'Darstellung', detail: render.error || `Inhalt fast leer (${render.text} Zeichen)` });
+    for (const e of render.storyErrors) failures.push({ page: doc.id, combo, kind: 'Story-Fehler', detail: e });
     if (render.pageOverflow > 0) failures.push({ page: doc.id, combo, kind: 'seitliches Scrollen', detail: `${render.pageOverflow}px` });
     await page.evaluate(axeSource);
     const violations = await page.evaluate(async ({ tags, extra, off, chromeSel, whole }) => {
