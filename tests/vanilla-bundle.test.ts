@@ -24,6 +24,8 @@ export const EXPORTS = [
   'themeBootScript', 'writeTheme',
   // Sprache und Texte (I2); localeOf und onLocaleChange sind für die Bündel render, map und i18n-de, die den Kern von hier importieren
   'LOCALE_EVENT', 'availableLocales', 'getLocale', 'localeOf', 'onLocaleChange', 'registerLocale', 'setLocale', 'setTexts', 't',
+  // I4: Sprache des Katalogs, der die Texte liefert (für lang an den Wurzeln der Bausteine in render, map)
+  'resolvedLocale',
 ];
 
 beforeAll(async () => {

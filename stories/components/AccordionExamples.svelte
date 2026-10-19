@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localizeMarkup } from '../docs/localize-markup';
   import { initAccordion } from '../../js/accordion.js';
   import Accordion from '../../svelte/Accordion.svelte';
   import AccordionItem from '../../svelte/AccordionItem.svelte';
@@ -39,13 +40,13 @@
 
   // Vanilla-Beispiele: dasselbe Markup wie im Code-Beispiel; das Skript macht den Button-Weg bedienbar
   function vanillaButton(node: HTMLElement) {
-    node.replaceChildren(document.createRange().createContextualFragment(buttonMarkup));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(buttonMarkup)));
     const root = node.querySelector<HTMLElement>('.hoops-acc');
     const destroy = root ? initAccordion(root, { syncHash: false, expandAll: true }) : () => {};
     return { destroy };
   }
   function vanillaDetails(node: HTMLElement) {
-    node.replaceChildren(document.createRange().createContextualFragment(detailsMarkup));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(detailsMarkup)));
   }
 
 </script>

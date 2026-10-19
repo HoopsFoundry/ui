@@ -112,6 +112,18 @@ export function localeOf(options) {
   return options && options.locale ? normalize(options.locale) : st().locale;
 }
 
+/**
+ * Sprache, deren Katalog die Texte tatsächlich liefert: der erste registrierte Katalog aus `[code, Basissprache]`, sonst `en`. Ohne `code` gilt die
+ * globale Sprache. Für das Attribut `lang` (WCAG 3.1.2): `setLocale('fr')` ohne französischen Katalog zeigt englische Texte, also gilt `en`.
+ * `getLocale()`, die Formatierung über `Intl` und `detail.locale` des Ereignisses bleiben beim gesetzten Code.
+ */
+export function resolvedLocale(code) {
+  const wanted = code === undefined || code === null || code === '' ? st().locale : canonical(code) ?? DEFAULT_LOCALE;
+  const { catalogs } = st();
+  for (const c of [wanted, wanted.split('-')[0]]) if (catalogs.has(c)) return c;
+  return DEFAULT_LOCALE;
+}
+
 /** Registrierte Sprachcodes. */
 export function availableLocales() {
   return [...st().catalogs.keys()];

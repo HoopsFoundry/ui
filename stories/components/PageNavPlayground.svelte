@@ -3,7 +3,7 @@
 
   // Spielwiese für die Controls: eine Beispielseite mit `sections` Abschnitten; die Optionen gehen an initPageNav.
   // Jede Änderung baut die Navigation neu (zweiter Aufruf ersetzt den ersten).
-  let { sections = 5, label = 'Auf dieser Seite', minHeadings = 3, skipSecond = false, blockWithoutHeading = false, observe = true }:
+  let { sections = 5, label = undefined, minHeadings = 3, skipSecond = false, blockWithoutHeading = false, observe = true }:
     { sections?: number; label?: string; minHeadings?: number; skipSecond?: boolean; blockWithoutHeading?: boolean; observe?: boolean } = $props();
 
   const NAMES = ['Tabelle', 'Spielplan', 'Kader', 'Statistik', 'Hallen', 'Berichte', 'Termine', 'Kontakt'];

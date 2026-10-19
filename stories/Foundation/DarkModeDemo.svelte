@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from '../../js/i18n/index.js';
+  import { localizeMarkup } from '../docs/localize-markup';
   import { initAll } from '../../js/vanilla-core.js';
   import { initTheme } from '../../js/theme.js';
   import { buttonMarkup } from './DarkMode.code';
@@ -19,7 +21,7 @@
 
   // Vanilla-Beispiel: dasselbe Markup wie im Code-Beispiel, gestartet mit initAll (Ziel ist ein Ersatz-Element, nicht <html>)
   function vanillaButton(node: HTMLElement) {
-    node.replaceChildren(document.createRange().createContextualFragment(buttonMarkup));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(buttonMarkup)));
     const handle = initAll(node, { theme: { target: node, storage: null } });
     return { destroy: () => handle.destroy() };
   }
@@ -30,7 +32,7 @@
   function cell(node: HTMLElement, options: { pressed: boolean; cls: string }) {
     const button = node.querySelector<HTMLButtonElement>('button')!;
     if (options.cls) button.classList.add(...options.cls.split(' '));
-    const theme = initTheme(button, { target: node, storage: null, mode: options.pressed ? 'dark' : 'light', label: 'Dunkelmodus' });
+    const theme = initTheme(button, { target: node, storage: null, mode: options.pressed ? 'dark' : 'light' });
     return { destroy: () => theme.destroy() };
   }
 </script>
@@ -66,19 +68,19 @@
   </div>
 {:else if example === 'handy'}
   <div class="narrow demo" use:demo>
-    <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>Dunkelmodus</span></p>
+    <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>{t('theme.toggle')}</span></p>
     <div class="card"><strong>TSV Nordhain 1920</strong><p>Platz 3 von 12 in der Bayernliga Süd.</p></div>
     <dl class="report"><div><dt>Modus</dt><dd>{report.mode}</dd></div><div><dt>aria-pressed</dt><dd>{report.pressed}</dd></div></dl>
   </div>
 {:else if example === 'handy-dunkel'}
   <div class="narrow demo" use:demo>
-    <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>Dunkelmodus</span></p>
+    <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>{t('theme.toggle')}</span></p>
     <div class="card"><strong>Lindenberg Hawks</strong><p>Nächstes Spiel: Samstag, 19:30 Uhr.</p></div>
     <dl class="report"><div><dt>Zustand</dt><dd>{report.state}</dd></div><div><dt>aria-pressed</dt><dd>{report.pressed}</dd></div></dl>
   </div>
 {:else if example === 'do-name'}
   <p class="row">
-    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon hoops-theme-toggle" aria-label="Dunkelmodus" aria-pressed="true" data-theme-state="dark">
+    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon hoops-theme-toggle" aria-label={t('theme.toggle')} aria-pressed="true" data-theme-state="dark">
       <svg class="hoops-theme-icon hoops-theme-icon--sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
       <svg class="hoops-theme-icon hoops-theme-icon--moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
     </button>
@@ -94,7 +96,7 @@
   </p>
 {:else if example === 'do-symbol'}
   <p class="row">
-    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" aria-label="Dunkelmodus" aria-pressed="false">
+    <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" aria-label={t('theme.toggle')} aria-pressed="false">
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M2 12h2M20 12h2" /></svg>
     </button>
     <span>Symbol mit Namen</span>

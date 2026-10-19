@@ -1,4 +1,5 @@
 <script>
+  import { t } from '../../js/i18n/index.js';
   import Table from '../../svelte/Table.svelte';
   import { roster, boxscore, crew, signClass } from './tableData';
 
@@ -33,7 +34,7 @@
             <div class={`hoops-player ${r.status === 'bench' ? 'bench' : ''} ${r.status === 'dnp' ? 'dnp' : ''}`}>
               <div class="hoops-player-info">
                 <span class="hoops-player-name">{r.name}{r.cap ? ' (C)' : ''}</span>
-                {#if r.cap}<span class="hoops-player-meta">Kapitän</span>{/if}
+                {#if r.cap}<span class="hoops-player-meta">{t('player.captain')}</span>{/if}
               </div>
             </div>
           </td>

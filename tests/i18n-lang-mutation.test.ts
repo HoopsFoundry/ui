@@ -16,11 +16,16 @@ const RULES: Record<string, (m: Lang) => boolean> = {
     }
   },
   'documentLang als Zeichenkette gewinnt, leer heißt unbekannt': (m) => m.langFor({ locale: 'en', documentLang: 'de' }) === 'en' && m.langFor({ locale: 'en', documentLang: '' }) === '',
-  'gleiche Basissprache braucht kein lang': (m) => m.langFor({ locale: 'de-AT', documentLang: 'de' }) === '',
+  // de-AT hat keinen eigenen Katalog (Texte aus de); die Seite ist de-CH: gleiche Basissprache, kein lang
+  'gleiche Basissprache braucht kein lang': (m) => m.langFor({ locale: 'de-AT', documentLang: 'de-CH' }) === '',
+  // I4: lang folgt dem Katalog, der die Texte liefert (resolvedLocale); fr ohne Katalog zeigt englische Texte
+  'Sprache ohne Katalog: lang des Rückfalls': (m) =>
+    m.langFor({ locale: 'fr', documentLang: 'de' }) === 'en' && m.langFor({ locale: 'fr', documentLang: 'en' }) === '' && m.langFor({ locale: 'de-AT', documentLang: 'en' }) === 'de',
 };
 const MUTATIONS = [
   { name: 'Schlüssel „documentLang in options“ zählt', rule: 'ausdrücklich undefined heißt: das Dokument fragen', from: "const given = options && typeof options.documentLang === 'string';", to: "const given = options && 'documentLang' in options;" },
   { name: 'documentLang wird ignoriert', rule: 'documentLang als Zeichenkette gewinnt, leer heißt unbekannt', from: "let page = given ? options.documentLang : '';", to: "let page = '';" },
+  { name: 'lang nimmt den gesetzten Code statt der Katalogsprache', rule: 'Sprache ohne Katalog: lang des Rückfalls', from: 'const code = resolvedLocale(localeOf(options));', to: 'const code = localeOf(options);' },
   { name: 'Basissprache wird nicht verglichen', rule: 'gleiche Basissprache braucht kein lang', from: 'return base(page) === base(code) ? \'\' : code;', to: "return page === code ? '' : code;" },
 ];
 

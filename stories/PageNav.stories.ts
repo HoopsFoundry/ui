@@ -15,7 +15,7 @@ export default {
     blockWithoutHeading: { control: 'boolean', description: 'Nur Demo: ein Block ohne Überschrift mit `data-pagenav="Kalender-Abo"` wird mit aufgenommen.', table: t('boolean', 'false') },
     observe: { control: 'boolean', description: '`observe`: nachgeladene Überschriften beobachten (Standard `true`).', table: t('boolean', 'true') },
   },
-  args: { sections: 5, label: 'Auf dieser Seite', minHeadings: 3, skipSecond: false, blockWithoutHeading: false, observe: true },
+  args: { sections: 5, minHeadings: 3, skipSecond: false, blockWithoutHeading: false, observe: true },
 };
 
 export const Standard = { args: {} };
