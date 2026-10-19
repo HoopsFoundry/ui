@@ -13,7 +13,8 @@
  *    `default-src 'self'; style-src 'self'` mit;
  *  - Gegenproben: ohne Freigabe, mit falscher nonce und mit dem Standard-Hash für ein Skript mit anderen Optionen wird das Skript blockiert
  *    (Verletzung von script-src gemeldet), die Seite funktioniert weiter, nur das Attribut fehlt bis zum Laden des Bündels.
- * Ergebnis als JSON auf stdout; Exit-Code 1 bei jedem Fehlschlag. Ein Browser, der nicht startet, erscheint als „nicht gestartet“.
+ * Ergebnis als JSON auf stdout; Exit-Code 1 bei jedem Fehlschlag. Ein Browser, der nicht startet, erscheint als „nicht gestartet“; startet keiner
+ * der angeforderten, endet das Skript mit Exit-Code 1 und einer klaren Meldung (scripts/browser-launch.mjs).
  * Läuft nicht unter `npm test` (braucht Browser); der Rezept-Hash ohne Browser steht in tests/csp-boot.test.ts.
  */
 import { execFileSync } from 'node:child_process';
@@ -26,6 +27,7 @@ import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, firefox, webkit } from 'playwright';
 import { buildVanilla } from './build-vanilla.mjs';
+import { exitIfNoKnownBrowser, requireOneStarted } from './browser-launch.mjs';
 import { themeBootScript } from '../js/theme.js';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
@@ -34,6 +36,7 @@ const docSource = await readFile(join(ROOT, 'stories/Foundation/DarkMode.code.ts
 const cspHeader = (docSource.match(/export const cspHeader = `([\s\S]*?)`;/)?.[1] ?? '').replace(/\\\\/g, '\\');
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v = 'true'] = a.replace(/^--/, '').split('='); return [k, v]; }));
 const BROWSERS = (args.browsers ?? 'chromium,firefox,webkit').split(',');
+exitIfNoKnownBrowser(BROWSERS);
 const ENGINES = { chromium, firefox, webkit };
 const results = [];
 const notStarted = [];
@@ -166,9 +169,10 @@ try {
     await ctx.close();
     await browser.close();
   }
-  record('nonce ist je Antwort neu (keine zwei gleichen Werte)', nonces.length > 1 && new Set(nonces).size === nonces.length, { count: nonces.length });
+  if (Object.keys(versions).length) record('nonce ist je Antwort neu (keine zwei gleichen Werte)', nonces.length > 1 && new Set(nonces).size === nonces.length, { count: nonces.length });
 } finally {
   await srv.close();
   await rm(dir, { recursive: true, force: true });
 }
+requireOneStarted(BROWSERS, versions, notStarted);
 console.log(JSON.stringify({ versions, notStarted, hash: `sha256-${HASH}`, passed: results.filter((r) => r.ok).length, failed: results.filter((r) => !r.ok).length, results }, null, 2));

@@ -36,6 +36,13 @@ describe('Browser-Matrix der Kernbausteine', () => {
     }
   });
 
+  it('Modal: ::backdrop zählt nur beim modalen Dialog, Top-Layer über einem Wachposten mit z-index 2147483647 (Review W2)', () => {
+    expect(script).toContain('z-index:2147483647');
+    expect(script).toMatch(/opened\?\.modal && !transparent/);
+    expect(script).toMatch(/elementFromPoint\(r\.left \+ r\.width \/ 2, r\.top \+ r\.height \/ 2\)/);
+    expect(coreMatrix.groups.find((g) => g.name === 'Modal')!.what).toContain('show() statt showModal()');
+  });
+
   it('Firefox ist ehrlich als nicht gelaufen geführt, Doku und arc42 nennen das Skript', () => {
     expect(coreMatrix.browsers.map((b) => b.name)).toEqual(['Chromium', 'WebKit (Safari-Engine)', 'Firefox']);
     expect(coreMatrix.browsers[2].result).toBe('nicht gelaufen');

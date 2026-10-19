@@ -9,12 +9,14 @@
  *
  * Gebaut wird dist/vanilla in einen temporären Ordner (scripts/build-vanilla.mjs); ein lokaler Server liefert die Bündel und die Prüfseiten aus.
  * Geprüft wird je Browser: Accordion (Klick, Enter, Panel sichtbar/verborgen, gestrichelter Fokusring), Tabs (Pfeile, Pos1/Ende, Panels),
- * Modal mit `<dialog>` (showModal, `:modal`, `::backdrop`-Farbe, Top-Layer, Fokus hinein, Fokusfalle, Escape, Fokus zurück, Scroll-Sperre),
+ * Modal mit `<dialog>` (`:modal`, `::backdrop`-Farbe nur beim modalen Dialog, Top-Layer über einem Element mit z-index 2147483647, Fokus hinein,
+ * Fokusfalle, Escape, Fokus zurück, Scroll-Sperre; mit show() statt showModal() werden drei Prüfungen rot),
  * Karten-Platzhalter (Zwei-Klick: keine Anfrage an Leaflet oder Kacheln, Knopf ≥ 44 px), PageNav (Navigation aus den Überschriften, Sprung mit
  * Fokus und Hash), Theme (Umschalter, `aria-pressed`, Speicher, Token wechseln, prefers-color-scheme ohne Wahl, Boot-Skript vor dem ersten
  * Zeichnen), Container-Abfragen (Hallenkarte einspaltig bei schmalem Behälter, zweispaltig bei breitem, unabhängig vom Fenster) und
  * Bewegung (Live-Punkt pulsiert, steht bei prefers-reduced-motion und data-motion="reduce" still; Ergebniszahlen pulsieren nie).
- * Ein Browser, der nicht startet, erscheint als „nicht gestartet“ mit Grund (kein Fehlschlag, außer mit --strict).
+ * Ein Browser, der nicht startet, erscheint als „nicht gestartet“ mit Grund (Fehlschlag nur mit --strict); startet keiner der angeforderten
+ * Browser, endet das Skript immer mit Exit-Code 1 und einer klaren Meldung (scripts/browser-launch.mjs).
  * Ergebnis: JSON (oder Markdown) auf stdout; Exit-Code 1 bei jedem Fehlschlag. Läuft nicht unter `npm test` (braucht Browser).
  */
 import { createServer } from 'node:http';
@@ -25,6 +27,7 @@ import { extname, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium, firefox, webkit } from 'playwright';
 import { buildVanilla } from './build-vanilla.mjs';
+import { exitIfNoKnownBrowser, requireOneStarted } from './browser-launch.mjs';
 import { renderVenueCard } from '../js/render/venue-card.js';
 import { registerLocale, setLocale } from '../js/i18n/index.js';
 import de from '../js/i18n/de.js';
@@ -35,6 +38,7 @@ setLocale('de');
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const args = Object.fromEntries(process.argv.slice(2).map((a) => { const [k, v = 'true'] = a.replace(/^--/, '').split('='); return [k, v]; }));
 const BROWSERS = (args.browsers ?? 'chromium,firefox,webkit').split(',');
+exitIfNoKnownBrowser(BROWSERS);
 const ONLY = args.only ? args.only.split(',') : null;
 const wants = (key) => !ONLY || ONLY.includes(key);
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.map': 'application/json' };
@@ -80,6 +84,8 @@ ${['Spiele', 'Tabelle', 'Kader'].map((label, i) => `<button type="button" class=
 ${['Spiele', 'Tabelle', 'Kader'].map((label, i) => `<div id="t${i}-p" role="tabpanel" aria-labelledby="t${i}" tabindex="0"${i === 0 ? '' : ' hidden'}><p>${label}: ${LOREM}</p></div>`).join('\n')}
 </main>${boot('initAll();')}`,
   '/modal.html': () => `${head('Modal')}<main><h1>Modal</h1><div style="height:200vh"><button type="button" id="open" class="hoops-btn hoops-btn--primary hoops-btn--md" data-hoops-modal-open="dlg">Dialog öffnen</button></div>
+<!-- Wachposten für den Top-Layer: höchstmöglicher z-index im normalen Stapel; nur ein Dialog im Top-Layer (showModal) liegt darüber -->
+<div id="wache" aria-hidden="true" style="position:fixed;inset:0;z-index:2147483647;background:transparent"></div>
 <dialog class="hoops-modal-dialog" id="dlg" data-hoops="modal" aria-labelledby="dlg-t"><div class="hoops-modal"><div class="hoops-m-head"><div class="hoops-m-head-text"><h2 class="hoops-m-title" id="dlg-t">Fehler melden</h2></div>
 <button type="button" class="hoops-m-close" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></div>
 <div class="hoops-m-body"><p>${LOREM}</p><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--md" id="in1">Eins</button> <button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--md" id="in2">Zwei</button></div></div></dialog>
@@ -187,7 +193,7 @@ async function checkTabs(b, ctx, srv) {
   record(b, 'Tabs', 'Ende und Pos1 springen auf den letzten und ersten Tab', s2.focus === 't2' && s2.visible.join() === 't2-p' && s3.focus === 't0' && s3.visible.join() === 't0-p', { ende: s2, pos1: s3 });
   await page.keyboard.press('ArrowLeft');
   const s4 = await state();
-  record(b, 'Tabs', 'Pfeil links auf dem ersten Tab springt zum letzten', s4.focus === 't2', s4);
+  record(b, 'Tabs', 'Pfeil links auf dem ersten Tab: Fokus, Auswahl und Panel springen zum letzten', s4.focus === 't2' && s4.selected.join() === 't2' && s4.visible.join() === 't2-p', s4);
   record(b, 'Tabs', 'keine Seitenfehler', errors.length === 0, errors);
   await page.close();
 }
@@ -201,17 +207,17 @@ async function checkModal(b, ctx, srv) {
     if (!d.open) return null;
     const bd = getComputedStyle(d, '::backdrop').backgroundColor;
     const r = d.querySelector('.hoops-modal').getBoundingClientRect();
-    // Punkt neben der Fläche: dort liegt im Top-Layer das Dialog-Element (bzw. sein Hintergrund), nicht der Knopf der Seite
-    const hit = document.elementFromPoint(Math.max(2, r.left - 10), Math.max(2, r.top - 10));
+    // Mitte der Dialogfläche: im Top-Layer liegt der Dialog über dem Wachposten (z-index 2147483647); mit show() statt showModal() träfe der Punkt den Wachposten
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
     return {
       modal: d.matches(':modal'), backdrop: bd, focusInside: d.contains(document.activeElement), focus: document.activeElement?.className,
-      overflow: document.documentElement.style.overflow, hitOutside: hit === d || d.contains(hit),
+      overflow: document.documentElement.style.overflow, hit: hit?.id || hit?.className || hit?.tagName, hitDialog: d.contains(hit),
     };
   }));
   const transparent = !opened || /rgba\(0, 0, 0, 0\)|transparent/.test(opened.backdrop);
   record(b, 'Modal', 'showModal: dialog offen, :modal trifft zu', opened?.modal, opened);
-  record(b, 'Modal', '::backdrop hat eine deckende Farbe (nicht transparent)', !transparent, opened?.backdrop);
-  record(b, 'Modal', 'Top-Layer: ein Klickpunkt neben der Fläche trifft den Dialog, nicht die Seite', opened?.hitOutside, opened);
+  record(b, 'Modal', '::backdrop des modalen Dialogs hat eine deckende Farbe (nur gültig, wenn :modal zutrifft)', opened?.modal && !transparent, { modal: opened?.modal, backdrop: opened?.backdrop });
+  record(b, 'Modal', 'Top-Layer: der Dialog liegt über einem Element mit z-index 2147483647', opened?.hitDialog, opened);
   record(b, 'Modal', 'Fokus geht in den Dialog, Seite scrollt nicht (overflow hidden)', opened?.focusInside && opened?.overflow === 'hidden', opened);
   const trail = [];
   for (let i = 0; i < 6; i += 1) {
@@ -258,10 +264,10 @@ async function checkPageNav(b, ctx, srv) {
     const jumped = await waitFor(() => page.evaluate((href) => {
       const target = document.getElementById(new URL(href, location.href).hash.slice(1));
       const r = target?.getBoundingClientRect();
-      const ok = target && document.activeElement === target && r.top >= -2 && r.top < innerHeight;
+      const ok = target && document.activeElement === target && location.hash === `#${target.id}` && r.top >= -2 && r.top < innerHeight;
       return ok ? { hash: location.hash, top: Math.round(r.top) } : null;
     }, nav.links[2]), 4000);
-    record(b, 'PageNav', 'Sprung: Ziel im Bild und fokussiert', jumped, jumped ?? await page.evaluate(() => ({ active: document.activeElement?.id, hash: location.hash, y: scrollY, top: document.activeElement?.getBoundingClientRect().top })));
+    record(b, 'PageNav', 'Sprung: Ziel im Bild, fokussiert, Hash gesetzt', jumped, jumped ?? await page.evaluate(() => ({ active: document.activeElement?.id, hash: location.hash, y: scrollY, top: document.activeElement?.getBoundingClientRect().top })));
   }
   record(b, 'PageNav', 'keine Seitenfehler', errors.length === 0, errors);
   await page.close();
@@ -370,6 +376,7 @@ try {
   await srv.close();
   await rm(dir, { recursive: true, force: true });
 }
+requireOneStarted(BROWSERS, versions, notStarted);
 
 if (args.markdown) {
   const ran = Object.keys(versions);

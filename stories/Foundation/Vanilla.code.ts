@@ -88,6 +88,8 @@ Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<Hash des
 # Hash des Boot-Skripts (der Text zwischen <script> und </script>, ohne Änderung):
 printf '%s' "$(node -e "import('@hoopsfoundry/ui/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
   | openssl dgst -sha256 -binary | openssl base64
+# Eigene Optionen: genau die Werte aus dem Template auch hier einsetzen, sonst passt der Hash nicht, zum Beispiel
+#   … m.themeBootScript({ defaultMode: 'dark', storageKey: 'mein-theme' }) …
 
 # Alternative mit nonce: der Server erzeugt je Antwort einen Wert und setzt ihn in Header und Tag
 Content-Security-Policy: script-src 'self' 'nonce-<zufällig je Antwort>'
@@ -252,11 +254,11 @@ export const coreMatrix = {
     { name: 'Firefox', version: 'Playwright 1543 (155.0) und System-Firefox 138.0.1', result: 'nicht gelaufen' },
   ],
   groups: [
-    { name: 'Accordion', checks: 5, what: 'Klick und Enter öffnen und schließen (aria-expanded, Panel verborgen und inert), gestrichelter Fokusring, natives details ohne Skript' },
-    { name: 'Tabs', checks: 4, what: 'Pfeiltasten mit Umlauf, Pos1 und Ende, genau ein sichtbares Panel' },
-    { name: 'Modal', checks: 7, what: 'dialog mit showModal: :modal, ::backdrop mit deckender Farbe, Top-Layer (Klick neben der Fläche trifft den Dialog), Fokus hinein, Fokusfalle, Escape mit Fokus zurück, Scroll-Sperre' },
+    { name: 'Accordion', checks: 5, what: 'Klick öffnet (aria-expanded, Panel sichtbar und nicht inert), Enter schließt (Panel verborgen), gestrichelter Fokusring, natives details ohne Skript' },
+    { name: 'Tabs', checks: 4, what: 'Pfeil rechts, Ende und Pos1, Pfeil links vom ersten zum letzten Tab; jeweils Fokus, Auswahl und genau ein sichtbares Panel (bei Ende und Pos1 Fokus und Panel)' },
+    { name: 'Modal', checks: 7, what: 'dialog: :modal, ::backdrop mit deckender Farbe nur beim modalen Dialog, Top-Layer (der Dialog liegt über einem Element mit z-index 2147483647), Fokus hinein, Fokusfalle, Escape mit Fokus zurück, Scroll-Sperre. Mit show() statt showModal() werden drei Prüfungen rot' },
     { name: 'Karte', checks: 3, what: 'Platzhalter mit Knopf ≥ 44 px; vor dem Klick kein Leaflet, keine Kachel, kein Cookie, kein Speicher' },
-    { name: 'PageNav', checks: 3, what: 'Navigation aus den Überschriften, Sprung mit Fokus auf dem Ziel' },
+    { name: 'PageNav', checks: 3, what: 'Navigation aus den Überschriften, Sprung: Ziel im Bild, fokussiert, Hash gesetzt' },
     { name: 'Theme', checks: 5, what: 'Umschalter mit aria-pressed, Speicher, Token wechseln, prefers-color-scheme ohne Wahl, Boot-Skript setzt die Wahl vor dem ersten Zeichnen' },
     { name: 'Container', checks: 2, what: 'Hallenkarte einspaltig im 520-px-Behälter, zweispaltig im 960-px-Behälter, bei 1280 und 600 px Fensterbreite' },
     { name: 'Bewegung', checks: 2, what: 'Live-Punkt pulsiert, Ergebniszahl nie; prefers-reduced-motion und data-motion="reduce" halten an' },
