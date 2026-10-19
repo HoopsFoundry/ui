@@ -9,22 +9,29 @@
  *   node scripts/check-preview-docs.mjs storybook-static --full                # volles Produkt Marke × Theme × Breite × Sprache × Fensterbreite
  *
  * Seiten: alle Docs-Seiten des Builds, die eine Vorschau enthalten. Je Seite laufen sechs Kombinationen, die jeden Wert jeder Dimension
- * mindestens einmal abdecken (Fenster 1400×900, 900×900, 640×900, 320×900; dazu zwei niedrige Fenster, 640×450 = Zoom 200 % bei einem
- * Fenster von 1280×900 und 844×390 = Handy quer; Breite voll, handy, tablet, desktop; Marke, Theme und Sprache wechselnd); `--full` nimmt das
+ * mindestens einmal abdecken (Fenster 1400×900, 900×900, 640×900, 320×900; dazu niedrige Fenster: 640×450 = Zoom 200 % bei einem
+ * Fenster von 1280×900, 844×390 = Handy quer, 320×568 = Handy hoch, 320×256 = Zoom 400 % bei 1280×1024, 320×225 und 640×225 =
+ * Zoom 400 % bei 1280×900 bzw. 2560×900; Breite voll, handy, tablet, desktop; Marke, Theme und Sprache wechselnd); `--full` nimmt das
  * volle Produkt (die niedrigen Fenster kommen für jede Marke, jedes Theme, jede Breite und jede Sprache hinzu). Geprüft wird je Lauf:
  *  - keine Seitenfehler und keine Konsolenfehler (auch aus den Iframes),
  *  - jede Vorschau und jedes Beispiel einer feststehenden Vorschau rendert (Story sichtbar, keine Fehlermeldung von Storybook),
  *  - der Iframe übernimmt Marke, Theme und Sprache der Seite (Adresse und `data-brand`/`data-theme` im Iframe), seine Breite ist die
- *    gewählte Gerätebreite (bei breiteren Geräten verkleinert per transform) bzw. die Spaltenbreite bei Vollbreite,
+ *    gewählte Gerätebreite (bei breiteren Geräten verkleinert per transform) bzw. bei Vollbreite die Spaltenbreite, mindestens aber 320 px
+ *    (ist die Spalte schmaler, etwa 240 px bei Fenster 320 px, wird der Iframe verkleinert: kein Gerät ist schmaler als 320 px),
  *  - kein seitliches Scrollen durch die Vorschau (Docs-Seite) und keines im Iframe; seitliches Scrollen durch andere Inhalte der Seite wird
  *    als Hinweis gezählt (nicht Teil dieser Prüfung, die Docs-Matrix prüft 1280 und 420 px),
  *  - feststehend: `position: sticky` mit `top` 16 px (nebeneinander, ab 1100 px) bzw. 0 px (untereinander) und beim Scrollen durch den
- *    Abschnitt steht die Vorschau wirklich dort. Ist der Text kürzer als die Vorschau, wird er für die Messung künstlich verlängert (sonst
+ *    Abschnitt steht die Vorschau wirklich dort. Untereinander steht sie nur bei genug Fensterhöhe fest (`data-pinned`, previewPinned in
+ *    preview-logic.ts); das Skript rechnet die Regel aus den gemessenen Maßen nach (Fenster mindestens 360 px hoch und Überbau der Spalte
+ *    plus 160 px Mindesthöhe höchstens 70 % der Fensterhöhe) und verlangt sonst `position: static`, Ist der Text kürzer als die Vorschau, wird er für die Messung künstlich verlängert (sonst
  *    gäbe es nichts zu halten und ein fehlendes `sticky` fiele nicht auf),
  *  - die Liste der Vorschau ist per Tastatur bedienbar und kein Text der Seite ist inert,
- *  - Reflow (niedrige Fenster): untereinander nimmt die Vorschau samt Liste höchstens 70 % der Fensterhöhe ein (Obergrenze 60 vh, bei
- *    390 px Höhe greift die Mindesthöhe des Iframes von 160 px) und der Text bleibt darunter mindestens 100 px sichtbar (WCAG 1.4.10),
+ *  - Reflow (niedrige Fenster): steht die Vorschau untereinander fest, nimmt sie samt Liste höchstens 70 % der Fensterhöhe ein (die Grenze der
+ *    Spalte liegt bei 50 vh, mit fester Höhe bei 60 vh; gemessen bis 66 %, weil die Mindesthöhe des Iframes von 160 px darüber liegen darf)
+ *    und der Text bleibt darunter mindestens 100 px sichtbar; steht sie nicht fest, scrollt sie mit dem Text und verdeckt ihn nie (WCAG 1.4.10),
  *  - automatischer Wechsel (bei 1400 und 900 px): Steht der Anfang eines Abschnitts an der Lesezeile, zeigt die Vorschau sein Beispiel.
+ *    Vorher laden alle Iframes der Seite (jede Vorschau wird einmal in den Blick geholt), damit kein Iframe erst beim Scrollen lädt und die Spalte
+ *    wachsen lässt; der Baustein selbst lädt in der Spalte sofort und gleicht Höhenänderungen durch Scrollen aus (kein Wackeln des Textes),
  * Die Beispiele werden mit reduzierter Bewegung (`prefers-reduced-motion`) über die Liste gewählt, damit kein automatischer Wechsel dazwischen
  * kommt; den automatischen Wechsel prüft ein eigener Lauf ohne reduzierte Bewegung.
  * Ausgabe: eine Zeile je Fehlschlag, am Ende eine Übersicht; Exit-Code 1 bei Fehlschlägen oder wenn kein Browser startet (ADR-013).
@@ -46,7 +53,10 @@ const DEVICE = { voll: null, handy: 390, tablet: 768, desktop: 1280 }; // wie .s
 const STICKY_TOP = { wide: 16, narrow: 0 }; // wie STICKY_GAP in Preview.tsx und blocks.css
 const WIDE_MIN = 1100;
 const READ_LINE = { wide: 0.3, narrow: 0.62 }; // wie READ_LINE_WIDE und READ_LINE_NARROW in preview-logic.ts
-const SIZES = [[1400, 900], [900, 900], [640, 900], [320, 900], [640, 450], [844, 390]]; // Breite × Höhe des Fensters
+const SIZES = [[1400, 900], [900, 900], [640, 900], [320, 900], [640, 450], [844, 390], [320, 568], [320, 256], [320, 225], [640, 225]]; // Breite × Höhe des Fensters
+const MIN_FULL_WIDTH = 320; // wie MIN_FULL_WIDTH in preview-logic.ts: Vollbreite sieht mindestens so viel
+const PIN_MIN_VIEWPORT = 360; // wie PIN_MIN_VIEWPORT in preview-logic.ts
+const MIN_CAP = 160; // wie MIN_CAP in preview-logic.ts
 const LOW = 600; // Fenster unter dieser Höhe: Reflow-Prüfung (Zoom 200 %, Handy quer)
 const MAX_ASIDE_SHARE = 0.7; // untereinander: Vorschau samt Liste höchstens so viel der Fensterhöhe
 const MIN_TEXT_VISIBLE = 100; // untereinander: so viel Text bleibt unter der feststehenden Vorschau sichtbar (px)
@@ -59,6 +69,10 @@ const COMBOS = args.full === 'true'
       { width: 320, height: 900, breite: 'desktop', brand: 'dbb', theme: 'Light', locale: 'de' },
       { width: 640, height: 450, breite: 'voll', brand: 'bbv', theme: 'Light', locale: 'en' }, // Zoom 200 % bei 1280×900
       { width: 844, height: 390, breite: 'handy', brand: 'dbb', theme: 'Dark', locale: 'de' }, // Handy quer
+      { width: 320, height: 568, breite: 'voll', brand: 'bbv', theme: 'Dark', locale: 'de' }, // Handy hoch
+      { width: 320, height: 256, breite: 'voll', brand: 'dbb', theme: 'Light', locale: 'en' }, // Zoom 400 % bei 1280×1024
+      { width: 320, height: 225, breite: 'desktop', brand: 'bbv', theme: 'Light', locale: 'de' }, // Zoom 400 % bei 1280×900
+      { width: 640, height: 225, breite: 'handy', brand: 'dbb', theme: 'Dark', locale: 'en' }, // Zoom 400 % bei 2560×900
     ];
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.map': 'application/json' };
 const CONSOLE_IGNORE = [/Download the React DevTools/, /favicon/, /\[HMR\]/];
@@ -93,6 +107,21 @@ let autoChecked = 0;
 const otherOverflow = new Set();
 const pagesWithPreview = new Set();
 
+/**
+ * Jede Vorschau der Seite einmal in den Blick holen und warten, bis alle Iframes geladen und gemessen sind. Ein Iframe, der erst beim
+ * Hinscrollen lädt (freistehende Vorschauen laden lazy), ändert dabei seine Höhe und schöbe den Text mitten in der Messung.
+ */
+async function loadAllFrames(page) {
+  const n = await page.locator('.hoops-preview').count();
+  for (let i = 0; i < n; i += 1) {
+    await page.locator('.hoops-preview').nth(i).evaluate((f) => f.scrollIntoView({ block: 'center' }));
+    await page.waitForTimeout(150);
+  }
+  await page.waitForFunction(() => [...document.querySelectorAll('.hoops-preview iframe')].every((f) => f.contentDocument?.body?.classList.contains('sb-show-main')), null, { timeout: 30000 }).catch(() => {});
+  await page.waitForTimeout(400);
+  await page.evaluate(() => scrollTo(0, 0));
+}
+
 async function checkCombo(browserName, ctx, id, combo) {
   const page = await ctx.newPage();
   const errors = [];
@@ -108,6 +137,7 @@ async function checkCombo(browserName, ctx, id, combo) {
     if (count === 0) { await page.close(); return false; }
     pagesWithPreview.add(id);
     runs += 1;
+    await loadAllFrames(page);
     for (let i = 0; i < count; i += 1) {
       const fig = figures.nth(i);
       const picks = fig.locator('xpath=ancestor::div[contains(concat(" ", @class, " "), " hoops-sp ")][1]//button[contains(@class, "hoops-sp-pick")]');
@@ -151,7 +181,7 @@ async function checkCombo(browserName, ctx, id, combo) {
         const where = `„${r.title}“`;
         if (r.error) fail('Story-Fehler', `${where}: ${r.error}`);
         if (r.overflow > 0) fail('seitliches Scrollen im Iframe', `${where}: ${r.overflow}px`);
-        const want = DEVICE[combo.breite] ?? Math.floor(r.stageWidth);
+        const want = DEVICE[combo.breite] ?? Math.max(MIN_FULL_WIDTH, Math.floor(r.stageWidth));
         if (Math.abs(r.innerWidth - want) > 1) fail('Breite', `${where}: Iframe ${r.innerWidth}px statt ${want}px`);
         if (r.visualWidth > r.stageWidth + 1) fail('Breite', `${where}: sichtbar ${r.visualWidth}px breiter als die Spalte ${r.stageWidth}px`);
         if (!r.src.includes(`brand:${combo.brand}`) || !r.src.includes(`locale:${combo.locale}`)) fail('Globals', `${where}: ${r.src}`);
@@ -179,8 +209,17 @@ async function checkCombo(browserName, ctx, id, combo) {
     const wide = combo.width >= WIDE_MIN;
     const expect = wide ? STICKY_TOP.wide : STICKY_TOP.narrow;
     for (const sp of await page.locator('.hoops-sp').all()) {
-      const css = await sp.evaluate((el) => { const cs = getComputedStyle(el.querySelector('.hoops-sp-aside')); return { position: cs.position, top: parseFloat(cs.top) }; });
-      if (css.position !== 'sticky' || css.top !== expect) fail('feststehend', `position ${css.position}, top ${css.top}px statt sticky und ${expect}px`);
+      const css = await sp.evaluate((el) => {
+        const aside = el.querySelector('.hoops-sp-aside');
+        const cs = getComputedStyle(aside);
+        return { position: cs.position, top: parseFloat(cs.top), pinned: el.getAttribute('data-pinned'), overhead: aside.getBoundingClientRect().height - aside.querySelector('.hoops-preview-box').getBoundingClientRect().height };
+      });
+      // Regel nachgerechnet aus den gemessenen Maßen (previewPinned in preview-logic.ts): nebeneinander immer fest, untereinander nur bei genug Höhe
+      const mustPin = wide || (combo.height >= PIN_MIN_VIEWPORT && css.overhead + MIN_CAP <= combo.height * MAX_ASIDE_SHARE);
+      if ((css.pinned === 'true') !== mustPin) fail('feststehend', `data-pinned=${css.pinned}, erwartet ${mustPin} (Fenster ${combo.width}×${combo.height}, Überbau der Spalte ${Math.round(css.overhead)}px)`);
+      const pinned = css.pinned === 'true';
+      if (pinned && (css.position !== 'sticky' || css.top !== expect)) fail('feststehend', `position ${css.position}, top ${css.top}px statt sticky und ${expect}px`);
+      if (!pinned && css.position !== 'static') fail('feststehend', `Vorschau soll bei dieser Fensterhöhe nicht feststehen, hat aber position ${css.position}`);
       // Text kürzer als die Vorschau (oder kaum länger): für die Messung einen Abstandhalter ans Ende des Textes setzen, sonst gäbe es
       // nichts zu halten (position: sticky wirkt nur, solange der Abschnitt höher ist als die Vorschau)
       const spacer = await sp.evaluate((el) => {
@@ -201,11 +240,11 @@ async function checkCombo(browserName, ctx, id, combo) {
         return { top: aside.top, bottom: aside.bottom, height: aside.height, visible: Math.min(innerHeight, text.bottom) - Math.max(aside.bottom, text.top), vh: innerHeight };
       });
       stickyMeasured += 1;
-      if (Math.abs(at.top - expect) > 2) fail('feststehend', `Vorschau steht bei ${Math.round(at.top)}px statt ${expect}px${spacer ? ' (Text künstlich verlängert)' : ''}`);
+      if (pinned && Math.abs(at.top - expect) > 2) fail('feststehend', `Vorschau steht bei ${Math.round(at.top)}px statt ${expect}px${spacer ? ' (Text künstlich verlängert)' : ''}`);
       // Reflow: untereinander darf die Vorschau den Text bei niedrigem Fenster nicht verdecken (Zoom 200 %, Handy quer; WCAG 1.4.10)
       if (!wide && combo.height < LOW) {
         reflowMeasured += 1;
-        if (at.height > at.vh * MAX_ASIDE_SHARE) fail('Reflow', `Vorschau samt Liste ${Math.round(at.height)}px hoch bei ${at.vh}px Fensterhöhe (mehr als ${Math.round(MAX_ASIDE_SHARE * 100)} %)`);
+        if (pinned && at.height > at.vh * MAX_ASIDE_SHARE) fail('Reflow', `Vorschau samt Liste ${Math.round(at.height)}px hoch bei ${at.vh}px Fensterhöhe (mehr als ${Math.round(MAX_ASIDE_SHARE * 100)} %)`);
         if (at.visible < MIN_TEXT_VISIBLE) fail('Reflow', `nur ${Math.round(at.visible)}px Text unter der Vorschau sichtbar (mindestens ${MIN_TEXT_VISIBLE}px)`);
       }
       if (spacer) await sp.evaluate((el) => el.querySelector('[data-pruef-abstand]')?.remove());
@@ -234,6 +273,7 @@ async function checkAuto(browserName, ctx, id, combo) {
   try {
     await page.goto(`${origin}/iframe.html?viewMode=docs&id=${id}&globals=breite:${combo.breite}`, { waitUntil: 'networkidle', timeout: 60000 });
     await page.waitForSelector('.sbdocs-content', { timeout: 20000 });
+    await loadAllFrames(page);
     const share = combo.width >= WIDE_MIN ? READ_LINE.wide : READ_LINE.narrow;
     for (const sp of await page.locator('.hoops-sp[data-steps]').all()) {
       if (Number(await sp.getAttribute('data-steps')) < 2) continue;
