@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { t } from '../../js/i18n/index.js';
+  import { localizeMarkup } from '../docs/localize-markup';
   import Modal from '../../svelte/Modal.svelte';
   import Button from '../../svelte/Button.svelte';
   import ModalDemo from './ModalDemo.svelte';
@@ -32,7 +34,7 @@
 
   // Vanilla-Beispiele: das Markup aus dem Code-Beispiel (createContextualFragment statt HTML-Zuweisung), gestartet mit initAll.
   function vanillaModal(node: HTMLElement, markup: string) {
-    node.replaceChildren(document.createRange().createContextualFragment(markup));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(markup)));
     const handle = initAll(node, { only: ['modal'] });
     return { destroy: () => handle.destroy() };
   }
@@ -53,7 +55,7 @@
           <h2 class="hoops-m-title" id="{p.id}-titel">{p.title}</h2>
           <div class="hoops-m-subtitle">{p.subtitle}</div>
         </div>
-        <button type="button" class="hoops-m-close" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
+        <button type="button" class="hoops-m-close" aria-label={t('modal.close')}><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 4l8 8M12 4l-8 8"/></svg></button>
       </div>
       <div class="hoops-m-body">{p.body}</div>
       <div class="hoops-m-footer">
@@ -128,7 +130,7 @@
             {#if c === 'Gesperrt'}
               <span class="none">nicht vorgesehen</span>
             {:else}
-              <button type="button" class="hoops-m-close {stateClass[c]}" aria-label="Schließen"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg></button>
+              <button type="button" class="hoops-m-close {stateClass[c]}" aria-label={t('modal.close')}><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" /></svg></button>
             {/if}
           </div>
         {/each}

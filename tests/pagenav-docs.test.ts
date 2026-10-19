@@ -77,6 +77,8 @@ describe('Doku-Seite', () => {
     const names = onPage.flatMap(([, text]) => [
       ...[...text.matchAll(/label: '([^']+)'/g)].map((m) => m[1]),
       ...[...text.matchAll(/<p class="hoops-eyebrow" id="[^"]+">([^<]+)<\/p>/g)].map((m) => m[1]),
+      // ohne label gilt der Katalogtext (pagenav.label); er zählt wie ein Name und darf nur einmal vorkommen
+      ...[...text.matchAll(/use:nav=\{\{(?![^}]*label:)[^}]*\}\}/g)].map(() => '(Katalog: pagenav.label)'),
     ]);
     // 'vanilla' setzt den Namen über data-hoops-options
     names.push(...[...pieces[0].matchAll(/label: '([^']+)'/g)].map((m) => m[1]));

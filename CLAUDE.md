@@ -17,6 +17,7 @@ node scripts/check-map-browser.mjs   # Browser-Prüfung der Karte ohne Build (Ch
 node scripts/check-map-docs.mjs <ordner>  # axe auf den Karten-Seiten eines Storybook-Builds (npx storybook build -o <ordner>)
 node scripts/release-vanilla.mjs --dry-run --allow-dirty --no-build   # Release-Ablauf prüfen (schreibt nichts); ohne --dry-run nach release/ (gitignored)
 node scripts/check-portal-seite.mjs --browsers=chromium,webkit   # Beispiel-Portalseite im Browser (Release → portal-sync → strenge CSP, axe); nicht Teil von npm test
+node scripts/check-i18n-docs.mjs <ordner>  # axe und Sprachumschaltung auf der Seite Foundation/Internationalisierung eines Storybook-Builds (de/en, hell/dunkel)
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```
@@ -40,7 +41,7 @@ Docs sind MDX-Seiten je Komponente in `stories/` (`X.mdx`, `X.stories.ts`, `X.co
 - Beispiel-Stories, die nur in der Doku erscheinen, tragen das **literale** `tags: ['!dev']` im Story-Objekt (der Indexer liest keine Tags aus Hilfsfunktionen).
 - `remark-gfm` ist nicht installiert: Tabellen über `DocTable`, nicht Markdown-Tabellen.
 - „Don't"-Beispiele in `DosDonts` sind `inert`; mehrere gleiche Komponenten auf einer Seite brauchen eindeutige Titel/Labels (axe `landmark-unique`); vor dem ersten Beispiel steht eine `##`-Überschrift (`heading-order`).
-- Neue Seiten in `stories/Introduction.mdx` und im `storySort` in `.storybook/preview.ts` eintragen. Toolbar-Globals: Marke, Typ (`dbb`), Framework, Zustand (Hover/Fokus erzwingen), Bewegung; Theme-Werte in URLs sind `Dark`/`Light`.
+- Neue Seiten in `stories/Introduction.mdx` und im `storySort` in `.storybook/preview.ts` eintragen. Toolbar-Globals: Marke, Typ (`dbb`), Framework, Zustand (Hover/Fokus erzwingen), Bewegung, Sprache (`locale`: `de` Start, `en`; `applyLocale` aus `.storybook/locale.ts` läuft als `beforeEach` und ruft `setLocale`, `<html lang="de">`); Theme-Werte in URLs sind `Dark`/`Light`. Die Doku-Texte bleiben deutsch.
 - Zahlen und Aussagen in der Doku werden gegen CSS/Browser gemessen und von Tests geprüft (`tests/*-docs.test.ts`, `*-code.test.ts` führen die Beispiele aus); nichts schätzen.
 
 ## Qualitätsregeln (WCAG 2.2 AAA als Ziel)

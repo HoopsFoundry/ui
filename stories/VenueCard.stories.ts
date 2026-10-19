@@ -16,7 +16,7 @@ export const Spielwiese = {
   render,
   args: {
     name: hall.name, address: hall.address, lat: hall.lat, lng: hall.lng, info: hall.info, contact: hall.contact,
-    gameCount: 4, limit: 2, gamesLabel: 'Nächste Spiele in der Halle', href: hall.href, linkLabel: 'Zur Hallenseite',
+    gameCount: 4, limit: 2, href: hall.href,
     names: 'full', logos: true, size: 'standard', load: 'click', tileUrl: 'demo', mapHeight: 250,
   },
   argTypes: {

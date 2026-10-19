@@ -68,7 +68,7 @@
   </div>
 {:else if example === 'dunkel'}
   <div class="wide">
-    <PlayByPlay title="Play-by-Play · neueste oben" meta="4. Viertel" dark events={drei} />
+    <PlayByPlay meta="4. Viertel" dark events={drei} />
   </div>
 {:else if example === 'zustaende'}
   <!-- data-fixed-states: die Werkzeugleiste "Zustand" lässt diese Matrix in Ruhe -->
@@ -87,10 +87,10 @@
 
 <!-- Dos und Don'ts -->
 {:else if example === 'do-reihenfolge'}
-  <div class="wide"><PlayByPlay title="Play-by-Play · neueste oben" live={false} events={drei} /></div>
+  <div class="wide"><PlayByPlay live={false} events={drei} /></div>
 {:else if example === 'dont-reihenfolge'}
   <!-- Der Baustein sortiert nicht: die App liefert die Ereignisse in der Reihenfolge, die der Titel nennt -->
-  <div class="wide"><PlayByPlay title="Play-by-Play · neueste oben" live={false} events={dreiAelteste} /></div>
+  <div class="wide"><PlayByPlay live={false} events={dreiAelteste} /></div>
 {:else if example === 'do-team'}
   <div class="wide">
     <PlayByPlay title="Auszeiten" live={false} events={[{ id: 1, time: '03:21', period: 4, team: 'gast', kind: 'timeout', title: 'Auszeit · Gast', detail: '2. von 3 Auszeiten', score: { heim: 82, gast: 64 } }]} />
@@ -108,9 +108,9 @@
     <PlayByPlay title="Zeitangabe" live={false} events={[{ id: 1, time: '2 Min. 14 Sek. verbleibend', period: 4, team: 'heim', kind: 'score-2p', title: '2-Punkte-Wurf · Spieler #7', score: { heim: 87, gast: 64 } }]} />
   </div>
 {:else if example === 'do-live'}
-  <div class="wide"><PlayByPlay title="Play-by-Play · neueste oben" meta="Spiel beendet" live={false} events={drei.slice(0, 2)} /></div>
+  <div class="wide"><PlayByPlay meta="Spiel beendet" live={false} events={drei.slice(0, 2)} /></div>
 {:else if example === 'dont-live'}
-  <div class="wide"><PlayByPlay title="Play-by-Play · neueste oben" meta="Spiel beendet" live events={drei.slice(0, 2)} /></div>
+  <div class="wide"><PlayByPlay meta="Spiel beendet" live events={drei.slice(0, 2)} /></div>
 {/if}
 
 <style>

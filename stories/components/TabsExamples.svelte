@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localizeMarkup } from '../docs/localize-markup';
   import { onMount } from 'svelte';
   import Tabs from '../../svelte/Tabs.svelte';
   import { ensureSprite } from '../../svelte/Icon.svelte';
@@ -67,7 +68,7 @@
 
   // Vanilla-Beispiele: das Markup aus dem Code-Beispiel (createContextualFragment statt HTML-Zuweisung), gestartet mit initAll.
   function vanillaMarkup(node: HTMLElement, markup: string) {
-    node.replaceChildren(document.createRange().createContextualFragment(markup));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(markup)));
     const handle = initAll(node, { only: ['tabs'] });
     return { destroy: () => handle.destroy() };
   }

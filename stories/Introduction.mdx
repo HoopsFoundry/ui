@@ -33,9 +33,10 @@ Oben im Storybook stehen die Schalter, die auf allen Seiten wirken:
 - **Schrift:** Standard (Sora, Manrope) oder DBB-Original (Rubik, Sucrose).
 - **Theme:** Hell oder Dunkel.
 - **Fassung:** welche Code-Beispiele die Seiten zeigen: Vanilla (HTML und CSS), Svelte oder React.
+- **Sprache:** Deutsch oder Englisch für die eingebauten Texte der Bausteine (Beschriftungen, `aria-label`, Statuszeilen). Deutsch bleiben die Doku-Texte, der Code der Beispiele und die Demodaten, die eine Anwendung selbst übergäbe (Namen, Titel, Tab-Beschriftungen, Knopftexte wie „Erneut versuchen“, Kennzahlen-Beschriftungen) ([Internationalisierung](?path=/docs/foundation-internationalisierung--docs)).
 - **Zustand:** erzwingt Hover, Fokus oder Aktiv auf den Vorschauen einer Seite, damit du sie ohne Maus und Tastatur prüfen kannst.
 
-Marke, Schrift, Theme und Zustand wirken auf Vorschauen, die direkt auf der Seite stehen; Vorschauen im eigenen Rahmen (iframe) behalten ihre Einstellung.
+Marke, Schrift, Theme, Sprache und Zustand wirken auf Vorschauen, die direkt auf der Seite stehen; Vorschauen im eigenen Rahmen (iframe) behalten ihre Einstellung.
 
 ## Einbinden
 
@@ -70,6 +71,7 @@ Svelte-Komponenten importierst du einzeln über den Path-Export, etwa aus `@hoop
 - [Live](?path=/docs/foundation-live--docs): grüne Live-Sprache, Puls, Token
 - [Dark Mode](?path=/docs/foundation-dark-mode--docs): Hell, Dunkel oder System, Umschalter ohne Flackern (`initTheme`, `themeBootScript`)
 - [Vanilla](?path=/docs/foundation-vanilla--docs): das Paket ohne Framework und Build: `dist/vanilla`, `data-hoops`, `initAll`, Markup aus Daten (`renderX`, `mountX`), die Karte ohne Framework (`mountMap`, `initMap`, Leaflet lokal), Sicherheit, CSP, Größen, Kopieren ins Projekt, Einbinden aus dem Release, Aktualisieren und Rollback, Kompatibilität (Browsermatrix), Wechsel auf npm ab 1.0, Versionsabgleich
+- [Internationalisierung](?path=/docs/foundation-internationalisierung--docs): eingebaute Texte in Englisch (Standard) und Deutsch, Sprache einstellen (`setLocale`, `provideI18n`, `HoopsProvider`), Texte überschreiben, eigene Sprache ergänzen (`registerLocale`), Ereignis `hoops:localechange`, Übersetzungsleitfaden mit Glossar, Migration
 
 ### Eingabe und Aktion
 

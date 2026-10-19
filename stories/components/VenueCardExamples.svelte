@@ -30,7 +30,7 @@
 </script>
 
 {#if example === 'aufbau'}
-  <VenueCard {...venueProps(0)} games={games} logos tileUrl={tile} linkLabel="Zur Hallenseite" />
+  <VenueCard {...venueProps(0)} games={games} logos tileUrl={tile} />
 {:else if example === 'geladen'}
   <VenueCard {...venueProps(1)} games={gamesPlain} tileUrl={tile} load="auto" />
 {:else if example === 'minimal'}
@@ -91,7 +91,7 @@
     <VenueCard {...venueProps(1)} name="Mehrzweckhalle Seeberg Süd" size="compact" tileUrl={tile} />
   </div>
 {:else if example === 'vanilla'}
-  <div use:vanilla={{ ...venueProps(13), name: 'Buchenhalle Süd', games: gamesPlain, tileUrl: tile, linkLabel: 'Zur Hallenseite' } as never}></div>
+  <div use:vanilla={{ ...venueProps(13), name: 'Buchenhalle Süd', games: gamesPlain, tileUrl: tile } as never}></div>
 {:else if example === 'vanilla-handy'}
   <div class="narrow">
     <div use:vanilla={{ ...venueProps(14), name: 'Ahornhalle Nord', games: games, logos: true, names: 'short', tileUrl: tile } as never}></div>

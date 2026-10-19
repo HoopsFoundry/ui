@@ -53,7 +53,6 @@
   {/if}
 
   <PlayByPlay
-    title="Play-by-Play · neueste oben"
     meta={`${events.length} Events`}
     live={mode === 'live' ? isLive : true}
     {dark}

@@ -10,13 +10,12 @@ import 'leaflet/dist/leaflet.css';
 import './storybook.css';
 import { installPseudoStates } from './pseudo-states';
 import { setForcedState, type ForcedState } from './state-switch';
-// Sprache der Dokumentation: Die Bibliothek startet mit Englisch, die Doku-Seiten und ihre Beispiele sind deutsch. Bis zur Sprachauswahl in der
-// Werkzeugleiste registriert dieser Import den deutschen Katalog, und `setLocale('de')` hält die Doku in der bisherigen Sprache.
+// Sprache der Bausteine: Die Bibliothek startet mit Englisch (Katalog im Kern), dieser Import registriert den deutschen Katalog. Welche Sprache
+// gilt, wählt der Umschalter „Sprache“ in der Werkzeugleiste (Global `locale`, Start `de`, weil die Doku-Texte deutsch sind). `applyLocale`
+// läuft als `beforeEach` vor jedem Rendern, nicht im Decorator (dort liefe `setLocale` mitten im Svelte-Rendern); nach einem Wechsel baut
+// Storybook die Stories neu auf (neue Knoten, Fokus auf `body`). `<html lang>` ist `de`, die Sprache der Doku-Texte.
 import '../js/i18n/de-register.js';
-import { setLocale } from '../js/i18n/index.js';
-
-setLocale('de');
-
+import { applyLocale } from './locale';
 
 const preview: Preview = {
   globalTypes: {
@@ -69,6 +68,18 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    locale: {
+      description: 'Sprache der eingebauten Texte (setLocale); die Doku-Texte bleiben deutsch',
+      toolbar: {
+        title: 'Sprache',
+        icon: 'globe',
+        items: [
+          { value: 'de', title: 'Deutsch (de)' },
+          { value: 'en', title: 'English (en)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     state: {
       description: 'Zustand erzwingen (Hover, Fokus, Aktiv)',
       toolbar: {
@@ -89,6 +100,7 @@ const preview: Preview = {
     type: 'standard',
     framework: 'svelte',
     motion: 'normal',
+    locale: 'de',
     state: 'normal',
 
     backgrounds: {
@@ -96,6 +108,10 @@ const preview: Preview = {
     }
   },
   parameters: {
+    // Sprache der Doku für Hilfstechnik: Storybook setzt `lang` an den Docs-Inhalt (`docs.lang`) und an jede eingebettete Story (`htmlLang`),
+    // Standard wäre `en`. Die Doku ist deutsch; Bausteine in Englisch tragen dann `lang="en"` an ihrer Wurzel.
+    htmlLang: 'de',
+    docs: { lang: 'de' },
     controls: {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },
@@ -110,7 +126,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Introduction',
-          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode', 'Vanilla'],
+          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode', 'Vanilla', 'Internationalisierung'],
           'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Kennzahlen', 'Map', 'VenueCard', 'Tabs', 'Accordion', 'PageNav', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
         ],
       },
@@ -120,6 +136,10 @@ const preview: Preview = {
       config: { rules: [{ id: 'color-contrast', enabled: true }] },
     },
   },
+  // Sprache vor jedem Rendern (auch nach einem Wechsel der Globals), außerhalb des Svelte-Renderns; siehe .storybook/locale.ts
+  beforeEach: [(context) => {
+    applyLocale(context.globals);
+  }],
   decorators: [
     (story, context) => {
       installPseudoStates(); // idempotent: Kopien der Hover-/Fokus-/Active-Regeln für feste Zustands-Vorschauen
