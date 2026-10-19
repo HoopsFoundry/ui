@@ -9,8 +9,9 @@ const root = new URL('../', import.meta.url);
 const config = JSON.parse(readFileSync(new URL('project.config.json', root), 'utf8')) as { domain: string };
 const read = (p: string) => readFileSync(new URL(p, root), 'utf8');
 
-const ALLE = ['logo-claim.svg', 'logo-claim-hell.svg', 'logo-farbig.svg', 'logo-einfarbig.svg', 'logo-app-icon.svg', 'logo-icon.svg', 'logo-icon-farbig.svg'];
-const ICONS = ['logo-icon.svg', 'logo-icon-farbig.svg'];
+const ALLE = ['logo-claim.svg', 'logo-claim-hell.svg', 'logo-farbig.svg', 'logo-farbig-dunkel.svg', 'logo-einfarbig.svg', 'logo-app-icon.svg', 'logo-app-icon-dunkel.svg', 'favicon.svg', 'logo-icon.svg', 'logo-icon-farbig.svg', 'logo-icon-farbig-dunkel.svg'];
+const ICONS = ['logo-icon.svg', 'logo-icon-farbig.svg', 'logo-icon-farbig-dunkel.svg']; // im npm-Paket
+const DUNKEL_ZEICHEN = ['logo-farbig-dunkel.svg', 'logo-icon-farbig-dunkel.svg']; // Zeichen weiß, nie Ash
 const S2 = '#f2561d'; // die eine Signalfarbe (hell und dunkel)
 const ASH = '#24292f'; // Ash: ersetzt das Schwarz (Zeichen, "Hoops", Claim hell, Kachel des App-Icons)
 const CLAIM_DUNKEL = '#c9d1d9'; // Claim auf dunklem Grund
@@ -29,9 +30,21 @@ function svgProbleme(name: string, src: string): string[] {
   if (einfarbig && /fill:|rgb\(/.test(src)) p.push('feste Farbe in einer einfarbigen Fassung');
   if (!einfarbig && !src.replaceAll(' ', '').includes(`fill:${S2}`)) p.push('F in der Signalfarbe #f2561d fehlt');
   if (/rgb\(189,\s*0,\s*13\)/.test(src)) p.push('altes Rot rgb(189,0,13) kommt noch vor');
-  if (!einfarbig && /fill:(black|#000(000)?|#fff|white)\b[^;]*/.test(src) && name !== 'logo-app-icon.svg') p.push('reines Schwarz oder Weiß statt Ash');
+  if (!einfarbig && !name.includes('app-icon') && name !== 'favicon.svg' && /fill:(black|#000(000)?|#fff|white)\b/.test(src)) p.push('reines Schwarz oder Weiß statt Ash');
   if (name === 'logo-app-icon.svg' && !src.includes(`style="fill:${ASH};"`)) p.push('Kachel nicht in Ash');
   if (name === 'logo-app-icon.svg' && !/fill:white/.test(src)) p.push('weißes Zeichen fehlt');
+  // Dunkle Fassungen: invertiert, Ash kommt nie als Zeichen auf dunklem Grund vor
+  if (DUNKEL_ZEICHEN.includes(name) && !/\sfill="#fff"/.test(root)) p.push('dunkle Fassung: Zeichen nicht weiß');
+  if (DUNKEL_ZEICHEN.includes(name) && src.includes(ASH)) p.push('dunkle Fassung enthält Ash (Ash nie auf dunkler Fläche)');
+  if (name === 'logo-app-icon-dunkel.svg') {
+    if (!src.includes('style="fill:#fff;"')) p.push('dunkles App-Icon: Kachel nicht weiß');
+    if (!src.includes(`style="fill:${ASH};"`)) p.push('dunkles App-Icon: Zeichen nicht in Ash');
+  }
+  if (name === 'favicon.svg') {
+    if (!/@media \(prefers-color-scheme:\s*dark\)/.test(src)) p.push('Favicon: Umschaltung per prefers-color-scheme fehlt');
+    if (!src.includes(`.k{fill:${ASH}}`) || !src.includes('.z{fill:#fff}')) p.push('Favicon: helle Fassung (Kachel Ash, Zeichen weiß) fehlt');
+    if (!src.includes(`dark){.k{fill:#fff}.z{fill:${ASH}}`)) p.push('Favicon: dunkle Fassung nicht invertiert');
+  }
   if (['logo-farbig.svg', 'logo-icon-farbig.svg', 'logo-claim.svg'].includes(name) && !new RegExp(`\\sfill="${ASH}"`).test(root)) p.push('Zeichen nicht in Ash (Grundfüllung fehlt)');
   if (name === 'logo-claim-hell.svg' && !/\sfill="#fff"/.test(root)) p.push('weiße Füllung fehlt');
   // Logo mit Claim: "Foundry" und F in der Signalfarbe (8 Pfade), der Claim (24 Pfade) neutral: Ash auf hellem, hellgrau auf dunklem Grund
@@ -60,6 +73,10 @@ describe('SVG-Dateien', () => {
     const vb = (n: string) => read(`logo/${n}`).match(/viewBox="(-?\d+) (-?\d+) (\d+) (\d+)"/)!.slice(1).map(Number);
     expect(vb('logo-icon.svg').slice(2)).toEqual([661, 944]);
     expect(vb('logo-icon-farbig.svg').slice(2)).toEqual(vb('logo-farbig.svg').slice(2));
+    expect(vb('logo-icon-farbig-dunkel.svg')).toEqual(vb('logo-icon-farbig.svg'));
+    expect(vb('logo-farbig-dunkel.svg')).toEqual(vb('logo-farbig.svg'));
+    expect(vb('logo-app-icon-dunkel.svg')).toEqual(vb('logo-app-icon.svg'));
+    expect(vb('favicon.svg')).toEqual(vb('logo-app-icon.svg'));
     expect(vb('logo-claim.svg').slice(2)).toEqual([4645, 989]);
     expect(vb('logo-claim-hell.svg')).toEqual(vb('logo-claim.svg'));
     const [, , w, h] = vb('logo-app-icon.svg');
@@ -69,6 +86,8 @@ describe('SVG-Dateien', () => {
     const paths = (s: string) => [...s.matchAll(/ d="([^"]+)"/g)].map((m) => m[1]);
     expect(paths(read('logo/logo-icon.svg'))).toEqual(paths(read('logo/logo-farbig.svg')));
     expect(paths(read('logo/logo-icon-farbig.svg'))).toEqual(paths(read('logo/logo-farbig.svg')));
+    for (const n of DUNKEL_ZEICHEN) expect(paths(read(`logo/${n}`)), n).toEqual(paths(read('logo/logo-farbig.svg')));
+    for (const n of ['logo-app-icon-dunkel.svg', 'favicon.svg']) expect(paths(read(`logo/${n}`)), n).toEqual(paths(read('logo/logo-app-icon.svg')));
   });
   it('Mutationsprobe: verfälschte Kopien fallen durch', () => {
     const claim = read('logo/logo-claim.svg');
@@ -85,6 +104,17 @@ describe('SVG-Dateien', () => {
     expect(svgProbleme('logo-farbig.svg', '<!DOCTYPE svg>' + farbig)).toContain('DOCTYPE, XML-Kopf oder Editor-Reste');
     expect(svgProbleme('logo-farbig.svg', farbig.replace('fill:#f2561d', 'fill:rgb(0,0,0)'))).toContain('F in der Signalfarbe #f2561d fehlt');
     expect(svgProbleme('logo-farbig.svg', farbig.replace('fill="#24292f"', ''))).toContain('Zeichen nicht in Ash (Grundfüllung fehlt)');
+    // dunkle Fassungen und Favicon: Invertierung und Regel "kein Ash auf dunkler Fläche"
+    const dunkel = read('logo/logo-farbig-dunkel.svg');
+    expect(svgProbleme('logo-farbig-dunkel.svg', dunkel.replace('fill="#fff"', 'fill="#24292f"'))).toEqual(expect.arrayContaining(['dunkle Fassung: Zeichen nicht weiß', 'dunkle Fassung enthält Ash (Ash nie auf dunkler Fläche)']));
+    expect(svgProbleme('logo-farbig-dunkel.svg', dunkel.replace('fill:#f2561d', 'fill:#24292f'))).toContain('dunkle Fassung enthält Ash (Ash nie auf dunkler Fläche)');
+    expect(svgProbleme('logo-icon-farbig-dunkel.svg', read('logo/logo-icon-farbig-dunkel.svg').replace('fill="#fff"', 'fill="#24292f"'))).toContain('dunkle Fassung: Zeichen nicht weiß');
+    const appDunkel = read('logo/logo-app-icon-dunkel.svg');
+    expect(svgProbleme('logo-app-icon-dunkel.svg', appDunkel.replace('style="fill:#fff;"', 'style="fill:#24292f;"'))).toContain('dunkles App-Icon: Kachel nicht weiß');
+    expect(svgProbleme('logo-app-icon-dunkel.svg', read('logo/logo-app-icon.svg'))).toContain('dunkles App-Icon: Kachel nicht weiß');
+    const fav = read('logo/favicon.svg');
+    expect(svgProbleme('favicon.svg', fav.replace('prefers-color-scheme', 'prefers-reduced-motion'))).toContain('Favicon: Umschaltung per prefers-color-scheme fehlt');
+    expect(svgProbleme('favicon.svg', fav.replace('dark){.k{fill:#fff}.z{fill:#24292f}}', 'dark){.k{fill:#24292f}.z{fill:#fff}}'))).toContain('Favicon: dunkle Fassung nicht invertiert');
     const icon = read('logo/logo-icon.svg');
     expect(svgProbleme('logo-icon.svg', icon.replace(' fill="currentColor"', ''))).toContain('currentColor fehlt');
     expect(svgProbleme('logo-icon.svg', icon.replace('<path d=', '<path style="fill:rgb(1,2,3)" d='))).toContain('feste Farbe in einer einfarbigen Fassung');
@@ -101,13 +131,13 @@ describe('Social Preview', () => {
 
 describe('npm-Paket', () => {
   const pkg = JSON.parse(read('package.json')) as { files: string[]; exports: Record<string, string> };
-  it('führt genau die zwei Footer-Icons als Dateien und Exports', () => {
+  it('führt genau die Footer-Icons (einfarbig, farbig hell, farbig dunkel) als Dateien und Exports', () => {
     for (const n of ICONS) {
       expect(pkg.files).toContain(`logo/${n}`);
       expect(pkg.exports[`./logo/${n}`]).toBe(`./logo/${n}`);
     }
-    expect(pkg.files.filter((f) => f.startsWith('logo'))).toHaveLength(2);
-    expect(Object.keys(pkg.exports).filter((k) => k.startsWith('./logo'))).toHaveLength(2);
+    expect(pkg.files.filter((f) => f.startsWith('logo'))).toHaveLength(ICONS.length);
+    expect(Object.keys(pkg.exports).filter((k) => k.startsWith('./logo'))).toHaveLength(ICONS.length);
     expect(code.paketDateien).toEqual(ICONS.map((n) => `logo/${n}`));
   });
   it('npm pack enthält aus logo/ die Footer-Icons und die README.md (npm nimmt Readme-Dateien immer mit), sonst nichts', () => {
@@ -132,10 +162,10 @@ describe('Storybook', () => {
   it('staticDirs liefert logo/ unter logo/ aus', () => {
     expect(read('.storybook/main.ts')).toMatch(/staticDirs: \[\{ from: '\.\.\/logo', to: '\/logo' \}\]/);
   });
-  it('das Favicon ist das App-Icon, relativ und ohne Fremdadresse (Manager und Vorschau)', () => {
+  it('das Favicon ist eine eigene SVG (schaltet per prefers-color-scheme um), relativ und ohne Fremdadresse (Manager und Vorschau)', () => {
     for (const f of ['.storybook/manager-head.html', '.storybook/preview-head.html']) {
       const html = read(f);
-      expect(html, f).toContain('<link rel="icon" type="image/svg+xml" href="./logo/logo-app-icon.svg"');
+      expect(html, f).toContain('<link rel="icon" type="image/svg+xml" href="./logo/favicon.svg"');
       expect(html, f).not.toMatch(/https?:\/\//);
     }
   });

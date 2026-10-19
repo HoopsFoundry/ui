@@ -6,10 +6,14 @@ Das Zeichen zeigt ein H, einen Korb-Ring, einen Spieler und ein F in der Signalf
 | --- | --- | --- |
 | `logo-claim.svg` | Logo mit Wortmarke und Claim auf hellem Grund; Zeichen und „Hoops“ Ash, „Foundry“ S2, Claim Ash | nein |
 | `logo-claim-hell.svg` | dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2, Claim hellgrau (`#c9d1d9`) | nein |
-| `logo-farbig.svg` | Zeichen allein, Ash mit F in S2 | nein |
+| `logo-farbig.svg` | Zeichen allein für hellen Grund, Ash mit F in S2 | nein |
+| `logo-farbig-dunkel.svg` | Zeichen allein für dunklen Grund, weiß mit F in S2 | nein |
 | `logo-einfarbig.svg` | Zeichen allein in einer Farbe (`currentColor`) | nein |
-| `logo-app-icon.svg` | weißes Zeichen (F in S2) auf Ash-farbener, abgerundeter Kachel (Favicon der Doku, App-Symbol) | nein |
-| `logo-icon-farbig.svg` | Footer-Icon, eng beschnitten, Ash mit F in S2 | ja |
+| `logo-app-icon.svg` | App-Symbol für hellen Grund: weißes Zeichen (F in S2) auf Ash-farbener, abgerundeter Kachel | nein |
+| `logo-app-icon-dunkel.svg` | App-Symbol für dunklen Grund, invertiert: Ash-Zeichen (F in S2) auf weißer Kachel | nein |
+| `favicon.svg` | Favicon der Doku: schaltet per `prefers-color-scheme` zwischen App-Icon und invertierter Fassung um | nein |
+| `logo-icon-farbig.svg` | Footer-Icon für hellen Grund, eng beschnitten, Ash mit F in S2 | ja |
+| `logo-icon-farbig-dunkel.svg` | Footer-Icon für dunklen Grund, eng beschnitten, weiß mit F in S2 | ja |
 | `logo-icon.svg` | Footer-Icon einfarbig (`currentColor`) | ja |
 | `social-preview.png` | Vorschaubild für das GitHub-Repository, 1280 × 640 | nein |
 
@@ -17,9 +21,9 @@ Das Social-Preview-Bild entsteht mit `node scripts/make-social-preview.mjs` aus 
 
 ## Footer-Icon
 
-Im Paket liegen nur die zwei Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg` und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`. Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf die Projektseite (Adresse: Feld `domain` in `project.config.json`). Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
+Im Paket liegen nur die Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg`, `@hoopsfoundry/ui/logo/logo-icon-farbig.svg` (heller Grund) und `@hoopsfoundry/ui/logo/logo-icon-farbig-dunkel.svg` (dunkler Grund). Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf die Projektseite (Adresse: Feld `domain` in `project.config.json`). Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
 
-Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 48 px Höhe (Kontraste und Begründung der Farben: Storybook-Seite „Foundation/Logo“, Abschnitt „Farben“). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
+Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 48 px Höhe (Kontraste und Begründung der Farben: Storybook-Seite „Foundation/Logo“, Abschnitt „Farben“). Regel: je Untergrund eine Fassung, Ash nie auf einer dunklen Fläche (auf Schwarz nur 1,43:1). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
 
 ## Marke und Nutzung
 

@@ -9,9 +9,12 @@
     { datei: 'logo-claim.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ in Ash (dunkelgrau), „Foundry“ in Orangerot, Claim in Ash', hoehe: 56, dunkel: false },
     { datei: 'logo-claim-hell.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ weiß, „Foundry“ in Orangerot, Claim hellgrau, für dunklen Grund', hoehe: 56, dunkel: true },
     { datei: 'logo-farbig.svg', alt: 'Marken-Zeichen: H mit Korb-Ring, Spieler in Ash und orangerotem F', hoehe: 112, dunkel: false },
+    { datei: 'logo-farbig-dunkel.svg', alt: 'Marken-Zeichen für dunklen Grund: weiß mit orangerotem F', hoehe: 112, dunkel: true },
     { datei: 'logo-einfarbig.svg', alt: 'Marken-Zeichen einfarbig (currentColor), hier schwarz', hoehe: 112, dunkel: false },
     { datei: 'logo-app-icon.svg', alt: 'App-Icon: weißes Zeichen mit orangerotem F auf Ash-farbener abgerundeter Kachel', hoehe: 112, dunkel: false },
+    { datei: 'logo-app-icon-dunkel.svg', alt: 'App-Icon für dunklen Grund, invertiert: Zeichen in Ash mit orangerotem F auf weißer abgerundeter Kachel', hoehe: 112, dunkel: true },
     { datei: 'logo-icon-farbig.svg', alt: 'Footer-Icon farbig: Zeichen in Ash mit orangerotem F', hoehe: 112, dunkel: false },
+    { datei: 'logo-icon-farbig-dunkel.svg', alt: 'Footer-Icon farbig für dunklen Grund: weißes Zeichen mit orangerotem F', hoehe: 112, dunkel: true },
     { datei: 'logo-icon.svg', alt: 'Footer-Icon einfarbig (currentColor), hier schwarz', hoehe: 112, dunkel: false },
   ];
   const groessen = [16, 24, 32, 48];
@@ -62,6 +65,12 @@
     <div class="logo-stage logo-stage--seite">
       <a class="logo-foot logo-foot--seite" href={projektUrl}>
         <span class="logo-maske" style="-webkit-mask: url(./logo/logo-icon.svg) center / contain no-repeat; mask: url(./logo/logo-icon.svg) center / contain no-repeat" aria-hidden="true"></span>
+        <span>Powered by HoopsFoundry UI</span>
+      </a>
+    </div>
+    <div class="logo-stage logo-stage--footer is-dunkel">
+      <a class="logo-foot" href={projektUrl}>
+        <img src="./logo/logo-icon-farbig-dunkel.svg" alt="" width="16" height="23" />
         <span>Powered by HoopsFoundry UI</span>
       </a>
     </div>

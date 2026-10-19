@@ -60,4 +60,4 @@ export function PoweredBy() {
 }`;
 
 /** Dateien des Pakets, die unter @hoopsfoundry/ui/logo/ ausgeliefert werden (Test: package.json und npm pack). */
-export const paketDateien = ['logo/logo-icon.svg', 'logo/logo-icon-farbig.svg'];
+export const paketDateien = ['logo/logo-icon.svg', 'logo/logo-icon-farbig.svg', 'logo/logo-icon-farbig-dunkel.svg'];

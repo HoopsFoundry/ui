@@ -77,7 +77,8 @@ css/
 stories/                ← v0.6 · Stories für alle Komponenten + Foundation
 logo/
   logo-icon.svg         ← Footer-Icon einfarbig (currentColor), im Paket als @hoopsfoundry/ui/logo/logo-icon.svg
-  logo-icon-farbig.svg  ← Footer-Icon farbig; die großen Logos (Claim, App-Icon, Social Preview) bleiben im Repository
+  logo-icon-farbig.svg  ← Footer-Icon farbig für hellen Grund (Ash mit F in S2)
+  logo-icon-farbig-dunkel.svg ← Footer-Icon farbig für dunklen Grund (weiß mit F in S2); die großen Logos (Claim, App-Icon, Social Preview) bleiben im Repository
 docs/
   entwuerfe/            ← historische Design-Entwürfe (HTML, tweaks-panel.jsx); nicht gepflegt
 ```
@@ -702,7 +703,7 @@ Das Logo (Ordner [`logo/`](logo/), Footer-Icon im Paket) und der Name HoopsFound
 </a>
 ```
 
-Im Paket: `@hoopsfoundry/ui/logo/logo-icon.svg` (einfarbig, `currentColor`) und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`.
+Im Paket: `@hoopsfoundry/ui/logo/logo-icon.svg` (einfarbig, `currentColor`), `@hoopsfoundry/ui/logo/logo-icon-farbig.svg` (für hellen Grund) und `@hoopsfoundry/ui/logo/logo-icon-farbig-dunkel.svg` (für dunklen Grund; Ash gehört nie auf eine dunkle Fläche).
 
 ---
 
