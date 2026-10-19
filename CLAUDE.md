@@ -17,6 +17,9 @@ node scripts/check-map-browser.mjs   # Browser-Prüfung der Karte ohne Build (Ch
 node scripts/check-map-docs.mjs <ordner>  # axe auf den Karten-Seiten eines Storybook-Builds (npx storybook build -o <ordner>)
 node scripts/release-vanilla.mjs --dry-run --allow-dirty --no-build   # Release-Ablauf prüfen (schreibt nichts); ohne --dry-run nach release/ (gitignored)
 node scripts/check-portal-seite.mjs --browsers=chromium,webkit   # Beispiel-Portalseite im Browser (Release → portal-sync → strenge CSP, axe); nicht Teil von npm test
+node scripts/check-browser-matrix.mjs --markdown   # Kernbausteine in Chromium, Firefox, WebKit (Accordion, Tabs, Modal/::backdrop, Karte, PageNav, Theme, Container, Bewegung); nicht Teil von npm test
+node scripts/check-csp-boot.mjs     # Boot-Skript des Dunkelmodus unter echter CSP (Hash, meta, nonce, Gegenproben) in Chromium/Firefox/WebKit; nicht Teil von npm test
+node scripts/check-docs-axe.mjs storybook-static --widths=1280,420   # axe- und Regressionsmatrix über alle Docs-Seiten (BBV/DBB × hell/dunkel); nach npm run build-storybook; Exit-Code für CI
 node scripts/check-i18n-docs.mjs <ordner>  # axe und Sprachumschaltung auf der Seite Foundation/Internationalisierung eines Storybook-Builds (de/en, hell/dunkel)
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)

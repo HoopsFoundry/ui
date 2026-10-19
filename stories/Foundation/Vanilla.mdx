@@ -3,7 +3,7 @@ import * as VanillaStories from './Vanilla.stories';
 import { DosDonts } from '../docs/blocks/DosDonts';
 import { CodeBlock } from '../docs/blocks/CodeBlock';
 import { DocTable } from '../docs/blocks/DocTable';
-import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget, mapSizes, mapBudget, getSync, releaseSync, manualCheck, updateFlow, npmSwitch, compat, nodeVersions } from './Vanilla.code';
+import { vanilla, options, dynamic, cspHeader, bundleSizes, budget, renderPage, renderNode, renderEscape, renderSizes, renderBudget, mapSizes, mapBudget, getSync, releaseSync, manualCheck, updateFlow, npmSwitch, compat, coreMatrix, nodeVersions } from './Vanilla.code';
 import syncSource from '../../scripts/portal-sync.mjs?raw';
 import portalSource from '../examples/portal-seite/portal.js?raw';
 import '../docs/blocks/blocks.css';
@@ -280,6 +280,24 @@ Die Bündel sind ES-Module mit Ziel `es2020`. Die Beispiel-Portalseite läuft in
 />
 
 Geprüft werden je Browser: keine Konsolen- und Seitenfehler, keine fremden Anfragen und kein Leaflet vor dem Klick, keine Verletzung der CSP (Karte und Kacheln eingeschlossen), Versionsabgleich, Tab-Reihenfolge und sichtbarer Fokusring, Dialog (Fokus, Escape, Fokus zurück), Accordion, Tabs, kein seitliches Scrollen bei 420, 360 und 320 px (WCAG 1.4.10), Betrieb unter einem Unterpfad, Verhalten ohne JavaScript, Theme-Umschalter mit Merken, Nach-oben, Seitennavigation und axe (WCAG 2.x A/AA/AAA, 2.2, best-practice, Kontrast AAA, Zielgröße). Firefox ist in dieser Umgebung nicht gelaufen. Versucht wurden Playwrights Firefox 155.0 (Neuinstallation, eigenes Profil und Temp-Ordner, ohne die Sandbox-Variablen von Mozilla) und der System-Firefox 138.0.1 mit `--remote-debugging-port`; der erste bricht mit „Could not find profile folder“ ab, der zweite öffnet den Port nicht. Die Ursache ist ungeklärt, ein Lauf auf einem anderen Rechner steht aus.
+
+### Browser-Matrix der Kernbausteine
+
+Unabhängig von der Portalseite prüft `node scripts/check-browser-matrix.mjs` die Kernbausteine einzeln auf reinen HTML-Seiten, je Browser dieselben {coreMatrix.checksPerBrowser} Prüfungen (Ergebnis als JSON, mit `--markdown` als Tabelle; `--browsers=` und `--only=` grenzen ein):
+
+<DocTable
+  label="Browser-Matrix: Ergebnis je Browser"
+  head={['Browser', 'Version', 'Ergebnis']}
+  rows={coreMatrix.browsers.map((b) => [b.name, b.version, b.result])}
+/>
+
+<DocTable
+  label="Browser-Matrix: Bereiche"
+  head={['Bereich', 'Prüfungen', 'Was geprüft wird']}
+  rows={coreMatrix.groups.map((g) => [g.name, String(g.checks), g.what])}
+/>
+
+In Chromium und WebKit weicht nichts ab: `dialog` mit `::backdrop`, Container-Abfragen, `prefers-color-scheme`, `prefers-reduced-motion` und das native `details` verhalten sich gleich. Firefox: {coreMatrix.firefoxNote}
 
 Segmentierte Tabs (`hoops-tabs--segmented`) brechen bei schmalem Raum um und sind höchstens so breit wie ihr Behälter; die Teamseite der Beispiel-Portalseite hatte bei 320 px einen seitlichen Überlauf von 34 px (`scrollWidth` 354 bei 320 px Breite).
 

@@ -137,6 +137,24 @@ describe('AAA-Kontrast (≥ 7:1) der nachgezogenen Farbpaare', () => {
     expect(css).toMatch(/\.hoops-pill-s\.cap\s*\{[^}]*color:\s*var\(--hoops-accent-text\)/);
   });
 
+  it('Laufende Ergebniszahlen (Spielplan-Zeile, Raster-Zelle, Spielkarte): grün, ohne Puls und ohne Deckkraft, ≥ 7:1 hell (Lückenplan 2.6)', () => {
+    // Früher pulsierte die Zahl bis Deckkraft 0,8 und fiel hell auf 4,8 bis 5,2:1 (im Browser gemessen 5,3 bis 5,8:1).
+    const selectors = ['.hoops-sch-row.is-live .hoops-sch-score', '.hoops-sg-game.is-live .hoops-sch-score', '.hoops-match--live .hoops-match-score'];
+    const plain = css.replace(/\/\*[\s\S]*?\*\//g, '');
+    const bodies = [...plain.matchAll(/(?<=^|[{}])\s*([^{}@]+)\{([^{}]*)\}/g)]
+      .filter((m) => m[1].split(',').map((x) => x.trim().replace(/^:root\[data-motion="reduce"\] /, '')).some((sel) => selectors.includes(sel)))
+      .map((m) => m[2]);
+    expect(bodies.join('')).toMatch(/color:\s*var\(--hoops-live-fg\)/);
+    for (const body of bodies) {
+      expect(body).not.toMatch(/(?:^|[;\s])opacity\s*:/);
+      expect(body).not.toMatch(/animation(?:-name)?\s*:\s*(?!none)[\w-]/);
+    }
+    // Hell: --hoops-live-fg = --hoops-ok-text auf --hoops-surface-2 (knappste Fläche) bleibt statisch über 7:1
+    const light = blockOf(css, '/* ── Semantische Aliase · Light');
+    const scope = `--hoops-h-signal: var(--hoops-h-amber);\n${light}\n${tokens}`;
+    expect(ratio(color('var(--hoops-live-fg)', scope), color('var(--hoops-surface-2)', scope))).toBeGreaterThanOrEqual(AAA);
+  });
+
   it('Hilfsfunktion: bekannte Werte', () => {
     expect(ratio([1, 1, 1], [0, 0, 0])).toBeCloseTo(21, 5);
     expect(ratio(hex('#191919'), hex('#b3994d'))).toBeCloseTo(6.34, 1);

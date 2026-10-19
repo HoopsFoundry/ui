@@ -2,7 +2,7 @@
   /**
    * HoopsFoundry UI TopBar · Svelte 5
    * --------------------------------------------------------------
-   * App-Shell-Leiste, dunkle Fläche, 56 px. Marke links, optionaler
+   * App-Shell-Leiste, dunkle Fläche, mindestens 56 px hoch (in schmalen Spalten bricht der Kontext um). Marke links, optionaler
    * Spielkontext, Aktionen rechts. Nutzt nur Klassen aus css/components.css
    * (`hoops-topbar hoops-topbar--dark`; die helle `.hoops-topbar` bleibt dem
    * Vereinsregister).

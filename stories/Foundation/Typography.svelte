@@ -193,11 +193,16 @@
   .audit th, .audit td { text-align: left; padding: 6px 28px 6px 0; border-bottom: 1px solid var(--hoops-page-line); }
   .audit th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); }
   .audit tr.off td { font-weight: 700; }
+  /* letzte Spalte ohne Abstand rechts: bei 420 px lief die Prüftabelle sonst 14 px über und machte die Vorschau scrollbar (axe scrollable-region-focusable) */
+  .audit th:last-child, .audit td:last-child { padding-right: 0; }
   .ok { font-family: var(--hoops-font-mono); font-size: 13px; color: var(--hoops-chip-ok-fg); }
   @media (max-width: 640px) {
     .row { grid-template-columns: minmax(0, 1fr); gap: 8px; }
     .scoreline { flex-wrap: wrap; gap: 16px 32px; }
     .audit { font-size: 12px; }
-    .audit th, .audit td { padding-right: 16px; }
+    /* feste Spaltenaufteilung auf volle Breite: Zellen brechen um, die Tabelle läuft auch bei 320 px nicht über */
+    .audit { width: 100%; table-layout: fixed; }
+    .audit th, .audit td { padding-right: 12px; overflow-wrap: anywhere; }
+    .audit th:last-child, .audit td:last-child { padding-right: 0; }
   }
 </style>

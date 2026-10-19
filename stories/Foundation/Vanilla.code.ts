@@ -88,6 +88,8 @@ Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-<Hash des
 # Hash des Boot-Skripts (der Text zwischen <script> und </script>, ohne Änderung):
 printf '%s' "$(node -e "import('@hoopsfoundry/ui/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
   | openssl dgst -sha256 -binary | openssl base64
+# Eigene Optionen: genau die Werte aus dem Template auch hier einsetzen, sonst passt der Hash nicht, zum Beispiel
+#   … m.themeBootScript({ defaultMode: 'dark', storageKey: 'mein-theme' }) …
 
 # Alternative mit nonce: der Server erzeugt je Antwort einen Wert und setzt ihn in Header und Tag
 Content-Security-Policy: script-src 'self' 'nonce-<zufällig je Antwort>'
@@ -240,6 +242,28 @@ export const compat = {
     { name: 'WebKit (Safari-Engine)', version: '26.6', checks: 36, result: 'bestanden', note: 'wie Chromium; axe nur BBV hell bei 420 px; auf macOS erreicht Tab Links und Schaltflächen nur mit Alt+Tab (Systemeinstellung); der Fokus darf am Dialogende kurz in die Browser-Oberfläche laufen' },
     { name: 'Firefox', version: 'Playwright 1543 (155.0) und System-Firefox 138.0.1', checks: 0, result: 'nicht gelaufen', note: 'Ursache ungeklärt: Playwrights Build bricht beim Start mit „Could not find profile folder“ ab, der System-Firefox öffnet keinen Debug-Port. Befehl für einen anderen Rechner: node scripts/check-portal-seite.mjs --browsers=firefox' },
   ],
+};
+
+/** Browser-Matrix der Kernbausteine (scripts/check-browser-matrix.mjs, Lückenplan 2.1); Stand der Messung 2026-10-18. Je Bereich: Zahl der Prüfungen und Ergebnis je Browser. */
+export const coreMatrix = {
+  command: 'node scripts/check-browser-matrix.mjs --markdown',
+  checksPerBrowser: 31,
+  browsers: [
+    { name: 'Chromium', version: '153.0.8010.12', result: '31 von 31 bestanden' },
+    { name: 'WebKit (Safari-Engine)', version: '26.6', result: '31 von 31 bestanden' },
+    { name: 'Firefox', version: 'Playwright 1543 (155.0) und System-Firefox 138.0.1', result: 'nicht gelaufen' },
+  ],
+  groups: [
+    { name: 'Accordion', checks: 5, what: 'Klick öffnet (aria-expanded, Panel sichtbar und nicht inert), Enter schließt (Panel verborgen), gestrichelter Fokusring, natives details ohne Skript' },
+    { name: 'Tabs', checks: 4, what: 'Pfeil rechts, Ende und Pos1, Pfeil links vom ersten zum letzten Tab; jeweils Fokus, Auswahl und genau ein sichtbares Panel (bei Ende und Pos1 Fokus und Panel)' },
+    { name: 'Modal', checks: 7, what: 'dialog: :modal, ::backdrop mit deckender Farbe nur beim modalen Dialog, Top-Layer (der Dialog liegt über einem Element mit z-index 2147483647), Fokus hinein, Fokusfalle, Escape mit Fokus zurück, Scroll-Sperre. Mit show() statt showModal() werden drei Prüfungen rot' },
+    { name: 'Karte', checks: 3, what: 'Platzhalter mit Knopf ≥ 44 px; vor dem Klick kein Leaflet, keine Kachel, kein Cookie, kein Speicher' },
+    { name: 'PageNav', checks: 3, what: 'Navigation aus den Überschriften, Sprung: Ziel im Bild, fokussiert, Hash gesetzt' },
+    { name: 'Theme', checks: 5, what: 'Umschalter mit aria-pressed, Speicher, Token wechseln, prefers-color-scheme ohne Wahl, Boot-Skript setzt die Wahl vor dem ersten Zeichnen' },
+    { name: 'Container', checks: 2, what: 'Hallenkarte einspaltig im 520-px-Behälter, zweispaltig im 960-px-Behälter, bei 1280 und 600 px Fensterbreite' },
+    { name: 'Bewegung', checks: 2, what: 'Live-Punkt pulsiert, Ergebniszahl nie; prefers-reduced-motion und data-motion="reduce" halten an' },
+  ],
+  firefoxNote: 'Ursache ungeklärt. Playwrights Firefox bricht ohne Fenster mit „Could not find profile folder“ ab; mit Fenster beendet macOS den Inhaltsprozess (Signal 9, „sandbox_extension_issue_file_to_process failed“). Der System-Firefox über WebDriver BiDi (--firefox-channel=moz-firefox) startet nicht innerhalb von 60 s, mit derselben Sandbox-Meldung. Gemessen unter macOS 27.0.1; ein Lauf auf einem anderen Rechner steht aus.',
 };
 
 /** Node-Versionen, mit denen das Release-Skript und hoops-sync.mjs (--from-dir und --from-release gegen einen lokalen Server) gelaufen sind. */

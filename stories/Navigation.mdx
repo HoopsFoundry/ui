@@ -17,7 +17,7 @@ import {
 
 **App-Shell-Navigation:** alle Navigationskomponenten außer Tabs. Die Top-Bar trägt Marke und Live-Kontext, die [AppNav](?path=/docs/components-appnav--docs) und die [Tabs](?path=/docs/components-tabs--docs) strukturieren die App, die Bottom-Nav dient dem Handy, Breadcrumbs und Stepper orientieren in Hierarchie und Ablauf.
 
-- **TopBar:** dunkle App-Top-Bar (56 px) mit drei Kontexten: Default, Live (mit Spielstand und Uhr) und Admin.
+- **TopBar:** dunkle App-Top-Bar (mindestens 56 px hoch) mit drei Kontexten: Default, Live (mit Spielstand und Uhr) und Admin. In schmalen Spalten bricht der Kontext um und die Leiste wird höher, statt Stand oder Uhr abzuschneiden. Gemessen in Chromium und WebKit (Live-Kontext mit Spiel, Stand und Uhr): mit der Standardmarke „Hoops“ läuft nichts über bis etwa 220 px Behälterbreite, mit der längeren Marke „HoopsFoundry UI“ bis etwa 280 px; darunter läuft die Leiste seitlich über. Unter 320 px wird sie dabei deutlich höher (bei 280 px etwa 87 bis 131 px).
 - **BottomNav:** mobile Navigation für Schiri-App und Coach-App, 4 bis 5 Einträge, optional mit FAB für die zentrale Aktion.
 - **Breadcrumbs:** drei Varianten, Plain (Seitenkopf), Tagged (mit Kontext-Labels) und Chip (mobilfreundlich).
 - **Stepper:** Setup-Abläufe in drei Layouts, Horizontal, Compact (Sticky-Header) und Vertikal (Sidebar-Wizard).

@@ -24,7 +24,7 @@ export interface TopBarProps {
   className?: string;
 }
 
-/** Dunkle App-Leiste (56 px): Marke links, optionaler Spielkontext, Aktionen rechts. */
+/** Dunkle App-Leiste (mindestens 56 px hoch, in schmalen Spalten bricht der Kontext um und sie wird höher): Marke links, optionaler Spielkontext, Aktionen rechts. */
 export function TopBar({
   brand = 'Hoops',
   mark = 'D',

@@ -22,6 +22,11 @@
 .sbdocs-content :is(h1, h2, h3):not(.docs-story *) { font-family: var(--hoops-font-display); color: var(--hoops-page-fg); }
 .sbdocs-content p, .sbdocs-content li { color: var(--hoops-page-fg); }
 .sbdocs-content code:not(pre code) { font-family: var(--hoops-font-mono); }
+/* Unsere Inhalte im Storybook-Rahmen (Lückenplan 2.5): Links aus dem MDX-Text und Inline-Code nehmen die Token der Seite statt Storybooks
+   Standardfarben. Storybook-Blau #006deb erreicht auf --hoops-page-bg nur 4,58:1, Storybooks Inline-Code im Dunkelmodus nur 1,64:1
+   (dunkler Text auf Schwarz, etwa `initAll` in einer Überschrift). --hoops-link ist für Hell und Dunkel auf 7:1 ausgelegt. */
+.sbdocs-content a.sbdocs-a:not(.docs-story *) { color: var(--hoops-link); text-decoration: underline; text-underline-offset: 2px; }
+.sbdocs-content code:not(pre code):not(.docs-story *) { color: var(--hoops-page-fg); background: var(--hoops-page-surface-2); border-color: var(--hoops-page-line); }
 
 /* Canvas-Rahmen und Controls-Tabelle folgen Marke und Hell/Dunkel (Stories erwarten die Seitenfläche) */
 .sbdocs.sbdocs-preview { background: var(--hoops-page-bg); border: 1px solid var(--hoops-page-line); box-shadow: none; }
@@ -45,6 +50,10 @@
 .sbdocs .docblock-argstable.docblock-argstable textarea { background: var(--hoops-page-surface-0); box-shadow: inset 0 0 0 1px var(--hoops-page-line); }
 .sbdocs .docblock-argstable.docblock-argstable label { background: var(--hoops-page-surface-0); box-shadow: inset 0 0 0 1px var(--hoops-page-line); }
 .sbdocs .docblock-argstable.docblock-argstable label span { background: transparent; }
+/* Objekt-Steuerelemente der Argumenttabelle (JSON-Baum): Storybook-Blau #006deb erreicht auf unserer dunklen Tabellenfläche (Schwarz) nur 4,38:1
+   und verfehlt sogar AA; die Fläche haben wir gesetzt (oben), also nehmen auch die Knöpfe die Linkfarbe der Seite (Lückenplan 2.5). */
+.sbdocs .docblock-argstable.docblock-argstable .rejt-accordion-button,
+.sbdocs .docblock-argstable.docblock-argstable .rejt-name { color: var(--hoops-link); }
 .sbdocs .docblock-argstable.docblock-argstable td:nth-child(3) span,
 .sbdocs .docblock-argstable.docblock-argstable td:not(:first-child) div div > span { font-family: var(--hoops-font-mono); background: var(--hoops-page-surface-0); }
 
