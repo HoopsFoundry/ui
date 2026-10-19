@@ -3,6 +3,7 @@ import * as TeamCardStories from './TeamCard.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './TeamCard.code';
 import { teamRender } from './Render.code';
@@ -12,7 +13,6 @@ import { teamRender } from './Render.code';
 # TeamCard
 
 **Mannschaftskarte**: Logo, Liga, Bilanz, Tabellenplatz, nächstes und letztes Spiel, Kader und optionale Saison-Statistik. Sie gehört zur [Card Library](?path=/docs/components-card-library--docs), hat aber eine eigene Seite, weil sie mehr Blöcke und Zustände hat. Die Spielplan-Teams ([Spielplan](?path=/docs/components-spielplan--docs)) teilen sich das Datenmodell: `name`, `short` und `logo` sind dieselben Felder wie bei `ScheduleTeam`.
-
 
 ## Aufbau
 
@@ -65,25 +65,15 @@ Mit `href` ist die ganze Karte ein Link, mit `onclick` (React: `onClick`) allein
 
 <Canvas of={TeamCardStories.Klickbar} />
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Die Vorschauen sind eingebettete Seiten mit fester Breite von 390 px, links hell, rechts dunkel: Der Kurzname erscheint automatisch, die Spielzeilen brechen um, die Seite scrollt nicht seitlich. Im Dunkelmodus gelten dieselben Tokens; alle Texte haben mindestens 7:1.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">TeamCard · hell</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: TeamCard hell">
-      <iframe title="Handy-Vorschau: Teamkarte hell in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-teamcard--handy" loading="lazy" />
-    </div>
-  </div>
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">TeamCard · dunkel</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: TeamCard dunkel">
-      <iframe title="Handy-Vorschau: Teamkarte dunkel in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv;theme:Dark&id=components-teamcard--handy" loading="lazy" />
-    </div>
-  </div>
-</div>
-
+<StickyPreview>
+  <PreviewStep of={TeamCardStories.Handy} title="Teamkarte in Gerätebreite">
+    Bis 640 px Breite erscheint der Kurzname automatisch; in Handy-Breite (390 px) brechen die Spielzeilen um und die Seite scrollt nicht seitlich. Im Dunkelmodus gelten dieselben Tokens; alle Texte haben mindestens 7:1.
+  </PreviewStep>
+</StickyPreview>
 
 ## Zustände: Hover, Fokus
 

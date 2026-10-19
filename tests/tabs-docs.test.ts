@@ -1,6 +1,6 @@
 // @vitest-environment node
 // Doku-Seite „Tabs“: das Vanilla-Markup stimmt mit der Ausgabe der Svelte- und React-Komponenten überein (bis auf ids, aria-controls und die Panels),
-// jede Story und jedes Beispiel existiert, Beispiel-Stories sind versteckt, Handy-Vorschauen, Dos und Don'ts, Einbindung in Einführung und Sortierung.
+// jede Story und jedes Beispiel existiert, Beispiel-Stories sind versteckt, Vorschau in Gerätebreite, Dos und Don'ts, Einbindung in Einführung und Sortierung.
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -103,14 +103,17 @@ describe('Doku-Seite', () => {
   it('Beispiel-Stories sind versteckt (literales Tag), kein autodocs', () => {
     expect(stories).not.toContain('autodocs');
     for (const m of stories.matchAll(/export const (\w+)\s*= \{ \.\.\.example/g)) expect(stories, m[1]).toMatch(new RegExp(`export const ${m[1]}\\s*= .*tags: \\['!dev'\\]`));
-    for (const name of ['VanillaRegister', 'VanillaFilter', 'Handy', 'HandyDunkel', 'DoPanels', 'DontPanels']) expect(stories).toMatch(new RegExp(`export const ${name}\\s*= .*tags: \\['!dev'\\]`));
+    for (const name of ['VanillaRegister', 'VanillaFilter', 'Handy', 'HandyVerein', 'DoPanels', 'DontPanels']) expect(stories).toMatch(new RegExp(`export const ${name}\\s*= .*tags: \\['!dev'\\]`));
   });
-  it('Handy-Vorschauen: zwei Iframes mit verschiedenen Beispielen (hell, dunkel)', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(2);
-    expect(mdx).toContain('id=components-tabs--handy"');
-    expect(mdx).toContain('theme:Dark&id=components-tabs--handy-dunkel');
+  it('Vorschau in Gerätebreite: zwei verschiedene Beispiele in einer feststehenden Vorschau, keine festen Iframes und kein festes Theme', () => {
+    expect(mdx).not.toMatch(/<iframe /);
+    expect(mdx).not.toContain('hoops-phone');
+    expect(mdx).not.toContain('theme:Dark');
+    expect(mdx.match(/<PreviewStep /g)).toHaveLength(2);
+    expect(mdx).toContain('<PreviewStep of={TabsStories.Handy} ');
+    expect(mdx).toContain('<PreviewStep of={TabsStories.HandyVerein} ');
     expect(examples).toContain("example === 'handy'");
-    expect(examples).toContain("example === 'handy-dunkel'");
+    expect(examples).toContain("example === 'handy-verein'");
   });
   it('fünf Dos und Don\'ts; die Don\'t-Bühne ist inert (DosDonts), das neue Paar zeigt das Panel-Beispiel', () => {
     expect([...mdx.matchAll(/doText:/g)]).toHaveLength(5);

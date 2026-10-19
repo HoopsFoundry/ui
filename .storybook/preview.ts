@@ -16,30 +16,29 @@ import { setForcedState, type ForcedState } from './state-switch';
 // Storybook die Stories neu auf (neue Knoten, Fokus auf `body`). `<html lang>` ist `de`, die Sprache der Doku-Texte.
 import '../js/i18n/de-register.js';
 import { applyLocale } from './locale';
+import { applyBrand } from './brand';
+import { BREITEN, VIEWPORT_OPTIONS, type Breite } from './breite';
 
 const preview: Preview = {
   globalTypes: {
     brand: {
-      description: 'Marke',
+      description: 'Marke mit ihrer Schrift (BBV: Sora und Manrope, DBB: Rubik und Sucrose); setzt data-brand und data-type',
       toolbar: {
         title: 'Marke',
         icon: 'paintbrush',
         items: [
-          { value: 'bbv', title: 'BBV (Ink · Amber · Sky)' },
-          { value: 'dbb', title: 'DBB (Schwarz · Gold · Orange)' },
+          { value: 'bbv', title: 'BBV (Ink · Amber · Sky; Sora · Manrope)' },
+          { value: 'dbb', title: 'DBB (Schwarz · Gold · Orange; Rubik · Sucrose*)' },
         ],
         dynamicTitle: true,
       },
     },
-    type: {
-      description: 'Schrift',
+    breite: {
+      description: 'Breite der eingebetteten Vorschauen (Docs-Seiten); das Viewport-Werkzeug von Storybook wirkt nur in der Story-Ansicht',
       toolbar: {
-        title: 'Schrift',
-        icon: 'edit',
-        items: [
-          { value: 'standard', title: 'Standard (Sora · Manrope)' },
-          { value: 'dbb', title: 'DBB-Original (Rubik · Sucrose*)' },
-        ],
+        title: 'Breite',
+        icon: 'mobile',
+        items: (Object.keys(BREITEN) as Breite[]).map((value) => ({ value, title: BREITEN[value].title })),
         dynamicTitle: true,
       },
     },
@@ -97,7 +96,7 @@ const preview: Preview = {
   },
   initialGlobals: {
     brand: 'bbv',
-    type: 'standard',
+    breite: 'voll',
     framework: 'svelte',
     motion: 'normal',
     locale: 'de',
@@ -112,6 +111,8 @@ const preview: Preview = {
     // Standard wäre `en`. Die Doku ist deutsch; Bausteine in Englisch tragen dann `lang="en"` an ihrer Wurzel.
     htmlLang: 'de',
     docs: { lang: 'de' },
+    // Viewport-Werkzeug der Story-Ansicht mit denselben Geräten wie der Umschalter „Breite“ (in der Docs-Ansicht wirkt es nicht, siehe breite.ts)
+    viewport: { options: VIEWPORT_OPTIONS },
     controls: {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },
@@ -143,11 +144,7 @@ const preview: Preview = {
   decorators: [
     (story, context) => {
       installPseudoStates(); // idempotent: Kopien der Hover-/Fokus-/Active-Regeln für feste Zustands-Vorschauen
-      const brand = context.globals.brand;
-      if (brand === 'dbb') document.documentElement.setAttribute('data-brand', 'dbb');
-      else document.documentElement.removeAttribute('data-brand');
-      if (context.globals.type === 'dbb') document.documentElement.setAttribute('data-type', 'dbb');
-      else document.documentElement.removeAttribute('data-type');
+      applyBrand(context.globals); // Marke und Schrift gekoppelt: data-brand und data-type (.storybook/brand.ts)
       // Code-Beispiele der Spec-Seiten folgen dem Umschalter "Fassung" (reines CSS, siehe stories/docs/blocks/useActiveFramework.ts)
       document.documentElement.dataset.framework = context.globals.framework ?? 'svelte';
       // Pause-Schalter der Live-Animation (wie in der App: Attribut auf <html>)

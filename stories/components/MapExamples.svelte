@@ -48,7 +48,7 @@
     </div>
   </div>
 {:else if example === 'dunkle-kacheln'}
-  <div class="narrow">
+  <div class="device">
     <div class="cap">darkTiles="dim" (Standard)</div>
     <MapView label="Karte mit abgedunkelten Kacheln" markers={[SITZ, HALLEN[0]]} tileUrl={tile} load="auto" height={220} showList={false} darkTiles="dim" />
     <div class="gap"></div>
@@ -82,7 +82,7 @@
 {:else if example === 'fehler'}
   <MapView label="Karte mit ungültiger Kachel-Adresse" markers={one} tileUrl={'http://tiles.example.org/{z}/{x}/{y}.png'} />
 {:else if example === 'handy'}
-  <div class="narrow">
+  <div class="device">
     <MapView label="Karte auf dem Handy (Platzhalter)" markers={three} height={260} />
     <div class="gap"></div>
     <MapView label="Karte auf dem Handy (geladen)" markers={three} tileUrl={tile} load="auto" height={260} />
@@ -146,11 +146,11 @@
 {:else if example === 'vanilla-geladen'}
   <div use:vanilla={{ label: 'Vanilla: Vereinssitz und zwei Hallen', markers: [SITZ, HALLEN[0], HALLEN[1]], tileUrl: tile, load: 'auto', darkTiles: 'invert', height: 300 } as never}></div>
 {:else if example === 'vanilla-handy'}
-  <div class="narrow">
+  <div class="device">
     <div use:vanilla={{ label: 'Vanilla: Hallen Seeberg und Kiefernau (Handy)', markers: [HALLEN[1], HALLEN[2]], tileUrl: tile, height: 240 } as never}></div>
   </div>
-{:else if example === 'vanilla-handy-dunkel'}
-  <div class="narrow">
+{:else if example === 'vanilla-handy-geladen'}
+  <div class="device">
     <div use:vanilla={{ label: 'Vanilla: Geschäftsstelle und Gymnasium Kiefernau (Handy)', markers: [SITZ, HALLEN[2]], tileUrl: tile, load: 'auto', height: 240 } as never}></div>
   </div>
 {:else if example === 'do-lokal'}
@@ -196,6 +196,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; align-items: start; }
   .narrow { width: 100%; max-width: 380px; }
   .gap { height: 12px; }

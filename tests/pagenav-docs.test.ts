@@ -92,12 +92,12 @@ describe('Doku-Seite', () => {
     expect(mdx).toMatch(/landmark-unique/);
     expect(mdx).toMatch(/Der Name ist deshalb ein Parameter/);
   });
-  it('die Handy-Vorschauen: zwei Iframes mit verschiedenen Beispielen, dazu zwei Nach-oben-Rahmen', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(4);
-    expect(mdx).toContain('id=components-pagenav--handy"');
-    expect(mdx).toContain('theme:Dark&id=components-pagenav--handy-dunkel');
-    expect(mdx).toContain('id=components-pagenav--nach-oben"');
-    expect(mdx).toContain('id=components-pagenav--nach-oben-bnav"');
+  it('Vorschau in Gerätebreite: zwei verschiedene Beispiele, dazu zwei Nach-oben-Vorschauen mit fester Höhe (der Iframe scrollt selbst)', () => {
+    expect(mdx).not.toMatch(/<iframe |theme:Dark/);
+    expect(mdx).toContain('<PreviewStep of={PageNavStories.Handy} ');
+    expect(mdx).toContain('<PreviewStep of={PageNavStories.HandyBereiche} ');
+    expect(mdx).toMatch(/<PreviewStep of=\{PageNavStories\.NachOben\} [^>]*height=\{350\}>/);
+    expect(mdx).toMatch(/<PreviewStep of=\{PageNavStories\.NachObenBnav\} [^>]*height=\{350\}>/);
   });
   it('keine globalen Regeln: die Doku nennt Token und Opt-in-Klasse', () => {
     expect(mdx).toMatch(/--hoops-scroll-offset/);

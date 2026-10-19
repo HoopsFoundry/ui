@@ -189,7 +189,7 @@ describe('README, LICENSE und Markenhinweis', () => {
   });
   it('CHANGELOG, arc42 (Kapitel 5, 8, 9) und das Erzeugungsskript sind nachgeführt', () => {
     expect(read('CHANGELOG.md')).toContain('**Logo HoopsFoundry:**');
-    expect(read('docs/architecture/sections/09-architecture-decisions.adoc')).toContain('=== ADR-014:');
+    expect(read('docs/architecture/sections/09-architecture-decisions.adoc')).toContain('=== ADR-015: Logo');
     expect(read('docs/architecture/sections/05-building-block-view.adoc')).toContain('`logo/`');
     expect(read('docs/architecture/sections/08-crosscutting-concepts.adoc')).toContain('=== Marke und Logo');
     expect(read('scripts/make-social-preview.mjs')).toContain('logo/social-preview.png');

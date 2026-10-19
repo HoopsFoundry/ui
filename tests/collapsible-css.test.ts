@@ -89,9 +89,9 @@ describe('CSS einklappbarer Rahmen', () => {
 
 describe('Zielgröße der Links im Spielplan (WCAG 2.5.8)', () => {
   const sub = css.match(/\.hoops-sch-sub \.hoops-link, \.hoops-sch-team \.hoops-link \{([^}]*)\}/);
-  it('Links in Unterzeile und am Teamnamen: 3 px Fläche oben und unten, negativer Rand hält die Zeilenhöhe', () => {
+  it('Links in Unterzeile und am Teamnamen: 5 px Fläche oben und unten (mit Rubik 15 px Textfläche, also 25 px), negativer Rand hält die Zeilenhöhe', () => {
     expect(sub).not.toBeNull();
-    expect(sub![1]).toMatch(/padding-block:\s*3px/);
-    expect(sub![1]).toMatch(/margin-block:\s*-3px/);
+    expect(sub![1]).toMatch(/padding-block:\s*5px/);
+    expect(sub![1]).toMatch(/margin-block:\s*-5px/);
   });
 });

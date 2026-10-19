@@ -180,7 +180,7 @@
   <div class="narrow">
     <div class="vanilla" use:vanillaMarkup={registerMarkup}></div>
   </div>
-{:else if example === 'handy-dunkel'}
+{:else if example === 'handy-verein'}
   <div class="narrow">
     <div class="hoops-tabs hoops-tabs--underline hoops-tabs--md" role="tablist" aria-label="Vereinsseite" use:bar={{ activation: 'manual' }}>
       <button type="button" class="hoops-tab is-active" role="tab" id="hv-team" aria-selected="true" aria-controls="hv-team-panel" tabindex="0"><span class="hoops-tab-label">Mannschaften</span><span class="hoops-tab-count">7</span></button>
@@ -240,7 +240,7 @@
   .cap { margin-bottom: 8px; }
   .panel { margin: 14px 0 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .clip { width: 100%; overflow: hidden; }
-  .narrow { box-sizing: border-box; max-width: 390px; padding: 14px; }
+  .narrow { box-sizing: border-box; padding: 14px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .vanilla :global([role='tabpanel']) { margin: 14px 0 0; padding: 0 2px; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
   .vanilla :global(.hoops-tabs + [role='tabpanel']), .vanilla :global([role='tabpanel'] + .hoops-tabs) { margin-top: 14px; }
   .vanilla :global([role='tabpanel'] p) { margin: 0; }

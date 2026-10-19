@@ -33,7 +33,7 @@
   <div class="page" use:page={pageMarkup}></div>
 {:else if example === 'handy'}
   <div class="narrow page" use:page={registerMarkup}></div>
-{:else if example === 'handy-dunkel'}
+{:else if example === 'handy-accordion'}
   <div class="narrow page" use:page={accordionMarkup}></div>
 {:else if example === 'markup'}
   <div class="page stack">
@@ -52,7 +52,7 @@
     <div use:run={[mountMatchCard as Mount, spiel]}></div>
     <div use:run={[mountStats as Mount, kennzahlen]}></div>
   </div>
-{:else if example === 'markup-handy-dunkel'}
+{:else if example === 'markup-handy-team'}
   <div class="narrow page stack">
     <div use:run={[mountTeamCard as Mount, team]}></div>
     <div use:run={[mountVenueCard as Mount, { ...halle, name: 'Sporthalle Lindenberg', games: [], href: undefined }]}></div>
@@ -78,7 +78,7 @@
 
 <style>
   .page { box-sizing: border-box; max-width: 720px; padding: 14px 18px; background: var(--hoops-surface); border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-lg); color: var(--hoops-fg); }
-  .narrow { max-width: 390px; }
+  .narrow { box-sizing: border-box; width: 100%; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .stack { display: grid; gap: 16px; }
   .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); gap: 12px; }
   .page :global([role='tabpanel']) { margin: 12px 0; font-size: var(--hoops-fs-body-sm); }
