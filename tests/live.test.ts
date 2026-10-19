@@ -105,33 +105,61 @@ describe('Live-Stellen sprechen Grün, Rot bleibt Fehlern vorbehalten', () => {
   });
 });
 
-// Alle Regeln, deren Selektorliste eine laufende Ergebniszahl trifft, und die kleinste Deckkraft, die sie ihr geben
-// (direkt über opacity oder über eine Keyframe-Animation). Ohne Animation und ohne opacity ist das 1.
+// Kleinste Deckkraft, die das CSS einer laufenden Ergebniszahl gibt: direkt über opacity oder eine Keyframe-Animation, und zwar auf der Zahl
+// selbst und auf ihren Behältern (Zeile, Raster-Zelle, Spielkarte; Deckkraft vererbt sich multiplikativ). Regeln für andere Zustände
+// (abgesagt, beendet, gesperrt) zählen nicht. Ohne Animation und ohne opacity ist das 1.
 const SCORE_SELECTORS = ['.hoops-sch-row.is-live .hoops-sch-score', '.hoops-sg-game.is-live .hoops-sch-score', '.hoops-match--live .hoops-match-score'];
-const keyframeBody = (name: string) => {
-  const m = css.match(new RegExp(`@keyframes ${name}\\s*\\{([^@]*?\\}\\s*)\\}`));
+const SCORE = /\.hoops-(?:sch|match)-score(?![\w-])/;
+const CONTAINER = /\.hoops-(?:sch-row|sg-game|sg-result|match|match--live|match-body)(?![\w-])/;
+const OTHER_STATE = /cancel|abgesagt|is-final|is-done|--final|:disabled|is-own/;
+const keyframeBody = (name: string, source = css) => {
+  const m = source.match(new RegExp(`@keyframes ${name}\\s*\\{([^@]*?\\}\\s*)\\}`));
   expect(m, `@keyframes ${name}`).not.toBeNull();
   return m![1];
 };
-const minOpacity = (name: string) => Math.min(1, ...[...keyframeBody(name).matchAll(/opacity:\s*([\d.]+)/g)].map((m) => Number(m[1])));
-const scoreAlpha = () => {
-  let alpha = 1;
-  let rules = 0;
-  const plain = css.replace(/\/\*[\s\S]*?\*\//g, '');
+const minOpacity = (name: string, source = css) => Math.min(1, ...[...keyframeBody(name, source).matchAll(/opacity:\s*([\d.]+)/g)].map((m) => Number(m[1])));
+/** Deckkraft aus einer CSS-Quelle (Standard: css/components.css); exportiert für die Mutationsproben unten. */
+const scoreAlpha = (source = css) => {
+  const level = { score: 1, container: 1 };
+  let scoreRules = 0;
+  const plain = source.replace(/\/\*[\s\S]*?\*\//g, '');
   for (const m of plain.matchAll(/(?<=^|[{}])\s*([^{}@]+)\{([^{}]*)\}/g)) {
-    const selectors = m[1].split(',').map((x) => x.trim().replace(/^:root\[data-motion="reduce"\] /, ''));
-    if (!selectors.some((sel) => /hoops-(?:sch|match)-score/.test(sel))) continue;
-    rules += 1;
     const body = m[2];
     const op = body.match(/(?:^|;|\s)opacity:\s*([\d.]+)/);
-    if (op) alpha = Math.min(alpha, Number(op[1]));
     const anim = body.match(/animation(?:-name)?:\s*([\w-]+)/);
-    if (anim && anim[1] !== 'none') alpha = Math.min(alpha, minOpacity(anim[1]));
+    let alpha = op ? Number(op[1]) : 1;
+    if (anim && anim[1] !== 'none' && plain.includes(`@keyframes ${anim[1]}`)) alpha = Math.min(alpha, minOpacity(anim[1], source));
+    for (const raw of m[1].split(',')) {
+      // Gegenstand der Regel: der letzte zusammengesetzte Selektor (nach dem letzten Kombinator)
+      const subject = raw.trim().replace(/^:root\[data-motion="reduce"\] /, '').split(/\s+|>|~|\+/).filter(Boolean).pop() ?? '';
+      if (SCORE.test(subject)) {
+        if (body.includes('color: var(--hoops-live-fg)')) scoreRules += 1;
+        if (!OTHER_STATE.test(raw)) level.score = Math.min(level.score, alpha);
+      } else if (CONTAINER.test(subject) && !OTHER_STATE.test(raw)) {
+        level.container = Math.min(level.container, alpha);
+      }
+    }
   }
-  // Schutz gegen eine leere Suche: mindestens die Farbregel der Live-Zahlen muss gefunden werden
-  expect(rules).toBeGreaterThan(0);
-  return alpha;
+  // Schutz gegen eine leere Suche: die Farbregel der Live-Zahlen muss gefunden werden
+  expect(scoreRules).toBeGreaterThan(0);
+  return level.score * level.container;
 };
+
+describe('Deckkraft der Live-Zahlen: auch Behälter zählen (Review K1)', () => {
+  const live = '.hoops-sch-row.is-live .hoops-sch-score, .hoops-sg-game.is-live .hoops-sch-score, .hoops-match--live .hoops-match-score { color: var(--hoops-live-fg); }';
+  it('Ausgangslage: 1', () => expect(scoreAlpha()).toBe(1));
+  it.each([
+    ['.hoops-sg-game.is-live { opacity: 0.85; }', 0.85],
+    ['.hoops-sch-row.is-live { opacity: 0.9; }', 0.9],
+    ['.hoops-match--live { animation: x 1s infinite; }\n@keyframes x { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; } }', 0.8],
+    ['.hoops-match--live .hoops-match-score { opacity: 0.95; }', 0.95],
+  ])('Mutation %s wird erkannt', (rule, expected) => {
+    expect(scoreAlpha(`${live}\n${rule}`)).toBeCloseTo(expected, 5);
+  });
+  it('Regeln für andere Zustände zählen nicht (abgesagte Spiele dürfen blass sein)', () => {
+    expect(scoreAlpha(`${live}\n.hoops-sg-game.is-cancelled { opacity: 0.6; }`)).toBe(1);
+  });
+});
 
 describe('Eine Animation für alles Live: nur der Punkt pulsiert', () => {
   const keyframes = [...css.matchAll(/@keyframes\s+([\w-]+)/g)].map((m) => m[1]);

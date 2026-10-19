@@ -611,9 +611,10 @@ dialog.hoops-modal-dialog:not(:modal) { background: var(--hoops-backdrop, rgb(0 
 .hoops-pill-s.dnp { background: var(--hoops-chip-err-bg); color: var(--hoops-chip-err-fg); }
 
 /* ── TopBar · dunkle App-Leiste (Modifier, die helle Vereinsregister-Leiste bleibt) ── */
-/* Mindesthöhe statt fester Höhe: in schmalen Spalten (unter etwa 410 px) bricht der Kontext um, statt Stand oder Uhr abzuschneiden (WCAG 1.4.10) */
+/* Mindesthöhe statt fester Höhe: 44 px Inhalt + 2 × 6 px Innenabstand = 56 px wie bisher. In schmalen Spalten bricht der Kontext um, statt
+   Stand oder Uhr abzuschneiden (WCAG 1.4.10); der Innenabstand oben und unten hält die umbrochenen Zeilen vom Rand fern. */
 .hoops-topbar.hoops-topbar--dark {
-  display: flex; align-items: center; min-height: 56px; padding: 0 20px; gap: 20px;
+  display: flex; align-items: center; min-height: 44px; padding: 6px 20px; gap: 20px;
   background: var(--hoops-base-1000); color: var(--hoops-n-100); border-bottom: 1px solid var(--hoops-n-900);
   font-family: var(--hoops-font-body);
 }
