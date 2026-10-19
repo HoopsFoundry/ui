@@ -1,6 +1,6 @@
-import { Children, isValidElement, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
+import { Children, createContext, isValidElement, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { DocsContext } from '@storybook/addon-docs/blocks';
-import { activeStep, autoSwitchAllowed, breiteOf, previewCap, previewLayout, previewSrc, STICKY_GAP, READ_LINE_NARROW, READ_LINE_WIDE } from './preview-logic';
+import { activeStep, autoSwitchAllowed, breiteOf, previewCap, previewLayout, previewPinned, previewSrc, STICKY_GAP, READ_LINE_NARROW, READ_LINE_WIDE } from './preview-logic';
 
 // Doku-Bausteine für Vorschauen in Gerätebreite (nur Storybook). `Preview` bettet eine Story als Iframe ein: Breite aus dem Umschalter
 // „Breite“ (Global `breite`), Marke, Theme, Sprache, Bewegung, Fassung und Zustand aus den Globals der Seite, Höhe aus dem Inhalt
@@ -10,6 +10,13 @@ import { activeStep, autoSwitchAllowed, breiteOf, previewCap, previewLayout, pre
 export { STICKY_GAP };
 /** Ab dieser Breite des Docs-Fensters stehen Text und Vorschau nebeneinander; darunter steht die Vorschau oben (höchstens 50 vh, mit fester Höhe 60 vh). */
 export const WIDE_MIN = 1100;
+
+/** Steht die umgebende Vorschau-Spalte fest (`StickyPreview`)? Untereinander und bei niedrigem Fenster nicht (`previewPinned`); sonst gilt die Grenze einer freien Vorschau. */
+const PinnedContext = createContext(true);
+/** Überbau der Spalte: alles in `.hoops-sp-aside` außer dem Iframe-Kasten (Liste, Beschriftung, Innenabstand) in px. */
+function asideOverhead(aside: Element | null | undefined, box: Element | null | undefined): number {
+  return aside && box ? aside.getBoundingClientRect().height - box.getBoundingClientRect().height : 0;
+}
 
 type Of = Parameters<NonNullable<React.ContextType<typeof DocsContext>>['resolveOf']>[0];
 type Globals = Record<string, unknown>;
@@ -78,6 +85,7 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
   const breite = breiteOf(globals);
   const src = previewSrc(storyId, globals, overrides);
   const wide = useMedia(`(min-width: ${WIDE_MIN}px)`);
+  const pinned = useContext(PinnedContext);
   const rootRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -91,10 +99,10 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
   const updateCap = useCallback(() => {
     const aside = rootRef.current?.closest('.hoops-sp-aside');
     const box = boxRef.current;
-    const inAside = Boolean(aside && box);
-    const overhead = aside && box ? aside.getBoundingClientRect().height - box.getBoundingClientRect().height : 0;
-    setCap(previewCap({ inAside, wide, viewportHeight: window.innerHeight, overhead, fixedHeight }));
-  }, [wide, fixedHeight]);
+    // steht die Spalte nicht fest, gilt die Grenze einer freien Vorschau (sie scrollt mit dem Text)
+    const inAside = Boolean(aside && box) && pinned;
+    setCap(previewCap({ inAside, wide, viewportHeight: window.innerHeight, overhead: asideOverhead(aside, box), fixedHeight }));
+  }, [wide, fixedHeight, pinned]);
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -151,6 +159,21 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
     if (contentHeight > 0 || fixedHeight) setFloor((f) => Math.max(f, layout.visualHeight));
   }, [contentHeight, fixedHeight, layout.visualHeight]);
   const boxHeight = Math.max(layout.visualHeight, floor);
+  // Wächst oder schrumpft der Rahmen, während die Spalte darüber steht (untereinander, oben am Fenster oder schon darüber hinaus), rutscht
+  // der Text mit. Der Rahmen gleicht das aus: Die Seite scrollt um dieselbe Höhe, der gelesene Text bleibt stehen (kein Wackeln an der
+  // Lesezeile, kein Wechsel zurück). `overflow-anchor: none` in blocks.css verhindert, dass der Browser dasselbe ein zweites Mal tut.
+  const lastBox = useRef(0);
+  useLayoutEffect(() => {
+    const before = lastBox.current;
+    lastBox.current = boxHeight;
+    const aside = rootRef.current?.closest('.hoops-sp-aside');
+    if (!aside || wide || before <= 0 || boxHeight === before) return;
+    if (aside.getBoundingClientRect().top <= 1) window.scrollBy({ top: boxHeight - before, behavior: 'instant' as ScrollBehavior });
+  }, [boxHeight, wide]);
+  // In der Spalte lädt der Iframe sofort: ein Iframe, der erst beim Hinscrollen lädt, wüchse dann auf seine echte Höhe und schöbe den Text
+  // von der Lesezeile. Freistehende Vorschauen laden weiter erst beim Hinscrollen.
+  const [inAside, setInAside] = useState(false);
+  useLayoutEffect(() => setInAside(Boolean(rootRef.current?.closest('.hoops-sp-aside'))), []);
   return (
     <figure className="hoops-preview" ref={rootRef} data-hoops-preview={storyId} data-breite={breite}>
       <figcaption className="hoops-preview-meta">
@@ -164,7 +187,7 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
               ref={frameRef}
               title={`Vorschau: ${title}`}
               src={src}
-              loading="lazy"
+              loading={inAside ? 'eager' : 'lazy'}
               style={{ width: layout.width, height: layout.height, transform: layout.scale < 1 ? `scale(${layout.scale})` : undefined }}
             />
           )}
@@ -206,6 +229,22 @@ export function StickyPreview({ children, level = 3, listLabel = 'Beispiel in de
   const auto = useAutoSwitch();
   const wide = useMedia(`(min-width: ${WIDE_MIN}px)`);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const asideRef = useRef<HTMLDivElement>(null);
+  // Steht die Spalte fest? Untereinander nur, wenn Überbau und Mindesthöhe des Iframes genug Text übrig lassen (`previewPinned`).
+  const [pinned, setPinned] = useState(true);
+  useLayoutEffect(() => {
+    const aside = asideRef.current;
+    if (!aside) return undefined;
+    const update = () => setPinned(previewPinned({ wide, viewportHeight: window.innerHeight, overhead: asideOverhead(aside, aside.querySelector('.hoops-preview-box')) }));
+    const ro = new ResizeObserver(update);
+    ro.observe(aside);
+    update();
+    window.addEventListener('resize', update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, [wide, steps.length]);
 
   useEffect(() => {
     if (!auto || steps.length < 2) return undefined;
@@ -233,7 +272,7 @@ export function StickyPreview({ children, level = 3, listLabel = 'Beispiel in de
   if (!current) return null;
   const H = level === 4 ? 'h4' : 'h3';
   return (
-    <div className="hoops-sp" data-auto={auto ? 'true' : 'false'} data-steps={steps.length}>
+    <div className="hoops-sp" data-auto={auto ? 'true' : 'false'} data-steps={steps.length} data-pinned={pinned ? 'true' : 'false'}>
       <div className="hoops-sp-text">
         {steps.map((s, i) => (
           <div key={s.props.title} className="hoops-sp-step" data-step={i} data-active={i === active ? 'true' : undefined} ref={(el) => { stepRefs.current[i] = el; }}>
@@ -245,7 +284,7 @@ export function StickyPreview({ children, level = 3, listLabel = 'Beispiel in de
           </div>
         ))}
       </div>
-      <div className="hoops-sp-aside">
+      <div className="hoops-sp-aside" ref={asideRef}>
         {steps.length > 1 && (
           <div className="hoops-sp-list" role="group" aria-label={listLabel}>
             {steps.map((s, i) => (
@@ -255,7 +294,9 @@ export function StickyPreview({ children, level = 3, listLabel = 'Beispiel in de
             ))}
           </div>
         )}
-        <Preview of={current.props.of} title={current.props.title} minHeight={current.props.minHeight} height={current.props.height} globals={current.props.globals} />
+        <PinnedContext.Provider value={pinned}>
+          <Preview of={current.props.of} title={current.props.title} minHeight={current.props.minHeight} height={current.props.height} globals={current.props.globals} />
+        </PinnedContext.Provider>
       </div>
     </div>
   );

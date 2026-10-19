@@ -22,6 +22,9 @@ export function previewSrc(storyId: string, globals: Record<string, unknown> | u
   return `iframe.html?viewMode=story&id=${encodeURIComponent(storyId)}${g ? `&globals=${g}` : ''}`;
 }
 
+/** Kleinste Breite des Iframes bei „Vollbreite“ in px: so schmal wie das kleinste Gerät, das die Komponenten tragen (WCAG 1.4.10, 320 px). Ist die Spalte schmaler, wird der Iframe wie bei breiteren Geräten verkleinert (transform). */
+export const MIN_FULL_WIDTH = 320;
+
 export type PreviewLayoutInput = {
   breite: Breite;
   /** verfügbare Breite der Vorschau-Spalte in px */
@@ -58,7 +61,9 @@ export type PreviewLayout = {
 export function previewLayout({ breite, available, contentHeight, cap, minHeight = 0, fixedHeight }: PreviewLayoutInput): PreviewLayout {
   const avail = Math.max(1, Math.floor(available));
   const device = BREITEN[breite].width;
-  const width = device ?? avail;
+  // Die Docs-Seite zieht bei 320 px Fensterbreite 80 px Rand ab: 240 px wären schmaler als jedes echte Gerät und zeigten Überläufe, die dort
+  // nicht vorkommen. Deshalb sieht auch die Vollbreite mindestens `MIN_FULL_WIDTH` und wird bei schmaler Spalte verkleinert.
+  const width = device ?? Math.max(avail, MIN_FULL_WIDTH);
   const scale = width > avail ? avail / width : 1;
   const visualCap = Math.max(1, cap);
   // Höhe im Iframe so wählen, dass die sichtbare Höhe (height * scale) die Grenze nicht überschreitet
@@ -119,6 +124,22 @@ export function previewCap({ inAside, wide, viewportHeight: vh, overhead, fixedH
     if (fixedHeight) next = Math.max(next, Math.min(fixedHeight, Math.floor(vh * NARROW_FIXED_SHARE - overhead)));
   }
   return Math.max(MIN_CAP, next);
+}
+
+/** Anteil der Fensterhöhe, den die feststehende Vorschau untereinander samt Mindesthöhe des Iframes höchstens einnehmen darf; sonst steht sie nicht fest. */
+export const PIN_MAX_SHARE = 0.7;
+/** Unterhalb dieser Fensterhöhe (px) steht die Vorschau untereinander nie fest: Zoom 400 % bei 1280×1024 gibt 320×256, Handy quer 844×390 bleibt darüber. */
+export const PIN_MIN_VIEWPORT = 360;
+
+/**
+ * Steht die Vorschau fest (`position: sticky`)? Nebeneinander immer (der Text steht daneben). Untereinander nur, wenn Spalten-Überbau
+ * (Liste, Beschriftung, Innenabstand) plus Mindesthöhe des Iframes höchstens `PIN_MAX_SHARE` der Fensterhöhe einnehmen und das Fenster
+ * mindestens `PIN_MIN_VIEWPORT` hoch ist. Sonst verdeckte die feststehende Vorschau den ganzen Text (Zoom 400 %, WCAG 1.4.10): sie
+ * scrollt dann mit dem Text. Mit dieser Regel bleibt die Spalte untereinander stets unter `PIN_MAX_SHARE` (siehe `previewCap`).
+ */
+export function previewPinned({ wide, viewportHeight, overhead }: { wide: boolean; viewportHeight: number; overhead: number }): boolean {
+  if (wide) return true;
+  return viewportHeight >= PIN_MIN_VIEWPORT && overhead + MIN_CAP <= viewportHeight * PIN_MAX_SHARE;
 }
 
 /** Breite aus den Globals der Seite (Umschalter „Breite“). */
