@@ -10,11 +10,11 @@ import '../docs/blocks/blocks.css';
 
 # Logo
 
-Das Zeichen von HoopsFoundry UI zeigt ein H, einen Korb-Ring, einen Spieler und ein rotes F. Es gibt es als Logo mit Claim, als Zeichen allein, als einfarbige Fassung und als App-Icon. Für den **Footer** von Anwendungen, die HoopsFoundry UI einsetzen, liefert das npm-Paket ein kleines Icon in zwei Fassungen mit. Die großen Logos bleiben im Repository.
+Das Zeichen von HoopsFoundry UI zeigt ein H, einen Korb-Ring, einen Spieler und ein F in der Signalfarbe Orangerot (`#f2561d`). Es gibt es als Logo mit Claim, als Zeichen allein, als einfarbige Fassung und als App-Icon. Für den **Footer** von Anwendungen, die HoopsFoundry UI einsetzen, liefert das npm-Paket ein kleines Icon in zwei Fassungen mit. Die großen Logos bleiben im Repository.
 
 ## Varianten
 
-Das Rot (`rgb(189, 0, 13)`) hat auf Weiß 6,6:1, auf Schwarz aber nur 3,2:1 (auf `#0d1117`, dem dunklen GitHub-Grund, 2,9:1). Für Zeichen reicht das (3:1), für den kleinen roten Text „Foundry“ und den Claim auf dunklem Grund nicht ganz; setze das Logo dort nicht klein ein. Die Vorschauen stehen auf festem hellem bzw. dunklem Grund, weil die Logos schwarz oder weiß sind und einen passenden Grund brauchen, egal in welchem Modus die Doku gerade steht.
+Das Logo hat **eine** Signalfarbe, das Orangerot S2 (`#f2561d`), für hellen und dunklen Grund, und statt Schwarz das dunkle Grau Ash (`#24292f`). Die Vorschauen stehen auf festem hellem bzw. dunklem Grund, weil die Logos Ash oder weiß sind und einen passenden Grund brauchen, egal in welchem Modus die Doku gerade steht. Die Messwerte stehen im Abschnitt „Farben“ weiter unten.
 
 <Canvas of={LogoStories.Varianten} />
 
@@ -22,21 +22,56 @@ Das Rot (`rgb(189, 0, 13)`) hat auf Weiß 6,6:1, auf Schwarz aber nur 3,2:1 (auf
   label="Logo-Dateien und Einsatz"
   head={['Datei', 'Einsatz', 'Im npm-Paket']}
   rows={[
-    ['logo-claim.svg', 'Logo mit Wortmarke und Claim auf hellem Grund (README, Präsentationen, Doku); Zeichen und „Hoops“ schwarz, „Foundry“ und Claim rot', 'nein'],
-    ['logo-claim-hell.svg', 'dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ und Claim bleiben rot', 'nein'],
-    ['logo-farbig.svg', 'Zeichen allein, schwarz mit rotem F', 'nein'],
+    ['logo-claim.svg', 'Logo mit Wortmarke und Claim auf hellem Grund (README, Präsentationen, Doku); Zeichen und „Hoops“ Ash, „Foundry“ S2, Claim Ash', 'nein'],
+    ['logo-claim-hell.svg', 'dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2, Claim hellgrau (`#c9d1d9`)', 'nein'],
+    ['logo-farbig.svg', 'Zeichen allein, Ash mit F in S2', 'nein'],
     ['logo-einfarbig.svg', 'Zeichen allein in einer Farbe (currentColor), etwa für Druck oder Stempel', 'nein'],
-    ['logo-app-icon.svg', 'weißes Zeichen auf schwarzer, abgerundeter Kachel; Favicon, App-Symbol', 'nein'],
-    ['logo-icon-farbig.svg', 'Footer-Icon: Zeichen eng beschnitten, schwarz mit rotem F', 'ja'],
+    ['logo-app-icon.svg', 'weißes Zeichen (F in S2) auf Ash-farbener, abgerundeter Kachel; Favicon, App-Symbol', 'nein'],
+    ['logo-icon-farbig.svg', 'Footer-Icon: Zeichen eng beschnitten, Ash mit F in S2', 'ja'],
     ['logo-icon.svg', 'Footer-Icon einfarbig (currentColor): übernimmt die Textfarbe', 'ja'],
   ]}
 />
 
 Alle Dateien sind SVG mit einer sauberen `viewBox` und ohne feste Breite und Höhe. Sie skalieren deshalb in `<img>` und als Hintergrund von selbst; gib die Größe über Höhe oder Breite des Bildes vor.
 
+## Farben
+
+Das Logo kennt vier Farben: Ash (`#24292f`, Zeichen, „Hoops“, Claim auf hellem Grund, Kachel des App-Icons), S2 (`#f2561d`, das F und „Foundry“), Weiß (Zeichen und „Hoops“ auf dunklem Grund) und Hellgrau (`#c9d1d9`, Claim auf dunklem Grund). S2 gilt unverändert für hellen und dunklen Grund, das alte Rot (`rgb(189, 0, 13)`) ist ersetzt. Ash ist derselbe Ton wie der neutrale Claim und ersetzt das Schwarz. Die einfarbigen Fassungen (`currentColor`) bleiben, wie sie sind.
+
+Logos und Wortmarken sind nach WCAG 2 (1.4.3) von der Kontrastpflicht ausgenommen. Die Werte sind trotzdem gemessen: nach WCAG 2 als Kontrastverhältnis, dazu nach APCA (Lc, mit Vorzeichen: positiv dunkel auf hell, negativ hell auf dunkel). APCA ist nur **informativ**: Es gehört zum Arbeitsentwurf von WCAG 3.0, der Algorithmus ist nicht final. „Foundry“ ist große, fette Schrift; dafür gelten bei APCA etwa Lc 45 bis 60 als Richtwert.
+
+<DocTable
+  label="Kontrast der Logo-Farben"
+  head={['Farbe', 'Grund', 'WCAG 2', 'APCA']}
+  rows={[
+    ['S2 (F, „Foundry“)', 'Weiß', '3,43:1', 'Lc 61'],
+    ['S2 (F, „Foundry“)', 'Schwarz', '6,12:1', 'Lc −41 (unter der Richtmarke 45)'],
+    ['Ash (Zeichen, „Hoops“, Claim)', 'Weiß', '14,65:1', 'Lc 101'],
+    ['Ash', 'helle Seitenfläche BBV (#f9fafc)', '14,03:1', 'Lc 98'],
+    ['Ash', 'helle Seitenfläche DBB (#fafafa)', '14,04:1', 'Lc 98'],
+    ['Hellgrau (Claim, dunkel)', '#0d1117 (GitHub dunkel)', '12,26:1', 'Lc −78'],
+    ['Hellgrau (Claim, dunkel)', '#1b1c1d', '11,06:1', 'Lc −76'],
+    ['Hellgrau (Claim, dunkel)', 'Schwarz (dunkle Seitenfläche BBV und DBB)', '13,61:1', 'Lc −78'],
+    ['Weiß (Zeichen auf der Kachel)', 'Ash-Kachel', '14,65:1', 'Lc −104'],
+    ['S2 (F auf der Kachel)', 'Ash-Kachel', '4,27:1', 'Lc −37'],
+    ['Ash (Kachel, Zeichen)', 'Schwarz (dunkle Seitenfläche BBV und DBB)', '1,43:1', 'kein Unterschied (Lc 0)'],
+    ['Ash (Kachel, Zeichen)', '#0d1117', '1,29:1', 'kein Unterschied (Lc 0)'],
+    ['Ash (Kachel, Zeichen)', '#1b1c1d', '1,16:1', 'kein Unterschied (Lc 0)'],
+    ['altes Rot (zum Vergleich)', 'Schwarz', '3,17:1', 'Lc −22'],
+  ]}
+/>
+
+Was daraus folgt:
+
+- **S2 auf Weiß** erreicht mit 3,43:1 die 3:1 für Grafik und große Schrift, nicht die 4,5:1 für kleinen Text; „Foundry“ ist groß und fett, der Wert genügt dafür. **S2 auf Schwarz** ist mit 6,12:1 deutlich besser, aber APCA misst nur Lc −41; das liegt unter dem Richtwert für große Schrift, wirkt auf dunklem Grund also schwächer, als das Verhältnis vermuten lässt.
+- **Ash** hat auf allen hellen Flächen weit über 7:1, auch als Claim in kleiner Schrift.
+- **Hellgrau** als Claim auf dunklem Grund liegt bei Lc −76 bis −78 und über 11:1.
+- **Das F auf der Ash-Kachel** des App-Icons hat nur 4,27:1 (Lc −37). Das F ist eine Fläche im Zeichen, kein Text; es bleibt als Farbakzent erkennbar, aber zart.
+- **Ash auf dem fast schwarzen Grund des Dunkelmodus** (BBV und DBB: Schwarz) ist praktisch unsichtbar: 1,43:1. Das gilt für die Kachel des App-Icons (Rand und Form gehen verloren; das weiße Zeichen darin bleibt lesbar) und noch mehr für das farbige Zeichen und das farbige Footer-Icon. Das App-Icon steht oft auf dunklem Grund (Startbildschirm, Dock, dunkle Seiten): Prüfe es dort und lege bei Bedarf einen hellen Rand oder eine helle Unterlage an. Auf dunklem Grund nimmst du sonst das Logo mit Claim in der hellen Fassung oder die einfarbige Fassung.
+
 ## Mindestgröße und Schutzraum
 
-Das Footer-Icon ist ein Hochformat (661 zu 944). Es bleibt ab **16 px Höhe** als Zeichen erkennbar (H und Ring; das F ist dort nur noch ein roter Block, lesbar wird es ab etwa 24 px). Für den Footer sind 16 bis 32 px gedacht. Beim Logo mit Claim ist der Claim auf hellem Grund ab etwa 40 px Höhe zu entziffern und ab **48 px Höhe** gut lesbar (gerendert bei 24, 32, 40, 48 und 64 px verglichen). Kleiner gehören nur das Zeichen oder das Icon hin, nie das Logo mit Claim.
+Das Footer-Icon ist ein Hochformat (661 zu 944). Es bleibt ab **16 px Höhe** als Zeichen erkennbar (H und Ring; das F ist dort nur noch ein orangeroter Block, lesbar wird es ab etwa 24 px). Für den Footer sind 16 bis 32 px gedacht. Beim Logo mit Claim ist der Claim auf hellem Grund ab etwa 40 px Höhe zu entziffern und ab **48 px Höhe** gut lesbar (gerendert bei 24, 32, 40, 48 und 64 px verglichen). Kleiner gehören nur das Zeichen oder das Icon hin, nie das Logo mit Claim.
 
 <Canvas of={LogoStories.Groessen} />
 
@@ -57,7 +92,7 @@ Anwendungen, die HoopsFoundry UI einsetzen, dürfen das Footer-Icon zusammen mit
 - **Icon neben Text:** Der Text benennt den Link, das Icon ist Dekoration und trägt `alt=""` (oder `aria-hidden="true"` bei der Maske). So liest eine Sprachausgabe den Link nur einmal.
 - **Icon allein:** Das Bild trägt den Namen des Links, etwa `alt="HoopsFoundry UI"`. Ein leeres `alt` ergäbe einen Link ohne Namen.
 - **Zielgröße:** Der Link ist mindestens 24 × 24 px groß (WCAG 2.2, 2.5.8); das Beispiel erreicht das mit Innenabstand um das 16 px hohe Icon.
-- **Grund:** Das farbige Icon ist schwarz und gehört auf hellen Grund. Auf dunklem Grund nimmst du die einfarbige Fassung, die die Textfarbe übernimmt.
+- **Grund:** Das farbige Icon ist Ash und gehört auf hellen Grund. Auf den schwarzen Flächen des Dunkelmodus hat Ash nur 1,43:1 (siehe „Farben“) und verschwindet; dort nimmst du die einfarbige Fassung, die die Textfarbe übernimmt.
 
 ### Code
 

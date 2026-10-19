@@ -11,7 +11,9 @@ const read = (p: string) => readFileSync(new URL(p, root), 'utf8');
 
 const ALLE = ['logo-claim.svg', 'logo-claim-hell.svg', 'logo-farbig.svg', 'logo-einfarbig.svg', 'logo-app-icon.svg', 'logo-icon.svg', 'logo-icon-farbig.svg'];
 const ICONS = ['logo-icon.svg', 'logo-icon-farbig.svg'];
-const ROT = 'rgb(189,0,13)';
+const S2 = '#f2561d'; // die eine Signalfarbe (hell und dunkel)
+const ASH = '#24292f'; // Ash: ersetzt das Schwarz (Zeichen, "Hoops", Claim hell, Kachel des App-Icons)
+const CLAIM_DUNKEL = '#c9d1d9'; // Claim auf dunklem Grund
 
 /** Regeln für jede SVG-Datei; liefert die Verstöße (leer = in Ordnung). Wird auch gegen verfälschte Kopien ausgeführt (Mutationsprobe). */
 function svgProbleme(name: string, src: string): string[] {
@@ -25,10 +27,23 @@ function svgProbleme(name: string, src: string): string[] {
   const einfarbig = name === 'logo-einfarbig.svg' || name === 'logo-icon.svg';
   if (einfarbig && !/\sfill="currentColor"/.test(root)) p.push('currentColor fehlt');
   if (einfarbig && /fill:|rgb\(/.test(src)) p.push('feste Farbe in einer einfarbigen Fassung');
-  if (!einfarbig && name !== 'logo-claim-hell.svg' && !src.replaceAll(' ', '').includes(ROT)) p.push('rotes F fehlt');
+  if (!einfarbig && !src.replaceAll(' ', '').includes(`fill:${S2}`)) p.push('F in der Signalfarbe #f2561d fehlt');
+  if (/rgb\(189,\s*0,\s*13\)/.test(src)) p.push('altes Rot rgb(189,0,13) kommt noch vor');
+  if (!einfarbig && /fill:(black|#000(000)?|#fff|white)\b[^;]*/.test(src) && name !== 'logo-app-icon.svg') p.push('reines Schwarz oder Weiß statt Ash');
+  if (name === 'logo-app-icon.svg' && !src.includes(`style="fill:${ASH};"`)) p.push('Kachel nicht in Ash');
+  if (name === 'logo-app-icon.svg' && !/fill:white/.test(src)) p.push('weißes Zeichen fehlt');
+  if (['logo-farbig.svg', 'logo-icon-farbig.svg', 'logo-claim.svg'].includes(name) && !new RegExp(`\\sfill="${ASH}"`).test(root)) p.push('Zeichen nicht in Ash (Grundfüllung fehlt)');
   if (name === 'logo-claim-hell.svg' && !/\sfill="#fff"/.test(root)) p.push('weiße Füllung fehlt');
-  // Das Claim-Logo: "Foundry" und Claim sind rot (32 Pfade), Zeichen und "Hoops" erben die Grundfarbe
-  if (name.startsWith('logo-claim') && (src.match(/fill:rgb\(189,0,13\)/g) ?? []).length !== 32) p.push('Foundry und Claim sind nicht rot (erwartet: 32 rote Pfade)');
+  // Logo mit Claim: "Foundry" und F in der Signalfarbe (8 Pfade), der Claim (24 Pfade) neutral: Ash auf hellem, hellgrau auf dunklem Grund
+  if (name.startsWith('logo-claim')) {
+    const i = src.indexOf('matrix(1.29129');
+    const farben = (t: string) => [...t.matchAll(/fill:(#[0-9a-f]{6})/g)].map((m) => m[1]);
+    const vorn = farben(src.slice(0, i));
+    const claim = farben(src.slice(i));
+    if (vorn.length !== 8 || !vorn.every((c) => c === S2)) p.push('Foundry und F sind nicht in der Signalfarbe (erwartet: 8 Pfade in #f2561d)');
+    const soll = name === 'logo-claim.svg' ? ASH : CLAIM_DUNKEL;
+    if (claim.length !== 24 || !claim.every((c) => c === soll)) p.push(`Claim ist nicht neutral (erwartet: 24 Pfade in ${soll})`);
+  }
   if (name.startsWith('logo-claim') && /<text/.test(src)) p.push('Text muss als Pfade vorliegen');
   return p;
 }
@@ -57,14 +72,19 @@ describe('SVG-Dateien', () => {
   });
   it('Mutationsprobe: verfälschte Kopien fallen durch', () => {
     const claim = read('logo/logo-claim.svg');
-    expect(svgProbleme('logo-claim.svg', claim.replace('fill:rgb(189,0,13)', 'fill:rgb(0,0,0)'))).toContain('Foundry und Claim sind nicht rot (erwartet: 32 rote Pfade)');
+    expect(svgProbleme('logo-claim.svg', claim.replace('fill:#f2561d', 'fill:#000000'))).toContain('Foundry und F sind nicht in der Signalfarbe (erwartet: 8 Pfade in #f2561d)');
+    expect(svgProbleme('logo-claim.svg', claim.replace('fill:#24292f', 'fill:#f2561d'))).toContain('Claim ist nicht neutral (erwartet: 24 Pfade in #24292f)');
+    expect(svgProbleme('logo-claim.svg', claim.replace('fill:#f2561d', 'fill:rgb(189,0,13)'))).toContain('altes Rot rgb(189,0,13) kommt noch vor');
+    expect(svgProbleme('logo-claim-hell.svg', read('logo/logo-claim-hell.svg').replace('fill:#c9d1d9', 'fill:#f2561d'))).toContain('Claim ist nicht neutral (erwartet: 24 Pfade in #c9d1d9)');
+    expect(svgProbleme('logo-app-icon.svg', read('logo/logo-app-icon.svg').replace('fill:#24292f', 'fill:black'))).toContain('Kachel nicht in Ash');
     expect(svgProbleme('logo-claim.svg', claim.replace('</svg>', '<text>x</text></svg>'))).toContain('Text muss als Pfade vorliegen');
     expect(svgProbleme('logo-claim-hell.svg', read('logo/logo-claim-hell.svg').replace(' fill="#fff"', ''))).toContain('weiße Füllung fehlt');
     const farbig = read('logo/logo-farbig.svg');
     expect(svgProbleme('logo-farbig.svg', farbig.replace('<svg ', '<svg width="100%" '))).toContain('feste Breite oder Höhe am Wurzelelement');
     expect(svgProbleme('logo-farbig.svg', farbig.replace(/ viewBox="[^"]*"/, ''))).toContain('viewBox fehlt oder ist nicht ganzzahlig');
     expect(svgProbleme('logo-farbig.svg', '<!DOCTYPE svg>' + farbig)).toContain('DOCTYPE, XML-Kopf oder Editor-Reste');
-    expect(svgProbleme('logo-farbig.svg', farbig.replace('rgb(189,0,13)', 'rgb(0,0,0)'))).toContain('rotes F fehlt');
+    expect(svgProbleme('logo-farbig.svg', farbig.replace('fill:#f2561d', 'fill:rgb(0,0,0)'))).toContain('F in der Signalfarbe #f2561d fehlt');
+    expect(svgProbleme('logo-farbig.svg', farbig.replace('fill="#24292f"', ''))).toContain('Zeichen nicht in Ash (Grundfüllung fehlt)');
     const icon = read('logo/logo-icon.svg');
     expect(svgProbleme('logo-icon.svg', icon.replace(' fill="currentColor"', ''))).toContain('currentColor fehlt');
     expect(svgProbleme('logo-icon.svg', icon.replace('<path d=', '<path style="fill:rgb(1,2,3)" d='))).toContain('feste Farbe in einer einfarbigen Fassung');

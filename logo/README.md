@@ -1,15 +1,15 @@
 # Logo von HoopsFoundry UI
 
-Das Zeichen zeigt ein H, einen Korb-Ring, einen Spieler und ein rotes F (Farbe `rgb(189, 0, 13)`). Alle Dateien sind SVG mit sauberer `viewBox` und ohne feste Breite und Höhe; sie skalieren in `<img>` und als Hintergrund über die Höhe oder Breite, die du vorgibst. Die Seite „Foundation/Logo“ in der Storybook-Doku zeigt Varianten, Mindestgröße, Schutzraum und ein Footer-Beispiel.
+Das Zeichen zeigt ein H, einen Korb-Ring, einen Spieler und ein F in der Signalfarbe S2 (`#f2561d`, Orangerot); das übrige Zeichen ist Ash (`#24292f`, ein dunkles Grau statt Schwarz). Alle Dateien sind SVG mit sauberer `viewBox` und ohne feste Breite und Höhe; sie skalieren in `<img>` und als Hintergrund über die Höhe oder Breite, die du vorgibst. Die Seite „Foundation/Logo“ in der Storybook-Doku zeigt Varianten, Mindestgröße, Schutzraum und ein Footer-Beispiel.
 
 | Datei | Einsatz | im npm-Paket |
 | --- | --- | --- |
-| `logo-claim.svg` | Logo mit Wortmarke und Claim auf hellem Grund; Zeichen und „Hoops“ schwarz, „Foundry“ und Claim rot | nein |
-| `logo-claim-hell.svg` | dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ und Claim rot | nein |
-| `logo-farbig.svg` | Zeichen allein, schwarz mit rotem F | nein |
+| `logo-claim.svg` | Logo mit Wortmarke und Claim auf hellem Grund; Zeichen und „Hoops“ Ash, „Foundry“ S2, Claim Ash | nein |
+| `logo-claim-hell.svg` | dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2, Claim hellgrau (`#c9d1d9`) | nein |
+| `logo-farbig.svg` | Zeichen allein, Ash mit F in S2 | nein |
 | `logo-einfarbig.svg` | Zeichen allein in einer Farbe (`currentColor`) | nein |
-| `logo-app-icon.svg` | weißes Zeichen auf schwarzer, abgerundeter Kachel (Favicon der Doku, App-Symbol) | nein |
-| `logo-icon-farbig.svg` | Footer-Icon, eng beschnitten, schwarz mit rotem F | ja |
+| `logo-app-icon.svg` | weißes Zeichen (F in S2) auf Ash-farbener, abgerundeter Kachel (Favicon der Doku, App-Symbol) | nein |
+| `logo-icon-farbig.svg` | Footer-Icon, eng beschnitten, Ash mit F in S2 | ja |
 | `logo-icon.svg` | Footer-Icon einfarbig (`currentColor`) | ja |
 | `social-preview.png` | Vorschaubild für das GitHub-Repository, 1280 × 640 | nein |
 
@@ -19,7 +19,7 @@ Das Social-Preview-Bild entsteht mit `node scripts/make-social-preview.mjs` aus 
 
 Im Paket liegen nur die zwei Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg` und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`. Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf die Projektseite (Adresse: Feld `domain` in `project.config.json`). Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
 
-Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 48 px Höhe (der rote Claim hat auf Schwarz nur 3,2:1 Kontrast, auf Weiß 6,6:1). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
+Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 48 px Höhe (Kontraste und Begründung der Farben: Storybook-Seite „Foundation/Logo“, Abschnitt „Farben“). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
 
 ## Marke und Nutzung
 

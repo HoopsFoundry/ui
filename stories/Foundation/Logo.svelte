@@ -6,12 +6,12 @@
   let { mode = 'varianten' } = $props();
 
   const varianten = [
-    { datei: 'logo-claim.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ schwarz, „Foundry“ und Claim rot', hoehe: 56, dunkel: false },
-    { datei: 'logo-claim-hell.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ weiß, „Foundry“ und Claim rot, für dunklen Grund', hoehe: 56, dunkel: true },
-    { datei: 'logo-farbig.svg', alt: 'Marken-Zeichen: H mit Korb-Ring, Spieler und rotem F', hoehe: 112, dunkel: false },
-    { datei: 'logo-einfarbig.svg', alt: 'Marken-Zeichen einfarbig schwarz', hoehe: 112, dunkel: false },
-    { datei: 'logo-app-icon.svg', alt: 'App-Icon: weißes Zeichen mit rotem F auf schwarzer abgerundeter Kachel', hoehe: 112, dunkel: false },
-    { datei: 'logo-icon-farbig.svg', alt: 'Footer-Icon farbig: schwarzes Zeichen mit rotem F', hoehe: 112, dunkel: false },
+    { datei: 'logo-claim.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ in Ash (dunkelgrau), „Foundry“ in Orangerot, Claim in Ash', hoehe: 56, dunkel: false },
+    { datei: 'logo-claim-hell.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ weiß, „Foundry“ in Orangerot, Claim hellgrau, für dunklen Grund', hoehe: 56, dunkel: true },
+    { datei: 'logo-farbig.svg', alt: 'Marken-Zeichen: H mit Korb-Ring, Spieler in Ash und orangerotem F', hoehe: 112, dunkel: false },
+    { datei: 'logo-einfarbig.svg', alt: 'Marken-Zeichen einfarbig (currentColor), hier schwarz', hoehe: 112, dunkel: false },
+    { datei: 'logo-app-icon.svg', alt: 'App-Icon: weißes Zeichen mit orangerotem F auf Ash-farbener abgerundeter Kachel', hoehe: 112, dunkel: false },
+    { datei: 'logo-icon-farbig.svg', alt: 'Footer-Icon farbig: Zeichen in Ash mit orangerotem F', hoehe: 112, dunkel: false },
     { datei: 'logo-icon.svg', alt: 'Footer-Icon einfarbig (currentColor), hier schwarz', hoehe: 112, dunkel: false },
   ];
   const groessen = [16, 24, 32, 48];
@@ -76,7 +76,7 @@
 <style>
   .logo-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
   .logo-cell { display: grid; gap: 6px; min-width: 0; }
-  /* Feste Grundfarben: Die Logos sind schwarz bzw. weiß und brauchen einen passenden Grund, egal in welchem Modus die Doku steht */
+  /* Feste Grundfarben: Die Logos sind Ash bzw. weiß und brauchen einen passenden Grund, egal in welchem Modus die Doku steht */
   .logo-stage { background: #fff; color: #000; border: 1px solid var(--hoops-page-line); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: center; min-height: 96px; }
   .logo-stage.is-dunkel { background: #000; color: #fff; }
   .logo-stage img { display: block; max-width: 100%; }
