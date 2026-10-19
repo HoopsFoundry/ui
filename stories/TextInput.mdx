@@ -2,6 +2,7 @@ import { Meta, Canvas, Controls, Story } from '@storybook/addon-docs/blocks';
 import * as TextInputStories from './TextInput.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
+import { DocTable } from './docs/blocks/DocTable';
 import './docs/blocks/blocks.css';
 import { vanilla, svelte, react } from './TextInput.code';
 
@@ -35,16 +36,15 @@ Drei Höhen: `touch` (56 px) für den Kampfgerichts-Tisch, `default` (44 px) als
 
 <Canvas of={TextInputStories.Dichten} />
 
-<table>
-  <thead>
-    <tr><th>Dichte</th><th>Höhe</th><th>Token</th><th>Einsatz</th></tr>
-  </thead>
-  <tbody>
-    <tr><td><code>touch</code></td><td>56 px</td><td><code>--hoops-fld-h-touch</code></td><td>Kampfgericht, Halle, Tisch</td></tr>
-    <tr><td><code>default</code></td><td>44 px</td><td><code>--hoops-fld-h-default</code></td><td>Standard, alle Formulare</td></tr>
-    <tr><td><code>compact</code></td><td>36 px</td><td><code>--hoops-fld-h-compact</code></td><td>Dichte Ansichten, Filterleisten</td></tr>
-  </tbody>
-</table>
+<DocTable
+  label="Dichten des Eingabefelds"
+  head={['Dichte', 'Höhe', 'Token', 'Einsatz']}
+  rows={[
+    [<code>touch</code>, '56 px', <code>--hoops-fld-h-touch</code>, 'Kampfgericht, Halle, Tisch'],
+    [<code>default</code>, '44 px', <code>--hoops-fld-h-default</code>, 'Standard, alle Formulare'],
+    [<code>compact</code>, '36 px', <code>--hoops-fld-h-compact</code>, 'Dichte Ansichten, Filterleisten'],
+  ]}
+/>
 
 ## Zustände: Fokus, Fehler, OK, Warnung, Gesperrt
 

@@ -3,6 +3,9 @@ import { create } from 'storybook/theming';
 
 // Marke in der Seitenleiste: Logo mit Claim. Das Logo ist Ash (dunkelgrau), deshalb gibt es für den dunklen Modus die helle Fassung
 // (logo/logo-claim-hell.svg). Der Manager folgt der Einstellung des Geräts (`prefers-color-scheme`); die Bilder liegen über
+// Marke in der Seitenleiste: Wortmarke ohne Claim (Zeichen und "HoopsFoundry"); der Claim wäre bei 150 × 32 px nicht lesbar, das Logo mit
+// Claim steht stattdessen in der Introduction. Das Logo ist Ash (dunkelgrau), deshalb gibt es für den dunklen Modus die helle Fassung
+// (logo/logo-wortmarke-hell.svg). Der Manager folgt der Einstellung des Geräts (`prefers-color-scheme`); die Bilder liegen über
 // `staticDirs` (main.ts) unter `logo/`. Der Pfad ist relativ, damit die Doku auch unter einem Unterpfad (Webspace, GitHub Pages) lädt.
 const scheme = window.matchMedia('(prefers-color-scheme: dark)');
 
@@ -11,7 +14,7 @@ function themeFor(dark: boolean) {
     base: dark ? 'dark' : 'light',
     brandTitle: 'HoopsFoundry UI',
     brandUrl: './',
-    brandImage: dark ? './logo/logo-claim-hell.svg' : './logo/logo-claim.svg',
+    brandImage: dark ? './logo/logo-wortmarke-hell.svg' : './logo/logo-wortmarke.svg',
   });
 }
 

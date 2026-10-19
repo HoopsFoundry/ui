@@ -1,18 +1,15 @@
 import { Children, isValidElement, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { DocsContext } from '@storybook/addon-docs/blocks';
-import { activeStep, autoSwitchAllowed, breiteOf, previewLayout, previewSrc, READ_LINE_NARROW, READ_LINE_WIDE } from './preview-logic';
+import { activeStep, autoSwitchAllowed, breiteOf, previewCap, previewLayout, previewSrc, STICKY_GAP, READ_LINE_NARROW, READ_LINE_WIDE } from './preview-logic';
 
 // Doku-Bausteine für Vorschauen in Gerätebreite (nur Storybook). `Preview` bettet eine Story als Iframe ein: Breite aus dem Umschalter
 // „Breite“ (Global `breite`), Marke, Theme, Sprache, Bewegung, Fassung und Zustand aus den Globals der Seite, Höhe aus dem Inhalt
 // (ResizeObserver im Iframe, gleiche Herkunft). `StickyPreview` stellt Text und Vorschau nebeneinander (ab 1100 px) oder die Vorschau
 // feststehend über den Text und wechselt das Beispiel mit dem Abschnitt, der gerade im Blick ist.
 
-/** Abstand der feststehenden Vorschau zum oberen und unteren Rand (px); dieselben Werte stehen in blocks.css. */
-export const STICKY_GAP = 16;
-/** Ab dieser Breite des Docs-Fensters stehen Text und Vorschau nebeneinander; darunter steht die Vorschau oben (höchstens 50 vh). */
+export { STICKY_GAP };
+/** Ab dieser Breite des Docs-Fensters stehen Text und Vorschau nebeneinander; darunter steht die Vorschau oben (höchstens 50 vh, mit fester Höhe 60 vh). */
 export const WIDE_MIN = 1100;
-const NARROW_SHARE = 0.5;
-const FREE_SHARE = 0.8;
 
 type Of = Parameters<NonNullable<React.ContextType<typeof DocsContext>>['resolveOf']>[0];
 type Globals = Record<string, unknown>;
@@ -94,16 +91,9 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
   const updateCap = useCallback(() => {
     const aside = rootRef.current?.closest('.hoops-sp-aside');
     const box = boxRef.current;
-    const vh = window.innerHeight;
-    let next: number;
-    if (aside && box) {
-      const overhead = aside.getBoundingClientRect().height - box.getBoundingClientRect().height;
-      next = Math.floor((wide ? vh - 2 * STICKY_GAP : vh * NARROW_SHARE) - overhead);
-    } else next = Math.floor(vh * FREE_SHARE);
-    // Eine feste Höhe (height) gilt bis zur Fensterhöhe, auch untereinander über 50 vh hinaus: Modale und lange Seiten im Iframe brauchen
-    // ihre Höhe, sonst scrollt ihr Inhalt in einem Ausschnitt, den es auf einem echten Gerät dieser Breite nicht gäbe.
-    if (fixedHeight) next = Math.max(next, Math.min(fixedHeight, vh - 2 * STICKY_GAP));
-    setCap(Math.max(160, next));
+    const inAside = Boolean(aside && box);
+    const overhead = aside && box ? aside.getBoundingClientRect().height - box.getBoundingClientRect().height : 0;
+    setCap(previewCap({ inAside, wide, viewportHeight: window.innerHeight, overhead, fixedHeight }));
   }, [wide, fixedHeight]);
 
   useLayoutEffect(() => {

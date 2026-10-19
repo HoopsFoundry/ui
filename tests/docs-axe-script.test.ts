@@ -43,6 +43,16 @@ describe('axe-Matrix der Docs-Seiten', () => {
     expect(script).toContain("kind: 'Story-Fehler (Vorschau)'");
     expect(script).toContain('frameRuns');
   });
+  it('prüft Reflow: --reflow nimmt 900 und 320 px dazu, bekannte Überläufe von Inline-Beispielen stehen in einer Liste und werden ausgegeben', () => {
+    expect(script).toContain("args.reflow === 'true' ? '1280,900,420,320'");
+    expect(script).toContain('KNOWN_CANVAS_OVERFLOW');
+    expect(script).toContain('bekannteUeberlaeufeInlineBeispiele');
+    for (const page of ['components-accordion--docs', 'components-kennzahlen--docs', 'components-map--docs', 'components-appnav--docs']) expect(script).toContain(page);
+    // Spielplan, Button und TextInput sind behoben und dürfen nicht in der Ausnahmeliste stehen
+    expect(script.slice(script.indexOf('KNOWN_CANVAS_OVERFLOW = ['), script.indexOf('];', script.indexOf('KNOWN_CANVAS_OVERFLOW = [')))).not.toMatch(/spielplan|button|textinput/);
+    const chapter = read('docs/architecture/sections/11-risks-and-technical-debt.adoc');
+    for (const part of ['KNOWN_CANVAS_OVERFLOW', 'Lückenplan 3.11', '--reflow']) expect(chapter, part).toContain(part);
+  });
   it('ist CI-fähig: Exit-Code 1 bei Befunden, 2 ohne Build, JSON-Ausgabe auf Wunsch', () => {
     expect(script).toMatch(/process\.exitCode = failures\.length === 0 \? 0 : 1/);
     expect(script).toMatch(/process\.exit\(2\)/);

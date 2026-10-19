@@ -61,6 +61,28 @@ describe('Vanilla-Markup gegen die Svelte-Komponente', () => {
   });
 });
 
+describe('Beispiele ohne Verhalten (ModalDemo inline)', () => {
+  const demo = (name: string, props: string) =>
+    renderSvelteSource(vite, render, tmpDir, name, `<script>\nimport ModalDemo from '../../stories/components/ModalDemo.svelte';\n</script>\n<ModalDemo ${props} />`);
+  it.each([
+    ['standard', 'title="Spielbericht freigeben" subtitle="BBL" body="Text"'],
+    ['warn', 'severity="warn" size="sm" title="Anwurfzeit" subtitle="Hallenordnung" body="Text" cancelLabel="Zeit ändern" confirmLabel="Trotzdem" confirmVariant="amber"'],
+    ['danger-ohne-fuss', 'severity="danger" closable={false} footer={false} title="Verbindung" subtitle="Offline" body="Text"'],
+  ])('%s: gleiches Markup wie die Komponente (Kopf, Inhalt, Fuß, Klassen), aber ohne aria-modal', async (name, props) => {
+    const real = await demo(`real-${name}`, props);
+    const inline = await demo(`inline-${name}`, `inline ${props}`);
+    expect(parts(inline)).toEqual(parts(real));
+    expect(real).toContain('aria-modal="true"');
+    expect(inline).not.toContain('aria-modal');
+    expect(inline).toContain('role="dialog"');
+  });
+  it('jedes ModalDemo der Beispielseite ist inline (sonst schaltet ein offenes Modal die ganze Doku-Seite inert und sperrt das Scrollen)', () => {
+    const tags = [...examples.matchAll(/<ModalDemo\b[^>]*>/g)].map((m) => m[0]);
+    expect(tags.length).toBeGreaterThan(5);
+    for (const tag of tags) expect(tag).toMatch(/<ModalDemo inline\b/);
+  });
+});
+
 describe('Code-Beispiel', () => {
   it('enthält beide Markup-Wege, beide Aufrufarten, Optionen und Ereignisse', () => {
     expect(code.vanilla).toContain(code.dialogMarkup);

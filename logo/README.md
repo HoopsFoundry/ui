@@ -6,6 +6,8 @@ Das Zeichen zeigt ein H, einen Korb-Ring, einen Spieler und ein F in der Signalf
 | --- | --- | --- |
 | `logo-claim.svg` | Logo mit Wortmarke und Claim auf hellem Grund; Zeichen und „Hoops“ Ash, „Foundry“ S2, Claim Ash | nein |
 | `logo-claim-hell.svg` | dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2, Claim hellgrau (`#c9d1d9`) | nein |
+| `logo-wortmarke.svg` | Wortmarke ohne Claim auf hellem Grund (Zeichen und „HoopsFoundry“), für enge Stellen wie die Seitenleiste der Doku; Zeichen und „Hoops“ Ash, „Foundry“ S2 | nein |
+| `logo-wortmarke-hell.svg` | dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2 | nein |
 | `logo-farbig.svg` | Zeichen allein für hellen Grund, Ash mit F in S2 | nein |
 | `logo-farbig-dunkel.svg` | Zeichen allein für dunklen Grund, weiß mit F in S2 | nein |
 | `logo-einfarbig.svg` | Zeichen allein in einer Farbe (`currentColor`) | nein |
@@ -24,6 +26,7 @@ Das Social-Preview-Bild entsteht mit `node scripts/make-social-preview.mjs` aus 
 Im Paket liegen nur die Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg`, `@hoopsfoundry/ui/logo/logo-icon-farbig.svg` (heller Grund) und `@hoopsfoundry/ui/logo/logo-icon-farbig-dunkel.svg` (dunkler Grund). Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf die Projektseite (Adresse: Feld `domain` in `project.config.json`). Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
 
 Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 48 px Höhe (Kontraste und Begründung der Farben: Storybook-Seite „Foundation/Logo“, Abschnitt „Farben“). Regel: je Untergrund eine Fassung, Ash nie auf einer dunklen Fläche (auf Schwarz nur 1,43:1). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
+Mindestgröße: Icon ab 16 px Höhe, Wortmarke ohne Claim ab 24 px Höhe, Logo mit Claim ab 48 px Höhe (Kontraste und Begründung der Farben: Storybook-Seite „Foundation/Logo“, Abschnitt „Farben“). Regel: je Untergrund eine Fassung, Ash nie auf einer dunklen Fläche (auf Schwarz nur 1,43:1). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
 
 ## Marke und Nutzung
 
@@ -31,4 +34,4 @@ Das Logo und der Name HoopsFoundry sind von der MIT-Lizenz des Codes ausgenommen
 
 ## Schrift im Logo mit Claim
 
-Wortmarke und Claim sind als Pfade ausgegeben (kein Text, keine Schrift zum Laden). Die Glyphen stammen aus der Schrift PT Mono Bold (ParaType Free Font Licence). Die Lizenzbedingungen für die Umwandlung in Pfade prüft der Projektinhaber.
+Wortmarke und Claim (auch in den Wortmarken-Dateien ohne Claim) sind als Pfade ausgegeben (kein Text, keine Schrift zum Laden). Die Glyphen stammen aus der Schrift PT Mono Bold (ParaType Free Font Licence). Die Lizenzbedingungen für die Umwandlung in Pfade prüft der Projektinhaber.
