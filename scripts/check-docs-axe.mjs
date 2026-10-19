@@ -6,14 +6,15 @@
  *   node scripts/check-docs-axe.mjs storybook-static           # alle Docs-Seiten × BBV/DBB × hell/dunkel, 1280 px
  *   node scripts/check-docs-axe.mjs storybook-static --widths=1280,420 --filter=components-map --concurrency=4
  *   node scripts/check-docs-axe.mjs storybook-static --json=axe-docs.json   # Ergebnis zusätzlich als Datei (CI-Artefakt)
+ *   node scripts/check-docs-axe.mjs storybook-static --extra-css=probe.css     # Mutationsprobe: zusätzliches CSS in jeder Seite
  *   node scripts/check-docs-axe.mjs storybook-static --scope=page            # ganze Seite samt Storybook-Rahmen (zur Information, Lückenplan 2.5)
  *
  * Die Seiten kommen aus `index.json` des Builds (alle Einträge vom Typ `docs`): neue Seiten sind ohne Änderung am Skript dabei.
  * Matrix: Marke (`brand:bbv|dbb`) × Theme (`theme:Light|Dark`, dazu `prefers-color-scheme` im Kontext) × Breiten. Je Lauf:
  *  - axe auf dem Docs-Inhalt (`.sbdocs-content`) mit WCAG 2.x A/AA/AAA, 2.1, 2.2, best-practice, color-contrast-enhanced, target-size,
  *    landmark-unique, heading-order. Wie im a11y-Addon gelten Regeln für das ganze Dokument (region, landmark-one-main, page-has-heading-one)
- *    der App, nicht der Doku; Storybook-eigene Bausteine (Argumenttabelle, Links und Codeblöcke von Storybook, Klassen `css-…`) sind
- *    ausgenommen, dieselbe Abgrenzung wie in scripts/check-map-docs.mjs. Was Storybook selbst erzeugt, dokumentiert Lückenplan 2.5.
+ *    der App, nicht der Doku; Storybook-eigene Bausteine (Argumenttabelle, „Show code“, Vorschau-Aktionen, Codeblöcke, Syntaxfarben) sind
+ *    ausgenommen (nur ganze Bausteine, scripts/docs-axe-chrome.mjs); MDX-Links und Inline-Code bleiben in der Prüfung. Was Storybook selbst erzeugt, dokumentiert Lückenplan 2.5.
  *  - Regression: die Seite rendert (Inhalt vorhanden, keine Fehlermeldung von Storybook), keine Seitenfehler und keine Konsolenfehler,
  *    kein seitliches Scrollen des Docs-Inhalts.
  * Ausgabe: eine Zeile je Fehlschlag, am Ende eine Übersicht (Läufe, Seiten, Verstöße je Regel); Exit-Code 1 bei jedem Fehlschlag.
@@ -25,6 +26,7 @@ import { existsSync } from 'node:fs';
 import { extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { STORYBOOK_CHROME } from './docs-axe-chrome.mjs';
 
 const ROOT = fileURLToPath(new URL('../', import.meta.url));
 const positional = process.argv.slice(2).filter((a) => !a.startsWith('--'));
@@ -37,11 +39,12 @@ const THEMES = (args.themes ?? 'Light,Dark').split(',');
 const CONCURRENCY = Math.max(1, Number(args.concurrency ?? 4));
 // content: nur unser Docs-Inhalt (Standard, Gate); page: das ganze Dokument samt Storybook-Rahmen, ohne Ausnahmen (zeigt, was Storybook erzeugt)
 const WHOLE_PAGE = args.scope === 'page';
+// Mutationsprobe: eine CSS-Datei, die in jede Seite eingesetzt wird (z. B. Inline-Code #333), muss Befunde erzeugen
+const EXTRA_CSS = args['extra-css'] ? await readFile(resolve(args['extra-css']), 'utf8') : '';
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.map': 'application/json' };
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag2aaa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 const EXTRA = ['color-contrast-enhanced', 'target-size', 'landmark-unique', 'heading-order'];
 const PAGE_RULES = ['region', 'landmark-one-main', 'page-has-heading-one'];
-const EXCLUDE = ['.docblock-argstable', '.sb-argstableBlock'];
 // Konsolenmeldungen, die Storybook oder der Browser selbst erzeugen und die keine Regression unserer Seiten sind
 const CONSOLE_IGNORE = [/Download the React DevTools/, /favicon/, /\[HMR\]/];
 
@@ -81,6 +84,7 @@ async function checkPage(ctx, doc, combo) {
   try {
     await page.goto(`${origin}/iframe.html?viewMode=docs&id=${doc.id}&globals=brand:${combo.brand};theme:${combo.theme}`, { waitUntil: 'networkidle', timeout: 60000 });
     await page.waitForSelector('.sbdocs-content', { timeout: 20000 });
+    if (EXTRA_CSS) await page.addStyleTag({ content: EXTRA_CSS });
     await page.waitForTimeout(1200);
     const render = await page.evaluate(() => {
       const content = document.querySelector('.sbdocs-content');
@@ -95,15 +99,16 @@ async function checkPage(ctx, doc, combo) {
     if (render.text < 50 || render.error) failures.push({ page: doc.id, combo, kind: 'Darstellung', detail: render.error || `Inhalt fast leer (${render.text} Zeichen)` });
     if (render.pageOverflow > 0) failures.push({ page: doc.id, combo, kind: 'seitliches Scrollen', detail: `${render.pageOverflow}px` });
     await page.evaluate(axeSource);
-    const violations = await page.evaluate(async ({ tags, extra, off, exclude, whole }) => {
+    const violations = await page.evaluate(async ({ tags, extra, off, chromeSel, whole }) => {
       const rules = { ...Object.fromEntries(extra.map((r) => [r, { enabled: true }])), ...Object.fromEntries(off.map((r) => [r, { enabled: false }])) };
       const target = whole ? document : (document.querySelector('.sbdocs-content') ?? document);
-      const out = await window.axe.run(whole ? document : { include: [target], exclude: exclude.map((s) => [s]) }, { runOnly: { type: 'tag', values: tags }, rules });
-      const chrome = (n) => !whole && n.target.some((t) => /\.sbdocs|\.docblock|\.sb-|\.css-[a-z0-9]+|react-aria|\.token/.test(t));
+      const out = await window.axe.run(whole ? document : { include: [target] }, { runOnly: { type: 'tag', values: tags }, rules, elementRef: true });
+      // nur Knoten in Storybook-Bausteinen fallen weg (scripts/docs-axe-chrome.mjs), geprüft am Element selbst, nicht am Selektortext
+      const chrome = (n) => !whole && Boolean(n.element?.closest?.(chromeSel));
       return out.violations
         .map((v) => ({ id: v.id, impact: v.impact, nodes: v.nodes.filter((n) => !chrome(n)).map((n) => `${n.target.join(' ')}: ${(n.failureSummary || '').split('\n')[1] ?? ''}`.slice(0, 240)) }))
         .filter((v) => v.nodes.length > 0);
-    }, { tags: TAGS, extra: EXTRA, off: WHOLE_PAGE ? [] : PAGE_RULES, exclude: WHOLE_PAGE ? [] : EXCLUDE, whole: WHOLE_PAGE });
+    }, { tags: TAGS, extra: EXTRA, off: WHOLE_PAGE ? [] : PAGE_RULES, chromeSel: STORYBOOK_CHROME, whole: WHOLE_PAGE });
     for (const v of violations) {
       byRule[v.id] = (byRule[v.id] ?? 0) + v.nodes.length;
       failures.push({ page: doc.id, combo, kind: `axe ${v.id}`, detail: v.nodes.slice(0, 3).join(' | '), count: v.nodes.length });
