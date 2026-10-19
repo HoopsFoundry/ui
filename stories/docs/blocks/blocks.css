@@ -94,7 +94,7 @@
 .hoops-preview-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; margin: 16px 0 24px; } /* nur Seite Dark Mode: hell und dunkel nebeneinander */
 .hoops-preview-box iframe { display: block; max-width: none; border: 0; transform-origin: 0 0; background: transparent; }
 
-/* Feststehende Vorschau (StickyPreview): untereinander steht die Vorschau oben fest (höchstens 50 vh, feste Höhen bis zur Fensterhöhe; berechnet in Preview.tsx), der Text
+/* Feststehende Vorschau (StickyPreview): untereinander steht die Vorschau oben fest (Spalte höchstens 50 vh, mit fester Höhe höchstens 60 vh, der Iframe scrollt dann selbst; berechnet in previewCap, preview-logic.ts), der Text
    scrollt darunter; ab 1100 px Text links, Vorschau rechts, 16 px vom oberen Rand (STICKY_GAP, WIDE_MIN in Preview.tsx). Die DOM-Reihenfolge
    bleibt Text, dann Vorschau (Fokus-Reihenfolge); nur die Darstellung stellt die Vorschau untereinander nach oben. Keine Übergänge. */
 .hoops-sp { display: flex; flex-direction: column; gap: 16px; margin: 16px 0 32px; }

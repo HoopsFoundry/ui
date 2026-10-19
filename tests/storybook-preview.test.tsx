@@ -86,6 +86,18 @@ function logicRules(m: Logic) {
     voll: m.previewLayout({ breite: 'voll', available: 581.6, contentHeight: 200, cap: 700, minHeight: 300 }),
     tall: m.previewLayout({ breite: 'desktop', available: 640, contentHeight: 2000, cap: 400 }),
     fixed: m.previewLayout({ breite: 'handy', available: 600, contentHeight: 2000, cap: 700, fixedHeight: 350 }),
+    cap: {
+      // Zoom 200 % (Fenster 450 px hoch), Spalte mit 100 px Überbau
+      narrowFixedLow: m.previewCap({ inAside: true, wide: false, viewportHeight: 450, overhead: 100, fixedHeight: 560 }),
+      narrowLow: m.previewCap({ inAside: true, wide: false, viewportHeight: 450, overhead: 100 }),
+      narrowFixedTall: m.previewCap({ inAside: true, wide: false, viewportHeight: 900, overhead: 100, fixedHeight: 560 }),
+      narrowFixedSmall: m.previewCap({ inAside: true, wide: false, viewportHeight: 900, overhead: 100, fixedHeight: 200 }),
+      narrowTall: m.previewCap({ inAside: true, wide: false, viewportHeight: 900, overhead: 100 }),
+      wideFixed: m.previewCap({ inAside: true, wide: true, viewportHeight: 450, overhead: 100, fixedHeight: 560 }),
+      wide: m.previewCap({ inAside: true, wide: true, viewportHeight: 900, overhead: 100 }),
+      free: m.previewCap({ inAside: false, wide: false, viewportHeight: 450, overhead: 0 }),
+      freeFixed: m.previewCap({ inAside: false, wide: false, viewportHeight: 450, overhead: 0, fixedHeight: 560 }),
+    },
     active: [m.activeStep([100, 400, 900], 270), m.activeStep([300, 400], 270), m.activeStep([-500, -100, 260], 270)],
     auto: [m.autoSwitchAllowed(false, undefined), m.autoSwitchAllowed(true, undefined), m.autoSwitchAllowed(false, 'reduce')],
   };
@@ -100,6 +112,8 @@ const LOGIC_OK = {
   // sichtbare Höhe bleibt bei der Grenze (400), im Iframe also 800 px bei halber Größe
   tall: { width: 1280, height: 800, scale: 0.5, visualWidth: 640, visualHeight: 400, label: 'Desktop · 1280 px, verkleinert auf 50 %' },
   fixed: { width: 390, height: 350, scale: 1, visualWidth: 390, visualHeight: 350, label: 'Handy · 390 px' },
+  // untereinander höchstens 60 vh samt Überbau (450 * 0,6 - 100 = 170), mit Mindesthöhe 160; nebeneinander bis zur Fensterhöhe
+  cap: { narrowFixedLow: 170, narrowLow: 160, narrowFixedTall: 440, narrowFixedSmall: 350, narrowTall: 350, wideFixed: 418, wide: 768, free: 360, freeFixed: 418 },
   active: [0, 0, 2],
   auto: [true, false, false],
 };
@@ -114,6 +128,9 @@ describe('Regeln der Vorschau (preview-logic.ts)', () => {
     ['Grenze ohne Skalierung', 'Math.min(wanted, visualCap / scale)', 'Math.min(wanted, visualCap)'],
     ['feste Höhe übergangen', 'const wanted = fixedHeight ?? Math.max(', 'const wanted = Math.max('],
     ['Mindesthöhe vergessen', 'Math.max(minHeight, contentHeight || minHeight || 320);', 'Math.max(contentHeight || 320);'],
+    ['feste Höhe untereinander bis zur Fensterhöhe (Reflow)', 'Math.floor(vh * NARROW_FIXED_SHARE - overhead)', 'vh - 2 * STICKY_GAP'],
+    ['feste Höhe untereinander ohne Überbau', 'Math.floor(vh * NARROW_FIXED_SHARE - overhead)', 'Math.floor(vh * NARROW_FIXED_SHARE)'],
+    ['Mindesthöhe der Vorschau fehlt', 'return Math.max(MIN_CAP, next);', 'return next;'],
     ['Theme nicht übernommen', "'brand', 'theme', 'locale'", "'brand', 'locale'"],
     ['Überschreibung verloren', 'const merged: Record<string, unknown> = { ...globals, ...overrides };', 'const merged: Record<string, unknown> = { ...overrides, ...globals };'],
     ['Trennzeichen eingeschleust', "const SAFE = /^[A-Za-z0-9_-]+$/;", 'const SAFE = /./;'],
@@ -296,6 +313,8 @@ describe('StickyPreview', () => {
 });
 
 describe('CSS der Vorschau (blocks.css)', () => {
+  // Hinweis: Dieser Test prüft Sticky nur am CSS-Text. Ob die Vorschau beim Scrollen wirklich oben steht (auch bei kurzem Text) und den Text
+  // bei Zoom 200 % nicht verdeckt, messen nur scripts/check-preview-docs.mjs im Browser und die Mutationsproben von previewCap oben.
   it('feststehend: untereinander oben (top 0), ab WIDE_MIN zweispaltig mit top STICKY_GAP; keine Übergänge', () => {
     expect(blocksCss).toMatch(/\.hoops-sp-aside \{ position: sticky; top: 0;[^}]*order: -1;/);
     expect(blocksCss).toContain(`@media (min-width: ${WIDE_MIN}px) {`);
