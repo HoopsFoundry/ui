@@ -8,6 +8,8 @@
   const varianten = [
     { datei: 'logo-claim.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ in Ash (dunkelgrau), „Foundry“ in Orangerot, Claim in Ash', hoehe: 56, dunkel: false },
     { datei: 'logo-claim-hell.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ weiß, „Foundry“ in Orangerot, Claim hellgrau, für dunklen Grund', hoehe: 56, dunkel: true },
+    { datei: 'logo-wortmarke.svg', alt: 'HoopsFoundry ohne Claim: Zeichen und „Hoops“ in Ash (dunkelgrau), „Foundry“ in Orangerot', hoehe: 40, dunkel: false },
+    { datei: 'logo-wortmarke-hell.svg', alt: 'HoopsFoundry ohne Claim für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ in Orangerot', hoehe: 40, dunkel: true },
     { datei: 'logo-farbig.svg', alt: 'Marken-Zeichen: H mit Korb-Ring, Spieler in Ash und orangerotem F', hoehe: 112, dunkel: false },
     { datei: 'logo-farbig-dunkel.svg', alt: 'Marken-Zeichen für dunklen Grund: weiß mit orangerotem F', hoehe: 112, dunkel: true },
     { datei: 'logo-einfarbig.svg', alt: 'Marken-Zeichen einfarbig (currentColor), hier schwarz', hoehe: 112, dunkel: false },
