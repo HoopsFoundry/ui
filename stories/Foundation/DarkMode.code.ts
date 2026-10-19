@@ -80,6 +80,8 @@ export function ThemeToggle() {
 export const cspHeader = `# Hash des Boot-Skripts (der Text zwischen <script> und </script>, ohne Änderung):
 printf '%s' "$(node -e "import('@hoopsfoundry/ui/theme.js').then((m) => process.stdout.write(m.themeBootScript()))")" \\
   | openssl dgst -sha256 -binary | openssl base64
+# Eigene Optionen: genau die Werte aus dem Template auch hier einsetzen, sonst passt der Hash nicht, zum Beispiel
+#   … m.themeBootScript({ defaultMode: 'dark', storageKey: 'mein-theme' }) …
 
 # Content-Security-Policy (Header oder meta): der Hash erlaubt genau dieses Skript, nichts anderes Inline
 Content-Security-Policy: script-src 'self' 'sha256-<Ausgabe des Befehls>'

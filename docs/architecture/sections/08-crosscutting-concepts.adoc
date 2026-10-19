@@ -11,7 +11,7 @@ Alle eigenen CSS-Custom-Properties tragen das Präfix `--hoops-` (private Hilfsv
 
 Semantische Überschriften, Tastaturbedienung, verständliche Namen und Fokusmanagement sind Bestandteil der API-Verantwortung. Modal (Fokus hinein, Falle, Rückgabe, abgeschaltete Seite, Scroll-Sperre) und Tabs (Pfeile, Pos1/Ende) verhalten sich in Vanilla, Svelte und React gleich (ADR-011). Aussagen zu WCAG-Konformität müssen einen benannten Prüfungsumfang haben; Kontrasttests allein beweisen keine vollständige Konformität.
 
-Animationen ändern nie die Deckkraft von Text: Der Live-Puls (`hoops-live-pulse`) hängt nur an Punkten und Flächen, die grünen Ergebniszahlen laufender Spiele stehen still, weil schon 95 % Deckkraft sie hell unter 7:1 drücken würde (Lückenplan 2.6). `tests/live.test.ts` rechnet den Kontrast mit der kleinsten Deckkraft, die das CSS der Zahl gibt.
+Animationen ändern nie die Deckkraft von Text: Der Live-Puls (`hoops-live-pulse`) hängt nur an Punkten und Flächen, die grünen Ergebniszahlen laufender Spiele stehen still, weil schon 95 % Deckkraft sie hell unter 7:1 drücken würde (Lückenplan 2.6). `tests/live.test.ts` rechnet den Kontrast mit der kleinsten Deckkraft, die das CSS der Zahl oder ihren Behältern gibt (ADR-013).
 
 === Sicherheit
 

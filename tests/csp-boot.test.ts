@@ -31,6 +31,8 @@ describe('CSP-Rezept für das Boot-Skript', () => {
       expect(h).toMatch(/script-src 'self' 'sha256-</);
       expect(h).toMatch(/script-src 'self' 'nonce-<zufällig je Antwort>'/);
       expect(h).toMatch(/<script nonce="<zufällig je Antwort>">/);
+      // eigene Optionen gehören in den node -e-Aufruf (Review K7)
+      expect(h).toContain("m.themeBootScript({ defaultMode: 'dark', storageKey: 'mein-theme' })");
     }
   });
 
