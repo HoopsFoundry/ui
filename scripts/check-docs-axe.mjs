@@ -68,7 +68,6 @@ const KNOWN_CANVAS_OVERFLOW = [
   { page: 'components-accordion--docs', widths: [320] },
   { page: 'components-kennzahlen--docs', widths: [320] },
   { page: 'components-map--docs', widths: [320] },
-  { page: 'components-spielplan--docs', widths: [320] },
   { page: 'components-appnav--docs', widths: [900] },
 ];
 // axe `scrollable-region-focusable`: (a) die Flächen der Inline-Beispiele scrollen bei 320 px seitlich (gleiche Ursache wie oben, Beispiel statt
