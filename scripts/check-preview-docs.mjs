@@ -21,7 +21,7 @@
  *  - feststehend: `position: sticky` mit `top` 16 px (nebeneinander, ab 1100 px) bzw. 0 px (untereinander) und beim Scrollen durch den
  *    Abschnitt steht die Vorschau wirklich dort. Ist der Text kürzer als die Vorschau, wird er für die Messung künstlich verlängert (sonst
  *    gäbe es nichts zu halten und ein fehlendes `sticky` fiele nicht auf),
- *  - die Liste der Vorschau ist per Tastatur bedienbar und nichts außerhalb der Don't-Bühnen ist inert,
+ *  - die Liste der Vorschau ist per Tastatur bedienbar und kein Text der Seite ist inert,
  *  - Reflow (niedrige Fenster): untereinander nimmt die Vorschau samt Liste höchstens 70 % der Fensterhöhe ein (Obergrenze 60 vh, bei
  *    390 px Höhe greift die Mindesthöhe des Iframes von 160 px) und der Text bleibt darunter mindestens 100 px sichtbar (WCAG 1.4.10),
  *  - automatischer Wechsel (bei 1400 und 900 px): Steht der Anfang eines Abschnitts an der Lesezeile, zeigt die Vorschau sein Beispiel.
@@ -159,10 +159,12 @@ async function checkCombo(browserName, ctx, id, combo) {
         if (!r.fixedTheme && r.theme !== combo.theme.toLowerCase()) fail('Theme', `${where}: data-theme=${r.theme} statt ${combo.theme.toLowerCase()}`);
       }
     }
-    // Liste per Tastatur: nichts auf der Seite ist inert (offene Modale in Beispielen schalteten sonst die ganze Doku-Seite ab), der Schalter
+    // Liste per Tastatur: der Text der Seite ist nicht inert (offene Modale in Beispielen schalteten sonst die ganze Doku-Seite ab), der Schalter
     // nimmt den Fokus an und wählt mit Enter sein Beispiel
-    const inertCount = await page.evaluate(() => [...document.querySelectorAll('[inert]')].filter((el) => !el.closest('.hoops-dd-stage, .sb-wrapper')).length);
-    if (inertCount > 0) fail('inert', `${inertCount} Elemente der Seite sind inert (außerhalb der Don't-Bühnen)`);
+    // inert zählt nur, wo der Text der Seite liegt (Überschriften, Absätze, Vorschau, Tabellen); geschlossene Bereiche (`hidden inert`) und die
+    // Don't-Bühnen sind absichtlich inert
+    const inertCount = await page.evaluate(() => [...document.querySelectorAll('.sbdocs-content :is(h1, h2, h3, h4, p, ul, .hoops-sp, .hoops-doc-table-wrap)')].filter((el) => el.closest('[inert]') && !el.closest('[hidden], .hoops-dd-stage')).length);
+    if (inertCount > 0) fail('inert', `${inertCount} Textelemente der Seite sind inert (offene Modale in Beispielen schalten die Seite ab)`);
     for (const sp of await page.locator('.hoops-sp').all()) {
       const picks = sp.locator('.hoops-sp-pick');
       if ((await picks.count()) < 2) continue;
