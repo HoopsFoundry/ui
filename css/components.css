@@ -190,7 +190,7 @@
   transition: background 0.12s, color 0.12s, box-shadow 0.12s;
 }
 .hoops-tabs--md .hoops-tab { min-height: 44px; padding: 0 14px; font-size: var(--hoops-fs-body-md); }
-.hoops-tabs--underline { border-bottom: 1px solid var(--hoops-line); gap: var(--hoops-space-1); }
+.hoops-tabs--underline { flex-wrap: wrap; border-bottom: 1px solid var(--hoops-line); gap: var(--hoops-space-1); } /* schmaler Raum (320 px): die Tabs brechen in eine zweite Zeile um statt die Seite zu verbreitern (WCAG 1.4.10) */
 .hoops-tabs--underline .hoops-tab { border-bottom: 2px solid transparent; margin-bottom: -1px; }
 .hoops-tabs--underline .hoops-tab:hover { color: var(--hoops-fg); }
 .hoops-tabs--underline .hoops-tab.is-active,
