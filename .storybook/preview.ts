@@ -126,7 +126,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Introduction',
-          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode', 'Vanilla', 'Internationalisierung'],
+          'Foundation', ['Colors', 'Typography', 'Headings', 'Focus & Hover', 'Live', 'Dark Mode', 'Vanilla', 'Internationalisierung', 'Logo'],
           'Components', ['Button', 'TextInput', 'Select', 'Checkbox', 'Modal', 'Banner', 'Card', 'Card Library', 'TeamCard', 'LeagueCard', 'Kennzahlen', 'Map', 'VenueCard', 'Tabs', 'Accordion', 'PageNav', 'Navigation', 'AppNav', 'Table', 'Spielplan', ['Spielplan', 'Tabelle', 'Zeitraster', 'Spielwiese'], 'EmptyState', 'CourtLines', 'PlayByPlay', 'Icon'],
         ],
       },

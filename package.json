@@ -51,6 +51,8 @@
       "types": "./svelte/i18n.d.ts",
       "import": "./svelte/i18n.js"
     },
+    "./logo/logo-icon.svg": "./logo/logo-icon.svg",
+    "./logo/logo-icon-farbig.svg": "./logo/logo-icon-farbig.svg",
     "./appnav.js": "./js/appnav.js",
     "./schedule.js": {
       "types": "./js/schedule.d.ts",
@@ -222,6 +224,8 @@
     "css/",
     "fonts/",
     "icons/",
+    "logo/logo-icon.svg",
+    "logo/logo-icon-farbig.svg",
     "js/",
     "svelte/",
     "dist/",
