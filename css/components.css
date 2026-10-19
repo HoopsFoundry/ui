@@ -1163,7 +1163,10 @@ button.hoops-pc-row:focus-visible { outline: var(--hoops-ring-w) var(--hoops-rin
 .hoops-tbl--schedule td.hoops-sch-ha { width: 64px; padding-right: 0; }
 .hoops-tbl--schedule td.hoops-sch-match { color: var(--hoops-fg); }
 .hoops-sch-sub { display: block; margin-top: 2px; font-size: var(--hoops-fs-body-sm); }
-/* Zielgröße: Links in der Unterzeile und am Teamnamen bekommen 5 px Fläche oben und unten (WCAG 2.5.8), der negative Rand hält die Zeilenhöhe */
+/* Zielgröße: Links in der Unterzeile und am Teamnamen bekommen 5 px Fläche oben und unten (WCAG 2.5.8). Die Links sind inline: Dort ändert
+   padding die Zeilenhöhe nie und der negative Rand wirkt nicht; er gilt nur, falls ein Link als inline-block gesetzt wird. Folge: Der
+   Fokusring umschließt die ganze Fläche und ragt bis zu 5 px (plus 2 px Abstand) in die Nachbarzeile. Im Browser gemessen (Chromium, WebKit,
+   Spielplan mit mehrzeiligem Link): er überdeckt keinen Text, nur den Zwischenraum an der Unterlänge der Zeile darüber; bewusst belassen. */
 .hoops-sch-sub .hoops-link, .hoops-sch-team .hoops-link { padding-block: 5px; margin-block: -5px; }
 .hoops-sch-sep { color: var(--hoops-mute); }
 .hoops-sch-team.is-loser, .hoops-sch-team.is-loser .hoops-link { color: var(--hoops-mute); }
