@@ -21,6 +21,7 @@
  *  - feststehend: `position: sticky` mit `top` 16 px (nebeneinander, ab 1100 px) bzw. 0 px (untereinander) und beim Scrollen durch den
  *    Abschnitt steht die Vorschau wirklich dort. Ist der Text kürzer als die Vorschau, wird er für die Messung künstlich verlängert (sonst
  *    gäbe es nichts zu halten und ein fehlendes `sticky` fiele nicht auf),
+ *  - die Liste der Vorschau ist per Tastatur bedienbar und nichts außerhalb der Don't-Bühnen ist inert,
  *  - Reflow (niedrige Fenster): untereinander nimmt die Vorschau samt Liste höchstens 70 % der Fensterhöhe ein (Obergrenze 60 vh, bei
  *    390 px Höhe greift die Mindesthöhe des Iframes von 160 px) und der Text bleibt darunter mindestens 100 px sichtbar (WCAG 1.4.10),
  *  - automatischer Wechsel (bei 1400 und 900 px): Steht der Anfang eines Abschnitts an der Lesezeile, zeigt die Vorschau sein Beispiel.
@@ -87,6 +88,7 @@ let runs = 0;
 let previewsChecked = 0;
 let stickyMeasured = 0;
 let reflowMeasured = 0;
+let keyboardChecked = 0;
 let autoChecked = 0;
 const otherOverflow = new Set();
 const pagesWithPreview = new Set();
@@ -156,6 +158,20 @@ async function checkCombo(browserName, ctx, id, combo) {
         if ((combo.brand === 'dbb') !== (r.brand === 'dbb' && r.type === 'dbb')) fail('Marke/Schrift', `${where}: data-brand=${r.brand} data-type=${r.type}`);
         if (!r.fixedTheme && r.theme !== combo.theme.toLowerCase()) fail('Theme', `${where}: data-theme=${r.theme} statt ${combo.theme.toLowerCase()}`);
       }
+    }
+    // Liste per Tastatur: nichts auf der Seite ist inert (offene Modale in Beispielen schalteten sonst die ganze Doku-Seite ab), der Schalter
+    // nimmt den Fokus an und wählt mit Enter sein Beispiel
+    const inertCount = await page.evaluate(() => [...document.querySelectorAll('[inert]')].filter((el) => !el.closest('.hoops-dd-stage, .sb-wrapper')).length);
+    if (inertCount > 0) fail('inert', `${inertCount} Elemente der Seite sind inert (außerhalb der Don't-Bühnen)`);
+    for (const sp of await page.locator('.hoops-sp').all()) {
+      const picks = sp.locator('.hoops-sp-pick');
+      if ((await picks.count()) < 2) continue;
+      await picks.nth(1).scrollIntoViewIfNeeded();
+      await picks.nth(1).focus();
+      await page.keyboard.press('Enter');
+      const ok = await picks.nth(1).evaluate((b) => document.activeElement === b && b.getAttribute('aria-pressed') === 'true');
+      if (!ok) fail('Liste per Tastatur', 'der zweite Schalter nimmt den Fokus nicht an oder wählt sein Beispiel nicht');
+      keyboardChecked += 1;
     }
     // feststehende Vorschau: position: sticky mit dem erwarteten top, und in der Mitte des Abschnitts steht sie dort
     const wide = combo.width >= WIDE_MIN;
@@ -272,8 +288,8 @@ try {
 }
 
 if (requireOneStarted(BROWSERS, versions, notStarted)) {
-  const summary = { browsers: versions, notStarted, pages: [...pagesWithPreview].sort(), combos: COMBOS.length, runs, previewsChecked, stickyMeasured, reflowMeasured, autoChecked, failures: failures.length, hinweisSeitlichesScrollenAndererInhalte: [...otherOverflow].sort() };
+  const summary = { browsers: versions, notStarted, pages: [...pagesWithPreview].sort(), combos: COMBOS.length, runs, previewsChecked, stickyMeasured, reflowMeasured, keyboardChecked, autoChecked, failures: failures.length, hinweisSeitlichesScrollenAndererInhalte: [...otherOverflow].sort() };
   console.log(JSON.stringify(summary, null, 2));
-  console.log(failures.length === 0 ? `OK: ${runs} Läufe, ${previewsChecked} Vorschauen, ${stickyMeasured} Messungen der feststehenden Vorschau (${reflowMeasured} davon Reflow bei niedrigem Fenster), ${autoChecked} automatische Wechsel ohne Befund` : `${failures.length} Befunde`);
+  console.log(failures.length === 0 ? `OK: ${runs} Läufe, ${previewsChecked} Vorschauen, ${stickyMeasured} Messungen der feststehenden Vorschau (${reflowMeasured} davon Reflow bei niedrigem Fenster), ${keyboardChecked} Listen per Tastatur, ${autoChecked} automatische Wechsel ohne Befund` : `${failures.length} Befunde`);
   if (failures.length) process.exitCode = 1;
 }
