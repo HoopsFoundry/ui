@@ -14,7 +14,7 @@ Das Zeichen von HoopsFoundry UI zeigt ein H, einen Korb-Ring, einen Spieler und 
 
 ## Varianten
 
-Die Vorschauen stehen auf festem hellem bzw. dunklem Grund, weil die Logos schwarz oder weiß sind und einen passenden Grund brauchen, egal in welchem Modus die Doku gerade steht.
+Das Rot (`rgb(189, 0, 13)`) hat auf Weiß 6,6:1, auf Schwarz aber nur 3,2:1 (auf `#0d1117`, dem dunklen GitHub-Grund, 2,9:1). Für Zeichen reicht das (3:1), für den kleinen roten Text „Foundry“ und den Claim auf dunklem Grund nicht ganz; setze das Logo dort nicht klein ein. Die Vorschauen stehen auf festem hellem bzw. dunklem Grund, weil die Logos schwarz oder weiß sind und einen passenden Grund brauchen, egal in welchem Modus die Doku gerade steht.
 
 <Canvas of={LogoStories.Varianten} />
 
@@ -22,8 +22,8 @@ Die Vorschauen stehen auf festem hellem bzw. dunklem Grund, weil die Logos schwa
   label="Logo-Dateien und Einsatz"
   head={['Datei', 'Einsatz', 'Im npm-Paket']}
   rows={[
-    ['logo-claim.svg', 'Logo mit Wortmarke und Claim auf hellem Grund (README, Präsentationen, Doku)', 'nein'],
-    ['logo-claim-hell.svg', 'dieselbe Fassung in Weiß für dunklen Grund', 'nein'],
+    ['logo-claim.svg', 'Logo mit Wortmarke und Claim auf hellem Grund (README, Präsentationen, Doku); Zeichen und „Hoops“ schwarz, „Foundry“ und Claim rot', 'nein'],
+    ['logo-claim-hell.svg', 'dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ und Claim bleiben rot', 'nein'],
     ['logo-farbig.svg', 'Zeichen allein, schwarz mit rotem F', 'nein'],
     ['logo-einfarbig.svg', 'Zeichen allein in einer Farbe (currentColor), etwa für Druck oder Stempel', 'nein'],
     ['logo-app-icon.svg', 'weißes Zeichen auf schwarzer, abgerundeter Kachel; Favicon, App-Symbol', 'nein'],
@@ -36,7 +36,7 @@ Alle Dateien sind SVG mit einer sauberen `viewBox` und ohne feste Breite und Hö
 
 ## Mindestgröße und Schutzraum
 
-Das Footer-Icon ist ein Hochformat (661 zu 944). Es bleibt ab **16 px Höhe** als Zeichen erkennbar (H und Ring; das F ist dort nur noch ein roter Block, lesbar wird es ab etwa 24 px). Für den Footer sind 16 bis 32 px gedacht. Das Logo mit Claim hält der Claim ab **40 px Höhe** lesbar. Kleiner gehören nur das Zeichen oder das Icon hin, nie das Logo mit Claim.
+Das Footer-Icon ist ein Hochformat (661 zu 944). Es bleibt ab **16 px Höhe** als Zeichen erkennbar (H und Ring; das F ist dort nur noch ein roter Block, lesbar wird es ab etwa 24 px). Für den Footer sind 16 bis 32 px gedacht. Beim Logo mit Claim ist der Claim auf hellem Grund ab etwa 40 px Höhe zu entziffern und ab **48 px Höhe** gut lesbar (gerendert bei 24, 32, 40, 48 und 64 px verglichen). Kleiner gehören nur das Zeichen oder das Icon hin, nie das Logo mit Claim.
 
 <Canvas of={LogoStories.Groessen} />
 

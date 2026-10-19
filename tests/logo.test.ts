@@ -27,6 +27,9 @@ function svgProbleme(name: string, src: string): string[] {
   if (einfarbig && /fill:|rgb\(/.test(src)) p.push('feste Farbe in einer einfarbigen Fassung');
   if (!einfarbig && name !== 'logo-claim-hell.svg' && !src.replaceAll(' ', '').includes(ROT)) p.push('rotes F fehlt');
   if (name === 'logo-claim-hell.svg' && !/\sfill="#fff"/.test(root)) p.push('weiße Füllung fehlt');
+  // Das Claim-Logo: "Foundry" und Claim sind rot (32 Pfade), Zeichen und "Hoops" erben die Grundfarbe
+  if (name.startsWith('logo-claim') && (src.match(/fill:rgb\(189,0,13\)/g) ?? []).length !== 32) p.push('Foundry und Claim sind nicht rot (erwartet: 32 rote Pfade)');
+  if (name.startsWith('logo-claim') && /<text/.test(src)) p.push('Text muss als Pfade vorliegen');
   return p;
 }
 
@@ -53,6 +56,10 @@ describe('SVG-Dateien', () => {
     expect(paths(read('logo/logo-icon-farbig.svg'))).toEqual(paths(read('logo/logo-farbig.svg')));
   });
   it('Mutationsprobe: verfälschte Kopien fallen durch', () => {
+    const claim = read('logo/logo-claim.svg');
+    expect(svgProbleme('logo-claim.svg', claim.replace('fill:rgb(189,0,13)', 'fill:rgb(0,0,0)'))).toContain('Foundry und Claim sind nicht rot (erwartet: 32 rote Pfade)');
+    expect(svgProbleme('logo-claim.svg', claim.replace('</svg>', '<text>x</text></svg>'))).toContain('Text muss als Pfade vorliegen');
+    expect(svgProbleme('logo-claim-hell.svg', read('logo/logo-claim-hell.svg').replace(' fill="#fff"', ''))).toContain('weiße Füllung fehlt');
     const farbig = read('logo/logo-farbig.svg');
     expect(svgProbleme('logo-farbig.svg', farbig.replace('<svg ', '<svg width="100%" '))).toContain('feste Breite oder Höhe am Wurzelelement');
     expect(svgProbleme('logo-farbig.svg', farbig.replace(/ viewBox="[^"]*"/, ''))).toContain('viewBox fehlt oder ist nicht ganzzahlig');
@@ -130,7 +137,7 @@ describe('Doku-Seite Foundation/Logo', () => {
     expect(stories).toMatch(/title: 'Foundation\/Logo'/);
   });
   it('nennt Mindestgrößen, Schutzraum, Footer-Text, Link und die Erlaubnis für Anwender', () => {
-    for (const s of ['16 px Höhe', '40 px Höhe', 'Schutzraum', 'Powered by HoopsFoundry UI', `https://${config.domain}`, 'alt=""', 'Marke']) expect(mdx, s).toContain(s);
+    for (const s of ['16 px Höhe', '48 px Höhe', 'Schutzraum', 'Powered by HoopsFoundry UI', `https://${config.domain}`, 'alt=""', 'Marke']) expect(mdx, s).toContain(s);
     expect(mdx).toContain('nicht** von der MIT-Lizenz');
   });
   it('jedes Bild der Vorschau hat einen alt-Text; Dekoration ist leer, ein Icon allein hat einen Namen', () => {

@@ -4,8 +4,8 @@ Das Zeichen zeigt ein H, einen Korb-Ring, einen Spieler und ein rotes F (Farbe `
 
 | Datei | Einsatz | im npm-Paket |
 | --- | --- | --- |
-| `logo-claim.svg` | Logo mit Wortmarke und Claim auf hellem Grund | nein |
-| `logo-claim-hell.svg` | dieselbe Fassung in Weiß für dunklen Grund | nein |
+| `logo-claim.svg` | Logo mit Wortmarke und Claim auf hellem Grund; Zeichen und „Hoops“ schwarz, „Foundry“ und Claim rot | nein |
+| `logo-claim-hell.svg` | dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ und Claim rot | nein |
 | `logo-farbig.svg` | Zeichen allein, schwarz mit rotem F | nein |
 | `logo-einfarbig.svg` | Zeichen allein in einer Farbe (`currentColor`) | nein |
 | `logo-app-icon.svg` | weißes Zeichen auf schwarzer, abgerundeter Kachel (Favicon der Doku, App-Symbol) | nein |
@@ -19,8 +19,12 @@ Das Social-Preview-Bild entsteht mit `node scripts/make-social-preview.mjs` aus 
 
 Im Paket liegen nur die zwei Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg` und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`. Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf die Projektseite (Adresse: Feld `domain` in `project.config.json`). Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
 
-Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 40 px Höhe. Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
+Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 48 px Höhe (der rote Claim hat auf Schwarz nur 3,2:1 Kontrast, auf Weiß 6,6:1). Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
 
 ## Marke und Nutzung
 
 Das Logo und der Name HoopsFoundry sind von der MIT-Lizenz des Codes ausgenommen (siehe `LICENSE`). Nutzung ist erlaubt, um das Projekt zu kennzeichnen oder anzugeben, dass eine Anwendung HoopsFoundry UI verwendet. Nicht erlaubt ist sie für abgeleitete Produkte oder so, dass der Eindruck einer Zugehörigkeit oder Billigung durch das Projekt entsteht. Das Zeichen darf nicht verzerrt, gedreht, umgefärbt (außer der einfarbigen Fassung) oder in seinen Teilen verändert werden. Dieser Hinweis ist keine Rechtsberatung.
+
+## Schrift im Logo mit Claim
+
+Wortmarke und Claim sind als Pfade ausgegeben (kein Text, keine Schrift zum Laden). Die Glyphen stammen aus der Schrift PT Mono Bold (ParaType Free Font Licence). Die Lizenzbedingungen für die Umwandlung in Pfade prüft der Projektinhaber.

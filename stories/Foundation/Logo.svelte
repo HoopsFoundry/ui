@@ -6,8 +6,8 @@
   let { mode = 'varianten' } = $props();
 
   const varianten = [
-    { datei: 'logo-claim.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“, schwarz mit rotem F', hoehe: 56, dunkel: false },
-    { datei: 'logo-claim-hell.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“, weiß mit rotem F, für dunklen Grund', hoehe: 56, dunkel: true },
+    { datei: 'logo-claim.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ schwarz, „Foundry“ und Claim rot', hoehe: 56, dunkel: false },
+    { datei: 'logo-claim-hell.svg', alt: 'HoopsFoundry mit Claim „Build for the love of the game“: Zeichen und „Hoops“ weiß, „Foundry“ und Claim rot, für dunklen Grund', hoehe: 56, dunkel: true },
     { datei: 'logo-farbig.svg', alt: 'Marken-Zeichen: H mit Korb-Ring, Spieler und rotem F', hoehe: 112, dunkel: false },
     { datei: 'logo-einfarbig.svg', alt: 'Marken-Zeichen einfarbig schwarz', hoehe: 112, dunkel: false },
     { datei: 'logo-app-icon.svg', alt: 'App-Icon: weißes Zeichen mit rotem F auf schwarzer abgerundeter Kachel', hoehe: 112, dunkel: false },
@@ -40,9 +40,9 @@
     {/each}
     <li class="logo-cell">
       <div class="logo-stage">
-        <img src="./logo/logo-claim.svg" alt="Logo mit Claim, 40 Pixel hoch (Mindestgröße)" style="height:40px" />
+        <img src="./logo/logo-claim.svg" alt="Logo mit Claim, 48 Pixel hoch (Mindestgröße)" style="height:48px" />
       </div>
-      <span class="logo-name">Logo mit Claim, 40 px hoch</span>
+      <span class="logo-name">Logo mit Claim, 48 px hoch</span>
     </li>
   </ul>
 {:else if mode === 'schutzraum'}
