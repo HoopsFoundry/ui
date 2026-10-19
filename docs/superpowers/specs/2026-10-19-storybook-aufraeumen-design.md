@@ -1,6 +1,6 @@
 # Storybook aufräumen: Marke und Schrift, Hell/Dunkel, Breite, feststehende Vorschau
 
-Stand: Entwurf zur Freigabe (2026-10-19). Auslöser: Nutzerwunsch in der Sitzung vom 2026-10-19.
+Stand: freigegeben vom Nutzer am 2026-10-19 (Entscheidungen unten). Auslöser: Nutzerwunsch in der Sitzung vom 2026-10-19.
 
 ## Ziele (vom Nutzer)
 1. **Marke und Schrift koppeln.** Statt der Umschalter „Marke“ und „Schrift“ gibt es einen: BBV bringt Sora und Manrope, DBB bringt Rubik und Sucrose mit.
@@ -20,7 +20,7 @@ Stand: Entwurf zur Freigabe (2026-10-19). Auslöser: Nutzerwunsch in der Sitzung
 ### 1. Marke und Schrift
 - Ein Global `brand` mit `bbv` und `dbb`; `data-type` wird daraus abgeleitet (`dbb` → `data-type="dbb"`). Das Global `type` entfällt.
 - Alte URLs mit `globals=type:dbb` werden nicht weiter ausgewertet; die Seiten und Tests, die `type` setzen, werden angepasst.
-- Offen: Soll es weiterhin möglich sein, die Marke DBB mit der Standardschrift zu sehen (zum Beispiel für Vergleiche)? Vorschlag: nein, die Seite `Foundation/Typography` zeigt beide Schriften fest nebeneinander.
+- Entschieden: DBB mit Standardschrift ist nicht mehr einstellbar; die Seite `Foundation/Typography` zeigt beide Schriften fest nebeneinander.
 
 ### 2. Hell und Dunkel
 - Quelle der Wahrheit ist die Theme-Auswahl der Leiste. Alle Beispiele (auch in iframes) übernehmen sie über die Globals in der Adresse (`globals=theme:Dark`).
@@ -35,7 +35,7 @@ Stand: Entwurf zur Freigabe (2026-10-19). Auslöser: Nutzerwunsch in der Sitzung
 
 ### 4. Feststehende Vorschau
 - Auf Seiten mit Vorschau: zweispaltige Doku (Text links, Vorschau rechts, `position: sticky; top: <Höhe der Leiste>`), unter 1100 px untereinander mit sticky Vorschau am oberen Rand und begrenzter Höhe (z. B. 50 vh).
-- Mehrere Beispiele einer Seite: die Vorschau gehört zum Abschnitt, der gerade im Blick ist; der Text zeigt, welches Beispiel aktiv ist. Offen: Auswahl der Beispiele per Abschnitt (IntersectionObserver) oder Reiter in der Vorschau.
+- Mehrere Beispiele einer Seite: Entschieden ist der automatische Wechsel. Die Vorschau zeigt das Beispiel des Abschnitts, der gerade im Blick ist (IntersectionObserver); der Text kennzeichnet das aktive Beispiel. Ohne JavaScript und bei `prefers-reduced-motion` bleibt das erste Beispiel stehen und die Beispiele sind über eine Liste wählbar.
 - Bedienbar per Tastatur (Fokus-Reihenfolge Text → Vorschau), keine Fokusfalle, `prefers-reduced-motion` ohne Übergänge.
 
 ## Nicht Teil
