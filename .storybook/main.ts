@@ -9,6 +9,10 @@ const config: StorybookConfig = {
     '../stories/**/*.spec.stories.ts',
   ],
 
+  // Logos der Doku: Marke in der Seitenleiste (manager.ts), Favicon (manager-head.html, preview-head.html) und die Seite Foundation/Logo.
+  // Relative Pfade, damit die Doku auch unter einem Unterpfad lädt (Webspace per rsync, GitHub Pages).
+  staticDirs: [{ from: '../logo', to: '/logo' }],
+
   addons: [
     '@storybook/addon-docs',
     '@storybook/addon-a11y',

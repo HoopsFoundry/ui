@@ -19,3 +19,25 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+Logo und Name / Logo and name
+
+Deutsch: Die MIT-Lizenz oben gilt für den Quellcode und die Dokumentation dieses
+Repositorys. Das Logo (die Dateien im Ordner logo/ und das Footer-Icon im
+npm-Paket) und der Name „HoopsFoundry“ sind davon ausgenommen; sie sind eine Marke
+des Projektinhabers. Sie dürfen nur verwendet werden, um das Projekt zu
+kennzeichnen oder anzugeben, dass eine Anwendung HoopsFoundry UI verwendet (zum
+Beispiel das Footer-Icon mit dem Text „Powered by HoopsFoundry UI“). Nicht
+erlaubt ist die Verwendung für abgeleitete Produkte oder so, dass der Eindruck
+einer Zugehörigkeit zum Projekt oder einer Billigung durch das Projekt entsteht.
+
+English: The MIT License above applies to the source code and documentation of
+this repository. The logo (the files in the logo/ folder and the footer icon in
+the npm package) and the name "HoopsFoundry" are excluded from it; they are a
+trademark of the project owner. They may only be used to identify the project or
+to state that an application uses HoopsFoundry UI (for example the footer icon
+with the text "Powered by HoopsFoundry UI"). They may not be used for derived
+products or in a way that suggests affiliation with or endorsement by the
+project.

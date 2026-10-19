@@ -19,6 +19,10 @@ Die Vanilla-Renderer (`js/render/`) und die Karte (`js/map-vanilla.js`) escapen 
 
 Content-Security-Policy: Die Bündel brauchen nur `script-src 'self'` und `style-src 'self'`. Das einzige Inline-Skript ist das Boot-Skript des Dunkelmodus (`themeBootScript()`); es wird per Hash oder nonce freigegeben, ohne Freigabe blockiert der Browser es und nur das Flackern kehrt zurück. `scripts/check-csp-boot.mjs` belegt das in Chromium und WebKit (Hash im Header und im meta-Element, nonce je Antwort, Gegenproben ohne Freigabe, mit falscher nonce und mit dem Hash eines anders konfigurierten Skripts); `tests/csp-boot.test.ts` führt das Hash-Rezept der Doku in der Shell aus und vergleicht es mit dem Hash aus `node:crypto`.
 
+=== Marke und Logo
+
+Das Logo und der Name HoopsFoundry sind von der MIT-Lizenz des Codes ausgenommen und Marke des Projektinhabers (`LICENSE`, `README.md`, `logo/README.md`, Storybook-Seite `Foundation/Logo`): Nutzung nur zur Kennzeichnung des Projekts oder als Hinweis „verwendet HoopsFoundry UI“, nicht für abgeleitete Produkte oder mit dem Eindruck von Zugehörigkeit oder Billigung. Das Footer-Icon im Paket folgt den Zugänglichkeitsregeln: neben Text `alt=""`, allein mit sprechendem `alt`, Zielgröße mindestens 24 px. Logo-Bilder kommen aus dem eigenen Ursprung (`img-src 'self'` genügt, keine Änderung an `deploy/htaccess`). Der Wortlaut des Markenhinweises ist keine Rechtsberatung und vom Projektinhaber zu prüfen.
+
 === Datenschutz
 
 Kartenanfragen und externe Assets müssen explizit dokumentiert sein. Leaflet und `leaflet.css` werden aus dem eigenen Projekt ausgeliefert (kein CDN, Option `loadLeaflet` oder importmap) und erst nach der Freigabe geladen; die Zwei-Klick-Freigabe gilt in allen Fassungen. Kacheln kommen von `tileUrl` (eigener Proxy) oder, als Demo, von OpenStreetMap; in der Content-Security-Policy gehört der Kachel-Host in `img-src`. Ein Browsertest zählt die Anfragen vor und nach dem Klick (nur der eigene Host, keine Cookies, kein Storage) und läuft in Chromium und WebKit.

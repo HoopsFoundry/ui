@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/logo-claim-hell.svg">
+    <img src="logo/logo-claim.svg" alt="HoopsFoundry UI – Build for the love of the game" width="560">
+  </picture>
+</p>
+
 # HoopsFoundry UI
 
 **Komponenten-Library für Basketball-Apps**
@@ -68,6 +75,9 @@ css/
   courtlines/           ← v0.9 · court.svg, court-portrait.svg (Maske für CourtLines)
 .storybook/             ← v0.6 · Storybook config
 stories/                ← v0.6 · Stories für alle Komponenten + Foundation
+logo/
+  logo-icon.svg         ← Footer-Icon einfarbig (currentColor), im Paket als @hoopsfoundry/ui/logo/logo-icon.svg
+  logo-icon-farbig.svg  ← Footer-Icon farbig; die großen Logos (Claim, App-Icon, Social Preview) bleiben im Repository
 docs/
   entwuerfe/            ← historische Design-Entwürfe (HTML, tweaks-panel.jsx); nicht gepflegt
 ```
@@ -679,7 +689,20 @@ Die HTML-Dokumente werden automatisch öffentlich anschaubar:
 
 ## Lizenz
 
-MIT · Frei für Vereins-, Verbands- und kommerzielle Nutzung im Basketball-Kontext.
+MIT · Frei für Vereins-, Verbands- und kommerzielle Nutzung im Basketball-Kontext (Code und Dokumentation).
+
+## Logo und Marke
+
+Das Logo (Ordner [`logo/`](logo/), Footer-Icon im Paket) und der Name HoopsFoundry sind **von der MIT-Lizenz ausgenommen** und eine Marke des Projektinhabers. Erlaubt ist die Nutzung, um das Projekt zu kennzeichnen oder anzugeben, dass eine Anwendung HoopsFoundry UI verwendet, zum Beispiel das kleine Icon im Footer mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf `https://ui.hoopsfoundry.com`. Nicht erlaubt ist sie für abgeleitete Produkte oder so, dass der Eindruck einer Zugehörigkeit zum Projekt oder einer Billigung entsteht. Der Wortlaut steht in [`LICENSE`](LICENSE), Varianten, Mindestgröße und Footer-Beispiel in [`logo/README.md`](logo/README.md) und auf der Storybook-Seite „Foundation/Logo“. Dieser Hinweis ist keine Rechtsberatung.
+
+```html
+<a href="https://ui.hoopsfoundry.com">
+  <img src="logo-icon-farbig.svg" alt="" width="16" height="23" />
+  <span>Powered by HoopsFoundry UI</span>
+</a>
+```
+
+Im Paket: `@hoopsfoundry/ui/logo/logo-icon.svg` (einfarbig, `currentColor`) und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`.
 
 ---
 

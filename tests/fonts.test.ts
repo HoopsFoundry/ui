@@ -32,6 +32,8 @@ describe('Selbst gehostete Schriften', () => {
   it('Storybook lädt nichts von Google', () => {
     const preview = readFileSync(new URL('.storybook/preview.ts', root), 'utf8');
     expect(preview).toContain("../fonts/fonts.css");
-    expect(existsSync(new URL('.storybook/preview-head.html', root))).toBe(false);
+    // preview-head.html darf es geben (Favicon), aber nichts von außen laden
+    const head = new URL('.storybook/preview-head.html', root);
+    if (existsSync(head)) expect(readFileSync(head, 'utf8')).not.toMatch(/https?:\/\/|googleapis|gstatic/);
   });
 });
