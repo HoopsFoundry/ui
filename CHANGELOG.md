@@ -41,6 +41,7 @@ Versionierung folgt [Semantic Versioning](https://semver.org/).
 - Doku: Beschreibende Sätze in Button, Tabelle und Kartenbibliothek sprechen nicht mehr vom „Spielbericht“.
 - **Icons `ft`, `2p`, `3p` sind jetzt Schiedsrichter-Handzeichen** (ein Finger, zwei Finger, zwei Finger mit abgespreiztem Daumen; gefüllte Zeichnung statt Linienzeichnung, `currentColor`, 24 × 24). Namen und Aufrufe bleiben gleich, das Aussehen ändert sich (Play-by-Play, Spielaktionen).
 - **Lückenplan Welle 2 (Prüflücken):** Laufende Ergebniszahlen pulsieren nicht mehr (Kontrast jederzeit ≥ 7:1, vorher hell 4,9:1 im Puls-Tal); die dunkle TopBar bricht in schmalen Spalten um (Mindesthöhe 56 px) statt die Uhr abzuschneiden; Doku-Links und Inline-Code in Storybook mit Seiten-Token. Neue Prüfskripte: `check-browser-matrix.mjs`, `check-csp-boot.mjs`, `check-docs-axe.mjs`.
+- **Storybook-Nacharbeit (nur Doku und Prüfskripte):** Die feststehende Vorschau nimmt untereinander höchstens 60 vh ein, auch mit fester Höhe (Zoom 200 %, Handy quer); Doku-Beispiele auf `Components/Modal` zeigen offene Modale ohne Verhalten und schalten die Seite nicht mehr `inert`; `check-preview-docs.mjs` prüft niedrige Fenster, Sticky auch bei kurzem Text und die Liste per Tastatur; `check-docs-axe.mjs --reflow` prüft 900 und 320 px; unverpackte Tabellen (Button, TextInput) und das Varianten-Raster im Spielplan schieben die Seite bei 320 px nicht mehr.
 
 ## [0.10.0] — 2026-10-17 — Umbenennung auf HoopsFoundry UI, Marken-Rollen und DBB-Marke
 

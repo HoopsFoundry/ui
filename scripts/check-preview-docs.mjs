@@ -8,17 +8,22 @@
  *   node scripts/check-preview-docs.mjs storybook-static --browsers=webkit --filter=components-tabs
  *   node scripts/check-preview-docs.mjs storybook-static --full                # volles Produkt Marke × Theme × Breite × Sprache × Fensterbreite
  *
- * Seiten: alle Docs-Seiten des Builds, die eine Vorschau enthalten. Je Seite laufen vier Kombinationen, die jeden Wert jeder Dimension
- * mindestens einmal abdecken (Fensterbreite 1400, 900, 640 = Zoom 200 % bei 1280, 320; Breite voll, handy, tablet, desktop; Marke, Theme und
- * Sprache wechselnd); `--full` nimmt das volle Produkt. Geprüft wird je Lauf:
+ * Seiten: alle Docs-Seiten des Builds, die eine Vorschau enthalten. Je Seite laufen sechs Kombinationen, die jeden Wert jeder Dimension
+ * mindestens einmal abdecken (Fenster 1400×900, 900×900, 640×900, 320×900; dazu zwei niedrige Fenster, 640×450 = Zoom 200 % bei einem
+ * Fenster von 1280×900 und 844×390 = Handy quer; Breite voll, handy, tablet, desktop; Marke, Theme und Sprache wechselnd); `--full` nimmt das
+ * volle Produkt (die niedrigen Fenster kommen für jede Marke, jedes Theme, jede Breite und jede Sprache hinzu). Geprüft wird je Lauf:
  *  - keine Seitenfehler und keine Konsolenfehler (auch aus den Iframes),
  *  - jede Vorschau und jedes Beispiel einer feststehenden Vorschau rendert (Story sichtbar, keine Fehlermeldung von Storybook),
  *  - der Iframe übernimmt Marke, Theme und Sprache der Seite (Adresse und `data-brand`/`data-theme` im Iframe), seine Breite ist die
  *    gewählte Gerätebreite (bei breiteren Geräten verkleinert per transform) bzw. die Spaltenbreite bei Vollbreite,
  *  - kein seitliches Scrollen durch die Vorschau (Docs-Seite) und keines im Iframe; seitliches Scrollen durch andere Inhalte der Seite wird
  *    als Hinweis gezählt (nicht Teil dieser Prüfung, die Docs-Matrix prüft 1280 und 420 px),
- *  - feststehend: Ist der Abschnitt höher als die Vorschau, steht sie beim Scrollen durch den Abschnitt 16 px (nebeneinander, ab 1100 px)
- *    bzw. 0 px (untereinander) vom oberen Rand,
+ *  - feststehend: `position: sticky` mit `top` 16 px (nebeneinander, ab 1100 px) bzw. 0 px (untereinander) und beim Scrollen durch den
+ *    Abschnitt steht die Vorschau wirklich dort. Ist der Text kürzer als die Vorschau, wird er für die Messung künstlich verlängert (sonst
+ *    gäbe es nichts zu halten und ein fehlendes `sticky` fiele nicht auf),
+ *  - die Liste der Vorschau ist per Tastatur bedienbar und kein Text der Seite ist inert,
+ *  - Reflow (niedrige Fenster): untereinander nimmt die Vorschau samt Liste höchstens 70 % der Fensterhöhe ein (Obergrenze 60 vh, bei
+ *    390 px Höhe greift die Mindesthöhe des Iframes von 160 px) und der Text bleibt darunter mindestens 100 px sichtbar (WCAG 1.4.10),
  *  - automatischer Wechsel (bei 1400 und 900 px): Steht der Anfang eines Abschnitts an der Lesezeile, zeigt die Vorschau sein Beispiel.
  * Die Beispiele werden mit reduzierter Bewegung (`prefers-reduced-motion`) über die Liste gewählt, damit kein automatischer Wechsel dazwischen
  * kommt; den automatischen Wechsel prüft ein eigener Lauf ohne reduzierte Bewegung.
@@ -41,13 +46,19 @@ const DEVICE = { voll: null, handy: 390, tablet: 768, desktop: 1280 }; // wie .s
 const STICKY_TOP = { wide: 16, narrow: 0 }; // wie STICKY_GAP in Preview.tsx und blocks.css
 const WIDE_MIN = 1100;
 const READ_LINE = { wide: 0.3, narrow: 0.62 }; // wie READ_LINE_WIDE und READ_LINE_NARROW in preview-logic.ts
+const SIZES = [[1400, 900], [900, 900], [640, 900], [320, 900], [640, 450], [844, 390]]; // Breite × Höhe des Fensters
+const LOW = 600; // Fenster unter dieser Höhe: Reflow-Prüfung (Zoom 200 %, Handy quer)
+const MAX_ASIDE_SHARE = 0.7; // untereinander: Vorschau samt Liste höchstens so viel der Fensterhöhe
+const MIN_TEXT_VISIBLE = 100; // untereinander: so viel Text bleibt unter der feststehenden Vorschau sichtbar (px)
 const COMBOS = args.full === 'true'
-  ? ['bbv', 'dbb'].flatMap((brand) => ['Light', 'Dark'].flatMap((theme) => Object.keys(DEVICE).flatMap((breite) => ['de', 'en'].flatMap((locale) => [1400, 900, 640, 320].map((width) => ({ brand, theme, breite, locale, width }))))))
+  ? ['bbv', 'dbb'].flatMap((brand) => ['Light', 'Dark'].flatMap((theme) => Object.keys(DEVICE).flatMap((breite) => ['de', 'en'].flatMap((locale) => SIZES.map(([width, height]) => ({ brand, theme, breite, locale, width, height }))))))
   : [
-      { width: 1400, breite: 'voll', brand: 'bbv', theme: 'Light', locale: 'de' },
-      { width: 900, breite: 'handy', brand: 'dbb', theme: 'Dark', locale: 'en' },
-      { width: 640, breite: 'tablet', brand: 'bbv', theme: 'Dark', locale: 'en' },
-      { width: 320, breite: 'desktop', brand: 'dbb', theme: 'Light', locale: 'de' },
+      { width: 1400, height: 900, breite: 'voll', brand: 'bbv', theme: 'Light', locale: 'de' },
+      { width: 900, height: 900, breite: 'handy', brand: 'dbb', theme: 'Dark', locale: 'en' },
+      { width: 640, height: 900, breite: 'tablet', brand: 'bbv', theme: 'Dark', locale: 'en' },
+      { width: 320, height: 900, breite: 'desktop', brand: 'dbb', theme: 'Light', locale: 'de' },
+      { width: 640, height: 450, breite: 'voll', brand: 'bbv', theme: 'Light', locale: 'en' }, // Zoom 200 % bei 1280×900
+      { width: 844, height: 390, breite: 'handy', brand: 'dbb', theme: 'Dark', locale: 'de' }, // Handy quer
     ];
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.woff2': 'font/woff2', '.woff': 'font/woff', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.map': 'application/json' };
 const CONSOLE_IGNORE = [/Download the React DevTools/, /favicon/, /\[HMR\]/];
@@ -76,6 +87,8 @@ const notStarted = [];
 let runs = 0;
 let previewsChecked = 0;
 let stickyMeasured = 0;
+let reflowMeasured = 0;
+let keyboardChecked = 0;
 let autoChecked = 0;
 const otherOverflow = new Set();
 const pagesWithPreview = new Set();
@@ -85,7 +98,7 @@ async function checkCombo(browserName, ctx, id, combo) {
   const errors = [];
   page.on('pageerror', (e) => errors.push(`Seitenfehler: ${String(e.message ?? e).split('\n')[0]}`));
   page.on('console', (m) => { if (m.type() === 'error' && !CONSOLE_IGNORE.some((re) => re.test(m.text()))) errors.push(`Konsole: ${m.text().slice(0, 200)}`); });
-  const label = `${browserName} ${id} [${combo.width}px ${combo.breite} ${combo.brand}/${combo.theme}/${combo.locale}]`;
+  const label = `${browserName} ${id} [${combo.width}×${combo.height} ${combo.breite} ${combo.brand}/${combo.theme}/${combo.locale}]`;
   const fail = (kind, detail) => failures.push({ label, kind, detail });
   try {
     await page.goto(`${origin}/iframe.html?viewMode=docs&id=${id}&globals=brand:${combo.brand};theme:${combo.theme};breite:${combo.breite};locale:${combo.locale}`, { waitUntil: 'networkidle', timeout: 60000 });
@@ -146,16 +159,56 @@ async function checkCombo(browserName, ctx, id, combo) {
         if (!r.fixedTheme && r.theme !== combo.theme.toLowerCase()) fail('Theme', `${where}: data-theme=${r.theme} statt ${combo.theme.toLowerCase()}`);
       }
     }
-    // feststehende Vorschau: in der Mitte des Abschnitts muss die Vorschau am oberen Rand stehen
+    // Liste per Tastatur: der Text der Seite ist nicht inert (offene Modale in Beispielen schalteten sonst die ganze Doku-Seite ab), der Schalter
+    // nimmt den Fokus an und wählt mit Enter sein Beispiel
+    // inert zählt nur, wo der Text der Seite liegt (Überschriften, Absätze, Vorschau, Tabellen); geschlossene Bereiche (`hidden inert`) und die
+    // Don't-Bühnen sind absichtlich inert
+    const inertCount = await page.evaluate(() => [...document.querySelectorAll('.sbdocs-content :is(h1, h2, h3, h4, p, ul, .hoops-sp, .hoops-doc-table-wrap)')].filter((el) => el.closest('[inert]') && !el.closest('[hidden], .hoops-dd-stage')).length);
+    if (inertCount > 0) fail('inert', `${inertCount} Textelemente der Seite sind inert (offene Modale in Beispielen schalten die Seite ab)`);
     for (const sp of await page.locator('.hoops-sp').all()) {
+      const picks = sp.locator('.hoops-sp-pick');
+      if ((await picks.count()) < 2) continue;
+      await picks.nth(1).scrollIntoViewIfNeeded();
+      await picks.nth(1).focus();
+      await page.keyboard.press('Enter');
+      const ok = await picks.nth(1).evaluate((b) => document.activeElement === b && b.getAttribute('aria-pressed') === 'true');
+      if (!ok) fail('Liste per Tastatur', 'der zweite Schalter nimmt den Fokus nicht an oder wählt sein Beispiel nicht');
+      keyboardChecked += 1;
+    }
+    // feststehende Vorschau: position: sticky mit dem erwarteten top, und in der Mitte des Abschnitts steht sie dort
+    const wide = combo.width >= WIDE_MIN;
+    const expect = wide ? STICKY_TOP.wide : STICKY_TOP.narrow;
+    for (const sp of await page.locator('.hoops-sp').all()) {
+      const css = await sp.evaluate((el) => { const cs = getComputedStyle(el.querySelector('.hoops-sp-aside')); return { position: cs.position, top: parseFloat(cs.top) }; });
+      if (css.position !== 'sticky' || css.top !== expect) fail('feststehend', `position ${css.position}, top ${css.top}px statt sticky und ${expect}px`);
+      // Text kürzer als die Vorschau (oder kaum länger): für die Messung einen Abstandhalter ans Ende des Textes setzen, sonst gäbe es
+      // nichts zu halten (position: sticky wirkt nur, solange der Abschnitt höher ist als die Vorschau)
+      const spacer = await sp.evaluate((el) => {
+        const aside = el.querySelector('.hoops-sp-aside').offsetHeight;
+        if (el.offsetHeight - aside >= 600) return false;
+        const pad = document.createElement('div');
+        pad.dataset.pruefAbstand = '';
+        pad.style.height = `${aside + 600}px`;
+        el.querySelector('.hoops-sp-text').append(pad);
+        return true;
+      });
       const m = await sp.evaluate((el) => ({ top: el.getBoundingClientRect().top + scrollY, h: el.offsetHeight, aside: el.querySelector('.hoops-sp-aside').offsetHeight }));
-      if (m.h - m.aside < 120) continue; // Text kürzer als die Vorschau: nichts zu halten
       await page.evaluate((y) => scrollTo(0, y), m.top + (m.h - m.aside) / 2);
       await page.waitForTimeout(250);
-      const top = await sp.evaluate((el) => el.querySelector('.hoops-sp-aside').getBoundingClientRect().top);
-      const expect = combo.width >= WIDE_MIN ? STICKY_TOP.wide : STICKY_TOP.narrow;
+      const at = await sp.evaluate((el) => {
+        const aside = el.querySelector('.hoops-sp-aside').getBoundingClientRect();
+        const text = el.querySelector('.hoops-sp-text').getBoundingClientRect();
+        return { top: aside.top, bottom: aside.bottom, height: aside.height, visible: Math.min(innerHeight, text.bottom) - Math.max(aside.bottom, text.top), vh: innerHeight };
+      });
       stickyMeasured += 1;
-      if (Math.abs(top - expect) > 2) fail('feststehend', `Vorschau steht bei ${Math.round(top)}px statt ${expect}px`);
+      if (Math.abs(at.top - expect) > 2) fail('feststehend', `Vorschau steht bei ${Math.round(at.top)}px statt ${expect}px${spacer ? ' (Text künstlich verlängert)' : ''}`);
+      // Reflow: untereinander darf die Vorschau den Text bei niedrigem Fenster nicht verdecken (Zoom 200 %, Handy quer; WCAG 1.4.10)
+      if (!wide && combo.height < LOW) {
+        reflowMeasured += 1;
+        if (at.height > at.vh * MAX_ASIDE_SHARE) fail('Reflow', `Vorschau samt Liste ${Math.round(at.height)}px hoch bei ${at.vh}px Fensterhöhe (mehr als ${Math.round(MAX_ASIDE_SHARE * 100)} %)`);
+        if (at.visible < MIN_TEXT_VISIBLE) fail('Reflow', `nur ${Math.round(at.visible)}px Text unter der Vorschau sichtbar (mindestens ${MIN_TEXT_VISIBLE}px)`);
+      }
+      if (spacer) await sp.evaluate((el) => el.querySelector('[data-pruef-abstand]')?.remove());
     }
     // seitliches Scrollen: nur, was die Vorschau-Bausteine selbst über den Rand schieben, zählt als Befund
     const over = await page.evaluate(() => {
@@ -219,12 +272,12 @@ try {
     }
     for (const id of DOCS) {
       for (const combo of COMBOS) {
-        const ctx = await browser.newContext({ viewport: { width: combo.width, height: 900 }, colorScheme: combo.theme === 'Dark' ? 'dark' : 'light', reducedMotion: 'reduce' });
+        const ctx = await browser.newContext({ viewport: { width: combo.width, height: combo.height }, colorScheme: combo.theme === 'Dark' ? 'dark' : 'light', reducedMotion: 'reduce' });
         const hasPreview = await checkCombo(name, ctx, id, combo);
         await ctx.close();
         if (!hasPreview) break; // Seite ohne Vorschau: weitere Kombinationen unnötig
-        if (combo.width === 1400 || combo.width === 900) {
-          const auto = await browser.newContext({ viewport: { width: combo.width, height: 900 }, reducedMotion: 'no-preference' });
+        if ((combo.width === 1400 || combo.width === 900) && combo.height === 900) {
+          const auto = await browser.newContext({ viewport: { width: combo.width, height: combo.height }, reducedMotion: 'no-preference' });
           await checkAuto(name, auto, id, combo);
           await auto.close();
         }
@@ -237,8 +290,8 @@ try {
 }
 
 if (requireOneStarted(BROWSERS, versions, notStarted)) {
-  const summary = { browsers: versions, notStarted, pages: [...pagesWithPreview].sort(), combos: COMBOS.length, runs, previewsChecked, stickyMeasured, autoChecked, failures: failures.length, hinweisSeitlichesScrollenAndererInhalte: [...otherOverflow].sort() };
+  const summary = { browsers: versions, notStarted, pages: [...pagesWithPreview].sort(), combos: COMBOS.length, runs, previewsChecked, stickyMeasured, reflowMeasured, keyboardChecked, autoChecked, failures: failures.length, hinweisSeitlichesScrollenAndererInhalte: [...otherOverflow].sort() };
   console.log(JSON.stringify(summary, null, 2));
-  console.log(failures.length === 0 ? `OK: ${runs} Läufe, ${previewsChecked} Vorschauen, ${stickyMeasured} Messungen der feststehenden Vorschau, ${autoChecked} automatische Wechsel ohne Befund` : `${failures.length} Befunde`);
+  console.log(failures.length === 0 ? `OK: ${runs} Läufe, ${previewsChecked} Vorschauen, ${stickyMeasured} Messungen der feststehenden Vorschau (${reflowMeasured} davon Reflow bei niedrigem Fenster), ${keyboardChecked} Listen per Tastatur, ${autoChecked} automatische Wechsel ohne Befund` : `${failures.length} Befunde`);
   if (failures.length) process.exitCode = 1;
 }
