@@ -1,8 +1,13 @@
+import project from '../../project.config.json';
+
+/** Adresse der Projektseite aus project.config.json (die eine Quelle; keine feste Adresse im Code). */
+export const PROJEKT_URL = `https://${project.domain}`;
+
 // Code-Beispiele der Seite „Logo“: das Footer-Icon in HTML, Svelte und React. Die Tests führen sie aus bzw. prüfen sie gegen die Dateien in logo/.
 
 /** Icon neben Text: Der Text benennt den Link, das Bild ist Dekoration (`alt=""`). */
 export const htmlNebenText = `<footer>
-  <a href="https://ui.hoopsfoundry.com">
+  <a href="${PROJEKT_URL}">
     <img src="/assets/logo-icon-farbig.svg" alt="" width="16" height="23" />
     <span>Powered by HoopsFoundry UI</span>
   </a>
@@ -10,7 +15,7 @@ export const htmlNebenText = `<footer>
 
 /** Nur das Icon als Link: Das Bild trägt den Namen des Links. */
 export const htmlAllein = `<footer>
-  <a href="https://ui.hoopsfoundry.com">
+  <a href="${PROJEKT_URL}">
     <img src="/assets/logo-icon-farbig.svg" alt="HoopsFoundry UI" width="16" height="23" />
   </a>
 </footer>`;
@@ -25,7 +30,7 @@ export const cssMaske = `.hoops-powered-icon {
   mask: url('/assets/logo-icon.svg') center / contain no-repeat;
 }`;
 
-export const htmlMaske = `<a href="https://ui.hoopsfoundry.com">
+export const htmlMaske = `<a href="${PROJEKT_URL}">
   <span class="hoops-powered-icon" aria-hidden="true"></span>
   <span>Powered by HoopsFoundry UI</span>
 </a>`;
@@ -35,7 +40,7 @@ export const svelte = `<script>
 </script>
 
 <footer>
-  <a href="https://ui.hoopsfoundry.com">
+  <a href="${PROJEKT_URL}">
     <img src={iconUrl} alt="" width="16" height="23" />
     <span>Powered by HoopsFoundry UI</span>
   </a>
@@ -46,7 +51,7 @@ export const react = `import iconUrl from '@hoopsfoundry/ui/logo/logo-icon-farbi
 export function PoweredBy() {
   return (
     <footer>
-      <a href="https://ui.hoopsfoundry.com">
+      <a href="${PROJEKT_URL}">
         <img src={iconUrl} alt="" width="16" height="23" />
         <span>Powered by HoopsFoundry UI</span>
       </a>

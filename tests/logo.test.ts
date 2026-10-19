@@ -6,6 +6,7 @@ import { describe, expect, it } from 'vitest';
 import * as code from '../stories/Foundation/Logo.code';
 
 const root = new URL('../', import.meta.url);
+const config = JSON.parse(readFileSync(new URL('project.config.json', root), 'utf8')) as { domain: string };
 const read = (p: string) => readFileSync(new URL(p, root), 'utf8');
 
 const ALLE = ['logo-claim.svg', 'logo-claim-hell.svg', 'logo-farbig.svg', 'logo-einfarbig.svg', 'logo-app-icon.svg', 'logo-icon.svg', 'logo-icon-farbig.svg'];
@@ -129,7 +130,7 @@ describe('Doku-Seite Foundation/Logo', () => {
     expect(stories).toMatch(/title: 'Foundation\/Logo'/);
   });
   it('nennt Mindestgrößen, Schutzraum, Footer-Text, Link und die Erlaubnis für Anwender', () => {
-    for (const s of ['16 px Höhe', '40 px Höhe', 'Schutzraum', 'Powered by HoopsFoundry UI', 'https://ui.hoopsfoundry.com', 'alt=""', 'Marke']) expect(mdx, s).toContain(s);
+    for (const s of ['16 px Höhe', '40 px Höhe', 'Schutzraum', 'Powered by HoopsFoundry UI', `https://${config.domain}`, 'alt=""', 'Marke']) expect(mdx, s).toContain(s);
     expect(mdx).toContain('nicht** von der MIT-Lizenz');
   });
   it('jedes Bild der Vorschau hat einen alt-Text; Dekoration ist leer, ein Icon allein hat einen Namen', () => {
@@ -144,6 +145,7 @@ describe('Doku-Seite Foundation/Logo', () => {
     expect(Math.round((16 * 944) / 661)).toBe(23);
   });
   it('Code-Beispiele: Text neben dem Icon, alt leer; Icon allein, alt benannt; Maske zeigt auf die einfarbige Datei', () => {
+    expect(code.htmlNebenText).toContain(`href="https://${config.domain}"`);
     expect(code.htmlNebenText).toContain('alt=""');
     expect(code.htmlNebenText).toContain('Powered by HoopsFoundry UI');
     expect(code.htmlAllein).toMatch(/alt="[^"]+"/);

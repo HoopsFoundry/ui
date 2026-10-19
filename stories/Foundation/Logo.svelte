@@ -1,4 +1,7 @@
 <script>
+  import project from '../../project.config.json';
+  // Projektadresse aus project.config.json (die eine Quelle)
+  const projektUrl = `https://${project.domain}`;
   // Vorschauen der Logo-Seite. Bilder liegen über `staticDirs` (.storybook/main.ts) unter `logo/`, relativ zur Seite.
   let { mode = 'varianten' } = $props();
 
@@ -51,19 +54,19 @@
 {:else if mode === 'footer'}
   <div class="logo-footers">
     <div class="logo-stage logo-stage--footer">
-      <a class="logo-foot" href="https://ui.hoopsfoundry.com">
+      <a class="logo-foot" href={projektUrl}>
         <img src="./logo/logo-icon-farbig.svg" alt="" width="16" height="23" />
         <span>Powered by HoopsFoundry UI</span>
       </a>
     </div>
     <div class="logo-stage logo-stage--seite">
-      <a class="logo-foot logo-foot--seite" href="https://ui.hoopsfoundry.com">
+      <a class="logo-foot logo-foot--seite" href={projektUrl}>
         <span class="logo-maske" style="-webkit-mask: url(./logo/logo-icon.svg) center / contain no-repeat; mask: url(./logo/logo-icon.svg) center / contain no-repeat" aria-hidden="true"></span>
         <span>Powered by HoopsFoundry UI</span>
       </a>
     </div>
     <div class="logo-stage logo-stage--footer">
-      <a class="logo-foot logo-foot--allein" href="https://ui.hoopsfoundry.com">
+      <a class="logo-foot logo-foot--allein" href={projektUrl}>
         <img src="./logo/logo-icon-farbig.svg" alt="HoopsFoundry UI" width="16" height="23" />
       </a>
     </div>

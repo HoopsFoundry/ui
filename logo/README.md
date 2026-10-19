@@ -17,7 +17,7 @@ Das Social-Preview-Bild entsteht mit `node scripts/make-social-preview.mjs` aus 
 
 ## Footer-Icon
 
-Im Paket liegen nur die zwei Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg` und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`. Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf `https://ui.hoopsfoundry.com`. Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
+Im Paket liegen nur die zwei Footer-Icons: `@hoopsfoundry/ui/logo/logo-icon.svg` und `@hoopsfoundry/ui/logo/logo-icon-farbig.svg`. Anwendungen, die HoopsFoundry UI einsetzen, dürfen sie im Footer zeigen, am besten mit dem Text „Powered by HoopsFoundry UI“ und einem Link auf die Projektseite (Adresse: Feld `domain` in `project.config.json`). Steht der Text daneben, bekommt das Bild `alt=""`; steht das Icon allein, trägt `alt` den Namen des Links.
 
 Mindestgröße: Icon ab 16 px Höhe, Logo mit Claim ab 40 px Höhe. Schutzraum: mindestens ein Viertel der Zeichenbreite rundum.
 
