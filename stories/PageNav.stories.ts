@@ -35,7 +35,7 @@ export const Nachladen  = { ...example('nachladen'), tags: ['!dev'] };
 export const Optionen   = { ...example('optionen'), tags: ['!dev'] };
 export const VanillaSeite = { ...example('vanilla'), tags: ['!dev'] };
 export const Handy      = { ...example('handy'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
-export const HandyDunkel = { ...example('handy-dunkel'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
+export const HandyBereiche = { ...example('handy-bereiche'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
 
 // Nach-oben-Knopf: eigene Seiten im Rahmen, weil er am Fenster hängt
 export const NachOben = { render: () => ({ Component: PageNavBackTop, props: { bnav: false } }), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };

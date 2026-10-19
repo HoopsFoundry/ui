@@ -66,11 +66,13 @@ describe('Doku-Seite', () => {
     expect(examples).toMatch(/Falsch: nur ein Symbol, kein Name/);
     expect(examples).toMatch(/class="card fixed"/);
   });
-  it('drei Iframes: Ausprobieren und zwei Handy-Vorschauen mit verschiedenen Inhalten', () => {
-    expect(mdx.match(/<iframe /g)).toHaveLength(3);
-    expect(mdx).toContain('id=foundation-dark-mode--demo"');
-    expect(mdx).toContain('id=foundation-dark-mode--handy"');
-    expect(mdx).toContain('theme:Dark&id=foundation-dark-mode--handy-dunkel');
+  it('drei Vorschauen: Ausprobieren und die einzige Gegenüberstellung hell/dunkel der Doku (feste Themes), verschiedene Inhalte', () => {
+    expect(mdx).not.toMatch(/<iframe /);
+    expect(mdx.match(/<Preview /g)).toHaveLength(3);
+    expect(mdx).toContain('<Preview of={DarkModeStories.Demo} ');
+    expect(mdx).toMatch(/<Preview of=\{DarkModeStories\.Handy\} [^>]*globals=\{\{ theme: 'Light' \}\} \/>/);
+    expect(mdx).toMatch(/<Preview of=\{DarkModeStories\.HandyDunkel\} [^>]*globals=\{\{ theme: 'Dark' \}\} \/>/);
+    expect(mdx).toContain('## Hell und Dunkel nebeneinander');
     expect(examples).toContain('TSV Nordhain 1920');
     expect(examples).toContain('Lindenberg Hawks');
   });
@@ -80,7 +82,7 @@ describe('Doku-Seite', () => {
   it('die Seite nennt defaultMode an beiden Stellen und die geteilten Umschalter; die Vorschau ist hoch genug', () => {
     expect(mdx).toContain("`defaultMode` an beiden Stellen gleich setzen");
     expect(mdx).toContain('Mehrere Umschalter');
-    expect(mdx).toContain("height: '300px'");
+    expect(mdx).toContain('title="Umschalter zum Ausprobieren" height={300}');
     expect(read('README.md')).toContain('`defaultMode` an **beide**');
   });
   it('Einführung, storySort, README und CHANGELOG nennen die Seite', () => {

@@ -54,7 +54,7 @@ export const Zustaende    = { ...example('zustaende'), tags: ['!dev'] };
 export const VanillaKarte     = { ...example('vanilla'), tags: ['!dev'] };
 export const VanillaGeladen   = { ...example('vanilla-geladen'), tags: ['!dev'] };
 export const VanillaHandy     = { ...example('vanilla-handy'), tags: ['!dev'] };
-export const VanillaHandyDunkel = { ...example('vanilla-handy-dunkel'), tags: ['!dev'] };
+export const VanillaHandyGeladen = { ...example('vanilla-handy-geladen'), tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoAdresse       = { ...example('do-adresse'), tags: ['!dev'] };

@@ -53,12 +53,6 @@
 .hoops-doc-k { font-family: var(--hoops-font-mono); font-weight: 600; white-space: nowrap; }
 .hoops-doc-v { font-family: var(--hoops-font-mono); font-size: 12.5px; }
 
-/* Handy-Vorschauen (eingebettete Seiten mit fester Breite) */
-.hoops-phones { display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start; margin: 16px 0 24px; }
-.hoops-phone { max-width: 100%; min-width: 0; }
-.hoops-phone-scroll { max-width: 100%; overflow-x: auto; padding-bottom: 4px; }
-.hoops-phone iframe { display: block; width: 390px; height: 560px; max-width: none; border: 1px solid var(--hoops-page-line); border-radius: 18px; background: var(--hoops-n-0); }
-
 /* Variantenkarten (Abschnitt Auswahl) und Hör-Liste (Barrierefreiheit) */
 .hoops-var-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
 .hoops-var-card { min-width: 0; }
@@ -67,7 +61,7 @@
 .hoops-hear li { font-size: var(--hoops-fs-body-sm); line-height: 1.5; border-left: 3px solid var(--hoops-page-line); padding-left: 12px; }
 @media (max-width: 760px) { .hoops-hear { grid-template-columns: minmax(0, 1fr); } }
 
-/* Überschrift als Beschriftung (Handy-Vorschau): Storybook färbt h4 fest dunkel, hier folgt sie dem Theme */
+/* Überschrift als Beschriftung: Storybook färbt h4 fest dunkel, hier folgt sie dem Theme */
 .sbdocs h4.hoops-doc-cap { font-family: var(--hoops-font-mono); font-size: var(--hoops-fs-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--hoops-page-mute); margin: 0 0 8px; }
 
 /* Inline-Code in Tabellenzellen: Storybook färbt code fest dunkelgrau, im Dunkelmodus unlesbar */
@@ -97,6 +91,7 @@
 .hoops-preview-name { font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 .hoops-preview-stage { width: 100%; min-width: 0; }
 .hoops-preview-box { margin: 0 auto; max-width: 100%; overflow: hidden; border-radius: 12px; box-shadow: 0 0 0 1px var(--hoops-page-line); background: var(--hoops-page-bg); }
+.hoops-preview-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 24px; margin: 16px 0 24px; } /* nur Seite Dark Mode: hell und dunkel nebeneinander */
 .hoops-preview-box iframe { display: block; max-width: none; border: 0; transform-origin: 0 0; background: transparent; }
 
 /* Feststehende Vorschau (StickyPreview): untereinander steht die Vorschau oben fest (höchstens 50 vh, berechnet in Preview.tsx), der Text

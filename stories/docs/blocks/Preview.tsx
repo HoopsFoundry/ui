@@ -69,12 +69,14 @@ export type PreviewProps = {
   title: string;
   /** kleinste Höhe in px, etwa für Modale (position: fixed meldet keine Höhe) */
   minHeight?: number;
+  /** feste Höhe in px statt der Inhaltshöhe: der Iframe scrollt selbst (etwa für „Nach oben“ in einer langen Seite) */
+  height?: number;
   /** feste Globals statt der Werte der Seite, z. B. `{ theme: 'Dark' }` (nur Seite Dark Mode) */
   globals?: Record<string, string>;
 };
 
 /** Eine Story als Iframe in der gewählten Breite. Nur Storybook-Doku. */
-export function Preview({ of, title, minHeight = 0, globals: overrides }: PreviewProps) {
+export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals: overrides }: PreviewProps) {
   const { storyId, globals } = usePageGlobals(of);
   const breite = breiteOf(globals);
   const src = previewSrc(storyId, globals, overrides);
@@ -144,7 +146,7 @@ export function Preview({ of, title, minHeight = 0, globals: overrides }: Previe
 
   useLayoutEffect(updateCap, [contentHeight, updateCap]);
 
-  const layout = previewLayout({ breite, available, contentHeight, cap, minHeight });
+  const layout = previewLayout({ breite, available, contentHeight, cap, minHeight, fixedHeight });
   return (
     <figure className="hoops-preview" ref={rootRef} data-hoops-preview={storyId} data-breite={breite}>
       <figcaption className="hoops-preview-meta">
@@ -168,7 +170,7 @@ export function Preview({ of, title, minHeight = 0, globals: overrides }: Previe
   );
 }
 
-export type PreviewStepProps = { of: Of; title: string; minHeight?: number; globals?: Record<string, string>; children?: ReactNode };
+export type PreviewStepProps = { of: Of; title: string; minHeight?: number; height?: number; globals?: Record<string, string>; children?: ReactNode };
 
 /** Ein Abschnitt der feststehenden Vorschau: Text links (bzw. darunter), das Beispiel in der Vorschau. Nur innerhalb von `StickyPreview`. */
 export function PreviewStep(_props: PreviewStepProps): null {
@@ -213,6 +215,16 @@ export function StickyPreview({ children, level = 3, listLabel = 'Beispiel in de
     return () => io.disconnect();
   }, [auto, wide, steps.length]);
 
+  // Wahl über die Liste: Im automatischen Wechsel rückt der Abschnitt ohne Animation an die Lesezeile, damit Text und Vorschau
+  // übereinstimmen und der nächste Scroll nicht sofort zurückwechselt. Bei reduzierter Bewegung bleibt die Seite stehen.
+  const pick = (i: number) => {
+    setActive(i);
+    const el = stepRefs.current[i];
+    if (!auto || !el) return;
+    const line = window.innerHeight * (wide ? READ_LINE_WIDE : READ_LINE_NARROW);
+    window.scrollBy({ top: el.getBoundingClientRect().top - line + 1, behavior: 'instant' as ScrollBehavior });
+  };
+
   const current = steps[Math.min(active, steps.length - 1)];
   if (!current) return null;
   const H = level === 4 ? 'h4' : 'h3';
@@ -233,13 +245,13 @@ export function StickyPreview({ children, level = 3, listLabel = 'Beispiel in de
         {steps.length > 1 && (
           <div className="hoops-sp-list" role="group" aria-label={listLabel}>
             {steps.map((s, i) => (
-              <button key={s.props.title} type="button" className="hoops-sp-pick" aria-pressed={i === active} onClick={() => setActive(i)}>
+              <button key={s.props.title} type="button" className="hoops-sp-pick" aria-pressed={i === active} onClick={() => pick(i)}>
                 {s.props.title}
               </button>
             ))}
           </div>
         )}
-        <Preview of={current.props.of} title={current.props.title} minHeight={current.props.minHeight} globals={current.props.globals} />
+        <Preview of={current.props.of} title={current.props.title} minHeight={current.props.minHeight} height={current.props.height} globals={current.props.globals} />
       </div>
     </div>
   );

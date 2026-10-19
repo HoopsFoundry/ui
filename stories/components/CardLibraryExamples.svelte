@@ -83,7 +83,7 @@
     <MatchCard state="finished" league="Bayernliga Süd" matchday="16. Spieltag" logos heim={{ ...NORDHAIN, score: 92 }} gast={{ ...HAWKS, score: 79 }} />
   </div>
 {:else if example === 'namen-handy'}
-  <div class="narrow">
+  <div class="device">
     <MatchCard state="scheduled" league="Bayernliga Süd" date="Sa, 25. Mai" time="19:30" logos heim={NORDHAIN} gast={HAWKS} />
   </div>
 {:else if example === 'spieler'}
@@ -132,7 +132,7 @@
     </div>
   </div>
 {:else if example === 'spieler-foto-handy'}
-  <div class="narrow">
+  <div class="device">
     <PlayerCard size="hero" jersey="4" name="J. Tanner" position="PG" captain age="24 J." height_cm="188" photo={PLAYERS.tanner.photo} vitals={[{ label: 'PPG', value: '17.4', accent: true }, { label: 'APG', value: '6.2' }, { label: 'STL', value: '2.1' }, { label: '3P%', value: '41.8' }]} />
   </div>
 {:else if example === 'spieler-foto-fallback'}
@@ -258,6 +258,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 18px; align-items: start; }
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 18px; }
   .stack { display: flex; flex-direction: column; gap: 28px; }

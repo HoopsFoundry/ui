@@ -163,7 +163,7 @@
     {@render mock()}
     {@render staticModal({ id: 'hm', severity: 'warn', title: 'Anwurfzeit nach 22:00 Uhr', subtitle: 'Hallenordnung prüfen', body: 'Die Halle schließt um 23:00, Spielzeit und Verlängerung passen evtl. nicht hinein.', safe: 'Zeit ändern', ok: 'Trotzdem ansetzen' })}
   </div>
-{:else if example === 'handy-dunkel'}
+{:else if example === 'handy-verwerfen'}
   <div class="frame phone">
     {@render mock()}
     {@render staticModal({ id: 'hd', severity: 'danger', title: 'Spielbericht verwerfen?', subtitle: 'Nicht wiederherstellbar', body: 'Alle erfassten Aktionen werden gelöscht. Das lässt sich nicht rückgängig machen.', safe: 'Behalten', danger: 'Verwerfen', ring: 'safe' })}
@@ -211,7 +211,7 @@
   .mock-h { font-family: var(--hoops-font-display); font-weight: 700; }
   .mock-l { height: 10px; border-radius: 5px; background: var(--hoops-page-line); }
   .mock-s { width: 60%; }
-  .phone { max-width: 390px; height: 520px; }
+  .phone { height: 520px; } /* Vorschau in Gerätebreite: volle Breite des Iframes, feste Höhe für das Modal */
   .page { padding: 24px; display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
   .page-t { margin: 0; font-family: var(--hoops-font-display); font-weight: 700; color: var(--hoops-page-fg); }
   .matrix { display: flex; flex-direction: column; gap: 16px; }

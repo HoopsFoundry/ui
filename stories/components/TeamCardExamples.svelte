@@ -113,7 +113,7 @@
     </div>
   </div>
 {:else if example === 'handy'}
-  <div class="narrow">
+  <div class="device">
     <TeamCard {...TEAM} stats={STATS} href="#nordhain" />
     <div class="gap"></div>
     <div class="list">
@@ -179,6 +179,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); gap: 18px; }
   .col { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
   .list { display: flex; flex-direction: column; gap: 8px; }

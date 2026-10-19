@@ -85,6 +85,7 @@ function logicRules(m: Logic) {
     desktop: m.previewLayout({ breite: 'desktop', available: 640, contentHeight: 300, cap: 400 }),
     voll: m.previewLayout({ breite: 'voll', available: 581.6, contentHeight: 200, cap: 700, minHeight: 300 }),
     tall: m.previewLayout({ breite: 'desktop', available: 640, contentHeight: 2000, cap: 400 }),
+    fixed: m.previewLayout({ breite: 'handy', available: 600, contentHeight: 2000, cap: 700, fixedHeight: 350 }),
     active: [m.activeStep([100, 400, 900], 270), m.activeStep([300, 400], 270), m.activeStep([-500, -100, 260], 270)],
     auto: [m.autoSwitchAllowed(false, undefined), m.autoSwitchAllowed(true, undefined), m.autoSwitchAllowed(false, 'reduce')],
   };
@@ -98,6 +99,7 @@ const LOGIC_OK = {
   voll: { width: 581, height: 300, scale: 1, visualWidth: 581, visualHeight: 300, label: 'Vollbreite · 581 px' },
   // sichtbare Höhe bleibt bei der Grenze (400), im Iframe also 800 px bei halber Größe
   tall: { width: 1280, height: 800, scale: 0.5, visualWidth: 640, visualHeight: 400, label: 'Desktop · 1280 px, verkleinert auf 50 %' },
+  fixed: { width: 390, height: 350, scale: 1, visualWidth: 390, visualHeight: 350, label: 'Handy · 390 px' },
   active: [0, 0, 2],
   auto: [true, false, false],
 };
@@ -110,7 +112,8 @@ describe('Regeln der Vorschau (preview-logic.ts)', () => {
     ['ohne Verkleinerung', 'const scale = width > avail ? avail / width : 1;', 'const scale = 1;'],
     ['Breite nicht übernommen', 'const width = device ?? avail;', 'const width = avail;'],
     ['Grenze ohne Skalierung', 'Math.min(wanted, visualCap / scale)', 'Math.min(wanted, visualCap)'],
-    ['Mindesthöhe vergessen', 'const wanted = Math.max(minHeight, contentHeight || minHeight || 320);', 'const wanted = contentHeight || 320;'],
+    ['feste Höhe übergangen', 'const wanted = fixedHeight ?? Math.max(', 'const wanted = Math.max('],
+    ['Mindesthöhe vergessen', 'Math.max(minHeight, contentHeight || minHeight || 320);', 'Math.max(contentHeight || 320);'],
     ['Theme nicht übernommen', "'brand', 'theme', 'locale'", "'brand', 'locale'"],
     ['Überschreibung verloren', 'const merged: Record<string, unknown> = { ...globals, ...overrides };', 'const merged: Record<string, unknown> = { ...overrides, ...globals };'],
     ['Trennzeichen eingeschleust', "const SAFE = /^[A-Za-z0-9_-]+$/;", 'const SAFE = /./;'],
@@ -165,7 +168,9 @@ class FakeIO {
   disconnect() {}
 }
 let reduced = false;
+const scrollBy = vi.fn();
 beforeAll(() => {
+  vi.stubGlobal('scrollBy', scrollBy);
   vi.stubGlobal('ResizeObserver', FakeRO);
   vi.stubGlobal('IntersectionObserver', FakeIO);
   vi.stubGlobal('matchMedia', (q: string) => ({ matches: q.includes('reduced-motion') ? reduced : q.includes(`${WIDE_MIN}px`), addEventListener() {}, removeEventListener() {} }));
@@ -173,6 +178,7 @@ beforeAll(() => {
 });
 afterEach(() => {
   cleanup();
+  scrollBy.mockClear();
   ios.length = 0;
   reduced = false;
   delete document.documentElement.dataset.motion;
@@ -225,6 +231,9 @@ describe('StickyPreview', () => {
     expect(container.querySelector('.hoops-sp-step[data-active] .hoops-sp-badge')?.textContent).toBe('In der Vorschau');
     await act(async () => buttons[1].click());
     expect(screen.getByTitle('Vorschau: Verein').getAttribute('src')).toContain('components-tabs--handy-verein');
+    // automatischer Wechsel: der gewählte Abschnitt rückt ohne Animation an die Lesezeile
+    expect(scrollBy).toHaveBeenCalledTimes(1);
+    expect(scrollBy.mock.calls[0][0]).toMatchObject({ behavior: 'instant' });
     expect(screen.getAllByRole('button')[1].getAttribute('aria-pressed')).toBe('true');
     expect(container.querySelectorAll('.hoops-sp-step')[1].hasAttribute('data-active')).toBe(true);
   });
@@ -247,6 +256,9 @@ describe('StickyPreview', () => {
     expect(ios).toHaveLength(0);
     expect(container.querySelector('.hoops-sp')?.getAttribute('data-auto')).toBe('false');
     expect(screen.getAllByRole('button')).toHaveLength(2);
+    act(() => screen.getAllByRole('button')[1].click());
+    expect(screen.getByTitle('Vorschau: Verein')).toBeInTheDocument();
+    expect(scrollBy).not.toHaveBeenCalled();
   });
   it('ein einzelnes Beispiel braucht keine Liste und keine Marke', () => {
     const docs = fakeDocs({});

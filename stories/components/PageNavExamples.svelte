@@ -77,14 +77,14 @@
 {:else if example === 'vanilla'}
   <div class="page" use:vanillaPage></div>
 {:else if example === 'handy'}
-  <div class="narrow page" use:nav={{ selector: 'h3', label: 'Auf dieser Seite: Handy hell', syncHash: false }}>
+  <div class="device page" use:nav={{ selector: 'h3', label: 'Auf dieser Seite: Handy', syncHash: false }}>
     <h3>Tabelle</h3><p>Platz 3 von 12.</p>
     <h3>Spielplan</h3><p>Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle gegen die Lindenberg Hawks.</p>
     <h3>Kader und Trainerstab</h3><p>Zehn Spieler im Aufgebot.</p>
     <h3>Statistik der laufenden Saison</h3><p>Im Schnitt 82,4 Punkte.</p>
   </div>
-{:else if example === 'handy-dunkel'}
-  <div class="narrow page" use:nav={{ selector: 'h3:not(.hoops-acc-title), h4', label: 'Auf dieser Seite: Handy dunkel', syncHash: false }}>
+{:else if example === 'handy-bereiche'}
+  <div class="device page" use:nav={{ selector: 'h3:not(.hoops-acc-title), h4', label: 'Auf dieser Seite: Handy mit Bereichen', syncHash: false }}>
     <h3>Übersicht</h3><p>Zwei geschlossene Bereiche.</p>
     <Accordion syncHash={false}>
       <AccordionItem id="pnd-kader" title="Kader"><h4>Torhüter</h4><p>Zwei Torhüter.</p><h4>Guards</h4><p>Vier Guards.</p></AccordionItem>
@@ -128,6 +128,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .page { box-sizing: border-box; max-width: 640px; padding: 14px 18px; background: var(--hoops-surface); border: 1px solid var(--hoops-line); border-radius: var(--hoops-radius-lg); color: var(--hoops-fg); }
   .page :global(h3) { margin: 18px 0 6px; font-size: var(--hoops-fs-h3); line-height: var(--hoops-lh-h3); }
   .page :global(h3:first-child) { margin-top: 0; }

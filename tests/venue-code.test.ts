@@ -131,13 +131,13 @@ describe('Doku', () => {
   });
   it('Beispiele rendern, jede Halle höchstens einmal je Seite (landmark-unique) und die Don\'t-Stages sind inert', async () => {
     const Examples = ((await vite.ssrLoadModule(`${rootDir}stories/components/VenueCardExamples.svelte`)) as { default: unknown }).default;
-    // 'handy' und 'handy-dunkel' erscheinen als Iframes (eigene Dokumente), alle anderen stehen inline auf einer Seite
+    // 'handy' und 'handy-andere-hallen' erscheinen als Vorschau-Iframes (eigene Dokumente), alle anderen stehen inline auf einer Seite
     // Die Vanilla-Beispiele entstehen erst im Browser (mountVenueCard in einer Svelte-Aktion): im Server-Rendering ist der Behälter leer
-    const browserOnly = ['vanilla', 'vanilla-handy', 'vanilla-handy-dunkel'];
-    const iframes = ['handy', 'handy-dunkel', ...browserOnly];
+    const browserOnly = ['vanilla', 'vanilla-handy', 'vanilla-handy-kompakt'];
+    const iframes = ['handy', 'handy-andere-hallen', ...browserOnly];
     const names = [...stories.matchAll(/example\('([\w-]+)'\)/g)].map((m) => m[1]);
     const labelsOf = (n: string) => render(Examples, { props: { example: n } }).body.match(/aria-label="Karte: [^"]*"/g) ?? [];
-    expect(labelsOf('handy').filter((l) => labelsOf('handy-dunkel').includes(l))).toEqual([]);
+    expect(labelsOf('handy').filter((l) => labelsOf('handy-andere-hallen').includes(l))).toEqual([]);
     const seen = new Map<string, string>();
     for (const name of names.filter((n) => !iframes.includes(n))) {
       const html = render(Examples, { props: { example: name } }).body;
@@ -155,7 +155,7 @@ describe('Doku', () => {
       const block = examples.slice(examples.indexOf(`example === '${name}'`));
       return Number(block.match(/venueProps\((\d+)\)/)![1]);
     };
-    const mine = ['vanilla', 'vanilla-handy', 'vanilla-handy-dunkel'].map(indexOf);
+    const mine = ['vanilla', 'vanilla-handy', 'vanilla-handy-kompakt'].map(indexOf);
     expect(new Set(mine).size).toBe(3);
     const vanillaStart = examples.indexOf("example === 'vanilla'");
     const vanillaEnd = examples.indexOf("example === 'zustaende'");
@@ -180,7 +180,7 @@ describe('Doku', () => {
     for (const phone of data.match(/030 \d{5} \d{3}/g) ?? []) expect(phone, phone).toMatch(/^030 23125 \d{3}$/);
   });
   it('Seite nennt Datenschutz mit Verweis auf die Map, Größen, Handy, Dunkelmodus, Zustände, Props, Code und Dos/Don\'ts', () => {
-    for (const needle of ['## Aufbau', '## Karte und Datenschutz', 'components-map--docs', '## Größen', '## Handy', 'Containerbreite ohne den 1 px breiten Rand', '**Breite der Karte**', 'Rand der Trikotpunkte', '258 px (30 %)', 'handy-dunkel', '## Dunkelmodus', '## Zustände', '<Controls of=', '<DocTable', '<FrameworkCode', '## Dos und Don\'ts', '**Vanilla:**']) expect(mdx, needle).toContain(needle);
+    for (const needle of ['## Aufbau', '## Karte und Datenschutz', 'components-map--docs', '## Größen', '## Vorschau in Gerätebreite', 'Containerbreite ohne den 1 px breiten Rand', '**Breite der Karte**', 'Rand der Trikotpunkte', '258 px (30 %)', 'VenueCardStories.HandyAndereHallen', '## Dunkelmodus', '## Zustände', '<Controls of=', '<DocTable', '<FrameworkCode', '## Dos und Don\'ts', '**Vanilla:**']) expect(mdx, needle).toContain(needle);
     expect((mdx.match(/title: '/g) ?? []).length).toBeGreaterThanOrEqual(3);
   });
   it('Einträge in Introduction, storySort, README und CHANGELOG', () => {

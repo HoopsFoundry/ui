@@ -32,6 +32,8 @@ export type PreviewLayoutInput = {
   cap: number;
   /** kleinste Höhe in px (z. B. für Modale mit position: fixed, deren Inhalt keine Höhe meldet) */
   minHeight?: number;
+  /** feste Höhe in px statt der Inhaltshöhe (z. B. eine lange Seite, in der der Iframe selbst scrollt) */
+  fixedHeight?: number;
 };
 
 export type PreviewLayout = {
@@ -53,14 +55,14 @@ export type PreviewLayout = {
  * damit die Story trotzdem diese Breite sieht. Vollbreite nimmt die Spalte. Die Höhe folgt dem Inhalt, begrenzt auf `cap` (sichtbar) und
  * mindestens `minHeight`; ist der Inhalt höher, scrollt er im Iframe.
  */
-export function previewLayout({ breite, available, contentHeight, cap, minHeight = 0 }: PreviewLayoutInput): PreviewLayout {
+export function previewLayout({ breite, available, contentHeight, cap, minHeight = 0, fixedHeight }: PreviewLayoutInput): PreviewLayout {
   const avail = Math.max(1, Math.floor(available));
   const device = BREITEN[breite].width;
   const width = device ?? avail;
   const scale = width > avail ? avail / width : 1;
   const visualCap = Math.max(1, cap);
   // Höhe im Iframe so wählen, dass die sichtbare Höhe (height * scale) die Grenze nicht überschreitet
-  const wanted = Math.max(minHeight, contentHeight || minHeight || 320);
+  const wanted = fixedHeight ?? Math.max(minHeight, contentHeight || minHeight || 320);
   const height = Math.max(1, Math.round(Math.min(wanted, visualCap / scale)));
   const pct = Math.round(scale * 100);
   const name = device === null ? `Vollbreite · ${width} px` : BREITEN[breite].title;

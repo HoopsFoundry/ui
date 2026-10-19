@@ -33,7 +33,7 @@ export const Form       = { ...example('form'), tags: ['!dev'] };
 export const Tabelle    = { ...example('tabelle'), tags: ['!dev'] };
 export const VanillaMarkup = { ...example('vanilla'), tags: ['!dev'] };
 export const Handy      = { ...example('handy'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
-export const HandyDunkel = { ...example('handy-dunkel'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
+export const HandyKompakt = { ...example('handy-kompakt'), parameters: { controls: { disable: true }, layout: 'fullscreen' }, tags: ['!dev'] };
 
 // Dos und Don'ts: nur in der Doku. Der Tag steht als Literal an jeder Story (der Indexer liest keine Funktionsrückgaben).
 export const DoFarbe    = { ...example('do-farbe'), tags: ['!dev'] };

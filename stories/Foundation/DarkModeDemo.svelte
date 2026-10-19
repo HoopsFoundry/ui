@@ -67,13 +67,13 @@
     </div>
   </div>
 {:else if example === 'handy'}
-  <div class="narrow demo" use:demo>
+  <div class="device demo" use:demo>
     <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>{t('theme.toggle')}</span></p>
     <div class="card"><strong>TSV Nordhain 1920</strong><p>Platz 3 von 12 in der Bayernliga Süd.</p></div>
     <dl class="report"><div><dt>Modus</dt><dd>{report.mode}</dd></div><div><dt>aria-pressed</dt><dd>{report.pressed}</dd></div></dl>
   </div>
 {:else if example === 'handy-dunkel'}
-  <div class="narrow demo" use:demo>
+  <div class="device demo" use:demo>
     <p class="row"><button type="button" class="hoops-btn hoops-btn--secondary hoops-btn--icon" hidden></button><span>{t('theme.toggle')}</span></p>
     <div class="card"><strong>Lindenberg Hawks</strong><p>Nächstes Spiel: Samstag, 19:30 Uhr.</p></div>
     <dl class="report"><div><dt>Zustand</dt><dd>{report.state}</dd></div><div><dt>aria-pressed</dt><dd>{report.pressed}</dd></div></dl>
@@ -117,6 +117,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .demo { max-width: 520px; padding: 16px; color: var(--hoops-fg); background: var(--hoops-surface); font-family: var(--hoops-font-body); }
   .narrow { max-width: 380px; }
   .row { display: flex; align-items: center; gap: 12px; margin: 0 0 14px; font-size: var(--hoops-fs-body-md); color: var(--hoops-page-fg); }

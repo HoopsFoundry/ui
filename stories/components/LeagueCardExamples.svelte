@@ -120,7 +120,7 @@
     <LeagueCard {...COMMON} title={LIGEN[17]} teams={mid} size="compact" logos names="short" />
   </div>
 {:else if example === 'handy'}
-  <div class="narrow">
+  <div class="device">
     <LeagueCard {...COMMON} title={LIGEN[18]} teams={mid} columns={['won', 'lost', 'diff', 'form']} logos live={2} />
     <div class="gap"></div>
     <LeagueCard {...COMMON} title={LIGEN[19]} teams={demoTable(11, { zones: true })} size="compact" columns={['diff']} />
@@ -212,6 +212,7 @@
 {/if}
 
 <style>
+  .device { box-sizing: border-box; width: 100%; padding: 12px; } /* Vorschau in Gerätebreite: volle Breite des Iframes */
   .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); gap: 18px; align-items: start; }
   .grid1 { display: flex; flex-direction: column; gap: 18px; min-width: 0; max-width: 640px; }
   .links { margin: 0; font-size: var(--hoops-fs-body-sm); color: var(--hoops-page-fg); }
