@@ -21,7 +21,7 @@ Content-Security-Policy: Die Bündel brauchen nur `script-src 'self'` und `style
 
 === Marke und Logo
 
-Das Logo und der Name HoopsFoundry sind von der MIT-Lizenz des Codes ausgenommen und Marke des Projektinhabers (`LICENSE`, `README.md`, `logo/README.md`, Storybook-Seite `Foundation/Logo`): Nutzung nur zur Kennzeichnung des Projekts oder als Hinweis „verwendet HoopsFoundry UI“, nicht für abgeleitete Produkte oder mit dem Eindruck von Zugehörigkeit oder Billigung. Das Footer-Icon im Paket folgt den Zugänglichkeitsregeln: neben Text `alt=""`, allein mit sprechendem `alt`, Zielgröße mindestens 24 px. Logo-Bilder kommen aus dem eigenen Ursprung (`img-src 'self'` genügt, keine Änderung an `deploy/htaccess`). Der Wortlaut des Markenhinweises ist keine Rechtsberatung und vom Projektinhaber zu prüfen.
+Das Logo und der Name HoopsFoundry sind von der MIT-Lizenz des Codes ausgenommen und Marke des Projektinhabers (`LICENSE`, `README.md`, `logo/README.md`, Storybook-Seite `Foundation/Logo`): Nutzung nur zur Kennzeichnung des Projekts oder als Hinweis „verwendet HoopsFoundry UI“, nicht für abgeleitete Produkte oder mit dem Eindruck von Zugehörigkeit oder Billigung. Das Footer-Icon im Paket folgt den Zugänglichkeitsregeln: neben Text `alt=""`, allein mit sprechendem `alt`, Zielgröße mindestens 24 px. Logo-Bilder kommen aus dem eigenen Ursprung (`img-src 'self'` genügt, keine Änderung an `deploy/htaccess`). Farben: eine Signalfarbe S2 `#f2561d` für Hell und Dunkel, Ash `#24292f` statt Schwarz (ADR-015); Logos sind nach WCAG 2 von der Kontrastpflicht ausgenommen, die Doku nennt die Messwerte. Der Wortlaut des Markenhinweises ist keine Rechtsberatung und vom Projektinhaber zu prüfen.
 
 === Datenschutz
 

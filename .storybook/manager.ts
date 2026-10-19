@@ -1,7 +1,7 @@
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming';
 
-// Marke in der Seitenleiste: Logo mit Claim. Das Logo ist schwarz, deshalb gibt es für den dunklen Modus die helle Fassung
+// Marke in der Seitenleiste: Logo mit Claim. Das Logo ist Ash (dunkelgrau), deshalb gibt es für den dunklen Modus die helle Fassung
 // (logo/logo-claim-hell.svg). Der Manager folgt der Einstellung des Geräts (`prefers-color-scheme`); die Bilder liegen über
 // `staticDirs` (main.ts) unter `logo/`. Der Pfad ist relativ, damit die Doku auch unter einem Unterpfad (Webspace, GitHub Pages) lädt.
 const scheme = window.matchMedia('(prefers-color-scheme: dark)');
