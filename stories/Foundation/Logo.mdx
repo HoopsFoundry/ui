@@ -10,7 +10,7 @@ import '../docs/blocks/blocks.css';
 
 # Logo
 
-Das Zeichen von HoopsFoundry UI zeigt ein H, einen Korb-Ring, einen Spieler und ein F in der Signalfarbe Orangerot (`#f2561d`). Es gibt es als Logo mit Claim, als Zeichen allein, als einfarbige Fassung und als App-Icon, die farbigen Fassungen jeweils für hellen und für dunklen Grund. Für den **Footer** von Anwendungen, die HoopsFoundry UI einsetzen, liefert das npm-Paket ein kleines Icon in drei Fassungen mit (einfarbig, farbig für hellen und farbig für dunklen Grund). Die großen Logos bleiben im Repository.
+Das Zeichen von HoopsFoundry UI zeigt ein H, einen Korb-Ring, einen Spieler und ein F in der Signalfarbe Orangerot (`#f2561d`). Es gibt es als Logo mit Claim, als Wortmarke ohne Claim, als Zeichen allein, als einfarbige Fassung und als App-Icon, die farbigen Fassungen jeweils für hellen und für dunklen Grund. Für den **Footer** von Anwendungen, die HoopsFoundry UI einsetzen, liefert das npm-Paket ein kleines Icon in drei Fassungen mit (einfarbig, farbig für hellen und farbig für dunklen Grund). Die großen Logos bleiben im Repository.
 
 ## Varianten
 
@@ -24,6 +24,8 @@ Das Logo hat **eine** Signalfarbe, das Orangerot S2 (`#f2561d`), für hellen und
   rows={[
     ['logo-claim.svg', 'Logo mit Wortmarke und Claim auf hellem Grund (README, Präsentationen, Doku); Zeichen und „Hoops“ Ash, „Foundry“ S2, Claim Ash', 'nein'],
     ['logo-claim-hell.svg', 'dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2, Claim hellgrau (`#c9d1d9`)', 'nein'],
+    ['logo-wortmarke.svg', 'Wortmarke ohne Claim für hellen Grund, für enge Stellen wie die Seitenleiste dieser Doku; Zeichen und „Hoops“ Ash, „Foundry“ S2', 'nein'],
+    ['logo-wortmarke-hell.svg', 'dieselbe Fassung für dunklen Grund: Zeichen und „Hoops“ weiß, „Foundry“ S2', 'nein'],
     ['logo-farbig.svg', 'Zeichen allein für hellen Grund, Ash mit F in S2', 'nein'],
     ['logo-farbig-dunkel.svg', 'Zeichen allein für dunklen Grund, weiß mit F in S2', 'nein'],
     ['logo-einfarbig.svg', 'Zeichen allein in einer Farbe (currentColor), etwa für Druck oder Stempel', 'nein'],
@@ -80,7 +82,7 @@ Was daraus folgt:
 
 ## Mindestgröße und Schutzraum
 
-Das Footer-Icon ist ein Hochformat (661 zu 944). Es bleibt ab **16 px Höhe** als Zeichen erkennbar (H und Ring; das F ist dort nur noch ein orangeroter Block, lesbar wird es ab etwa 24 px). Für den Footer sind 16 bis 32 px gedacht. Beim Logo mit Claim ist der Claim auf hellem Grund ab etwa 40 px Höhe zu entziffern und ab **48 px Höhe** gut lesbar (gerendert bei 24, 32, 40, 48 und 64 px verglichen). Kleiner gehören nur das Zeichen oder das Icon hin, nie das Logo mit Claim.
+Das Footer-Icon ist ein Hochformat (661 zu 944). Es bleibt ab **16 px Höhe** als Zeichen erkennbar (H und Ring; das F ist dort nur noch ein orangeroter Block, lesbar wird es ab etwa 24 px). Für den Footer sind 16 bis 32 px gedacht. Beim Logo mit Claim ist der Claim auf hellem Grund ab etwa 40 px Höhe zu entziffern und ab **48 px Höhe** gut lesbar (gerendert bei 24, 32, 40, 48 und 64 px verglichen). Die **Wortmarke ohne Claim** (Zeichen und „HoopsFoundry“) ist ein Querformat (4645 zu 944) und bleibt ab **24 px Höhe** lesbar (bei 24, 28, 32 und 40 px sowie bei 16 und 20 px gerendert verglichen: ab 20 px noch zu entziffern, bei 16 px sind die Buchstaben zu klein). Die Seitenleiste dieser Doku zeigt sie mit 30 px Höhe. **Welche Fassung?** Das Logo mit Claim gehört in große Köpfe (Introduction, README, Präsentationen) ab 48 px Höhe. Wo es niedriger sein muss, steht die Wortmarke ohne Claim (ab 24 px). Wo auch sie nicht mehr passt, steht das Zeichen oder das Footer-Icon. Das Logo mit Claim kommt nie unter 48 px.
 
 <Canvas of={LogoStories.Groessen} />
 

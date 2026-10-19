@@ -9,9 +9,10 @@ const root = new URL('../', import.meta.url);
 const config = JSON.parse(readFileSync(new URL('project.config.json', root), 'utf8')) as { domain: string };
 const read = (p: string) => readFileSync(new URL(p, root), 'utf8');
 
-const ALLE = ['logo-claim.svg', 'logo-claim-hell.svg', 'logo-farbig.svg', 'logo-farbig-dunkel.svg', 'logo-einfarbig.svg', 'logo-app-icon.svg', 'logo-app-icon-dunkel.svg', 'favicon.svg', 'logo-icon.svg', 'logo-icon-farbig.svg', 'logo-icon-farbig-dunkel.svg'];
+const ALLE = ['logo-claim.svg', 'logo-claim-hell.svg', 'logo-wortmarke.svg', 'logo-wortmarke-hell.svg', 'logo-farbig.svg', 'logo-farbig-dunkel.svg', 'logo-einfarbig.svg', 'logo-app-icon.svg', 'logo-app-icon-dunkel.svg', 'favicon.svg', 'logo-icon.svg', 'logo-icon-farbig.svg', 'logo-icon-farbig-dunkel.svg'];
 const ICONS = ['logo-icon.svg', 'logo-icon-farbig.svg', 'logo-icon-farbig-dunkel.svg']; // im npm-Paket
 const DUNKEL_ZEICHEN = ['logo-farbig-dunkel.svg', 'logo-icon-farbig-dunkel.svg']; // Zeichen weiß, nie Ash
+const WORTMARKE = ['logo-wortmarke.svg', 'logo-wortmarke-hell.svg']; // Wortmarke ohne Claim (Repository und Doku, nicht im Paket)
 const S2 = '#f2561d'; // die eine Signalfarbe (hell und dunkel)
 const ASH = '#24292f'; // Ash: ersetzt das Schwarz (Zeichen, "Hoops", Claim hell, Kachel des App-Icons)
 const CLAIM_DUNKEL = '#c9d1d9'; // Claim auf dunklem Grund
@@ -34,6 +35,7 @@ function svgProbleme(name: string, src: string): string[] {
   if (name === 'logo-app-icon.svg' && !src.includes(`style="fill:${ASH};"`)) p.push('Kachel nicht in Ash');
   if (name === 'logo-app-icon.svg' && !/fill:white/.test(src)) p.push('weißes Zeichen fehlt');
   // Dunkle Fassungen: invertiert, Ash kommt nie als Zeichen auf dunklem Grund vor
+  if (name === 'logo-wortmarke-hell.svg' && src.includes(ASH)) p.push('dunkle Fassung enthält Ash (Ash nie auf dunkler Fläche)');
   if (DUNKEL_ZEICHEN.includes(name) && !/\sfill="#fff"/.test(root)) p.push('dunkle Fassung: Zeichen nicht weiß');
   if (DUNKEL_ZEICHEN.includes(name) && src.includes(ASH)) p.push('dunkle Fassung enthält Ash (Ash nie auf dunkler Fläche)');
   if (name === 'logo-app-icon-dunkel.svg') {
@@ -45,8 +47,8 @@ function svgProbleme(name: string, src: string): string[] {
     if (!src.includes(`.k{fill:${ASH}}`) || !src.includes('.z{fill:#fff}')) p.push('Favicon: helle Fassung (Kachel Ash, Zeichen weiß) fehlt');
     if (!src.includes(`dark){.k{fill:#fff}.z{fill:${ASH}}`)) p.push('Favicon: dunkle Fassung nicht invertiert');
   }
-  if (['logo-farbig.svg', 'logo-icon-farbig.svg', 'logo-claim.svg'].includes(name) && !new RegExp(`\\sfill="${ASH}"`).test(root)) p.push('Zeichen nicht in Ash (Grundfüllung fehlt)');
-  if (name === 'logo-claim-hell.svg' && !/\sfill="#fff"/.test(root)) p.push('weiße Füllung fehlt');
+  if (['logo-farbig.svg', 'logo-icon-farbig.svg', 'logo-claim.svg', 'logo-wortmarke.svg'].includes(name) && !new RegExp(`\\sfill="${ASH}"`).test(root)) p.push('Zeichen nicht in Ash (Grundfüllung fehlt)');
+  if (['logo-claim-hell.svg', 'logo-wortmarke-hell.svg'].includes(name) && !/\sfill="#fff"/.test(root)) p.push('weiße Füllung fehlt');
   // Logo mit Claim: "Foundry" und F in der Signalfarbe (8 Pfade), der Claim (24 Pfade) neutral: Ash auf hellem, hellgrau auf dunklem Grund
   if (name.startsWith('logo-claim')) {
     const i = src.indexOf('matrix(1.29129');
@@ -57,7 +59,14 @@ function svgProbleme(name: string, src: string): string[] {
     const soll = name === 'logo-claim.svg' ? ASH : CLAIM_DUNKEL;
     if (claim.length !== 24 || !claim.every((c) => c === soll)) p.push(`Claim ist nicht neutral (erwartet: 24 Pfade in ${soll})`);
   }
-  if (name.startsWith('logo-claim') && /<text/.test(src)) p.push('Text muss als Pfade vorliegen');
+  // Wortmarke ohne Claim: dieselben Pfade wie das Logo mit Claim ohne die Claim-Glyphen (14 Pfade, davon 8 in S2), kein <text>
+  if (WORTMARKE.includes(name)) {
+    if (src.includes('matrix(1.29129')) p.push('Gruppe mit den Claim-Glyphen ist noch da');
+    if ((src.match(/<path\b/g) ?? []).length !== 14) p.push('erwartet: 14 Pfade (Zeichen und Wortmarke, ohne Claim)');
+    if ((src.match(/fill:#f2561d/g) ?? []).length !== 8) p.push('Foundry und F sind nicht in der Signalfarbe (erwartet: 8 Pfade in #f2561d)');
+    if (!/viewBox="0 0 4645 944"/.test(root)) p.push('viewBox nicht eng auf die Wortmarke gesetzt (erwartet: 0 0 4645 944)');
+  }
+  if ((name.startsWith('logo-claim') || WORTMARKE.includes(name)) && /<text/.test(src)) p.push('Text muss als Pfade vorliegen');
   return p;
 }
 
@@ -79,6 +88,8 @@ describe('SVG-Dateien', () => {
     expect(vb('favicon.svg')).toEqual(vb('logo-app-icon.svg'));
     expect(vb('logo-claim.svg').slice(2)).toEqual([4645, 989]);
     expect(vb('logo-claim-hell.svg')).toEqual(vb('logo-claim.svg'));
+    expect(vb('logo-wortmarke.svg').slice(2)).toEqual([4645, 944]);
+    expect(vb('logo-wortmarke-hell.svg')).toEqual(vb('logo-wortmarke.svg'));
     const [, , w, h] = vb('logo-app-icon.svg');
     expect(Math.abs(w - h)).toBeLessThanOrEqual(1);
   });
@@ -89,6 +100,21 @@ describe('SVG-Dateien', () => {
     for (const n of DUNKEL_ZEICHEN) expect(paths(read(`logo/${n}`)), n).toEqual(paths(read('logo/logo-farbig.svg')));
     for (const n of ['logo-app-icon-dunkel.svg', 'favicon.svg']) expect(paths(read(`logo/${n}`)), n).toEqual(paths(read('logo/logo-app-icon.svg')));
   });
+  it('die Wortmarke ist das Logo mit Claim ohne die Claim-Glyphen (gleiche Pfade, keine Gestaltungsänderung)', () => {
+    const paths = (s: string) => [...s.matchAll(/ d="([^"]+)"/g)].map((m) => m[1]);
+    const claimPfade = paths(read('logo/logo-claim.svg'));
+    expect(claimPfade).toHaveLength(38);
+    expect(paths(read('logo/logo-wortmarke.svg'))).toEqual(claimPfade.slice(0, 14));
+    expect(paths(read('logo/logo-wortmarke-hell.svg'))).toEqual(claimPfade.slice(0, 14));
+    expect(read('logo/logo-wortmarke.svg')).not.toContain('matrix(1.29129');
+  });
+  it('die Wortmarken-Dateien liegen nicht im npm-Paket', () => {
+    const pkg = JSON.parse(read('package.json')) as { files: string[]; exports: Record<string, string> };
+    for (const n of WORTMARKE) {
+      expect(pkg.files).not.toContain(`logo/${n}`);
+      expect(pkg.exports[`./logo/${n}`]).toBeUndefined();
+    }
+  });
   it('Mutationsprobe: verfälschte Kopien fallen durch', () => {
     const claim = read('logo/logo-claim.svg');
     expect(svgProbleme('logo-claim.svg', claim.replace('fill:#f2561d', 'fill:#000000'))).toContain('Foundry und F sind nicht in der Signalfarbe (erwartet: 8 Pfade in #f2561d)');
@@ -98,6 +124,17 @@ describe('SVG-Dateien', () => {
     expect(svgProbleme('logo-app-icon.svg', read('logo/logo-app-icon.svg').replace('fill:#24292f', 'fill:black'))).toContain('Kachel nicht in Ash');
     expect(svgProbleme('logo-claim.svg', claim.replace('</svg>', '<text>x</text></svg>'))).toContain('Text muss als Pfade vorliegen');
     expect(svgProbleme('logo-claim-hell.svg', read('logo/logo-claim-hell.svg').replace(' fill="#fff"', ''))).toContain('weiße Füllung fehlt');
+    // Wortmarke ohne Claim
+    const wm = read('logo/logo-wortmarke.svg');
+    expect(svgProbleme('logo-wortmarke.svg', wm)).toEqual([]);
+    expect(svgProbleme('logo-wortmarke.svg', wm.replace('</svg>', '<g transform="matrix(1.29129,0,0,1.29129,0,0)"><path d="M0,0" style="fill:#24292f;"/></g></svg>'))).toContain('Gruppe mit den Claim-Glyphen ist noch da');
+    expect(svgProbleme('logo-wortmarke.svg', wm.replace('viewBox="0 0 4645 944"', 'viewBox="0 0 4645 989"'))).toContain('viewBox nicht eng auf die Wortmarke gesetzt (erwartet: 0 0 4645 944)');
+    expect(svgProbleme('logo-wortmarke.svg', wm.replace('fill:#f2561d', 'fill:#000000'))).toContain('Foundry und F sind nicht in der Signalfarbe (erwartet: 8 Pfade in #f2561d)');
+    expect(svgProbleme('logo-wortmarke.svg', wm.replace('fill="#24292f"', ''))).toContain('Zeichen nicht in Ash (Grundfüllung fehlt)');
+    expect(svgProbleme('logo-wortmarke.svg', wm.replace('</svg>', '<text>x</text></svg>'))).toContain('Text muss als Pfade vorliegen');
+    const wmHell = read('logo/logo-wortmarke-hell.svg');
+    expect(svgProbleme('logo-wortmarke-hell.svg', wmHell)).toEqual([]);
+    expect(svgProbleme('logo-wortmarke-hell.svg', wmHell.replace(' fill="#fff"', ' fill="#24292f"'))).toEqual(expect.arrayContaining(['weiße Füllung fehlt', 'dunkle Fassung enthält Ash (Ash nie auf dunkler Fläche)']));
     const farbig = read('logo/logo-farbig.svg');
     expect(svgProbleme('logo-farbig.svg', farbig.replace('<svg ', '<svg width="100%" '))).toContain('feste Breite oder Höhe am Wurzelelement');
     expect(svgProbleme('logo-farbig.svg', farbig.replace(/ viewBox="[^"]*"/, ''))).toContain('viewBox fehlt oder ist nicht ganzzahlig');
@@ -149,15 +186,30 @@ describe('npm-Paket', () => {
 });
 
 describe('Storybook', () => {
-  it('die Marke nutzt das Logo mit Claim, hell und dunkel, über relative Pfade', () => {
+  it('die Marke in der Seitenleiste nutzt die Wortmarke ohne Claim, hell und dunkel, über relative Pfade', () => {
     const m = read('.storybook/manager.ts');
     expect(m).toContain("from 'storybook/theming'");
-    expect(m).toContain('./logo/logo-claim.svg');
-    expect(m).toContain('./logo/logo-claim-hell.svg');
+    expect(m).toContain("'./logo/logo-wortmarke.svg'");
+    expect(m).toContain("'./logo/logo-wortmarke-hell.svg'");
+    expect(m).not.toContain("'./logo/logo-claim");
     expect(m).toMatch(/brandTitle: '[^']+'/);
     expect(m).toContain('prefers-color-scheme: dark');
-    for (const n of ['logo-claim.svg', 'logo-claim-hell.svg']) expect(existsSync(new URL(`logo/${n}`, root))).toBe(true);
+    for (const n of WORTMARKE) expect(existsSync(new URL(`logo/${n}`, root))).toBe(true);
     expect(m).not.toMatch(/https?:\/\//);
+  });
+  it('die Introduction zeigt das Logo mit Claim als zwei Bilder (hell, dunkel), die das CSS nach Umschalter und Betriebssystem umschaltet', () => {
+    const intro = read('stories/Introduction.mdx');
+    expect(intro).toContain('src="./logo/logo-claim.svg"');
+    expect(intro).toContain('src="./logo/logo-claim-hell.svg"');
+    expect(intro).not.toContain('<picture');
+    expect(intro.indexOf('hoops-logo-kopf')).toBeLessThan(intro.indexOf('# HoopsFoundry UI'));
+    for (const img of intro.match(/<img\b[^>]*>/g) ?? []) expect(img).toMatch(/alt="[^"]+"/);
+    const css = read('stories/docs/blocks/blocks.css');
+    expect(css).toContain('.hoops-logo-kopf .hoops-logo-dunkel { display: none; }');
+    expect(css).toContain(':root[data-theme="dark"] .hoops-logo-kopf .hoops-logo-hell { display: none; }');
+    expect(css).toContain(':root[data-theme="dark"] .hoops-logo-kopf .hoops-logo-dunkel { display: block; }');
+    expect(css).toContain(':root:not([data-theme="light"]) .hoops-logo-kopf .hoops-logo-hell { display: none; }');
+    expect(css).toContain(':root:not([data-theme="light"]) .hoops-logo-kopf .hoops-logo-dunkel { display: block; }');
   });
   it('staticDirs liefert logo/ unter logo/ aus', () => {
     expect(read('.storybook/main.ts')).toMatch(/staticDirs: \[\{ from: '\.\.\/logo', to: '\/logo' \}\]/);
@@ -187,7 +239,7 @@ describe('Doku-Seite Foundation/Logo', () => {
     expect(stories).toMatch(/title: 'Foundation\/Logo'/);
   });
   it('nennt Mindestgrößen, Schutzraum, Footer-Text, Link und die Erlaubnis für Anwender', () => {
-    for (const s of ['16 px Höhe', '48 px Höhe', 'Schutzraum', 'Powered by HoopsFoundry UI', `https://${config.domain}`, 'alt=""', 'Marke']) expect(mdx, s).toContain(s);
+    for (const s of ['16 px Höhe', '24 px Höhe', '48 px Höhe', 'Wortmarke ohne Claim', 'Schutzraum', 'Powered by HoopsFoundry UI', `https://${config.domain}`, 'alt=""', 'Marke']) expect(mdx, s).toContain(s);
     expect(mdx).toContain('nicht** von der MIT-Lizenz');
   });
   it('jedes Bild der Vorschau hat einen alt-Text; Dekoration ist leer, ein Icon allein hat einen Namen', () => {

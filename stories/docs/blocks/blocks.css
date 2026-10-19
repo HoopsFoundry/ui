@@ -115,3 +115,15 @@
 .hoops-sp-pick[aria-pressed="true"] { background: var(--hoops-page-fg); border-color: var(--hoops-page-fg); color: var(--hoops-page-bg); font-weight: 700; }
 .hoops-sp-pick[aria-pressed="true"]::before { content: '✓ ' / ''; } /* Zeichen nur sichtbar, der Zustand kommt über aria-pressed */
 .hoops-sp-pick:focus-visible { outline: var(--hoops-ring-w) var(--hoops-ring-style) var(--hoops-ring-color); outline-offset: 2px; }
+
+/* Logo mit Claim im Kopf der Introduction: zwei Bilder, je Modus eins sichtbar (display:none nimmt das andere auch Hilfstechnik).
+   Ein <picture> mit media-Abfrage folgte nur dem Betriebssystem, nicht dem Umschalter Hell/Dunkel (data-theme auf <html>). Mindesthöhe 48 px (Doku Foundation/Logo). */
+.hoops-logo-kopf { margin: 0 0 24px; }
+.hoops-logo-kopf img { display: block; width: min(100%, 360px); height: auto; max-width: 100%; }
+.hoops-logo-kopf .hoops-logo-dunkel { display: none; }
+:root[data-theme="dark"] .hoops-logo-kopf .hoops-logo-hell { display: none; }
+:root[data-theme="dark"] .hoops-logo-kopf .hoops-logo-dunkel { display: block; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .hoops-logo-kopf .hoops-logo-hell { display: none; }
+  :root:not([data-theme="light"]) .hoops-logo-kopf .hoops-logo-dunkel { display: block; }
+}
