@@ -1,4 +1,5 @@
 <script>
+  import { t } from '../../js/i18n/index.js';
   import { onMount } from 'svelte';
   import AppNav from '../../svelte/AppNav.svelte';
   import TopBar from '../../svelte/TopBar.svelte';
@@ -63,7 +64,7 @@
                       <div class="hoops-appnav-bar">
                         <button type="button" class="hoops-appnav-toggle {stateClass[c]}" style="display: inline-flex" aria-expanded="false">
                           <svg class="hoops-icon" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><use href="#i-menu"></use></svg>
-                          <span>Menü</span>
+                          <span>{t('appnav.menu')}</span>
                         </button>
                       </div>
                     </nav>

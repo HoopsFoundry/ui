@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localizeMarkup } from '../docs/localize-markup';
   import { initAll } from '../../js/vanilla-core.js';
   import { initBackToTop } from '../../js/backtop.js';
   import { initPageNav } from '../../js/pagenav.js';
@@ -18,7 +19,7 @@
 
   // Vanilla-Beispiel: dasselbe Markup wie im Code-Beispiel, gestartet mit initAll
   function vanillaPage(node: HTMLElement) {
-    node.replaceChildren(document.createRange().createContextualFragment(pageMarkup.replace('<main ', '<div ').replace('</main>', '</div>').replace(/<h1>[^<]*<\/h1>/, '<h3>Verein Nordhain</h3>').replace(/<h2/g, '<h3').replace(/<\/h2>/g, '</h3>')));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(pageMarkup).replace('<main ', '<div ').replace('</main>', '</div>').replace(/<h1>[^<]*<\/h1>/, '<h3>Verein Nordhain</h3>').replace(/<h2/g, '<h3').replace(/<\/h2>/g, '</h3>')));
     const root = node.querySelector<HTMLElement>('[data-hoops="pagenav"]');
     // Die Beispiel-Seite benutzt h3 statt h2; die Auswahl ist eine Option (am Element als JSON)
     root?.setAttribute('data-hoops-options', JSON.stringify({ label: 'Auf dieser Seite: Vanilla-Beispiel', selector: 'h3:not(:first-child), [data-pagenav]' }));
@@ -40,7 +41,7 @@
 </script>
 
 {#if example === 'aufbau'}
-  <div class="page" use:nav={{ selector: 'h3', label: 'Auf dieser Seite' }}>
+  <div class="page" use:nav={{ selector: 'h3' }}>
     <h3>Tabelle</h3><p>Platz 3 von 12 in der Bayernliga Süd, 12 Siege, 3 Niederlagen.</p>
     <h3>Spielplan</h3><p>Nächstes Spiel: Samstag, 19:30 Uhr in der Nordhain-Halle.</p>
     <h3>Kader</h3><p>Zehn Spieler im Aufgebot, dazu zwei Trainer.</p>

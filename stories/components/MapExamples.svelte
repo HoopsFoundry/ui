@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../../js/i18n/index.js';
   import MapView from '../../svelte/Map.svelte';
   import { pinElement } from '../../js/map-leaflet.js';
   import { mountMap } from '../../js/map-vanilla.js';
@@ -95,7 +96,7 @@
           {#each stateName as name, i (name)}
             <div class="cell">
               <div class="colhead">{name}</div>
-              <button type="button" class={`hoops-map-zoom-btn ${stateClass[i]}`} aria-label={`Vergrößern (${name})`} aria-disabled={i === 3 ? 'true' : undefined}>
+              <button type="button" class={`hoops-map-zoom-btn ${stateClass[i]}`} aria-label={`${t('map.zoom-in')} (${name})`} aria-disabled={i === 3 ? 'true' : undefined}>
                 <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M10 4v12M4 10h12" /></svg>
               </button>
             </div>
@@ -129,12 +130,12 @@
           {#each ['', 'pseudo-hover', 'pseudo-focus-visible'] as cls, i (i)}
             <div class="cell">
               <div class="colhead">{stateName[i]}</div>
-              <button type="button" class={`hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load ${cls}`}>Karte laden</button>
+              <button type="button" class={`hoops-btn hoops-btn--primary hoops-btn--md hoops-map-load ${cls}`}>{t('map.load')}</button>
             </div>
           {/each}
           <div class="cell">
             <div class="colhead">Quellenangabe · Fokus</div>
-            <p class="hoops-map-attr attr-static"><a class="pseudo-focus-visible" href="https://www.openstreetmap.org/copyright">© OpenStreetMap-Mitwirkende</a></p>
+            <p class="hoops-map-attr attr-static"><a class="pseudo-focus-visible" href="https://www.openstreetmap.org/copyright">{t('map.attribution')}</a></p>
           </div>
         </div>
       </div>

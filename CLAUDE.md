@@ -41,7 +41,7 @@ Docs sind MDX-Seiten je Komponente in `stories/` (`X.mdx`, `X.stories.ts`, `X.co
 - Beispiel-Stories, die nur in der Doku erscheinen, tragen das **literale** `tags: ['!dev']` im Story-Objekt (der Indexer liest keine Tags aus Hilfsfunktionen).
 - `remark-gfm` ist nicht installiert: Tabellen über `DocTable`, nicht Markdown-Tabellen.
 - „Don't"-Beispiele in `DosDonts` sind `inert`; mehrere gleiche Komponenten auf einer Seite brauchen eindeutige Titel/Labels (axe `landmark-unique`); vor dem ersten Beispiel steht eine `##`-Überschrift (`heading-order`).
-- Neue Seiten in `stories/Introduction.mdx` und im `storySort` in `.storybook/preview.ts` eintragen. Toolbar-Globals: Marke, Typ (`dbb`), Framework, Zustand (Hover/Fokus erzwingen), Bewegung, Sprache (`locale`: `de` Start, `en`; der Decorator ruft `setLocale`); Theme-Werte in URLs sind `Dark`/`Light`. Die Doku-Texte bleiben deutsch.
+- Neue Seiten in `stories/Introduction.mdx` und im `storySort` in `.storybook/preview.ts` eintragen. Toolbar-Globals: Marke, Typ (`dbb`), Framework, Zustand (Hover/Fokus erzwingen), Bewegung, Sprache (`locale`: `de` Start, `en`; `applyLocale` aus `.storybook/locale.ts` läuft als `beforeEach` und ruft `setLocale`, `<html lang="de">`); Theme-Werte in URLs sind `Dark`/`Light`. Die Doku-Texte bleiben deutsch.
 - Zahlen und Aussagen in der Doku werden gegen CSS/Browser gemessen und von Tests geprüft (`tests/*-docs.test.ts`, `*-code.test.ts` führen die Beispiele aus); nichts schätzen.
 
 ## Qualitätsregeln (WCAG 2.2 AAA als Ziel)

@@ -11,10 +11,11 @@ import './storybook.css';
 import { installPseudoStates } from './pseudo-states';
 import { setForcedState, type ForcedState } from './state-switch';
 // Sprache der Bausteine: Die Bibliothek startet mit Englisch (Katalog im Kern), dieser Import registriert den deutschen Katalog. Welche Sprache
-// gilt, wählt der Umschalter „Sprache“ in der Werkzeugleiste (Global `locale`, Start `de`, weil die Doku-Texte deutsch sind); der Decorator unten
-// ruft `setLocale`. Svelte-Komponenten rendern über das Abonnement am Kern neu, gemountete Vanilla-Bausteine über `hoops:localechange`.
+// gilt, wählt der Umschalter „Sprache“ in der Werkzeugleiste (Global `locale`, Start `de`, weil die Doku-Texte deutsch sind). `applyLocale`
+// läuft als `beforeEach` vor jedem Rendern, nicht im Decorator (dort liefe `setLocale` mitten im Svelte-Rendern); nach einem Wechsel baut
+// Storybook die Stories neu auf (neue Knoten, Fokus auf `body`). `<html lang>` ist `de`, die Sprache der Doku-Texte.
 import '../js/i18n/de-register.js';
-import { getLocale, setLocale } from '../js/i18n/index.js';
+import { applyLocale } from './locale';
 
 const preview: Preview = {
   globalTypes: {
@@ -107,6 +108,10 @@ const preview: Preview = {
     }
   },
   parameters: {
+    // Sprache der Doku für Hilfstechnik: Storybook setzt `lang` an den Docs-Inhalt (`docs.lang`) und an jede eingebettete Story (`htmlLang`),
+    // Standard wäre `en`. Die Doku ist deutsch; Bausteine in Englisch tragen dann `lang="en"` an ihrer Wurzel.
+    htmlLang: 'de',
+    docs: { lang: 'de' },
     controls: {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },
@@ -131,6 +136,10 @@ const preview: Preview = {
       config: { rules: [{ id: 'color-contrast', enabled: true }] },
     },
   },
+  // Sprache vor jedem Rendern (auch nach einem Wechsel der Globals), außerhalb des Svelte-Renderns; siehe .storybook/locale.ts
+  beforeEach: [(context) => {
+    applyLocale(context.globals);
+  }],
   decorators: [
     (story, context) => {
       installPseudoStates(); // idempotent: Kopien der Hover-/Fokus-/Active-Regeln für feste Zustands-Vorschauen
@@ -145,10 +154,6 @@ const preview: Preview = {
       if (context.globals.motion === 'reduce') document.documentElement.dataset.motion = 'reduce';
       else delete document.documentElement.dataset.motion;
       setForcedState((context.globals.state ?? 'normal') as ForcedState);
-      // Sprache der Bausteine (Umschalter „Sprache“): nur bei einem Wechsel setzen, sonst meldete jeder Durchlauf allen Abonnenten eine Änderung.
-      // Svelte-Komponenten und gemountete Vanilla-Bausteine folgen dem Kern ohne Neuaufbau der Story.
-      const locale = context.globals.locale === 'en' ? 'en' : 'de';
-      if (getLocale() !== locale) setLocale(locale);
       return story();
     },
     withThemeByDataAttribute({

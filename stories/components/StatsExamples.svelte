@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localizeMarkup } from '../docs/localize-markup';
   import StatGrid from '../../svelte/StatGrid.svelte';
   import FormChips from '../../svelte/FormChips.svelte';
   import LeagueCard from '../../svelte/LeagueCard.svelte';
@@ -24,7 +25,7 @@
 
   // Vanilla-Beispiele: dasselbe Markup wie im Code-Beispiel
   function fragment(node: HTMLElement, html: string) {
-    node.replaceChildren(document.createRange().createContextualFragment(html));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(html)));
   }
 </script>
 

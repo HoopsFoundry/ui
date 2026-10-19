@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '../../js/i18n/index.js';
   import Table from '../../svelte/Table.svelte';
   import Accordion from '../../svelte/Accordion.svelte';
   import { boxscore, roster, signClass } from './tableData';
@@ -81,7 +82,7 @@
       <div class="row">
         <span class="hoops-pill-s">Bank</span>
         <span class="hoops-pill-s on">Aktiv</span>
-        <span class="hoops-pill-s cap">Kapitän</span>
+        <span class="hoops-pill-s cap">{t('player.captain')}</span>
         <span class="hoops-pill-s dnp">DNP</span>
       </div>
     </div>

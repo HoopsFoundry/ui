@@ -20,10 +20,10 @@ Die Bausteine bringen eigene Texte mit: Beschriftungen („Karte laden“, „Na
 - **Ein Kern für alle Fassungen:** `@hoopsfoundry/ui/i18n` mit `setLocale`, `getLocale`, `t`, `registerLocale`, `setTexts`, `subscribe`. Svelte, React und die Vanilla-Bündel lesen denselben Zustand (er liegt unter `globalThis[Symbol.for('hoops.i18n')]`, auch wenn mehrere Kopien des Kerns auf der Seite sind).
 - **Kataloge:** Englisch ist im Kern eingebaut. Deutsch kommt über `@hoopsfoundry/ui/i18n/de` bzw. ohne Build über `hoops-i18n-de.js`; das Modul registriert sich beim Import. Beide Kataloge haben {katalog.schluessel} Schlüssel aus {katalog.bausteine} Bereichen, davon {katalog.mehrzahl} mit Mehrzahlformen und {katalog.platzhalter} mit Platzhaltern.
 - **Zur Laufzeit umschaltbar:** Ein Aufruf von `setLocale` stellt alle sichtbaren Bausteine um, ohne Neuladen und ohne dass Fokus, offene Bereiche oder Auswahl verloren gehen. Eine Live-Region sagt dabei nichts an.
-- **`lang` am Baustein:** Weicht die Sprache eines Bausteins von `document.documentElement.lang` ab, trägt seine Wurzel `lang` (Hilfstechnik liest dann richtig vor). Verglichen wird die Basissprache: `de-AT` und `de` gelten als gleich.
+- **`lang` am Baustein:** Weicht die Sprache eines Bausteins von `document.documentElement.lang` ab, trägt seine Wurzel `lang` (Hilfstechnik liest dann richtig vor). Maßgeblich ist die Sprache des Katalogs, der die Texte liefert (`resolvedLocale`); verglichen wird die Basissprache, `de-AT` und `de` gelten als gleich.
 - **Zahlen** (Dezimalkomma, Tausender, Koordinaten) laufen über `Intl` in der gewählten Sprache.
 
-Die Beispiele auf dieser Seite folgen dem Umschalter **Sprache** in der Werkzeugleiste (Deutsch oder English). Die Doku-Texte bleiben deutsch; Vorschauen im eigenen Rahmen (iframe) auf anderen Seiten behalten ihre Einstellung.
+Die eingebauten Texte der Beispiele folgen dem Umschalter **Sprache** in der Werkzeugleiste (Deutsch oder English); Storybook baut die Vorschauen dabei neu auf. Deutsch bleiben die Doku-Texte, der Code der Beispiele und Demodaten, die eine Anwendung selbst übergäbe (Namen, Titel, Schritte des Steppers). Vorschauen im eigenen Rahmen (iframe) auf anderen Seiten behalten ihre Einstellung.
 
 ## Beispiel: dieselben Bausteine in der gewählten Sprache
 
@@ -31,7 +31,7 @@ Svelte-Komponenten (LeagueCard, Stepper, Formleiste mit Buchstaben). Schalte die
 
 <Canvas of={I18nStories.SvelteSprache} />
 
-Dieselbe Karte ohne Framework, eingesetzt mit `mountLeagueCard`. Sie folgt dem Umschalter über das Ereignis `hoops:localechange` und wird mit gleichem Zustand neu eingesetzt:
+Dieselbe Karte ohne Framework, eingesetzt mit `mountLeagueCard`. In einer Anwendung folgt sie einem späteren `setLocale` über das Ereignis `hoops:localechange` und wird mit gleichem Zustand neu eingesetzt (hier in Storybook baut der Umschalter die Vorschau ohnehin neu auf):
 
 <Canvas of={I18nStories.VanillaSprache} />
 
@@ -100,8 +100,8 @@ Jede Änderung (`setLocale`, `registerLocale`, `setTexts`) meldet der Kern seine
   label="Verhalten bei unbekannter Sprache"
   head={['Aufruf', 'getLocale()', 'Texte', 'Hinweis']}
   rows={[
-    [<code>setLocale('de')</code>, <code>'de'</code>, 'Deutsch', <>nur nach dem Import von <code>@hoopsfoundry/ui/i18n/de</code>; sonst englische Texte wie in der nächsten Zeile</>],
-    [<code>setLocale('fr')</code>, <code>'fr'</code>, 'Englisch (Rückfall)', <>keine Warnung; Zahlen nach französischen Regeln; weicht die Seite ab, trägt der Baustein <code>lang="fr"</code>, obwohl der Text englisch ist. Katalog vorher registrieren.</>],
+    [<code>setLocale('de')</code>, <code>'de'</code>, 'Deutsch', <>nur nach dem Import von <code>@hoopsfoundry/ui/i18n/de</code>; ohne Import englische Texte und <code>lang="en"</code> wie in der nächsten Zeile</>],
+    [<code>setLocale('fr')</code>, <code>'fr'</code>, 'Englisch (Rückfall)', <>keine Warnung; Zahlen nach französischen Regeln. <code>lang</code> folgt der Sprache der Texte (<code>resolvedLocale('fr')</code> ist <code>'en'</code>): auf einer deutschen Seite trägt der Baustein <code>lang="en"</code>. Mit registriertem Katalog <code>fr</code> gilt <code>lang="fr"</code>.</>],
     [<code>setLocale('de_AT')</code>, <code>'de-AT'</code>, 'Deutsch (Basissprache)', 'Unterstrich wird zu Bindestrich, die Schreibweise vereinheitlicht'],
     [<code>setLocale('xx!!')</code>, <code>'en'</code>, 'Englisch', 'ungültiger Code: einmalige Warnung in der Entwicklung, dann gilt en'],
     [<code>t('gibt.es.nicht')</code>, '–', 'der Schlüssel selbst', 'einmalige Warnung in der Entwicklung'],
@@ -121,12 +121,12 @@ Für alle, die einen Katalog schreiben: eine neue Sprache für die eigene Anwend
 ### Platzhalter
 
 - **`{name}`** steht für einen Wert, den der Baustein einsetzt (`{count}`, `{team}`, `{rank}`). Namen nicht übersetzen, nicht umbenennen, nicht weglassen; die Reihenfolge im Satz bestimmt die Sprache (`{number}. Viertel`, `Quarter {number}`).
-- **Ein Platzhalter ohne Wert bleibt sichtbar stehen** (`{label}`), ein fehlender Schlüssel erscheint als Schlüssel. Das Prüfskript meldet beides vorher: einen Platzhalter, der anders heißt als im englischen Text, und einen fehlenden Schlüssel.
+- **Ein Platzhalter ohne Wert bleibt sichtbar stehen** (`{label}`), ein Schlüssel, der in der Sprache fehlt, fällt auf die Basissprache und dann auf Englisch zurück; nur wenn er auch im englischen Katalog fehlt, erscheint der Schlüssel selbst. Das Prüfskript meldet beides vorher: einen Platzhalter, der anders heißt als im englischen Text, und einen fehlenden Schlüssel.
 - **Kein Markup in Werten.** Wo im Satz ein Element steht (der Teamname in `{team} hat Freilos`), schneidet der Baustein am Platzhalter und setzt das Element selbst ein.
 
 ### Mehrzahl und Zahlen
 
-- **Mehrzahl als Objekt** mit den Kategorien von `Intl.PluralRules` der Sprache: Deutsch und Englisch kennen `one` und `other`, andere Sprachen mehr (Polnisch `one`, `few`, `many`, `other`). `one` und `other` sind immer Pflicht; die Zahl steht als `{count}` im Text. Gewählt wird die Form nach `count`.
+- **Mehrzahl als Objekt** mit den Kategorien von `Intl.PluralRules` der Sprache: Deutsch und Englisch kennen `one` und `other`, andere Sprachen mehr (Polnisch `one`, `few`, `many`, `other`). Das Prüfskript verlangt jede Kategorie, die `Intl.PluralRules` für die Sprache meldet, und immer `other`; zur Laufzeit ist nur `other` nötig (fehlt die gewählte Form, gilt `other`). Die Zahl steht als `{count}` im Text, gewählt wird die Form nach `count`.
 - **Zahlen nicht in den Text schreiben:** Dezimalzeichen und Tausendertrennung macht `Intl` (`formatNumber`, `formatCoords` aus `@hoopsfoundry/ui/i18n/format`), die Himmelsrichtungen der Koordinaten kommen aus `common.direction.*`.
 
 ### Länge

@@ -8,8 +8,10 @@
  * 1. axe auf der Docs-Seite und ihren Stories, Matrix Sprache de/en × hell/dunkel × 1280/420 px (Marke BBV), Regeln wie scripts/check-map-docs.mjs
  *    (WCAG 2.x A/AA/AAA, best-practice, color-contrast-enhanced, target-size, landmark-unique, heading-order); dazu kein seitliches Scrollen der Stories.
  * 2. Texte je Sprache: Svelte- und Vanilla-Beispiel zeigen die Beschriftungen der gewählten Sprache (über `globals=locale:` in der Adresse).
- * 3. Umschalter in der Oberfläche: Storybook öffnen, im Menü „Sprache“ English wählen, ohne Neuladen wechseln die Texte im Vorschau-Rahmen,
- *    Fokus und Zustand des Rahmens bleiben (die Seite lädt nicht neu); zurück auf Deutsch.
+ *    `<html lang>` ist `de` (Sprache der Doku); in Englisch tragen die Wurzeln der Bausteine `lang="en"`, in Deutsch keine.
+ * 3. Umschalter in der Oberfläche: Storybook öffnen, im Menü „Sprache“ English wählen, die Texte im Vorschau-Rahmen wechseln, ohne dass der Rahmen
+ *    neu lädt; zurück auf Deutsch. Storybook baut die Stories dabei neu auf (neue Knoten, der Fokus springt auf `body`), das prüft das Skript nicht.
+ *    Jede Fehlermeldung in der Konsole (auch aus dem Rahmen) und jede nicht gefangene Ausnahme zählt als Fehler, ebenso beim Laden der Matrix.
  * Exit 1 bei einem Fehler; nicht installierte Browser werden gemeldet und übersprungen.
  */
 import { createServer } from 'node:http';
@@ -56,13 +58,19 @@ let failed = 0;
 let checks = 0;
 const fail = (message) => { failed += 1; console.log(`FAIL ${message}`); };
 
+// Wurzeln der Bausteine auf der Seite, die `lang` tragen müssen, wenn ihre Sprache von der Seite abweicht
+const ROOTS = '.hoops-league, .hoops-step, .hoops-form';
+
 /** Texte der Beispiele im Dokument `frame` (Seite oder Rahmen). */
-const texts = (frame) => frame.evaluate(() => ({
-  stepper: [...document.querySelectorAll('[aria-label]')].map((n) => n.getAttribute('aria-label')),
+const texts = (frame) => frame.evaluate((roots) => ({
+  stepper: [...document.querySelectorAll('.hoops-step')].map((n) => n.getAttribute('aria-label')),
   body: document.body.textContent,
   letters: [...document.querySelectorAll('.hoops-form--letters .hoops-form-item')].map((n) => n.getAttribute('data-letter')),
-  lang: [...document.querySelectorAll('[lang]')].map((n) => n.getAttribute('lang')),
-}));
+  // äußerste Wurzeln (eine Formleiste in der Karte erbt das lang der Karte): eigenes Attribut; dazu die wirksame Sprache jeder Wurzel
+  roots: [...document.querySelectorAll(roots)].filter((n) => !n.parentElement?.closest(roots)).map((n) => n.getAttribute('lang')),
+  effective: [...document.querySelectorAll(roots)].map((n) => n.closest('[lang]')?.getAttribute('lang') ?? ''),
+  page: document.documentElement.lang,
+}), ROOTS);
 
 function expectTexts(found, locale, label) {
   const want = TEXT[locale];
@@ -72,6 +80,20 @@ function expectTexts(found, locale, label) {
   if (!found.body.includes(want.points)) fail(`${label}: Spaltenkopf „${want.points}“ fehlt`);
   if (found.body.includes(other.link)) fail(`${label}: Text der anderen Sprache („${other.link}“)`);
   if (label.includes('svelte') && found.letters.slice(0, 3).join('') !== want.letters.join('')) fail(`${label}: Formbuchstaben ${found.letters.join('')} statt ${want.letters.join('')}`);
+  if (found.page !== 'de') fail(`${label}: <html lang> ist „${found.page}“ statt de`);
+  if (found.roots.length === 0) fail(`${label}: keine Wurzel eines Bausteins gefunden`);
+  const wrong = found.roots.filter((l) => (locale === 'en' ? l !== 'en' : l !== null));
+  if (wrong.length) fail(`${label}: lang an den Wurzeln ${JSON.stringify(found.roots)} (erwartet ${locale === 'en' ? 'überall en' : 'keins'})`);
+  const eff = found.effective.filter((l) => l !== (locale === 'en' ? 'en' : 'de'));
+  if (eff.length) fail(`${label}: wirksame Sprache der Bausteine ${JSON.stringify(found.effective)}`);
+}
+
+/** Sammelt Fehlermeldungen der Konsole und Ausnahmen einer Seite (mit allen Rahmen). */
+function errorsOf(page) {
+  const list = [];
+  page.on('console', (m) => { if (m.type() === 'error') list.push(m.text().split('\n')[0].slice(0, 200)); });
+  page.on('pageerror', (e) => list.push(`Ausnahme: ${String(e.message).split('\n')[0].slice(0, 200)}`));
+  return list;
 }
 
 for (const name of BROWSERS) {
@@ -89,6 +111,7 @@ for (const name of BROWSERS) {
         const ctx = await browser.newContext({ viewport: { width, height: 900 }, colorScheme: theme === 'Dark' ? 'dark' : 'light' });
         for (const [kind, id] of PAGES) {
           const page = await ctx.newPage();
+          const errors = errorsOf(page);
           await page.goto(`${origin}/iframe.html?viewMode=${kind}&id=${id}&globals=brand:bbv;theme:${theme};locale:${locale}`, { waitUntil: 'networkidle' });
           await page.waitForTimeout(kind === 'docs' ? 1500 : 600);
           const where = `${name} ${id} [${locale}/${theme}/${width}]`;
@@ -111,6 +134,7 @@ for (const name of BROWSERS) {
           }
           const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
           if (kind === 'story' && overflow > 0) fail(`${where} seitliches Scrollen ${overflow}px`);
+          if (errors.length) fail(`${where} Konsole: ${errors.join(' | ')}`);
           await page.close();
         }
         await ctx.close();
@@ -121,6 +145,7 @@ for (const name of BROWSERS) {
   // 3: Umschalter in der Oberfläche (Manager), ohne Neuladen
   const ctx = await browser.newContext({ viewport: { width: 1400, height: 1000 } });
   const page = await ctx.newPage();
+  const errors = errorsOf(page);
   await page.goto(`${origin}/?path=/docs/${DOCS}`, { waitUntil: 'networkidle' });
   const frame = page.frameLocator('#storybook-preview-iframe');
   await frame.locator('.sbdocs-content').waitFor();
@@ -133,6 +158,7 @@ for (const name of BROWSERS) {
   const toggle = page.locator('button[aria-haspopup="listbox"][aria-label^="Sprache der eingebauten Texte"]');
   for (const [target, label] of [['en', 'English (en)'], ['de', 'Deutsch (de)']]) {
     const failedBefore = failed;
+    errors.length = 0;
     await toggle.click();
     await page.getByRole('option', { name: label }).click();
     await page.waitForTimeout(1200);
@@ -141,7 +167,7 @@ for (const name of BROWSERS) {
     expectTexts(after, target, `${name} Oberfläche svelte+vanilla nach Wechsel auf ${target}`);
     const marker = await preview.evaluate(() => window.__hoopsMarker);
     if (marker !== 'ohne Neuladen') fail(`${name} Oberfläche: der Rahmen wurde neu geladen`);
-    if (target === 'en' && !after.lang.includes('en')) fail(`${name} Oberfläche: lang="en" fehlt an den Bausteinen`);
+    if (errors.length) fail(`${name} Oberfläche: Konsole beim Wechsel auf ${target}: ${errors.join(' | ')}`);
     // Storybook schreibt nur vom Start abweichende Globals in die Adresse: en steht drin, der Start de nicht mehr
     const search = decodeURIComponent(new URL(page.url()).search);
     if (target === 'en' ? !search.includes('locale:en') : search.includes('locale:en')) fail(`${name} Oberfläche: Adresse passt nicht zu ${target} (${page.url()})`);

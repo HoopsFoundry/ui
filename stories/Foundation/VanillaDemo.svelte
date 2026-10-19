@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { localizeMarkup } from '../docs/localize-markup';
   import { initAll } from '../../js/vanilla-core.js';
   import { buttonMarkup as accordionMarkup } from '../Accordion.code';
   import { pageMarkup } from './Vanilla.code';
@@ -13,7 +14,7 @@
   let { example }: { example: string } = $props();
 
   function page(node: HTMLElement, markup: string) {
-    node.replaceChildren(document.createRange().createContextualFragment(markup));
+    node.replaceChildren(document.createRange().createContextualFragment(localizeMarkup(markup)));
     const handle = initAll(node, { only: ['tabs', 'modal', 'accordion'], accordion: { syncHash: false } });
     return { destroy: () => handle.destroy() };
   }

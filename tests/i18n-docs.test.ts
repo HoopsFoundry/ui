@@ -12,7 +12,7 @@ import type { ViteDevServer } from 'vite';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import * as code from '../stories/Foundation/Internationalisierung.code';
 import type { GlossarEintrag } from '../stories/Foundation/Internationalisierung.code';
-import { __resetForTests, getLocale, registerLocale, setLocale, setTexts, t } from '../js/i18n/index.js';
+import { __resetForTests, availableLocales, getLocale, registerLocale, setLocale, setTexts, subscribe, t } from '../js/i18n/index.js';
 import { langFor } from '../js/i18n/lang.js';
 import en from '../js/i18n/en.js';
 import de from '../js/i18n/de.js';
@@ -167,14 +167,27 @@ describe('Svelte- und React-Beispiele', () => {
       .replaceAll("'@hoopsfoundry/ui/i18n/de'", `'../js/i18n/de-register.js'`)
       .replaceAll("'@hoopsfoundry/ui/i18n'", `'../js/i18n/index.js'`);
 
-  it('Svelte, Sprache einstellen: der Stepper ist deutsch, obwohl der Test mit Englisch beginnt', async () => {
-    registerLocale('de', de); // der Vite-Server hat den Katalog im eigenen Modulgraphen schon geladen; der Import im Beispiel registriert nicht erneut
+  // Der deutsche Katalog kommt nur über den Import im Beispiel: Der Test registriert ihn nicht selbst (der Kern ist vor jedem Test zurückgesetzt, nur en).
+  // Die Abfrage `?lauf=` macht den Import je Lauf zu einem frischen Modul, sonst registrierte ein zwischengespeichertes Modul nach dem Zurücksetzen nicht erneut.
+  let lauf = 0;
+  const deFrisch = (source: string, base: string) => source.replaceAll("'@hoopsfoundry/ui/i18n/de'", `'${base}js/i18n/de-register.js?lauf=${++lauf}'`);
+  const svelteEinstellen = (source: string, name: string) => renderSvelteSource(vite, render, tmpDir, name, svelteSource(deFrisch(source, rootDir)));
+  const istDeutsch = (html: string) => html.includes('aria-label="Fortschritt"') && html.includes('erledigt');
+
+  it('Svelte, Sprache einstellen: der Stepper ist deutsch, obwohl der Kern nur Englisch kennt (der Import im Beispiel registriert de)', async () => {
     expect(getLocale()).toBe('en');
-    const html = await renderSvelteSource(vite, render, tmpDir, 'einstellen', svelteSource(code.einstellenSvelte));
+    expect(availableLocales()).toEqual(['en']);
+    const html = await svelteEinstellen(code.einstellenSvelte, 'einstellen');
     expect(getLocale()).toBe('de');
-    expect(html).toContain('aria-label="Fortschritt"');
-    expect(html).toContain('erledigt');
+    expect(istDeutsch(html)).toBe(true);
     expect(html).not.toContain('undefined');
+  });
+  it('Probe: ohne den Import von @hoopsfoundry/ui/i18n/de im Svelte-Beispiel ist der Stepper englisch (die Prüfung wird rot)', async () => {
+    const ohne = code.einstellenSvelte.replace("  import '@hoopsfoundry/ui/i18n/de';", '  // (Import entfernt)');
+    expect(ohne).not.toBe(code.einstellenSvelte);
+    const html = await svelteEinstellen(ohne, 'einstellen-ohne');
+    expect(istDeutsch(html)).toBe(false);
+    expect(html).toContain('aria-label="Progress"');
   });
   it('Svelte, Texte überschreiben: Anbieter und texts an der Komponente', async () => {
     registerLocale('de', de);
@@ -187,16 +200,24 @@ describe('Svelte- und React-Beispiele', () => {
   it('React-Beispiele bestehen den TypeScript-Compiler', () => {
     expect(compileReact({ i18nEinstellen: reactSource(code.einstellenReact), i18nUeberschreiben: reactSource(code.ueberschreibenReact) })).toEqual([]);
   }, 60000);
-  it('React, Sprache einstellen: außen deutsch, im HoopsProvider englisch mit lang="en", useLocale meldet beides richtig', async () => {
-    registerLocale('de', de);
+  const reactEinstellen = async (source: string, name: string) => {
     mkdirSync(tmpDir, { recursive: true });
-    const file = `${tmpDir}einstellen.tsx`;
-    writeFileSync(file, code.einstellenReact
-      .replaceAll("'@hoopsfoundry/ui/i18n/de'", `'${rootDir}js/i18n/de-register.js'`)
+    const file = `${tmpDir}${name}.tsx`;
+    writeFileSync(file, deFrisch(source, rootDir)
       .replaceAll("'@hoopsfoundry/ui/i18n'", `'${rootDir}js/i18n/index.js'`)
       .replaceAll("'@hoopsfoundry/ui/react'", `'${rootDir}react/index.ts'`));
     const { App } = (await vite.ssrLoadModule(file)) as { App: () => unknown };
-    const html = renderToString(createElement(App as never));
+    return renderToString(createElement(App as never));
+  };
+  it('Probe: ohne den Import von @hoopsfoundry/ui/i18n/de im React-Beispiel ist der Stepper außen englisch (die Prüfung wird rot)', async () => {
+    const ohne = code.einstellenReact.replace("import '@hoopsfoundry/ui/i18n/de';", '// (Import entfernt)');
+    expect(ohne).not.toBe(code.einstellenReact);
+    const html = await reactEinstellen(ohne, 'einstellen-ohne');
+    expect(html).not.toContain('aria-label="Fortschritt"');
+  });
+  it('React, Sprache einstellen: außen deutsch, im HoopsProvider englisch mit lang="en", useLocale meldet beides richtig', async () => {
+    expect(availableLocales()).toEqual(['en']);
+    const html = await reactEinstellen(code.einstellenReact, 'einstellen');
     expect(getLocale()).toBe('de');
     expect(html).toContain('aria-label="Fortschritt"');
     expect(html).toContain('aria-label="Progress"');
@@ -247,15 +268,25 @@ describe('Glossar und Kataloge', () => {
       expect(values.has(b.en), b.en).toBe(false);
     }
   });
-  it('die Zahlen der Seite sind die der Kataloge; beide Kataloge haben dieselben Schlüssel (Prüfskript)', () => {
+  it('die Zahlen der Seite gelten für beide Kataloge: gleiche Schlüssel, gleich viele Mehrzahlformen (die Seite sagt „beide Kataloge haben …“)', () => {
     expect(checkCatalogs({ en, de })).toEqual([]);
-    expect(code.katalog.schluessel).toBe(Object.keys(de).length);
-    expect(code.katalog.mehrzahl).toBeGreaterThan(0);
-    expect(code.katalog.platzhalter).toBeGreaterThan(code.katalog.mehrzahl);
+    const plural = (cat: Catalog) => Object.keys(cat).filter((k) => typeof cat[k] !== 'string');
+    expect(plural(de as Catalog)).toEqual(plural(en as Catalog));
+    expect(code.katalog.mehrzahl).toBe(plural(de as Catalog).length);
+    expect(mdx).toContain('Beide Kataloge haben {katalog.schluessel} Schlüssel');
+  });
+  it('die Tabelle „Längste deutsche Texte“ zeigt die Wortlaute der Kataloge und wirklich die fünf größten Unterschiede', () => {
+    const other = (v: string | Record<string, string>) => (typeof v === 'string' ? v : v.other);
+    const diff = (key: string) => [...other((de as Catalog)[key])].length - [...other((en as Catalog)[key])].length;
     expect(code.laengsteDe).toHaveLength(5);
-    for (const z of code.laengsteDe) expect(z.mehr).toBeGreaterThan(0);
-    expect(mdx).toContain('{katalog.schluessel}');
-    expect(mdx).toContain('{katalog.zeichenDe}');
+    for (const z of code.laengsteDe) {
+      expect(z.de).toBe(other((de as Catalog)[z.key]));
+      expect(z.en).toBe(other((en as Catalog)[z.key]));
+      expect(z.mehr).toBe(diff(z.key));
+    }
+    const fuenfter = code.laengsteDe[4].mehr;
+    const groesser = Object.keys(en).filter((k) => diff(k) > fuenfter && !code.laengsteDe.some((z) => z.key === k));
+    expect(groesser).toEqual([]);
   });
 });
 
@@ -263,12 +294,12 @@ describe('Aussagen der Seite zum Kern', () => {
   beforeEach(() => {
     registerLocale('de', de);
   });
-  it('unbekannte Sprache: getLocale behält den Code, Texte englisch, lang am Baustein ist der Code', () => {
+  it('unbekannte Sprache: getLocale behält den Code, Texte englisch, lang am Baustein ist en (die Sprache der Texte)', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     setLocale('fr');
     expect(getLocale()).toBe('fr');
     expect(t('modal.close')).toBe('Close');
-    expect(langFor({ documentLang: 'de' })).toBe('fr');
+    expect(langFor({ documentLang: 'de' })).toBe('en');
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
   });
@@ -292,24 +323,55 @@ describe('Aussagen der Seite zum Kern', () => {
     expect(t('modal.close')).toBe('Done');
   });
   it('die Tabelle der Seite nennt diese Fälle', () => {
-    for (const part of ["setLocale('fr')", "setLocale('de_AT')", "setLocale('xx!!')", "'de-AT'", 'Englisch (Rückfall)', 'lang="fr"']) expect(mdx, part).toContain(part);
+    for (const part of ["setLocale('fr')", "setLocale('de_AT')", "setLocale('xx!!')", "'de-AT'", 'Englisch (Rückfall)', 'lang="en"', 'resolvedLocale']) expect(mdx, part).toContain(part);
   });
 });
 
 describe('Seite, Werkzeugleiste, Einträge', () => {
-  it('Toolbar-Global locale mit de und en, Start de; der Decorator setzt die Sprache aus context.globals.locale; kein fester Aufruf mehr', () => {
+  it('Toolbar-Global locale mit de und en, Start de; beforeEach ruft applyLocale, der Decorator ruft setLocale nicht (kein Aufruf im Rendern)', () => {
     expect(preview).toMatch(/locale: \{[\s\S]*?title: 'Sprache'[\s\S]*?value: 'de'[\s\S]*?value: 'en'/);
     expect(preview).toMatch(/initialGlobals: \{[\s\S]*?locale: 'de'/);
-    expect(preview).toMatch(/context\.globals\.locale/);
-    expect(preview).toMatch(/if \(getLocale\(\) !== locale\) setLocale\(locale\)/);
+    expect(preview).toMatch(/beforeEach: \[\(context\) => \{\s*applyLocale\(context\.globals\);/);
+    const decorators = preview.slice(preview.indexOf('decorators:'));
+    expect(decorators).not.toMatch(/setLocale|applyLocale/);
     expect(preview).not.toMatch(/^setLocale\('de'\);/m);
     expect(preview).toContain("import '../js/i18n/de-register.js'");
   });
-  it('Mutationsprobe: ohne Decorator-Aufruf oder ohne Global schlägt die Prüfung fehl', () => {
-    const ohneAufruf = preview.replace('if (getLocale() !== locale) setLocale(locale);', '');
-    expect(ohneAufruf).not.toMatch(/if \(getLocale\(\) !== locale\) setLocale\(locale\)/);
-    const ohneGlobal = preview.replace("title: 'Sprache'", "title: 'Language'");
-    expect(ohneGlobal).not.toMatch(/locale: \{[\s\S]*?title: 'Sprache'/);
+  // Regeln von applyLocale, ausgeführt (nicht nur gelesen); dieselben Regeln gegen eine verfälschte Kopie von .storybook/locale.ts
+  type Apply = { applyLocale: (g?: Record<string, unknown>) => string };
+  const applyRules = (m: Apply) => {
+    __resetForTests();
+    registerLocale('de', de);
+    setLocale('de'); // Ausgangslage wie in Storybook nach dem Start
+    document.documentElement.lang = 'en';
+    const calls: string[] = [];
+    const stop = subscribe((l) => calls.push(l));
+    try {
+      const results = [m.applyLocale({ locale: 'en' }), getLocale(), m.applyLocale({ locale: 'en' }), m.applyLocale({}), getLocale(), m.applyLocale({ locale: 'de' })];
+      return { results, calls, lang: document.documentElement.lang };
+    } finally {
+      stop();
+    }
+  };
+  const applyOk = (r: ReturnType<typeof applyRules>) =>
+    JSON.stringify(r.results) === JSON.stringify(['en', 'en', 'en', 'de', 'de', 'de']) && JSON.stringify(r.calls) === JSON.stringify(['en', 'de']) && r.lang === 'de';
+  it('applyLocale: en nur bei ausdrücklicher Wahl, sonst de; setLocale nur bei einem Wechsel; <html lang="de">', async () => {
+    const r = applyRules((await import('../.storybook/locale')) as Apply);
+    expect(r).toEqual({ results: ['en', 'en', 'en', 'de', 'de', 'de'], calls: ['en', 'de'], lang: 'de' });
+    expect(applyOk(r)).toBe(true);
+  });
+  it.each([
+    ['umgedrehte Abbildung', "globals?.locale === 'en' ? 'en' : 'de'", "globals?.locale === 'en' ? 'de' : 'en'"],
+    ['setLocale bei jedem Aufruf', 'if (getLocale() !== locale) setLocale(locale);', 'setLocale(locale);'],
+    ['ohne lang der Doku', "document.documentElement.lang = 'de';", "document.documentElement.lang = document.documentElement.lang;"],
+  ])('Mutationsprobe applyLocale: %s wird rot', async (_name, from, to) => {
+    const m = mutantDir();
+    try {
+      const file = writeMutant(m.dir, 'locale.ts', '.storybook/locale.ts', [[from, to]]);
+      expect(applyOk(applyRules((await import(/* @vite-ignore */ pathToFileURL(file).href)) as Apply))).toBe(false);
+    } finally {
+      m.drop();
+    }
   });
   it('vor dem ersten Beispiel steht eine ##-Überschrift; jede genutzte Story gibt es, mit literalem Tag und Beispiel in der Demo', () => {
     expect(mdx.indexOf('\n## ')).toBeGreaterThan(0);

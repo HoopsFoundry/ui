@@ -31,6 +31,8 @@ export function getTexts(): Record<string, CatalogValue>;
 export function subscribe(fn: (locale: string) => void): () => void;
 /** `options.locale` oder die globale Sprache. */
 export function localeOf(options?: { locale?: string }): string;
+/** Sprache des Katalogs, der die Texte liefert: erster registrierter aus `[code, Basissprache]`, sonst `en` (ohne `code`: die globale Sprache). */
+export function resolvedLocale(code?: string): string;
 /** Registrierte Sprachcodes. */
 export function availableLocales(): string[];
 /** Nur für Tests: Zustand auf Werkseinstellung zurücksetzen. */
