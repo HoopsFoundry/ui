@@ -18,16 +18,14 @@
     { id: 'caption', use: 'Mono-Beschriftung, Chips, Meta',        sample: 'Q4 · 02:14' },
   ];
 
-  // Live-Werte aus den CSS-Variablen, folgen data-brand / data-type / Handy-Breakpoint
+  // Live-Werte aus den CSS-Variablen, folgen der Marke (data-brand und data-type) und dem Handy-Breakpoint
   let live = $state({});
-  let fonts = $state({});
   function read() {
     const cs = getComputedStyle(document.documentElement);
     const v = (n) => cs.getPropertyValue(n).trim();
     const next = {};
     for (const s of steps) next[s.id] = { fs: v(`--hoops-fs-${s.id}`), sm: v(`--hoops-fs-${s.id}-sm`), lh: v(`--hoops-lh-${s.id}`), ls: v(`--hoops-ls-${s.id}`), fw: v(`--hoops-fw-${s.id}`) };
     live = next;
-    fonts = { display: v('--hoops-font-display'), heading: v('--hoops-font-heading'), body: v('--hoops-font-body'), mono: v('--hoops-font-mono'), tt: v('--hoops-tt-display'), measure: v('--hoops-measure') };
   }
   onMount(() => {
     read();
@@ -40,6 +38,19 @@
   const first = (stack) => (stack || '').split(',')[0].replace(/['"]/g, '').trim();
 
   const weights = [300, 400, 500, 600, 700, 800];
+
+  // Beide Schriften fest nebeneinander, unabhängig vom Umschalter „Marke“ (der koppelt Marke und Schrift). Die Stapel stehen wörtlich in
+  // tokens/tokens.css (:root und :root[data-type="dbb"]); tests/storybook-preview-pages.test.ts vergleicht sie.
+  const SCHRIFTEN = [
+    {
+      id: 'bbv', label: 'BBV · Standardschrift (Sora, Manrope)', tt: 'none',
+      families: { display: "'Sora', system-ui, sans-serif", heading: "'Sora', system-ui, sans-serif", body: "'Manrope', system-ui, sans-serif", mono: "'JetBrains Mono', ui-monospace, monospace" },
+    },
+    {
+      id: 'dbb', label: 'DBB · Schrift von basketball-bund.de (Rubik, Sucrose)', tt: 'uppercase',
+      families: { display: "'Sucrose', 'Barlow Condensed', 'Rubik', system-ui, sans-serif", heading: "'Sucrose', 'Barlow Condensed', 'Rubik', system-ui, sans-serif", body: "'Rubik', system-ui, sans-serif", mono: "'JetBrains Mono', ui-monospace, monospace" },
+    },
+  ];
   const pangram = 'Zwölf Boxkämpfer jagen Viktor quer über den großen Sylter Deich';
 
   // Audit: Schriftgrößen in css/ und svelte/ (zur Laufzeit aus den Quelltexten gezählt)
@@ -78,17 +89,24 @@
     {/each}
 
   {:else if mode === 'families'}
-    {#each [['Display', 'display', 'Scoreboard, Headlines, Trikotnummern'], ['Heading', 'heading', 'Überschriften'], ['Body', 'body', 'UI, Fließtext, Formulare'], ['Mono', 'mono', 'Spielzeit, Tabellen, Beschriftungen']] as [label, key, use]}
-      <div class="fam">
-        <div class="fam-h"><span class="name">{label}</span><span class="spec">{first(fonts[key])}</span><span class="use">{use}</span></div>
-        <div class="weights">
-          {#each weights as w}
-            <div class="w"><span class="wl">{w}</span><span style={`font-family: var(--hoops-font-${key}); font-weight: ${w}; font-size: 24px;`}>Aa Gg 0123</span></div>
+    <div class="fam-grid">
+      {#each SCHRIFTEN as schrift}
+        <section class="fam-col" aria-label={schrift.label}>
+          <div class="cap">{schrift.label}</div>
+          {#each [['Display', 'display', 'Scoreboard, Headlines, Trikotnummern'], ['Heading', 'heading', 'Überschriften'], ['Body', 'body', 'UI, Fließtext, Formulare'], ['Mono', 'mono', 'Spielzeit, Tabellen, Beschriftungen']] as [label, key, use]}
+            <div class="fam">
+              <div class="fam-h"><span class="name">{label}</span><span class="spec">{first(schrift.families[key])}</span><span class="use">{use}</span></div>
+              <div class="weights">
+                {#each weights as w}
+                  <div class="w"><span class="wl">{w}</span><span style={`font-family: ${schrift.families[key]}; font-weight: ${w}; font-size: 20px;`}>Aa Gg 0123</span></div>
+                {/each}
+              </div>
+              <div style={`font-family: ${schrift.families[key]}; font-size: 17px; margin-top: 10px;${key === 'display' ? ` text-transform: ${schrift.tt};` : ''}`}>{pangram}</div>
+            </div>
           {/each}
-        </div>
-        <div style={`font-family: var(--hoops-font-${key}); font-size: 18px; margin-top: 10px;`}>{pangram}</div>
-      </div>
-    {/each}
+        </section>
+      {/each}
+    </div>
 
   {:else if mode === 'numbers'}
     <div class="pair">
@@ -171,6 +189,8 @@
   .meta .spec { font-family: var(--hoops-font-mono); font-size: 11px; color: var(--hoops-page-mute); margin-top: 2px; }
   .meta .use { font-size: 12px; color: var(--hoops-page-mute); margin-top: 4px; }
   .sample { overflow: hidden; }
+  .fam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 32px; }
+  .fam-col { min-width: 0; }
   .fam { padding: 18px 0 22px; border-top: 1px solid var(--hoops-page-line); }
   .fam-h { display: flex; gap: 16px; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; }
   .fam-h .name { font-family: var(--hoops-font-mono); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }

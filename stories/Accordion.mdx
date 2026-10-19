@@ -3,6 +3,7 @@ import * as AccordionStories from './Accordion.stories';
 import { DosDonts } from './docs/blocks/DosDonts';
 import { FrameworkCode } from './docs/blocks/FrameworkCode';
 import { DocTable } from './docs/blocks/DocTable';
+import { StickyPreview, PreviewStep } from './docs/blocks/Preview';
 import './docs/blocks/blocks.css';
 import { vanilla, detailsVanilla, svelte, react, ebenenSvelte, ebenenReact, tokensCss, funktionenJs } from './Accordion.code';
 
@@ -163,18 +164,15 @@ Die Gruppe hat in React zusätzlich `className`, in Svelte `class`; `navLabel` (
 
 <FrameworkCode label="Tokens (CSS, für alle Fassungen)" vanilla={tokensCss} svelte={tokensCss} react={tokensCss} />
 
-## Handy · 390 px Breite
+## Vorschau in Gerätebreite
 
-Die Vorschau ist eine eingebettete Seite mit fester Breite von 390 px: Die Sprungleiste ist selbst einklappbar, die Köpfe sind mindestens 44 px hoch und die Zusatzinfo bleibt neben dem Titel.
+Die Vorschau ist eine eingebettete Seite in der Breite, die der Umschalter **Breite** in der Werkzeugleiste wählt (Handy 390 px, Tablet 768 px, Desktop 1280 px oder Vollbreite); Marke, Hell/Dunkel und Sprache folgen der Werkzeugleiste. Ist das Gerät breiter als die Spalte, wird die Vorschau verkleinert, die Media-Queries sehen trotzdem die gewählte Breite.
 
-<div className="hoops-phones">
-  <div className="hoops-phone">
-    <h3 className="hoops-doc-cap">Accordion · Sprungleiste und Zusatzinfo</h3>
-    <div className="hoops-phone-scroll" tabIndex={0} role="region" aria-label="Scrollbereich: Accordion auf dem Handy">
-      <iframe title="Handy-Vorschau: Accordion mit Sprungleiste in 390 Pixel Breite" src="iframe.html?viewMode=story&globals=brand:bbv&id=components-accordion--handy" loading="lazy" />
-    </div>
-  </div>
-</div>
+<StickyPreview>
+  <PreviewStep of={AccordionStories.Handy} title="Sprungleiste und Zusatzinfo">
+    Unter 640 px Breite (`max-width: 639.98px`) ist die Sprungleiste selbst einklappbar: Ein Schalter mit ihrem Namen (`navLabel`) öffnet die Liste, die Links stehen dann untereinander in voller Breite. Ab 640 px stehen die Links nebeneinander und brechen um. Die Köpfe sind mindestens 44 px hoch, die Zusatzinfo (`meta`) bleibt neben dem Titel. Mit **Breite** auf Handy und Tablet lässt sich der Wechsel vergleichen.
+  </PreviewStep>
+</StickyPreview>
 
 ## Beispiel: Liga-Seite mit vier Bereichen
 

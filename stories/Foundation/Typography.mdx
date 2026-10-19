@@ -6,7 +6,7 @@ import '../docs/blocks/blocks.css';
 
 # Typography
 
-Die Schrift von HoopsFoundry UI ist eine Skala aus 13 Stufen, vier Familien und einer festen Zahlenregel. Marke (`data-brand`) und Schrift (`data-type`) sind unabhängig und lassen sich in der Werkzeugleiste frei kombinieren. Die Werte in den Vorschauen sind live aus den CSS-Variablen gelesen und folgen Marke, Schrift und Handy-Breakpoint.
+Die Schrift von HoopsFoundry UI ist eine Skala aus 13 Stufen, vier Familien und einer festen Zahlenregel. Im Paket sind Marke (`data-brand`) und Schrift (`data-type`) zwei Attribute; der Umschalter **Marke** in der Werkzeugleiste setzt beide zusammen: BBV mit der Standardschrift (Sora, Manrope), DBB mit der DBB-Schrift (Rubik, Sucrose). Die Werte in den Vorschauen sind live aus den CSS-Variablen gelesen und folgen der Marke und dem Handy-Breakpoint; der Abschnitt „Familien und Gewichte“ zeigt beide Schriften fest nebeneinander.
 
 ## Type scale
 
@@ -16,7 +16,7 @@ Die Schrift von HoopsFoundry UI ist eine Skala aus 13 Stufen, vier Familien und 
 
 ## Familien und Gewichte
 
-Die Familien folgen `data-type` auf `<html>`. Gewichte, die eine Schrift nicht lädt, werden vom Browser auf das nächste verfügbare gesetzt. Standard sind Sora (Display, Heading) und Manrope (Body), die DBB-Schrift nutzt Rubik und Sucrose mit dem freien Fallback Barlow Condensed (Sucrose ist lizenzpflichtig und nicht im Paket). Die DBB-Schrift setzt Display, H1 und H2 in Versalien und ohne negatives Tracking.
+Die Familien folgen `data-type` auf `<html>`; die Vorschau zeigt beide Schriften fest nebeneinander, unabhängig von der Marke in der Werkzeugleiste. Eine Anwendung kann `data-type` auch ohne `data-brand` setzen (etwa DBB-Schrift zu BBV-Farben); die Doku zeigt nur die gekoppelten Paare. Gewichte, die eine Schrift nicht lädt, werden vom Browser auf das nächste verfügbare gesetzt. Standard sind Sora (Display, Heading) und Manrope (Body), die DBB-Schrift nutzt Rubik und Sucrose mit dem freien Fallback Barlow Condensed (Sucrose ist lizenzpflichtig und nicht im Paket). Die DBB-Schrift setzt Display, H1 und H2 in Versalien und ohne negatives Tracking.
 
 <Canvas of={TypographyStories.FamiliesAndWeights} />
 
