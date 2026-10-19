@@ -1163,8 +1163,8 @@ button.hoops-pc-row:focus-visible { outline: var(--hoops-ring-w) var(--hoops-rin
 .hoops-tbl--schedule td.hoops-sch-ha { width: 64px; padding-right: 0; }
 .hoops-tbl--schedule td.hoops-sch-match { color: var(--hoops-fg); }
 .hoops-sch-sub { display: block; margin-top: 2px; font-size: var(--hoops-fs-body-sm); }
-/* Zielgröße: Links in der Unterzeile und am Teamnamen bekommen 3 px Fläche oben und unten (WCAG 2.5.8), der negative Rand hält die Zeilenhöhe */
-.hoops-sch-sub .hoops-link, .hoops-sch-team .hoops-link { padding-block: 3px; margin-block: -3px; }
+/* Zielgröße: Links in der Unterzeile und am Teamnamen bekommen 5 px Fläche oben und unten (WCAG 2.5.8), der negative Rand hält die Zeilenhöhe */
+.hoops-sch-sub .hoops-link, .hoops-sch-team .hoops-link { padding-block: 5px; margin-block: -5px; }
 .hoops-sch-sep { color: var(--hoops-mute); }
 .hoops-sch-team.is-loser, .hoops-sch-team.is-loser .hoops-link { color: var(--hoops-mute); }
 .hoops-sch-ph { color: var(--hoops-mute); font-style: italic; }

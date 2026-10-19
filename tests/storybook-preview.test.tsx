@@ -205,6 +205,14 @@ describe('Preview', () => {
     expect(after.style.transform).toBe('scale(0.5)');
     expect(screen.getByText('Desktop · 1280 px, verkleinert auf 50 %')).toBeInTheDocument();
   });
+  it('eine feste Höhe gilt bis zur Fensterhöhe, auch über die übliche Grenze (80 % bzw. 50 vh) hinaus', () => {
+    const docs = fakeDocs({ breite: 'handy' });
+    render(<DocsContext.Provider value={docs.ctx}><Preview of={A as never} title="Modal" height={700} /><Preview of={B as never} title="Zu hoch" height={5000} /></DocsContext.Provider>);
+    // jsdom: Fensterhöhe 768 px; ohne feste Höhe gälte 80 % = 614 px
+    expect(window.innerHeight).toBe(768);
+    expect((screen.getByTitle('Vorschau: Modal') as HTMLIFrameElement).style.height).toBe('700px');
+    expect((screen.getByTitle('Vorschau: Zu hoch') as HTMLIFrameElement).style.height).toBe(`${768 - 2 * STICKY_GAP}px`);
+  });
   it('feste Globals (Seite Dark Mode) haben Vorrang vor der Werkzeugleiste', () => {
     const docs = fakeDocs({ theme: 'Light' });
     render(<DocsContext.Provider value={docs.ctx}><Preview of={A as never} title="Dunkel" globals={{ theme: 'Dark' }} /></DocsContext.Provider>);
@@ -259,6 +267,25 @@ describe('StickyPreview', () => {
     act(() => screen.getAllByRole('button')[1].click());
     expect(screen.getByTitle('Vorschau: Verein')).toBeInTheDocument();
     expect(scrollBy).not.toHaveBeenCalled();
+  });
+  it('der Rahmen schrumpft beim Wechsel nicht (kein Aufschaukeln untereinander), eine neue Breite setzt ihn zurück', async () => {
+    const docs = fakeDocs({ breite: 'handy' });
+    const { container } = render(
+      <DocsContext.Provider value={docs.ctx}>
+        <StickyPreview>
+          <PreviewStep of={A as never} title="Hoch" height={500}>a</PreviewStep>
+          <PreviewStep of={B as never} title="Flach" height={300}>b</PreviewStep>
+        </StickyPreview>
+      </DocsContext.Provider>,
+    );
+    const box = () => container.querySelector<HTMLElement>('.hoops-preview-box')!;
+    expect(box().style.height).toBe('500px');
+    await act(async () => screen.getAllByRole('button')[1].click());
+    expect((screen.getByTitle('Vorschau: Flach') as HTMLIFrameElement).style.height).toBe('300px');
+    expect(box().style.height).toBe('500px');
+    // Tablet (768 px) in 640 px Spalte: verkleinert auf 5/6, 300 px werden sichtbar 250 px; die alte Höhe gilt nicht mehr
+    await act(async () => docs.setGlobals({ breite: 'tablet' }));
+    expect(box().style.height).toBe('250px');
   });
   it('ein einzelnes Beispiel braucht keine Liste und keine Marke', () => {
     const docs = fakeDocs({});

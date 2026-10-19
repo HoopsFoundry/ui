@@ -26,6 +26,23 @@ describe('axe-Matrix der Docs-Seiten', () => {
     expect(script).toContain("document.querySelectorAll('.docs-story .sb-story > pre')");
     expect(script).toContain("kind: 'Story-Fehler'");
   });
+  it('prüft die Vorschau-Iframes (Preview/StickyPreview) mit eigenem axe im Rahmen, jedes Beispiel und jede Breite (Storybook aufräumen)', () => {
+    // die Seite selbst ohne Iframes (iframes: false), die Iframes einzeln mit denselben Regeln
+    expect(script).toContain('iframes: false');
+    expect(script).toContain("runAxe(frame, '#storybook-root')");
+    expect(script).toContain("runAxe(page, '.sbdocs-content')");
+    // jedes Beispiel einer feststehenden Vorschau über die Liste, die Iframes laden lazy
+    expect(script).toContain('hoops-sp-pick');
+    expect(script).toContain("scrollIntoView({ block: 'center' })");
+    expect(script).toContain("reducedMotion: 'reduce'");
+    expect(script).toMatch(/classList\.contains\('sb-show-main'\)/);
+    // Breiten: die erste für alle Seiten, weitere für Seiten mit Vorschauen; Standard voll und handy
+    expect(script).toContain("args.breiten ?? 'voll,handy'");
+    expect(script).toContain('breite:${breite}');
+    expect(script).toContain("kind: 'seitliches Scrollen (Vorschau)'");
+    expect(script).toContain("kind: 'Story-Fehler (Vorschau)'");
+    expect(script).toContain('frameRuns');
+  });
   it('ist CI-fähig: Exit-Code 1 bei Befunden, 2 ohne Build, JSON-Ausgabe auf Wunsch', () => {
     expect(script).toMatch(/process\.exitCode = failures\.length === 0 \? 0 : 1/);
     expect(script).toMatch(/process\.exit\(2\)/);

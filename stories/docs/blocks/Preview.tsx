@@ -95,11 +95,16 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
     const aside = rootRef.current?.closest('.hoops-sp-aside');
     const box = boxRef.current;
     const vh = window.innerHeight;
+    let next: number;
     if (aside && box) {
       const overhead = aside.getBoundingClientRect().height - box.getBoundingClientRect().height;
-      setCap(Math.max(160, Math.floor((wide ? vh - 2 * STICKY_GAP : vh * NARROW_SHARE) - overhead)));
-    } else setCap(Math.max(160, Math.floor(vh * FREE_SHARE)));
-  }, [wide]);
+      next = Math.floor((wide ? vh - 2 * STICKY_GAP : vh * NARROW_SHARE) - overhead);
+    } else next = Math.floor(vh * FREE_SHARE);
+    // Eine feste Höhe (height) gilt bis zur Fensterhöhe, auch untereinander über 50 vh hinaus: Modale und lange Seiten im Iframe brauchen
+    // ihre Höhe, sonst scrollt ihr Inhalt in einem Ausschnitt, den es auf einem echten Gerät dieser Breite nicht gäbe.
+    if (fixedHeight) next = Math.max(next, Math.min(fixedHeight, vh - 2 * STICKY_GAP));
+    setCap(Math.max(160, next));
+  }, [wide, fixedHeight]);
 
   useLayoutEffect(() => {
     const stage = stageRef.current;
@@ -147,13 +152,22 @@ export function Preview({ of, title, minHeight = 0, height: fixedHeight, globals
   useLayoutEffect(updateCap, [contentHeight, updateCap]);
 
   const layout = previewLayout({ breite, available, contentHeight, cap, minHeight, fixedHeight });
+  // Die Höhe des Rahmens wächst, schrumpft aber nicht beim Wechsel des Beispiels (gleiche Breite und Grenze): Untereinander steht die
+  // Vorschau im Fluss über dem Text; würde sie schrumpfen, rückte der Text nach oben, ein anderer Abschnitt erreichte die Lesezeile und
+  // der Wechsel schaukelte sich auf. Neue Breite, neue Grenze oder neue Gerätebreite setzen die Höhe zurück.
+  const [floor, setFloor] = useState(0);
+  useEffect(() => setFloor(0), [breite, available, cap]);
+  useEffect(() => {
+    if (contentHeight > 0 || fixedHeight) setFloor((f) => Math.max(f, layout.visualHeight));
+  }, [contentHeight, fixedHeight, layout.visualHeight]);
+  const boxHeight = Math.max(layout.visualHeight, floor);
   return (
     <figure className="hoops-preview" ref={rootRef} data-hoops-preview={storyId} data-breite={breite}>
       <figcaption className="hoops-preview-meta">
         <span className="hoops-preview-name">{title}</span> <span className="hoops-preview-size">{available > 0 ? layout.label : ''}</span>
       </figcaption>
       <div className="hoops-preview-stage" ref={stageRef}>
-        <div className="hoops-preview-box" ref={boxRef} style={available > 0 ? { width: layout.visualWidth, height: layout.visualHeight } : undefined}>
+        <div className="hoops-preview-box" ref={boxRef} style={available > 0 ? { width: layout.visualWidth, height: boxHeight } : undefined}>
           {available > 0 && (
             <iframe
               key={src}

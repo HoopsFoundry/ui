@@ -21,6 +21,7 @@ node scripts/check-browser-matrix.mjs --markdown   # Kernbausteine in Chromium, 
 node scripts/check-csp-boot.mjs     # Boot-Skript des Dunkelmodus unter echter CSP (Hash, meta, nonce, Gegenproben) in Chromium/Firefox/WebKit; nicht Teil von npm test
 node scripts/check-docs-axe.mjs storybook-static --widths=1280,420   # axe- und Regressionsmatrix über alle Docs-Seiten (BBV/DBB × hell/dunkel); nach npm run build-storybook; Exit-Code für CI
 node scripts/check-i18n-docs.mjs <ordner>  # axe und Sprachumschaltung auf der Seite Foundation/Internationalisierung eines Storybook-Builds (de/en, hell/dunkel)
+node scripts/check-preview-docs.mjs storybook-static   # Vorschauen in Gerätebreite (Preview/StickyPreview) in Chromium und WebKit: Marke × Theme × Breite × Sprache, feststehend, automatischer Wechsel; --full für das volle Produkt
 npm run storybook                 # Dev-Server, Port 6006
 npm run build-storybook           # statischer Build nach storybook-static/ (gitignored)
 ```
@@ -39,12 +40,13 @@ Es gibt keinen Linter. `tests/no-dss.test.ts` verbietet den alten Namen (Präfix
 
 ## Dokumentation (Storybook)
 
-Docs sind MDX-Seiten je Komponente in `stories/` (`X.mdx`, `X.stories.ts`, `X.code.ts` mit Code je Fassung, `components/XExamples.svelte`), Blöcke in `stories/docs/blocks/` (`DosDonts`, `FrameworkCode`, `DocTable`, `CodeBlock`). Konventionen, die Tests und axe sonst brechen:
+Docs sind MDX-Seiten je Komponente in `stories/` (`X.mdx`, `X.stories.ts`, `X.code.ts` mit Code je Fassung, `components/XExamples.svelte`), Blöcke in `stories/docs/blocks/` (`DosDonts`, `FrameworkCode`, `DocTable`, `CodeBlock`, `Preview`/`StickyPreview`/`PreviewStep` mit den Regeln in `preview-logic.ts`). Konventionen, die Tests und axe sonst brechen:
 
 - Beispiel-Stories, die nur in der Doku erscheinen, tragen das **literale** `tags: ['!dev']` im Story-Objekt (der Indexer liest keine Tags aus Hilfsfunktionen).
 - `remark-gfm` ist nicht installiert: Tabellen über `DocTable`, nicht Markdown-Tabellen.
 - „Don't"-Beispiele in `DosDonts` sind `inert`; mehrere gleiche Komponenten auf einer Seite brauchen eindeutige Titel/Labels (axe `landmark-unique`); vor dem ersten Beispiel steht eine `##`-Überschrift (`heading-order`).
-- Neue Seiten in `stories/Introduction.mdx` und im `storySort` in `.storybook/preview.ts` eintragen. Toolbar-Globals: Marke, Typ (`dbb`), Framework, Zustand (Hover/Fokus erzwingen), Bewegung, Sprache (`locale`: `de` Start, `en`; `applyLocale` aus `.storybook/locale.ts` läuft als `beforeEach` und ruft `setLocale`, `<html lang="de">`); Theme-Werte in URLs sind `Dark`/`Light`. Die Doku-Texte bleiben deutsch.
+- Beispiele, die Media-Queries zeigen (Handy, Tablet), stehen als Vorschau in Gerätebreite: `<StickyPreview><PreviewStep of={X.Story} title="…">Text</PreviewStep></StickyPreview>` (eigener Iframe, Breite aus dem Global `breite`, Titel je Seite eindeutig, `height`/`minHeight` für Seiten, die im Iframe scrollen oder fest positioniert sind). Keine festen `<iframe>`, keine festen Themes in Adressen; hell und dunkel nebeneinander nur auf `Foundation/Dark Mode` (`<Preview globals={{ theme: 'Dark' }}>`). Beispiele dafür ohne Breitenbegrenzung (Klasse `device`).
+- Neue Seiten in `stories/Introduction.mdx` und im `storySort` in `.storybook/preview.ts` eintragen. Toolbar-Globals: Marke (bringt die Schrift mit: `applyBrand` aus `.storybook/brand.ts` setzt `data-brand` und `data-type`; ein Global für die Schrift gibt es nicht), Breite (`breite`: `voll`, `handy` 390, `tablet` 768, `desktop` 1280; `.storybook/breite.ts`, wirkt auf die Vorschau-Iframes, weil das Viewport-Werkzeug von Storybook in der Docs-Ansicht nicht wirkt), Framework, Zustand (Hover/Fokus erzwingen), Bewegung, Sprache (`locale`: `de` Start, `en`; `applyLocale` aus `.storybook/locale.ts` läuft als `beforeEach` und ruft `setLocale`, `<html lang="de">`); Theme-Werte in URLs sind `Dark`/`Light`. Die Doku-Texte bleiben deutsch.
 - Zahlen und Aussagen in der Doku werden gegen CSS/Browser gemessen und von Tests geprüft (`tests/*-docs.test.ts`, `*-code.test.ts` führen die Beispiele aus); nichts schätzen.
 
 ## Qualitätsregeln (WCAG 2.2 AAA als Ziel)

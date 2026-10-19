@@ -189,7 +189,7 @@
   .meta .spec { font-family: var(--hoops-font-mono); font-size: 11px; color: var(--hoops-page-mute); margin-top: 2px; }
   .meta .use { font-size: 12px; color: var(--hoops-page-mute); margin-top: 4px; }
   .sample { overflow: hidden; }
-  .fam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 8px 32px; }
+  .fam-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 8px 32px; }
   .fam-col { min-width: 0; }
   .fam { padding: 18px 0 22px; border-top: 1px solid var(--hoops-page-line); }
   .fam-h { display: flex; gap: 16px; align-items: baseline; margin-bottom: 10px; flex-wrap: wrap; }
